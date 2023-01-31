@@ -15,7 +15,7 @@ fun KeySetDetailsScreenFull(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
-	alertState: State<AlertState?>, //for shield icon
+	networkState: State<NetworkState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
 	val bottomSheetState =
@@ -32,7 +32,7 @@ fun KeySetDetailsScreenFull(
 		bottomSheetContent = {
 			KeySetDetailsMenu(
 				navigator = navigator,
-				alertState = alertState,
+				networkState = networkState,
 				removeSeed = onRemoveKeySet,
 				onSelectKeysClicked = {
 					scope.launch { bottomSheetState.hide() }
@@ -48,7 +48,7 @@ fun KeySetDetailsScreenFull(
 			KeySetDetailsScreenView(
 				model = model,
 				navigator = navigator,
-				alertState = alertState,
+				networkState = networkState,
 				onMenu = {
 					scope.launch {
 						bottomSheetState.animateTo(

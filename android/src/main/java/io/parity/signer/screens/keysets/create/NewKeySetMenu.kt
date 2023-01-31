@@ -17,7 +17,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
@@ -26,7 +26,7 @@ import io.parity.signer.uniffi.Action
 
 @Composable
 fun NewSeedMenu(
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigator: Navigator,
 ) {
 	val sidePadding = 24.dp
@@ -47,7 +47,7 @@ fun NewSeedMenu(
 				iconId = R.drawable.ic_add_28,
 				label = stringResource(R.string.add_key_set_menu_add),
 				onclick = {
-					if (alertState.value == AlertState.None)
+					if (networkState.value == NetworkState.None)
 						navigator.navigate(Action.NEW_SEED)
 					else
 						navigator.navigate(Action.SHIELD)
@@ -58,7 +58,7 @@ fun NewSeedMenu(
 				iconId = R.drawable.ic_download_offline_28,
 				label = stringResource(R.string.add_key_set_menu_recover),
 				onclick = {
-					if (alertState.value == AlertState.None)
+					if (networkState.value == NetworkState.None)
 						navigator.navigate(Action.RECOVER_SEED)
 					else
 						navigator.navigate(Action.SHIELD)
@@ -87,7 +87,7 @@ fun NewSeedMenu(
 )
 @Composable
 private fun PreviewNewSeedMenu() {
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	SignerNewTheme {
 		NewSeedMenu(
 			state,

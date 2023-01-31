@@ -2,7 +2,7 @@ package io.parity.signer.domain.storage
 
 import android.annotation.SuppressLint
 import android.content.Context
-import io.parity.signer.dependencygraph.getDbNameFromContext
+import io.parity.signer.domain.getDbNameFromContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -13,7 +13,6 @@ import java.io.FileOutputStream
 class DatabaseAssetsInteractor(private val context: Context,
 															 private val seedStorage: SeedStorage) {
 	private val dbName: String = context.getDbNameFromContext()
-
 
 	/**
 	 * Wipes all data

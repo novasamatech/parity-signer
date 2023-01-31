@@ -48,7 +48,7 @@ import io.parity.signer.uniffi.Action
 fun KeySetDetailsScreenView(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
+	networkState: State<NetworkState?>, //for shield icon
 	onMenu: Callback,
 ) {
 	Column {
@@ -104,7 +104,7 @@ fun KeySetDetailsScreenView(
 
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
-					alertState = alertState, navigator = navigator,
+					networkState = networkState, navigator = navigator,
                     Modifier
                         .align(Alignment.End)
                         .padding(end = 16.dp)
@@ -181,7 +181,7 @@ fun SeedKeyViewItem(
 @Composable
 private fun PreviewKeySetDetailsScreen() {
 
-	val state = remember { mutableStateOf(AlertState.Active) }
+	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {

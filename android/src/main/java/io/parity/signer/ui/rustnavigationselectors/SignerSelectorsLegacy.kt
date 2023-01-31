@@ -24,7 +24,7 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
 	screenData: ScreenData,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -89,7 +89,7 @@ fun ScreenSelector(
 fun ModalSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigate: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -148,7 +148,7 @@ fun ModalSelector(
 @Composable
 fun AlertSelector(
 	alert: AlertData?,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigate: (Action, String, String) -> Unit,
 	acknowledgeWarning: Callback
 ) {
@@ -162,7 +162,7 @@ fun AlertSelector(
 			)
 			is AlertData.Shield -> ShieldAlert(
 				// alert.f,
-				alertState = alertState,
+				networkState = networkState,
 				navigateBack = { button1(Action.GO_BACK) },
 				acknowledgeWarning = acknowledgeWarning
 			)

@@ -1,9 +1,11 @@
 package io.parity.signer.domain
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import java.io.File
 
 typealias Callback = () -> Unit
 
@@ -52,4 +54,16 @@ fun List<UByte>.intoImageBitmap(): ImageBitmap {
 		Log.d("image decoding error", e.toString())
 		ImageBitmap(1, 1)
 	}
+}
+
+
+fun Context.getDbNameFromContext(): String =
+	applicationContext.filesDir.toString() + "/Database"
+
+/**
+ * We showing onboarding if db was not yet created, and this is how currently
+ * different parts of the app can determine if app initialized
+ */
+fun Context.isDbCreatedAndOnboardingPassed(): Boolean {
+	return File(getDbNameFromContext()).exists()
 }

@@ -40,7 +40,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 fun SignerMainSubgraph() {
 	val signerDataModel: SignerDataModel = viewModel()
 	val actionResult = signerDataModel.actionResult.collectAsState()
-	val shieldAlert = signerDataModel.alertState.collectAsState()
+	val shieldAlert = signerDataModel.networkState.collectAsState()
 	val localNavAction = signerDataModel.localNavAction.collectAsState()
 
 	BackHandler {
@@ -62,7 +62,7 @@ fun SignerMainSubgraph() {
 				) {
 					TopBar(
 						signerDataModel = signerDataModel,
-						alertState = shieldAlert,
+						networkState = shieldAlert,
 					)
 				}
 			},
@@ -80,14 +80,14 @@ fun SignerMainSubgraph() {
 			Box(modifier = Modifier.padding(innerPadding)) {
 				ScreenSelector(
 					screenData = actionResult.value.screenData,
-					alertState = shieldAlert,
+					networkState = shieldAlert,
 					navigate = signerDataModel.navigator::navigate,
 					signerDataModel = signerDataModel
 				)
 				ModalSelector(
 					modalData = actionResult.value.modalData,
 					localNavAction = localNavAction.value,
-					alertState = shieldAlert,
+					networkState = shieldAlert,
 					navigate = signerDataModel.navigator::navigate,
 					signerDataModel = signerDataModel,
 				)
@@ -102,19 +102,19 @@ fun SignerMainSubgraph() {
 			CombinedScreensSelector(
 				screenData = actionResult.value.screenData,
 				localNavAction = localNavAction.value,
-				alertState = shieldAlert,
+				networkState = shieldAlert,
 				signerDataModel = signerDataModel
 			)
 			BottomSheetSelector(
 				modalData = actionResult.value.modalData,
 				localNavAction = localNavAction.value,
-				alertState = shieldAlert,
+				networkState = shieldAlert,
 				signerDataModel = signerDataModel,
 				navigator = signerDataModel.navigator,
 			)
 			AlertSelector(
 				alert = actionResult.value.alertData,
-				alertState = shieldAlert,
+				networkState = shieldAlert,
 				navigate = signerDataModel.navigator::navigate,
 				acknowledgeWarning = signerDataModel::acknowledgeWarning
 			)

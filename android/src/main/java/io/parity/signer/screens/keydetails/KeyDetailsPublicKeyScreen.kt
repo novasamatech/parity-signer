@@ -157,7 +157,7 @@ private fun ExposedKeyAlarm() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenDerived() {
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
@@ -177,7 +177,7 @@ private fun PreviewKeyDetailsScreenDerived() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenRoot() {
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {

@@ -20,7 +20,7 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.domain.AlertState
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
@@ -38,7 +38,7 @@ fun SettingsScreen(
 	isStrongBoxProtected: Boolean,
 	appVersion: String,
 	wipeToFactory: Callback,
-	alertState: State<AlertState?>
+	networkState: State<NetworkState?>
 ) {
 	var confirm by remember { mutableStateOf(false) }
 
@@ -82,7 +82,7 @@ fun SettingsScreen(
 				)
 			}
 			ExposedIcon(
-				alertState = alertState, navigator = rootNavigator,
+				networkState = networkState, navigator = rootNavigator,
 				modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 16.dp)
@@ -145,13 +145,13 @@ internal fun SettingsElement(
 @Composable
 private fun PreviewSettingsScreen() {
 	SignerNewTheme {
-		val state = remember { mutableStateOf(AlertState.Past) }
+		val state = remember { mutableStateOf(NetworkState.Past) }
 		SettingsScreen(
 			rootNavigator = EmptyNavigator(),
 			isStrongBoxProtected = false,
 			appVersion = "0.6.1",
 			wipeToFactory = {},
-			alertState = state,
+			networkState = state,
 		)
 	}
 }

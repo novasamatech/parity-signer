@@ -1,11 +1,9 @@
 package io.parity.signer.domain
 
 import android.content.*
-import android.provider.Settings
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.dependencygraph.getDbNameFromContext
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedStorage
 import io.parity.signer.screens.onboarding.OnboardingWasShown
@@ -13,7 +11,6 @@ import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
-import java.io.File
 
 class SignerDataModel : ViewModel() {
 
@@ -23,10 +20,6 @@ class SignerDataModel : ViewModel() {
 
 	val navigator by lazy { SignerNavigator(this) }
 
-	// Alert
-	private val _alertState: MutableStateFlow<AlertState> =
-		MutableStateFlow(AlertState.None)
-
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
 	internal var lastOpenedKeyDetails: MKeyDetails? = null
 
@@ -35,6 +28,7 @@ class SignerDataModel : ViewModel() {
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
 	private val databaseAssetsInteractor = DatabaseAssetsInteractor(context, seedStorage)
+	private val networkExposedStateKeeper = NetworkExposedStateKeeper(context)
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -61,7 +55,7 @@ class SignerDataModel : ViewModel() {
 	// Observables for screens state
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
-	val alertState: StateFlow<AlertState> = _alertState
+	val networkState: StateFlow<NetworkState> = networkExposedStateKeeper.networkState
 
 	val actionResult: StateFlow<ActionResult> = _actionResult
 
@@ -75,17 +69,6 @@ class SignerDataModel : ViewModel() {
 	fun lateInit() {
 		// Define local database name
 		dbName = context.getDbNameFromContext()
-
-		// Airplane mode detector
-		isAirplaneOn()
-
-		val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
-		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-			override fun onReceive(context: Context, intent: Intent) {
-				isAirplaneOn()
-			}
-		}
-		context.registerReceiver(receiver, intentFilter)
 
 		// Imitate ios behavior
 		val authentication = ServiceLocator.authentication
@@ -117,31 +100,6 @@ class SignerDataModel : ViewModel() {
 		historyInitHistoryNoCert()
 	}
 
-
-	/**
-	 * Checks if airplane mode was off
-	 */
-	private fun isAirplaneOn() {
-		if (Settings.Global.getInt(
-				context.contentResolver,
-				Settings.Global.AIRPLANE_MODE_ON,
-				0
-			) == 0
-		) {
-			if (alertState.value != AlertState.Active) {
-				_alertState.value = AlertState.Active
-				if (onBoardingDone.value == OnboardingWasShown.Yes) {
-					historyDeviceWasOnline()
-				}
-			}
-		} else {
-			if (alertState.value == AlertState.Active) {
-				_alertState.value = if (onBoardingDone.value == OnboardingWasShown.Yes)
-					AlertState.Past else AlertState.None
-			}
-		}
-	}
-
 	// MARK: Init boilerplate end
 
 	// MARK: General utils begin
@@ -151,16 +109,20 @@ class SignerDataModel : ViewModel() {
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
-		val checkRefresh = File(dbName).exists()
-		if (checkRefresh) _onBoardingDone.value =
-			OnboardingWasShown.Yes else _onBoardingDone.value = OnboardingWasShown.No
-		if (checkRefresh) {
-			val allNames = seedStorage.getSeedNames()
-			initNavigation(dbName, allNames.toList())
-			getAlertState()
-			isAirplaneOn()
-			navigator.navigate(Action.START)
-		}
+		val checkRefresh = context.isDbCreatedAndOnboardingPassed()
+		if (checkRefresh) totalRefreshDbExist() else totalRefreshDbMissing()
+	}
+
+	private fun totalRefreshDbExist() {
+		_onBoardingDone.value = OnboardingWasShown.Yes
+		val allNames = seedStorage.getSeedNames()
+		initNavigation(dbName, allNames.toList())
+		updateAlertState()
+		navigator.navigate(Action.START)
+	}
+
+	private fun totalRefreshDbMissing() {
+		_onBoardingDone.value = OnboardingWasShown.No
 	}
 
 	/**
@@ -191,27 +153,10 @@ class SignerDataModel : ViewModel() {
 		).versionName
 	}
 
-	private fun getAlertState() {
-		_alertState.value = if (historyGetWarnings()) {
-			if (alertState.value == AlertState.Active) AlertState.Active else AlertState.Past
-		} else {
-			AlertState.None
-		}
-	}
-
 	fun acknowledgeWarning() {
-		if (alertState.value == AlertState.Past) {
-			historyAcknowledgeWarnings()
-			_alertState.value = AlertState.None
-		}
+		networkExposedStateKeeper.acknowledgeWarning()
 	}
+
 }
 
-/**
- * Describes current state of network detection alertness
- */
-enum class AlertState {
-	None,
-	Active,
-	Past
-}
+

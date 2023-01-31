@@ -43,7 +43,7 @@ import io.parity.signer.uniffi.keysBySeedName
 fun CombinedScreensSelector(
 	screenData: ScreenData,
 	localNavAction: LocalNavAction?,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	signerDataModel: SignerDataModel
 ) {
 	val rootNavigator = signerDataModel.navigator
@@ -55,7 +55,7 @@ fun CombinedScreensSelector(
 			KeySetsNavSubgraph(
 				screenData.f.toKeySetsSelectModel(),
 				rootNavigator = rootNavigator,
-				alertState = alertState,
+				networkState = networkState,
 			)
 		}
 		is ScreenData.Keys -> {
@@ -63,7 +63,7 @@ fun CombinedScreensSelector(
 			KeySetDetailsNavSubgraph(
 				model = keys.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
-				alertState = alertState,
+				networkState = networkState,
 				singleton = signerDataModel,
 			)
 		}
@@ -94,7 +94,7 @@ fun CombinedScreensSelector(
 					isStrongBoxProtected = signerDataModel.seedStorage.isStrongBoxProtected,
 					appVersion = signerDataModel.getAppVersion(),
 					wipeToFactory = signerDataModel::wipeToFactory,
-					alertState = alertState
+					networkState = networkState
 				)
 			}
 		is ScreenData.NewSeed ->
@@ -138,7 +138,7 @@ fun CombinedScreensSelector(
 fun BottomSheetSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	signerDataModel: SignerDataModel,
 	navigator: Navigator,
 ) {
@@ -174,7 +174,7 @@ fun BottomSheetSelector(
 						navigator.backAction()
 					}) {
 						NewSeedMenu(
-							alertState = alertState,
+							networkState = networkState,
 							navigator = signerDataModel.navigator,
 						)
 					}

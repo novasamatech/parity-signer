@@ -18,7 +18,7 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFu
 fun KeySetDetailsNavSubgraph(
 	model: KeySetDetailsModel,
 	rootNavigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
+	networkState: State<NetworkState?>, //for shield icon
 	singleton: SignerDataModel,
 ) {
 	val navController = rememberNavController()
@@ -32,7 +32,7 @@ fun KeySetDetailsNavSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				navController = navController,
-				alertState = alertState,
+				networkState = networkState,
 				onRemoveKeySet = {
 					val root = model.root
 					if (root != null) {
@@ -63,7 +63,7 @@ fun KeySetDetailsNavSubgraph(
 					KeySetDetailsScreenView(
 						model = model,
 						navigator = EmptyNavigator(),
-						alertState = alertState,
+						networkState = networkState,
 						onMenu = {},
 					)
 				}

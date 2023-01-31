@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.domain.Authentication
+import io.parity.signer.domain.getDbNameFromContext
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.SeedStorage
 
@@ -45,7 +46,4 @@ object ServiceLocator {
 			authentication, activity)
 	}
 }
-
-fun Context.getDbNameFromContext() =
-	applicationContext.filesDir.toString() + "/Database"
 
