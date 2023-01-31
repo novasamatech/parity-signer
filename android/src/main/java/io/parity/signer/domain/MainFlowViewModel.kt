@@ -66,10 +66,9 @@ class MainFlowViewModel(
 	// Observables for screens state
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airplaneModeState
-
 	val actionResult: StateFlow<ActionResult> = _actionResult
-
 	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
+	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
 	// MARK: init boilerplate begin
 
@@ -107,7 +106,7 @@ class MainFlowViewModel(
 	 * Populate database!
 	 * This is first start of the app
 	 */
-	fun initAssets() {
+	private fun initAssets() {
 		databaseAssetsInteractor.wipe()
 		databaseAssetsInteractor.copyAsset("")
 		historyInitHistoryWithCert()

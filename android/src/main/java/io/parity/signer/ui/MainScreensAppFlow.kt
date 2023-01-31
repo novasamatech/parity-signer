@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,19 +24,25 @@ import io.parity.signer.ui.rustnavigationselectors.*
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.mainScreenRoute) {
-		SignerMainSubgraph() //todo onboarding add not auth state
+		val mainFlowViewModel: MainFlowViewModel = viewModel(
+			factory = MainFlowViewModelFactory(
+				appContext = LocalContext.current.applicationContext,
+				activity = LocalContext.current.findActivity() as FragmentActivity
+			)
+		)
+		val authenticated = mainFlowViewModel.authenticated.collectAsState()
+		if (authenticated.value) {
+			SignerMainSubgraph(mainFlowViewModel)
+		} else {
+			UnlockAppAuthScreen { mainFlowViewModel.totalRefresh() }
+		}
 	}
 }
 
 
 @Composable
-fun SignerMainSubgraph() {
-	val mainFlowViewModel: MainFlowViewModel = viewModel(
-		factory = MainFlowViewModelFactory(
-			appContext = LocalContext.current.applicationContext,
-			activity = LocalContext.current.findActivity() as FragmentActivity
-		)
-	)
+fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
+
 	val actionResult = mainFlowViewModel.actionResult.collectAsState()
 	val shieldAlert = mainFlowViewModel.networkState.collectAsState()
 	val localNavAction = mainFlowViewModel.localNavAction.collectAsState()
@@ -123,7 +128,7 @@ fun SignerMainSubgraph() {
 
 
 @Composable
-private fun UnlockAppAuthScreen(onSuccess: Callback) {
+fun UnlockAppAuthScreen(onSuccess: Callback) {
 	val activity = LocalContext.current.findActivity() as FragmentActivity
 
 	Column(verticalArrangement = Arrangement.Center) {
