@@ -5,6 +5,11 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import java.io.File
 
 typealias Callback = () -> Unit
@@ -40,6 +45,15 @@ const val BASE58_STYLE_ABBREVIATE = 8
  */
 fun ByteArray.encodeHex(): String {
 	return this.joinToString(separator = "") { byte -> "%02x".format(byte) }
+}
+
+fun <T, K> StateFlow<T>.mapState(
+	scope: CoroutineScope,
+	transform: (data: T) -> K
+): StateFlow<K> {
+	return mapLatest {
+		transform(it)
+	}.stateIn(scope, SharingStarted.Eagerly, transform(value))
 }
 
 /**

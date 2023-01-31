@@ -19,14 +19,14 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 		registerAirplaneBroadcastReceiver()
 	}
 
-	private val _networkState: MutableStateFlow<NetworkState> =
+	private val _airplaneModeState: MutableStateFlow<NetworkState> =
 		MutableStateFlow(NetworkState.None)
-	val networkState: StateFlow<NetworkState> = _networkState
+	val airplaneModeState: StateFlow<NetworkState> = _airplaneModeState
 
 	fun acknowledgeWarning() {
-		if (networkState.value == NetworkState.Past) {
+		if (airplaneModeState.value == NetworkState.Past) {
 			historyAcknowledgeWarnings()
-			_networkState.value = NetworkState.None
+			_airplaneModeState.value = NetworkState.None
 		}
 	}
 
@@ -44,8 +44,8 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 	 * Can't do initially as navigation should be init before we check rust.
 	 */
 	fun updateAlertState() {
-		_networkState.value = if (historyGetWarnings()) {
-			if (networkState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
+		_airplaneModeState.value = if (historyGetWarnings()) {
+			if (airplaneModeState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
 		} else {
 			NetworkState.None
 		}
@@ -61,15 +61,15 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 				0
 			) == 0
 		) {
-			if (networkState.value != NetworkState.Active) {
-				_networkState.value = NetworkState.Active
+			if (airplaneModeState.value != NetworkState.Active) {
+				_airplaneModeState.value = NetworkState.Active
 				if (appContext.isDbCreatedAndOnboardingPassed()) {
 					historyDeviceWasOnline()
 				}
 			}
 		} else {
-			if (networkState.value == NetworkState.Active) {
-				_networkState.value = if (appContext.isDbCreatedAndOnboardingPassed())
+			if (airplaneModeState.value == NetworkState.Active) {
+				_airplaneModeState.value = if (appContext.isDbCreatedAndOnboardingPassed())
 					NetworkState.Past else NetworkState.None
 			}
 		}

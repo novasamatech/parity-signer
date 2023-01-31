@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedStorage
-import io.parity.signer.screens.onboarding.OnboardingWasShown
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +28,7 @@ class MainFlowViewModel : ViewModel() {
 
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
 	private val databaseAssetsInteractor: DatabaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
-	private val networkExposedStateKeeper = NetworkExposedStateKeeper(context)
+	private val networkExposedStateKeeper = ServiceLocator.networkExposedStateKeeper
 
 	// Navigator
 	internal val _actionResult = MutableStateFlow(
@@ -51,7 +50,7 @@ class MainFlowViewModel : ViewModel() {
 	)
 
 	// Observables for screens state
-	val networkState: StateFlow<NetworkState> = networkExposedStateKeeper.networkState
+	val networkState: StateFlow<NetworkState> = networkExposedStateKeeper.airplaneModeState
 
 	val actionResult: StateFlow<ActionResult> = _actionResult
 

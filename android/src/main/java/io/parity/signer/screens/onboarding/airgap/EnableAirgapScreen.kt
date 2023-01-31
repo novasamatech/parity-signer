@@ -11,15 +11,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import io.parity.signer.screens.onboarding.airgap.AirGapViewModel
 import io.parity.signer.ui.theme.Text600
+import kotlinx.coroutines.flow.collect
 
 
 const val enableAirgapRoute = "navigation_point_enable_airgap" //todo onboarding remove this part
 
-fun NavGraphBuilder.enableAirgapAppFlow() {
+fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) {
 	composable(route = enableAirgapRoute) {
+		val viewModel: AirGapViewModel = viewModel()
+		LaunchedEffect(viewModel) {
+			viewModel.isFinished.collect{
+				if (it) globalNavController.navigate(unlockAppScreenRoute)
+			}
+		}
 		EnableAirgapScreen()
 	}
 }
