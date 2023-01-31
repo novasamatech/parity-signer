@@ -20,6 +20,7 @@ fun SignerMainNavigationGraph(
 	NavHost(navController = navController, startDestination = startDestination) {
 		termsConsentAppFlow(navController)
 		enableAirgapAppFlow(navController)
+		unlockAppScreenFlow(navController)
 		mainSignerAppFlow(navController)
 	}
 }
@@ -27,5 +28,6 @@ fun SignerMainNavigationGraph(
 object MainGraphRoutes {
 	const val termsConsentRoute = "navigation_point_terms_consent"
 	const val enableAirgapRoute = "navigation_point_enable_airgap"
+	const val initialUnlockRoute = "navigation_point_initial_unlock"
 	const val mainScreenRoute = "navigation_main_screen"
 }
