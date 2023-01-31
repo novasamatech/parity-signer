@@ -66,10 +66,8 @@ pub fn process_decoded_payload(
                 Ok(Ready::NotYet(decoding))
             }
             InProgress::BananaRecovery(ref mut recovery) => {
-                let result = recovery.share_set.try_add_share(share);
-                log::warn!("result {:?}", result);
+                recovery.share_set.try_add_share(share)?;
                 let next = recovery.share_set.next_action();
-                log::warn!("next {:?}", next);
                 match next {
                     NextAction::MoreShares { .. } => Ok(Ready::NotYet(decoding)),
                     NextAction::AskUserForPassword => {
@@ -82,7 +80,6 @@ pub fn process_decoded_payload(
                                 }
                                 Err(e) => return Err(e.into()),
                             };
-                            log::warn!("recovered phrase: {result}");
                             Ok(Ready::BananaSplitReady(result))
                         } else {
                             Ok(Ready::BananaSplitPasswordRequest)

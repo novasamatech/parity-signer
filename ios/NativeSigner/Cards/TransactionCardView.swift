@@ -15,9 +15,6 @@ struct TransactionCardView: View {
                 .frame(minHeight: Heights.minTransactionCardHeight)
         }
         .padding(.leading, CGFloat(card.indent) * Spacing.extraSmall)
-        .onAppear {
-            print("Card info: \(card.index)  \(card.indent)  \(card.card)")
-        }
     }
 }
 
