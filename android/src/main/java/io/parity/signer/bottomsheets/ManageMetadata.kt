@@ -18,7 +18,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.MainFlowViewModel
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
@@ -27,14 +27,14 @@ import io.parity.signer.uniffi.MManageMetadata
 
 @Composable
 fun ManageMetadata(
-	networks: MManageMetadata,
-	signerDataModel: SignerDataModel
+    networks: MManageMetadata,
+    mainFlowViewModel: MainFlowViewModel
 ) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Surface(
 		color = Color.Transparent,
-		modifier = Modifier.clickable { signerDataModel.navigate(Action.GO_BACK) }
+		modifier = Modifier.clickable { mainFlowViewModel.navigate(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(Modifier.weight(1f))
@@ -64,7 +64,7 @@ fun ManageMetadata(
 						text = "Sign this metadata",
 						isShaded = true,
 						isCrypto = true,
-						action = { signerDataModel.navigate(Action.SIGN_METADATA) })
+						action = { mainFlowViewModel.navigate(Action.SIGN_METADATA) })
 					BigButton(
 						text = "Delete this metadata",
 						isShaded = true,
@@ -83,7 +83,7 @@ fun ManageMetadata(
 		header = "Remove metadata?",
 		text = "This metadata will be removed for all networks",
 		back = { confirm = false },
-		forward = { signerDataModel.navigate(Action.REMOVE_METADATA) },
+		forward = { mainFlowViewModel.navigate(Action.REMOVE_METADATA) },
 		backText = "Cancel",
 		forwardText = "Remove metadata"
 	)

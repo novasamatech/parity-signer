@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 
-class SignerDataModel : ViewModel() {
+class MainFlowViewModel : ViewModel() {
 
 	// todo migrate to use dependencies from ServiceLocator rather than expecting them here
 	val context: Context get() = ServiceLocator.appContext
@@ -49,9 +49,6 @@ class SignerDataModel : ViewModel() {
 		LocalNavAction.None
 	)
 
-	// Data storage locations
-	internal var dbName: String = ""
-
 	// Observables for screens state
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
@@ -67,9 +64,6 @@ class SignerDataModel : ViewModel() {
 	 * Don't forget to call real init after defining context!
 	 */
 	fun lateInit() {
-		// Define local database name
-		dbName = context.getDbNameFromContext()
-
 		// Imitate ios behavior
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
@@ -100,8 +94,6 @@ class SignerDataModel : ViewModel() {
 		historyInitHistoryNoCert()
 	}
 
-	// MARK: Init boilerplate end
-
 	// MARK: General utils begin
 
 	/**
@@ -110,19 +102,14 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun totalRefresh() {
 		val checkRefresh = context.isDbCreatedAndOnboardingPassed()
-		if (checkRefresh) totalRefreshDbExist() else totalRefreshDbMissing()
+		if (checkRefresh) totalRefreshDbExist()
 	}
 
 	private fun totalRefreshDbExist() {
-		_onBoardingDone.value = OnboardingWasShown.Yes
 		val allNames = seedStorage.getSeedNames()
-		initNavigation(dbName, allNames.toList())
-		updateAlertState()
+		initNavigation(context.getDbNameFromContext(), allNames.toList())
+		networkExposedStateKeeper.updateAlertState()
 		navigator.navigate(Action.START)
-	}
-
-	private fun totalRefreshDbMissing() {
-		_onBoardingDone.value = OnboardingWasShown.No
 	}
 
 	/**

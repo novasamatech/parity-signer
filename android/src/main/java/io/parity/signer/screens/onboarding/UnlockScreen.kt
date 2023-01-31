@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import io.parity.signer.R
 import io.parity.signer.components.BigButton
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.MainFlowViewModel
 import io.parity.signer.domain.findActivity
 
 
@@ -22,7 +22,7 @@ const val unlockAppScreenRoute = "navigation_point_unlock_app"//
 
 fun NavGraphBuilder.unlockAppScreenFlow() {
 	composable(route = unlockAppScreenRoute) {
-		val model: SignerDataModel = viewModel() //todo onboarding remove
+		val model: MainFlowViewModel = viewModel() //todo onboarding remove
 		UnlockAppAuthScreen(model)
 	}
 }
@@ -30,7 +30,7 @@ fun NavGraphBuilder.unlockAppScreenFlow() {
 
 
 @Composable
-private fun UnlockAppAuthScreen(signerDataModel: SignerDataModel) {
+private fun UnlockAppAuthScreen(mainFlowViewModel: MainFlowViewModel) {
 	val activity = LocalContext.current.findActivity() as FragmentActivity
 
 	Column(verticalArrangement = Arrangement.Center) {
@@ -39,7 +39,7 @@ private fun UnlockAppAuthScreen(signerDataModel: SignerDataModel) {
 			text = stringResource(R.string.unlock_app_button),
 			action = {
 				ServiceLocator.authentication.authenticate(activity) {
-					signerDataModel.totalRefresh()
+					mainFlowViewModel.totalRefresh()
 				}
 			}
 		)

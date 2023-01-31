@@ -40,7 +40,10 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 		appContext.registerReceiver(receiver, intentFilter)
 	}
 
-	private fun updateAlertState() {
+	/**
+	 * Can't do initially as navigation should be init before we check rust.
+	 */
+	fun updateAlertState() {
 		_networkState.value = if (historyGetWarnings()) {
 			if (networkState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
 		} else {

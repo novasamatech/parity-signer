@@ -11,21 +11,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
+import io.parity.signer.screens.onboarding.termsconsent.TermsConsentViewModel
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
 
 
-
-const val termsConsentRoute = "navigation_point_terms_consent" //todo onboarding remove this part
+const val termsConsentRoute =
+	"navigation_point_terms_consent" //todo onboarding remove this part
 
 fun NavGraphBuilder.termsConsentAppFlow() {
 	composable(route = termsConsentRoute) {
+		val viewModel: TermsConsentViewModel = viewModel()
+
 		Scaffold(
 			modifier = Modifier
 				.navigationBarsPadding()
@@ -33,7 +37,7 @@ fun NavGraphBuilder.termsConsentAppFlow() {
 				.statusBarsPadding(),
 		) { padding ->
 			TermsConsentScreen(
-				signerDataModel::onBoard,
+				viewModel::onBoard,
 				modifier = Modifier.padding(padding)
 			)
 		}

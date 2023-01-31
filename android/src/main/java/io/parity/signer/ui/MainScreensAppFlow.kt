@@ -15,7 +15,7 @@ import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
-import io.parity.signer.domain.SignerDataModel
+import io.parity.signer.domain.MainFlowViewModel
 import io.parity.signer.screens.onboarding.unlockAppScreenRoute
 import io.parity.signer.ui.rustnavigationselectors.*
 
@@ -38,13 +38,13 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 
 @Composable
 fun SignerMainSubgraph() {
-	val signerDataModel: SignerDataModel = viewModel()
-	val actionResult = signerDataModel.actionResult.collectAsState()
-	val shieldAlert = signerDataModel.networkState.collectAsState()
-	val localNavAction = signerDataModel.localNavAction.collectAsState()
+	val mainFlowViewModel: MainFlowViewModel = viewModel()
+	val actionResult = mainFlowViewModel.actionResult.collectAsState()
+	val shieldAlert = mainFlowViewModel.networkState.collectAsState()
+	val localNavAction = mainFlowViewModel.localNavAction.collectAsState()
 
 	BackHandler {
-		signerDataModel.navigator.backAction()
+		mainFlowViewModel.navigator.backAction()
 	}
 	// Structure to contain all app
 	Box {
@@ -61,7 +61,7 @@ fun SignerMainSubgraph() {
 					)
 				) {
 					TopBar(
-						signerDataModel = signerDataModel,
+						mainFlowViewModel = mainFlowViewModel,
 						networkState = shieldAlert,
 					)
 				}
@@ -73,7 +73,7 @@ fun SignerMainSubgraph() {
 					)
 					&& actionResult.value.footer
 				) {
-					BottomBar(signerDataModel = signerDataModel)
+					BottomBar(mainFlowViewModel = mainFlowViewModel)
 				}
 			},
 		) { innerPadding ->
@@ -81,15 +81,15 @@ fun SignerMainSubgraph() {
 				ScreenSelector(
 					screenData = actionResult.value.screenData,
 					networkState = shieldAlert,
-					navigate = signerDataModel.navigator::navigate,
-					signerDataModel = signerDataModel
+					navigate = mainFlowViewModel.navigator::navigate,
+					mainFlowViewModel = mainFlowViewModel
 				)
 				ModalSelector(
 					modalData = actionResult.value.modalData,
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
-					navigate = signerDataModel.navigator::navigate,
-					signerDataModel = signerDataModel,
+					navigate = mainFlowViewModel.navigator::navigate,
+					mainFlowViewModel = mainFlowViewModel,
 				)
 			}
 		}
@@ -103,20 +103,20 @@ fun SignerMainSubgraph() {
 				screenData = actionResult.value.screenData,
 				localNavAction = localNavAction.value,
 				networkState = shieldAlert,
-				signerDataModel = signerDataModel
+				mainFlowViewModel = mainFlowViewModel
 			)
 			BottomSheetSelector(
 				modalData = actionResult.value.modalData,
 				localNavAction = localNavAction.value,
 				networkState = shieldAlert,
-				signerDataModel = signerDataModel,
-				navigator = signerDataModel.navigator,
+				mainFlowViewModel = mainFlowViewModel,
+				navigator = mainFlowViewModel.navigator,
 			)
 			AlertSelector(
 				alert = actionResult.value.alertData,
 				networkState = shieldAlert,
-				navigate = signerDataModel.navigator::navigate,
-				acknowledgeWarning = signerDataModel::acknowledgeWarning
+				navigate = mainFlowViewModel.navigator::navigate,
+				acknowledgeWarning = mainFlowViewModel::acknowledgeWarning
 			)
 		}
 	}

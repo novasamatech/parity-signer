@@ -44,11 +44,11 @@ fun CombinedScreensSelector(
 	screenData: ScreenData,
 	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
-	signerDataModel: SignerDataModel
+	mainFlowViewModel: MainFlowViewModel
 ) {
-	val rootNavigator = signerDataModel.navigator
+	val rootNavigator = mainFlowViewModel.navigator
 	val seedNames =
-		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
+		mainFlowViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
@@ -64,7 +64,7 @@ fun CombinedScreensSelector(
 				model = keys.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
 				networkState = networkState,
-				singleton = signerDataModel,
+				singleton = mainFlowViewModel,
 			)
 		}
 		is ScreenData.KeyDetails ->
@@ -91,9 +91,9 @@ fun CombinedScreensSelector(
 			Box(modifier = Modifier.statusBarsPadding()) {
 				SettingsScreen(
 					rootNavigator = rootNavigator,
-					isStrongBoxProtected = signerDataModel.seedStorage.isStrongBoxProtected,
-					appVersion = signerDataModel.getAppVersion(),
-					wipeToFactory = signerDataModel::wipeToFactory,
+					isStrongBoxProtected = mainFlowViewModel.seedStorage.isStrongBoxProtected,
+					appVersion = mainFlowViewModel.getAppVersion(),
+					wipeToFactory = mainFlowViewModel::wipeToFactory,
 					networkState = networkState
 				)
 			}
@@ -139,7 +139,7 @@ fun BottomSheetSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
-	signerDataModel: SignerDataModel,
+	mainFlowViewModel: MainFlowViewModel,
 	navigator: Navigator,
 ) {
 	SignerNewTheme {
@@ -165,7 +165,7 @@ fun BottomSheetSelector(
 					}) {
 						KeyDetailsMenuAction(
 							navigator = navigator,
-							keyDetails = signerDataModel.lastOpenedKeyDetails
+							keyDetails = mainFlowViewModel.lastOpenedKeyDetails
 						)
 					}
 				is ModalData.NewSeedMenu ->
@@ -175,14 +175,14 @@ fun BottomSheetSelector(
 					}) {
 						NewSeedMenu(
 							networkState = networkState,
-							navigator = signerDataModel.navigator,
+							navigator = mainFlowViewModel.navigator,
 						)
 					}
 				is ModalData.NewSeedBackup -> {
 					NewKeySetBackupScreenFull(
 						model = modalData.f.toNewSeedBackupModel(),
 						onBack = { navigator.backAction() },
-						onCreateKeySet = signerDataModel::addSeed
+						onCreateKeySet = mainFlowViewModel::addSeed
 					)
 				}
 				is ModalData.LogRight ->
@@ -190,7 +190,7 @@ fun BottomSheetSelector(
 						navigator.backAction()
 					}) {
 						LogsMenu(
-							navigator = signerDataModel.navigator,
+							navigator = mainFlowViewModel.navigator,
 						)
 					}
 				is ModalData.EnterPassword ->
@@ -210,7 +210,7 @@ fun BottomSheetSelector(
 					}
 				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
+				is ModalData.LogComment -> LogComment(mainFlowViewModel = mainFlowViewModel)
 				else -> {}
 			}
 		}
