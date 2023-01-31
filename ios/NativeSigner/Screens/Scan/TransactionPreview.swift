@@ -93,9 +93,6 @@ struct TransactionPreview: View {
                     ForEach(content.sortedValueCards(), id: \.index) { card in
                         TransactionCardSelector(card: card)
                             .frame(minHeight: Heights.minTransactionCardHeight)
-                            .onAppear {
-                                print("Card info: \(card.index)  \(card.indent)  \(card.card)")
-                            }
                     }
                 }
             }

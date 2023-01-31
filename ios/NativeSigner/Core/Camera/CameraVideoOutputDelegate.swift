@@ -17,7 +17,6 @@ final class CameraVideoOutputDelegate: NSObject, AVCaptureVideoDataOutputSampleB
 
     func captureOutput(_: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from _: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-            print("Failed to obtain pixelbuffer for this frame")
             return
         }
 
@@ -27,9 +26,7 @@ final class CameraVideoOutputDelegate: NSObject, AVCaptureVideoDataOutputSampleB
             let detectionRequest = VNDetectBarcodesRequest(completionHandler: qrCodeDetection)
             detectionRequest.symbologies = [.qr]
             try imageRequestHandler.perform([detectionRequest])
-        } catch {
-            print("Failed to handle \(error)")
-        }
+        } catch {}
     }
 
     func set(updateReceiver: QRPayloadUpdateReceiving) {
@@ -38,11 +35,7 @@ final class CameraVideoOutputDelegate: NSObject, AVCaptureVideoDataOutputSampleB
 }
 
 private extension CameraVideoOutputDelegate {
-    func qrCodeDetection(request: VNRequest, error: Error?) {
-        if error != nil {
-            print("QR code detection error: \(String(describing: error))")
-        }
-
+    func qrCodeDetection(request: VNRequest, error _: Error?) {
         guard
             let qrCodeDescriptor = (request as? VNDetectBarcodesRequest)?.results?.first?
             .barcodeDescriptor as? CIQRCodeDescriptor

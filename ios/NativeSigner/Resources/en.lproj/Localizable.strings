@@ -623,3 +623,13 @@
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked because of failed authentication, please unlock the device to keep using the Signer";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
+
+"OnboardingOverview.Label.Header" = "Welcome to Signer";
+"OnboardingOverview.Action.Skip" = "Skip";
+"OnboardingOverview.Action.Continue" = "Continue";
+"OnboardingOverview.Label.Header" = "Welcome to Signer";
+"OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
+"OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
+"OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
+"OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
+
