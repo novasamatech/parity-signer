@@ -42,7 +42,7 @@ fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) 
 			}
 		}
 		TermsConsentScreen(
-			onBoard = { viewModel.onBoard(context) },
+			onBoard = { globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) },
 			modifier = Modifier
 				.navigationBarsPadding()
 				.captionBarPadding()

@@ -79,7 +79,7 @@ fun BottomBarButton(
 	action: Action,
 ) {
 	val selected =
-		mainFlowViewModel.actionResult.collectAsState().value.footerButton == actionGetName(action)
+		mainFlowViewModel.actionResult.collectAsState().value?.footerButton == actionGetName(action)
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {

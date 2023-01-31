@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class OnBoardingViewModel : ViewModel() {
 
-	private val databaseAssetsInteractor = ServiceLocator.databaseAssetsInteractor
-
 	private val _isFinishedOnboarding: MutableStateFlow<Boolean> =
 		MutableStateFlow(false)
 	val isFinishedOnboarding: StateFlow<Boolean> =
@@ -21,16 +19,5 @@ class OnBoardingViewModel : ViewModel() {
 
 	fun checkShouldProceed(context: Context) {
 		_isFinishedOnboarding.value = context.isDbCreatedAndOnboardingPassed()
-	}
-
-	/**
-	 * Populate database!
-	 * This is normal onboarding
-	 */
-	fun onBoard(context: Context) {  //todo onboarding move to main thread
-		databaseAssetsInteractor.wipe()
-		databaseAssetsInteractor.copyAsset("")
-		historyInitHistoryWithCert()
-		checkShouldProceed(context)
 	}
 }

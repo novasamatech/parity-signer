@@ -24,7 +24,7 @@ fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) 
 		val viewModel: AirGapViewModel = viewModel()
 		LaunchedEffect(viewModel) {
 			viewModel.isFinished.collect{
-				if (it) globalNavController.navigate(MainGraphRoutes.unlockAppScreenRoute)
+				if (it) globalNavController.navigate(MainGraphRoutes.initialUnlockRoute)
 			}
 		}
 		EnableAirgapScreen()

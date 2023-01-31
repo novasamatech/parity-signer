@@ -9,7 +9,7 @@ import io.parity.signer.uniffi.ScreenData
 object NavigationMigrations {
 	fun shouldShowBar(
 		localNavAction: LocalNavAction?,
-		globalNavAction: ActionResult?
+		globalNavAction: ActionResult
 	): Boolean {
 
 		return when (localNavAction) {

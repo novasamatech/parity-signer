@@ -128,7 +128,9 @@ class SignerNavigator(private val singleton: MainFlowViewModel) : Navigator {
 
 	private fun backRustNavigation() {
 		val lastRustNavAction = singleton.actionResult.value
-		if (
+		if (lastRustNavAction == null) {
+			singleton.activity.moveTaskToBack(true)
+		} else if (
 			lastRustNavAction.alertData == null &&
 			lastRustNavAction.modalData == null &&
 			(

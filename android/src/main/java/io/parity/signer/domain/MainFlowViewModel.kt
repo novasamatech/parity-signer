@@ -45,18 +45,7 @@ class MainFlowViewModel(
 		ServiceLocator.networkExposedStateKeeper
 
 	// Navigator
-	internal val _actionResult = MutableStateFlow(
-		ActionResult(
-			screenLabel = "",
-			back = false,
-			footer = false,
-			footerButton = null,
-			rightButton = null,
-			screenNameType = ScreenNameType.H4,
-			screenData = ScreenData.Documents,
-			modalData = null,
-			alertData = null,
-		)
+	internal val _actionResult = MutableStateFlow<ActionResult?>(null
 	)
 
 	internal val _localNavAction = MutableStateFlow<LocalNavAction>(
@@ -66,7 +55,7 @@ class MainFlowViewModel(
 	// Observables for screens state
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airplaneModeState
-	val actionResult: StateFlow<ActionResult> = _actionResult
+	val actionResult: StateFlow<ActionResult?> = _actionResult
 	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
