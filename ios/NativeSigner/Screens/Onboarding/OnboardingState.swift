@@ -37,6 +37,7 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func onAgreementNextTap() {
-        currentState = .airgap
+        // This is just temporary, on last step we need to revert to first one
+        currentState = .overview
     }
 }

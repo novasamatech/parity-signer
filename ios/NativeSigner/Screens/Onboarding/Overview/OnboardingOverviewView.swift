@@ -13,7 +13,6 @@ struct OnboardingOverviewView: View {
     }
 
     @StateObject var viewModel: ViewModel
-//    @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
         ZStack {
