@@ -11,6 +11,7 @@ struct MainScreenContainer: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var data: SignerDataModel
+    @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
         if !data.protected {
@@ -24,7 +25,7 @@ struct MainScreenContainer: View {
                 UnlockDeviceView(viewModel: .init())
                     .environmentObject(data)
             } else {
-                OnboardingAgreementsView(viewModel: .init())
+                onboarding.currentView()
                     .environmentObject(data)
             }
         }
