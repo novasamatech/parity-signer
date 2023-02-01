@@ -23,6 +23,24 @@ extension PreviewData {
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
+    static let qrCodeAddressFooterViewModelNoPath = QRCodeAddressFooterViewModel(
+        identicon: PreviewData.exampleIdenticon,
+        rootKeyName: "Dotsama parachains",
+        path: "",
+        hasPassword: false,
+        network: "Polkadot",
+        base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
+    )
+
+    static let qrCodeAddressFooterViewModelVeryLongPath = QRCodeAddressFooterViewModel(
+        identicon: PreviewData.exampleIdenticon,
+        rootKeyName: "Dotsama Crowdloans and Parity is a not just a very long name but the longest name",
+        path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
+        hasPassword: false,
+        network: "Polkadot",
+        base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
+    )
+
     static let qrCodeRootFooterViewModel = QRCodeRootFooterViewModel(
         keyName: "Staking",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
@@ -65,25 +83,41 @@ extension PreviewData {
 
     static let exampleDerivedKeyOverview = DerivedKeyOverviewViewModel(
         identicon: PreviewData.exampleIdenticon,
-        path: "// polkadot",
-        hasPassword: false
+        path: "//polkadot",
+        hasPassword: false,
+        network: "Polkadot"
     )
 
     static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// polkadot",
-            hasPassword: false
+            path: "",
+            hasPassword: false,
+            network: "Kusama"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// kusama",
-            hasPassword: false
+            path: "//polkadot",
+            hasPassword: false,
+            network: "Polkadot"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// astar",
-            hasPassword: true
+            path: "//astar",
+            hasPassword: false,
+            network: "Astar"
+        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "//kusama",
+            hasPassword: true,
+            network: "Kusama"
+        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
+            hasPassword: true,
+            network: "Kusama"
         )
     ]
 

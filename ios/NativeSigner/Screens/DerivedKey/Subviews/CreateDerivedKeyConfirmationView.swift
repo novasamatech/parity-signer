@@ -31,12 +31,17 @@ struct CreateDerivedKeyConfirmationView: View {
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                             .font(PrimaryFont.bodyL.font)
                             .padding(.bottom, Spacing.extraSmall)
-                        Text(viewModel.derivationPath.formattedAsPasswordedPath)
-                            .foregroundColor(Asset.accentPink300.swiftUIColor)
-                            .font(PrimaryFont.bodyL.font)
-                            .padding(.bottom, Spacing.extraSmall)
+                        if viewModel.derivationPath.formattedAsPasswordedPath.isEmpty {
+                            Localizable.CreateDerivedKey.Modal.Confirmation.emptyPath.text
+                                .padding(.bottom, Spacing.extraSmall)
+                        } else {
+                            Text(viewModel.derivationPath.formattedAsPasswordedPath)
+                                .padding(.bottom, Spacing.extraSmall)
+                        }
                         HStack { Spacer() }
                     }
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
                     .padding(Spacing.medium)
                     .strokeContainerBackground()
                     .padding(.bottom, Spacing.medium)
