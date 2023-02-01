@@ -10,6 +10,7 @@ import SwiftUI
 struct ScreenSelector: View {
     @EnvironmentObject private var data: SignerDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
+    @EnvironmentObject private var stateMachine: OnboardingStateMachine
 
     var body: some View {
         switch navigation.actionResult.screenData {
@@ -53,7 +54,7 @@ struct ScreenSelector: View {
             RecoverSeedPhrase(
                 content: value
             )
-        case let .deriveKey:
+        case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
         case let .vVerifier(value):
             VerfierCertificateView(viewModel: .init(content: value))
@@ -70,7 +71,7 @@ struct ScreenSelector: View {
                 content: value
             )
         case .documents:
-            OnboardingAgreementsView(viewModel: .init())
+            OnboardingAgreementsView(viewModel: .init(stateMachine: stateMachine))
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()

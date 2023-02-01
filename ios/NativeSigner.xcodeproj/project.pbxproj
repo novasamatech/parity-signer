@@ -148,6 +148,7 @@
 		6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */; };
 		6D7B44FC2979263200111D0E /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7B44FB2979263200111D0E /* TermsOfServiceView.swift */; };
 		6D7B44FE2979298700111D0E /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7B44FD2979298700111D0E /* PrivacyPolicyView.swift */; };
+		6D7DF6542987ADEF00A8438E /* OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7DF6532987ADEF00A8438E /* OnboardingState.swift */; };
 		6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */; };
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
@@ -245,6 +246,12 @@
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
 		6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */; };
 		6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */; };
+		6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF43942987853000881AFF /* OnboardingOverviewView.swift */; };
+		6DDF439729878D0E00881AFF /* PaginatedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */; };
+		6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF439B29879D3900881AFF /* SecondaryFont.swift */; };
+		6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */; };
+		6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */; };
+		6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
 		6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */; };
 		6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */; };
@@ -443,6 +450,7 @@
 		6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyExportModel.swift; sourceTree = "<group>"; };
 		6D7B44FB2979263200111D0E /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
 		6D7B44FD2979298700111D0E /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
+		6D7DF6532987ADEF00A8438E /* OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingState.swift; sourceTree = "<group>"; };
 		6D8045D628D06E6B00237F8C /* PreviewData+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewData+Components.swift"; sourceTree = "<group>"; };
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
@@ -541,6 +549,12 @@
 		6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyButton.swift; sourceTree = "<group>"; };
+		6DDF43942987853000881AFF /* OnboardingOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverviewView.swift; sourceTree = "<group>"; };
+		6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedScrollView.swift; sourceTree = "<group>"; };
+		6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Black.ttf"; sourceTree = "<group>"; };
+		6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Regular.ttf"; sourceTree = "<group>"; };
+		6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Bold.ttf"; sourceTree = "<group>"; };
+		6DDF439B29879D3900881AFF /* SecondaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryFont.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
 		6DE8467028C0FA1E0051346A /* ExportPrivateKeyWarningModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyWarningModal.swift; sourceTree = "<group>"; };
 		6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedPhraseView.swift; sourceTree = "<group>"; };
@@ -820,6 +834,7 @@
 				6DD9FF1828C8C9AF00FB6195 /* Animations.swift */,
 				6D971AB82940CD5800121A36 /* UIFont+Web3.swift */,
 				6D971AC4294229AE00121A36 /* UIFont+Roboto.swift */,
+				6DDF439B29879D3900881AFF /* SecondaryFont.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -1018,6 +1033,9 @@
 		6D57DC5E289E524800005C63 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */,
+				6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */,
+				6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */,
 				6D605B8E2976897B005822F3 /* RobotoMono-Regular.ttf */,
 				6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */,
 				6D57DC5F289E524800005C63 /* Inter-Bold.otf */,
@@ -1300,7 +1318,9 @@
 		6D9921B3297EC1DA004891B6 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				6DDF43932987851700881AFF /* Overview */,
 				6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */,
+				6D7DF6532987ADEF00A8438E /* OnboardingState.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -1530,6 +1550,15 @@
 			path = Buttons;
 			sourceTree = "<group>";
 		};
+		6DDF43932987851700881AFF /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				6DDF43942987853000881AFF /* OnboardingOverviewView.swift */,
+				6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */,
+			);
+			path = Overview;
+			sourceTree = "<group>";
+		};
 		6DE8466828BF6E9B0051346A /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1705,16 +1734,19 @@
 				6DF7751F28B3A0500040012E /* (null) in Resources */,
 				2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */,
 				6D57DC6E289E524800005C63 /* Inter-SemiBold.otf in Resources */,
+				6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */,
 				6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */,
 				6D57DC6A289E524800005C63 /* Inter-Bold.otf in Resources */,
 				6D57DC66289E524800005C63 /* Localizable.strings in Resources */,
 				6D57DC70289E524800005C63 /* Web3-Regular.otf in Resources */,
+				6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */,
 				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
 				6D57DC69289E524800005C63 /* swiftui-strings-template.stencil in Resources */,
 				6D57DC6B289E524800005C63 /* Inter-Regular.otf in Resources */,
 				6D57DC6C289E524800005C63 /* Inter-Medium.otf in Resources */,
 				6D971ABE2941B20F00121A36 /* identicon_example.svg in Resources */,
 				2D72D52A2732B8A7004BA7C9 /* Database in Resources */,
+				6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */,
 				6D57DC67289E524800005C63 /* Assets.xcassets in Resources */,
 				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
 				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
@@ -1877,11 +1909,13 @@
 				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
 				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
 				6DA2ACAC2939E87600AAEADC /* Event+Value.swift in Sources */,
+				6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */,
 				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
 				6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */,
 				6D971AB92940CD5800121A36 /* UIFont+Web3.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
 				6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */,
+				6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */,
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				6D971AC32941CDF600121A36 /* Identicon.swift in Sources */,
 				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
@@ -1932,6 +1966,7 @@
 				6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */,
 				6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */,
 				6D9921B5297EC1E9004891B6 /* OnboardingAgreementsView.swift in Sources */,
+				6D7DF6542987ADEF00A8438E /* OnboardingState.swift in Sources */,
 				6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */,
 				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */,
@@ -1948,6 +1983,7 @@
 				6D932CDF292E05CB008AD883 /* InlineButton.swift in Sources */,
 				6D971AC72942465C00121A36 /* QrData+Helpers.swift in Sources */,
 				6DDD737C2940629D00F04CE7 /* LogsMoreActionsModal.swift in Sources */,
+				6DDF439729878D0E00881AFF /* PaginatedScrollView.swift in Sources */,
 				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
 				6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */,
 				6D8045D728D06E6B00237F8C /* PreviewData+Components.swift in Sources */,
