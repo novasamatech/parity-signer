@@ -620,9 +620,13 @@
 "Error.Jailbreak.Label.Title" = "Please try again with not Jailbroken device";
 "Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
 
-"Error.DevicePincodeRequired.Label.Title" = "Please try again with not Jailbroken device";
-"Error.DevicePincodeRequired.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
-"Error.DevicePincodeRequired.Action.Settings" = "Open Settings";
+"Error.DevicePincodeRequired.Label.Title" = "Set Up A Passcode";
+"Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Signer requires passcode confirmation. Using the application without a password is not allowed.";
+"Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
+"Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
+
+"Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked because of failed authentication, please unlock the device to keep using the Signer";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";

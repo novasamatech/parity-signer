@@ -21,7 +21,7 @@ struct MainScreenContainer: View {
                 if data.authenticated {
                     AuthenticatedScreenContainer()
                         .environmentObject(data)
-                    .environmentObject(onboarding)
+                        .environmentObject(onboarding)
                 } else {
                     UnauthenticatedScreenContainer()
                         .environmentObject(data)
@@ -31,8 +31,7 @@ struct MainScreenContainer: View {
                     .environmentObject(data)
             }
         case false:
-            Localizable.pleaseProtectDeviceWithPinOrPassword.text
-                .background(Asset.backgroundPrimary.swiftUIColor)
+            DevicePincodeRequired(viewModel: .init())
         }
     }
 }
