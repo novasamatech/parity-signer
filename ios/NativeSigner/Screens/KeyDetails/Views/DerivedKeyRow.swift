@@ -17,20 +17,21 @@ struct DerivedKeyRow: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: Spacing.small) {
+        HStack(alignment: .center, spacing: Spacing.small) {
             Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
                 .padding(.top, Spacing.extraExtraSmall)
                 .padding(.leading, Spacing.medium)
             VStack(alignment: .leading) {
-                fullPath
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.titleS.font)
-                Spacer().frame(height: Spacing.extraExtraSmall)
-                HStack(spacing: Spacing.extraExtraSmall) {
-                    Asset.derivedKeyAddress.swiftUIImage
-                    Text(viewModel.base58.truncateMiddle())
+                if !isRoot {
+                    fullPath
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
+                        .font(PrimaryFont.captionM.font)
+                    Spacer().frame(height: Spacing.extraExtraSmall)
+                }
+                HStack(spacing: Spacing.extraExtraSmall) {
+                    Text(viewModel.base58.truncateMiddle())
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                 }
             }
@@ -64,54 +65,70 @@ struct DerivedKeyRow: View {
             ) :
             Text(viewModel.path)
     }
-}
 
-struct DerivedKeyRow_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            DerivedKeyRow(
-                viewModel: DerivedKeyRowViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// polkadot",
-                    hasPassword: false,
-                    base58: "15Gsc678654FDSG0HA04H0A",
-                    rootKeyName: ""
-                ),
-                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                isPresentingSelectionOverlay: Binding<Bool>.constant(true)
-            )
-            DerivedKeyRow(
-                viewModel: DerivedKeyRowViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// astar",
-                    hasPassword: false,
-                    base58: "15Gsc678654FDSG0HA04H0A"
-                ),
-                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                isPresentingSelectionOverlay: Binding<Bool>.constant(true)
-            )
-            DerivedKeyRow(
-                viewModel: DerivedKeyRowViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// kusama",
-                    hasPassword: true,
-                    base58: "15Gsc678654FDSG0HA04H0A"
-                ),
-                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                isPresentingSelectionOverlay: Binding<Bool>.constant(false)
-            )
-            DerivedKeyRow(
-                viewModel: DerivedKeyRowViewModel(
-                    identicon: PreviewData.exampleIdenticon,
-                    path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
-                    hasPassword: true,
-                    base58: "15Gsc678654FDSG0HA04H0A"
-                ),
-                selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                isPresentingSelectionOverlay: Binding<Bool>.constant(false)
-            )
-        }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
+    private var isRoot: Bool {
+        !viewModel.hasPassword && viewModel.path.isEmpty
     }
 }
+
+#if DEBUG
+    struct DerivedKeyRow_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                DerivedKeyRow(
+                    viewModel: DerivedKeyRowViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// polkadot",
+                        hasPassword: false,
+                        base58: "15Gsc678654FDSG0HA04H0A",
+                        rootKeyName: ""
+                    ),
+                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
+                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                )
+                DerivedKeyRow(
+                    viewModel: DerivedKeyRowViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "",
+                        hasPassword: false,
+                        base58: "15Gsc678654FDSG0HA04H0A"
+                    ),
+                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
+                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                )
+                DerivedKeyRow(
+                    viewModel: DerivedKeyRowViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// astar",
+                        hasPassword: false,
+                        base58: "15Gsc678654FDSG0HA04H0A"
+                    ),
+                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
+                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                )
+                DerivedKeyRow(
+                    viewModel: DerivedKeyRowViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// kusama",
+                        hasPassword: true,
+                        base58: "15Gsc678654FDSG0HA04H0A"
+                    ),
+                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
+                    isPresentingSelectionOverlay: Binding<Bool>.constant(false)
+                )
+                DerivedKeyRow(
+                    viewModel: DerivedKeyRowViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
+                        hasPassword: true,
+                        base58: "15Gsc678654FDSG0HA04H0A"
+                    ),
+                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
+                    isPresentingSelectionOverlay: Binding<Bool>.constant(false)
+                )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+        }
+    }
+#endif

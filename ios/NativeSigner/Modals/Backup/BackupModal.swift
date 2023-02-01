@@ -79,7 +79,7 @@ struct BackupModal: View {
                             VStack(alignment: .leading, spacing: 0) {
                                 ForEach(
                                     viewModel.derivedKeys,
-                                    id: \.path
+                                    id: \.id
                                 ) { derivedKey in
                                     DerivedKeyOverviewRow(derivedKey)
                                     if viewModel.derivedKeys.last != derivedKey {
