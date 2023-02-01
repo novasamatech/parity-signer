@@ -146,7 +146,8 @@ struct TCDerivations: View {
     @ViewBuilder
     private func pathView(_ renderable: DerivedKeysSetRenderable.DerivedKeyRenderable) -> some View {
         if renderable.derivationPath.isEmpty {
-            EmptyView()
+            Localizable.ImportKeys.Label.emptyPath.text
+                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
         } else if renderable.isPassworded {
             Text(
                 "\(renderable.displayablePath)\(Image(.lock))"

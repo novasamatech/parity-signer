@@ -83,25 +83,41 @@ extension PreviewData {
 
     static let exampleDerivedKeyOverview = DerivedKeyOverviewViewModel(
         identicon: PreviewData.exampleIdenticon,
-        path: "// polkadot",
-        hasPassword: false
+        path: "//polkadot",
+        hasPassword: false,
+        network: "Polkadot"
     )
 
     static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// polkadot",
-            hasPassword: false
+            path: "",
+            hasPassword: false,
+            network: "Kusama"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// kusama",
-            hasPassword: false
+            path: "//polkadot",
+            hasPassword: false,
+            network: "Polkadot"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
-            path: "// astar",
-            hasPassword: true
+            path: "//astar",
+            hasPassword: false,
+            network: "Astar"
+        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "//kusama",
+            hasPassword: true,
+            network: "Kusama"
+        ),
+        DerivedKeyOverviewViewModel(
+            identicon: PreviewData.exampleIdenticon,
+            path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
+            hasPassword: true,
+            network: "Kusama"
         )
     ]
 

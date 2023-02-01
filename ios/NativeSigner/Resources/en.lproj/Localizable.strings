@@ -328,6 +328,7 @@
 "BackupModal.Label.Derived" = "Derived keys";
 "BackupModal.Label.QRCode" = "Backup with QR Code";
 "BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
+"BackupModal.Label.EmptyPath" = "Derivation Path Name Is Empty";
 
 "ErrorModal.Action.Ok" = "Got It";
 "GenericErrorModal.Label.Title" = "Something has gone wrong.";
@@ -516,6 +517,7 @@
 "ImportKeys.Label.Title.Single" = "Import Key";
 "ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
 "ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
+"ImportKeys.Label.EmptyPath" = "Derivation path name is empty";
 "ImportKeys.Action.Import" = "Import Keys";
 "ImportKeys.Error.Label.KeySetMissing" = "Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.";
 "ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
@@ -558,6 +560,7 @@
 "CreateDerivedKey.Label.Header.Network" = "Choose Network";
 "CreateDerivedKey.Label.Header.Path" = "Derivation Path";
 "CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
+"CreateDerivedKey.Label.EmpyyPath" = "Derivation path name is empty";
 "CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Action.Add" = "Create Derived Key";
 "CreateDerivedKey.Label.Network.Single" = "Network";
@@ -574,7 +577,7 @@
 "CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
-"CreateDerivedKey.Modal.Path.Placeholder.Path" = "//network//1";
+"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation path name is empty";
 "CreateDerivedKey.Modal.Path.Error.Password" = "Passwords don’t match";
 "CreateDerivedKey.Modal.Path.Error.AlreadyExists" = "Key with this Derivation path name already exists";
 "CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";

@@ -11,15 +11,18 @@ struct DerivedKeyOverviewViewModel: Equatable {
     let identicon: [UInt8]
     let path: String
     let hasPassword: Bool
+    let network: String
 
     init(
         identicon: [UInt8],
         path: String,
-        hasPassword: Bool
+        hasPassword: Bool,
+        network: String
     ) {
         self.identicon = identicon
         self.path = path
         self.hasPassword = hasPassword
+        self.network = network
     }
 }
 
@@ -28,6 +31,7 @@ extension DerivedKeyOverviewViewModel {
         path = key.key.address.path
         identicon = key.key.address.identicon.svgPayload
         hasPassword = key.key.address.hasPwd
+        network = key.network.networkTitle
     }
 }
 
@@ -41,10 +45,18 @@ struct DerivedKeyOverviewRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.small) {
             Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-            fullPath
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(PrimaryFont.titleS.font)
-                .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
+            if viewModel.path.isEmpty, !viewModel.hasPassword {
+                Localizable.BackupModal.Label.emptyPath.text
+                    .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                    .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
+            } else {
+                fullPath
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
+                    .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
+            }
+            NetworkCapsuleView(network: viewModel.network)
         }
         .padding([.top, .bottom], Spacing.extraSmall)
     }
@@ -67,29 +79,41 @@ struct DerivedKeyOverviewRow: View {
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// polkadot",
-                        hasPassword: false
+                        path: "",
+                        hasPassword: false,
+                        network: "Kusama"
                     )
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// astar",
-                        hasPassword: false
+                        path: "//polkadot",
+                        hasPassword: false,
+                        network: "Polkadot"
                     )
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// kusama",
-                        hasPassword: true
+                        path: "//astar",
+                        hasPassword: false,
+                        network: "Astar"
+                    )
+                )
+                DerivedKeyOverviewRow(
+                    DerivedKeyOverviewViewModel(
+                        identicon: PreviewData.exampleIdenticon,
+                        path: "//kusama",
+                        hasPassword: true,
+                        network: "Kusama"
                     )
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
                         identicon: PreviewData.exampleIdenticon,
                         path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
-                        hasPassword: true
+                        hasPassword: true,
+                        network: "Kusama"
                     )
                 )
             }
