@@ -202,7 +202,7 @@ pub const FPS_NOM: u16 = 1;
 
 /// Denominator of the fraction of time (in seconds) for which the frame in the
 /// animated QR code is displayed
-pub const FPS_DEN: u16 = 30;
+pub const FPS_DEN: u16 = 15;
 
 /// Width of the QR code border, in QR code dots
 pub const BORDER: i32 = 4;
