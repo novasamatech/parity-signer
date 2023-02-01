@@ -51,7 +51,6 @@ final class SignerDataModel: ObservableObject {
     func onboard(verifierRemoved: Bool = false) {
         wipe()
         guard databaseMediator.recreateDatabaseFile() else {
-            print("Database could not be recreated")
             return
         }
         do {
@@ -64,9 +63,7 @@ final class SignerDataModel: ObservableObject {
             onboardingDone = true
             totalRefresh()
             seedsMediator.refreshSeeds()
-        } catch {
-            print("History init failed! This will not do.")
-        }
+        } catch {}
     }
 }
 
@@ -80,9 +77,7 @@ private extension SignerDataModel {
             seedsMediator.initialRefreshSeeds()
             do {
                 try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
-            } catch {
-                print("InitNavigation has failed! This will not do.")
-            }
+            } catch {}
             totalRefresh()
         } else {
             // remove secrets first
@@ -147,7 +142,6 @@ extension SignerDataModel {
         do {
             alert = try historyGetWarnings()
         } catch {
-            print("History init failed! This will not do.")
             alert = true
         }
     }

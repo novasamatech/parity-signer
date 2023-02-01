@@ -50,11 +50,9 @@ enum ShownDocument: String, CaseIterable, Identifiable {
                 )
                 return taCMD ?? "Terms and conditions text corrupted! Please report bug."
             } catch {
-                print("TaC file damaged")
                 return "Terms and conditions text corrupted! Please report bug."
             }
         } else {
-            print("TaC file not found!")
             return "Terms and conditions not found! Please report bug."
         }
     }
@@ -70,11 +68,9 @@ enum ShownDocument: String, CaseIterable, Identifiable {
                 )
                 return ppMD ?? "Privacy policy text corrupted! Please report bug."
             } catch {
-                print("PP file damaged")
                 return "Privacy policy text corrupted! Please report bug."
             }
         } else {
-            print("PP file not found!")
             return "Privacy policy not found! Please report bug."
         }
     }

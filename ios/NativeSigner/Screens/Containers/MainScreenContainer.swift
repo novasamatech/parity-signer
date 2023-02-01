@@ -12,6 +12,7 @@ struct MainScreenContainer: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var passwordProtectionStatePublisher: PasswordProtectionStatePublisher
     @StateObject var data: SignerDataModel
+    @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
         switch passwordProtectionStatePublisher.isProtected {
@@ -20,12 +21,13 @@ struct MainScreenContainer: View {
                 if data.authenticated {
                     AuthenticatedScreenContainer()
                         .environmentObject(data)
+                    .environmentObject(onboarding)
                 } else {
                     UnauthenticatedScreenContainer()
                         .environmentObject(data)
                 }
             } else {
-                OnboardingAgreementsView(viewModel: .init())
+                onboarding.currentView()
                     .environmentObject(data)
             }
         case false:

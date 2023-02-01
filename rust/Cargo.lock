@@ -2764,7 +2764,6 @@ dependencies = [
  "banana_recovery",
  "definitions",
  "hex",
- "log",
  "nom",
  "raptorq",
  "thiserror",

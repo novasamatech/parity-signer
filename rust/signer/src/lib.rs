@@ -154,7 +154,6 @@ fn backend_action(
 ///
 /// Accepts list of seed names to avoid calling [`update_seed_names`] every time
 fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
-    log::warn!("init_navigation {dbname}");
     let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
 
     *DB.write().unwrap() = val;
@@ -174,7 +173,6 @@ fn update_seed_names(seed_names: Vec<String>) -> Result<(), ErrorDisplayed> {
 /// Determines estimated required number of multiframe QR that should be gathered before decoding
 /// is attempted
 fn qrparser_get_packets_total(data: &str, cleaned: bool) -> anyhow::Result<u32, ErrorDisplayed> {
-    log::warn!("get packets total {}", data);
     qr_reader_phone::get_length(data, cleaned).map_err(|e| e.to_string().into())
 }
 
@@ -189,8 +187,6 @@ fn qrparser_try_decode_qr_sequence(
     cleaned: bool,
 ) -> anyhow::Result<DecodeSequenceResult, QrSequenceDecodeError> {
     let res = qr_reader_phone::decode_sequence(data, &password, cleaned);
-
-    log::warn!("result in qr_parser_try_decode_qr {:?}", res);
 
     Ok(res?)
 }
