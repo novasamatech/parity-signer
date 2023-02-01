@@ -10,25 +10,28 @@ import SwiftUI
 struct MainScreenContainer: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var passwordProtectionStatePublisher: PasswordProtectionStatePublisher
     @StateObject var data: SignerDataModel
     @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
-        if !data.protected {
-            Localizable.pleaseProtectDeviceWithPinOrPassword.text
-                .background(Asset.backgroundPrimary.swiftUIColor)
-        } else {
-            if data.onboardingDone, data.authenticated {
-                AuthenticatedScreenContainer()
-                    .environmentObject(data)
-                    .environmentObject(onboarding)
-            } else if data.onboardingDone {
-                UnlockDeviceView(viewModel: .init())
-                    .environmentObject(data)
+        switch passwordProtectionStatePublisher.isProtected {
+        case true:
+            if data.onboardingDone {
+                if data.authenticated {
+                    AuthenticatedScreenContainer()
+                        .environmentObject(data)
+                        .environmentObject(onboarding)
+                } else {
+                    UnlockDeviceView(viewModel: .init())
+                        .environmentObject(data)
+                }
             } else {
                 onboarding.currentView()
                     .environmentObject(data)
             }
+        case false:
+            DevicePincodeRequired(viewModel: .init())
         }
     }
 }
