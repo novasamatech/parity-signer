@@ -23,7 +23,7 @@ struct MainScreenContainer: View {
                         .environmentObject(data)
                         .environmentObject(onboarding)
                 } else {
-                    UnauthenticatedScreenContainer()
+                    UnlockDeviceView(viewModel: .init())
                         .environmentObject(data)
                 }
             } else {
