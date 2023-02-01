@@ -163,13 +163,19 @@ struct CreateDerivedKeyView: View {
         HStack(spacing: 0) {
             Spacer()
                 .frame(width: Spacing.medium)
-            Text(
-                viewModel.derivationPath == nil ?
-                    Localizable.CreateDerivedKey.Label.Placeholder.path.string :
-                    viewModel.unwrappedDerivationPath().formattedAsPasswordedPath
-            )
-            .font(PrimaryFont.bodyL.font)
-            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            if viewModel.derivationPath == nil {
+                Localizable.CreateDerivedKey.Label.Placeholder.path.text
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            } else if viewModel.derivationPath?.isEmpty == true {
+                Localizable.CreateDerivedKey.Label.empyyPath.text
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            } else {
+                Text(viewModel.unwrappedDerivationPath().formattedAsPasswordedPath)
+                    .font(PrimaryFont.bodyL.font)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            }
             Spacer()
             Asset.chevronRight.swiftUIImage
                 .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
