@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-struct DerivedKeyOverviewViewModel: Equatable {
+struct DerivedKeyOverviewViewModel: Equatable, Identifiable {
+    let id = UUID()
     let identicon: [UInt8]
     let path: String
     let hasPassword: Bool
