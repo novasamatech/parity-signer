@@ -1,4 +1,4 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import io.parity.signer.BuildConfig
 

@@ -21,7 +21,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400

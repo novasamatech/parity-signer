@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.ui.theme.backgroundSystem
 import io.parity.signer.uniffi.MTransaction

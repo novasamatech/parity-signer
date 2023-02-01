@@ -22,9 +22,9 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
-import io.parity.signer.models.Callback
-import io.parity.signer.models.getData
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.getData
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.scan.elements.TransactionErrors
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView

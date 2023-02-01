@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.Callback
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -31,7 +31,7 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun KeySetDetailsMenu(
 	navigator: Navigator,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	removeSeed: Callback,
 	onSelectKeysClicked: Callback,
 	onBackupClicked: Callback,
@@ -43,7 +43,7 @@ fun KeySetDetailsMenu(
 		KeySetDetailsMenuState.GENERAL ->
 			KeyDetailsMenuGeneral(
 				navigator = navigator,
-				alertState = alertState,
+				networkState = networkState,
 				onDeleteClicked = {
 					state.value = KeySetDetailsMenuState.DELETE_CONFIRM
 				},
@@ -76,7 +76,7 @@ fun KeySetDeleteConfirmBottomSheet(
 @Composable
 fun KeyDetailsMenuGeneral(
 	navigator: Navigator,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	onSelectKeysClicked: Callback,
 	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
@@ -98,7 +98,7 @@ fun KeyDetailsMenuGeneral(
 			iconId = R.drawable.ic_library_add_28,
 			label = stringResource(R.string.menu_option_derive_from_key),
 			onclick = {
-				if (alertState.value == AlertState.None)
+				if (networkState.value == NetworkState.None)
 					navigator.navigate(Action.NEW_KEY)
 				else
 					navigator.navigate(Action.SHIELD)
@@ -109,7 +109,7 @@ fun KeyDetailsMenuGeneral(
 			iconId = R.drawable.ic_settings_backup_restore_28,
 			label = stringResource(R.string.menu_option_backup_key_set),
 			onclick = {
-				if (alertState.value == AlertState.None)
+				if (networkState.value == NetworkState.None)
 					onBackupClicked()
 				else
 					navigator.navigate(Action.SHIELD)
@@ -150,7 +150,7 @@ private enum class KeySetDetailsMenuState {
 @Composable
 private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
-		val state = remember { mutableStateOf(AlertState.None) }
+		val state = remember { mutableStateOf(NetworkState.None) }
 		KeySetDetailsMenu(
 			EmptyNavigator(), state, {}, {}, {},
 		)

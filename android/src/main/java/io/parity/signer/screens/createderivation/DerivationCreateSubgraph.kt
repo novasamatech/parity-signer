@@ -11,8 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.models.Callback
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
 import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationPathScreen
 import io.parity.signer.screens.createderivation.derivationsubscreens.DeriveKeyBaseScreen

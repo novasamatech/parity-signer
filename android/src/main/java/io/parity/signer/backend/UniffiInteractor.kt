@@ -1,8 +1,8 @@
 package io.parity.signer.backend
 
-import io.parity.signer.models.NetworkModel
-import io.parity.signer.models.submitErrorState
-import io.parity.signer.models.toNetworkModel
+import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

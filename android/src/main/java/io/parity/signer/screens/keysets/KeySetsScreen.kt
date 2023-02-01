@@ -23,7 +23,7 @@ import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeySetItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.backgroundSystem
@@ -37,7 +37,7 @@ fun KeySetsScreen(
 	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
 	localNavigator: NavController,
-	alertState: State<AlertState?>, //for shield icon
+	networkState: State<NetworkState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
 		ScreenHeader(
@@ -62,7 +62,7 @@ fun KeySetsScreen(
 			}
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
-					alertState = alertState, navigator = rootNavigator,
+					networkState = networkState, navigator = rootNavigator,
 					Modifier
 						.align(Alignment.End)
 						.padding(end = 16.dp)
@@ -113,7 +113,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 			)
 		)
 	}
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
@@ -145,7 +145,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 			3.toUInt()
 		),
 	)
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
@@ -166,7 +166,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 @Composable
 private fun PreviewKeySetsSelectScreenEmpty() {
 	val keys = emptyList<KeySetModel>()
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {

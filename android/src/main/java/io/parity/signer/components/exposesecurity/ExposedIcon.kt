@@ -20,23 +20,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.AlertState
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
 @Composable
 fun ExposedIcon(
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigator: Navigator,
 	modifier: Modifier = Modifier,
 ) {
-	when (alertState.value) {
-		AlertState.Active -> ExposedIconActive(navigator, modifier)
-		AlertState.Past -> ExposedIconPast(navigator, modifier)
-		AlertState.None, null -> {
+	when (networkState.value) {
+		NetworkState.Active -> ExposedIconActive(navigator, modifier)
+		NetworkState.Past -> ExposedIconPast(navigator, modifier)
+		NetworkState.None, null -> {
 			//emty view
 		}
 	}

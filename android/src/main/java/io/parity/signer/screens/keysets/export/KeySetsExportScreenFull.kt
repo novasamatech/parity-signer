@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import io.parity.signer.models.Callback
-import io.parity.signer.models.KeySetModel
-import io.parity.signer.models.KeySetsSelectModel
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeySetModel
+import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 

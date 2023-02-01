@@ -19,7 +19,7 @@ import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
 

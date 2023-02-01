@@ -17,10 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.KeySetModel
-import io.parity.signer.models.KeySetsSelectModel
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.KeySetModel
+import io.parity.signer.domain.KeySetsSelectModel
+import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action

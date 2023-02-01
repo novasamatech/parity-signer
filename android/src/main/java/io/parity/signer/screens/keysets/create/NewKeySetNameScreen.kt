@@ -21,8 +21,8 @@ import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.DotsIndicator
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary

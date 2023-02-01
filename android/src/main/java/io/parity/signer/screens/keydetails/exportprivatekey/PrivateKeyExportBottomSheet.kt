@@ -23,10 +23,10 @@ import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.models.DisableScreenshots
-import io.parity.signer.models.EmptyNavigator
-import io.parity.signer.models.Navigator
-import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.domain.DisableScreenshots
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme

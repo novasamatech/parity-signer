@@ -29,7 +29,7 @@ import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.sharedcomponents.KeyCardPassword
-import io.parity.signer.models.Callback
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red500

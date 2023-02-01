@@ -8,26 +8,26 @@ import androidx.compose.material.icons.filled.GppGood
 import androidx.compose.material.icons.filled.GppMaybe
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import io.parity.signer.models.AlertState
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignalDanger
 import io.parity.signer.ui.theme.SignalWarning
 
 @Composable
-fun NavbarShield(alertState: State<AlertState?>) {
+fun NavbarShield(networkState: State<NetworkState?>) {
 
-	when (alertState.value) {
-		AlertState.None -> Icon(
+	when (networkState.value) {
+		NetworkState.None -> Icon(
 			Icons.Default.GppGood,
 			"device is safe",
 			tint = MaterialTheme.colors.Crypto400
 		)
-		AlertState.Active -> Icon(
+		NetworkState.Active -> Icon(
 			Icons.Default.GppBad,
 			"device is online",
 			tint = MaterialTheme.colors.SignalDanger
 		)
-		AlertState.Past -> Icon(
+		NetworkState.Past -> Icon(
 			Icons.Default.GppBad,
 			"potential security breach",
 			tint = MaterialTheme.colors.SignalWarning

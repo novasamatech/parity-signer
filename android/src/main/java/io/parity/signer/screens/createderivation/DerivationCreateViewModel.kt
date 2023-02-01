@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.models.Navigator
-import io.parity.signer.models.NetworkModel
-import io.parity.signer.models.storage.SeedRepository
-import io.parity.signer.models.storage.mapError
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.storage.SeedRepository
+import io.parity.signer.domain.storage.mapError
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.flow.MutableStateFlow

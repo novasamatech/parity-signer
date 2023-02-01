@@ -17,14 +17,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.SingleTextInput
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun LogComment(signerDataModel: SignerDataModel) {
+fun LogComment(mainFlowViewModel: MainFlowViewModel) {
 	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -46,7 +46,7 @@ fun LogComment(signerDataModel: SignerDataModel) {
 					comment.value = it
 				},
 				onDone = {
-					signerDataModel.navigate(Action.GO_FORWARD, comment.value)
+					mainFlowViewModel.navigate(Action.GO_FORWARD, comment.value)
 				},
 				focusManager = focusManager,
 				focusRequester = focusRequester

@@ -1,4 +1,4 @@
-package io.parity.signer.screens
+package io.parity.signer.screens.onboarding.termsconsent
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -11,21 +11,53 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
+import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
+
+
+fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
+	composable(route = MainGraphRoutes.onboardingRoute) {
+//		val viewModel: OnBoardingViewModel = viewModel()
+
+		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
+			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+				popUpTo(0)
+			}
+		}
+
+		TermsConsentScreen(
+			onBoard = {
+				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+					popUpTo(0)
+				}
+			},
+			modifier = Modifier
+				.navigationBarsPadding()
+				.captionBarPadding()
+				.statusBarsPadding()
+		)
+	}
+}
+
 
 /**
  * First screen with legal consent request
  */
 @Composable
-fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
+private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	var confirm by remember { mutableStateOf(false) }
 	var tacAccept by remember { mutableStateOf(false) }
 	var ppAccept by remember { mutableStateOf(false) }
@@ -109,6 +141,6 @@ fun LandingView(onBoard: () -> Unit, modifier: Modifier) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewLandingView() {
-	LandingView({}, Modifier)
+private fun PreviewTermsConsentScreen() {
+	TermsConsentScreen({}, Modifier)
 }

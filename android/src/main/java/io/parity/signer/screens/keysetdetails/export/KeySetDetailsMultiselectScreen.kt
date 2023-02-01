@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.items.KeyDerivedItemMultiselect
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.screens.keysets.export.ClickableLabel
 import io.parity.signer.ui.theme.*

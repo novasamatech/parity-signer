@@ -23,7 +23,7 @@ import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeySeedCard
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)

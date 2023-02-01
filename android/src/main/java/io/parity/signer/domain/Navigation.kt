@@ -1,4 +1,4 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import android.util.Log
 import android.widget.Toast
@@ -7,13 +7,13 @@ import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
-import io.parity.signer.models.storage.getSeed
+import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.uniffi.*
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
-fun SignerDataModel.navigate(
+fun MainFlowViewModel.navigate(
 	button: Action,
 	details: String = "",
 	seedPhrase: String = ""
@@ -37,7 +37,12 @@ interface Navigator {
 	fun backAction()
 }
 
-class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
+
+/**
+ * Class to navigate within rust state-machine area. It is one (big) part of compose-based navigation.
+ * This class have nothing to do with composa-based navigation.
+ */
+class SignerNavigator(private val singleton: MainFlowViewModel) : Navigator {
 
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		if (singleton.localNavAction.value != LocalNavAction.None) {
@@ -123,7 +128,9 @@ class SignerNavigator(private val singleton: SignerDataModel) : Navigator {
 
 	private fun backRustNavigation() {
 		val lastRustNavAction = singleton.actionResult.value
-		if (
+		if (lastRustNavAction == null) {
+			singleton.activity.moveTaskToBack(true)
+		} else if (
 			lastRustNavAction.alertData == null &&
 			lastRustNavAction.modalData == null &&
 			(

@@ -31,7 +31,7 @@ import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -48,7 +48,7 @@ import io.parity.signer.uniffi.Action
 fun KeySetDetailsScreenView(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
+	networkState: State<NetworkState?>, //for shield icon
 	onMenu: Callback,
 ) {
 	Column {
@@ -104,7 +104,7 @@ fun KeySetDetailsScreenView(
 
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
-					alertState = alertState, navigator = navigator,
+					networkState = networkState, navigator = navigator,
                     Modifier
                         .align(Alignment.End)
                         .padding(end = 16.dp)
@@ -181,7 +181,7 @@ fun SeedKeyViewItem(
 @Composable
 private fun PreviewKeySetDetailsScreen() {
 
-	val state = remember { mutableStateOf(AlertState.Active) }
+	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {

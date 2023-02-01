@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.models.*
-import io.parity.signer.models.storage.removeSeed
+import io.parity.signer.domain.*
+import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
@@ -18,8 +18,8 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFu
 fun KeySetDetailsNavSubgraph(
 	model: KeySetDetailsModel,
 	rootNavigator: Navigator,
-	alertState: State<AlertState?>, //for shield icon
-	singleton: SignerDataModel,
+	networkState: State<NetworkState?>, //for shield icon
+	singleton: MainFlowViewModel,
 ) {
 	val navController = rememberNavController()
 	NavHost(
@@ -32,7 +32,7 @@ fun KeySetDetailsNavSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				navController = navController,
-				alertState = alertState,
+				networkState = networkState,
 				onRemoveKeySet = {
 					val root = model.root
 					if (root != null) {
@@ -63,7 +63,7 @@ fun KeySetDetailsNavSubgraph(
 					KeySetDetailsScreenView(
 						model = model,
 						navigator = EmptyNavigator(),
-						alertState = alertState,
+						networkState = networkState,
 						onMenu = {},
 					)
 				}

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
-import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MSufficientCryptoReady

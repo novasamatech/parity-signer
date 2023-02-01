@@ -1,4 +1,4 @@
-package io.parity.signer.models.storage
+package io.parity.signer.domain.storage
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -8,9 +8,9 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import io.parity.signer.dependencygraph.getDbNameFromContext
-import io.parity.signer.models.FeatureFlags
-import io.parity.signer.models.FeatureOption
+import io.parity.signer.domain.FeatureFlags
+import io.parity.signer.domain.FeatureOption
+import io.parity.signer.domain.getDbNameFromContext
 import io.parity.signer.uniffi.historySeedNameWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +31,6 @@ class SeedStorage {
 
 
 	private lateinit var masterKey: MasterKey
-	private lateinit var dbName: String
 	private var hasStrongbox: Boolean = false
 	private lateinit var sharedPreferences: SharedPreferences
 	private val KEYSTORE_NAME = "AndroidKeyStore"
@@ -47,8 +46,6 @@ class SeedStorage {
 		} else {
 			false
 		}
-
-		dbName = appContext.getDbNameFromContext()
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 

@@ -11,7 +11,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.logs.items.LogItem
 import io.parity.signer.screens.logs.items.LogItemDate
 import io.parity.signer.screens.logs.items.LogsListEntryModel

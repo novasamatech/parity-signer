@@ -1,15 +1,15 @@
-package io.parity.signer.models.storage
+package io.parity.signer.domain.storage
 
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
-import io.parity.signer.models.AuthResult
-import io.parity.signer.models.Authentication
-import io.parity.signer.models.Navigator
+import io.parity.signer.domain.AuthResult
+import io.parity.signer.domain.Authentication
+import io.parity.signer.domain.Navigator
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.updateSeedNames
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.submitErrorState
 
 
 class SeedRepository(

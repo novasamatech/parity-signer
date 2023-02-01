@@ -1,4 +1,4 @@
-package io.parity.signer.ui.navigationselectors
+package io.parity.signer.ui.rustnavigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -8,9 +8,9 @@ import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
 import io.parity.signer.components.Documents
-import io.parity.signer.models.*
-import io.parity.signer.models.storage.addSeed
-import io.parity.signer.models.storage.signSufficientCrypto
+import io.parity.signer.domain.*
+import io.parity.signer.domain.storage.addSeed
+import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
 import io.parity.signer.screens.networks.NetworkDetails
@@ -23,15 +23,15 @@ import io.parity.signer.uniffi.ScreenData
 
 @Composable
 fun ScreenSelector(
-	screenData: ScreenData,
-	alertState: State<AlertState?>,
-	navigate: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
+    screenData: ScreenData,
+    networkState: State<NetworkState?>,
+    navigate: (Action, String, String) -> Unit,
+    mainFlowViewModel: MainFlowViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
 	val seedNames =
-		signerDataModel.seedStorage.lastKnownSeedNames.collectAsState()
+		mainFlowViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> {} // migrated
@@ -58,13 +58,13 @@ fun ScreenSelector(
 		is ScreenData.NewSeed -> {} // new selector
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
-			signerDataModel::navigate,
+			mainFlowViewModel::navigate,
 			seedNames.value
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
-			button = signerDataModel::navigate,
-			addSeed = signerDataModel::addSeed
+			button = mainFlowViewModel::navigate,
+			addSeed = mainFlowViewModel::addSeed
 		)
 		ScreenData.Scan -> {} //in new selector
 		is ScreenData.Transaction -> {} //in new selector
@@ -76,22 +76,22 @@ fun ScreenSelector(
 		is ScreenData.Settings -> {} //new selector
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
-			signerDataModel::signSufficientCrypto
+			mainFlowViewModel::signSufficientCrypto
 		)
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
-			signerDataModel::wipeToJailbreak
+			mainFlowViewModel::wipeToJailbreak
 		)
 	}
 }
 
 @Composable
 fun ModalSelector(
-	modalData: ModalData?,
-	localNavAction: LocalNavAction?,
-	alertState: State<AlertState?>,
-	navigate: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
+    modalData: ModalData?,
+    localNavAction: LocalNavAction?,
+    networkState: State<NetworkState?>,
+    navigate: (Action, String, String) -> Unit,
+    mainFlowViewModel: MainFlowViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
@@ -121,10 +121,10 @@ fun ModalSelector(
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
-				signerDataModel = signerDataModel
+				mainFlowViewModel = mainFlowViewModel
 			)
 			is ModalData.ManageMetadata -> {
-				ManageMetadata(modalData.f, signerDataModel = signerDataModel)
+				ManageMetadata(modalData.f, mainFlowViewModel = mainFlowViewModel)
 			}
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
@@ -132,13 +132,13 @@ fun ModalSelector(
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
 			is ModalData.TypesInfo -> TypesInfo(
 				modalData.f,
-				signerDataModel = signerDataModel
+				mainFlowViewModel = mainFlowViewModel
 			)
 			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				submitErrorState("This is part of refactored screen and not shown separately")
-				SelectSeed(modalData.f, signerDataModel = signerDataModel)
+				SelectSeed(modalData.f, mainFlowViewModel = mainFlowViewModel)
 			}
 			null -> {}
 		}
@@ -148,7 +148,7 @@ fun ModalSelector(
 @Composable
 fun AlertSelector(
 	alert: AlertData?,
-	alertState: State<AlertState?>,
+	networkState: State<NetworkState?>,
 	navigate: (Action, String, String) -> Unit,
 	acknowledgeWarning: Callback
 ) {
@@ -162,17 +162,11 @@ fun AlertSelector(
 			)
 			is AlertData.Shield -> ShieldAlert(
 				// alert.f,
-				alertState = alertState,
+				networkState = networkState,
 				navigateBack = { button1(Action.GO_BACK) },
 				acknowledgeWarning = acknowledgeWarning
 			)
 			null -> {}
 		}
 	}
-}
-
-enum class OnboardingWasShown {
-	InProgress,
-	No,
-	Yes;
 }

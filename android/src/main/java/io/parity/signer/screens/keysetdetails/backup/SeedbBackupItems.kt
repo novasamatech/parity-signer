@@ -1,7 +1,7 @@
 package io.parity.signer.screens.keysetdetails.backup
 
-import io.parity.signer.models.KeyModel
-import io.parity.signer.models.KeySetDetailsModel
+import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.KeySetDetailsModel
 
 data class SeedBackupModel(
 	val seedName: String,

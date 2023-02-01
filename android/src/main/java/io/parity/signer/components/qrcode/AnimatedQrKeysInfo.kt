@@ -20,7 +20,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds

@@ -6,8 +6,8 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.models.encodeHex
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.encodeHex
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

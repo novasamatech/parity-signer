@@ -26,7 +26,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeySeedCard
-import io.parity.signer.models.*
+import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -157,7 +157,7 @@ private fun ExposedKeyAlarm() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenDerived() {
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
@@ -177,7 +177,7 @@ private fun PreviewKeyDetailsScreenDerived() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenRoot() {
-	val state = remember { mutableStateOf(AlertState.Past) }
+	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {

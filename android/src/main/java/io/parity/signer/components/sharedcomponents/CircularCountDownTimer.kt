@@ -21,7 +21,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.models.submitErrorState
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlin.time.ExperimentalTime

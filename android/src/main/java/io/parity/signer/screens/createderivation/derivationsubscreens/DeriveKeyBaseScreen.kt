@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.models.Callback
-import io.parity.signer.models.NetworkModel
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkModel
 import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
 import io.parity.signer.screens.createderivation.INITIAL_DERIVATION_PATH
 import io.parity.signer.ui.theme.*

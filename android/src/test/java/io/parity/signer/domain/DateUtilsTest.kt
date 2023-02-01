@@ -1,11 +1,8 @@
-package io.parity.signer.models
+package io.parity.signer.domain
 
 import org.junit.Assert.*
 
 import org.junit.Test
-import java.text.ParseException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class DateUtilsTest {
