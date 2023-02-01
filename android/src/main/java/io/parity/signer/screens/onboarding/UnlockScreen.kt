@@ -23,7 +23,9 @@ import io.parity.signer.ui.MainGraphRoutes
 fun NavGraphBuilder.initialUnlockAppScreenFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.initialUnlockRoute) {
 		UnlockAppAuthScreen {
-			globalNavController.navigate(MainGraphRoutes.mainScreenRoute)
+			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
+				popUpTo(0)
+			}
 		}
 	}
 }

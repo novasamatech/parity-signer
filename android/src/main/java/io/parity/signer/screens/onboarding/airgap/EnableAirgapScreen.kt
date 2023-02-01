@@ -24,7 +24,9 @@ fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) 
 		val viewModel: AirGapViewModel = viewModel()
 		LaunchedEffect(viewModel) {
 			viewModel.isFinished.collect{
-				if (it) globalNavController.navigate(MainGraphRoutes.initialUnlockRoute)
+				if (it) globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+					popUpTo(0)
+				}
 			}
 		}
 

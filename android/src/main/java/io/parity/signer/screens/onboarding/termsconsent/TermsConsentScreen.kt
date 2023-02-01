@@ -33,11 +33,17 @@ fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) 
 //		val viewModel: OnBoardingViewModel = viewModel()
 
 		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
-			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute)
+			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+				popUpTo(0)
+			}
 		}
 
 		TermsConsentScreen(
-			onBoard = { globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) },
+			onBoard = {
+				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+					popUpTo(0)
+				}
+			},
 			modifier = Modifier
 				.navigationBarsPadding()
 				.captionBarPadding()

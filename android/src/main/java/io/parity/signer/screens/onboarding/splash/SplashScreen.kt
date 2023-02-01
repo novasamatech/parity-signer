@@ -27,11 +27,17 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		val context = LocalContext.current
 		LaunchedEffect(Unit) {
 			if (viewModel.shouldShowOnboarding(context)) {
-				globalNavController.navigate(MainGraphRoutes.onboardingRoute)
+				globalNavController.navigate(MainGraphRoutes.onboardingRoute) {
+					popUpTo(0)
+				}
 			} else if (viewModel.isShouldShowAirgap()) {
-				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute)
+				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+					popUpTo(0)
+				}
 			} else {
-				globalNavController.navigate(MainGraphRoutes.initialUnlockRoute)
+				globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+					popUpTo(0)
+				}
 			}
 		}
 	}
