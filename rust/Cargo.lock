@@ -3498,6 +3498,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]

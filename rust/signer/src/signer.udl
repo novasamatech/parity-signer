@@ -609,6 +609,12 @@ namespace signer {
     sequence<MMNetwork> get_all_networks();
 
     void init_logging(string tag);
+
+    [Throws=ErrorDisplayed]
+    MLog get_logs();
+
+    [Throws=ErrorDisplayed]
+    MLogDetails get_log_details(u32 order);
 };
 
 dictionary MKeysNew {

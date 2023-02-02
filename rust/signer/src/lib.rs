@@ -333,6 +333,34 @@ fn get_all_networks() -> anyhow::Result<Vec<MMNetwork>, ErrorDisplayed> {
     db_handling::interface_signer::show_all_networks(&get_db()?).map_err(|e| e.to_string().into())
 }
 
+fn get_logs() -> anyhow::Result<MLog, ErrorDisplayed> {
+    let history = db_handling::manage_history::get_history(&get_db()?)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    let log: Vec<_> = history
+        .into_iter()
+        .map(|(order, entry)| History {
+            order: order.stamp(),
+            timestamp: entry.timestamp,
+            events: entry.events,
+        })
+        .collect();
+
+    Ok(MLog { log })
+}
+
+use transaction_parsing::entry_to_transactions_with_decoding;
+fn get_log_details(order: u32) -> anyhow::Result<MLogDetails, ErrorDisplayed> {
+    let e = db_handling::manage_history::get_history_entry_by_order(&get_db()?, order)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let timestamp = e.timestamp.clone();
+
+    let events = entry_to_transactions_with_decoding(&get_db()?, e)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    Ok(MLogDetails { timestamp, events })
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.
