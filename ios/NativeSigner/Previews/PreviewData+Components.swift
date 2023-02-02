@@ -126,6 +126,11 @@ extension PreviewData {
         derivedKeys: exampleDerivedKeyOverviews,
         seedPhrase: seedPhraseViewModel
     )
+
+    static let exampleSettingsBackupViewModel = SettingsBackupViewModel(
+        keyName: "Main Polkadot",
+        seedPhrase: seedPhraseViewModel
+    )
 }
 
 extension PreviewData {
