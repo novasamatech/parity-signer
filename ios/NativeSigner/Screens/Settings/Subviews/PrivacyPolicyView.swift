@@ -15,11 +15,9 @@ struct PrivacyPolicyView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.Settings.PrivacyPolicy.Label.title.string,
-                    leftButton: .arrow,
+                    leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                    rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    leftBarMenuAction: viewModel.onBackTap
                 )
             )
             ScrollView {

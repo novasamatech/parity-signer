@@ -17,12 +17,12 @@ struct BackupSelectKeyView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.Settings.SelectKey.title.string,
-                    leftButton: .arrow,
-                    rightButton: .empty,
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: viewModel.onBackTap
+                    )],
+                    rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    leftBarMenuAction: viewModel.onBackTap
                 )
             )
             ScrollView {

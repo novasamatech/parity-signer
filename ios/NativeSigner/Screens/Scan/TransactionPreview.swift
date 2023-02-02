@@ -28,11 +28,8 @@ struct TransactionPreview: View {
                         viewModel.dataModel.count,
                         previewType: viewModel.dataModel.first?.content.previewType
                     ),
-                    leftButton: .xmark
-                ),
-                actionModel: .init(
-                    leftBarMenuAction: { viewModel.onBackButtonTap() },
-                    rightBarMenuAction: {}
+                    leftButtons: [.init(type: .xmark, action: viewModel.onBackButtonTap)],
+                    rightButtons: [.init(type: .empty)]
                 )
             )
             ScrollView(showsIndicators: false) {

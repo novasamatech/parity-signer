@@ -23,14 +23,11 @@ struct KeyDetailsView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        leftButton: .arrow,
-                        rightButton: .more
-                    ),
-                    actionModel: .init(
-                        leftBarMenuAction: { viewModel.onBackTap() },
-                        rightBarMenuAction: {
-                            viewModel.isShowingActionSheet.toggle()
-                        }
+                        leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                        rightButtons: [
+                            .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
+                            .init(type: .more, action: { viewModel.isShowingActionSheet.toggle() })
+                        ]
                     )
                 )
                 ScrollView(showsIndicators: false) {
@@ -68,12 +65,6 @@ struct KeyDetailsView: View {
                                 .alert
                         ))
                     )
-                    PrimaryButton(
-                        action: viewModel.onCreateDerivedKeyTap,
-                        text: Localizable.KeyDetails.Action.create.key
-                    )
-                    .padding(.horizontal, Spacing.large)
-                    .padding(.bottom, Spacing.large)
                 }
             }
         }

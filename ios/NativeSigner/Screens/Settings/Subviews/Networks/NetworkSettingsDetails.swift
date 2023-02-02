@@ -15,11 +15,13 @@ struct NetworkSettingsDetails: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    leftButton: .arrow,
-                    rightButton: .more,
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(rightBarMenuAction: viewModel.onMoreMenuTap)
+                )
             )
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {

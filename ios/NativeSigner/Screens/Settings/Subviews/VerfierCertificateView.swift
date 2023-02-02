@@ -17,8 +17,11 @@ struct VerfierCertificateView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.VerifierCertificate.Label.title.string,
-                    leftButton: .arrow,
-                    rightButton: .empty
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(type: .empty)]
                 )
             )
             VStack {

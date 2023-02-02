@@ -15,10 +15,10 @@ struct TransactionDetailsView: View {
     var body: some View {
         VStack(spacing: 0) {
             NavigationBarView(
-                viewModel: .init(title: Localizable.TransactionPreview.Label.title.string, leftButton: .xmark),
-                actionModel: .init(
-                    leftBarMenuAction: { viewModel.onBackButtonTap() },
-                    rightBarMenuAction: {}
+                viewModel: .init(
+                    title: Localizable.TransactionPreview.Label.title.string,
+                    leftButtons: [.init(type: .xmark, action: viewModel.onBackButtonTap)],
+                    rightButtons: [.init(type: .empty)]
                 )
             )
             ScrollView {
