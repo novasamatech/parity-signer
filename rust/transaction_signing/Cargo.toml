@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 hex = "0.4.3"
 parity-scale-codec = "3.3.0"
-zeroize = "1.5.7"
+zeroize = { version = "1.5.7", features = ["std"] }
 
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
