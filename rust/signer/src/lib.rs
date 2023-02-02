@@ -35,6 +35,7 @@ use std::{
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::entry_to_transactions_with_decoding;
 
 lazy_static! {
     static ref DB: Arc<RwLock<Option<Db>>> = Arc::new(RwLock::new(None));
@@ -348,7 +349,6 @@ fn get_logs() -> anyhow::Result<MLog, ErrorDisplayed> {
     Ok(MLog { log })
 }
 
-use transaction_parsing::entry_to_transactions_with_decoding;
 fn get_log_details(order: u32) -> anyhow::Result<MLogDetails, ErrorDisplayed> {
     let e = db_handling::manage_history::get_history_entry_by_order(&get_db()?, order)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
@@ -359,6 +359,16 @@ fn get_log_details(order: u32) -> anyhow::Result<MLogDetails, ErrorDisplayed> {
         .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
 
     Ok(MLogDetails { timestamp, events })
+}
+
+fn clear_log_history() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::clear_history(&get_db()?)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::history_entry_user(&get_db()?, string_from_user)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.
