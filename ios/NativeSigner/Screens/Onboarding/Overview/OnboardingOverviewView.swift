@@ -124,6 +124,8 @@ struct FeatureOverviewView: View {
             Spacer()
             HStack {
                 image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
             }
         }
         .padding(.horizontal, Spacing.large)
