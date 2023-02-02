@@ -52,6 +52,8 @@ enum Heights {
     /// Height for element in Network Filter modal
     static let networkFilterItem: CGFloat = 48
     static let settingsEntryHeight: CGFloat = 56
+    static let settingsSelectKeyEntryHeight: CGFloat = 60
+
     static let verifierCertificateActionHeight: CGFloat = 48
     /// Height for element in Network Selection Settings
     static let networkSelectionSettings: CGFloat = 52

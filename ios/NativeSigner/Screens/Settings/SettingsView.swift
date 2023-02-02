@@ -68,6 +68,9 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $viewModel.isPresentingPrivacyPolicy) {
             PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
         }
+        .fullScreenCover(isPresented: $viewModel.isPresentingBackup) {
+            BackupSelectKeyView(viewModel: .init(isPresented: $viewModel.isPresentingBackup))
+        }
     }
 }
 
@@ -77,6 +80,7 @@ extension SettingsView {
         @Published var isPresentingWipeConfirmation = false
         @Published var isPresentingTermsOfService = false
         @Published var isPresentingPrivacyPolicy = false
+        @Published var isPresentingBackup = false
 
         private weak var navigation: NavigationCoordinator!
         private weak var data: SignerDataModel!
@@ -107,6 +111,8 @@ extension SettingsView {
                 navigation.perform(navigation: .init(action: .manageNetworks))
             case .verifier:
                 navigation.perform(navigation: .init(action: .viewGeneralVerifier))
+            case .backup:
+                onBackupTap()
             }
         }
 
@@ -120,6 +126,10 @@ extension SettingsView {
 
         private func onPrivacyPolicyTap() {
             isPresentingPrivacyPolicy = true
+        }
+
+        private func onBackupTap() {
+            isPresentingBackup = true
         }
 
         func wipe() {

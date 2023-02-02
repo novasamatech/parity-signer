@@ -253,6 +253,8 @@
 		6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */; };
 		6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */; };
 		6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */; };
+		6DE67D05298AA4270042415A /* BackupSelectKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */; };
+		6DE67D07298AB7B80042415A /* SettingsBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
 		6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */; };
 		6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DEA1B1628D4592B00D170B7 /* RobotoMono-Bold.ttf */; };
@@ -558,6 +560,8 @@
 		6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Regular.ttf"; sourceTree = "<group>"; };
 		6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Bold.ttf"; sourceTree = "<group>"; };
 		6DDF439B29879D3900881AFF /* SecondaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryFont.swift; sourceTree = "<group>"; };
+		6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSelectKeyView.swift; sourceTree = "<group>"; };
+		6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackupModal.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
 		6DE8467028C0FA1E0051346A /* ExportPrivateKeyWarningModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyWarningModal.swift; sourceTree = "<group>"; };
 		6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedPhraseView.swift; sourceTree = "<group>"; };
@@ -979,6 +983,7 @@
 		6D52E3A82946F57000AD72F0 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				6DE67D03298AA41D0042415A /* Backup */,
 				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
 				6D7129202952B7570048558C /* Networks */,
 				6D7B44FB2979263200111D0E /* TermsOfServiceView.swift */,
@@ -1565,6 +1570,15 @@
 			path = Overview;
 			sourceTree = "<group>";
 		};
+		6DE67D03298AA41D0042415A /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */,
+				6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		6DE8466828BF6E9B0051346A /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1771,6 +1785,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		2D75EF99280EACC800C48FAF /* Run Linter */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1813,6 +1828,7 @@
 		};
 		6DBD21F0289983DB005D539B /* Run Code Formatter */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1929,8 +1945,10 @@
 				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
 				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,
 				6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */,
+				6DE67D05298AA4270042415A /* BackupSelectKeyView.swift in Sources */,
 				6D45065E296E94FC0065B4D4 /* DerivationMethodsInfoView.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* PrimaryFont.swift in Sources */,
+				6DE67D07298AB7B80042415A /* SettingsBackupModal.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				6D77F321296D0D4600044C7C /* GetAllNetworksService.swift in Sources */,
 				6D5FDDD02977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift in Sources */,
