@@ -96,9 +96,7 @@ struct PaginatedScrollView: View {
                     let cleanOffset = (value.predictedEndTranslation.width - gestureDragOffset)
                     let velocityDiff = cleanOffset * scrollDampingFactor
 
-                    var newPageIndex = countPageIndex(for: currentScrollOffset + velocityDiff)
-
-                    let currentItemOffset = CGFloat(currentPageIndex) * (itemWidth + itemPadding)
+                    let newPageIndex = countPageIndex(for: currentScrollOffset + velocityDiff)
 
                     gestureDragOffset = 0
                     withAnimation(

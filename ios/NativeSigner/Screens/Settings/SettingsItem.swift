@@ -10,6 +10,7 @@ import Foundation
 enum SettingsItem: Equatable, CaseIterable {
     case networks
     case verifier
+    case backup
     case privacyPolicy
     case termsAndConditions
     case wipe
@@ -22,6 +23,8 @@ extension SettingsItem {
             return Localizable.Settings.Label.networks.string
         case .verifier:
             return Localizable.Settings.Label.verifier.string
+        case .backup:
+            return Localizable.Settings.Label.backup.string
         case .privacyPolicy:
             return Localizable.Settings.Label.policy.string
         case .termsAndConditions:

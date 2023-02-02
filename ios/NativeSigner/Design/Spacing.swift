@@ -31,6 +31,8 @@ enum Spacing {
     static let x3Large: CGFloat = 48
     /// Spacing for dedicated spacer: 60 pts
     static let componentSpacer: CGFloat = 60
+    /// Spacing for dedicated spacer: 70 pts
+    static let backupComponentSpacer: CGFloat = 70
     /// Large spacing for dedicated spacer: 90 pts
     static let largeComponentSpacer: CGFloat = 90
     /// Spacing for top area offset: 20 pts

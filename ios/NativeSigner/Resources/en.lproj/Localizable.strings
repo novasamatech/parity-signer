@@ -451,10 +451,9 @@
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";
 "Settings.Label.Verifier" = "Verifier Certificate";
-"Settings.Label.Backup" = "Backup Keys";
+"Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
 "Settings.Label.Terms" = "Terms and Conditions";
-"Settings.Label.Feedback" = "Leave Feedback";
 "Settings.Label.Version" = "App version %@";
 "Settings.Label.Wipe" = "Wipe all Data";
 "Settings.Action.Cancel" = "Cancel";
@@ -510,6 +509,10 @@
 "Settings.TermsOfService.Label.Title" = "Terms of service";
 "Settings.PrivacyPolicy.Label.Title" = "Privacy Policy";
 
+"Settings.SelectKey.Title" = "Select Key Set";
+"Settings.SelectKey.Header" = "Select a key set you want to Expose a Secret Recovery Phrase for";
+"Settings.BackupModal.Label.Header" = "Secret Recovery Phrase";
+"Settings.BackupModal.Label.Snackbar" = "Secret Recovery Phrase will be hidden in";
 
 "VerifierCertificate.Label.Title" = "Verifier Certificate";
 "VerifierCertificate.Action.Remove" = "Remove certificate";
