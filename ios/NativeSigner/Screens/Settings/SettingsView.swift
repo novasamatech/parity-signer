@@ -18,8 +18,8 @@ struct SettingsView: View {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.Settings.Label.title.string,
-                        leftButton: .empty,
-                        rightButton: .empty,
+                        leftButtons: [.init(type: .empty)],
+                        rightButtons: [.init(type: .empty)],
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
                     )
                 )
