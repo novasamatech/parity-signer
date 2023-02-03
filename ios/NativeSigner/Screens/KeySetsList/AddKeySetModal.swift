@@ -65,7 +65,7 @@ struct AddKeySetModal: View {
         Animations.chainAnimation(
             animateBackground.toggle(),
             delayedAnimationClosure: {
-                isShowingNewSeedMenu.toggle()
+                isShowingNewSeedMenu = false
                 completion()
             }()
         )

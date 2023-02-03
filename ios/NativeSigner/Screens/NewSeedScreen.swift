@@ -18,21 +18,23 @@ struct NewSeedScreen: View {
             NavigationBarView(
                 viewModel: .init(
                     title: nil,
-                    leftButton: .xmark,
-                    rightButton:
-                    .activeAction(
-                        Localizable.NewSeed.Name.Action.next.key,
-                        .constant(
-                            (seedName.isEmpty) || ServiceLocator.seedsMediator
-                                .checkSeedCollision(seedName: seedName)
-                        )
-                    )
-                ),
-                actionModel: .init(
-                    rightBarMenuAction: {
-                        self.nameFocused = false
-                        self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
-                    }
+                    leftButtons: [.init(
+                        type: .xmark,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(
+                        type: .activeAction(
+                            Localizable.NewSeed.Name.Action.next.key,
+                            .constant(
+                                (seedName.isEmpty) || ServiceLocator.seedsMediator
+                                    .checkSeedCollision(seedName: seedName)
+                            )
+                        ),
+                        action: {
+                            self.nameFocused = false
+                            self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
+                        }
+                    )]
                 )
             )
             VStack(alignment: .leading, spacing: 0) {

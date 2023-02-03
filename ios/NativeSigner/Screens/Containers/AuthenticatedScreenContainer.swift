@@ -22,12 +22,19 @@ struct AuthenticatedScreenContainer: View {
                 NavigationBarView(
                     viewModel: .init(
                         title: navigation.actionResult.screenLabel,
-                        leftButton: navigation.actionResult.back ? .arrow : .empty,
-                        rightButton: [.none, .multiSelect]
-                            .contains(navigation.actionResult.rightButton) ? .empty : .more
-                    ),
-                    actionModel: .init(
-                        rightBarMenuAction: { self.navigation.perform(navigation: .init(action: .rightButtonAction)) }
+                        leftButtons: [
+                            .init(
+                                type: navigation.actionResult.back ? .arrow : .empty,
+                                action: { navigation.perform(navigation: .init(action: .goBack)) }
+                            )
+                        ],
+                        rightButtons: [
+                            .init(
+                                type: [.none, .multiSelect]
+                                    .contains(navigation.actionResult.rightButton) ? .empty : .more,
+                                action: { self.navigation.perform(navigation: .init(action: .rightButtonAction)) }
+                            )
+                        ]
                     )
                 )
             }

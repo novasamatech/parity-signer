@@ -15,11 +15,12 @@ struct TermsOfServiceView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.Settings.TermsOfService.Label.title.string,
-                    leftButton: .arrow,
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: viewModel.onBackTap
+                    )],
+                    rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    leftBarMenuAction: viewModel.onBackTap
                 )
             )
             ScrollView {

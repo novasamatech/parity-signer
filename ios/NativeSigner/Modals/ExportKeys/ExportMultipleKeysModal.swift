@@ -183,7 +183,7 @@ private extension ExportMultipleKeysModal {
     func animateDismissal() {
         Animations.chainAnimation(
             viewModel.animateBackground.toggle(),
-            delayedAnimationClosure: viewModel.isPresented.toggle()
+            delayedAnimationClosure: { self.viewModel.isPresented = false }()
         )
     }
 }

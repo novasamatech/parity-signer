@@ -48,7 +48,7 @@ struct KeyListMoreMenuModal: View {
         Animations.chainAnimation(
             animateBackground.toggle(),
             delayedAnimationClosure: {
-                isPresented.toggle()
+                self.isPresented = false
                 completion()
             }()
         )
