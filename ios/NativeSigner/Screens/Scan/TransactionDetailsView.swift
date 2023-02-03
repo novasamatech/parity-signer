@@ -61,7 +61,7 @@ extension TransactionDetailsView {
         }
 
         func onBackButtonTap() {
-            isPresented.toggle()
+            isPresented = false
         }
     }
 }

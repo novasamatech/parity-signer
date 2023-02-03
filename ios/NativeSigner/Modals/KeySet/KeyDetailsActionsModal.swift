@@ -64,7 +64,7 @@ struct KeyDetailsActionsModal: View {
         Animations.chainAnimation(
             animateBackground.toggle(),
             delayedAnimationClosure: {
-                isShowingActionSheet.toggle()
+                isShowingActionSheet = false
                 completion()
             }()
         )

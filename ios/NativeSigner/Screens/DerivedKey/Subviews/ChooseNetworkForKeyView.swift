@@ -155,7 +155,7 @@ extension ChooseNetworkForKeyView {
         }
 
         private func hide() {
-            isPresented.toggle()
+            isPresented = false
         }
     }
 }

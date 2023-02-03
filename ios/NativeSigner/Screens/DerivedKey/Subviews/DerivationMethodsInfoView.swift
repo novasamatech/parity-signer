@@ -84,7 +84,7 @@ extension DerivationMethodsInfoView {
         }
 
         private func hide() {
-            isPresented.toggle()
+            isPresented = false
         }
     }
 }
