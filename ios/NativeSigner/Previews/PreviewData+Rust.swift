@@ -67,6 +67,7 @@ extension PreviewData {
     static let seedNameCard = SeedNameCard(
         seedName: "aaaa",
         identicon: .svg(image: PreviewData.exampleIdenticon),
+        usedInNetworks: ["polkadot", "kusama", "westend"],
         derivedKeysCount: 3
     )
 
@@ -75,36 +76,43 @@ extension PreviewData {
             SeedNameCard(
                 seedName: "aaaa",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 3
             ),
             SeedNameCard(
                 seedName: "bbbb",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 0
             ),
             SeedNameCard(
                 seedName: "cccc",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "dddd",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 4
             ),
             SeedNameCard(
                 seedName: "eeee",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 15
             ),
             SeedNameCard(
                 seedName: "ffff",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 1
             ),
             SeedNameCard(
                 seedName: "gggg",
                 identicon: .svg(image: PreviewData.exampleIdenticon),
+                usedInNetworks: ["polkadot", "kusama", "westend"],
                 derivedKeysCount: 0
             )
         ]

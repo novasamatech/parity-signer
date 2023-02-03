@@ -54,7 +54,7 @@ use crate::{
 /// Network could support more than one encryption algorithm. In this case
 /// there would be more than one database entry with different
 /// [`NetworkSpecsKey`] values. Such entries do not conflict.  
-#[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
+#[derive(Decode, Hash, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecsKey(Vec<u8>);
 
 /// Decoded `NetworkSpecsKey` content, encryption-based variants with vector

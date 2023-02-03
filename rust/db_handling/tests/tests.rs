@@ -93,9 +93,14 @@ fn print_seed_names() {
         identicon: SignerImage::Png {
             image: alice_sr_root().to_vec(),
         },
+        used_in_networks: vec![
+            "kusama".to_string(),
+            "polkadot".to_string(),
+            "westend".to_string(),
+        ],
         derived_keys_count: 4, // "//westend", "//kusama", "//polkadot", "//Alice"
     }];
-    assert!(cards == expected_cards, "\nReceived: \n{cards:?}");
+    assert_eq!(cards, expected_cards);
 }
 
 #[cfg(feature = "test")]
@@ -115,6 +120,11 @@ fn print_seed_names_with_orphan() {
             identicon: SignerImage::Png {
                 image: alice_sr_root().to_vec(),
             },
+            used_in_networks: vec![
+                "kusama".to_string(),
+                "polkadot".to_string(),
+                "westend".to_string(),
+            ],
             derived_keys_count: 4,
         },
         SeedNameCard {
@@ -122,10 +132,11 @@ fn print_seed_names_with_orphan() {
             identicon: SignerImage::Png {
                 image: empty_png().to_vec(),
             },
+            used_in_networks: vec![],
             derived_keys_count: 0,
         },
     ];
-    assert!(cards == expected_cards, "\nReceived: \n{cards:?}");
+    assert_eq!(cards, expected_cards);
 }
 
 #[cfg(feature = "test")]
