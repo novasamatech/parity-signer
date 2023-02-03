@@ -146,7 +146,7 @@ extension NetworkSelectionModal {
 //        }
 
         func hide() {
-            isPresented.toggle()
+            isPresented = false
         }
 
         func animateDismissal() {

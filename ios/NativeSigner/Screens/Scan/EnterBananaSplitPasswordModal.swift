@@ -141,7 +141,7 @@ extension EnterBananaSplitPasswordModal {
         }
 
         func onCancelTap() {
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onDoneTap() {
@@ -179,7 +179,7 @@ extension EnterBananaSplitPasswordModal {
                     navigation.performFake(navigation: .init(action: .goBack))
                     navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
                     isKeyRecovered = true
-                    isPresented.toggle()
+                    isPresented = false
                 }
             } catch QrSequenceDecodeError.BananaSplitWrongPassword {
                 invalidPasswordAttempts += 1
@@ -200,7 +200,7 @@ extension EnterBananaSplitPasswordModal {
         private func dismissWithError(_ model: ErrorBottomModalViewModel) {
             presentableError = model
             isErrorPresented = true
-            isPresented.toggle()
+            isPresented = false
         }
 
         private func subscribeToUpdates() {

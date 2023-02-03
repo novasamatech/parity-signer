@@ -283,7 +283,7 @@ extension TransactionPreview {
                         style: .warning
                     )
                     self.snackbarPresentation.isSnackbarPresented = true
-                    self.isPresented.toggle()
+                    self.isPresented = false
                 }
             }
         }
@@ -302,22 +302,22 @@ extension TransactionPreview {
 
         func onBackButtonTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onDoneTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onCancelTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onApproveTap() {
             navigation.perform(navigation: .init(action: .goForward))
-            isPresented.toggle()
+            isPresented = false
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
                 snackbarPresentation.viewModel = .init(
@@ -361,7 +361,7 @@ extension TransactionPreview {
                 }
 
                 self.snackbarPresentation.isSnackbarPresented = true
-                self.isPresented.toggle()
+                self.isPresented = false
             }
         }
 

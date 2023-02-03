@@ -55,7 +55,7 @@ struct RootKeyDetailsModal: View {
     private func animateDismissal() {
         Animations.chainAnimation(
             animateBackground.toggle(),
-            delayedAnimationClosure: isPresented.toggle()
+            delayedAnimationClosure: { isPresented = false }()
         )
     }
 }

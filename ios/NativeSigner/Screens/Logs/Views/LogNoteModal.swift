@@ -102,12 +102,12 @@ extension LogNoteModal {
         }
 
         func onCancelTap() {
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onDoneTap() {
             navigation.performFake(navigation: .init(action: .goForward, details: note))
-            isPresented.toggle()
+            isPresented = false
         }
 
         private func subscribeToUpdates() {

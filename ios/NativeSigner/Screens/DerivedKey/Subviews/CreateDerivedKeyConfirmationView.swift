@@ -127,7 +127,7 @@ extension CreateDerivedKeyConfirmationView {
         }
 
         private func hide() {
-            isPresented.toggle()
+            isPresented = false
         }
     }
 }

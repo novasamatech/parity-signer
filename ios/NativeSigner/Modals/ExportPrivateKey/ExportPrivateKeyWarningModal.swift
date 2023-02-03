@@ -56,7 +56,7 @@ struct ExportPrivateKeyWarningModal: View {
     private func animateDismissal() {
         Animations.chainAnimation(
             animateBackground.toggle(),
-            delayedAnimationClosure: isPresentingExportKeysWarningModal.toggle()
+            delayedAnimationClosure: { isPresentingExportKeysWarningModal = false }()
         )
     }
 }
