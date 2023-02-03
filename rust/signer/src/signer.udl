@@ -372,6 +372,7 @@ interface DerivedKeyError {
 dictionary SeedNameCard {
     string seed_name;
     SignerImage identicon;
+    sequence<string> used_in_networks;
     u32 derived_keys_count;
 };
 
