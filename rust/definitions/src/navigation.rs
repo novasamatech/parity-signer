@@ -260,6 +260,7 @@ pub struct MTransaction {
 pub struct SeedNameCard {
     pub seed_name: String,
     pub identicon: SignerImage,
+    pub used_in_networks: Vec<String>,
     pub derived_keys_count: u32,
 }
 

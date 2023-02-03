@@ -6,7 +6,7 @@ use parity_scale_codec::Encode;
 use plot_icon::EMPTY_PNG;
 use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
@@ -60,6 +60,9 @@ pub fn get_all_seed_names_with_identicons(
 ) -> Result<Vec<SeedNameCard>> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     let mut derivation_count: HashMap<String, u32> = HashMap::new();
+    let mut used_in_networks: HashMap<String, HashSet<String>> = HashMap::new();
+    let mut network_names_cache: HashMap<NetworkSpecsKey, String> = HashMap::new();
+
     for (multisigner, address_details) in get_all_addresses(database)?.into_iter() {
         if address_details.is_root() {
             // found a seed key; could be any of the supported encryptions;
@@ -74,6 +77,19 @@ pub fn get_all_seed_names_with_identicons(
                 }
             }
         } else {
+            if let Some(network) = address_details.network_id {
+                if !network_names_cache.contains_key(&network) {
+                    let name = get_network_specs(database, &network)?.specs.name;
+                    network_names_cache.insert(network.clone(), name);
+                }
+                if let Some(name) = network_names_cache.get(&network) {
+                    used_in_networks
+                        .entry(address_details.seed_name.to_string())
+                        .or_default()
+                        .insert(name.to_string());
+                }
+            }
+
             derivation_count
                 .entry(address_details.seed_name.to_string())
                 .and_modify(|e| *e += 1)
@@ -90,10 +106,19 @@ pub fn get_all_seed_names_with_identicons(
     }
     let mut res: Vec<_> = data_set
         .into_iter()
-        .map(|(seed_name, multisigner_set)| SeedNameCard {
-            seed_name: seed_name.clone(),
-            identicon: preferred_multisigner_identicon(&multisigner_set),
-            derived_keys_count: *derivation_count.get(&seed_name).unwrap_or(&0),
+        .map(|(seed_name, multisigner_set)| {
+            let mut used_in_networks = used_in_networks
+                .get(&seed_name)
+                .cloned()
+                .map(|hs| hs.into_iter().collect())
+                .unwrap_or_else(Vec::new);
+            used_in_networks.sort();
+            SeedNameCard {
+                seed_name: seed_name.clone(),
+                identicon: preferred_multisigner_identicon(&multisigner_set),
+                derived_keys_count: *derivation_count.get(&seed_name).unwrap_or(&0),
+                used_in_networks,
+            }
         })
         .collect();
     res.sort_by(|a, b| a.seed_name.cmp(&b.seed_name));

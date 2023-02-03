@@ -108,7 +108,7 @@ struct ErrorBottomModal: View {
         Animations.chainAnimation(
             animateBackground.toggle(),
             delayedAnimationClosure: {
-                isShowingBottomAlert.toggle()
+                isShowingBottomAlert = false
                 completion()
             }()
         )

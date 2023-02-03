@@ -152,11 +152,11 @@ extension EnterPasswordModal {
             navigation.performFake(navigation: .init(action: .goBack))
             // Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
             navigation.performFake(navigation: .init(action: .navbarScan))
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onErrorDismiss() {
-            isPresented.toggle()
+            isPresented = false
         }
 
         func onDoneTap() {

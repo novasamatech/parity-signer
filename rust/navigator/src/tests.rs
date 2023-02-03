@@ -2349,6 +2349,7 @@ fn flow_test_1() {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Portia".to_string(),
                     identicon: SignerImage::default(),
+                    used_in_networks: vec![],
                     derived_keys_count: 3,
                 }],
             },
@@ -3069,11 +3070,13 @@ fn flow_test_1() {
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
                         identicon: SignerImage::default(),
+                        used_in_networks: vec![],
                         derived_keys_count: 3,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
                         identicon: SignerImage::default(),
+                        used_in_networks: vec![],
                         derived_keys_count: 3,
                     },
                 ],
@@ -3302,11 +3305,13 @@ fn flow_test_1() {
                     SeedNameCard {
                         seed_name: "Alice".to_string(),
                         identicon: SignerImage::default(),
+                        used_in_networks: vec![],
                         derived_keys_count: 3,
                     },
                     SeedNameCard {
                         seed_name: "Portia".to_string(),
                         identicon: SignerImage::default(),
+                        used_in_networks: vec![],
                         derived_keys_count: 3,
                     },
                 ],
@@ -3583,6 +3588,7 @@ fn flow_test_1() {
                     identicon: SignerImage::Png {
                         image: alice_sr_root().to_vec(),
                     },
+                    used_in_networks: vec![],
                     derived_keys_count: 4,
                 }],
             },
@@ -4028,6 +4034,7 @@ fn flow_test_1() {
                     identicon: SignerImage::Png {
                         image: alice_sr_root().to_vec(),
                     },
+                    used_in_networks: vec![],
                     derived_keys_count: 9,
                 }],
             },

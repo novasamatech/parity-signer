@@ -30,18 +30,20 @@ struct KeySetList: View {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.KeySets.title.string,
-                        leftButton: isExportKeysSelected ? .xmark : .empty,
-                        rightButton: isExportKeysSelected ? .empty : .more,
+                        leftButtons: [.init(
+                            type: isExportKeysSelected ? .xmark : .empty,
+                            action: {
+                                isExportKeysSelected.toggle()
+                                selectedItems.removeAll()
+                            }
+                        )],
+                        rightButtons: [.init(
+                            type: isExportKeysSelected ? .empty : .more,
+                            action: {
+                                isShowingMoreMenu.toggle()
+                            }
+                        )],
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
-                    ),
-                    actionModel: .init(
-                        leftBarMenuAction: {
-                            isExportKeysSelected.toggle()
-                            selectedItems.removeAll()
-                        },
-                        rightBarMenuAction: {
-                            isShowingMoreMenu.toggle()
-                        }
                     )
                 )
                 // Empty state

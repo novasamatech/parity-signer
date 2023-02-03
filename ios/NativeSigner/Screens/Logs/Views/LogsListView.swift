@@ -18,12 +18,9 @@ struct LogsListView: View {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.LogsList.Label.title.string,
-                        leftButton: .empty,
-                        rightButton: .more,
+                        leftButtons: [.init(type: .empty)],
+                        rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
-                    ),
-                    actionModel: .init(
-                        rightBarMenuAction: viewModel.onMoreMenuTap
                     )
                 )
                 ScrollView {

@@ -21,16 +21,18 @@ struct DerivationPathNameView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Modal.Path.title.string,
-                    leftButton: .xmark,
-                    rightButton: .activeAction(
-                        Localizable.CreateDerivedKey.Modal.Path.Action.navigation.key,
-                        $viewModel.isMainActionDisabled
-                    ),
+                    leftButtons: [.init(
+                        type: .xmark,
+                        action: viewModel.onDismissTap
+                    )],
+                    rightButtons: [.init(
+                        type: .activeAction(
+                            Localizable.CreateDerivedKey.Modal.Path.Action.navigation.key,
+                            $viewModel.isMainActionDisabled
+                        ),
+                        action: viewModel.onRightNavigationButtonTap
+                    )],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    leftBarMenuAction: viewModel.onDismissTap,
-                    rightBarMenuAction: viewModel.onRightNavigationButtonTap
                 )
             )
             ScrollView(showsIndicators: false) {

@@ -17,12 +17,12 @@ struct CreateDerivedKeyView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Label.title.string,
-                    leftButton: .xmark,
-                    rightButton: .questionmark,
+                    leftButtons: [.init(
+                        type: .xmark,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(type: .questionmark, action: viewModel.onRightNavigationButtonTap)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
-                ),
-                actionModel: .init(
-                    rightBarMenuAction: viewModel.onRightNavigationButtonTap
                 )
             )
             VStack(alignment: .leading, spacing: 0) {

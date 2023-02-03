@@ -53,10 +53,12 @@ struct KeyDetailsPublicKeyView: View {
                 viewModel: .init(
                     title: Localizable.PublicKeyDetails.Label.title.string,
                     subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
-                    leftButton: .xmark,
-                    rightButton: .more
-                ),
-                actionModel: .init(rightBarMenuAction: { isShowingActionSheet.toggle() })
+                    leftButtons: [.init(
+                        type: .xmark,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(type: .more, action: { isShowingActionSheet.toggle() })]
+                )
             )
             VStack {
                 VStack(spacing: 0) {

@@ -16,8 +16,11 @@ struct NetworkSelectionSettings: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.Settings.Networks.Label.title.string,
-                    leftButton: .arrow,
-                    rightButton: .empty,
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
                 )
             )

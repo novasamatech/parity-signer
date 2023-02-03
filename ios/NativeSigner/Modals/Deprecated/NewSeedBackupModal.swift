@@ -18,7 +18,10 @@ struct NewSeedBackupModal: View {
             NavigationBarView(
                 viewModel: .init(
                     title: nil,
-                    leftButton: .arrow
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )]
                 )
             )
             ScrollView(showsIndicators: false) {
