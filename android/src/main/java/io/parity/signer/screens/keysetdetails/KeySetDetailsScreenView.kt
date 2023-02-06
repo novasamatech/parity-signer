@@ -11,7 +11,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -25,8 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.items.KeyDerivedItem
 import io.parity.signer.components.panels.BottomBar2
@@ -52,8 +53,10 @@ fun KeySetDetailsScreenView(
 	onMenu: Callback,
 ) {
 	Column {
-		ScreenHeader(
-			title = null,
+		KeySetDetailsHeader(
+			onAddKey = {
+				navigator.navigate(Action.NEW_KEY, "") //new derived key
+			},
 			onBack = { navigator.backAction() },
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)
@@ -89,7 +92,7 @@ fun KeySetDetailsScreenView(
 //                                    ""
 //                                )
 //                            }
-                            .size(28.dp),
+							.size(28.dp),
 						tint = MaterialTheme.colors.textTertiary,
 					)
 				}
@@ -102,23 +105,64 @@ fun KeySetDetailsScreenView(
 				}
 			}
 
-			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-				ExposedIcon(
-					networkState = networkState, navigator = navigator,
-                    Modifier
-                        .align(Alignment.End)
-                        .padding(end = 16.dp)
-				)
-				PrimaryButtonWide(
-					label = stringResource(R.string.key_sets_details_screem_create_derived_button),
-					modifier = Modifier
-						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
-				) {
-					navigator.navigate(Action.NEW_KEY, "") //new derived key
-				}
-			}
+			ExposedIcon(
+				networkState = networkState, navigator = navigator,
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 24.dp)
+			)
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
+	}
+}
+
+
+@Composable
+fun KeySetDetailsHeader(
+	onAddKey: Callback,
+	onBack: Callback,
+	onMenu: Callback,
+) {
+	Row(
+		modifier = Modifier
+            .fillMaxWidth(1f)
+            .defaultMinSize(minHeight = 56.dp)
+	) {
+		Image(
+			imageVector = Icons.Filled.ChevronLeft,
+			contentDescription = stringResource(R.string.description_back_button),
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable(onClick = onBack)
+                .padding(8.dp)
+                .size(24.dp)
+                .align(Alignment.CenterVertically)
+		)
+		//center
+		Spacer(modifier = Modifier.weight(1f))
+		//end
+		Image(
+			imageVector = Icons.Default.Add,
+			contentDescription = stringResource(R.string.key_sets_details_screem_create_derived_button),
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier
+                .clickable(onClick = onAddKey)
+                .padding(8.dp)
+                .size(24.dp)
+                .align(Alignment.CenterVertically)
+		)
+		Image(
+			imageVector = Icons.Filled.MoreHoriz,
+			contentDescription = stringResource(R.string.description_menu_button),
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier
+                .padding(end = 8.dp)
+                .clickable(onClick = onMenu)
+                .padding(8.dp)
+                .size(24.dp)
+                .align(Alignment.CenterVertically)
+		)
 	}
 }
 
