@@ -95,7 +95,7 @@ struct ExportMultipleKeysModal: View {
                     derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                     id: \.id
                 ) {
-                    QRCodeAddressFooterView(viewModel: .init($0))
+                    QRCodeAddressFooterView(viewModel: .init($0), backgroundColor: Asset.fill6Solid.swiftUIColor)
                     if $0 != derivedKeys.last {
                         Divider()
                     }

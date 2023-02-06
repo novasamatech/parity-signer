@@ -66,7 +66,7 @@ struct NetworkSelectionModal: View {
     @ViewBuilder
     func item(for network: MmNetwork) -> some View {
         HStack(alignment: .center, spacing: 0) {
-            NetworkLogoIcon(logo: network.logo)
+            NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
