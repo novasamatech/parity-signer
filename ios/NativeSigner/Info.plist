@@ -32,7 +32,6 @@
 	<string>LaunchScreen</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Web3-Regular.otf</string>
 		<string>Unbounded-Black.ttf</string>
 		<string>Unbounded-Bold.ttf</string>
 		<string>Unbounded-Regular.ttf</string>

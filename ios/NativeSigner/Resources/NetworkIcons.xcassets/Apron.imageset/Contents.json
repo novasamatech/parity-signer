@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Apron.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -8,20 +8,42 @@
 import SwiftUI
 
 struct NetworkLogoIcon: View {
-    let logo: String
+    let networkName: String
     let size: CGFloat
 
-    init(logo: String, size: CGFloat = Heights.networkLogoInCell) {
-        self.logo = logo
+    init(networkName: String, size: CGFloat = Heights.networkLogoInCell) {
+        self.networkName = networkName
         self.size = size
     }
 
     var body: some View {
-        Text(logo)
-            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-            .font(.web3)
-            .frame(width: size, height: size)
-            .background(Circle().foregroundColor(Asset.fill12.swiftUIColor))
+        let image = UIImage(named: networkName.lowercased())
+        Group {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: size, height: size)
+                    .clipShape(Circle())
+            } else {
+                Text(networkName.prefix(1).uppercased())
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.titleM.font)
+                    .frame(width: size, height: size)
+                    .background(Color.random())
+                    .clipShape(Circle())
+            }
+        }
+    }
+}
+
+private extension Color {
+    static func random() -> Color {
+        Color(
+            red: .random(in: 0 ... 1),
+            green: .random(in: 0 ... 1),
+            blue: .random(in: 0 ... 1)
+        )
     }
 }
 
@@ -29,12 +51,16 @@ struct NetworkLogoIcon: View {
     struct NetworkLogoIcon_Previews: PreviewProvider {
         static var previews: some View {
             VStack {
-                NetworkLogoIcon(logo: "polkadot")
-                NetworkLogoIcon(logo: "kusama")
-                NetworkLogoIcon(logo: "westend")
-                NetworkLogoIcon(logo: "acala")
-                NetworkLogoIcon(logo: "moonbeam")
-                NetworkLogoIcon(logo: "astar")
+                NetworkLogoIcon(networkName: "polkadot")
+                NetworkLogoIcon(networkName: "kusama")
+                NetworkLogoIcon(networkName: "westend")
+                NetworkLogoIcon(networkName: "acala")
+                NetworkLogoIcon(networkName: "moonbeam")
+                NetworkLogoIcon(networkName: "astar")
+                NetworkLogoIcon(networkName: "moonriver")
+                NetworkLogoIcon(networkName: "BigNewNetwork")
+                NetworkLogoIcon(networkName: "Random")
+                NetworkLogoIcon(networkName: "GLMR")
             }
             .previewLayout(.sizeThatFits)
         }
