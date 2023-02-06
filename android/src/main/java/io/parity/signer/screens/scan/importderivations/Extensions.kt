@@ -1,6 +1,5 @@
 package io.parity.signer.screens.scan.importderivations
 
-import android.util.Log
 import io.parity.signer.screens.scan.transaction.sortedValueCards
 import io.parity.signer.uniffi.*
 
@@ -9,7 +8,6 @@ import io.parity.signer.uniffi.*
 // hence we need this support function to find out what is the proper UI error to show
 // if there are no importable keys left
 fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
-	Log.e("LOG", "checking dominant error, has keys is ${hasImportableKeys()}")
 	if (hasImportableKeys()) return null
 
 	val allErrors: List<DerivedKeyError> = flatMap { it.allImportDerivedKeys() }
@@ -18,13 +16,11 @@ fun List<MTransaction>.dominantImportError(): DerivedKeyError? {
 		.filterIsInstance<DerivedKeyStatus.Invalid>()
 		.flatMap { it.errors }
 
-	Log.e("LOG", "checking dominant error, all errors is ${allErrors}")
 	val mostCommonError = allErrors
 		.groupBy { it }
 		.maxByOrNull { entry -> entry.value.size }
 		?.key
 
-	Log.e("LOG", "most common error is ${mostCommonError}")
 	return mostCommonError
 }
 
