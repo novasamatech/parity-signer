@@ -13,7 +13,7 @@ import io.parity.signer.uniffi.*
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
-fun MainFlowViewModel.navigate(
+fun SignerMainViewModel.navigate(
 	button: Action,
 	details: String = "",
 	seedPhrase: String = ""
@@ -42,7 +42,7 @@ interface Navigator {
  * Class to navigate within rust state-machine area. It is one (big) part of compose-based navigation.
  * This class have nothing to do with composa-based navigation.
  */
-class SignerNavigator(private val singleton: MainFlowViewModel) : Navigator {
+class SignerNavigator(private val singleton: SignerMainViewModel) : Navigator {
 
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		if (singleton.localNavAction.value != LocalNavAction.None) {
