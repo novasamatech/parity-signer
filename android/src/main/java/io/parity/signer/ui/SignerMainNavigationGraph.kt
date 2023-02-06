@@ -27,6 +27,8 @@ fun SignerMainNavigationGraph(
 	}
 }
 
+const val NAVIGATION_TAG = "navigation"
+
 object MainGraphRoutes {
 	const val splashRoute = "navigation_point_splash"
 	const val onboardingRoute = "navigation_point_terms_consent"

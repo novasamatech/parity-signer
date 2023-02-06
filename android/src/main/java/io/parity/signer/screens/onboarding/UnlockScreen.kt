@@ -1,10 +1,12 @@
 package io.parity.signer.screens.onboarding
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,6 +17,7 @@ import io.parity.signer.R
 import io.parity.signer.components.BigButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.MainGraphRoutes
+import io.parity.signer.ui.NAVIGATION_TAG
 
 
 /**
@@ -26,6 +29,9 @@ fun NavGraphBuilder.initialUnlockAppScreenFlow(globalNavController: NavHostContr
 			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 				popUpTo(0)
 			}
+		}
+		LaunchedEffect(Unit) {
+			Log.d(NAVIGATION_TAG, "initial unlock screen opened")
 		}
 	}
 }

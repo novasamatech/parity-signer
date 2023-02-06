@@ -2,6 +2,7 @@ package io.parity.signer.screens.onboarding.termsconsent
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Checkbox
@@ -23,6 +24,7 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
 import io.parity.signer.ui.MainGraphRoutes
+import io.parity.signer.ui.NAVIGATION_TAG
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.SignerOldTheme
@@ -49,6 +51,9 @@ fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) 
 				.captionBarPadding()
 				.statusBarsPadding()
 		)
+		LaunchedEffect(Unit) {
+			Log.d(NAVIGATION_TAG, "terms screen opened")
+		}
 	}
 }
 

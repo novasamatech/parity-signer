@@ -1,5 +1,6 @@
 package io.parity.signer.ui
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
@@ -43,6 +44,9 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 			SignerMainSubgraph(mainFlowViewModel)
 		} else {
 			UnlockAppAuthScreen { mainFlowViewModel.totalRefresh() }
+		}
+		LaunchedEffect(Unit) {
+			Log.d(NAVIGATION_TAG, "main rust-handled screen navigation subgraph opened")
 		}
 	}
 }
