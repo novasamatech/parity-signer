@@ -15,4 +15,6 @@ enum ServiceLocator {
     /// As long as we have `SignerDataModel` as tech debt, we need to have seeds mediator as singleton which is
     /// unfortunate but necessary for now; to be able to use it outside SwiftUI views it can't be `@EnvironmentalObject`
     static var seedsMediator: SeedsMediating = SeedsMediator()
+
+    static var networkColorsGenerator = UnknownNetworkColorsGenerator()
 }

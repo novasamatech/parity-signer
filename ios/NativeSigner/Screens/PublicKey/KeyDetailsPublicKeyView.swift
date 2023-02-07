@@ -70,7 +70,7 @@ struct KeyDetailsPublicKeyView: View {
                         )
                     )
                     .padding(0.5)
-                    QRCodeAddressFooterView(viewModel: viewModel.footer)
+                    QRCodeAddressFooterView(viewModel: viewModel.footer, backgroundColor: Asset.fill6Solid.swiftUIColor)
                 }
                 .strokeContainerBackground()
                 // Exposed key alert

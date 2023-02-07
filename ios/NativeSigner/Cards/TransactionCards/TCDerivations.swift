@@ -62,7 +62,6 @@ struct TCDerivations: View {
                 .font(PrimaryFont.bodyM.font)
                 .padding(.top, Spacing.medium)
                 .padding(.horizontal, Spacing.medium)
-
             // Derived keys list
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(keySet.keys, id: \.id) {
@@ -86,7 +85,12 @@ struct TCDerivations: View {
     func derivedKey(_ preview: DerivedKeysSetRenderable.DerivedKeyRenderable) -> some View {
         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
             HStack(alignment: .center, spacing: Spacing.extraSmall) {
-                Identicon(identicon: preview.identicon, rowHeight: Heights.identiconSmall)
+                NetworkIdenticon(
+                    identicon: preview.identicon,
+                    network: preview.networkTitle,
+                    background: Asset.fill6Solid.swiftUIColor,
+                    size: Heights.identiconSmall
+                )
                 pathView(preview)
                     .font(PrimaryFont.bodyM.font)
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)

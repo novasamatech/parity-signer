@@ -51,7 +51,10 @@ struct ExportPrivateKeyModal: View {
                         )
                         .padding(0.5)
                         .privacySensitive()
-                        QRCodeAddressFooterView(viewModel: viewModel.addressFooter)
+                        QRCodeAddressFooterView(
+                            viewModel: viewModel.addressFooter,
+                            backgroundColor: Asset.fill6Solid.swiftUIColor
+                        )
                     }
                     .redacted(
                         reason: applicationStatePublisher.applicationState == .inactive ? .privacy : []

@@ -538,6 +538,7 @@ pub struct MSignatureReady {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MEnterPassword {
     pub author_info: MAddressCard,
+    pub network_info: Option<MSCNetworkInfo>,
     pub counter: u32,
 }
 

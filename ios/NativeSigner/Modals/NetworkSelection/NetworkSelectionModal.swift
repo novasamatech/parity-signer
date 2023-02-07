@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct NetworkSelectionModal: View {
+    private enum Constants {
+        static let maxNetworks = 5
+    }
+
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var appState: AppState
 
@@ -33,14 +37,8 @@ struct NetworkSelectionModal: View {
                     Divider()
                         .padding(.vertical, Spacing.medium)
                     // List of networks
-                    LazyVStack {
-                        ForEach(
-                            viewModel.networks,
-                            id: \.key
-                        ) {
-                            item(for: $0)
-                        }
-                    }
+                    networkList()
+
                     // Bottom actions
                     HStack(spacing: Spacing.extraSmall) {
                         SecondaryButton(
@@ -66,7 +64,7 @@ struct NetworkSelectionModal: View {
     @ViewBuilder
     func item(for network: MmNetwork) -> some View {
         HStack(alignment: .center, spacing: 0) {
-            NetworkLogoIcon(logo: network.logo)
+            NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -84,6 +82,31 @@ struct NetworkSelectionModal: View {
         .frame(height: Heights.networkFilterItem)
         .onTapGesture {
             viewModel.toggleSelection(network)
+        }
+    }
+
+    @ViewBuilder
+    func networkList() -> some View {
+        if viewModel.networks.count > Constants.maxNetworks {
+            ScrollView {
+                LazyVStack {
+                    ForEach(
+                        viewModel.networks,
+                        id: \.key
+                    ) {
+                        item(for: $0)
+                    }
+                }
+            }
+        } else {
+            LazyVStack {
+                ForEach(
+                    viewModel.networks,
+                    id: \.key
+                ) {
+                    item(for: $0)
+                }
+            }
         }
     }
 }
@@ -136,14 +159,6 @@ extension NetworkSelectionModal {
                 selectedNetworks.append(network)
             }
         }
-
-//
-//        func switchToNetwork(_ network: Network) {
-//            guard !selectedNetworks.contains(network) else { return }
-//            selectedNetworks = [network]
-//            navigation.perform(navigation: .init(action: .changeNetwork, details: network.key))
-//            animateDismissal()
-//        }
 
         func hide() {
             isPresented = false

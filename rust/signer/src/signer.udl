@@ -697,6 +697,7 @@ dictionary MSignatureReady {
 
 dictionary MEnterPassword {
     MAddressCard author_info;
+    MSCNetworkInfo? network_info;
     u32 counter;
 };
 
