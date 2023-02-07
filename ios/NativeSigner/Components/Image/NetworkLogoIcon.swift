@@ -10,14 +10,20 @@ import SwiftUI
 struct NetworkLogoIcon: View {
     let networkName: String
     let size: CGFloat
+    let colorGenerator: UnknownNetworkColorsGenerator
 
-    init(networkName: String, size: CGFloat = Heights.networkLogoInCell) {
+    init(
+        networkName: String,
+        size: CGFloat = Heights.networkLogoInCell,
+        colorGenerator: UnknownNetworkColorsGenerator = ServiceLocator.networkColorsGenerator
+    ) {
         self.networkName = networkName
         self.size = size
+        self.colorGenerator = colorGenerator
     }
 
     var body: some View {
-        let image = UIImage(named: networkName.lowercased())
+        let image = UIImage(named: networkName)
         Group {
             if let image = image {
                 Image(uiImage: image)
@@ -26,24 +32,20 @@ struct NetworkLogoIcon: View {
                     .frame(width: size, height: size)
                     .clipShape(Circle())
             } else {
-                Text(networkName.prefix(1).uppercased())
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.titleM.font)
-                    .frame(width: size, height: size)
-                    .background(Color.random())
-                    .clipShape(Circle())
+                unknownNetworkPlaceholder()
             }
         }
     }
-}
 
-private extension Color {
-    static func random() -> Color {
-        Color(
-            red: .random(in: 0 ... 1),
-            green: .random(in: 0 ... 1),
-            blue: .random(in: 0 ... 1)
-        )
+    @ViewBuilder
+    func unknownNetworkPlaceholder() -> some View {
+        let colorRenderable = colorGenerator.renderable(for: networkName)
+        Text(networkName.prefix(1).uppercased())
+            .foregroundColor(colorRenderable.text)
+            .font(PrimaryFont.titleM.font)
+            .frame(width: size, height: size)
+            .background(colorRenderable.background)
+            .clipShape(Circle())
     }
 }
 

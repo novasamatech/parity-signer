@@ -42,7 +42,7 @@ struct NetworkIdenticon: View {
             SVGView(data: identicon)
                 .frame(width: size, height: size)
                 .clipShape(Circle())
-            if let network = network {
+            if let network = network, !network.isEmpty {
                 NetworkLogoIcon(
                     networkName: network,
                     size: size / 2
