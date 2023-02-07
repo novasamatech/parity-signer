@@ -20,6 +20,7 @@ extension PreviewData {
         path: "//polkadot//path",
         hasPassword: true,
         network: "Polkadot",
+        networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
@@ -29,6 +30,7 @@ extension PreviewData {
         path: "",
         hasPassword: false,
         network: "Polkadot",
+        networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
@@ -38,6 +40,7 @@ extension PreviewData {
         path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
         hasPassword: false,
         network: "Polkadot",
+        networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
@@ -151,6 +154,7 @@ extension PreviewData {
     static let transactionSignature: TransactionSignatureRenderable = .init(
         path: "//polkadot//1",
         name: "Parity Keys",
+        network: "polkadot",
         base58: "1219xC79CXV31543DDXoQMjuA",
         identicon: PreviewData.exampleIdenticon
     )

@@ -19,7 +19,7 @@ struct NetworkCard: View {
                     .frame(height: 47)
             }
             HStack {
-                NetworkLogoIcon(logo: logo)
+                NetworkLogoIcon(networkName: logo)
                 Text(title).font(PrimaryFont.labelM.font)
                 if fancy { Spacer() }
             }

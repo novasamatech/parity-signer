@@ -18,9 +18,14 @@ struct DerivedKeyRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.small) {
-            Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
-                .padding(.top, Spacing.extraExtraSmall)
-                .padding(.leading, Spacing.medium)
+            NetworkIdenticon(
+                identicon: viewModel.identicon,
+                network: viewModel.network,
+                background: Asset.backgroundPrimary.swiftUIColor,
+                size: Heights.identiconInCell
+            )
+            .padding(.top, Spacing.extraExtraSmall)
+            .padding(.leading, Spacing.medium)
             VStack(alignment: .leading) {
                 if !isRoot {
                     fullPath
@@ -78,7 +83,8 @@ struct DerivedKeyRow: View {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// polkadot",
+                        network: "polkadot",
+                        path: "//polkadot",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A",
                         rootKeyName: ""
@@ -89,6 +95,7 @@ struct DerivedKeyRow: View {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
                         identicon: PreviewData.exampleIdenticon,
+                        network: "kusama",
                         path: "",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A"
@@ -99,7 +106,8 @@ struct DerivedKeyRow: View {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// astar",
+                        network: "astar",
+                        path: "//astar",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A"
                     ),
@@ -109,7 +117,8 @@ struct DerivedKeyRow: View {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// kusama",
+                        network: "kusama",
+                        path: "//kusama",
                         hasPassword: true,
                         base58: "15Gsc678654FDSG0HA04H0A"
                     ),
@@ -119,7 +128,8 @@ struct DerivedKeyRow: View {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
                         identicon: PreviewData.exampleIdenticon,
-                        path: "// kusama // verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
+                        network: "kusama",
+                        path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                         hasPassword: true,
                         base58: "15Gsc678654FDSG0HA04H0A"
                     ),

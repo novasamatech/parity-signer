@@ -12,12 +12,15 @@ struct RoundedContainerBackground: ViewModifier {
     let state: State
 
     enum State {
+        case list
         case standard
         case error
         case actionableInfo
 
         var foregroundColor: Color {
             switch self {
+            case .list:
+                return Asset.backgroundSecondary.swiftUIColor
             case .standard:
                 return Asset.fill6.swiftUIColor
             case .error:

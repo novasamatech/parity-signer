@@ -9,6 +9,7 @@ import UIKit
 
 /// Common UI components heights to be used for Design System views
 enum Heights {
+    static let chevronRightInList: CGFloat = 15
     static let oviewviewPageIndicator: CGFloat = 4
     /// All variants of `ActionButton`, 56 pt
     static let actionButton: CGFloat = 56
@@ -44,8 +45,10 @@ enum Heights {
     static let minTransactionSummaryItemHeight: CGFloat = 18
     static let chevronLogElementWidth: CGFloat = 32
     /// Height for `Network Logo` when used in list collections, 36 pt
-    static let networkLogoInCell: CGFloat = 36
+    static let networkLogoOverlay: CGFloat = 18
     /// Height for `Network Logo` when used in list collections, 36 pt
+    static let networkLogoInCell: CGFloat = 36
+    static let networkLogoInList: CGFloat = 32
     static let networkLogoInHeader: CGFloat = 56
     /// Height for `Network Logo` when used in small capsule view, 24 pt
     static let networkLogoInCapsule: CGFloat = 24

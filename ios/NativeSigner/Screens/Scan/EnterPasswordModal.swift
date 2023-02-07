@@ -102,7 +102,12 @@ struct EnterPasswordModal: View {
                 }
             }
             Spacer()
-            Identicon(identicon: viewModel.dataModel.authorInfo.address.identicon, rowHeight: Heights.identiconInCell)
+            NetworkIdenticon(
+                identicon: viewModel.dataModel.authorInfo.address.identicon,
+                network: viewModel.dataModel.networkInfo?.networkLogo,
+                background: Asset.accentRed300Overlay.swiftUIColor,
+                size: Heights.identiconInCell
+            )
         }
         .padding(Spacing.small)
         .containerBackground(state: .error)
@@ -223,6 +228,11 @@ struct EnterPasswordModal_Previews: PreviewProvider {
                                 secretExposed: true
                             )
                         ),
+                        networkInfo: MscNetworkInfo(
+                            networkTitle: "Polkadot",
+                            networkLogo: "polkadot",
+                            networkSpecsKey: "sr25519"
+                        ),
                         counter: 2
                     )
                 ),
@@ -230,6 +240,6 @@ struct EnterPasswordModal_Previews: PreviewProvider {
             )
         )
         .environmentObject(NavigationCoordinator())
-        .preferredColorScheme(.dark)
+//        .preferredColorScheme(.dark)
     }
 }

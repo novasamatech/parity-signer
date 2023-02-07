@@ -1369,9 +1369,10 @@ impl State {
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
                     t.current_password_author_info()
-                        .map(|author_info| ModalData::EnterPassword {
+                        .map(|(author_info, network_info)| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
+                                network_info: Some(network_info.into()),
                                 counter: t.counter() as u32,
                             },
                         })
@@ -1381,6 +1382,7 @@ impl State {
                         Some(ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
+                                network_info: None,
                                 counter: s.counter() as u32,
                             },
                         })
