@@ -21,6 +21,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
             path: keyDetails.address.path,
             hasPassword: keyDetails.address.hasPwd,
             network: keyDetails.networkInfo.networkTitle,
+            networkLogo: keyDetails.networkInfo.networkLogo,
             base58: keyDetails.base58
         )
         isKeyExposed = keyDetails.address.secretExposed

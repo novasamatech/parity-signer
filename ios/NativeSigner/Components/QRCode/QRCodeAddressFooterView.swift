@@ -13,6 +13,7 @@ struct QRCodeAddressFooterViewModel: Equatable {
     let path: String
     let hasPassword: Bool
     let network: String
+    let networkLogo: String
     let base58: String
 }
 
@@ -43,7 +44,7 @@ struct QRCodeAddressFooterView: View {
                 Spacer()
                 NetworkIdenticon(
                     identicon: viewModel.identicon,
-                    network: viewModel.network,
+                    network: viewModel.networkLogo,
                     background: backgroundColor,
                     size: Heights.identiconInCell
                 )

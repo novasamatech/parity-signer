@@ -21,6 +21,7 @@ extension QRCodeAddressFooterViewModel {
         path = derivedKey.viewModel.path
         hasPassword = derivedKey.viewModel.hasPassword
         network = derivedKey.keyData.network.networkTitle
+        networkLogo = derivedKey.keyData.network.networkLogo
         base58 = derivedKey.viewModel.base58
     }
 }
