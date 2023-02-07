@@ -284,8 +284,7 @@
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
-    <string name="key_set_details_no_keys_title">This key set have no derivations yet</string>
-	<string name="key_set_details_no_keys_message">Click + in header to add one or user camera to import derivations</string>
+	<string name="key_set_details_no_keys_title">Key Set Don't Have Any Derived Keys</string>
 	<string name="key_sets_empty_title">You Don\'t Have Any Key Sets</string>
 	<string name="key_sets_empty_message">Add a new Key Set to Store Keys and Sign Transactions</string>
 
