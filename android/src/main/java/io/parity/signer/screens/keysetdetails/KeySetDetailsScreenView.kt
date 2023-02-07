@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -34,10 +35,7 @@ import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textDisabled
-import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
 /**
@@ -61,47 +59,61 @@ fun KeySetDetailsScreenView(
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)
 		Box(modifier = Modifier.weight(1f)) {
-			Column(
-				modifier = Modifier.verticalScroll(rememberScrollState())
-			) {
-				//seed
-				model.root?.let {
-					SeedKeyDetails(
-						model = it,
-						Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
-					)
-				}
-				//filter row
-				Row(
-					modifier = Modifier.padding(horizontal = 24.dp),
-					verticalAlignment = Alignment.CenterVertically
+			if (model.keysAndNetwork.isNotEmpty()) {
+				Column(
+					modifier = Modifier.verticalScroll(rememberScrollState())
 				) {
-					Text(
-						text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-						color = MaterialTheme.colors.textTertiary,
-						style = SignerTypeface.BodyM,
-						modifier = Modifier.weight(1f),
-					)
-					Icon(
-						painter = painterResource(id = R.drawable.ic_tune_28),
-						contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-						modifier = Modifier
+					//seed
+					model.root?.let {
+						SeedKeyDetails(
+							model = it,
+							Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+						)
+					}
+					//filter row
+					Row(
+						modifier = Modifier.padding(horizontal = 24.dp),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.BodyM,
+							modifier = Modifier.weight(1f),
+						)
+						Icon(
+							painter = painterResource(id = R.drawable.ic_tune_28),
+							contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
+							modifier = Modifier
 //                            .clickable { //todo dmitry fix selector for new API
 //                                navigator.navigate(
 //                                    Action.NETWORK_SELECTOR,
 //                                    ""
 //                                )
 //                            }
-							.size(28.dp),
-						tint = MaterialTheme.colors.textTertiary,
-					)
-				}
-				for (key in model.keysAndNetwork) {
-					KeyDerivedItem(model = key.key) {
-						val selectKeyDetails =
-							"${key.key.addressKey}\n${key.network.networkSpecsKey}"
-						navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
+								.size(28.dp),
+							tint = MaterialTheme.colors.textTertiary,
+						)
 					}
+					for (key in model.keysAndNetwork) {
+						KeyDerivedItem(model = key.key) {
+							val selectKeyDetails =
+								"${key.key.addressKey}\n${key.network.networkSpecsKey}"
+							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
+						}
+					}
+				}
+			} else {
+				Column(
+				) {
+					//seed
+					model.root?.let {
+						SeedKeyDetails(
+							model = it,
+							Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+						)
+					}
+					KeySetDetailsEmptyList()
 				}
 			}
 
@@ -213,6 +225,31 @@ fun SeedKeyViewItem(
 	}
 }
 
+@Composable
+private fun KeySetDetailsEmptyList() {
+	Column(
+		modifier = Modifier
+            .fillMaxHeight(1f)
+            .padding(horizontal = 64.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Spacer(modifier = Modifier.weight(0.5f))
+		Text(
+			text = stringResource(R.string.key_set_details_no_keys_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.TitleM,
+			textAlign = TextAlign.Center,
+		)
+		Text(
+			text = stringResource(R.string.key_set_details_no_keys_message),
+			color = MaterialTheme.colors.textSecondary,
+			style = SignerTypeface.BodyL,
+			textAlign = TextAlign.Center,
+		)
+		Spacer(modifier = Modifier.weight(0.5f))
+	}
+}
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -224,9 +261,29 @@ fun SeedKeyViewItem(
 )
 @Composable
 private fun PreviewKeySetDetailsScreen() {
-
 	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {})
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetDetailsScreenEmpty() {
+	val state = remember { mutableStateOf(NetworkState.Active) }
+	val mockModel =
+		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {})
