@@ -5,14 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.provider.Settings
+import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.uniffi.historyAcknowledgeWarnings
-import io.parity.signer.uniffi.historyDeviceWasOnline
 import io.parity.signer.uniffi.historyGetWarnings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class NetworkExposedStateKeeper(private val appContext: Context) {
+class NetworkExposedStateKeeper(
+	private val appContext: Context,
+	private val rustInteractor: UniffiInteractor
+) {
 
 	private val _airplaneModeState: MutableStateFlow<NetworkState> =
 		MutableStateFlow(NetworkState.None)
@@ -23,6 +26,10 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 		registerAirplaneBroadcastReceiver()
 	}
 
+	/**
+	 * Expects that rust nav machine is initialized that should always be the case
+	 * as it's required to show UI calling this function
+	 */
 	fun acknowledgeWarning() {
 		if (airplaneModeState.value == NetworkState.Past) {
 			historyAcknowledgeWarnings()
@@ -41,9 +48,9 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 	}
 
 	/**
-	 * Can't do initially as navigation should be init before we check rust.
+	 * Can't do initially as navigation should be initialized before we check rust.
 	 */
-	fun updateAlertState() {
+	fun updateAlertStateFromHistory() {
 		_airplaneModeState.value = if (historyGetWarnings()) {
 			if (airplaneModeState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
 		} else {
@@ -64,13 +71,14 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 			if (airplaneModeState.value != NetworkState.Active) {
 				_airplaneModeState.value = NetworkState.Active
 				if (appContext.isDbCreatedAndOnboardingPassed()) {
-					historyDeviceWasOnline()
+					rustInteractor.historyDeviceWasOnline()
 				}
 			}
 		} else {
 			if (airplaneModeState.value == NetworkState.Active) {
-				_airplaneModeState.value = if (appContext.isDbCreatedAndOnboardingPassed())
-					NetworkState.Past else NetworkState.None
+				_airplaneModeState.value =
+					if (appContext.isDbCreatedAndOnboardingPassed())
+						NetworkState.Past else NetworkState.None
 			}
 		}
 	}

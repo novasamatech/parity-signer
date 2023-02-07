@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 
 class DerivationCreateViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val pathAnalyzer: DerivationPathAnalyzer = DerivationPathAnalyzer()
 

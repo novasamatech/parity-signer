@@ -15,7 +15,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NavbarShield
-import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.SignerMainViewModel
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Action400
@@ -28,9 +28,9 @@ import io.parity.signer.uniffi.ScreenNameType
 
 @Composable
 fun TopBar(
-	mainFlowViewModel: MainFlowViewModel,
-	actionResult: ActionResult,
-	networkState: State<NetworkState?>
+    signerMainViewModel: SignerMainViewModel,
+    actionResult: ActionResult,
+    networkState: State<NetworkState?>
 ) {
 
 	TopAppBar(
@@ -49,7 +49,7 @@ fun TopBar(
 						backgroundColor = MaterialTheme.colors.Bg100
 					),
 					onClick = {
-						mainFlowViewModel.navigate(Action.GO_BACK)
+						signerMainViewModel.navigate(Action.GO_BACK)
 					}
 				) {
 					if (actionResult.rightButton == RightButton.MULTI_SELECT) {
@@ -87,7 +87,7 @@ fun TopBar(
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			IconButton(onClick = { mainFlowViewModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
+			IconButton(onClick = { signerMainViewModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
 				when (actionResult.rightButton) {
 					RightButton.NEW_SEED -> {
 						Icon(
@@ -122,7 +122,7 @@ fun TopBar(
 					}
 				}
 			}
-			IconButton(onClick = { mainFlowViewModel.navigate(Action.SHIELD) }) {
+			IconButton(onClick = { signerMainViewModel.navigate(Action.SHIELD) }) {
 				NavbarShield(networkState = networkState)
 			}
 		}
