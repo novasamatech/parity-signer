@@ -7,7 +7,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,7 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
-import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.SignerMainViewModel
 import io.parity.signer.domain.MainFlowViewModelFactory
 import io.parity.signer.domain.NavigationMigrations
 import io.parity.signer.domain.findActivity
@@ -27,23 +26,23 @@ import io.parity.signer.ui.rustnavigationselectors.*
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.mainScreenRoute) {
-		val mainFlowViewModel: MainFlowViewModel = viewModel(
+		val signerMainViewModel: SignerMainViewModel = viewModel(
 			factory = MainFlowViewModelFactory(
 				appContext = LocalContext.current.applicationContext,
 				activity = LocalContext.current.findActivity() as FragmentActivity
 			)
 		)
 
-		val authenticated = mainFlowViewModel.authenticated.collectAsState()
+		val authenticated = signerMainViewModel.authenticated.collectAsState()
 
 		BackHandler {
-			mainFlowViewModel.navigator.backAction()
+			signerMainViewModel.navigator.backAction()
 		}
 
 		if (authenticated.value) {
-			SignerMainSubgraph(mainFlowViewModel)
+			SignerMainSubgraph(signerMainViewModel)
 		} else {
-			UnlockAppAuthScreen { mainFlowViewModel.totalRefresh() }
+			UnlockAppAuthScreen { signerMainViewModel.totalRefresh() }
 		}
 		LaunchedEffect(Unit) {
 			Log.d(NAVIGATION_TAG, "main rust-handled screen navigation subgraph opened")
@@ -53,11 +52,11 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 
 
 @Composable
-fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
+fun SignerMainSubgraph(signerMainViewModel: SignerMainViewModel) {
 
-	val actionResultState = mainFlowViewModel.actionResult.collectAsState()
-	val shieldAlert = mainFlowViewModel.networkState.collectAsState()
-	val localNavAction = mainFlowViewModel.localNavAction.collectAsState()
+	val actionResultState = signerMainViewModel.actionResult.collectAsState()
+	val shieldAlert = signerMainViewModel.networkState.collectAsState()
+	val localNavAction = signerMainViewModel.localNavAction.collectAsState()
 
 	val actionResult = actionResultState.value
 
@@ -79,7 +78,7 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 						)
 					) {
 						TopBar(
-							mainFlowViewModel = mainFlowViewModel,
+							signerMainViewModel = signerMainViewModel,
 							actionResult = actionResult,
 							networkState = shieldAlert,
 						)
@@ -92,7 +91,7 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 						)
 						&& actionResult.footer
 					) {
-						BottomBar(mainFlowViewModel = mainFlowViewModel)
+						BottomBar(signerMainViewModel = signerMainViewModel)
 					}
 				},
 			) { innerPadding ->
@@ -100,15 +99,15 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
 						networkState = shieldAlert,
-						navigate = mainFlowViewModel.navigator::navigate,
-						mainFlowViewModel = mainFlowViewModel
+						navigate = signerMainViewModel.navigator::navigate,
+						signerMainViewModel = signerMainViewModel
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
 						localNavAction = localNavAction.value,
 						networkState = shieldAlert,
-						navigate = mainFlowViewModel.navigator::navigate,
-						mainFlowViewModel = mainFlowViewModel,
+						navigate = signerMainViewModel.navigator::navigate,
+						signerMainViewModel = signerMainViewModel,
 					)
 				}
 			}
@@ -122,20 +121,20 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 					screenData = actionResult.screenData,
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
-					mainFlowViewModel = mainFlowViewModel
+					signerMainViewModel = signerMainViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
-					mainFlowViewModel = mainFlowViewModel,
-					navigator = mainFlowViewModel.navigator,
+					signerMainViewModel = signerMainViewModel,
+					navigator = signerMainViewModel.navigator,
 				)
 				AlertSelector(
 					alert = actionResult.alertData,
 					networkState = shieldAlert,
-					navigate = mainFlowViewModel.navigator::navigate,
-					acknowledgeWarning = mainFlowViewModel::acknowledgeWarning
+					navigate = signerMainViewModel.navigator::navigate,
+					acknowledgeWarning = signerMainViewModel::acknowledgeWarning
 				)
 			}
 		}

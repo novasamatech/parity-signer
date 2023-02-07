@@ -35,7 +35,7 @@ class BananaSplitViewModel() : ViewModel() {
 	val wrongPasswordCurrent = _wrongPasswordCurrent.asStateFlow()
 
 
-	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private lateinit var qrCodeData: List<String>
 	private var invalidPasswordAttempts = 0
