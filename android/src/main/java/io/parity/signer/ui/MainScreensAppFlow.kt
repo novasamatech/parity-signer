@@ -1,9 +1,11 @@
 package io.parity.signer.ui
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,6 +44,9 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 			SignerMainSubgraph(signerMainViewModel)
 		} else {
 			UnlockAppAuthScreen { signerMainViewModel.totalRefresh() }
+		}
+		LaunchedEffect(Unit) {
+			Log.d(NAVIGATION_TAG, "main rust-handled screen navigation subgraph opened")
 		}
 	}
 }
