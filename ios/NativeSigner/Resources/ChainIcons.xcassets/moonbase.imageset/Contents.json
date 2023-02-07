@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Moonbase_Alpha_Testnet.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

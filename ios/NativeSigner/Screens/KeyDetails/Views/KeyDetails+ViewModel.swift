@@ -228,7 +228,7 @@ private extension KeyDetailsView.ViewModel {
                 let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
                 return DerivedKeyRowModel(
                     keyData: $0,
-                    viewModel: DerivedKeyRowViewModel($0.key),
+                    viewModel: DerivedKeyRowViewModel($0),
                     actionModel: DerivedKeyActionModel(
                         tapAction: .init(action: .selectKey, details: details)
                     )

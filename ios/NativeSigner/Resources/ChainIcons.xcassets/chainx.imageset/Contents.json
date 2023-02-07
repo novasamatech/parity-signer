@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ChainX.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

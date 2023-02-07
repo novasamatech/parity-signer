@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Darwinia.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -45,7 +45,12 @@ struct DerivedKeyOverviewRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.small) {
-            Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
+            NetworkIdenticon(
+                identicon: viewModel.identicon,
+                network: viewModel.network,
+                background: Asset.backgroundPrimary.swiftUIColor,
+                size: Heights.identiconInCell
+            )
             if viewModel.path.isEmpty, !viewModel.hasPassword {
                 Localizable.BackupModal.Label.emptyPath.text
                     .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)

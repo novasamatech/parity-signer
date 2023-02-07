@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Beresheet.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
