@@ -1,11 +1,11 @@
 package io.parity.signer.domain.storage
 
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.SignerMainViewModel
 import io.parity.signer.domain.navigate
 import io.parity.signer.uniffi.Action
 
-fun MainFlowViewModel.signSufficientCrypto(seedName: String, addressKey: String) {
+fun SignerMainViewModel.signSufficientCrypto(seedName: String, addressKey: String) {
 	ServiceLocator.authentication.authenticate(activity) {
 		val seedPhrase = getSeed(
 			seedName

@@ -4,15 +4,24 @@ import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.uniffi.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Wrapper for uniffi calls into rust. Made for centralized handling errors
  * and to have those functions scoped in specific namespace
  */
-class UniffiInteractor(private val dbName: String) {
+class UniffiInteractor() {
+
+	/**
+	 * Rust db is initializing only when main screen is shown
+	 * and we need to provide seeds for it, so we cannot do it rightaway.
+	 */
+	val wasRustInitialized = MutableStateFlow(false)
+
+	private val suspendedTasksContext: CoroutineScope =
+		CoroutineScope(Dispatchers.IO)
 
 	suspend fun navigate(
 		action: Action,
@@ -23,6 +32,21 @@ class UniffiInteractor(private val dbName: String) {
 			UniffiResult.Success(backendAction(action, details, seedPhrase))
 		} catch (e: ErrorDisplayed) {
 			UniffiResult.Error(e)
+		}
+	}
+
+	fun historyDeviceWasOnline() {
+		if (wasRustInitialized.value) {
+			io.parity.signer.uniffi.historyDeviceWasOnline()
+		} else {
+			suspendedTasksContext.launch {
+				wasRustInitialized.collectLatest {
+					if (it) {
+						io.parity.signer.uniffi.historyDeviceWasOnline()
+						return@collectLatest
+					}
+				}
+			}
 		}
 	}
 
@@ -42,7 +66,7 @@ class UniffiInteractor(private val dbName: String) {
 		seed: String, derivedKeyAddr: List<String>
 	): UniffiResult<MKeysInfoExport> = withContext(Dispatchers.IO) {
 		try {
-			val keys = keysBySeedName( seed)
+			val keys = keysBySeedName(seed)
 			val pathAndNetworks = derivedKeyAddr.map { keyAddr ->
 				val key = keys.set.find { it.key.addressKey == keyAddr }!!
 				PathAndNetwork(
@@ -76,7 +100,8 @@ class UniffiInteractor(private val dbName: String) {
 	suspend fun getAllNetworks(): UniffiResult<List<NetworkModel>> =
 		withContext(Dispatchers.IO) {
 			try {
-				val networks = io.parity.signer.uniffi.getAllNetworks().map { it.toNetworkModel() }
+				val networks =
+					io.parity.signer.uniffi.getAllNetworks().map { it.toNetworkModel() }
 				UniffiResult.Success(networks)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

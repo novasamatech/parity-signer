@@ -27,7 +27,7 @@ private const val TAG = "ScanViewModelTag"
  */
 class ScanViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val importKeysService: ImportDerivedKeysRepository by lazy {
 		ImportDerivedKeysRepository(

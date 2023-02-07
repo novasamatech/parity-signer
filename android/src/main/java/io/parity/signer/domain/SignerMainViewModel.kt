@@ -16,7 +16,7 @@ import org.json.JSONObject
 
 
 @SuppressLint("StaticFieldLeak")
-class MainFlowViewModel() : ViewModel() {
+class SignerMainViewModel() : ViewModel() {
 	val context: Context = ServiceLocator.appContext.applicationContext
 	val activity: FragmentActivity = ServiceLocator.activityScope!!.activity
 
@@ -86,7 +86,8 @@ class MainFlowViewModel() : ViewModel() {
 	private fun totalRefreshDbExist() {
 		val allNames = seedStorage.getSeedNames()
 		initNavigation(context.getDbNameFromContext(), allNames.toList())
-		networkExposedStateKeeper.updateAlertState()
+		ServiceLocator.uniffiInteractor.wasRustInitialized.value = true
+		networkExposedStateKeeper.updateAlertStateFromHistory()
 		navigator.navigate(Action.START)
 	}
 
