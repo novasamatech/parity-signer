@@ -59,40 +59,50 @@ struct TransactionSummaryView: View {
                     .font(PrimaryFont.captionM.font)
                     .padding(.bottom, Spacing.extraSmall)
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        renderablePath(for: signature)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(PrimaryFont.captionM.font)
-                        Text(signature.name)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                            .font(PrimaryFont.bodyM.font)
-                        HStack {
-                            Text(
-                                isShowingFullAddress ? signature.base58 : signature.base58
-                                    .truncateMiddle()
-                            )
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            .font(PrimaryFont.bodyM.font)
-
-                            if !isShowingFullAddress {
-                                Asset.chevronDown.swiftUIImage
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                    .padding(.leading, Spacing.extraExtraSmall)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation {
-                                isShowingFullAddress = true
-                            }
-                        }
-                    }
+                    signatureDetails(signature)
                     Spacer()
-                    Identicon(identicon: signature.identicon, rowHeight: Heights.identiconInCell)
+                    NetworkIdenticon(
+                        identicon: signature.identicon,
+                        network: signature.network,
+                        background: Asset.fill6Solid.swiftUIColor,
+                        size: Heights.identiconInCell
+                    )
                 }
             }
         } else {
             EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private func signatureDetails(_ signature: TransactionSignatureRenderable) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.minimal) {
+            renderablePath(for: signature)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .font(PrimaryFont.captionM.font)
+            Text(signature.name)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyM.font)
+            HStack {
+                Text(
+                    isShowingFullAddress ? signature.base58 : signature.base58
+                        .truncateMiddle()
+                )
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .font(PrimaryFont.bodyM.font)
+
+                if !isShowingFullAddress {
+                    Asset.chevronDown.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .padding(.leading, Spacing.extraExtraSmall)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation {
+                    isShowingFullAddress = true
+                }
+            }
         }
     }
 
@@ -104,15 +114,17 @@ struct TransactionSummaryView: View {
     }
 }
 
-struct TransactionSummaryView_Previews: PreviewProvider {
-    static var previews: some View {
-        TransactionSummaryView(
-            renderable: .init(
-                summary: PreviewData.transactionSummary,
-                signature: PreviewData.transactionSignature
-            ),
-            onTransactionDetailsTap: {}
-        )
-        .preferredColorScheme(.dark)
+#if DEBUG
+    struct TransactionSummaryView_Previews: PreviewProvider {
+        static var previews: some View {
+            TransactionSummaryView(
+                renderable: .init(
+                    summary: PreviewData.transactionSummary,
+                    signature: PreviewData.transactionSignature
+                ),
+                onTransactionDetailsTap: {}
+            )
+            .preferredColorScheme(.dark)
+        }
     }
-}
+#endif

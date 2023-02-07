@@ -92,6 +92,7 @@
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
 		6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */; };
 		6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */; };
+		6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3DF92729920AA800B8A430 /* UnknownNetworkColorsGenerator.swift */; };
 		6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */; };
 		6D45065B296E865F0065B4D4 /* ChooseNetworkForKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D45065A296E865F0065B4D4 /* ChooseNetworkForKeyView.swift */; };
 		6D45065E296E94FC0065B4D4 /* DerivationMethodsInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D45065D296E94FC0065B4D4 /* DerivationMethodsInfoView.swift */; };
@@ -398,6 +399,7 @@
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
 		6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyView.swift; sourceTree = "<group>"; };
 		6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyActionsModal.swift; sourceTree = "<group>"; };
+		6D3DF92729920AA800B8A430 /* UnknownNetworkColorsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownNetworkColorsGenerator.swift; sourceTree = "<group>"; };
 		6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateKeyQRCodeService.swift; sourceTree = "<group>"; };
 		6D45065A296E865F0065B4D4 /* ChooseNetworkForKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseNetworkForKeyView.swift; sourceTree = "<group>"; };
 		6D45065D296E94FC0065B4D4 /* DerivationMethodsInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivationMethodsInfoView.swift; sourceTree = "<group>"; };
@@ -995,7 +997,6 @@
 			isa = PBXGroup;
 			children = (
 				6D52E3AE2946FF5400AD72F0 /* NetworkSelectionModal.swift */,
-				6D52E3B02946FF5E00AD72F0 /* NetworkLogoIcon.swift */,
 			);
 			path = NetworkSelection;
 			sourceTree = "<group>";
@@ -1320,8 +1321,10 @@
 		6D971AC12941CDEC00121A36 /* Image */ = {
 			isa = PBXGroup;
 			children = (
+				6D52E3B02946FF5E00AD72F0 /* NetworkLogoIcon.swift */,
 				6D971AC22941CDF600121A36 /* Identicon.swift */,
 				6DBBC1F1298CB09C00368638 /* NetworkIdenticon.swift */,
+				6D3DF92729920AA800B8A430 /* UnknownNetworkColorsGenerator.swift */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -2074,6 +2077,7 @@
 				6D2D244D28CE55A000862726 /* String+Utilities.swift in Sources */,
 				2DA5F86427566C3600D8DD29 /* TCError.swift in Sources */,
 				6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */,
+				6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */,
 				6DF5E7A22923A08A00F2B5B4 /* AttributedString+Markdown.swift in Sources */,

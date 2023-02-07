@@ -151,6 +151,7 @@ extension PreviewData {
     static let transactionSignature: TransactionSignatureRenderable = .init(
         path: "//polkadot//1",
         name: "Parity Keys",
+        network: "polkadot",
         base58: "1219xC79CXV31543DDXoQMjuA",
         identicon: PreviewData.exampleIdenticon
     )

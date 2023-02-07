@@ -19,17 +19,20 @@ struct KeySetViewModel: Equatable, Identifiable {
     let keyName: String
     let derivedKeys: String?
     let identicon: [UInt8]
+    let networks: [String]
 
     init(
         seed: SeedNameCard,
         keyName: String,
         derivedKeys: String?,
-        identicon: [UInt8]
+        identicon: [UInt8],
+        networks: [String]
     ) {
         self.seed = seed
         self.keyName = keyName
         self.derivedKeys = derivedKeys
         self.identicon = identicon
+        self.networks = networks
     }
 }
 
@@ -42,7 +45,8 @@ final class KeySetListViewModelBuilder {
                     seed: $0,
                     keyName: $0.seedName,
                     derivedKeys: derivedKeys(for: $0),
-                    identicon: $0.identicon.svgPayload
+                    identicon: $0.identicon.svgPayload,
+                    networks: $0.usedInNetworks
                 )
             }
         )

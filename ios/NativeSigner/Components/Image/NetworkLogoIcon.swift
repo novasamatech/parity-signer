@@ -42,10 +42,14 @@ struct NetworkLogoIcon: View {
         let colorRenderable = colorGenerator.renderable(for: networkName)
         Text(networkName.prefix(1).uppercased())
             .foregroundColor(colorRenderable.text)
-            .font(PrimaryFont.titleM.font)
+            .font(FontFamily.Inter.bold.swiftUIFont(size: fontSize))
             .frame(width: size, height: size)
             .background(colorRenderable.background)
             .clipShape(Circle())
+    }
+
+    private var fontSize: CGFloat {
+        max(floor(size * 0.7142) - 1, 12)
     }
 }
 
