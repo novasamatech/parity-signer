@@ -21,6 +21,7 @@ extension QRCodeAddressFooterViewModel {
         path = derivedKey.viewModel.path
         hasPassword = derivedKey.viewModel.hasPassword
         network = derivedKey.keyData.network.networkTitle
+        networkLogo = derivedKey.keyData.network.networkLogo
         base58 = derivedKey.viewModel.base58
     }
 }
@@ -95,7 +96,7 @@ struct ExportMultipleKeysModal: View {
                     derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                     id: \.id
                 ) {
-                    QRCodeAddressFooterView(viewModel: .init($0))
+                    QRCodeAddressFooterView(viewModel: .init($0), backgroundColor: Asset.fill6Solid.swiftUIColor)
                     if $0 != derivedKeys.last {
                         Divider()
                     }

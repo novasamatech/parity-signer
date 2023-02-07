@@ -128,7 +128,7 @@ struct CreateDerivedKeyView: View {
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 Spacer()
                 HStack(spacing: 0) {
-                    NetworkLogoIcon(logo: network.logo, size: Heights.networkLogoInCapsule)
+                    NetworkLogoIcon(networkName: network.logo, size: Heights.networkLogoInCapsule)
                         .padding(.trailing, Spacing.extraSmall)
                     Text(network.title)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)

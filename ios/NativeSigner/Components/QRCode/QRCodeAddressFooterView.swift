@@ -13,6 +13,7 @@ struct QRCodeAddressFooterViewModel: Equatable {
     let path: String
     let hasPassword: Bool
     let network: String
+    let networkLogo: String
     let base58: String
 }
 
@@ -21,9 +22,14 @@ struct QRCodeAddressFooterViewModel: Equatable {
 struct QRCodeAddressFooterView: View {
     @State private var showFullAddress: Bool = false
     private let viewModel: QRCodeAddressFooterViewModel
+    private let backgroundColor: Color
 
-    init(viewModel: QRCodeAddressFooterViewModel) {
+    init(
+        viewModel: QRCodeAddressFooterViewModel,
+        backgroundColor: Color
+    ) {
         self.viewModel = viewModel
+        self.backgroundColor = backgroundColor
     }
 
     var body: some View {
@@ -36,7 +42,12 @@ struct QRCodeAddressFooterView: View {
                         .font(PrimaryFont.bodyM.font)
                 }
                 Spacer()
-                Identicon(identicon: viewModel.identicon, rowHeight: Heights.identiconInCell)
+                NetworkIdenticon(
+                    identicon: viewModel.identicon,
+                    network: viewModel.networkLogo,
+                    background: backgroundColor,
+                    size: Heights.identiconInCell
+                )
             }
             HStack(alignment: .top, spacing: Spacing.small) {
                 VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
@@ -94,19 +105,19 @@ struct QRCodeAddressFooterView: View {
                 VStack {
                     Spacer()
                     QRCodeAddressFooterView(
-                        viewModel: PreviewData.qrCodeAddressFooterViewModel
+                        viewModel: PreviewData.qrCodeAddressFooterViewModel,
+                        backgroundColor: Asset.fill6Solid.swiftUIColor
                     )
-                    .background(Asset.fill6Solid.swiftUIColor)
                     Spacer()
                     QRCodeAddressFooterView(
-                        viewModel: PreviewData.qrCodeAddressFooterViewModelNoPath
+                        viewModel: PreviewData.qrCodeAddressFooterViewModelNoPath,
+                        backgroundColor: Asset.fill12.swiftUIColor
                     )
-                    .background(Asset.fill6Solid.swiftUIColor)
                     Spacer()
                     QRCodeAddressFooterView(
-                        viewModel: PreviewData.qrCodeAddressFooterViewModelVeryLongPath
+                        viewModel: PreviewData.qrCodeAddressFooterViewModelVeryLongPath,
+                        backgroundColor: Asset.backgroundSecondary.swiftUIColor
                     )
-                    .background(Asset.fill6Solid.swiftUIColor)
                     Spacer()
                 }
                 .background(.white)
