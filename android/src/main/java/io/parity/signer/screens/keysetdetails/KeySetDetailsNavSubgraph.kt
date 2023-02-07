@@ -16,10 +16,10 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFu
 
 @Composable
 fun KeySetDetailsNavSubgraph(
-	model: KeySetDetailsModel,
-	rootNavigator: Navigator,
-	networkState: State<NetworkState?>, //for shield icon
-	singleton: MainFlowViewModel,
+    model: KeySetDetailsModel,
+    rootNavigator: Navigator,
+    networkState: State<NetworkState?>, //for shield icon
+    singleton: SignerMainViewModel,
 ) {
 	val navController = rememberNavController()
 	NavHost(

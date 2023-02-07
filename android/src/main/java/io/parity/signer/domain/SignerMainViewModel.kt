@@ -16,7 +16,7 @@ import org.json.JSONObject
 
 
 @SuppressLint("StaticFieldLeak")
-class MainFlowViewModel(
+class SignerMainViewModel(
 	// todo migrate to use dependencies to DI rather than expecting them here
 	val context: Context,
 	val activity: FragmentActivity,
@@ -88,7 +88,8 @@ class MainFlowViewModel(
 	private fun totalRefreshDbExist() {
 		val allNames = seedStorage.getSeedNames()
 		initNavigation(context.getDbNameFromContext(), allNames.toList())
-		networkExposedStateKeeper.updateAlertState()
+		ServiceLocator.uniffiInteractor.wasRustInitialized.value = true
+		networkExposedStateKeeper.updateAlertStateFromHistory()
 		navigator.navigate(Action.START)
 	}
 
@@ -140,7 +141,7 @@ class MainFlowViewModel(
 @Suppress("UNCHECKED_CAST")
 class MainFlowViewModelFactory(private val appContext: Context, private val activity: FragmentActivity) : ViewModelProvider.Factory {
 	override fun <T : ViewModel> create(modelClass: Class<T>): T {
-		return MainFlowViewModel(appContext, activity) as T
+		return SignerMainViewModel(appContext, activity) as T
 	}
 }
 

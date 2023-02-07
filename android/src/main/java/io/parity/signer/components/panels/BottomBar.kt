@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.SignerMainViewModel
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.Text300
@@ -32,7 +32,7 @@ import io.parity.signer.uniffi.actionGetName
 @Composable
 @Deprecated("not used")
 fun BottomBar(
-	mainFlowViewModel: MainFlowViewModel,
+    signerMainViewModel: SignerMainViewModel,
 ) {
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.Bg000,
@@ -44,22 +44,22 @@ fun BottomBar(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			BottomBarButton(
-				mainFlowViewModel = mainFlowViewModel,
+				signerMainViewModel = signerMainViewModel,
 				image = Icons.Default.Pattern,
 				action = Action.NAVBAR_KEYS
 			)
 			BottomBarButton(
-				mainFlowViewModel = mainFlowViewModel,
+				signerMainViewModel = signerMainViewModel,
 				image = Icons.Default.CropFree,
 				action = Action.NAVBAR_SCAN
 			)
 			BottomBarButton(
-				mainFlowViewModel = mainFlowViewModel,
+				signerMainViewModel = signerMainViewModel,
 				image = Icons.Default.CalendarViewDay,
 				action = Action.NAVBAR_LOG
 			)
 			BottomBarButton(
-				mainFlowViewModel = mainFlowViewModel,
+				signerMainViewModel = signerMainViewModel,
 				image = Icons.Default.Settings,
 				action = Action.NAVBAR_SETTINGS
 			)
@@ -74,12 +74,12 @@ fun BottomBar(
  */
 @Composable
 fun BottomBarButton(
-	mainFlowViewModel: MainFlowViewModel,
-	image: ImageVector,
-	action: Action,
+    signerMainViewModel: SignerMainViewModel,
+    image: ImageVector,
+    action: Action,
 ) {
 	val selected =
-		mainFlowViewModel.actionResult.collectAsState().value?.footerButton == actionGetName(action)
+		signerMainViewModel.actionResult.collectAsState().value?.footerButton == actionGetName(action)
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {
@@ -94,7 +94,7 @@ fun BottomBarButton(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
 			.clickable(onClick = {
-				mainFlowViewModel.navigate(action)
+				signerMainViewModel.navigate(action)
 			})
 			.width(66.dp)
 	) {
