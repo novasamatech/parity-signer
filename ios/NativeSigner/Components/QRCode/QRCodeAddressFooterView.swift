@@ -74,7 +74,6 @@ struct QRCodeAddressFooterView: View {
         }
         .padding(Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
-        .background(backgroundColor)
     }
 
     /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
