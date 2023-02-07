@@ -13,6 +13,10 @@ enum NetworkSelection {
 }
 
 struct ChooseNetworkForKeyView: View {
+    private enum Constants {
+        static let maxNetworks = 5
+    }
+
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var appState: AppState
 
@@ -39,18 +43,8 @@ struct ChooseNetworkForKeyView: View {
                     Divider()
                         .padding(Spacing.medium)
                     // List of networks
-                    LazyVStack(spacing: Spacing.extraSmall) {
-                        ForEach(
-                            viewModel.networks,
-                            id: \.key
-                        ) {
-                            item(for: $0)
-                        }
-                        Divider()
-                            .padding(.horizontal, Spacing.medium)
-                        allowOnAnyNetwork()
-                    }
-                    .padding(.bottom, Spacing.small)
+                    networkSelection()
+                        .padding(.bottom, Spacing.small)
                 }
             }
         )
@@ -62,7 +56,7 @@ struct ChooseNetworkForKeyView: View {
     @ViewBuilder
     func item(for network: MmNetwork) -> some View {
         HStack(alignment: .center, spacing: 0) {
-            NetworkLogoIcon(logo: network.logo)
+            NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -100,6 +94,37 @@ struct ChooseNetworkForKeyView: View {
         .frame(height: Heights.networkFilterItem)
         .onTapGesture {
             viewModel.selectAllNetworks()
+        }
+    }
+
+    @ViewBuilder
+    func networkSelection() -> some View {
+        if viewModel.networks.count > Constants.maxNetworks {
+            ScrollView {
+                LazyVStack(spacing: Spacing.extraSmall) {
+                    ForEach(
+                        viewModel.networks,
+                        id: \.key
+                    ) {
+                        item(for: $0)
+                    }
+                    Divider()
+                        .padding(.horizontal, Spacing.medium)
+                    allowOnAnyNetwork()
+                }
+            }
+        } else {
+            LazyVStack(spacing: Spacing.extraSmall) {
+                ForEach(
+                    viewModel.networks,
+                    id: \.key
+                ) {
+                    item(for: $0)
+                }
+                Divider()
+                    .padding(.horizontal, Spacing.medium)
+                allowOnAnyNetwork()
+            }
         }
     }
 }

@@ -34,9 +34,7 @@ struct TCAddNewNetwork: View {
                     Text(Localizable.Transaction.AddNetwork.Label.logo.string)
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     Spacer()
-                    Text(value.logo)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(.web3)
+                    NetworkLogoIcon(networkName: value.logo)
                 }
                 Divider()
                 rowWrapper(Localizable.Transaction.AddNetwork.Label.path.string, value.pathId, isLast: true)

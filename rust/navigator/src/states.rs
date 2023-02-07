@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use definitions::navigation::MAddressCard;
+use definitions::{navigation::MAddressCard, network_specs::OrderedNetworkSpecs};
 use sp_runtime::MultiSignature;
 use transaction_parsing::{produce_output, TransactionAction};
 use transaction_signing::{Error as SignError, SignatureType};
@@ -67,11 +67,12 @@ pub struct TransactionState {
 }
 
 impl TransactionState {
-    pub fn current_password_author_info(&self) -> Option<MAddressCard> {
+    pub fn current_password_author_info(&self) -> Option<(MAddressCard, OrderedNetworkSpecs)> {
         match &self.action {
-            TransactionAction::Sign { actions, .. } => {
-                Some(actions[self.currently_signing].author_info.clone())
-            }
+            TransactionAction::Sign { actions, .. } => Some((
+                actions[self.currently_signing].author_info.clone(),
+                actions[self.currently_signing].network_info.clone(),
+            )),
             _ => None,
         }
     }

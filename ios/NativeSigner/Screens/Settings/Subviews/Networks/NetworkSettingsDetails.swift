@@ -26,7 +26,7 @@ struct NetworkSettingsDetails: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .center, spacing: 0) {
-                        NetworkLogoIcon(logo: viewModel.networkDetails.logo, size: Heights.networkLogoInHeader)
+                        NetworkLogoIcon(networkName: viewModel.networkDetails.logo, size: Heights.networkLogoInHeader)
                             .padding(.bottom, Spacing.small)
                         Text(viewModel.networkDetails.title)
                             .font(PrimaryFont.titleM.font)
