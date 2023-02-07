@@ -62,7 +62,6 @@ struct TCDerivations: View {
                 .font(PrimaryFont.bodyM.font)
                 .padding(.top, Spacing.medium)
                 .padding(.horizontal, Spacing.medium)
-
             // Derived keys list
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(keySet.keys, id: \.id) {
