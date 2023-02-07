@@ -2,6 +2,7 @@ package io.parity.signer.screens.onboarding.airgap
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -16,6 +17,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.ui.MainGraphRoutes
+import io.parity.signer.ui.NAVIGATION_TAG
 import io.parity.signer.ui.theme.Text600
 
 
@@ -23,7 +25,8 @@ fun NavGraphBuilder.enableAirgapAppFlow(globalNavController: NavHostController) 
 	composable(route = MainGraphRoutes.enableAirgapRoute) {
 		val viewModel: AirGapViewModel = viewModel()
 		LaunchedEffect(viewModel) {
-			viewModel.isFinished.collect{
+			Log.d(NAVIGATION_TAG, "airgap screen opened")
+			viewModel.isFinished.collect {
 				if (it) globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
 					popUpTo(0)
 				}
