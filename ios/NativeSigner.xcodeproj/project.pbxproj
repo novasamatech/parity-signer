@@ -202,7 +202,7 @@
 		6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */; };
 		6DB9903F2962A97E001101DC /* ImportDerivedKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */; };
 		6DBBC1F2298CB09C00368638 /* NetworkIdenticon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBBC1F1298CB09C00368638 /* NetworkIdenticon.swift */; };
-		6DBBC1F4298CB0D700368638 /* NetworkIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DBBC1F3298CB0D700368638 /* NetworkIcons.xcassets */; };
+		6DBBC1F4298CB0D700368638 /* ChainIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */; };
 		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
 		6DBD21F4289A77DE005D539B /* BundleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F3289A77DE005D539B /* BundleProtocol.swift */; };
 		6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */; };
@@ -508,7 +508,7 @@
 		6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTransaction+ImportDerivedKeys.swift"; sourceTree = "<group>"; };
 		6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDerivedKeysService.swift; sourceTree = "<group>"; };
 		6DBBC1F1298CB09C00368638 /* NetworkIdenticon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkIdenticon.swift; sourceTree = "<group>"; };
-		6DBBC1F3298CB0D700368638 /* NetworkIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = NetworkIcons.xcassets; sourceTree = "<group>"; };
+		6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ChainIcons.xcassets; sourceTree = "<group>"; };
 		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F3289A77DE005D539B /* BundleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleProtocol.swift; sourceTree = "<group>"; };
 		6DBD21F9289A7A26005D539B /* DatabaseMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediator.swift; sourceTree = "<group>"; };
@@ -1027,7 +1027,7 @@
 				6D57DC59289E524800005C63 /* Assets.xcassets */,
 				6D57DC5C289E524800005C63 /* Templates */,
 				6D57DC5E289E524800005C63 /* Fonts */,
-				6DBBC1F3298CB0D700368638 /* NetworkIcons.xcassets */,
+				6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1764,7 +1764,7 @@
 				6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */,
 				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
 				6D57DC69289E524800005C63 /* swiftui-strings-template.stencil in Resources */,
-				6DBBC1F4298CB0D700368638 /* NetworkIcons.xcassets in Resources */,
+				6DBBC1F4298CB0D700368638 /* ChainIcons.xcassets in Resources */,
 				6D57DC6B289E524800005C63 /* Inter-Regular.otf in Resources */,
 				6D57DC6C289E524800005C63 /* Inter-Medium.otf in Resources */,
 				6D971ABE2941B20F00121A36 /* identicon_example.svg in Resources */,
