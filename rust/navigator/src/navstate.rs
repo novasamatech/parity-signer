@@ -271,9 +271,19 @@ impl State {
                 // details_str is new seed name
                 match self.navstate.modal {
                     Modal::Empty => {
-                        new_navstate.modal = Modal::NewSeedBackup(details_str.to_string())
+                        use std::str::FromStr;
+                        let mut lines = details_str.lines();
+                        let name = lines.next().unwrap();
+                        let words_number = lines.next().unwrap_or("24");
+                        let words_number = usize::from_str(words_number).unwrap_or(24);
+                        let words_number = match words_number {
+                            12 | 15 | 18 | 21 | 24 => words_number,
+                            _ => 24,
+                        };
+
+                        new_navstate.modal = Modal::NewSeedBackup(name.to_string(), words_number)
                     }
-                    Modal::NewSeedBackup(ref seed_name) => match details_str.parse::<bool>() {
+                    Modal::NewSeedBackup(ref seed_name, _) => match details_str.parse::<bool>() {
                         Ok(roots) => {
                             match db_handling::identities::try_create_seed(
                                 &self.db,
@@ -1332,9 +1342,11 @@ impl State {
                 }
                 _ => None,
             },
-            Modal::NewSeedBackup(ref new_seed_name) => Some(ModalData::NewSeedBackup {
-                f: db_handling::interface_signer::print_new_seed(new_seed_name)?,
-            }),
+            Modal::NewSeedBackup(ref new_seed_name, words_number) => {
+                Some(ModalData::NewSeedBackup {
+                    f: db_handling::interface_signer::print_new_seed(new_seed_name, words_number)?,
+                })
+            }
             Modal::NetworkSelector(ref network_specs_key) => Some(ModalData::NetworkSelector {
                 f: db_handling::interface_signer::show_all_networks_with_flag(
                     &self.db,

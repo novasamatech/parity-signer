@@ -721,8 +721,8 @@ pub fn show_types_status(database: &sled::Db) -> Result<MTypesInfo> {
 
 /// Generate new random seed phrase, make identicon for `sr25519` public key,
 /// and send to Signer screen.
-pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
-    let seed_phrase = generate_random_phrase(24)?;
+pub fn print_new_seed(seed_name: &str, words_number: usize) -> Result<MNewSeedBackup> {
+    let seed_phrase = generate_random_phrase(words_number)?;
     let sr25519_pair =
         sr25519::Pair::from_string(&seed_phrase, None).map_err(Error::SecretStringError)?;
     let identicon = make_identicon_from_multisigner(

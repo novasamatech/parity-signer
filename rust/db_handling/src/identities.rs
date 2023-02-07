@@ -461,8 +461,8 @@ pub fn get_addresses_by_seed_name(
 ///
 /// Its zeroization and safe handling are delegated to hardware.
 #[cfg(feature = "signer")]
-pub fn generate_random_phrase(words_number: u32) -> Result<String> {
-    let mnemonic_type = MnemonicType::for_word_count(words_number as usize)?;
+pub fn generate_random_phrase(words_number: usize) -> Result<String> {
+    let mnemonic_type = MnemonicType::for_word_count(words_number)?;
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
 }

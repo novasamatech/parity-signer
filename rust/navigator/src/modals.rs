@@ -8,7 +8,7 @@ use transaction_signing::SignatureType;
 pub enum Modal {
     Backup(String),
     NewSeedMenu,
-    NewSeedBackup(String),
+    NewSeedBackup(String, usize),
     SeedMenu,
     NetworkSelector(NetworkSpecsKey),
     PasswordConfirm,
@@ -30,7 +30,7 @@ impl Modal {
         match self {
             Modal::Backup(_) => String::from("Backup"),
             Modal::NewSeedMenu => String::from("NewSeedMenu"),
-            Modal::NewSeedBackup(_) => String::from("NewSeedBackup"),
+            Modal::NewSeedBackup(_, _) => String::from("NewSeedBackup"),
             Modal::SeedMenu => String::from("SeedMenu"),
             Modal::NetworkSelector(_) => String::from("NetworkSelector"),
             Modal::PasswordConfirm => String::from("PasswordConfirm"),
