@@ -30,28 +30,37 @@ struct KeyDetailsView: View {
                         ]
                     )
                 )
-                ScrollView(showsIndicators: false) {
-                    // Main key cell
-                    rootKeyHeader()
-                    // Derived Keys header
-                    HStack {
-                        Localizable.KeyDetails.Label.derived.text
-                            .font(PrimaryFont.bodyM.font)
-                        Spacer().frame(maxWidth: .infinity)
-                        Asset.switches.swiftUIImage
-                            .foregroundColor(
-                                viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
-                                    .textAndIconsTertiary.swiftUIColor
-                            )
-                            .frame(width: Heights.actionSheetButton)
-                            .onTapGesture {
-                                viewModel.onNetworkSelectionTap()
-                            }
+                switch viewModel.viewState {
+                case .list:
+                    ScrollView(showsIndicators: false) {
+                        // Main key cell
+                        rootKeyHeader()
+                        // Derived Keys header
+                        HStack {
+                            Localizable.KeyDetails.Label.derived.text
+                                .font(PrimaryFont.bodyM.font)
+                            Spacer().frame(maxWidth: .infinity)
+                            Asset.switches.swiftUIImage
+                                .foregroundColor(
+                                    viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
+                                        .textAndIconsTertiary.swiftUIColor
+                                )
+                                .frame(width: Heights.actionSheetButton)
+                                .onTapGesture {
+                                    viewModel.onNetworkSelectionTap()
+                                }
+                        }
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.top, Spacing.medium)
+                        // List
+                        mainList
                     }
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .padding(.horizontal, Spacing.large)
-                    // List
-                    mainList
+                case .emptyState:
+                    rootKeyHeader()
+                    Spacer()
+                    emptyState()
+                    Spacer()
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
@@ -205,6 +214,25 @@ struct KeyDetailsView: View {
             EmptyView()
         }
     }
+
+    @ViewBuilder
+    func emptyState() -> some View {
+        VStack(spacing: 0) {
+            Localizable.KeyDetails.Label.EmptyState.header.text
+                .font(PrimaryFont.titleM.font)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .padding(.top, Spacing.large)
+                .padding(.horizontal, Spacing.componentSpacer)
+            PrimaryButton(
+                action: viewModel.onCreateDerivedKeyTap,
+                text: Localizable.KeyDetails.Label.EmptyState.action.key,
+                style: .secondary()
+            )
+            .padding(Spacing.large)
+        }
+        .containerBackground(CornerRadius.large, state: .actionableInfo)
+        .padding(.horizontal, Spacing.medium)
+    }
 }
 
 private struct KeySummaryView: View {
@@ -216,6 +244,8 @@ private struct KeySummaryView: View {
             Text(viewModel.keyName)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.titleXL.font)
+                .padding(.top, Spacing.medium)
+                .padding(.bottom, Spacing.extraSmall)
             HStack {
                 Text(viewModel.base58.truncateMiddle())
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -225,7 +255,6 @@ private struct KeySummaryView: View {
                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             }
         }
-        .padding(.bottom, Spacing.medium)
         .padding(.horizontal, Spacing.large)
     }
 }
