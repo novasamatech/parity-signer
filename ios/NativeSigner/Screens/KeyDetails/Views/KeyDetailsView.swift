@@ -230,7 +230,7 @@ struct KeyDetailsView: View {
             )
             .padding(Spacing.large)
         }
-        .containerBackground(CornerRadius.large, state: .error)
+        .containerBackground(CornerRadius.large, state: .actionableInfo)
         .padding(.horizontal, Spacing.medium)
     }
 }
