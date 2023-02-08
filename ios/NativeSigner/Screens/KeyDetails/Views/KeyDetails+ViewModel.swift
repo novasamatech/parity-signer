@@ -8,6 +8,11 @@
 import Foundation
 
 extension KeyDetailsView {
+    enum ViewState {
+        case emptyState
+        case list
+    }
+
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetAllNetworksService
@@ -39,6 +44,7 @@ extension KeyDetailsView {
         // Error handling
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
+        @Published var viewState: ViewState = .list
 
         /// Name of seed to be removed with `Remove Seed` action
         var removeSeed: String = ""
@@ -234,6 +240,7 @@ private extension KeyDetailsView.ViewModel {
                     )
                 )
             }
+        viewState = derivedKeys.isEmpty ? .emptyState : .list
     }
 
     func refreshKeySummary() {

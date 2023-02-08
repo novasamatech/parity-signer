@@ -278,6 +278,9 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
+"KeyDetails.Label.EmptyState.Header" = "Key Set Don't Have Any Derived Keys";
+"KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
+
 "KeyDetails.Action.Create" = "Create Derived key";
 "KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
 "KeyDetails.Overlay.Label.Key.Single" = "key";
