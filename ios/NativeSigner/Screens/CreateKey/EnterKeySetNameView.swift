@@ -1,15 +1,14 @@
 //
-//  NewSeedScreen.swift
+//  EnterKeySetNameView.swift
 //  NativeSigner
 //
-//  Created by Alexander Slesarev on 28.7.2021.
+//  Created by Krzysztof Rodak on 08/02/2023.
 //
 
 import SwiftUI
 
-struct NewSeedScreen: View {
-    let content: MNewSeed
-    @State private var seedName: String = ""
+struct EnterKeySetNameView: View {
+    @StateObject var viewModel: ViewModel
     @FocusState private var nameFocused: Bool
     @EnvironmentObject var navigation: NavigationCoordinator
 
@@ -20,19 +19,16 @@ struct NewSeedScreen: View {
                     title: nil,
                     leftButtons: [.init(
                         type: .xmark,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: viewModel.onBackTap
                     )],
                     rightButtons: [.init(
                         type: .activeAction(
                             Localizable.NewSeed.Name.Action.next.key,
-                            .constant(
-                                (seedName.isEmpty) || ServiceLocator.seedsMediator
-                                    .checkSeedCollision(seedName: seedName)
-                            )
+                            .constant(!viewModel.isActionAvailable())
                         ),
                         action: {
                             self.nameFocused = false
-                            self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
+                            viewModel.onNextTap()
                         }
                     )]
                 )
@@ -46,24 +42,20 @@ struct NewSeedScreen: View {
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyL.font)
                     .padding(.vertical, Spacing.extraSmall)
-                TextField("", text: $seedName)
+                TextField("", text: $viewModel.seedName)
+                    .submitLabel(.done)
                     .primaryTextFieldStyle(
                         Localizable.NewSeed.Name.Label.placeholder.string,
-                        text: $seedName
+                        text: $viewModel.seedName
                     )
                     .focused($nameFocused)
-                    .disableAutocorrection(true)
-                    .keyboardType(.asciiCapable)
-                    .submitLabel(.done)
                     .onSubmit {
                         nameFocused = false
-                        if !seedName.isEmpty, !ServiceLocator.seedsMediator.checkSeedCollision(seedName: seedName) {
-                            navigation.perform(navigation: .init(action: .goForward, details: seedName))
-                        }
+                        viewModel.onSubmitTap()
                     }
-                    .onAppear(perform: {
-                        nameFocused = content.keyboard
-                    })
+                    .onAppear {
+                        nameFocused = true
+                    }
                     .padding(.vertical, Spacing.medium)
                 Localizable.NewSeed.Name.Label.footer.text
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -71,12 +63,56 @@ struct NewSeedScreen: View {
                 Spacer()
             }
             .padding(.horizontal, Spacing.large)
+            .onAppear {
+                viewModel.use(navigation: navigation)
+            }
         }
     }
 }
 
-// struct NewSeedScreen_Previews: PreviewProvider {
-// static var previews: some View {
-// NewSeedScreen().previewLayout(.sizeThatFits)
-// }
-// }
+extension EnterKeySetNameView {
+    final class ViewModel: ObservableObject {
+        @Published var seedName: String = ""
+        weak var navigation: NavigationCoordinator!
+
+        private let seedsMediator: SeedsMediating
+
+        init(
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+        ) {
+            self.seedsMediator = seedsMediator
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
+        func onBackTap() {
+            navigation.perform(navigation: .init(action: .goBack))
+        }
+
+        func onNextTap() {
+            navigation.perform(navigation: .init(action: .goForward, details: seedName))
+        }
+
+        func isActionAvailable() -> Bool {
+            !seedName.isEmpty && !seedsMediator.checkSeedCollision(seedName: seedName)
+        }
+
+        func onSubmitTap() {
+            guard isActionAvailable() else { return }
+            onNextTap()
+        }
+    }
+}
+
+#if DEBUG
+    struct EnterKeySetNameView_Previews: PreviewProvider {
+        static var previews: some View {
+            EnterKeySetNameView(
+                viewModel: .init()
+            )
+            .previewLayout(.sizeThatFits)
+        }
+    }
+#endif
