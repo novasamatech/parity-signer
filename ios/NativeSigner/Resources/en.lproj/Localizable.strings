@@ -610,14 +610,6 @@
 "CreateDerivedKey.InfoModal.DerivationMethods.Password.Content" = "In this type of derivation, if the mnemonic phrase would leak, accounts cannot be derived without the initial password. In fact, for soft- and hard-derived accounts, if someone knows the mnemonic phrase and the derivation path, they will have access to your account. For password-derived accounts, the password is applied on the derivation path. You can know the mnemonic phrase and the derivation path, but without the password it is not possible to access the account. In mathematical terms, if we have a written derivation path and a password, we can calculate the real derivation path as f(written derivation path, password); where f is a function. We can then calculate the account key pair using f(seed, real derivation path). Note that unlike hard and soft derivations that can be mixed, only a single password should be specified per derivation.";
 "CreateDerivedKey.InfoModal.DerivationMethods.Action" = "Got It";
 
-"NewSeed.Name.Label.Title" = "Key Set Name";
-"NewSeed.Name.Label.Header" = "Enter a name that will help you identify this key set";
-"NewSeed.Name.Label.Placeholder" = "Enter Key Set name";
-"NewSeed.Name.Label.Footer" = "Name examples: Main account, My validator, Dotsama crowdloans, etc";
-"NewSeed.Name.Action.Next" = "Next";
-"NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
-"NewSeed.Backup.Action.Create" = "Create Key Set";
-
 "Onboarding.Agreements.Label.Title" = "Please Agree to our Terms of Service and Privacy Policy";
 "Onboarding.Agreements.Label.PrivacyCell" = "Privacy Policy";
 "Onboarding.Agreements.Label.ToSCell" = "Terms of Service";
@@ -646,4 +638,14 @@
 "OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
 "OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
 "OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
+
+"NewSeed.Name.Label.Title" = "Key Set Name";
+"NewSeed.Name.Label.Header" = "Enter a name that will help you identify this key set";
+"NewSeed.Name.Label.Placeholder" = "Enter Key Set name";
+"NewSeed.Name.Label.Footer" = "Name examples: Main account, My validator, Dotsama crowdloans, etc";
+"NewSeed.Name.Action.Next" = "Next";
+"NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
+"NewSeed.Backup.Action.Create" = "Create Key Set";
+"NewSeed.Backup.Label.Info" = "Write it down on a paper and keep it in a safe place. You can also use Banana Split for maximum security";
+"NewSeed.Backup.Label.Info.Underline" = "Banana Split";
 
