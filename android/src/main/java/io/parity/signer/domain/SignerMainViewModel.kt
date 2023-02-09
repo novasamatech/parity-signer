@@ -26,7 +26,6 @@ class SignerMainViewModel(
 		// Imitate ios behavior
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			seedStorage.init(context)
 			totalRefresh()
 		}
 	}
@@ -78,6 +77,9 @@ class SignerMainViewModel(
 	 * This returns the app into starting state;
 	 */
 	fun totalRefresh() {
+		if (!seedStorage.isInitialized()) {
+			seedStorage.init(context)
+		}
 		if (!context.isDbCreatedAndOnboardingPassed()) {
 			initAssetsAndTotalRefresh()
 		} else {

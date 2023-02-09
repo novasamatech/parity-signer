@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.SignerMainViewModel
 import io.parity.signer.domain.MainFlowViewModelFactory
 import io.parity.signer.domain.NavigationMigrations
@@ -43,10 +44,19 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		if (authenticated.value) {
 			SignerMainSubgraph(signerMainViewModel)
 		} else {
-			UnlockAppAuthScreen { signerMainViewModel.totalRefresh() }
+			val currentActivity = LocalContext.current.findActivity() as FragmentActivity
+			UnlockAppAuthScreen {
+				val authentication = ServiceLocator.authentication
+				authentication.authenticate(currentActivity) {
+					signerMainViewModel.totalRefresh()
+				}
+			}
 		}
 		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "main rust-handled screen navigation subgraph opened")
+			Log.d(
+				NAVIGATION_TAG,
+				"main rust-handled screen navigation subgraph opened"
+			)
 		}
 	}
 }
