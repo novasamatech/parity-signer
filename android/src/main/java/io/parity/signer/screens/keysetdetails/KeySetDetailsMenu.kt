@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -35,6 +35,7 @@ fun KeySetDetailsMenu(
 	removeSeed: Callback,
 	onSelectKeysClicked: Callback,
 	onBackupClicked: Callback,
+	onCancel: Callback,
 ) {
 	val state = remember {
 		mutableStateOf(KeySetDetailsMenuState.GENERAL)
@@ -49,6 +50,7 @@ fun KeySetDetailsMenu(
 				},
 				onSelectKeysClicked = onSelectKeysClicked,
 				onBackupClicked = onBackupClicked,
+				onCancel = onCancel,
 			)
 		KeySetDetailsMenuState.DELETE_CONFIRM ->
 			KeySetDeleteConfirmBottomSheet(
@@ -80,12 +82,13 @@ fun KeyDetailsMenuGeneral(
 	onSelectKeysClicked: Callback,
 	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
+	onCancel: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 		MenuItemForBottomSheet(
@@ -125,9 +128,8 @@ fun KeyDetailsMenuGeneral(
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
-		) {
-			navigator.backAction()
-		}
+			onClicked = onCancel
+		)
 		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 	}
 }
@@ -152,7 +154,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.None) }
 		KeySetDetailsMenu(
-			EmptyNavigator(), state, {}, {}, {},
+			EmptyNavigator(), state, {}, {}, {}, {},
 		)
 	}
 }
