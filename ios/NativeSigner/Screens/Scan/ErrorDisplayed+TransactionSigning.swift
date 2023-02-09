@@ -46,11 +46,11 @@ extension ErrorBottomModalViewModel {
         case let .generic(message):
             return ErrorBottomModalViewModel.alertError(message: message)
         case let .metadataForUnknownNetwork(name):
-            fatalError()
+            return ErrorBottomModalViewModel.metadataForUnknownNetwork(name)
         case let .networkAlreadyAdded(name, encryption):
-            fatalError()
+            return ErrorBottomModalViewModel.networkAlreadyAdded(name, encryption)
         case let .metadataAlreadyAdded(name, version):
-            fatalError()
+            return ErrorBottomModalViewModel.metadataAlreadyAdded(name, version)
         case let .outdatedMetadata(name, currentVersion, expectedVersion):
             return ErrorBottomModalViewModel.signingInvalidNetworkVersion(name)
         case let .unknownNetwork(genesisHash, encryption):
