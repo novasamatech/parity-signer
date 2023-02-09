@@ -396,7 +396,7 @@ fn can_sign_transaction_1() {
         order: 2,
     };
 
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, checksum } = output {
         let TransactionSignAction {
             content: set,
@@ -613,7 +613,7 @@ fn can_sign_message_1() {
     let card_text = String::from("uuid-abcd");
     let message = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{message}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
-    let output = produce_output(&db, &line);
+    let output = produce_output(&db, &line).unwrap();
 
     let content_known = TransactionCardSet {
         message: Some(vec![TransactionCard {
@@ -754,7 +754,7 @@ fn add_specs_westend_no_network_info_not_signed() {
 
     populate_cold_no_networks(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -837,7 +837,7 @@ fn add_specs_westend_ed25519_not_signed() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1069,7 +1069,7 @@ fn load_westend9070() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1183,7 +1183,7 @@ fn load_known_types_upd_general_verifier() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let warning = "Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged.".to_string();
 
     let warning2 =
@@ -1310,7 +1310,7 @@ fn load_new_types_verified() {
 
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
             index: 0,
@@ -1437,7 +1437,7 @@ fn dock_adventures_1() {
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1554,7 +1554,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1636,7 +1636,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let warning_1 = "Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31.".to_string();
     let warning_2 = "Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged.".to_string();
     let warning_3 = "Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database.".to_string();
@@ -1756,7 +1756,7 @@ fn dock_adventures_2() {
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1876,7 +1876,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -1960,7 +1960,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let warning_1 = "Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae. Proceeding will update the network verifier to custom verifier. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31.".to_string();
 
     let warning_2 = "Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database.".to_string();
@@ -2077,7 +2077,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
             index: 0,
@@ -2193,7 +2193,7 @@ fn can_parse_westend_with_v14() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/load_metadata_westendV9111_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -2302,7 +2302,7 @@ Identities:
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d9c0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480284d717d5031504025a62029723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let docs = "Same as the [`transfer`] call, but with a check that the transfer will not kill the\norigin account.\n\n99% of the time you want [`transfer`] instead.\n\n[`transfer`]: struct.Pallet.html#method.transfer\n# <weight>\n- Cheaper than transfer because account cannot be killed.\n- Base Weight: 51.4 µs\n- DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n#</weight>".to_string();
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     let content_known = TransactionCardSet {
         method: Some(vec![
             TransactionCard {
@@ -2480,7 +2480,7 @@ Identities:
     }
 
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ffe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     let docs1 = "Send a batch of dispatch calls and atomically execute them.\nThe whole transaction will rollback and fail if any of the calls failed.\n\nMay be called from any origin.\n\n- `calls`: The calls to be dispatched from the same origin. The number of call must not\n  exceed the constant: `batched_calls_limit` (available in constant metadata).\n\nIf origin is root then call are dispatch without checking origin filter. (This includes\nbypassing `frame_system::Config::BaseCallFilter`).\n\n# <weight>\n- Complexity: O(C) where C is the number of calls to be batched.\n# </weight>".to_string();
     let docs2 = "Take the origin account as a stash and lock up `value` of its balance. `controller` will\nbe the account that controls it.\n\n`value` must be more than the `minimum_balance` specified by `T::Currency`.\n\nThe dispatch origin for this call must be _Signed_ by the stash account.\n\nEmits `Bonded`.\n# <weight>\n- Independent of the arguments. Moderate complexity.\n- O(1).\n- Three extra DB entries.\n\nNOTE: Two of the storage writes (`Self::bonded`, `Self::payee`) are _never_ cleaned\nunless the `origin` falls below _existential deposit_ and gets removed as dust.\n------------------\n# </weight>".to_string();
 
@@ -2843,7 +2843,7 @@ fn parse_transaction_alice_remarks_westend9122() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/load_metadata_westendV9122_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         warning: Some(vec![TransactionCard {
             index: 0,
@@ -2891,7 +2891,7 @@ fn parse_transaction_alice_remarks_westend9122() {
     }
 
     let line = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d2509000115094c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20436f6e67756520657520636f6e7365717561742061632066656c697320646f6e65632e20547572706973206567657374617320696e7465676572206567657420616c6971756574206e696268207072616573656e742e204e6571756520636f6e76616c6c6973206120637261732073656d70657220617563746f72206e657175652e204e65747573206574206d616c6573756164612066616d6573206163207475727069732065676573746173207365642074656d7075732e2050656c6c656e746573717565206861626974616e74206d6f726269207472697374697175652073656e6563747573206574206e657475732065742e205072657469756d2076756c7075746174652073617069656e206e656320736167697474697320616c697175616d2e20436f6e76616c6c69732061656e65616e20657420746f72746f7220617420726973757320766976657272612e20566976616d757320617263752066656c697320626962656e64756d207574207472697374697175652065742065676573746173207175697320697073756d2e204d616c6573756164612070726f696e206c696265726f206e756e6320636f6e73657175617420696e74657264756d207661726975732e2045022c00a223000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66ae143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
 
     let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Congue eu consequat ac felis donec. Turpis egestas integer eget aliquet nibh praesent. Neque convallis a cras semper auctor neque. Netus et malesuada fames ac turpis egestas sed tempus. Pellentesque habitant morbi tristique senectus et netus et. Pretium vulputate sapien nec sagittis aliquam. Convallis aenean et tortor at risus viverra. Vivamus arcu felis bibendum ut tristique et egestas quis ipsum. Malesuada proin libero nunc consequat interdum varius. ".to_string();
 
@@ -3032,7 +3032,7 @@ fn proper_hold_display() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub {
         s: _,
@@ -3050,7 +3050,7 @@ fn proper_hold_display() {
     let warning_2 =
         "Received types information is identical to the one that was in the database.".to_string();
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
             index: 0,
@@ -3153,7 +3153,7 @@ Identities:
 
     let line =
         fs::read_to_string("for_tests/load_metadata_westendV9122_Alice-sr25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let error = "Bad input data. Network westend was previously known to the database with verifier public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata.".to_string();
 
     let reply_known = TransactionCardSet {
@@ -3184,7 +3184,7 @@ fn dock_adventures_3() {
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub {
         s: _,
@@ -3200,7 +3200,7 @@ fn dock_adventures_3() {
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub {
         s: _,
@@ -3291,7 +3291,7 @@ Identities:
             .unwrap();
     let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     let reply_known = TransactionCardSet {
         error: Some(vec![TransactionCard {
             index: 0,
@@ -3310,7 +3310,7 @@ Identities:
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
     let reply_known = TransactionCardSet {
@@ -3339,7 +3339,7 @@ fn acala_adventures() {
     populate_cold_no_networks(&db, Verifier { v: None }).unwrap();
 
     let line = fs::read_to_string("for_tests/add_specs_acala-sr25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub {
         s: _,
@@ -3367,7 +3367,7 @@ Identities:"#;
     );
 
     let line = fs::read_to_string("for_tests/load_metadata_acalaV2012_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub {
         s: _,
@@ -3384,7 +3384,7 @@ Identities:"#;
 
     let docs = "Transfer some liquid free balance to another account.\n\n`transfer` will set the `FreeBalance` of the sender and receiver.\nIt will decrease the total issuance of the system by the `TransferFee`.\nIf the sender's account is below the existential deposit as a result\nof the transfer, the account will be reaped.\n\nThe dispatch origin for this call must be `Signed` by the transactor.\n\n# <weight>\n- Dependent on arguments but not critical, given proper implementations for input config\n  types. See related functions below.\n- It contains a limited number of reads and writes internally and no complex\n  computation.\n\nRelated functions:\n\n  - `ensure_can_withdraw` is always called internally but has a bounded complexity.\n  - Transferring balances to accounts that did not exist before will cause\n    `T::OnNewAccount::on_new_account` to be called.\n  - Removing enough funds from an account will trigger `T::DustRemoval::on_unbalanced`.\n  - `transfer_keep_alive` works the same way as `transfer`, but has an additional check\n    that the transfer will not kill the origin account.\n---------------------------------\n- Origin account is already in memory, so no DB operations for them.\n# </weight>".to_string();
 
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     let content_known = TransactionCardSet {
         author: Some(vec![TransactionCard {
             index: 0,
@@ -3551,7 +3551,7 @@ fn shell_no_token_warning_on_metadata() {
     populate_cold_no_networks(&db, Verifier { v: None }).unwrap();
 
     let line = fs::read_to_string("for_tests/add_specs_shell-sr25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3564,7 +3564,7 @@ fn shell_no_token_warning_on_metadata() {
     }
 
     let line = fs::read_to_string("for_tests/load_metadata_shellV200_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     let warning_1 = "Received metadata has incomplete set of signed extensions. As a result, Signer may be unable to parse signable transactions using this metadata.".to_string();
     let warning_2 = "Received network information is not verified.".to_string();
@@ -3632,7 +3632,7 @@ fn rococo_and_verifiers_1() {
 
     // added rococo specs with `ed25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-ed25519_Alice-ed25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3646,7 +3646,7 @@ fn rococo_and_verifiers_1() {
 
     // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3703,7 +3703,7 @@ fn rococo_and_verifiers_2() {
 
     // added rococo specs with `sr25519`, general verifier, specified one
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3761,7 +3761,7 @@ fn rococo_and_verifiers_3() {
 
     // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3817,7 +3817,7 @@ fn rococo_and_verifiers_4() {
 
     // added rococo specs with `sr25519`, custom verifier None
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3842,7 +3842,7 @@ Identities:"#;
 
     // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3878,7 +3878,7 @@ fn rococo_and_verifiers_5() {
 
     // added rococo specs with `sr25519`, custom verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,
@@ -3903,7 +3903,7 @@ Identities:"#;
 
     // added rococo specs with `sr25519`, general verifier
     let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: _,
         u: checksum,

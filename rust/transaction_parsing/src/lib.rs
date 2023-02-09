@@ -2,14 +2,13 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use db_handling::identities::TransactionBulk;
-use definitions::{helpers::unhex, navigation::TransactionCardSet};
+use definitions::helpers::unhex;
 use parity_scale_codec::Decode;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
 pub mod cards;
-use cards::Card;
 pub mod check_signature;
 mod derivations;
 pub use derivations::prepare_derivations_preview;
@@ -96,5 +95,5 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
 }
 
 pub fn produce_output(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
-    Ok(handle_scanner_input(database, payload)?)
+    handle_scanner_input(database, payload)
 }

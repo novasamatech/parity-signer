@@ -1,4 +1,4 @@
-use crate::{produce_output, StubNav};
+use crate::{error, produce_output, StubNav};
 use constants::test_values::{
     alice_sr_alice, alice_sr_westend_0, bob, ed, id_01, id_02, id_03, types_known, types_unknown,
     westend_9070,
@@ -134,7 +134,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub { s, u: _, stub } = output {
         assert_eq!(*s, card_set_known);
@@ -153,7 +153,7 @@ fn add_specs_westend_not_signed() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -174,7 +174,7 @@ fn add_specs_westend_not_signed_general_verifier_disappear() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -196,7 +196,7 @@ fn load_types_known_not_signed() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -221,7 +221,7 @@ fn load_types_known_not_signed_general_verifier_disappear() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     let expected_action = TransactionAction::Read {
         r: Box::new(TransactionCardSet {
             error: Some(vec![TransactionCard {
@@ -301,7 +301,7 @@ fn load_types_known_alice_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: reply,
         u: _,
@@ -334,7 +334,7 @@ fn load_types_known_alice_signed_known_general_verifier() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: reply } = output {
         assert_eq!(*reply, reply_known);
     } else {
@@ -358,7 +358,7 @@ fn load_types_known_alice_signed_bad_general_verifier() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: reply } = action {
         assert_eq!(*reply, action_expected);
     } else {
@@ -410,7 +410,7 @@ fn load_types_known_alice_signed_metadata_hold() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = output {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -462,7 +462,7 @@ fn load_types_unknown_not_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(stub, StubNav::LoadTypes);
         assert_eq!(*set, expected_set);
@@ -514,7 +514,7 @@ fn load_types_unknown_alice_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, expected_set);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -529,20 +529,45 @@ fn parse_transaction_westend_50_not_in_db() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003200000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let expected_set = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
-        }]),
-        ..Default::default()
-    };
 
-    let action = produce_output(&db, line);
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, expected_set);
+    let error = produce_output(&db, line).unwrap_err();
+    if let error::Error::AllExtensionsParsingFailed {
+        network_name,
+        mut errors,
+    } = error
+    {
+        assert_eq!(network_name, "westend");
+        assert_eq!(errors.len(), 2);
+        let error = errors.pop().unwrap();
+        if let (
+            9000,
+            parser::Error::WrongNetworkVersion {
+                as_decoded,
+                in_metadata,
+            },
+        ) = error
+        {
+            assert_eq!(as_decoded, "50");
+            assert_eq!(in_metadata, 9000);
+        } else {
+            panic!("Unexpected error {:?}", error);
+        };
+        let error = errors.pop().unwrap();
+        if let (
+            9010,
+            parser::Error::WrongNetworkVersion {
+                as_decoded,
+                in_metadata,
+            },
+        ) = error
+        {
+            assert_eq!(as_decoded, "50");
+            assert_eq!(in_metadata, 9010);
+        } else {
+            panic!("Unexpected error {:?}", error);
+        };
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
 }
 
@@ -709,7 +734,7 @@ fn parse_transaction_1() {
         },
         order: 2,
     };
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1039,7 +1064,7 @@ fn parse_transaction_2() {
     };
     let network_info_known = westend_spec();
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
             content,
@@ -1208,7 +1233,7 @@ fn parse_transaction_3() {
         },
     };
     let network_info_known = westend_spec();
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1267,7 +1292,7 @@ fn load_westend9070_not_signed() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1290,7 +1315,7 @@ fn load_westend9070_alice_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: reply } = action {
         assert_eq!(*reply, set_expected);
     } else {
@@ -1315,7 +1340,7 @@ fn load_westend9000_already_in_db_not_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1341,7 +1366,7 @@ fn load_westend9000_already_in_db_alice_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = output {
         assert_eq!(*set, set_expected);
     } else {
@@ -1367,7 +1392,7 @@ fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1389,7 +1414,7 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1414,7 +1439,7 @@ fn load_dock31_unknown_network() {
        ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = output {
         assert_eq!(*set, set_expected);
     } else {
@@ -1471,7 +1496,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1537,7 +1562,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1595,7 +1620,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1660,7 +1685,7 @@ fn add_specs_dock_both_verified_same() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1725,7 +1750,7 @@ fn add_specs_dock_both_verified_different() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1780,7 +1805,7 @@ fn add_specs_westend_ed25519_not_signed() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1806,7 +1831,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1874,7 +1899,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1899,7 +1924,7 @@ fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -1961,7 +1986,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1986,7 +2011,7 @@ fn add_specs_westend_ed25519_both_verified_different() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2145,7 +2170,7 @@ fn parse_transaction_4_unknown_author() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2180,7 +2205,7 @@ fn parse_transaction_5_unknown_network() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2283,7 +2308,7 @@ fn parse_transaction_6_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2386,7 +2411,7 @@ fn parse_transaction_7_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2490,7 +2515,7 @@ fn parse_transaction_8_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2536,7 +2561,7 @@ fn parse_msg_1() {
     };
 
     let network_info_known = westend_spec();
-    let action = produce_output(&db, &line);
+    let action = produce_output(&db, &line).unwrap();
 
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
@@ -2574,7 +2599,7 @@ fn parse_msg_2() {
         }]),
         ..Default::default()
     };
-    let action = produce_output(&db, &line);
+    let action = produce_output(&db, &line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2627,7 +2652,7 @@ fn import_derivations() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Derivations { content: set } = action {
         assert_eq!(*set, set_expected);
     } else {
