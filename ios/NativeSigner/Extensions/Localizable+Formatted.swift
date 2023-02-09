@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension Localizable {
     static func createDerivedKeyModalPathInfo() -> AttributedString {
@@ -23,7 +24,8 @@ extension Localizable {
         attributedString.setAttributes([.foregroundColor: Asset.accentPink300.color], range: range)
         return AttributedString(attributedString)
     }
-  static func createKeySetSeedPhraseInfo() -> AttributedString {
+
+    static func createKeySetSeedPhraseInfo() -> AttributedString {
         let mainText = Localizable.NewSeed.Backup.Label.info.string
         let underlinedText = Localizable.NewSeed.Backup.Label.Info.underline.string
 
@@ -97,4 +99,3 @@ extension Localizable {
         return AttributedString(attributedString)
     }
 }
-
