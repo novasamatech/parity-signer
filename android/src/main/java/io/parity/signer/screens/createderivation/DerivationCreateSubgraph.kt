@@ -115,6 +115,7 @@ fun DerivationCreateSubgraph(
 									)
 								}
 								closeAction()
+								rootNavigator.backAction()
 							},
 						)
 					}
