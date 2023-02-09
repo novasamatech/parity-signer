@@ -119,11 +119,11 @@ struct ErrorBottomModal_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ErrorBottomModal(
-                viewModel: .signingUnknownNetwork("Westend"),
+                viewModel: .signingUnknownNetwork(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
             ErrorBottomModal(
-                viewModel: .signingInvalidNetworkVersion(),
+                viewModel: .signingInvalidNetworkVersion("Westend"),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
             ErrorBottomModal(

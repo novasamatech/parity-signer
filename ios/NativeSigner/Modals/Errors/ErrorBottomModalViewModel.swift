@@ -92,29 +92,17 @@ struct ErrorBottomModalViewModel {
         )
     }
 
-    static func signingUnknownNetwork(
+    static func signingInvalidNetworkVersion(
         _ networkName: String,
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             title: Localizable.TransactionSign.Error.InvalidNetworkVersion.title(networkName),
-            content: Localizable.TransactionSign.Error.InvalidNetworkVersion.message.string,
+            content: Localizable.TransactionSign.Error.InvalidNetworkVersion.message(networkName),
             steps: [
                 .init(
                     step: "1",
-                    content: {
-                        var stepOnePrefix = AttributedString(
-                            Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
-                                .string
-                        )
-                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
-                        var stepOneSuffix = AttributedString(
-                            Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.suffix
-                                .string
-                        )
-                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
-                        return stepOnePrefix + stepOneSuffix
-                    }()
+                    content: Localizable.signingInvalidNetworkVersionStepOne()
                 ),
                 .init(
                     step: "2",
@@ -129,7 +117,7 @@ struct ErrorBottomModalViewModel {
         )
     }
 
-    static func signingInvalidNetworkVersion(_ action: @escaping @autoclosure () -> Void = {}())
+    static func signingUnknownNetwork(_ action: @escaping @autoclosure () -> Void = {}())
         -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             title: Localizable.TransactionSign.Error.UnknownNetwork.title.string,
@@ -137,19 +125,7 @@ struct ErrorBottomModalViewModel {
             steps: [
                 .init(
                     step: "1",
-                    content: {
-                        var stepOnePrefix = AttributedString(
-                            Localizable.TransactionSign.Error.UnknownNetwork.step1
-                                .string
-                        )
-                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
-                        var stepOneSuffix = AttributedString(
-                            Localizable.TransactionSign.Error.UnknownNetwork.Step1.suffix
-                                .string
-                        )
-                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
-                        return stepOnePrefix + stepOneSuffix
-                    }()
+                    content: Localizable.signingUnknownNetworkStepOne()
                 ),
                 .init(
                     step: "2",
