@@ -3166,7 +3166,7 @@ Identities:
             "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"
         );
     } else {
-        panic!("Unexpected error {:?}", error);
+        panic!("Unexpected error {error:?}");
     }
 }
 
@@ -3289,7 +3289,7 @@ Identities:
     let error = produce_output(&db, line.trim()).unwrap_err();
     if let transaction_parsing::Error::DbError(_db) = error {
     } else {
-        panic!("Unexpected error {:?}", error);
+        panic!("Unexpected error {error:?}");
     }
 
     let line =
@@ -3298,7 +3298,7 @@ Identities:
     let error = produce_output(&db, line.trim()).unwrap_err();
     if let transaction_parsing::Error::DbError(_db) = error {
     } else {
-        panic!("Unexpected error {:?}", error);
+        panic!("Unexpected error {error:?}");
     }
 }
 

@@ -1796,7 +1796,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
     } = error
     {
         assert_eq!(
-            hex::encode(&genesis_hash),
+            hex::encode(genesis_hash),
             "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
         );
         assert_eq!(name, "westend");
