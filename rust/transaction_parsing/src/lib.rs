@@ -95,14 +95,6 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
     }
 }
 
-pub fn produce_output(database: &sled::Db, payload: &str) -> TransactionAction {
-    match handle_scanner_input(database, payload) {
-        Ok(out) => out,
-        Err(e) => TransactionAction::Read {
-            r: Box::new(TransactionCardSet {
-                error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
-                ..Default::default()
-            }),
-        },
-    }
+pub fn produce_output(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
+    Ok(handle_scanner_input(database, payload)?)
 }
