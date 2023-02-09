@@ -38,3 +38,23 @@ enum TransactionError: Error {
     case outdatedMetadata(name: String, currentVersion: String, expectedVersion: String)
     case unknownNetwork(genesisHash: String, encryption: String)
 }
+
+// swiftlint:disable all
+extension ErrorBottomModalViewModel {
+    static func transactionError(for transactionError: TransactionError) -> ErrorBottomModalViewModel {
+        switch transactionError {
+        case let .generic(message):
+            return ErrorBottomModalViewModel.alertError(message: message)
+        case let .metadataForUnknownNetwork(name):
+            fatalError()
+        case let .networkAlreadyAdded(name, encryption):
+            fatalError()
+        case let .metadataAlreadyAdded(name, version):
+            fatalError()
+        case let .outdatedMetadata(name, currentVersion, expectedVersion):
+            return ErrorBottomModalViewModel.signingInvalidNetworkVersion(name)
+        case let .unknownNetwork(genesisHash, encryption):
+            return ErrorBottomModalViewModel.signingUnknownNetwork()
+        }
+    }
+}

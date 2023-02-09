@@ -25,24 +25,6 @@ extension Localizable {
         return AttributedString(attributedString)
     }
 
-    static func createKeySetSeedPhraseInfo() -> AttributedString {
-        let mainText = Localizable.NewSeed.Backup.Label.info.string
-        let underlinedText = Localizable.NewSeed.Backup.Label.Info.underline.string
-
-        let attributedString = NSMutableAttributedString(string: mainText)
-        attributedString.addAttribute(
-            .foregroundColor,
-            value: Asset.accentPink300.color,
-            range: NSRange(location: 0, length: mainText.count)
-        )
-        attributedString.addAttribute(
-            .underlineStyle,
-            value: NSUnderlineStyle.single.rawValue,
-            range: (mainText as NSString).range(of: underlinedText)
-        )
-        return AttributedString(attributedString)
-    }
-
     static func signingInvalidNetworkVersionStepOne() -> AttributedString {
         let mainText = Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
             .string
