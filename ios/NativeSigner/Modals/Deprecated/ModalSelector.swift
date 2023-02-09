@@ -16,9 +16,7 @@ struct ModalSelector: View {
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case let .newSeedBackup(value):
-            NewSeedBackupModal(
-                content: value
-            )
+            CreateKeySetSeedPhraseView(viewModel: .init(dataModel: value))
         case let .selectSeed(value):
             SelectSeed(
                 content: value

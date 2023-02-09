@@ -42,10 +42,8 @@ struct ScreenSelector: View {
             } else {
                 EmptyView()
             }
-        case let .newSeed(value):
-            NewSeedScreen(
-                content: value
-            )
+        case .newSeed:
+            EnterKeySetNameView(viewModel: .init())
         case let .recoverSeedName(value):
             RecoverSeedName(
                 content: value
