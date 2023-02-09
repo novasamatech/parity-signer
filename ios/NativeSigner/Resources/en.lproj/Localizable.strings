@@ -433,6 +433,16 @@
 "TransactionSign.Error.InvalidNetworkVersion.Step1.Highlight.second" = "nova-wallet.github.io/metadata-portal";
 "TransactionSign.Error.InvalidNetworkVersion.Step2" = "Choose the network you need";
 "TransactionSign.Error.InvalidNetworkVersion.Step3" = "Scan the metadata’s QR code with the scanner";
+
+"TransactionSign.Error.NetworkAlreadyAdded.Title" = "%@ Network Has Already Been Added";
+"TransactionSign.Error.NetworkAlreadyAdded.Message" = "Go to Settings > Networks to check all the added networks.";
+
+"TransactionSign.Error.MetadataAlreadyAdded.Title" = "This %@ Network %@ Metadata Version Has Already Been Added";
+"TransactionSign.Error.MetadataAlreadyAdded.Message" = "Go to Settings > Networks. Tap on the network you need to check and modify the latest metadata.";
+
+
+
+
 "TransactionSign.Snackbar.Metadata" = "Metadata %@ %@ was added";
 "TransactionSign.Snackbar.NetworkAdded" = "Network %@ was added";
 

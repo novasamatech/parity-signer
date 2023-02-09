@@ -900,16 +900,15 @@
 		6D199C9D292A8CF300E79113 /* Scan */ = {
 			isa = PBXGroup;
 			children = (
+				6D34233829952EB500F3BA27 /* Errors */,
 				6D3423372994F11300F3BA27 /* Password */,
 				6D3423362994F10A00F3BA27 /* BananaSplit */,
-				6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */,
 				6D199CA0292A8EA200E79113 /* Models */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
 				2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */,
 				6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */,
 				6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */,
 				6D03118E2937269100C38F61 /* TransactionErrorsView.swift */,
-				6D8F813B2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift */,
 			);
 			path = Scan;
 			sourceTree = "<group>";
@@ -979,6 +978,15 @@
 				6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */,
 			);
 			path = Password;
+			sourceTree = "<group>";
+		};
+		6D34233829952EB500F3BA27 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				6D8F813B2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift */,
+				6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */,
+			);
+			path = Errors;
 			sourceTree = "<group>";
 		};
 		6D45065C296E94E70065B4D4 /* Subviews */ = {

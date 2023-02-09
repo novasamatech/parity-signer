@@ -22,13 +22,12 @@ extension ErrorBottomModalViewModel {
 
     static func networkAlreadyAdded(
         _ networkName: String,
-        _ encryption: String,
+        _: String,
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: "Network Already Added: \(networkName) \(encryption)",
-            content: "",
-            steps: [],
+            title: Localizable.TransactionSign.Error.NetworkAlreadyAdded.title(networkName),
+            content: Localizable.TransactionSign.Error.NetworkAlreadyAdded.message.string,
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
         )
     }
@@ -39,9 +38,8 @@ extension ErrorBottomModalViewModel {
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: "Metadata Already Added: \(networkName) \(version)",
-            content: "",
-            steps: [],
+            title: Localizable.TransactionSign.Error.MetadataAlreadyAdded.title(networkName, version),
+            content: Localizable.TransactionSign.Error.MetadataAlreadyAdded.message.string,
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
         )
     }
