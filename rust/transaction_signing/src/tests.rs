@@ -3153,25 +3153,21 @@ Identities:
 
     let line =
         fs::read_to_string("for_tests/load_metadata_westendV9122_Alice-sr25519.txt").unwrap();
-    let output = produce_output(&db, line.trim()).unwrap();
-    let error = "Bad input data. Network westend was previously known to the database with verifier public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata.".to_string();
+    let error = produce_output(&db, line.trim()).unwrap_err();
 
-    let reply_known = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: error },
-        }]),
-        ..Default::default()
-    };
-
-    if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(*reply, reply_known);
+    if let transaction_parsing::Error::LoadMetaNoSpecs {
+        name,
+        valid_current_verifier: _,
+        general_verifier,
+    } = error
+    {
+        assert_eq!(name, "westend");
+        assert_eq!(general_verifier.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"
+        );
     } else {
-        panic!("Wrong action: {output:?}")
+        panic!("Unexpected error {:?}", error);
     }
-
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
@@ -3289,46 +3285,21 @@ Identities:
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
             .unwrap();
-    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
 
-    let output = produce_output(&db, line.trim()).unwrap();
-    let reply_known = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: error },
-        }]),
-        ..Default::default()
-    };
-
-    if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(*reply, reply_known);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let transaction_parsing::Error::DbError(_db) = error {
     } else {
-        panic!("Wrong action: {output:?}")
+        panic!("Unexpected error {:?}", error);
     }
 
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt")
             .unwrap();
-    let output = produce_output(&db, line.trim()).unwrap();
-
-    let error = "Bad input data. Database error. Internal error. Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer.".to_string();
-    let reply_known = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: error },
-        }]),
-        ..Default::default()
-    };
-
-    if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(*reply, reply_known);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let transaction_parsing::Error::DbError(_db) = error {
     } else {
-        panic!("Wrong action: {output:?}")
+        panic!("Unexpected error {:?}", error);
     }
-
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
