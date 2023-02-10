@@ -1,6 +1,6 @@
-use crate::{produce_output, StubNav};
+use crate::{error, produce_output, Error, StubNav};
 use constants::test_values::{
-    alice_sr_alice, alice_sr_westend_0, bob, ed, id_01, id_02, id_03, types_known, types_unknown,
+    alice_sr_alice, alice_sr_westend_0, bob, ed, id_01, id_02, types_known, types_unknown,
     westend_9070,
 };
 
@@ -8,7 +8,6 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
-use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
@@ -20,6 +19,10 @@ use definitions::{
         TransactionCard, TransactionCardSet,
     },
     network_specs::{OrderedNetworkSpecs, Verifier, VerifierValue},
+};
+use definitions::{
+    derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview},
+    error_signer::GeneralVerifierForContent,
 };
 
 use pretty_assertions::assert_eq;
@@ -134,7 +137,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
 
     if let TransactionAction::Stub { s, u: _, stub } = output {
         assert_eq!(*s, card_set_known);
@@ -153,18 +156,13 @@ fn add_specs_westend_not_signed() {
 
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(&db, line.trim());
-    let expected_action = TransactionAction::Read {
-        r: Box::new(TransactionCardSet {
-            error: Some(vec![TransactionCard {
-                index: 0,
-                indent: 0,
-                card: Card::ErrorCard { f:  "Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database.".to_string()},
-            }]),
-            ..Default::default()
-        })
-    };
-    assert_eq!(action, expected_action);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::SpecsKnown { name, encryption } = error {
+        assert_eq!(name, "westend");
+        assert_eq!(encryption, Encryption::Sr25519);
+    } else {
+        panic!("Unexpected error {:?}", error);
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -174,19 +172,26 @@ fn add_specs_westend_not_signed_general_verifier_disappear() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-    let action = produce_output(&db, line.trim());
-    let expected_action = TransactionAction::Read {
-        r: Box::new(TransactionCardSet {
-            error: Some(vec![TransactionCard {
-                index: 0,
-                indent: 0,
-                card: Card::ErrorCard { f: "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier.".to_string()},
-            }]),
-            ..Default::default()
-        })
-    };
-    assert_eq!(action, expected_action);
 
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::NeedGeneralVerifier {
+        content,
+        verifier_value,
+    } = error
+    {
+        assert_eq!(
+            verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519",
+        );
+        assert_eq!(
+            content,
+            GeneralVerifierForContent::Network {
+                name: "westend".to_string()
+            },
+        );
+    } else {
+        panic!("Unexpected error {:?}", error);
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -196,22 +201,12 @@ fn load_types_known_not_signed() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(&db, line.trim());
-    let expected_action = TransactionAction::Read {
-        r: Box::new(TransactionCardSet {
-            error: Some(vec![TransactionCard {
-                index: 0,
-                indent: 0,
-                card: Card::ErrorCard {
-                    f: "Bad input data. Exactly same types information is already in the database."
-                        .to_string(),
-                },
-            }]),
-            ..Default::default()
-        }),
-    };
-    assert_eq!(action, expected_action);
+    let error = produce_output(&db, line.trim()).unwrap_err();
 
+    if let error::Error::TypesKnown = error {
+    } else {
+        panic!("Unexpected error {:?}", error);
+    }
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -221,20 +216,21 @@ fn load_types_known_not_signed_general_verifier_disappear() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_None.txt").unwrap();
-    let action = produce_output(&db, line.trim());
-    let expected_action = TransactionAction::Read {
-        r: Box::new(TransactionCardSet {
-            error: Some(vec![TransactionCard {
-                index: 0,
-                indent: 0,
-                card: Card::ErrorCard {
-                    f: "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received unsigned types information could be accepted only if signed by the general verifier.".to_string(),
-                },
-            }]),
-            ..Default::default()
-        }),
-    };
-    assert_eq!(action, expected_action);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::NeedGeneralVerifier {
+        content,
+        verifier_value,
+    } = error
+    {
+        assert_eq!(
+            verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"
+        );
+
+        assert_eq!(content, GeneralVerifierForContent::Types);
+    } else {
+        panic!("Unexpected error {:?}", error);
+    }
 
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -301,7 +297,7 @@ fn load_types_known_alice_signed() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub {
         s: reply,
         u: _,
@@ -322,23 +318,10 @@ fn load_types_known_alice_signed_known_general_verifier() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
-    let reply_known = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard {
-                f: "Bad input data. Exactly same types information is already in the database."
-                    .to_string(),
-            },
-        }]),
-        ..Default::default()
-    };
-
-    let output = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: reply } = output {
-        assert_eq!(*reply, reply_known);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::TypesKnown = error {
     } else {
-        panic!("Wrong action {:?}", output)
+        panic!("Unexpected error {:?}", error);
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -349,21 +332,27 @@ fn load_types_known_alice_signed_bad_general_verifier() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, verifier_alice_ed25519()).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
-    let action_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received types information could be accepted only if verified by the same general verifier. Current message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519.".to_string() },
-        }]),
-        ..Default::default()
-    };
 
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: reply } = action {
-        assert_eq!(*reply, action_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::GeneralVerifierChanged {
+        content,
+        old_general_verifier_value,
+        new_general_verifier_value,
+    } = error
+    {
+        assert_eq!(content, GeneralVerifierForContent::Types);
+        assert_eq!(
+            old_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519"
+        );
+        assert_eq!(
+            new_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"
+        );
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
+
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -410,7 +399,7 @@ fn load_types_known_alice_signed_metadata_hold() {
         ..Default::default()
     };
 
-    let output = produce_output(&db, line.trim());
+    let output = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = output {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -462,7 +451,7 @@ fn load_types_unknown_not_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(stub, StubNav::LoadTypes);
         assert_eq!(*set, expected_set);
@@ -514,7 +503,7 @@ fn load_types_unknown_alice_signed() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, expected_set);
         assert_eq!(stub, StubNav::LoadTypes);
@@ -529,20 +518,45 @@ fn parse_transaction_westend_50_not_in_db() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003200000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let expected_set = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (50) differs from the version in metadata (9000).".to_string() },
-        }]),
-        ..Default::default()
-    };
 
-    let action = produce_output(&db, line);
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, expected_set);
+    let error = produce_output(&db, line).unwrap_err();
+    if let error::Error::AllExtensionsParsingFailed {
+        network_name,
+        mut errors,
+    } = error
+    {
+        assert_eq!(network_name, "westend");
+        assert_eq!(errors.len(), 2);
+        let error = errors.pop().unwrap();
+        if let (
+            9000,
+            parser::Error::WrongNetworkVersion {
+                as_decoded,
+                in_metadata,
+            },
+        ) = error
+        {
+            assert_eq!(as_decoded, "50");
+            assert_eq!(in_metadata, 9000);
+        } else {
+            panic!("Unexpected error {:?}", error);
+        };
+        let error = errors.pop().unwrap();
+        if let (
+            9010,
+            parser::Error::WrongNetworkVersion {
+                as_decoded,
+                in_metadata,
+            },
+        ) = error
+        {
+            assert_eq!(as_decoded, "50");
+            assert_eq!(in_metadata, 9010);
+        } else {
+            panic!("Unexpected error {:?}", error);
+        };
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
 }
 
@@ -709,7 +723,7 @@ fn parse_transaction_1() {
         },
         order: 2,
     };
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1039,7 +1053,7 @@ fn parse_transaction_2() {
     };
     let network_info_known = westend_spec();
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
             content,
@@ -1208,7 +1222,7 @@ fn parse_transaction_3() {
         },
     };
     let network_info_known = westend_spec();
-    let output = produce_output(&db, line);
+    let output = produce_output(&db, line).unwrap();
     if let TransactionAction::Sign { actions, .. } = output {
         let TransactionSignAction {
             content,
@@ -1267,7 +1281,7 @@ fn load_westend9070_not_signed() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1282,19 +1296,20 @@ fn load_westend9070_alice_signed() {
     let db = sled::open(dbname).unwrap();
     populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_metadata_westendV9070_Alice.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Network westend is set to be verified by the general verifier, however, general verifier is not yet established. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. In order to accept verified metadata and set up the general verifier, first download properly verified network specs.".to_string() },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: reply } = action {
-        assert_eq!(*reply, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+
+    if let error::Error::LoadMetaSetGeneralVerifier {
+        name,
+        new_general_verifier_value,
+    } = error
+    {
+        assert_eq!(name, "westend");
+        assert_eq!(
+            new_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"           
+        );
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error)
     }
 }
 
@@ -1304,22 +1319,14 @@ fn load_westend9000_already_in_db_not_signed() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_None.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard {
-                f: "Bad input data. Metadata for westend9000 is already in the database."
-                    .to_string(),
-            },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+
+    let error = produce_output(&db, line.trim()).unwrap_err();
+
+    if let error::Error::MetadataKnown { name, version } = error {
+        assert_eq!(name, "westend");
+        assert_eq!(version, 9000);
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error)
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1330,22 +1337,18 @@ fn load_westend9000_already_in_db_alice_signed() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard {
-                f: "Bad input data. Network westend is set to be verified by the general verifier, however, general verifier is not yet established. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. In order to accept verified metadata and set up the general verifier, first download properly verified network specs.".to_string()
-            },
-        }]),
-        ..Default::default()
-    };
-
-    let output = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = output {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::LoadMetaSetGeneralVerifier {
+        name,
+        new_general_verifier_value,
+    } = error
+    {
+        assert_eq!(name, "westend");
+        assert_eq!(new_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519",
+        );
     } else {
-        panic!("Wrong action {:?}", output)
+        panic!("Unexpected error {:?}", error)
     }
 }
 
@@ -1355,23 +1358,12 @@ fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard {
-                f: "Bad input data. Metadata for westend9000 is already in the database."
-                    .to_string(),
-            },
-        }]),
-        ..Default::default()
-    };
-
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::MetadataKnown { name, version } = error {
+        assert_eq!(name, "westend");
+        assert_eq!(version, 9000);
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error)
     }
 }
 
@@ -1381,19 +1373,25 @@ fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_ed25519()).unwrap();
     let line = fs::read_to_string("for_tests/network_from_db_westendV9000_Alice.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f:  "Bad input data. Network westend is verified by the general verifier which currently is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519. Received load_metadata message is verified by public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.".to_string() }
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+
+    if let crate::Error::LoadMetaGeneralVerifierChanged {
+        name,
+        old_general_verifier_value,
+        new_general_verifier_value,
+    } = error
+    {
+        assert_eq!(name, "westend");
+        assert_eq!(
+            old_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: ed25519",
+        );
+        assert_eq!(
+            new_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519",
+        );
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error)
     }
 }
 
@@ -1405,20 +1403,12 @@ fn load_dock31_unknown_network() {
     let line =
         fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt")
             .unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Network dock-pos-main-runtime is not in the database. Add network specs before loading the metadata.".to_string() },
-        }]),
-       ..Default::default()
-    };
 
-    let output = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = output {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::LoadMetaUnknownNetwork { name } = error {
+        assert_eq!(name, "dock-pos-main-runtime");
     } else {
-        panic!("Wrong action {:?}", output)
+        panic!("Unknown error {:?}", error);
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1471,7 +1461,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1537,7 +1527,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1595,7 +1585,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1660,7 +1650,7 @@ fn add_specs_dock_both_verified_same() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1725,7 +1715,7 @@ fn add_specs_dock_both_verified_different() {
             &Encryption::Sr25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1780,7 +1770,7 @@ fn add_specs_westend_ed25519_not_signed() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1797,22 +1787,24 @@ fn add_specs_bad_westend_ed25519_not_signed() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified_bad_ones.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Network westend with genesis hash e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have same genesis hash and different base58 prefix 115.".to_string()
-            },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::AddSpecsDifferentBase58 {
+        genesis_hash,
+        name,
+        base58_database,
+        base58_input,
+    } = error
+    {
+        assert_eq!(
+            hex::encode(genesis_hash),
+            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        );
+        assert_eq!(name, "westend");
+        assert_eq!(base58_database, 42);
+        assert_eq!(base58_input, 115);
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
@@ -1874,7 +1866,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1890,20 +1882,25 @@ fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier.".to_string() },
-        }]),
-        ..Default::default()
-    };
 
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+    if let error::Error::NeedGeneralVerifier {
+        content,
+        verifier_value,
+    } = error
+    {
+        assert_eq!(
+            verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"           
+        );
+        assert_eq!(
+            content,
+            GeneralVerifierForContent::Network {
+                name: "westend".to_string()
+            }
+        );
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1961,7 +1958,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
             &Encryption::Ed25519,
         ),
     };
-    let action = produce_output(&db, line.trim());
+    let action = produce_output(&db, line.trim()).unwrap();
     if let TransactionAction::Stub { s: set, u: _, stub } = action {
         assert_eq!(*set, set_expected);
         assert_eq!(stub, stub_nav_known);
@@ -1977,22 +1974,31 @@ fn add_specs_westend_ed25519_both_verified_different() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, verifier_alice_sr25519()).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
-    let error = "Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received westend network information could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519.".to_string();
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard { f: error },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line.trim());
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line.trim()).unwrap_err();
+
+    if let error::Error::GeneralVerifierChanged {
+        content,
+        old_general_verifier_value,
+        new_general_verifier_value,
+    } = error
+    {
+        assert_eq!(
+            content,
+            GeneralVerifierForContent::Network {
+                name: "westend".to_string()
+            }
+        );
+        assert_eq!(
+            old_general_verifier_value.show_error(),
+            "public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519"
+        );
+        assert_eq!(
+            new_general_verifier_value.show_error(),
+            "public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519"
+        );
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error: {:?}", error);
     }
-    fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
@@ -2145,7 +2151,7 @@ fn parse_transaction_4_unknown_author() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2160,31 +2166,20 @@ fn parse_transaction_5_unknown_network() {
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
     let line = "530102761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62a8030300761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c620b00407a10f35aa707000b00a0724e1809140000000a000000f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769badc21d36b69bae1e8a41dedb34758567ba4efe711412f33d1461f795ffcd1de13f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba";
-    let set_expected = TransactionCardSet {
-        author: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::AuthorPublicKeyCard {
-                f: MVerifierDetails {
-                    public_key: "761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62"
-                        .to_string(),
-                    identicon: SignerImage::Png{ image: id_03().to_vec() } ,
-                    encryption: "sr25519".to_string(),
-                },
-            },
-        }]),
-        error: Some(vec![TransactionCard {
-            index: 1,
-            indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Input generated within unknown network and could not be processed. Add network with genesis hash f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba and encryption sr25519.".to_string() },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, line);
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+    let error = produce_output(&db, line).unwrap_err();
+    if let Error::UnknownNetwork {
+        genesis_hash,
+        encryption,
+    } = error
+    {
+        assert_eq!(
+            genesis_hash,
+            H256::from_str("f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba")
+                .unwrap()
+        );
+        assert_eq!(encryption, Encryption::Sr25519);
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error);
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -2283,7 +2278,7 @@ fn parse_transaction_6_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2386,7 +2381,7 @@ fn parse_transaction_7_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2490,7 +2485,7 @@ fn parse_transaction_8_error_on_parsing() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Read { r: set } = action {
         assert_eq!(*set, set_expected);
     } else {
@@ -2536,7 +2531,7 @@ fn parse_msg_1() {
     };
 
     let network_info_known = westend_spec();
-    let action = produce_output(&db, &line);
+    let action = produce_output(&db, &line).unwrap();
 
     if let TransactionAction::Sign { actions, .. } = action {
         let TransactionSignAction {
@@ -2564,21 +2559,12 @@ fn parse_msg_2() {
     // sneaking one extra byte in the text body
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd");
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
-    let set_expected = TransactionCardSet {
-        error: Some(vec![TransactionCard {
-            index: 0,
-            indent: 0,
-            card: Card::ErrorCard {
-                f: "Bad input data. Parser error: Error(Error { input: \"uuid-abcd\", code: TakeUntil })".to_string(),
-            },
-        }]),
-        ..Default::default()
-    };
-    let action = produce_output(&db, &line);
-    if let TransactionAction::Read { r: set } = action {
-        assert_eq!(*set, set_expected);
+
+    let error = produce_output(&db, &line).unwrap_err();
+    if let error::Error::ParserError(a) = error {
+        assert_eq!(a, "Error(Error { input: \"uuid-abcd\", code: TakeUntil })");
     } else {
-        panic!("Wrong action {:?}", action)
+        panic!("Unexpected error {:?}", error)
     }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -2627,7 +2613,7 @@ fn import_derivations() {
         ..Default::default()
     };
 
-    let action = produce_output(&db, line);
+    let action = produce_output(&db, line).unwrap();
     if let TransactionAction::Derivations { content: set } = action {
         assert_eq!(*set, set_expected);
     } else {

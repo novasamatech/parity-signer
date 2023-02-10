@@ -26,6 +26,7 @@ protocol BackendNavigationPerforming: AnyObject {
     ///   - seedPhrase: Seed phrase required to be sent along with some `action`s
     /// - Returns: `ActionResult` if action was valid, `nil` otherwise
     func performBackend(action: Action, details: String, seedPhrase: String) -> Result<ActionResult, NavigationError>
+    func performTransaction(with payload: String) -> Result<ActionResult, TransactionError>
 }
 
 /// We don't want to use module-wide public functions as there is no way of mocking them in unit  / UI tests
@@ -41,6 +42,24 @@ final class BackendNavigationAdapter: BackendNavigationPerforming {
             return .success(actionResult)
         } catch {
             return .failure(.init(message: Localizable.Error.Navigation.Label.message(error.localizedDescription)))
+        }
+    }
+
+    func performTransaction(with payload: String) -> Result<ActionResult, TransactionError> {
+        do {
+            let actionResult = try backendAction(
+                action: .transactionFetched,
+                details: payload,
+                seedPhrase: ""
+            )
+            return .success(actionResult)
+        } catch let errorDisplayed as ErrorDisplayed {
+            return .failure(errorDisplayed.transactionError)
+        } catch {
+            return .failure(.generic(NavigationError(
+                message: Localizable.Error.Navigation.Label
+                    .message(error.localizedDescription)
+            ).description))
         }
     }
 }

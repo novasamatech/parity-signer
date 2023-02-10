@@ -157,6 +157,21 @@ final class NavigationCoordinatorTests: XCTestCase {
         XCTAssertEqual(subject.genericError.errorMessage, navigationError.description)
         XCTAssertEqual(subject.genericError.isPresented, true)
     }
+
+    func test_performTransaction_callsBackendPerfomerWithSamePayload() {
+        // Given
+        let payload = "Payload"
+        let expectedResult: Result<ActionResult, TransactionError> = .failure(.noMetadataForNetwork(name: "westend"))
+        backendActionPerformer.performTransactionReturnValue = expectedResult
+        
+        // When
+        let result = subject.performTransaction(with: payload)
+
+        // Then
+        XCTAssertEqual(backendActionPerformer.performTransactionActionCallsCount, 1)
+        XCTAssertEqual(backendActionPerformer.performTransactionReceivedPayload, [payload])
+        XCTAssertEqual(result, expectedResult)
+    }
 }
 
 // MARK: - Mocks
@@ -206,11 +221,21 @@ final class BackendNavigationPerformingMock: BackendNavigationPerforming {
     var performBackendReceivedSeedPhrase: [String] = []
     var performBackendReturnValue: Result<ActionResult, NavigationError>!
 
+    var performTransactionActionCallsCount = 0
+    var performTransactionReceivedPayload: [String] = []
+    var performTransactionReturnValue: Result<ActionResult, TransactionError>!
+
     func performBackend(action: Action, details: String, seedPhrase: String) -> Result<ActionResult, NavigationError> {
         performBackendActionCallsCount += 1
         performBackendReceivedAction.append(action)
         performBackendReceivedDetails.append(details)
         performBackendReceivedSeedPhrase.append(seedPhrase)
         return performBackendReturnValue
+    }
+
+    func performTransaction(with payload: String) -> Result<ActionResult, TransactionError> {
+        performTransactionActionCallsCount += 1
+        performTransactionReceivedPayload.append(payload)
+        return performTransactionReturnValue
     }
 }

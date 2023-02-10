@@ -28,7 +28,7 @@ struct NetworkSettingsDetails: View {
                     VStack(alignment: .center, spacing: 0) {
                         NetworkLogoIcon(networkName: viewModel.networkDetails.logo, size: Heights.networkLogoInHeader)
                             .padding(.bottom, Spacing.small)
-                        Text(viewModel.networkDetails.title)
+                        Text(viewModel.networkDetails.name)
                             .font(PrimaryFont.titleM.font)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .padding(.bottom, Spacing.large)
@@ -125,10 +125,6 @@ private extension NetworkSettingsDetails {
     func networkSpecs() -> some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             rowWrapper(
-                Localizable.Settings.NetworkDetails.Label.name.string,
-                viewModel.networkDetails.name
-            )
-            rowWrapper(
                 Localizable.Settings.NetworkDetails.Label.basePrefix.string,
                 String(viewModel.networkDetails.base58prefix)
             )
@@ -144,18 +140,18 @@ private extension NetworkSettingsDetails {
                 Localizable.Settings.NetworkDetails.Label.genesisHash.string,
                 viewModel.networkDetails.genesisHash.formattedAsString
             )
-            switch viewModel.networkDetails.currentVerifier.ttype {
-            case "general":
+            switch viewModel.networkDetails.currentVerifier.type {
+            case .general:
                 generalVerifier(viewModel.networkDetails.currentVerifier)
-            case "custom":
+            case .custom:
                 customVerifier(viewModel.networkDetails.currentVerifier)
-            case "none":
+            case .none:
                 rowWrapper(
                     Localizable.Settings.NetworkDetails.Label.verifier.string,
                     Localizable.Settings.NetworkDetails.Label.Verifier.none.string,
                     isLast: true
                 )
-            default:
+            case .unknown:
                 rowWrapper(
                     Localizable.Settings.NetworkDetails.Label.verifier.string,
                     Localizable.Settings.NetworkDetails.Label.Verifier.unknown.string,

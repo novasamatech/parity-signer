@@ -677,7 +677,7 @@ pub struct MSCNetworkInfo {
 impl From<OrderedNetworkSpecs> for MSCNetworkInfo {
     fn from(o: OrderedNetworkSpecs) -> Self {
         MSCNetworkInfo {
-            network_title: o.specs.title,
+            network_title: o.specs.name,
             network_logo: o.specs.logo,
             network_specs_key: hex::encode(
                 NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),
