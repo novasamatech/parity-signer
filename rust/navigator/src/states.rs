@@ -77,16 +77,16 @@ impl TransactionState {
         }
     }
 
-    pub fn new(database: &sled::Db, details_str: &str) -> Self {
-        Self {
+    pub fn new(database: &sled::Db, details_str: &str) -> Result<Self> {
+        Ok(Self {
             seeds: vec![],
-            action: produce_output(database, details_str),
+            action: produce_output(database, details_str)?,
             counter: 1,
             passwords: HashMap::new(),
             comments: vec![],
             currently_signing: 0,
             signatures: vec![],
-        }
+        })
     }
 
     pub fn update_seeds(&mut self, seeds: &str) {

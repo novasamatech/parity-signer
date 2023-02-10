@@ -3493,11 +3493,13 @@ dependencies = [
  "log",
  "navigator",
  "oslog",
+ "parser",
  "qr_reader_phone",
  "qrcode_static",
  "sled",
  "sp-core",
  "sp-runtime",
+ "transaction_parsing",
  "uniffi",
  "uniffi_build",
 ]

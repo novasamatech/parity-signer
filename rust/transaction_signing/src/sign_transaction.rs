@@ -144,7 +144,7 @@ mod tests {
         populate_cold(&db, Verifier { v: None }).unwrap();
         let message = format!("<Bytes>{}bbb</Bytes>", "a".repeat(256));
         let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", hex::encode(&message));
-        let output = produce_output(&db, &line);
+        let output = produce_output(&db, &line).unwrap();
         let public = sp_core::sr25519::Public::try_from(
             hex::decode("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
                 .unwrap()

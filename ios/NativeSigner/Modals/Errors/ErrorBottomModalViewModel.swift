@@ -92,79 +92,15 @@ struct ErrorBottomModalViewModel {
         )
     }
 
-    static func signingUnknownNetwork(
-        _ networkName: String,
+    static func transactionSigningError(
+        message: String,
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: Localizable.TransactionSign.Error.InvalidNetworkVersion.title(networkName),
-            content: Localizable.TransactionSign.Error.InvalidNetworkVersion.message.string,
-            steps: [
-                .init(
-                    step: "1",
-                    content: {
-                        var stepOnePrefix = AttributedString(
-                            Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
-                                .string
-                        )
-                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
-                        var stepOneSuffix = AttributedString(
-                            Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.suffix
-                                .string
-                        )
-                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
-                        return stepOnePrefix + stepOneSuffix
-                    }()
-                ),
-                .init(
-                    step: "2",
-                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step2.string)
-                ),
-                .init(
-                    step: "3",
-                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step3.string)
-                )
-            ],
-            secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
-        )
-    }
-
-    static func signingInvalidNetworkVersion(_ action: @escaping @autoclosure () -> Void = {}())
-        -> ErrorBottomModalViewModel {
-        ErrorBottomModalViewModel(
-            title: Localizable.TransactionSign.Error.UnknownNetwork.title.string,
-            content: Localizable.TransactionSign.Error.UnknownNetwork.message.string,
-            steps: [
-                .init(
-                    step: "1",
-                    content: {
-                        var stepOnePrefix = AttributedString(
-                            Localizable.TransactionSign.Error.UnknownNetwork.step1
-                                .string
-                        )
-                        stepOnePrefix.foregroundColor = Asset.textAndIconsPrimary.swiftUIColor
-                        var stepOneSuffix = AttributedString(
-                            Localizable.TransactionSign.Error.UnknownNetwork.Step1.suffix
-                                .string
-                        )
-                        stepOneSuffix.foregroundColor = Asset.accentPink300.swiftUIColor
-                        return stepOnePrefix + stepOneSuffix
-                    }()
-                ),
-                .init(
-                    step: "2",
-                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step2.string)
-                ),
-                .init(
-                    step: "3",
-                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step3.string)
-                ),
-                .init(
-                    step: "4",
-                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step4.string)
-                )
-            ],
-            secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
+            title: Localizable.TransactionSign.Error.Generic.title.string,
+            content: Localizable.GenericErrorModal.Label.messagePrefix.string,
+            details: message,
+            secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
         )
     }
 
@@ -196,18 +132,6 @@ struct ErrorBottomModalViewModel {
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             title: Localizable.GenericErrorModal.Label.title.string,
-            content: Localizable.GenericErrorModal.Label.messagePrefix.string,
-            details: message,
-            secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
-        )
-    }
-
-    static func transactionSigningError(
-        message: String,
-        _ action: @escaping @autoclosure () -> Void = {}()
-    ) -> ErrorBottomModalViewModel {
-        ErrorBottomModalViewModel(
-            title: Localizable.TransactionSign.Error.Generic.title.string,
             content: Localizable.GenericErrorModal.Label.messagePrefix.string,
             details: message,
             secondaryAction: .init(label: Localizable.GenericErrorModal.Action.ok.key, action: action)
