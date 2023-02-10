@@ -100,7 +100,7 @@
 	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
 	<string name="subtitle_derived_keys">Derived Keys</string>
 	<string name="seed_backup_autohide_title">Backup info will be hidden in</string>
-	<string name="unlock_app_button">Unlock app</string>
+	<string name="unlock_app_button">Unlock the App</string>
 	<string name="add_key_set_menu_title">Add Key Set</string>
 	<string name="add_key_set_menu_add">Add new Key Set</string>
 	<string name="add_key_set_menu_recover">Recover Key Set</string>
@@ -284,6 +284,8 @@
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
+	<string name="unlock_screen_title">Please Unlock the App</string>
+	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Signer</string>
 	<string name="screen_lock_title">Set Up Screen Lock</string>
 	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin, pattern or fingerprint. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
 	<string name="screen_lock_open_settings_button">Go to Settings</string>

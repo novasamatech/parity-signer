@@ -323,7 +323,7 @@ fn bulk_signing_test_unpassworded() {
         &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
     )
     .unwrap();
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
 
     tx_state.update_seeds(&seeds);
 
@@ -440,7 +440,7 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
     tx_state.update_seeds(&format!(
         "{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}"
     ));
