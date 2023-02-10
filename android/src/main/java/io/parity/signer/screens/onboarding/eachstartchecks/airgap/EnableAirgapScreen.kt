@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.airgap
+package io.parity.signer.screens.onboarding.eachstartchecks.airgap
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
