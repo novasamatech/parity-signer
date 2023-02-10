@@ -32,7 +32,7 @@ extension ErrorDisplayed {
     }
 }
 
-enum TransactionError: Error {
+enum TransactionError: Error, Equatable {
     case generic(String)
     case metadataForUnknownNetwork(name: String)
     case networkAlreadyAdded(name: String, encryption: String)
