@@ -100,7 +100,7 @@
 	<string name="subtitle_secret_recovery_phrase">Secret Recovery Phrase</string>
 	<string name="subtitle_derived_keys">Derived Keys</string>
 	<string name="seed_backup_autohide_title">Backup info will be hidden in</string>
-	<string name="unlock_app_button">Unlock app</string>
+	<string name="unlock_app_button">Unlock the App</string>
 	<string name="add_key_set_menu_title">Add Key Set</string>
 	<string name="add_key_set_menu_add">Add new Key Set</string>
 	<string name="add_key_set_menu_recover">Recover Key Set</string>
@@ -284,6 +284,8 @@
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
+	<string name="unlock_screen_title">Please Unlock the App</string>
+	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Signer</string>
 	<string name="key_set_details_no_keys_title">Key Set Don\'t Have Any Derived Keys</string>
 	<string name="key_sets_empty_title">You Don\'t Have Any Key Sets</string>
 	<string name="key_sets_empty_message">Add a new Key Set to Store Keys and Sign Transactions</string>
