@@ -422,9 +422,8 @@
 "TransactionSign.Error.UnknownNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
 "TransactionSign.Error.UnknownNetwork.Step2" = "Choose the network you need";
 "TransactionSign.Error.UnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
-"TransactionSign.Error.UnknownNetwork.Step4" = "Select \"Metadata\" tab on top, scan QR code with Parity Signer and wait until the update is finished";
 
-"TransactionSign.Error.OutdatedMetadata.Title" = "Please uUdate %@ Network Metadata";
+"TransactionSign.Error.OutdatedMetadata.Title" = "Please Update %@ Network Metadata";
 "TransactionSign.Error.OutdatedMetadata.Message" = "%@ network's %@ metadata is different to the %@ data you're using in the app. Please update it to sign the transaction.";
 "TransactionSign.Error.OutdatedMetadata.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
 

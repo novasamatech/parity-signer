@@ -104,10 +104,6 @@ extension ErrorBottomModalViewModel {
                 .init(
                     step: "3",
                     content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step3.string)
-                ),
-                .init(
-                    step: "4",
-                    content: AttributedString(Localizable.TransactionSign.Error.UnknownNetwork.step4.string)
                 )
             ],
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
