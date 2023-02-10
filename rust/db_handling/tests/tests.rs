@@ -278,19 +278,19 @@ fn show_all_networks_no_flag() {
     let expected_networks = vec![
         MMNetwork {
             key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
-            title: "Polkadot".to_string(),
+            title: "polkadot".to_string(),
             logo: "polkadot".to_string(),
             order: 0,
         },
         MMNetwork {
             key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
-            title: "Kusama".to_string(),
+            title: "kusama".to_string(),
             logo: "kusama".to_string(),
             order: 1,
         },
         MMNetwork {
             key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
-            title: "Westend".to_string(),
+            title: "westend".to_string(),
             logo: "westend".to_string(),
             order: 2,
         },
@@ -353,7 +353,7 @@ fn export_alice_westend() {
             secret_exposed: false,
         },
         network_info: MSCNetworkInfo {
-            network_title: "Westend".to_string(),
+            network_title: "westend".to_string(),
             network_logo: "westend".to_string(),
             network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 .to_string(),

@@ -1502,7 +1502,7 @@ pub fn export_secret_key(
     };
 
     let network_info = MSCNetworkInfo {
-        network_title: network_specs.specs.title,
+        network_title: network_specs.specs.name,
         network_logo: network_specs.specs.logo,
         network_specs_key: network_specs_key_hex.to_owned(),
     };

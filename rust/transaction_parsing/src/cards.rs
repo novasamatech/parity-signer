@@ -39,13 +39,11 @@ pub(crate) enum Card<'a> {
         author: &'a MultiSigner,
         base58prefix: u16,
     },
-    AuthorPublicKey(&'a MultiSigner),
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
     NewSpecs(&'a NetworkSpecs),
     NetworkInfo(&'a OrderedNetworkSpecs),
-    NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [SeedKeysPreview]),
     Warning(Warning<'a>),
     Error(Error),
@@ -228,21 +226,6 @@ impl<'a> Card<'a> {
                     identicon: make_identicon_from_multisigner(author, IdenticonStyle::Dots),
                 },
             },
-            Card::AuthorPublicKey(author) => {
-                let identicon = make_identicon_from_multisigner(author, IdenticonStyle::Dots);
-                let (public_key, encryption) = match author {
-                    MultiSigner::Ed25519(p) => (hex::encode(p), Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => (hex::encode(p), Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => (hex::encode(p), Encryption::Ecdsa.show()),
-                };
-                NavCard::AuthorPublicKeyCard {
-                    f: MVerifierDetails {
-                        public_key,
-                        identicon,
-                        encryption,
-                    },
-                }
-            }
             Card::Verifier(x) => match x {
                 VerifierValue::Standard { m } => {
                     let (public_key, encryption) = match m {
@@ -288,7 +271,6 @@ impl<'a> Card<'a> {
                     ),
                 },
             },
-            Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
             Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {

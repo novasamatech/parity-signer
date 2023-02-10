@@ -322,7 +322,7 @@ pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
             key: hex::encode(
                 NetworkSpecsKey::from_parts(&n.specs.genesis_hash, &n.specs.encryption).key(),
             ),
-            title: n.specs.title,
+            title: n.specs.name,
             logo: n.specs.logo,
             order: n.order,
         })
@@ -423,7 +423,7 @@ pub fn export_key(
     };
 
     let network_info = MSCNetworkInfo {
-        network_title: network_specs.title,
+        network_title: network_specs.name,
         network_logo: network_specs.logo,
         network_specs_key: hex::encode(network_specs_key.key()),
     };
