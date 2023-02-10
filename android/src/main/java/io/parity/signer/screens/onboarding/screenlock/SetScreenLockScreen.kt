@@ -64,7 +64,7 @@ fun SetScreenLockScreen(onGoToSettings: Callback) {
 		)
 		Spacer(modifier = Modifier.padding(top = 40.dp))
 		val activity = LocalContext.current.findActivity()!!
-		PrimaryButtonWide(label = "Go to Settings") {
+		PrimaryButtonWide(label = stringResource(R.string.screen_lock_open_settings_button)) {
 			val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
 			if (intent.resolveActivity(activity.packageManager) != null) {
 				startActivityForResult(activity, intent, OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE, null)

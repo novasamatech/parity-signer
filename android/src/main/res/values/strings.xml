@@ -286,6 +286,7 @@
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
 	<string name="screen_lock_title">Set Up Screen Lock</string>
 	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin, pattern or fingerprint. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
+	<string name="screen_lock_open_settings_button">Go to Settings</string>
 
 
 </resources>
