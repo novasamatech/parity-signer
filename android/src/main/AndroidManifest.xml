@@ -6,6 +6,12 @@
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.FLASHLIGHT"/>
 
+	<queries>
+		<package android:name="android.settings.SECURITY_SETTINGS" />
+		<package android:name="android.settings.SETTINGS" />
+	</queries>
+
+
 	<application
 		android:allowBackup="false"
 		android:name=".SignerApp"
