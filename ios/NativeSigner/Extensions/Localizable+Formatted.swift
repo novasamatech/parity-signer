@@ -36,7 +36,7 @@ extension Localizable {
         let highlightedPartTwo = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
             .second.string
         let highlightedPartThree = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
-            .second.string
+            .third.string
         let attributedString = NSMutableAttributedString(string: mainText)
         let rangeFont = (mainText as NSString).range(of: highlightedFont)
         let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
@@ -54,7 +54,7 @@ extension Localizable {
             [.foregroundColor: Asset.textAndIconsTertiary.color],
             range: rangePartThree
         )
-        attributedString.setAttributes(
+        attributedString.addAttributes(
             [.font: FontFamily.Inter.regular.font(size: 14)],
             range: rangeFont
         )
@@ -72,7 +72,7 @@ extension Localizable {
         let highlightedPartTwo = Localizable.TransactionSign.Error.UnknownNetwork.Step1.Highlight
             .second.string
         let highlightedPartThree = Localizable.TransactionSign.Error.UnknownNetwork.Step1.Highlight
-            .second.string
+            .third.string
         let attributedString = NSMutableAttributedString(string: mainText)
         let rangeFont = (mainText as NSString).range(of: highlightedFont)
         let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
@@ -90,7 +90,7 @@ extension Localizable {
             [.foregroundColor: Asset.textAndIconsTertiary.color],
             range: rangePartThree
         )
-        attributedString.setAttributes(
+        attributedString.addAttributes(
             [.font: FontFamily.Inter.regular.font(size: 14)],
             range: rangeFont
         )
@@ -108,7 +108,7 @@ extension Localizable {
         let highlightedPartTwo = Localizable.TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight
             .second.string
         let highlightedPartThree = Localizable.TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight
-            .second.string
+            .third.string
         let attributedString = NSMutableAttributedString(string: mainText)
         let rangeFont = (mainText as NSString).range(of: highlightedFont)
         let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
@@ -126,7 +126,42 @@ extension Localizable {
             [.foregroundColor: Asset.textAndIconsTertiary.color],
             range: rangePartThree
         )
+        attributedString.addAttributes(
+            [.font: FontFamily.Inter.regular.font(size: 14)],
+            range: rangeFont
+        )
+        return AttributedString(attributedString)
+    }
+
+    static func noMetadataForNetwork() -> AttributedString {
+        let mainText = Localizable.TransactionSign.Error.NoMetadataForNetwork.step1
+            .string
+        let highlightedFont = Localizable.TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight
+            .font.string
+        let highlightedPartOne = Localizable.TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight
+            .first.string
+        let highlightedPartTwo = Localizable.TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight
+            .second.string
+        let highlightedPartThree = Localizable.TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight
+            .third.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let rangeFont = (mainText as NSString).range(of: highlightedFont)
+        let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
+        let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
+        let rangePartThree = (mainText as NSString).range(of: highlightedPartThree)
         attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: rangePartOne
+        )
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: rangePartTwo
+        )
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.textAndIconsTertiary.color],
+            range: rangePartThree
+        )
+        attributedString.addAttributes(
             [.font: FontFamily.Inter.regular.font(size: 14)],
             range: rangeFont
         )

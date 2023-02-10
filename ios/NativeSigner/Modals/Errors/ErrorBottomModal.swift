@@ -118,14 +118,7 @@ struct ErrorBottomModal: View {
 struct ErrorBottomModal_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ErrorBottomModal(
-                viewModel: .signingUnknownNetwork(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            ErrorBottomModal(
-                viewModel: .outdatedMetadata("Westend", "3119", "3220"),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
+            // Connectivity
             ErrorBottomModal(
                 viewModel: .connectivityOn(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
@@ -134,12 +127,14 @@ struct ErrorBottomModal_Previews: PreviewProvider {
                 viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
+            // General Error
             ErrorBottomModal(
                 viewModel: .alertError(
                     message: PreviewData.exampleErrorMessage
                 ),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
+            // Key Set Management
             ErrorBottomModal(
                 viewModel: .seedPhraseAlreadyExists(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)

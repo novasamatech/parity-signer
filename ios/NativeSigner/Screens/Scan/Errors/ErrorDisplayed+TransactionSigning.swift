@@ -37,6 +37,7 @@ enum TransactionError: Error {
     case metadataAlreadyAdded(name: String, version: String)
     case outdatedMetadata(name: String, currentVersion: String, expectedVersion: String)
     case unknownNetwork(genesisHash: String, encryption: String)
+    case noMetadataForNetwork(name: String)
 }
 
 // swiftlint:disable all
@@ -47,14 +48,16 @@ extension ErrorBottomModalViewModel {
             return ErrorBottomModalViewModel.alertError(message: message)
         case let .metadataForUnknownNetwork(name):
             return ErrorBottomModalViewModel.metadataForUnknownNetwork(name)
-        case let .networkAlreadyAdded(name, encryption):
-            return ErrorBottomModalViewModel.networkAlreadyAdded(name, encryption)
+        case let .networkAlreadyAdded(name, _):
+            return ErrorBottomModalViewModel.networkAlreadyAdded(name)
         case let .metadataAlreadyAdded(name, version):
             return ErrorBottomModalViewModel.metadataAlreadyAdded(name, version)
         case let .outdatedMetadata(name, currentVersion, expectedVersion):
             return ErrorBottomModalViewModel.outdatedMetadata(name, currentVersion, expectedVersion)
-        case let .unknownNetwork(genesisHash, encryption):
+        case .unknownNetwork:
             return ErrorBottomModalViewModel.signingUnknownNetwork()
+        case let .noMetadataForNetwork(name):
+            return ErrorBottomModalViewModel.noMetadataForNetwork(name)
         }
     }
 }

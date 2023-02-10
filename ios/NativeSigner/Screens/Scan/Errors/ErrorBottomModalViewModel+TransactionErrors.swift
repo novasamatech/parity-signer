@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension ErrorBottomModalViewModel {
     static func metadataForUnknownNetwork(
@@ -35,7 +36,6 @@ extension ErrorBottomModalViewModel {
 
     static func networkAlreadyAdded(
         _ networkName: String,
-        _: String,
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
@@ -112,5 +112,63 @@ extension ErrorBottomModalViewModel {
             ],
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
         )
+    }
+
+    static func noMetadataForNetwork(
+        _ networkName: String,
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.TransactionSign.Error.NoMetadataForNetwork.title(networkName),
+            content: Localizable.TransactionSign.Error.NoMetadataForNetwork.message(networkName),
+            steps: [
+                .init(
+                    step: "1",
+                    content: Localizable.signingMetadataUnknownNetwork()
+                ),
+                .init(
+                    step: "2",
+                    content: AttributedString(Localizable.TransactionSign.Error.NoMetadataForNetwork.step2.string)
+                ),
+                .init(
+                    step: "3",
+                    content: AttributedString(Localizable.TransactionSign.Error.NoMetadataForNetwork.step3.string)
+                )
+            ],
+            secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
+        )
+    }
+}
+
+struct ErrorBottomModalTransactionSigning_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ErrorBottomModal(
+                viewModel: .metadataForUnknownNetwork("Westend"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .networkAlreadyAdded("Westend"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .metadataAlreadyAdded("Westend", "3119"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .outdatedMetadata("Westend", "3119", "3220"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .signingUnknownNetwork(),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+            ErrorBottomModal(
+                viewModel: .noMetadataForNetwork("Westend"),
+                isShowingBottomAlert: Binding<Bool>.constant(true)
+            )
+        }
+        .preferredColorScheme(.dark)
+        .previewLayout(.sizeThatFits)
     }
 }
