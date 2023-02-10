@@ -18,6 +18,7 @@ struct PrimaryTextFieldStyle: ViewModifier {
             .placeholder(placeholder, when: text.isEmpty)
             .font(PrimaryFont.bodyL.font)
             .autocapitalization(.none)
+            .disableAutocorrection(true)
             .keyboardType(.asciiCapable)
             .submitLabel(.return)
             .frame(height: Heights.textFieldHeight)
