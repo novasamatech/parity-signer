@@ -319,7 +319,7 @@ pub fn nav_test_metadata() -> Result<Vec<MetaValues>> {
 /// Read metadata set for release cold database from `release_metadata` folder
 #[cfg(feature = "active")]
 pub fn release_metadata() -> Result<Vec<MetaValues>> {
-    metadata("../defaults/release_metadata")
+    Ok(vec![])
 }
 
 #[cfg(feature = "active")]
