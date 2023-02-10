@@ -16,11 +16,9 @@ import org.json.JSONObject
 
 
 @SuppressLint("StaticFieldLeak")
-class SignerMainViewModel(
-	// todo migrate to use dependencies to DI rather than expecting them here
-	val context: Context,
-	val activity: FragmentActivity,
-) : ViewModel() {
+class SignerMainViewModel() : ViewModel() {
+	val context: Context = ServiceLocator.appContext.applicationContext
+	val activity: FragmentActivity = ServiceLocator.activityScope!!.activity
 
 	init {
 		// Imitate ios behavior
@@ -134,14 +132,6 @@ class SignerMainViewModel(
 
 	fun acknowledgeWarning() {
 		networkExposedStateKeeper.acknowledgeWarning()
-	}
-}
-
-
-@Suppress("UNCHECKED_CAST")
-class MainFlowViewModelFactory(private val appContext: Context, private val activity: FragmentActivity) : ViewModelProvider.Factory {
-	override fun <T : ViewModel> create(modelClass: Class<T>): T {
-		return SignerMainViewModel(appContext, activity) as T
 	}
 }
 

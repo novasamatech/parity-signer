@@ -286,6 +286,9 @@
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
 	<string name="unlock_screen_title">Please Unlock the App</string>
 	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Signer</string>
+	<string name="key_set_details_no_keys_title">Key Set Don\'t Have Any Derived Keys</string>
+	<string name="key_sets_empty_title">You Don\'t Have Any Key Sets</string>
+	<string name="key_sets_empty_message">Add a new Key Set to Store Keys and Sign Transactions</string>
 
 
 </resources>
