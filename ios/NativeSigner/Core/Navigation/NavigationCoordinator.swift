@@ -96,6 +96,10 @@ extension NavigationCoordinator {
         }
     }
 
+    func performTransaction(with payload: String) -> Result<ActionResult, TransactionError> {
+        backendActionPerformer.performTransaction(with: payload)
+    }
+
     func perform(navigation: Navigation, skipDebounce: Bool = false) {
         guard isActionAvailable else { return }
         defer { handleDebounce(skipDebounce) }
