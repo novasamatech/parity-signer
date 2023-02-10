@@ -41,7 +41,6 @@ final class BackendNavigationAdapter: BackendNavigationPerforming {
             )
             return .success(actionResult)
         } catch {
-            print("NAVIGATION ERROR: \(error)")
             return .failure(.init(message: Localizable.Error.Navigation.Label.message(error.localizedDescription)))
         }
     }
@@ -55,10 +54,8 @@ final class BackendNavigationAdapter: BackendNavigationPerforming {
             )
             return .success(actionResult)
         } catch let errorDisplayed as ErrorDisplayed {
-            print("TRANSACTION TYPED ERROR: \(errorDisplayed)")
             return .failure(errorDisplayed.transactionError)
         } catch {
-            print("TRANSACTION ERROR: \(error)")
             return .failure(.generic(NavigationError(
                 message: Localizable.Error.Navigation.Label
                     .message(error.localizedDescription)

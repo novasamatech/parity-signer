@@ -13,9 +13,22 @@ extension ErrorBottomModalViewModel {
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: "Metadata for unknown network: \(networkName)",
-            content: "",
-            steps: [],
+            title: Localizable.TransactionSign.Error.MetadataUnknownNetwork.title(networkName),
+            content: Localizable.TransactionSign.Error.MetadataUnknownNetwork.message(networkName),
+            steps: [
+                .init(
+                    step: "1",
+                    content: Localizable.signingMetadataUnknownNetwork()
+                ),
+                .init(
+                    step: "2",
+                    content: AttributedString(Localizable.TransactionSign.Error.MetadataUnknownNetwork.step2.string)
+                ),
+                .init(
+                    step: "3",
+                    content: AttributedString(Localizable.TransactionSign.Error.MetadataUnknownNetwork.step3.string)
+                )
+            ],
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)
         )
     }
