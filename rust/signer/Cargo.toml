@@ -17,6 +17,8 @@ db_handling = { path = "../db_handling", default-features = false, features = ["
 definitions = { path = "../definitions", default-features = false, features = ["signer"] }
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
+transaction_parsing = { path = "../transaction_parsing" }
+parser = { path = "../parser" }
 qrcode_static = { path = "../qrcode_static" }
 lazy_static = "1.4.0"
 sled = "0.34"
