@@ -24,6 +24,8 @@ extension ErrorDisplayed {
             return .unknownNetwork(genesisHash: genesisHash.formattedAsString, encryption: encryption.rawValue)
         case let .MetadataOutdated(name, have, want):
             return .outdatedMetadata(name: name, currentVersion: String(have), expectedVersion: String(want))
+        case let .NoMetadata(name):
+            return .noMetadataForNetwork(name: name)
         case let .Str(errorMessage):
             return .generic(errorMessage)
         }
