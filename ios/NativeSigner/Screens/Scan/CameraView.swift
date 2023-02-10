@@ -292,38 +292,38 @@ extension CameraView {
         }
 
         func checkForTransactionNavigation(_ payload: String?) {
-            guard payload != nil, !isInTransactionProgress else { return }
+            guard let payload = payload, !isInTransactionProgress else { return }
             isInTransactionProgress = true
-            let actionResult = navigation.performFake(
-                navigation: .init(
-                    action: .transactionFetched,
-                    details: payload
-                )
-            )
-            // Handle transactions with just error payload
-            guard case let .transaction(transactions) = actionResult.screenData else { return }
-            if transactions.allSatisfy(\.isDisplayingErrorOnly) {
-                presentableError = .transactionSigningError(
-                    message: transactions
-                        .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
-                )
-                navigation.performFake(navigation: .init(action: .goBack))
+            switch navigation.performTransaction(with: payload) {
+            case let .success(actionResult):
+                // Handle transactions with just error payload
+                guard case let .transaction(transactions) = actionResult.screenData else { return }
+                if transactions.allSatisfy(\.isDisplayingErrorOnly) {
+                    presentableError = .transactionSigningError(
+                        message: transactions
+                            .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
+                    )
+                    navigation.performFake(navigation: .init(action: .goBack))
+                    isPresentingError = true
+                    return
+                }
+                // Handle rest of transactions with optional error payload
+                // Type is assumed based on first error
+                let firstTransaction = transactions.first
+                switch firstTransaction?.ttype {
+                case .sign:
+                    continueTransactionSignature(transactions)
+                case .importDerivations:
+                    continueImportDerivedKeys(transactions)
+                default:
+                    // Transaction with error
+                    // Transaction that does not require signing (i.e. adding network or metadata)
+                    self.transactions = transactions
+                    isPresentingTransactionPreview = true
+                }
+            case let .failure(error):
+                presentableError = ErrorBottomModalViewModel.transactionError(for: error)
                 isPresentingError = true
-                return
-            }
-            // Handle rest of transactions with optional error payload
-            // Type is assumed based on first error
-            let firstTransaction = transactions.first
-            switch firstTransaction?.ttype {
-            case .sign:
-                continueTransactionSignature(transactions)
-            case .importDerivations:
-                continueImportDerivedKeys(transactions)
-            default:
-                // Transaction with error
-                // Transaction that does not require signing (i.e. adding network or metadata)
-                self.transactions = transactions
-                isPresentingTransactionPreview = true
             }
         }
 

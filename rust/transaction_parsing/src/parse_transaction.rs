@@ -270,25 +270,10 @@ pub(crate) fn parse_transaction(
                 }), // author: [], hint: [], error: []
             }
         }
-        None => {
-            // did not find network with matching genesis hash in database
-            let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let error_card = Card::Error(Error::UnknownNetwork {
-                genesis_hash,
-                encryption,
-            })
-            .card(&mut index, indent);
-            let author = Some(vec![author_card]);
-            let error = Some(vec![error_card]);
-
-            let r = Box::new(TransactionCardSet {
-                author,
-                error,
-                ..Default::default()
-            });
-
-            Ok(TransactionAction::Read { r })
-        }
+        None => Err(Error::UnknownNetwork {
+            genesis_hash,
+            encryption,
+        }),
     }
 }
 

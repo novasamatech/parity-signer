@@ -3,7 +3,7 @@
 use variant_count::VariantCount;
 
 /// Content that should have been verified by the general verifier
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum GeneralVerifierForContent {
     /// Network data.

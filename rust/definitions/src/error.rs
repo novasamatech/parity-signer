@@ -150,7 +150,7 @@ impl TransferContent {
 }
 
 /// Intrinsic problems of the metadata making it unsuitable for Signer use
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, PartialEq, thiserror::Error)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MetadataError {
     /// Supported are `V12`, `V13`, and `V14` versions of
