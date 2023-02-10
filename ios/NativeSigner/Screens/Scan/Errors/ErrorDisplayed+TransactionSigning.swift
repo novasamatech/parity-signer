@@ -52,7 +52,7 @@ extension ErrorBottomModalViewModel {
         case let .metadataAlreadyAdded(name, version):
             return ErrorBottomModalViewModel.metadataAlreadyAdded(name, version)
         case let .outdatedMetadata(name, currentVersion, expectedVersion):
-            return ErrorBottomModalViewModel.signingInvalidNetworkVersion(name)
+            return ErrorBottomModalViewModel.outdatedMetadata(name, currentVersion, expectedVersion)
         case let .unknownNetwork(genesisHash, encryption):
             return ErrorBottomModalViewModel.signingUnknownNetwork()
         }

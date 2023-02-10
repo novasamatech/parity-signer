@@ -57,25 +57,31 @@ extension ErrorBottomModalViewModel {
         )
     }
 
-    static func signingInvalidNetworkVersion(
+    static func outdatedMetadata(
         _ networkName: String,
+        _ currentVersion: String,
+        _ expectedVersion: String,
         _ action: @escaping @autoclosure () -> Void = {}()
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: Localizable.TransactionSign.Error.InvalidNetworkVersion.title(networkName),
-            content: Localizable.TransactionSign.Error.InvalidNetworkVersion.message(networkName),
+            title: Localizable.TransactionSign.Error.OutdatedMetadata.title(networkName),
+            content: Localizable.TransactionSign.Error.OutdatedMetadata.message(
+                networkName,
+                expectedVersion,
+                currentVersion
+            ),
             steps: [
                 .init(
                     step: "1",
-                    content: Localizable.signingInvalidNetworkVersionStepOne()
+                    content: Localizable.signingOutdatedMetadataStepOne()
                 ),
                 .init(
                     step: "2",
-                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step2.string)
+                    content: AttributedString(Localizable.TransactionSign.Error.OutdatedMetadata.step2.string)
                 ),
                 .init(
                     step: "3",
-                    content: AttributedString(Localizable.TransactionSign.Error.InvalidNetworkVersion.step3.string)
+                    content: AttributedString(Localizable.TransactionSign.Error.OutdatedMetadata.step3.string)
                 )
             ],
             secondaryAction: .init(label: Localizable.TransactionSign.Action.error.key, action: action)

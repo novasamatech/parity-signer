@@ -123,7 +123,7 @@ struct ErrorBottomModal_Previews: PreviewProvider {
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
             ErrorBottomModal(
-                viewModel: .signingInvalidNetworkVersion("Westend"),
+                viewModel: .outdatedMetadata("Westend", "3119", "3220"),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
             ErrorBottomModal(

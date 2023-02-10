@@ -26,16 +26,16 @@ extension Localizable {
         return AttributedString(attributedString)
     }
 
-    static func signingInvalidNetworkVersionStepOne() -> AttributedString {
-        let mainText = Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
+    static func signingOutdatedMetadataStepOne() -> AttributedString {
+        let mainText = Localizable.TransactionSign.Error.OutdatedMetadata.step1
             .string
-        let highlightedFont = Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.Highlight
+        let highlightedFont = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
             .font.string
-        let highlightedPartOne = Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.Highlight
+        let highlightedPartOne = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
             .first.string
-        let highlightedPartTwo = Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.Highlight
+        let highlightedPartTwo = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
             .second.string
-        let highlightedPartThree = Localizable.TransactionSign.Error.InvalidNetworkVersion.Step1.Highlight
+        let highlightedPartThree = Localizable.TransactionSign.Error.OutdatedMetadata.Step1.Highlight
             .second.string
         let attributedString = NSMutableAttributedString(string: mainText)
         let rangeFont = (mainText as NSString).range(of: highlightedFont)
@@ -99,7 +99,7 @@ extension Localizable {
     }
 
     static func signingMetadataUnknownNetwork() -> AttributedString {
-        let mainText = Localizable.TransactionSign.Error.InvalidNetworkVersion.step1
+        let mainText = Localizable.TransactionSign.Error.MetadataUnknownNetwork.step1
             .string
         let highlightedFont = Localizable.TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight
             .font.string
