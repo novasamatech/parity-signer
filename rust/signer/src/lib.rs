@@ -69,6 +69,7 @@ pub enum ErrorDisplayed {
         name: String,
         version: u32,
     },
+    /// Do not have an up-to-date version of metadata in db
     MetadataOutdated {
         name: String,
         have: u32,
@@ -78,6 +79,10 @@ pub enum ErrorDisplayed {
     UnknownNetwork {
         genesis_hash: H256,
         encryption: Encryption,
+    },
+    /// No metadata for a known network found in store
+    NoMetadata {
+        name: String,
     },
 }
 
@@ -120,6 +125,9 @@ impl From<NavigatorError> for ErrorDisplayed {
                 } => Self::UnknownNetwork {
                     genesis_hash: *genesis_hash,
                     encryption: *encryption,
+                },
+                TxParsingError::NoMetadata { name } => Self::NoMetadata {
+                    name: name.to_string(),
                 },
                 _ => Self::Str { s: format!("{e}") },
             },

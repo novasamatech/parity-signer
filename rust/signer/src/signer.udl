@@ -8,6 +8,7 @@ interface ErrorDisplayed {
     MetadataKnown(string name, u32 version);
     MetadataOutdated(string name, u32 have, u32 want);
     UnknownNetwork(H256 genesis_hash, Encryption encryption);
+    NoMetadata(string name);
 };
 
 [Error]
