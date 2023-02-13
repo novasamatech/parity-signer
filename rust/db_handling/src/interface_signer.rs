@@ -264,7 +264,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
                 &network_specs.specs.encryption,
             );
             let network = MSCNetworkInfo {
-                network_title: network_specs.specs.title,
+                network_title: network_specs.specs.name,
                 network_logo: network_specs.specs.logo,
                 network_specs_key: hex::encode(network_specs_key.key()),
             };
@@ -461,7 +461,7 @@ pub fn backup_prep(database: &sled::Db, seed_name: &str) -> Result<MBackup> {
         .collect();
         if !id_set.is_empty() {
             derivations.push(DerivationPack {
-                network_title: network.specs.title,
+                network_title: network.specs.name,
                 network_logo: network.specs.logo,
                 network_order: network.order.to_string(),
                 id_set,
