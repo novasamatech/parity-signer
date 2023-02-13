@@ -163,7 +163,7 @@ final class NavigationCoordinatorTests: XCTestCase {
         let payload = "Payload"
         let expectedResult: Result<ActionResult, TransactionError> = .failure(.noMetadataForNetwork(name: "westend"))
         backendActionPerformer.performTransactionReturnValue = expectedResult
-        
+
         // When
         let result = subject.performTransaction(with: payload)
 
