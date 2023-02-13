@@ -374,7 +374,7 @@ fn backup_prep_alice() {
         seed_name: "Alice".to_string(),
         derivations: vec![
             DerivationPack {
-                network_title: "Polkadot".to_string(),
+                network_title: "polkadot".to_string(),
                 network_logo: "polkadot".to_string(),
                 network_order: 0.to_string(),
                 id_set: vec![DerivationEntry {
@@ -383,7 +383,7 @@ fn backup_prep_alice() {
                 }],
             },
             DerivationPack {
-                network_title: "Kusama".to_string(),
+                network_title: "kusama".to_string(),
                 network_logo: "kusama".to_string(),
                 network_order: 1.to_string(),
                 id_set: vec![DerivationEntry {
@@ -392,7 +392,7 @@ fn backup_prep_alice() {
                 }],
             },
             DerivationPack {
-                network_title: "Westend".to_string(),
+                network_title: "westend".to_string(),
                 network_logo: "westend".to_string(),
                 network_order: 2.to_string(),
                 id_set: vec![
