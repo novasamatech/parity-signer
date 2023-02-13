@@ -16,7 +16,7 @@ transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = { version = "1.5.7", features = ["std"] }
 qrcode_rtx = { path = "../qrcode_rtx" }
-parity-scale-codec = "3.3.0"
+parity-scale-codec = "3.4.0"
 sled = "0.34"
 log = "0.4"
 
