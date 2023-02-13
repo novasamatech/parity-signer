@@ -34,7 +34,7 @@ The encoded string are limited to 32 Bytes.
 
 For technical information about the soft and hard derivations on Substrate, please refer to introduction [here](https://github.com/paritytech/parity-signer/wiki/HDKD-on-Parity-Signer#hdkd-general-on-substrate).
 
-Path also could contain optional **password**; in Subkey standard password is prefixed with `///`. However, for convenience, Signer device has separate password entry field with password confirmation, thus do not add `///` to derivation field, it will result in error - instead omit `///` and type password into its' special field. It will not be stored on the device and will be required for any operation that requires private key of the account. There is no way to restore this password if it is lost so please back it up carefully.
+Path also could contain optional **password**; in Subkey standard password is prefixed with `///`. However, for convenience, Vault device has separate password entry field with password confirmation, thus do not add `///` to derivation field, it will result in error - instead omit `///` and type password into its' special field. It will not be stored on the device and will be required for any operation that requires private key of the account. There is no way to restore this password if it is lost so please back it up carefully.
 
 ### Further notes
 

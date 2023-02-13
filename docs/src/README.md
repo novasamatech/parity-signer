@@ -22,21 +22,21 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 ## Key features
 
-- This is not a complete crypto wallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app that only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps).
-- The Signer alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Signer could still lead to loss of funds and/or secrets.
-- When properly used, Signer provides best achievable security with Substrate networks to-date.
+- This is not a complete crypto wallet in itself. The Vault does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app that only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps).
+- The Vault alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Vault could still lead to loss of funds and/or secrets.
+- When properly used, Vault provides best achievable security with Substrate networks to-date.
 
 ## System requirements
 
-Currently Signer is available only for iOS. Android version is coming soon.
+Currently Vault is available only for iOS. Android version is coming soon.
 
 ## Getting Started
 
 **These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
 
-If you are upgrading from older version of Signer, please see [changelog](./about/Changelog.md) and [upgrading Signer](./tutorials/Upgrading.md)
+If you are upgrading from older version of Vault, please see [changelog](./about/Changelog.md) and [upgrading Vault](./tutorials/Upgrading.md)
 
-Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
+Please note that the Vault app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
 
 [Getting started guide](./tutorials/Start.md)
 

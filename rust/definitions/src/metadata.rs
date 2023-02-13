@@ -194,7 +194,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 /// Produces [`MetaInfo`] if the metadata is suitable for the Vault, and
 /// [`MetadataError`] if not.
 ///
-/// `RuntimeMetadata` suitable for use in Signer:  
+/// `RuntimeMetadata` suitable for use in Vault:
 ///
 /// - must be of runtime version `V12` or above
 /// - must have 'System' pallet  
@@ -309,7 +309,7 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
 /// Get [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// from slice of raw `Vec<u8>` metadata
 ///
-/// Raw `Vec<u8>` metadata suitable for use in Signer:  
+/// Raw `Vec<u8>` metadata suitable for use in Vault:
 ///
 /// - must begin with b"meta"  
 /// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version `V12` or above
@@ -329,10 +329,10 @@ pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata> {
 /// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
 /// and era are among signed extensions. Otherwise, a `ParserMetadataError` would occur on decoding.
 /// However, we can not simply forbid the loading of the metadata without required set of
-/// signed extensions into Signer.
+/// signed extensions into Vault.
 ///
 /// This function should be used for warnings only on `generate_message` side and during metadata
-/// loading into Signer.
+/// loading into Vault.
 fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
     let mut signed_extensions = HashMap::new();
     for x in metadata_v14.extrinsic.signed_extensions.iter() {
@@ -371,13 +371,13 @@ pub struct MetaSetElement {
 
 #[cfg(feature = "signer")]
 impl MetaSetElement {
-    /// Generates `MetaSetElement` from Signer database tree `METATREE` (key, value)
+    /// Generates `MetaSetElement` from Vault database tree `METATREE` (key, value)
     /// entry  
     ///
     /// Checks that name and version from [`MetaKey`] match the ones in metadata
     /// `Version` constant.  
     ///
-    /// Also checks that the metadata is suitable for use in Signer. Since the
+    /// Also checks that the metadata is suitable for use in Vault. Since the
     /// metadata already was accepted in the database at some point, errors here
     /// are very unlikely to happen and would indicate the database corruption
     pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self> {

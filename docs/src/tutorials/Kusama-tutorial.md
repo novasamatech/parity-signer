@@ -26,7 +26,7 @@ Polkadot Vault is meant to be used offline. The mobile device used to run Polkad
 - Once Polkadot Vault has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
 - Only charge the phone using a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
 
-Please find more info [here](#Parity-Signer-Mobile-App) about the Polkadot Vault application.
+Please find more info [here](#Polkadot-Vault-Mobile-App) about the Polkadot Vault application.
 
 ### Install Polkadot Vault mobile application
 
@@ -52,11 +52,11 @@ You will then be asked to choose a pin code. This pin will be needed later on to
 The next screen will allow you to select a network to generate an account.
 If you choose an Ethereum network, the related Ethereum account will be generated for the identity,
 
-If you choose a Substrate network (like Kusama), you will first create a root account, and then you will be able to derive more accounts with specified paths and names. The name can be changed later on, but once the path is set, it can not be changed. More information about path derivation see [here](#Parity-Signer-Hierarchical-Deterministic-Key-Derivation).
+If you choose a Substrate network (like Kusama), you will first create a root account, and then you will be able to derive more accounts with specified paths and names. The name can be changed later on, but once the path is set, it can not be changed. More information about path derivation see [here](#Polkadot-Vault-Hierarchical-Deterministic-Key-Derivation).
 
 For each derived account, you will be able to see the address and its related QR code.
 
-![create account](images/Parity-Signer-apps-0.png)
+![create account](images/Polkadot-Vault-apps-0.png)
 
 ### Recover an identity with your recovery phrase
 
@@ -73,7 +73,7 @@ NOTICE: For `V3` user, after recovering the seed phrase of Kusama account, the a
 
 ## 3. Add Polkadot Vault's account to Polkadot-js apps
 
-To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Polkadot Vault, you will need to get some KSMs on this account first. Polkadot-js apps allows you to manage your Signer account seamlessly.
+To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Polkadot Vault, you will need to get some KSMs on this account first. Polkadot-js apps allows you to manage your Vault account seamlessly.
 
 - Visit [Polkadot-js apps](https://polkadot.js.org/apps/) website.
 - Go to `Accounts` from the left sidebar.
@@ -93,7 +93,7 @@ Assuming that your Polkadot Vault account now has funds, you will be able to sen
 - Review the transaction, you can add tip to this transaction.
 - Click on `Scan via QR Code` when you're done.
 
-![Polkadot Vault Polkadot send transaction](images/Parity-Signer-apps-tx-workflow.png)
+![Polkadot Vault Polkadot send transaction](images/Polkadot-Vault-apps-tx-workflow.png)
 
 You will now be presented with a QR code that represents the transaction. Since this transaction is sending funds from your Polkadot Vault mobile app account, only this account (sitting on your phone) can sign and authorize this transaction. This is what we'll do in the next steps:
 
@@ -101,7 +101,7 @@ You will now be presented with a QR code that represents the transaction. Since 
 - Review the transaction addresses and the amount to send on your phone. The amount and addresses must match what you've entered in apps. If you got phished, this is where you can realize it and reject the transaction.
 - Once you're sure, scroll down and click `Sign Transaction` to enter your pin and get the QR code of the scanned transaction.
 
-![Sign Polkadot apps transaction](images/Parity-Signer-apps-1.png)
+![Sign Polkadot apps transaction](images/Polkadot-Vault-apps-1.png)
 
 Your phone has now *signed the transaction offline* using your Polkadot Vault account private key. The QR code that is now displayed on your phone represents a signed transaction that can be broadcasted. We will do this in the next steps:
 

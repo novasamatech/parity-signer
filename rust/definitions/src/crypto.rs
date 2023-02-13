@@ -56,17 +56,17 @@
 //! [`SufficientCrypto`] is a construction that could be created in Vault
 //! and exported through static QR code. It contains encryption algorithm,
 //! public key and corresponding signature for some data. Data could be network
-//! specs, network metadata, or types information, that is loaded into Signer.
+//! specs, network metadata, or types information, that is loaded into Vault.
 //! The information in [`SufficientCrypto`] is sufficient to verify the updating
 //! payload validity elsewhere.
 //!
-//! This way Signer user can produce verified updating transactions with
+//! This way Vault user can produce verified updating transactions with
 //! own signatures.  
 //!
 //! [`SufficientCrypto`] could be used by the hot-side client to generate QR
-//! codes with updating payloads signed by an address from Signer.  
+//! codes with updating payloads signed by an address from Vault.
 //!
-//! Signer keeps track of the generated [`SufficientCrypto`] QR codes in
+//! Vault keeps track of the generated [`SufficientCrypto`] QR codes in
 //! history log.  
 use parity_scale_codec::{Decode, Encode};
 use sp_core;

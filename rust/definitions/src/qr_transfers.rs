@@ -1,6 +1,6 @@
 //! Information that could be send and received through air-gap as QR codes content  
 //!
-//! All information that Signer could get without a complete wipe must arrive
+//! All information that Vault could get without a complete wipe must arrive
 //! through the QR codes maintaining the air-gap. In addition to transactions
 //! that could be parsed and signed, this includes:
 //! - adding new networks,  
@@ -38,7 +38,7 @@ use crate::navigation::SignerImage;
 /// `load_metadata` QR code content  
 ///
 /// Messages `load_metadata` are used to update through air-gap the network
-/// metadata for networks already known to the Signer.
+/// metadata for networks already known to the Vault.
 pub struct ContentLoadMeta(Vec<u8>);
 
 #[derive(Decode, Encode)]
@@ -105,7 +105,7 @@ impl ContentLoadMeta {
 
 /// `add_specs` QR code content  
 ///
-/// Messages `add_specs` are used to add new networks to the Signer.  
+/// Messages `add_specs` are used to add new networks to the Vault.
 #[derive(Decode, Encode)]
 pub struct ContentAddSpecs(Vec<u8>);
 
@@ -155,7 +155,7 @@ impl ContentAddSpecs {
     /// Note that it is different from `.to_sign()` function. Effectively, already
     /// SCALE-encoded [`NetworkSpecs`] are encoded second time as an opaque
     /// `Vec<u8>`. This is done to have encoded piece length announced at the
-    /// beginning of the `u8` set, to simplify cutting the received message in Signer.
+    /// beginning of the `u8` set, to simplify cutting the received message in Vault.
     pub fn to_transfer(&self) -> Vec<u8> {
         self.encode()
     }
@@ -163,7 +163,7 @@ impl ContentAddSpecs {
 
 /// `load_types` QR code content  
 ///
-/// Messages `load_types` are used to add or update Signer types information.  
+/// Messages `load_types` are used to add or update Vault types information.
 ///
 /// Externally acquired types information is needed only for
 /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
@@ -224,7 +224,7 @@ impl ContentLoadTypes {
     /// Note that it is different from `.to_sign()` function. Effectively, already
     /// SCALE-encoded `Vec<TypeEntry>` is encoded second time as an opaque
     /// `Vec<u8>`. This is done to have encoded piece length announced at the
-    /// beginning of the `u8` set, to simplify cutting the received message in Signer.  
+    /// beginning of the `u8` set, to simplify cutting the received message in Vault.
     pub fn to_transfer(&self) -> Vec<u8> {
         self.encode()
     }

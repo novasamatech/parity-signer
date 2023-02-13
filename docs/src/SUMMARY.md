@@ -13,9 +13,9 @@
 
 - [Development](./development/Development.md)
     - [Build](./development/Build.md)
-    - [Signer structure](./development/Signer-Structure.md)
+    - [Vault structure](./development/Vault-Structure.md)
     - [Troubleshooting](./development/Troubleshooting.md)
     - [Rust docs](./development/Rustdocs.md)
     - [Universal offline signature](./development/UOS.md)
-    - [Signer ecosystem](./development/Ecosystem.md)
+    - [Vault ecosystem](./development/Ecosystem.md)
 

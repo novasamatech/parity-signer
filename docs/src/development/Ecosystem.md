@@ -1,15 +1,15 @@
-# Signer ecosystem
+# Vault ecosystem
 
-Signer repository contains 3 tools that are part of Signer ecosystem
+Vault repository contains 3 tools that are part of Vault ecosystem
 
 - [Polkadot Vault app](https://github.com/paritytech/parity-signer)
 - [`generate_message` network data management tool](https://github.com/paritytech/parity-signer/tree/master/rust/generate_message)
 - [`qr_reader_pc` qr scanner app for PC](https://github.com/paritytech/parity-signer/tree/master/rust/generate_message)
 
-Greater Signer ecosystem:
+Greater Vault ecosystem:
 
 - [metadata portal](https://github.com/paritytech/metadata-portal)
 - [Signer companion](https://github.com/paritytech/parity-signer-companion)
 - [polkadot-js libraries for QR code data transfer](https://github.com/polkadot-js/apps)
-- [UOS interface specification](https://github.com/varovainen/parity-signer/blob/2022-05-25-uos/docs/src/development/UOS.md) - since no tools support original upstream specification, here is standard interpretation that is used in Signer.
+- [UOS interface specification](https://github.com/varovainen/parity-signer/blob/2022-05-25-uos/docs/src/development/UOS.md) - since no tools support original upstream specification, here is standard interpretation that is used in Vault.
 
