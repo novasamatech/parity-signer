@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">Parity Signer</string>
+	<string name="app_name">Polkadot Vault</string>
 	<string name="remove_key_confirm_title">Forget this key?</string>
 	<string name="remove_key_confirm_text">This key will be removed for this network. Are you sure?</string>
 	<string name="remove_key_confirm_cta">Remove key</string>

@@ -15,8 +15,8 @@
 //! There could be base58 prefix information in network metadata. If base58
 //! prefix is fetched via `system_properties` RPC call and the metadata contains
 //! `SS58Prefix` constant, they must be matching for the network to be
-//! suitable for use in the Signer. If no base58 prefix is encountered at all,
-//! network is not suitable for use in Signer either.
+//! suitable for use in the Vault. If no base58 prefix is encountered at all,
+//! network is not suitable for use in Vault either.
 //!
 //! Some networks support more than one token, in this case RPC returns an array
 //! of decimals and an array of units, that must have equal length. No mechanism

@@ -1,4 +1,4 @@
-- [About Parity Signer](./README.md)
+- [About Polkadot Vault](./README.md)
     - [FAQ](./about/FAQ.md)
     - [Security-And-Privacy](./about/Security-And-Privacy.md)
     - [Hierarchical-Deterministic-Key-Derivation](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)

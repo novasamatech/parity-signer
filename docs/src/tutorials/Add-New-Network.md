@@ -1,6 +1,6 @@
 # Add New Network
 
-Parity Signer supports adding any substrate-based networks or updating and existing network via QR code.
+Polkadot Vault supports adding any substrate-based networks or updating and existing network via QR code.
 
 After you've installed [required software](#Prerequisites), you need to add *Network's Specs* to Signer and add *Network Metadata* for this network, so that Signer is able to decode, and you could read and verify transactions you are signing on this network.
 

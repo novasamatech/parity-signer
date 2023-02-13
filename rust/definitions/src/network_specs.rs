@@ -1,22 +1,22 @@
 //! Network specs, verifiers, and related types  
 //!
-//! Signer could be used only for networks introduced to the database.  
+//! Vault could be used only for networks introduced to the database.
 //!
 //! Each network has associated set of parameters called here network specs.
 //! Cold database stores [`OrderedNetworkSpecs`].
 //! Hot database stores [`NetworkSpecs`]. Air-gap transfers with
 //! `add_specs` payload also contain [`NetworkSpecs`].
 //! Network specs rarely change and are generally are introduced into
-//! Signer only once for each network.
+//! Vault only once for each network.
 //!
-//! Signer has verifier system storing public keys that Signer trusts are providing
+//! Vault has verifier system storing public keys that Vault trusts are providing
 //! correct updates to the information.  
 //!
 //! Cold database stores [`CurrentVerifier`] for each network and general verifier.  
 //!
 //! # Verifiers in cold database  
 //!
-//! Signer is expected to be safe to use as long as the information uploaded
+//! Vault is expected to be safe to use as long as the information uploaded
 //! into it through air-gap is the correct one.  
 //!
 //! Damaged network specs or network metadata could result in transactions
@@ -26,9 +26,9 @@
 //! by a trusted party to exclude accidental or intentional errors. It is
 //! especially important in keeping fast-changing network metadata updated.  
 //!
-//! ## Verifiers of data entering the Signer  
+//! ## Verifiers of data entering the Vault
 //!
-//! The data scanned into Signer has an associated [`Verifier`].  
+//! The data scanned into Vault has an associated [`Verifier`].
 //!
 //! If the information is verified, [`Verifier`] is `Some(VerifierValue)`.  
 //!
@@ -36,7 +36,7 @@
 //!
 //! Payloads with verified data contain trusted party public key and signature
 //! for the data transferred, that are checked when the data is processed in
-//! Signer. Unverified data gets processed as is, without any verification.
+//! Vault. Unverified data gets processed as is, without any verification.
 //! Unverified data should be used cautiously, and avoided unless absolutely
 //! necessary.  
 //!

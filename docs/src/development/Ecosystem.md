@@ -2,7 +2,7 @@
 
 Signer repository contains 3 tools that are part of Signer ecosystem
 
-- [Parity Signer app](https://github.com/paritytech/parity-signer)
+- [Polkadot Vault app](https://github.com/paritytech/parity-signer)
 - [`generate_message` network data management tool](https://github.com/paritytech/parity-signer/tree/master/rust/generate_message)
 - [`qr_reader_pc` qr scanner app for PC](https://github.com/paritytech/parity-signer/tree/master/rust/generate_message)
 

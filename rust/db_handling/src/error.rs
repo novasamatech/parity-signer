@@ -39,7 +39,7 @@ pub enum Error {
     #[error("Database error. Internal error. {0}")]
     DbError(#[from] sled::Error),
 
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// Temporary database entry in `TRANSACTION` tree of the Vault database
     /// under the key `STUB`, used to store the update data awaiting for the
     /// user approval.
     ///
@@ -70,7 +70,7 @@ pub enum Error {
     /// Associated data is the [`VerifierKey`] of the network.
     #[error(
         "Network with genesis hash {} is disabled. It could be enabled \
-        again only after complete wipe and re-installation of Signer.",
+        again only after complete wipe and re-installation of Vault.",
         hex::encode(.0.genesis_hash()),
     )]
     DeadVerifier(VerifierKey),
@@ -92,7 +92,7 @@ pub enum Error {
     UnexpectedGenesisHash { name: String, genesis_hash: H256 },
 
     /// History log [`Entry`](definitions::history::Entry) stored in `HISTORY` tree
-    /// of the Signer database under the key [`Order`]
+    /// of the Vault database under the key [`Order`]
     /// could not be decoded.
     ///
     /// Associated data is the corresponding [`Order`].
@@ -119,7 +119,7 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    /// To generate QR code with public address information export, Signer
+    /// To generate QR code with public address information export, Vault
     /// receives both seed name and
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// from the navigation state `Navstate`.
@@ -257,7 +257,7 @@ pub enum Error {
     #[error("Derivation had password, then lost it.")]
     LostPwd,
 
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// Temporary database entry in `TRANSACTION` tree of the Vault database
     /// under the key `DRV`, used to store the derivation import data.
     ///
     /// Missing `Derivations` when it is expected always indicates the database
@@ -265,7 +265,7 @@ pub enum Error {
     #[error("Derivations not found.")]
     DerivationsNotFound,
 
-    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// Temporary database entry in `TRANSACTION` tree of the Vault database
     /// under the key `SIGN`, used to store the signable transaction data
     /// awaiting for the user approval.
     ///
@@ -318,7 +318,7 @@ pub enum Error {
     TypesNotFound,
 
     /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) for a network
-    /// in `SPECSTREE` tree of the Signer database, searched by
+    /// in `SPECSTREE` tree of the Vault database, searched by
     /// [`NetworkSpecsKey`].
     ///
     /// Associated data is the `NetworkSpecsKey` used for the search.
@@ -326,7 +326,7 @@ pub enum Error {
     NetworkSpecsNotFound(NetworkSpecsKey),
 
     /// [`AddressDetails`](definitions::users::AddressDetails) for [`AddressKey`] in
-    /// `ADDRTREE` tree of the Signer database.
+    /// `ADDRTREE` tree of the Vault database.
     ///
     /// Associated data is the `AddressKey` used for search.
     #[error(
@@ -334,7 +334,7 @@ pub enum Error {
     )]
     AddressNotFound(AddressKey),
 
-    /// Network metadata in `METATREE` tree of the Signer database, for network
+    /// Network metadata in `METATREE` tree of the Vault database, for network
     /// name and version combination.
     #[error("Meta values not found for {name} version {version}")]
     MetaValuesNotFound {

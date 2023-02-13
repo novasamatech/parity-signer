@@ -1,11 +1,11 @@
-//! Record of the Signer exposure to dangerous events  
+//! Record of the Vault exposure to dangerous events
 //!
-//! Signer potentially dangerous exposures are recorded in `SETTREE` as
+//! Vault potentially dangerous exposures are recorded in `SETTREE` as
 //! encoded [`DangerRecord`] under key `DANGER`.
 //!
-//! Signer should stay offline (i.e. air-gapped) throughout its usage.
+//! Vault should stay offline (i.e. air-gapped) throughout its usage.
 //!
-//! In case Signer finds itself online, it records this in the database
+//! In case Vault finds itself online, it records this in the database
 //! danger record and generates log entry in `HISTORY` tree.
 //!
 //! [`DangerRecord`] could be reset only by designated reset function, and the
@@ -17,9 +17,9 @@ use sled::IVec;
 #[cfg(feature = "signer")]
 use crate::error::Result;
 
-/// Danger status in the Signer database
+/// Danger status in the Vault database
 ///
-/// Indicates if the Signer has a record of unsafe exposure.
+/// Indicates if the Vault has a record of unsafe exposure.
 pub struct DangerRecord(Vec<u8>);
 
 /// Decoded `DangerRecord` content, struct with boolean fields corresponding

@@ -39,7 +39,7 @@ For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create
 
 ### What networks does Signer support?
 
-From-the-shelf Party Signer supports Polkadot, Kusama, and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand the capability of Parity Signer.
+From-the-shelf Party Signer supports Polkadot, Kusama, and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand the capability of Polkadot Vault.
 
 ### How can I update metadata version for a network?
 
@@ -66,17 +66,17 @@ Currently, the process requires you to have [rust](https://www.rust-lang.org/too
 
 ## Seeds and keys
 	
-### Can I import my keys from `polkadot{.js}` apps or extension to Parity Signer?
+### Can I import my keys from `polkadot{.js}` apps or extension to Polkadot Vault?
 
-Yes. Keys are compatible between `polkadot{.js}` and Parity Signer, except for the keys generated with Ledger (`BIP39`). To import seed keys into Parity Signer, you need to know:
+Yes. Keys are compatible between `polkadot{.js}` and Polkadot Vault, except for the keys generated with Ledger (`BIP39`). To import seed keys into Polkadot Vault, you need to know:
 1. Seed phrase\
 _It should always be backed up in paper!_
-2. Network you are adding address to and whether Parity Signer installed on your device has metadata for the respective network.\
+2. Network you are adding address to and whether Polkadot Vault installed on your device has metadata for the respective network.\
 _If (2) is not one of the default built-in networks, you will need to add network yourself or find a distribution center for adding networks._
 3. Derivation path\
 _Only if you are importing a derived key, usually keys generated with `polkadot{.js}` are seed keys._
 
-In Parity Signer go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
+In Polkadot Vault go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
 If you are importing a derived key select the seed from which your key is derived, select account's network, press "Plus" icon next to "Derived keys", enter your derivation path.
 
 ### What is the difference between seed key and derived key? Why should I use derived keys?

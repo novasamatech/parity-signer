@@ -1,14 +1,14 @@
 # Scope
 
-This is interpretation of UOS format used by Parity Signer. Since upstream
+This is interpretation of UOS format used by Polkadot Vault. Since upstream
 version of the published format diverges from actually implemented too much,
 this document was produced as representation of current state of UOS format
-compatible with Parity Signer. This document only covers networks compatible
-with Parity Signer (i.e. Substrate-based networks). This document also describes
-special payloads that are used for maintaining Parity Signer instance.
+compatible with Polkadot Vault. This document only covers networks compatible
+with Polkadot Vault (i.e. Substrate-based networks). This document also describes
+special payloads that are used for maintaining Polkadot Vault instance.
 
 Thus, effectively, this document describes input and output format for QR codes
-used by Parity Signer.
+used by Polkadot Vault.
 
 # Terminology
 
@@ -104,7 +104,7 @@ single payload and treated as data vector ("QR code content").
 
 ##### *Legacy Multipart Payload*
 
-In real implementation, the Parity Signer ecosystem generalized all payloads as
+In real implementation, the Polkadot Vault ecosystem generalized all payloads as
 multipart messages. 
 
 | bytes position | `[0]`  | `[1..3]` | `[3..5]`      | `[5..]`     |

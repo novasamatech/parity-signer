@@ -597,7 +597,7 @@ mod tests {
         }
     }
 
-    /// `EnteredInfo` holds String with sensitive information arriving either from Signer phone memory or from the user.
+    /// `EnteredInfo` holds String with sensitive information arriving either from Vault phone memory or from the user.
     /// `EnteredInto` is used in several structs, and should always be zeroized properly.
     #[test]
     fn zeroize_entered_info_in_sufficient_crypto_state() {

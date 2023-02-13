@@ -103,7 +103,7 @@ class SignerMainViewModel() : ViewModel() {
 	}
 
 	/**
-	 * Auth user and wipe the Signer to initial state
+	 * Auth user and wipe the Vault to initial state
 	 */
 	fun wipeToFactory() {
 		val authentication = ServiceLocator.authentication
@@ -114,7 +114,7 @@ class SignerMainViewModel() : ViewModel() {
 	}
 
 	/**
-	 * Auth user and wipe Signer to state without general verifier certificate
+	 * Auth user and wipe Vault to state without general verifier certificate
 	 */
 	fun wipeToJailbreak() {
 		val authentication = ServiceLocator.authentication

@@ -1,14 +1,14 @@
-![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
+![Polkadot Vault](./tutorials/images/logo-parity-signer.jpg)
 
 [<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
 [<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
 [<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
 
-# Parity Signer - Turn your smartphone into a hardware wallet
+# Polkadot Vault - Turn your smartphone into a hardware wallet
 
-![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
+![Polkadot Vault](./tutorials/images/logo-parity-signer.jpg)
 
-Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
+Polkadot Vault is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
 You can create accounts in Substrate-based networks, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
 
@@ -16,9 +16,9 @@ You must turn off or even physically remove the smartphone's Wifi, Mobile Networ
 
 **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./about/Security-And-Privacy.md) for more details.**
 
-Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
+Have a look at the tutorial on our wiki to learn how to use [Polkadot Vault together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
 
-Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
+Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
 ## Key features
 
@@ -50,7 +50,7 @@ Please note that the Signer app is an advanced tool designed for maximum securit
 
 ### About
 
-- [About Parity Signer](./README.md)
+- [About Polkadot Vault](./README.md)
 - [FAQ](./about/FAQ.md)
 - [Security-And-Privacy](./about/Security-And-Privacy.md)
 - [Hierarchical-Deterministic-Key-Derivation](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
@@ -66,4 +66,4 @@ Older versions of this app could be useful for development, however, they are no
 
 ## License
 
-Parity-Signer is [GPL 3.0 licensed](LICENSE).
+Polkadot-Vault is [GPL 3.0 licensed](LICENSE).

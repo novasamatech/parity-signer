@@ -1,15 +1,15 @@
 //! Network metadata and related types
 //!
-//! The main purpose of the Signer is to generate signatures for transactions.
-//! Signer reads the transactions as QR codes with SCALE-encoded
+//! The main purpose of the Vault is to generate signatures for transactions.
+//! Vault reads the transactions as QR codes with SCALE-encoded
 //! information.
 //! Any transaction before user is able to sign it must be decoded.
 //!
-//! Transaction decoding uses network metadata, and Signer needs latest
+//! Transaction decoding uses network metadata, and Vault needs latest
 //! available network metadata to parse freshly generated transactions.  
 //!
-//! New network metadata could be added to Signer through scanning `load_metadata`
-//! QR code for the network metadata. Signer allows loading new metadata only if
+//! New network metadata could be added to Vault through scanning `load_metadata`
+//! QR code for the network metadata. Vault allows loading new metadata only if
 //! the network has network specs in the database and the incoming `load_metadata`
 //! payload is signed by the verifier already associated with the network.  
 //!
@@ -130,7 +130,7 @@ impl MetaValues {
     /// Gets [`MetaValues`] from raw metadata in `Vec<u8>` format
     ///
     /// Produces [`MetadataError`] if the metadata is somehow not suitable for
-    /// use in Signer.
+    /// use in Vault.
     pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self> {
         let meta_info = info_from_metadata(&runtime_metadata_from_slice(meta_slice)?)?;
         Ok(Self {
@@ -191,7 +191,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 /// Searches `System` pallet within the metadata, gets from it `Version` and
 /// optionally `SS58Prefix` constants.
 ///
-/// Produces [`MetaInfo`] if the metadata is suitable for the Signer, and
+/// Produces [`MetaInfo`] if the metadata is suitable for the Vault, and
 /// [`MetadataError`] if not.
 ///
 /// `RuntimeMetadata` suitable for use in Signer:  

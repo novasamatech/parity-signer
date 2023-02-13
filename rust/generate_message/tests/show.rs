@@ -36,7 +36,7 @@ fn it_shows_networks() {
         "show networks",
         "Address book has entries for following networks:
 
-polkadot at wss://rpc.polkadot.io, encryption sr25519, Signer display title Polkadot\n",
+polkadot at wss://rpc.polkadot.io, encryption sr25519, Vault display title Polkadot\n",
         tmp_dir.path(),
     );
 }

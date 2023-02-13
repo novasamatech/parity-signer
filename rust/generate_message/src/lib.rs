@@ -1,26 +1,26 @@
 //! This crate is intended to support the
-//! [Signer](https://github.com/paritytech/parity-signer) from the active
+//! [Vault](https://github.com/paritytech/parity-signer) from the active
 //! (non air-gapped) side.
 //!
 //! This crate is mainly used to:
 //!
 //! - fetch network data through RPC calls
-//! - prepare Signer update and derivation import payloads
-//! - generate Signer update QR codes, either signed or unsigned, and
-//! derivations import QR codes, to be scanned into Signer
+//! - prepare Vault update and derivation import payloads
+//! - generate Vault update QR codes, either signed or unsigned, and
+//! derivations import QR codes, to be scanned into Vault
 //! - maintain the `hot` database on the network-connected device, to store and
 //! manage the data that went into update QR codes
-//! - maintain Signer default network metadata set in `defaults` crate and
-//! prepare the `cold` database for the Signer release
+//! - maintain Vault default network metadata set in `defaults` crate and
+//! prepare the `cold` database for the Vault release
 //!
-//! # Supported Signer updates
+//! # Supported Vault updates
 //!
-//! Crate `generate_message` can generate and the Signer can accept following
+//! Crate `generate_message` can generate and the Vault can accept following
 //! updates:
 //!
-//! - `add-specs`, to add a new network (i.e. the network specs) into the Signer
-//! - `load-metadata`, to load into the Signer the network metadata, for
-//! networks that already have corresponding network specs entry in the Signer
+//! - `add-specs`, to add a new network (i.e. the network specs) into the Vault
+//! - `load-metadata`, to load into the Vault the network metadata, for
+//! networks that already have corresponding network specs entry in the Vault
 //! database
 //! - `load-types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
@@ -99,7 +99,7 @@
 //!
 //! Note that the update payloads are build in such a way that the length of
 //! the payload always could be easily found, thus allowing to separate update
-//! payload, signature and reserved tail in Signer when accepting the update.
+//! payload, signature and reserved tail in Vault when accepting the update.
 //! The tail is reserved to future-proof the updates if the multi-signing is
 //! ever implemented for them. Currently the tail is empty.
 //!
@@ -110,13 +110,13 @@
 //! 1. make update payload
 //! 2. (optional) make signature for update payload
 //! 3. make update QR code (optionally signed), that could be scanned into
-//! Signer
+//! Vault
 //!
 //! Steps (1) and (3) are done in `generate_message`, the signature is produced
 //! in other tools, except the test "signed" updates with Alice as a verifier,
 //! when the signature is produced while making QR code during step (3).
 //!
-//! Signature could be produced with Subkey or with Signer. For update signing
+//! Signature could be produced with Subkey or with Vault. For update signing
 //! it is recommended to use a dedicated key, not used for transactions. This
 //! way, if the signed data was not really the update data, but something else
 //! posing as the update data, the signature produced could not do any damage.
