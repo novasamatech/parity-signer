@@ -56,7 +56,6 @@
 "Hide seed phrase in" = "Hide seed phrase in %@s";
 "I agree to the privacy policy" = "I agree to the privacy policy";
 "I agree to the terms and conditions" = "I agree to the terms and conditions";
-"I have written down my seed phrase" = "I have written down my seed phrase";
 "Immortal transaction" = "Immortal transaction";
 "Importing derivations:" = "Importing derivations:";
 "in network" = "in network";
@@ -686,4 +685,8 @@
 "NewSeed.Backup.Action.Create" = "Create Key Set";
 "NewSeed.Backup.Label.Info" = "Write it down on a paper and keep it in a safe place. You can also use Banana Split for maximum security";
 "NewSeed.Backup.Label.Info.Underline" = "Banana Split";
-
+"NewSeed.Backup.Label.Confirmation" = "I’ve written down my secret\nrecovery phrase";
+"NewSeed.Backup.BananaSplit.Label.Title" = "Banana Split";
+"NewSeed.Backup.BananaSplit.Label.Content" = "Banana Split is a self-contained HTML page, which makes your paper backups more resilient and secure using Shamir's secret sharing scheme. You can encrypt and split particularly sensitive information so that it's not physically stored in one place — your master password, seed phrase, etc.\n\nFor more details visit\nhttps://bs.parity.io";
+"NewSeed.Backup.BananaSplit.Label.Content.Highlight.1" = "Shamir's secret sharing scheme.";
+"NewSeed.Backup.BananaSplit.Label.Content.Highlight.2" = "https://bs.parity.io";
