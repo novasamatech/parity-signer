@@ -44,6 +44,8 @@ struct CreateKeySetSeedPhraseView: View {
                     AttributedTintInfoBox(text: Localizable.createKeySetSeedPhraseInfo())
                         .padding(.horizontal, Spacing.medium)
                         .padding(.bottom, Spacing.large)
+                        .contentShape(Rectangle())
+                        .onTapGesture { viewModel.onInfoBoxTap() }
                     Button(
                         action: {
                             viewModel.confirmBackup.toggle()
@@ -78,6 +80,15 @@ struct CreateKeySetSeedPhraseView: View {
         .onAppear {
             viewModel.use(navigation: navigation)
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingInfo
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableInfo,
+                isShowingBottomAlert: $viewModel.isPresentingInfo
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -88,6 +99,8 @@ extension CreateKeySetSeedPhraseView {
 
         let dataModel: MNewSeedBackup
         @Published var confirmBackup = false
+        @Published var isPresentingInfo: Bool = false
+        @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
 
         init(
             dataModel: MNewSeedBackup,
@@ -111,6 +124,10 @@ extension CreateKeySetSeedPhraseView {
                 seedPhrase: dataModel.seedPhrase,
                 navigate: true
             )
+        }
+
+        func onInfoBoxTap() {
+            isPresentingInfo = true
         }
     }
 }
