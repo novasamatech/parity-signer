@@ -24,21 +24,26 @@ struct CreateKeySetSeedPhraseView: View {
                 )
             )
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .center, spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
                     Localizable.NewSeed.Backup.Label.header.text
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyL.font)
-                        .multilineTextAlignment(.center)
+                        .font(PrimaryFont.titleM.font)
+                        .multilineTextAlignment(.leading)
                         .lineSpacing(Spacing.extraSmall)
+                    HStack {
+                        Spacer()
+                    }
                 }
-                .padding(.top, Spacing.extraSmall)
+                .padding(.top, Spacing.extraExtraSmall)
                 .padding(.bottom, Spacing.medium)
-                .padding(.horizontal, Spacing.medium)
+                .padding(.horizontal, Spacing.large)
                 VStack(alignment: .leading, spacing: 0) {
                     SeedPhraseView(viewModel: .init(dataModel: .init(seedPhrase: viewModel.dataModel.seedPhrase)))
                         .padding(.bottom, Spacing.extraSmall)
+                        .padding(.horizontal, Spacing.medium)
                     AttributedTintInfoBox(text: Localizable.createKeySetSeedPhraseInfo())
-                        .padding(.bottom, Spacing.medium)
+                        .padding(.horizontal, Spacing.medium)
+                        .padding(.bottom, Spacing.large)
                     Button(
                         action: {
                             viewModel.confirmBackup.toggle()
@@ -50,23 +55,23 @@ struct CreateKeySetSeedPhraseView: View {
                                         .swiftUIImage
                                 )
                                 .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                Localizable.iHaveWrittenDownMySeedPhrase.text
+                                Localizable.NewSeed.Backup.Label.confirmation.text
                                     .multilineTextAlignment(.leading)
                                     .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                                 Spacer()
                             }
                         }
                     )
-                    .padding(.vertical, Spacing.small)
+                    .padding(.horizontal, Spacing.large)
+                    .padding(.bottom, Spacing.extraSmall)
                     Spacer()
                     PrimaryButton(
                         action: viewModel.onCreateTap,
                         text: Localizable.NewSeed.Backup.Action.create.key,
                         style: .primary(isDisabled: .constant(!viewModel.confirmBackup))
                     )
-                    .padding(.vertical, Spacing.medium)
+                    .padding(Spacing.large)
                 }
-                .padding(.horizontal, Spacing.medium)
             }
         }
         .background(Asset.backgroundSecondary.swiftUIColor)
