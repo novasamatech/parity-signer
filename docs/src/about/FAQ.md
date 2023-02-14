@@ -56,7 +56,7 @@ It's a safety feature. Substrate-based blockchain networks can be updated and ot
 
 ### How can I add a new network to Vault?
 
-Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Vault open scanner, scan the QR and accept new network spec. Then scan the multipart QR-"movie" containing recent metadata for this network.
+Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Chain Specs", scan the network specs QR same way you scan transaction QR: in Vault open scanner, scan the QR and accept new network spec. Then scan the multipart QR-"movie" containing recent metadata for this network.
 
 ### Can I add a network that does not have network specs and metadata QR published anywhere?
 
