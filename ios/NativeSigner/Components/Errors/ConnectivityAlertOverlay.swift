@@ -1,6 +1,6 @@
 //
 //  ConnectivityAlertOverlay.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 28/12/2022.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct ConnectivityAlertOverlay: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .trailing) {
@@ -48,7 +48,7 @@ extension ConnectivityAlertOverlay {
         @Published var isPresentingConnectivityAlert = false
         @Published var isConnectivityAlertOn = false
         private weak var connectivityMediator: ConnectivityMediator!
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
         private let resetWarningAction: ResetConnectivtyWarningsAction
         private let cancelBag = CancelBag()
 
@@ -56,7 +56,7 @@ extension ConnectivityAlertOverlay {
             self.resetWarningAction = resetWarningAction
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
             data.$alert.sink {
                 self.isConnectivityAlertOn = $0

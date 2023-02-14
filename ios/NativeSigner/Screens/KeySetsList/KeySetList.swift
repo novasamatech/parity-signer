@@ -1,6 +1,6 @@
 //
 //  KeySetList.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 22/08/2022.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @Binding var dataModel: MSeeds
@@ -257,7 +257,7 @@ private struct KeyListEmptyState: View {
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SignerDataModel())
+            .environmentObject(SharedDataModel())
             .environmentObject(AppState.preview)
         }
     }

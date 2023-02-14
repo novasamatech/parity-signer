@@ -1,6 +1,6 @@
 //
 //  ActionableInfoBoxView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 30/12/2022.
 //

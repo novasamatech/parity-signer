@@ -1,6 +1,6 @@
 //
 //  TCText.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 10.11.2021.
 //

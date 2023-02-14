@@ -1,6 +1,6 @@
 //
 //  KeyDetailsPublicKeyView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 13/09/2022.
 //
@@ -30,7 +30,7 @@ struct KeyDetailsPublicKeyView: View {
 
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     init(
         forgetKeyActionHandler: ForgetSingleKeyAction,

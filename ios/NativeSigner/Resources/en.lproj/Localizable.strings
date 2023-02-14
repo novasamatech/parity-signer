@@ -9,7 +9,7 @@
 "Add note" = "Add note";
 "addSeed.uppercased" = "ADD SEED";
 "Airgap your phone" = "Airgap your phone";
-"airplaneMode.explanation" = "Airplane mode will stop your phone from using mobile data. Signer will only work when you have no wifi and no mobile connection!";
+"airplaneMode.explanation" = "Airplane mode will stop your phone from using mobile data. Polkadot Vault will only work when you have no wifi and no mobile connection!";
 "Back" = "Back";
 "Backup" = "Backup";
 "Backup Seed Phrase" = "Backup Seed Phrase";
@@ -23,7 +23,7 @@
 "Comment_uppercase" = "COMMENT";
 "Comment_alt" = "Comment :";
 "Comment (not published)" = "Comment (not published)";
-"Connectivity.explanation" = "Make sure your phone's Bluetooth, NFC and other sensors are off, and that all cables are disconnected. Signer will not check these connections, so it is important that you do!";
+"Connectivity.explanation" = "Make sure your phone's Bluetooth, NFC and other sensors are off, and that all cables are disconnected. Polkadot Vault will not check these connections, so it is important that you do!";
 "Create new key" = "Create new key";
 "Create root keys" = "Create root keys";
 "crypto:" = "crypto:";
@@ -37,7 +37,7 @@
 "DISPLAY NAME" = "DISPLAY NAME";
 "Display name is visible only on this device" = "Display name is visible only on this device";
 "Display name visible only to you" = "Display name visible only to you";
-"Do you want this Signer to forget all logged events? This is not reversible." = "Do you want this Signer to forget all logged events? This is not reversible.";
+"Do you want this Polkadot Vault to forget all logged events? This is not reversible." = "Do you want this Polkadot Vault to forget all logged events? This is not reversible.";
 "ecdsa" = "ecdsa";
 "ed25519" = "ed25519";
 "error" = "error";
@@ -101,7 +101,7 @@
 "Signature for network specs" = "Signature for network specs";
 "Signature for types" = "Signature for types";
 "Signed by: " = "Signed by: ";
-"Signer is secure" = "Signer is secure";
+"Polkadot Vault is secure" = "Polkadot Vault is secure";
 "spec name:" = "spec name:";
 "sr25519" = "sr25519";
 "This key already exists:" = "This key already exists:";
@@ -112,7 +112,7 @@
 "Types information needed for support of pre-v14 metadata will be removed. Are you sure?" = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?";
 "unit:" = "unit:";
 "Unknown network" = "Unknown network";
-"Use Signer in Airplane mode" = "Use Signer in Airplane mode";
+"Use Polkadot Vault in Airplane mode" = "Use Polkadot Vault in Airplane mode";
 "Used for:" = "Used for:";
 "verifier_certificate" = "Verifier Certificate";
 "verifier_certificate_uppercase" = "VERIFIER CERTIFICATE";
@@ -123,8 +123,8 @@
 "You are about to delete key" = "You are about to delete key";
 "You are about to delete selected keys" = "You are about to delete selected keys";
 
-"network_connected_message" = "Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
-"network_was_connected_message" = "Your Signer device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol";
+"network_connected_message" = "Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
+"network_was_connected_message" = "Your Polkadot Vault device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol";
 
 "KEY MENU" = "KEY MENU";
 "Select action" = "Select action";
@@ -319,10 +319,10 @@
 "PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
 
 "Connectivity.Label.Title" = "Network Connected";
-"Connectivity.Label.Content" = "Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
+"Connectivity.Label.Content" = "Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
 "Connectivity.Action.Ok" = "Got It";
 "PastConnectivity.Label.Title" = "Network Was Connected!";
-"PastConnectivity.Label.Content" = "Your Signer device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
+"PastConnectivity.Label.Content" = "Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
 "PastConnectivity.Action.Back" = "Go Back";
 "PastConnectivity.Action.Continue" = "Acknowledge and Proceed";
 
@@ -337,12 +337,12 @@
 "GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
 "GenericErrorModal.Action.Ok" = "OK";
 "Error.Navigation.Label.Prefix" = "Internal navigation error.";
-"Error.Navigation.Label.Message" = "Please restart Signer app and try again.\nInternal error description: %@";
-"Error.Navigation.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
+"Error.Navigation.Label.Message" = "Please restart Polkadot Vault app and try again.\nInternal error description: %@";
+"Error.Navigation.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
 "Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
 "Error.Service.Label.Prefix" = "Internal service error.";
 "Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
-"Error.Service.Label.Suffix" = "Report an issue to Signer team via Github at: https://github.com/paritytech/parity-signer/";
+"Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
@@ -412,7 +412,7 @@
 
 "TransactionSign.Error.Generic.Title" = "Error signing Transaction";
 "TransactionSign.Error.UnknownNetwork.Title" = "Please Add The Network\nYou Want To Transact in";
-"TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Parity Signer.";
+"TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Polkadot Vault.";
 "TransactionSign.Error.UnknownNetwork.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
 
 "TransactionSign.Error.UnknownNetwork.Step1" = "Go to Portal where your network is stored\nparity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
@@ -534,7 +534,7 @@
 "Settings.NetworkDetails.DeleteNetwork.Label.Confirmation" = "Network %@ Has Been Removed";
 
 "Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
-"Settings.Modal.WipeAll.Label.Content" = "Factory reset the Signer app. This operation can not be reverted!";
+"Settings.Modal.WipeAll.Label.Content" = "Factory reset the Polkadot Vault app. This operation can not be reverted!";
 "Settings.Modal.WipeAll.Action.Wipe" = "Remove";
 "Settings.Modal.WipeAll.Action.Cancel" = "Cancel";
 
@@ -657,20 +657,20 @@
 "Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
 
 "Error.DevicePincodeRequired.Label.Title" = "Set Up A Passcode";
-"Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Signer requires passcode confirmation. Using the application without a password is not allowed.";
+"Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Polkadot Vault requires passcode confirmation. Using the application without a password is not allowed.";
 "Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
 "Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
 
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
 
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
-"Error.LockedDevice.Label.Subtitle" = "The device has been locked because of failed authentication, please unlock the device to keep using the Signer";
+"Error.LockedDevice.Label.Subtitle" = "The device has been locked because of failed authentication, please unlock the device to keep using the Polkadot Vault";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
 
-"OnboardingOverview.Label.Header" = "Welcome to Signer";
+"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
 "OnboardingOverview.Action.Skip" = "Skip";
 "OnboardingOverview.Action.Continue" = "Continue";
-"OnboardingOverview.Label.Header" = "Welcome to Signer";
+"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
 "OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
 "OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
 "OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";

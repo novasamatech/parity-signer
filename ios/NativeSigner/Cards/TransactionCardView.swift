@@ -1,6 +1,6 @@
 //
 //  TransactionCardView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 10.8.2021.
 //

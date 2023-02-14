@@ -1,6 +1,6 @@
 //
 //  CameraService.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 20.7.2021.
 //

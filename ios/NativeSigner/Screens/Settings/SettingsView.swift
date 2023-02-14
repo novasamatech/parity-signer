@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 12/12/2022.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -83,7 +83,7 @@ extension SettingsView {
         @Published var isPresentingBackup = false
 
         private weak var navigation: NavigationCoordinator!
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
 
         init() {}
 
@@ -91,7 +91,7 @@ extension SettingsView {
             self.navigation = navigation
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
         }
 
@@ -152,7 +152,7 @@ struct SettingsViewRenderable: Equatable {
         static var previews: some View {
             SettingsView(viewModel: .init())
                 .environmentObject(NavigationCoordinator())
-                .environmentObject(SignerDataModel())
+                .environmentObject(SharedDataModel())
         }
     }
 #endif

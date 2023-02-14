@@ -1,6 +1,6 @@
 //
 //  KeyDetailsView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 29/08/2022.
 //
@@ -11,7 +11,7 @@ struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var appState: AppState
 
     let forgetKeyActionHandler: ForgetKeySetAction
@@ -364,7 +364,7 @@ private struct KeySummaryView: View {
 //            .previewLayout(.sizeThatFits)
 //            .environmentObject(NavigationCoordinator())
 //            .environmentObject(ConnectivityMediator())
-//            .environmentObject(SignerDataModel())
+//            .environmentObject(SharedDataModel())
 //            .environmentObject(AppState())
 //        }
 //    }

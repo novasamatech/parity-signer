@@ -1,6 +1,6 @@
 //
 //  SelectSeedForBackup.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 23.12.2021.
 //

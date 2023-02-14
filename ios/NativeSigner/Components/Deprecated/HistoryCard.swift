@@ -1,6 +1,6 @@
 //
 //  HistoryCard.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 13.8.2021.
 //

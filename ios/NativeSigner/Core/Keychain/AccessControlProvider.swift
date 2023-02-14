@@ -1,6 +1,6 @@
 //
 //  AccessControlProvider.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 25/08/2022.
 //
