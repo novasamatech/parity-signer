@@ -1,12 +1,10 @@
-![Polkadot Vault](./tutorials/images/logo-parity-signer.jpg)
+![Polkadot Vault](./tutorials/images/logo-parity-signer.svg)
 
-[<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
-[<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
-[<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
+<div align="center">
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="./res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="./res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="./res/app-store-badge.png" width="150"></a><br><br>
+</div>
 
 # Polkadot Vault - Turn your smartphone into a hardware wallet
-
-![Polkadot Vault](./tutorials/images/logo-parity-signer.jpg)
 
 Polkadot Vault is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
