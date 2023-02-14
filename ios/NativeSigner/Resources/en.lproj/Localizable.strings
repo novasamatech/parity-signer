@@ -676,6 +676,20 @@
 "OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
 "OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
 
+"Onboarding.Screenshots.Label.Title" = "Please confirm you understand the screenshots' risks";
+"Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
+"Onboarding.Screenshots.Label.Confirmation" = "I confirm I'm aware of taking screenshots danger";
+"Onboarding.Screenshots.Action.Next" = "Next";
+
+"Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
+"Onboarding.Airgap.Label.Content" = "Please Follow this steps to enable Air Gap mode and keep it enabled all the time";
+"Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
+"Onboarding.Airgap.Label.Bluetooth" = "Turn off Bluetooth";
+"Onboarding.Airgap.Label.Wifi" = "Turn off Wifi Connection";
+"Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
+"Onboarding.Airgap.Label.Cables.Confirmation" = "Cables are disconnected";
+"Onboarding.Airgap.Action.Next" = "Next";
+
 "NewSeed.Name.Label.Title" = "Key Set Name";
 "NewSeed.Name.Label.Header" = "Enter a name that will help you identify this key set";
 "NewSeed.Name.Label.Placeholder" = "Enter Key Set name";
