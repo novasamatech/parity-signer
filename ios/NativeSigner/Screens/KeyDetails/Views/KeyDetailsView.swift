@@ -106,8 +106,11 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(isPresented: $viewModel.isShowingBackupModal) {
-            if let viewModel = viewModel.backupViewModel() {
+        .fullScreenCover(
+            isPresented: $viewModel.isShowingBackupModal,
+            onDismiss: viewModel.clearBackupModalState
+        ) {
+            if let viewModel = viewModel.backupModal {
                 BackupModal(
                     isShowingBackupModal: $viewModel.isShowingBackupModal,
                     viewModel: viewModel

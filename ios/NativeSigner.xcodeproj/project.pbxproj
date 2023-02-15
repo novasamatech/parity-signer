@@ -91,7 +91,7 @@
 		6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */; };
 		6D3423352994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */; };
 		6D34233A299615FD00F3BA27 /* MVerifier+Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D342339299615FD00F3BA27 /* MVerifier+Type.swift */; };
-		6D3A538729968D920004DDDD /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D3A538629968D920004DDDD /* Launch Screen.storyboard */; };
+		6D3A538729968D920004DDDD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D3A538629968D920004DDDD /* LaunchScreen.storyboard */; };
 		6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3DF92729920AA800B8A430 /* UnknownNetworkColorsGenerator.swift */; };
 		6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */; };
 		6D45065B296E865F0065B4D4 /* ChooseNetworkForKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D45065A296E865F0065B4D4 /* ChooseNetworkForKeyView.swift */; };
@@ -402,7 +402,7 @@
 		6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyActionsModal.swift; sourceTree = "<group>"; };
 		6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorBottomModalViewModel+TransactionErrors.swift"; sourceTree = "<group>"; };
 		6D342339299615FD00F3BA27 /* MVerifier+Type.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVerifier+Type.swift"; sourceTree = "<group>"; };
-		6D3A538629968D920004DDDD /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		6D3A538629968D920004DDDD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6D3DF92729920AA800B8A430 /* UnknownNetworkColorsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownNetworkColorsGenerator.swift; sourceTree = "<group>"; };
 		6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateKeyQRCodeService.swift; sourceTree = "<group>"; };
 		6D45065A296E865F0065B4D4 /* ChooseNetworkForKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseNetworkForKeyView.swift; sourceTree = "<group>"; };
@@ -1060,7 +1060,7 @@
 				6D57DC5C289E524800005C63 /* Templates */,
 				6D57DC5E289E524800005C63 /* Fonts */,
 				6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */,
-				6D3A538629968D920004DDDD /* Launch Screen.storyboard */,
+				6D3A538629968D920004DDDD /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1806,7 +1806,7 @@
 				6D57DC66289E524800005C63 /* Localizable.strings in Resources */,
 				6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */,
 				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
-				6D3A538729968D920004DDDD /* Launch Screen.storyboard in Resources */,
+				6D3A538729968D920004DDDD /* LaunchScreen.storyboard in Resources */,
 				6D57DC69289E524800005C63 /* swiftui-strings-template.stencil in Resources */,
 				6DBBC1F4298CB0D700368638 /* ChainIcons.xcassets in Resources */,
 				6D57DC6B289E524800005C63 /* Inter-Regular.otf in Resources */,
