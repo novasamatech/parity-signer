@@ -1,6 +1,6 @@
 //
 //  Snackbar.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 08/09/2022.
 //

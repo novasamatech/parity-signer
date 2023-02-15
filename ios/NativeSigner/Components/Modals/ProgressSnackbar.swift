@@ -1,6 +1,6 @@
 //
 //  ProgressSnackbar.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 09/11/2022.
 //

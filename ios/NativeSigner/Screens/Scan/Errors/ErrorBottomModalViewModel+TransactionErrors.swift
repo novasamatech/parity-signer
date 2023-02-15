@@ -1,6 +1,6 @@
 //
 //  ErrorBottomModalViewModel+TransactionErrors.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 09/02/2023.
 //

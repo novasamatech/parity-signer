@@ -1,6 +1,6 @@
 //
 //  EnvironmentValues+SafeAreaInsets.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 13/10/2022.
 //

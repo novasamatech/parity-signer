@@ -1,6 +1,6 @@
 //
 //  LogEntryView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 07/12/2022.
 //

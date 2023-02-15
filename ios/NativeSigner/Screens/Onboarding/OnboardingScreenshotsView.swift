@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingScreenshotsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject var data: SharedDataModel
 
     var body: some View {
         ScrollView {
@@ -80,13 +80,13 @@ extension OnboardingScreenshotsView {
         @Published var isActionDisabled: Bool = true
 
         private let onNextTap: () -> Void
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
 
         init(onNextTap: @escaping () -> Void) {
             self.onNextTap = onNextTap
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
         }
 
@@ -108,7 +108,7 @@ extension OnboardingScreenshotsView {
             OnboardingScreenshotsView(
                 viewModel: .init(onNextTap: {})
             )
-            .environmentObject(SignerDataModel())
+            .environmentObject(SharedDataModel())
         }
     }
 #endif

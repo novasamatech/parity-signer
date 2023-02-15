@@ -1,6 +1,6 @@
 //
-//  NativeSigner-Bridging-Header.h
-//  NativeSigner
+// NativeSigner-Bridging-Header.h
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 22.7.2021.
 //

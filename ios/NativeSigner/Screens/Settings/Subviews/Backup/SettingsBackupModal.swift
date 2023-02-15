@@ -1,6 +1,6 @@
 //
 //  SettingsBackupModal.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 01/02/2023.
 //

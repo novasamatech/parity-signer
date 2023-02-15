@@ -1,6 +1,6 @@
 //
 //  BackupSelectKeyView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 02/02/2023.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {
