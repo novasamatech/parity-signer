@@ -26,12 +26,12 @@ fun ScreenSelector(
     screenData: ScreenData,
     networkState: State<NetworkState?>,
     navigate: (Action, String, String) -> Unit,
-    signerMainViewModel: SignerMainViewModel
+    sharedViewModel: SharedViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
 	val seedNames =
-		signerMainViewModel.seedStorage.lastKnownSeedNames.collectAsState()
+		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> {} // migrated
@@ -58,13 +58,13 @@ fun ScreenSelector(
 		is ScreenData.NewSeed -> {} // new selector
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
-			signerMainViewModel::navigate,
+			sharedViewModel::navigate,
 			seedNames.value
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
-			button = signerMainViewModel::navigate,
-			addSeed = signerMainViewModel::addSeed
+			button = sharedViewModel::navigate,
+			addSeed = sharedViewModel::addSeed
 		)
 		ScreenData.Scan -> {} //in new selector
 		is ScreenData.Transaction -> {} //in new selector
@@ -76,11 +76,11 @@ fun ScreenSelector(
 		is ScreenData.Settings -> {} //new selector
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
-			signerMainViewModel::signSufficientCrypto
+			sharedViewModel::signSufficientCrypto
 		)
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
-			signerMainViewModel::wipeToJailbreak
+			sharedViewModel::wipeToJailbreak
 		)
 	}
 }
@@ -91,7 +91,7 @@ fun ModalSelector(
     localNavAction: LocalNavAction?,
     networkState: State<NetworkState?>,
     navigate: (Action, String, String) -> Unit,
-    signerMainViewModel: SignerMainViewModel
+    sharedViewModel: SharedViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
@@ -121,10 +121,10 @@ fun ModalSelector(
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
-				signerMainViewModel = signerMainViewModel
+				sharedViewModel = sharedViewModel
 			)
 			is ModalData.ManageMetadata -> {
-				ManageMetadata(modalData.f, signerMainViewModel = signerMainViewModel)
+				ManageMetadata(modalData.f, sharedViewModel = sharedViewModel)
 			}
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
@@ -132,13 +132,13 @@ fun ModalSelector(
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
 			is ModalData.TypesInfo -> TypesInfo(
 				modalData.f,
-				signerMainViewModel = signerMainViewModel
+				sharedViewModel = sharedViewModel
 			)
 			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				submitErrorState("This is part of refactored screen and not shown separately")
-				SelectSeed(modalData.f, signerMainViewModel = signerMainViewModel)
+				SelectSeed(modalData.f, sharedViewModel = sharedViewModel)
 			}
 			null -> {}
 		}
