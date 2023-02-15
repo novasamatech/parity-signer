@@ -16,6 +16,7 @@ struct ErrorBottomModalViewModel {
     let icon: Image?
     let title: String
     let content: String
+    let attributedContent: AttributedString?
     let details: String?
     let steps: [Step]
     let primaryAction: ActionModel?
@@ -25,7 +26,8 @@ struct ErrorBottomModalViewModel {
     init(
         icon: Image? = nil,
         title: String,
-        content: String,
+        content: String = "",
+        attributedContent: AttributedString? = nil,
         details: String? = nil,
         steps: [Step] = [],
         primaryAction: ActionModel? = nil,
@@ -35,6 +37,7 @@ struct ErrorBottomModalViewModel {
         self.icon = icon
         self.title = title
         self.content = content
+        self.attributedContent = attributedContent
         self.details = details
         self.steps = steps
         self.primaryAction = primaryAction
@@ -172,6 +175,16 @@ struct ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             title: Localizable.KeyDetails.Error.NoNetworks.title.string,
             content: Localizable.KeyDetails.Error.NoNetworks.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
+
+    static func bananaSplitExplanation(
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.NewSeed.Backup.BananaSplit.Label.title.string,
+            attributedContent: Localizable.bananaSplitExplanation(),
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }
