@@ -5,7 +5,6 @@ import android.content.*
 import android.security.keystore.UserNotAuthenticatedException
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedStorage
@@ -16,7 +15,7 @@ import org.json.JSONObject
 
 
 @SuppressLint("StaticFieldLeak")
-class SignerMainViewModel() : ViewModel() {
+class SharedViewModel() : ViewModel() {
 	val context: Context = ServiceLocator.appContext.applicationContext
 	val activity: FragmentActivity = ServiceLocator.activityScope!!.activity
 
