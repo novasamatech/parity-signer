@@ -1,6 +1,6 @@
 //
 //  CloseModalButton.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 05/09/2022.
 //

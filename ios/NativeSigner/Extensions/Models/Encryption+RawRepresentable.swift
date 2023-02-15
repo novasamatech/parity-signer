@@ -1,6 +1,6 @@
 //
 //  Encryption+RawRepresentable.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 05/10/2022.
 //

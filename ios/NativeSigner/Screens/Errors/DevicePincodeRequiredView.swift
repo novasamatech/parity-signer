@@ -1,6 +1,6 @@
 //
 //  DevicePincodeRequiredView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 27/01/2023.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DevicePincodeRequired: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {

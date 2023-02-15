@@ -1,6 +1,6 @@
 //
 //  CornerRadiusModifier.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 27/12/2022.
 //

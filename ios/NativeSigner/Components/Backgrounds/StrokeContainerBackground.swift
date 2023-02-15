@@ -1,6 +1,6 @@
 //
 //  StrokeContainerBackground.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 22/11/2022.
 //

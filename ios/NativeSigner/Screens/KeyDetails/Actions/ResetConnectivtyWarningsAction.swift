@@ -1,6 +1,6 @@
 //
 //  ResetConnectivtyWarningsAction.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 29/09/2022.
 //

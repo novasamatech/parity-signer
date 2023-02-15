@@ -1,6 +1,6 @@
 //
 //  JailbreakDetectionPublisher.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 20/01/2023.
 //

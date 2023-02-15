@@ -1,6 +1,6 @@
 //
 //  SecuredTextField.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 24/11/2022.
 //
