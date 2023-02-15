@@ -1,6 +1,6 @@
 //
 //  QRCodeRootFooterView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 13/09/2022.
 //

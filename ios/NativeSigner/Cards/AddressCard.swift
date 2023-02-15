@@ -1,6 +1,6 @@
 //
 //  IdentityCard.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 3.8.2021.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 /// Card for showing any address.
 /// Accepts Address object
 struct AddressCard: View {
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     var card: MAddressCard
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28

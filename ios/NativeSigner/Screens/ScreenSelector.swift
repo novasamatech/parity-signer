@@ -1,6 +1,6 @@
 //
 //  ScreenSelector.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 26.11.2021.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ScreenSelector: View {
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
     @EnvironmentObject private var stateMachine: OnboardingStateMachine
 
@@ -69,7 +69,10 @@ struct ScreenSelector: View {
                 content: value
             )
         case .documents:
-            OnboardingAgreementsView(viewModel: .init(stateMachine: stateMachine))
+            OnboardingAgreementsView(
+                viewModel: .init(onNextTap: { data.onboard() })
+            )
+
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()

@@ -1,6 +1,6 @@
 //
 //  PaginatedScrollView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 30/01/2023.
 //
