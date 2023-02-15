@@ -1,6 +1,6 @@
 //
 //  KeySetListViewModelBuilder.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 22/08/2022.
 //

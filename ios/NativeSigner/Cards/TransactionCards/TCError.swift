@@ -1,6 +1,6 @@
 //
 //  TCError.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 17.8.2021.
 //

@@ -1,6 +1,6 @@
 //
 //  SignSufficientCrypto.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 21.12.2021.
 //

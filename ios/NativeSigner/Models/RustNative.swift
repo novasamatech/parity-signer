@@ -1,6 +1,6 @@
 //
 //  RustNative.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 22.7.2021.
 //
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-final class SignerDataModel: ObservableObject {
+final class SharedDataModel: ObservableObject {
     private let seedsMediator: SeedsMediating
 
     @ObservedObject private(set) var navigation: NavigationCoordinator
@@ -67,7 +67,7 @@ final class SignerDataModel: ObservableObject {
     }
 }
 
-private extension SignerDataModel {
+private extension SharedDataModel {
     func setUpConnectivityMonitoring() {
         alert = connectivityMediator.isConnectivityOn
     }
@@ -88,8 +88,8 @@ private extension SignerDataModel {
     }
 }
 
-extension SignerDataModel {
-    /// Restores the Signer to factory new state
+extension SharedDataModel {
+    /// Restores the `Polkadot Vault` to factory new state
     /// Should be called before app uninstall/upgrade!
     func wipe() {
         seedsMediator.refreshSeeds()
@@ -103,7 +103,7 @@ extension SignerDataModel {
     }
 }
 
-extension SignerDataModel {
+extension SharedDataModel {
     /// Remove general verifier; wipes everything, obviously
     func removeGeneralVerifier() {
         wipe()
@@ -111,7 +111,7 @@ extension SignerDataModel {
     }
 }
 
-extension SignerDataModel {
+extension SharedDataModel {
     func sign(seedName: String, comment: String) {
         navigation.perform(
             navigation:
@@ -125,7 +125,7 @@ extension SignerDataModel {
 }
 
 /// Address-related operations in data model
-extension SignerDataModel {
+extension SharedDataModel {
     /// Creates address in database with checks and features
     func createAddress(path: String, seedName: String) {
         let seedPhrase = seedsMediator.getSeed(seedName: seedName)
@@ -135,7 +135,7 @@ extension SignerDataModel {
     }
 }
 
-extension SignerDataModel {
+extension SharedDataModel {
     /// Check if alert was triggered
     func checkAlert() {
         guard onboardingDone else { return }

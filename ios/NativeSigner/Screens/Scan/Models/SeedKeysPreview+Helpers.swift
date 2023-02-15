@@ -1,6 +1,6 @@
 //
 //  SeedKeysPreview+Helpers.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 05/01/2023.
 //

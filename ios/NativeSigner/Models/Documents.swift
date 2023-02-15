@@ -1,6 +1,6 @@
 //
 //  Documents.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 11.8.2021.
 //
