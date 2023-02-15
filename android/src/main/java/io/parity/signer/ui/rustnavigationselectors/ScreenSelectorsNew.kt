@@ -41,14 +41,14 @@ import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
 fun CombinedScreensSelector(
-    screenData: ScreenData,
-    localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    signerMainViewModel: SignerMainViewModel
+	screenData: ScreenData,
+	localNavAction: LocalNavAction?,
+	networkState: State<NetworkState?>,
+	sharedViewModel: SharedViewModel
 ) {
-	val rootNavigator = signerMainViewModel.navigator
+	val rootNavigator = sharedViewModel.navigator
 	val seedNames =
-		signerMainViewModel.seedStorage.lastKnownSeedNames.collectAsState()
+		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
@@ -64,7 +64,7 @@ fun CombinedScreensSelector(
 				model = keys.toKeySetDetailsModel(),
 				rootNavigator = rootNavigator,
 				networkState = networkState,
-				singleton = signerMainViewModel,
+				singleton = sharedViewModel,
 			)
 		}
 		is ScreenData.KeyDetails ->
@@ -91,9 +91,9 @@ fun CombinedScreensSelector(
 			Box(modifier = Modifier.statusBarsPadding()) {
 				SettingsScreen(
 					rootNavigator = rootNavigator,
-					isStrongBoxProtected = signerMainViewModel.seedStorage.isStrongBoxProtected,
-					appVersion = signerMainViewModel.getAppVersion(),
-					wipeToFactory = signerMainViewModel::wipeToFactory,
+					isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
+					appVersion = sharedViewModel.getAppVersion(),
+					wipeToFactory = sharedViewModel::wipeToFactory,
 					networkState = networkState
 				)
 			}
@@ -136,11 +136,11 @@ fun CombinedScreensSelector(
 
 @Composable
 fun BottomSheetSelector(
-    modalData: ModalData?,
-    localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    signerMainViewModel: SignerMainViewModel,
-    navigator: Navigator,
+	modalData: ModalData?,
+	localNavAction: LocalNavAction?,
+	networkState: State<NetworkState?>,
+	sharedViewModel: SharedViewModel,
+	navigator: Navigator,
 ) {
 	SignerNewTheme {
 
@@ -165,7 +165,7 @@ fun BottomSheetSelector(
 					}) {
 						KeyDetailsMenuAction(
 							navigator = navigator,
-							keyDetails = signerMainViewModel.lastOpenedKeyDetails
+							keyDetails = sharedViewModel.lastOpenedKeyDetails
 						)
 					}
 				is ModalData.NewSeedMenu ->
@@ -175,14 +175,14 @@ fun BottomSheetSelector(
 					}) {
 						NewSeedMenu(
 							networkState = networkState,
-							navigator = signerMainViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.NewSeedBackup -> {
 					NewKeySetBackupScreenFull(
 						model = modalData.f.toNewSeedBackupModel(),
 						onBack = { navigator.backAction() },
-						onCreateKeySet = signerMainViewModel::addSeed
+						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
 				is ModalData.LogRight ->
@@ -190,7 +190,7 @@ fun BottomSheetSelector(
 						navigator.backAction()
 					}) {
 						LogsMenu(
-							navigator = signerMainViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.EnterPassword ->
@@ -210,7 +210,7 @@ fun BottomSheetSelector(
 					}
 				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(signerMainViewModel = signerMainViewModel)
+				is ModalData.LogComment -> LogComment(sharedViewModel = sharedViewModel)
 				else -> {}
 			}
 		}

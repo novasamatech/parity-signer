@@ -19,7 +19,7 @@ fun KeySetDetailsNavSubgraph(
     model: KeySetDetailsModel,
     rootNavigator: Navigator,
     networkState: State<NetworkState?>, //for shield icon
-    singleton: SignerMainViewModel,
+    singleton: SharedViewModel,
 ) {
 	val navController = rememberNavController()
 	NavHost(

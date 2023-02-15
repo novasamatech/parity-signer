@@ -11,14 +11,14 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.domain.SignerMainViewModel
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun NetworkDetailsMenu(signerMainViewModel: SignerMainViewModel) {
+fun NetworkDetailsMenu(sharedViewModel: SharedViewModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -35,7 +35,7 @@ fun NetworkDetailsMenu(signerMainViewModel: SignerMainViewModel) {
 					text = "Sign network specs",
 					isShaded = true,
 					isCrypto = true,
-					action = { signerMainViewModel.navigate(Action.SIGN_NETWORK_SPECS) })
+					action = { sharedViewModel.navigate(Action.SIGN_NETWORK_SPECS) })
 				BigButton(
 					text = "Delete network",
 					isShaded = true,
@@ -52,7 +52,7 @@ fun NetworkDetailsMenu(signerMainViewModel: SignerMainViewModel) {
 		header = "Remove network?",
 		text = "This network will be removed for whole device",
 		back = { confirm = false },
-		forward = { signerMainViewModel.navigate(Action.REMOVE_NETWORK) },
+		forward = { sharedViewModel.navigate(Action.REMOVE_NETWORK) },
 		backText = "Cancel",
 		forwardText = "Remove network"
 	)

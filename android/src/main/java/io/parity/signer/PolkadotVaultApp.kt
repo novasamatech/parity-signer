@@ -8,7 +8,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.initLogging
 import java.lang.Thread.UncaughtExceptionHandler
 
-class SignerApp : Application() {
+class PolkadotVaultApp : Application() {
 	override fun onCreate() {
 		super.onCreate()
 		// actually load RustNative code
@@ -18,7 +18,7 @@ class SignerApp : Application() {
 
 		val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
 		Thread.setDefaultUncaughtExceptionHandler(
-			SignerExceptionHandler(defaultHandler)
+			RootExceptionHandler(defaultHandler)
 		)
 
 		ServiceLocator.initAppDependencies(this)
@@ -26,7 +26,7 @@ class SignerApp : Application() {
 }
 
 
-class SignerExceptionHandler(
+class RootExceptionHandler(
 	private val defaultHandler: UncaughtExceptionHandler?
 ) : UncaughtExceptionHandler {
 	private val TAG = "SignerExceptionHandler"

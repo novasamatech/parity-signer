@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OnboardingAgreementsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -81,7 +80,6 @@ struct OnboardingAgreementsView: View {
             .padding(.bottom, Spacing.large)
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear { viewModel.use(data: data) }
         .fullScreenCover(isPresented: $viewModel.isPresentingTermsOfService) {
             TermsOfServiceView(viewModel: .init(isPresented: $viewModel.isPresentingTermsOfService))
         }
@@ -97,16 +95,10 @@ extension OnboardingAgreementsView {
         @Published var isPresentingTermsOfService = false
         @Published var isPresentingPrivacyPolicy = false
         @Published var isActionDisabled: Bool = true
+        private let onNextTap: () -> Void
 
-        private weak var stateMachine: OnboardingStateMachine!
-        private weak var data: SharedDataModel!
-
-        init(stateMachine: OnboardingStateMachine) {
-            self.stateMachine = stateMachine
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
+        init(onNextTap: @escaping () -> Void) {
+            self.onNextTap = onNextTap
         }
 
         func onTermsOfServiceTap() {
@@ -118,8 +110,7 @@ extension OnboardingAgreementsView {
         }
 
         func onDoneTap() {
-            stateMachine.onAgreementNextTap()
-            data.onboard()
+            onNextTap()
         }
 
         func toggleCheckbox() {
@@ -133,7 +124,7 @@ extension OnboardingAgreementsView {
     struct OnboardingAgreementsView_Previews: PreviewProvider {
         static var previews: some View {
             OnboardingAgreementsView(
-                viewModel: .init(stateMachine: OnboardingStateMachine())
+                viewModel: .init(onNextTap: {})
             )
         }
     }

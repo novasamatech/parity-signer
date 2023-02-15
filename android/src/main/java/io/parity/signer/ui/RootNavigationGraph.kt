@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
-fun SignerMainNavigationGraph(
+fun RootNavigationGraph(
 	navController: NavHostController,
 	startDestination: String = MainGraphRoutes.splashRoute,
 ) {
