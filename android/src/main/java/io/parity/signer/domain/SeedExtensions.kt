@@ -4,7 +4,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.getSeed
 
 
-suspend fun SignerMainViewModel.getSeedPhraseForBackup(seedName: String,
+suspend fun SharedViewModel.getSeedPhraseForBackup(seedName: String,
 ): String? {
 	return when (ServiceLocator.authentication.authenticate(activity)) {
 		AuthResult.AuthSuccess -> {

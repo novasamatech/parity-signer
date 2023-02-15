@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.*
-import io.parity.signer.domain.SignerMainViewModel
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
-fun TypesInfo(typesInfo: MTypesInfo, signerMainViewModel: SignerMainViewModel) {
+fun TypesInfo(typesInfo: MTypesInfo, sharedViewModel: SharedViewModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -43,7 +43,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerMainViewModel: SignerMainViewModel) {
 					text = "Sign types",
 					isShaded = true,
 					isCrypto = true,
-					action = { signerMainViewModel.navigate(Action.SIGN_TYPES) })
+					action = { sharedViewModel.navigate(Action.SIGN_TYPES) })
 				BigButton(
 					text = "Delete types",
 					isShaded = true,
@@ -60,7 +60,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerMainViewModel: SignerMainViewModel) {
 		header = "Remove types?",
 		text = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?",
 		back = { confirm = false },
-		forward = { signerMainViewModel.navigate(Action.REMOVE_TYPES) },
+		forward = { sharedViewModel.navigate(Action.REMOVE_TYPES) },
 		backText = "Cancel",
 		forwardText = "Remove types"
 	)
