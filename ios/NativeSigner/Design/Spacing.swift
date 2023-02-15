@@ -37,7 +37,7 @@ enum Spacing {
     static let largeComponentSpacer: CGFloat = 90
     /// Spacing for top area offset: 20 pts
     static let topSafeAreaSpacing: CGFloat = 20
-
+    static let screenshotIconCompensation: CGFloat = 20
     /// Spacing for dedicated spacer: 40 / 60 pts
     static var flexibleComponentSpacer: CGFloat {
         switch UIScreen.main.bounds.width {

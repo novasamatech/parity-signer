@@ -69,7 +69,10 @@ struct ScreenSelector: View {
                 content: value
             )
         case .documents:
-            OnboardingAgreementsView(viewModel: .init(stateMachine: stateMachine))
+            OnboardingAgreementsView(
+                viewModel: .init(onNextTap: { data.onboard() })
+            )
+
         // Screens handled outside of Rust navigation
         case .scan:
             EmptyView()
