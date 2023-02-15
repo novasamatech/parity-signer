@@ -1,6 +1,6 @@
 //
 //  GenericError.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 5/10/2022.
 //

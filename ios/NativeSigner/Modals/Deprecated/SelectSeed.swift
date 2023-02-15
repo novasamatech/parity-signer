@@ -1,6 +1,6 @@
 //
 //  SelectSeed.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 6.1.2022.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SelectSeed: View {
     let content: MSeeds
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject var data: SharedDataModel
 
     var body: some View {
         ZStack {

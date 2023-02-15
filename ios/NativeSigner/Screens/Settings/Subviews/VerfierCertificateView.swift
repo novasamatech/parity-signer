@@ -1,6 +1,6 @@
 //
 //  VerfierCertificateView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 12/12/2022.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct VerfierCertificateView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -84,13 +84,13 @@ extension VerfierCertificateView {
 
         let content: MVerifierDetails
 
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
 
         init(content: MVerifierDetails) {
             self.content = content
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
         }
 

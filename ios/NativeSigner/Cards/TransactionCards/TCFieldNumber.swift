@@ -1,6 +1,6 @@
 //
 //  TCFieldNumber.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 14.9.2021.
 //

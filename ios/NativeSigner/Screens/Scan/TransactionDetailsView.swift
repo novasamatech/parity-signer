@@ -1,6 +1,6 @@
 //
 //  TransactionDetailsView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 20/11/2022.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct TransactionDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {

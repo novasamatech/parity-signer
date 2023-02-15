@@ -1,6 +1,6 @@
 //
 //  ErrorBottomModal.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 29/09/2022.
 //
@@ -44,10 +44,17 @@ struct ErrorBottomModal: View {
                     }
                     Text(viewModel.title)
                         .font(PrimaryFont.titleM.font)
-                    Text(viewModel.content)
-                        .font(PrimaryFont.bodyM.font)
-                        .lineSpacing(Spacing.extraExtraSmall)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    if let attributedContent = viewModel.attributedContent {
+                        Text(attributedContent)
+                            .font(PrimaryFont.bodyM.font)
+                            .lineSpacing(Spacing.extraExtraSmall)
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    } else {
+                        Text(viewModel.content)
+                            .font(PrimaryFont.bodyM.font)
+                            .lineSpacing(Spacing.extraExtraSmall)
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    }
                     if let detailsMessage = viewModel.details {
                         Text(detailsMessage)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)

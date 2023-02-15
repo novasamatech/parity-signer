@@ -786,7 +786,7 @@ fn do_create_address(
 
                             Err(Error::DerivationExists {
                                 multisigner,
-                                address_details,
+                                address_details: Box::new(address_details),
                                 network_specs_key,
                             })
                         } else {
@@ -1254,7 +1254,7 @@ pub fn try_create_address(
         DerivationCheck::NoPassword(Some((multisigner, address_details))) => {
             Err(Error::DerivationExists {
                 multisigner,
-                address_details,
+                address_details: Box::new(address_details),
                 network_specs_key: network_specs_key.to_owned(),
             })
         }

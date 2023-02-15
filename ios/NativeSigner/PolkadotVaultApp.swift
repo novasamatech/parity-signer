@@ -1,6 +1,6 @@
 //
-//  NativeSignerApp.swift
-//  NativeSigner
+// PolkadotVaultApp.swift
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 19.7.2021.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct NativeSignerApp: App {
+struct PolkadotVaultApp: App {
     @StateObject var connectivityMediator = ConnectivityMediator()
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
@@ -22,7 +22,7 @@ struct NativeSignerApp: App {
                 JailbreakDetectedView()
             } else {
                 MainScreenContainer(
-                    data: SignerDataModel(
+                    data: SharedDataModel(
                         navigation: navigation,
                         connectivityMediator: connectivityMediator
                     ),

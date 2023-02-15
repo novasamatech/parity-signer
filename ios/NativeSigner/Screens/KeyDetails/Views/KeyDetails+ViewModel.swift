@@ -1,6 +1,6 @@
 //
 //  KeyDetails+ViewModel.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 27/10/2022.
 //
@@ -45,6 +45,7 @@ extension KeyDetailsView {
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
         @Published var viewState: ViewState = .list
+        @Published var backupModal: BackupModalViewModel?
 
         /// Name of seed to be removed with `Remove Seed` action
         var removeSeed: String = ""
@@ -178,7 +179,8 @@ extension KeyDetailsView.ViewModel {
                     self.isPresentingConnectivityAlert.toggle()
                 }
             } else {
-                isShowingBackupModal.toggle()
+                updateBackupModel()
+                isShowingBackupModal = true
             }
         }
         if shouldPresentSelectionOverlay {
@@ -187,8 +189,8 @@ extension KeyDetailsView.ViewModel {
         }
     }
 
-    func backupViewModel() -> BackupModalViewModel? {
-        exportPrivateKeyService.backupViewModel(keysData)
+    func clearBackupModalState() {
+        backupModal = nil
     }
 
     func keyExportModel() -> ExportMultipleKeysModalViewModel? {
@@ -211,6 +213,10 @@ extension KeyDetailsView.ViewModel {
 }
 
 private extension KeyDetailsView.ViewModel {
+    func updateBackupModel() {
+        backupModal = exportPrivateKeyService.backupViewModel(keysData)
+    }
+
     func keyData(for derivedKey: DerivedKeyRowModel) -> MKeyAndNetworkCard? {
         keysData?.set.first(where: { $0.key.address.path == derivedKey.viewModel.path })
     }

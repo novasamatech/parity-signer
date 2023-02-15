@@ -1,6 +1,6 @@
 //
 //  ModalSelector.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 7.12.2021.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ModalSelector: View {
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {

@@ -1,6 +1,6 @@
 //
 //  DerivedKeyOverviewRow.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 19/09/2022.
 //
@@ -13,17 +13,20 @@ struct DerivedKeyOverviewViewModel: Equatable, Identifiable {
     let path: String
     let hasPassword: Bool
     let network: String
+    let networkLogo: String
 
     init(
         identicon: [UInt8],
         path: String,
         hasPassword: Bool,
-        network: String
+        network: String,
+        networkLogo: String
     ) {
         self.identicon = identicon
         self.path = path
         self.hasPassword = hasPassword
         self.network = network
+        self.networkLogo = networkLogo
     }
 }
 
@@ -33,6 +36,7 @@ extension DerivedKeyOverviewViewModel {
         identicon = key.key.address.identicon.svgPayload
         hasPassword = key.key.address.hasPwd
         network = key.network.networkTitle
+        networkLogo = key.network.networkLogo
     }
 }
 
@@ -47,7 +51,7 @@ struct DerivedKeyOverviewRow: View {
         HStack(alignment: .center, spacing: Spacing.small) {
             NetworkIdenticon(
                 identicon: viewModel.identicon,
-                network: viewModel.network,
+                network: viewModel.networkLogo,
                 background: Asset.backgroundPrimary.swiftUIColor,
                 size: Heights.identiconInCell
             )
@@ -87,7 +91,8 @@ struct DerivedKeyOverviewRow: View {
                         identicon: PreviewData.exampleIdenticon,
                         path: "",
                         hasPassword: false,
-                        network: "Kusama"
+                        network: "Kusama",
+                        networkLogo: "kusama"
                     )
                 )
                 DerivedKeyOverviewRow(
@@ -95,7 +100,8 @@ struct DerivedKeyOverviewRow: View {
                         identicon: PreviewData.exampleIdenticon,
                         path: "//polkadot",
                         hasPassword: false,
-                        network: "Polkadot"
+                        network: "Polkadot",
+                        networkLogo: "polkadot"
                     )
                 )
                 DerivedKeyOverviewRow(
@@ -103,7 +109,8 @@ struct DerivedKeyOverviewRow: View {
                         identicon: PreviewData.exampleIdenticon,
                         path: "//astar",
                         hasPassword: false,
-                        network: "Astar"
+                        network: "Astar",
+                        networkLogo: "astar"
                     )
                 )
                 DerivedKeyOverviewRow(
@@ -111,7 +118,8 @@ struct DerivedKeyOverviewRow: View {
                         identicon: PreviewData.exampleIdenticon,
                         path: "//kusama",
                         hasPassword: true,
-                        network: "Kusama"
+                        network: "Kusama",
+                        networkLogo: "kusama"
                     )
                 )
                 DerivedKeyOverviewRow(
@@ -119,7 +127,8 @@ struct DerivedKeyOverviewRow: View {
                         identicon: PreviewData.exampleIdenticon,
                         path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
                         hasPassword: true,
-                        network: "Kusama"
+                        network: "Kusama",
+                        networkLogo: "kusama"
                     )
                 )
             }

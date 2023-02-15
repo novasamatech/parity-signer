@@ -1,6 +1,6 @@
 //
 //  Localizable+Formatted.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 12/01/2023.
 //
@@ -182,6 +182,29 @@ extension Localizable {
             .underlineStyle,
             value: NSUnderlineStyle.single.rawValue,
             range: (mainText as NSString).range(of: underlinedText)
+        )
+        return AttributedString(attributedString)
+    }
+
+    static func bananaSplitExplanation() -> AttributedString {
+        let mainText = Localizable.NewSeed.Backup.BananaSplit.Label.content.string
+        let highlightedPartOne = Localizable.NewSeed.Backup.BananaSplit.Label.Content.Highlight._1.string
+        let highlightedPartTwo = Localizable.NewSeed.Backup.BananaSplit.Label.Content.Highlight._2.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
+        let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: rangePartOne
+        )
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: rangePartTwo
+        )
+        attributedString.addAttribute(
+            .underlineStyle,
+            value: NSUnderlineStyle.single.rawValue,
+            range: rangePartTwo
         )
         return AttributedString(attributedString)
     }

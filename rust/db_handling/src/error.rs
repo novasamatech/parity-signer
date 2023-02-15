@@ -242,7 +242,7 @@ pub enum Error {
     )]
     DerivationExists {
         multisigner: MultiSigner,
-        address_details: AddressDetails,
+        address_details: Box<AddressDetails>,
         network_specs_key: NetworkSpecsKey,
     },
     /// Received `derivations` update payload contains an invalid derivation.

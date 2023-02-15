@@ -1,6 +1,6 @@
 //
 //  SeedsMediator.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 25/08/2022.
 //
@@ -22,9 +22,9 @@ protocol SeedsMediating: AnyObject {
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
     /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
-    /// `SignerDataModel`)
-    /// - Parameter signerDataModel: reference to `SignerDataModel`
-    func set(signerDataModel: SignerDataModel)
+    /// `SharedDataModel`)
+    /// - Parameter signerDataModel: reference to `SharedDataModel`
+    func set(signerDataModel: SharedDataModel)
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
@@ -78,7 +78,7 @@ final class SeedsMediator: SeedsMediating {
 
     private let queryProvider: KeychainQueryProviding
     private let keychainAccessAdapter: KeychainAccessAdapting
-    private weak var signerDataModel: SignerDataModel!
+    private weak var signerDataModel: SharedDataModel!
     private let databaseMediator: DatabaseMediating
 
     @Published var seedNames: [String] = []
@@ -93,7 +93,7 @@ final class SeedsMediator: SeedsMediating {
         self.databaseMediator = databaseMediator
     }
 
-    func set(signerDataModel: SignerDataModel) {
+    func set(signerDataModel: SharedDataModel) {
         self.signerDataModel = signerDataModel
     }
 

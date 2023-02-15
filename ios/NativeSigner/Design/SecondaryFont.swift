@@ -1,13 +1,13 @@
 //
 //  SecondaryFont.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 30/01/2023.
 //
 
 import SwiftUI
 
-/// Secondary font used in `Signer`
+/// Secondary font used in `Polkadot Vault`
 enum SecondaryFont {
     /// Black, 28pt
     case titleXL

@@ -1,6 +1,6 @@
 //
 //  PreviewData+Components.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 13/09/2022.
 //
@@ -88,7 +88,8 @@ extension PreviewData {
         identicon: PreviewData.exampleIdenticon,
         path: "//polkadot",
         hasPassword: false,
-        network: "Polkadot"
+        network: "Polkadot",
+        networkLogo: "polkadot"
     )
 
     static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
@@ -96,31 +97,36 @@ extension PreviewData {
             identicon: PreviewData.exampleIdenticon,
             path: "",
             hasPassword: false,
-            network: "Kusama"
+            network: "Kusama",
+            networkLogo: "kusama"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
             path: "//polkadot",
             hasPassword: false,
-            network: "Polkadot"
+            network: "Polkadot",
+            networkLogo: "polkadot"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
             path: "//astar",
             hasPassword: false,
-            network: "Astar"
+            network: "Astar",
+            networkLogo: "astar"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
             path: "//kusama",
             hasPassword: true,
-            network: "Kusama"
+            network: "Kusama",
+            networkLogo: "kusama"
         ),
         DerivedKeyOverviewViewModel(
             identicon: PreviewData.exampleIdenticon,
             path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
             hasPassword: true,
-            network: "Kusama"
+            network: "Kusama",
+            networkLogo: "kusama"
         )
     ]
 

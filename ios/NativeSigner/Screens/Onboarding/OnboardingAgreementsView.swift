@@ -1,6 +1,6 @@
 //
 //  OnboardingAgreementsView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 24/01/2023.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingAgreementsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var data: SignerDataModel
+    @EnvironmentObject var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -99,13 +99,13 @@ extension OnboardingAgreementsView {
         @Published var isActionDisabled: Bool = true
 
         private weak var stateMachine: OnboardingStateMachine!
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
 
         init(stateMachine: OnboardingStateMachine) {
             self.stateMachine = stateMachine
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
         }
 
