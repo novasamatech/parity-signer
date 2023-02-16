@@ -1,25 +1,25 @@
 //! This crate deals with standard database-related procedures used in
-//! [Signer](https://github.com/paritytech/parity-signer) and Signer-supporting
+//! [Vault](https://github.com/paritytech/parity-signer) and Vault-supporting
 //! ecosystem.  
 //!
 //! This crate:
 //!
-//! - contains helpers to operate the databases, used throughout Signer system
-//! - generates cold (used in air-gapped Signer) and hot (used in
+//! - contains helpers to operate the databases, used throughout Vault system
+//! - generates cold (used in air-gapped Vault) and hot (used in
 //! `generate_message` client) databases with default settings
 //! - deals with taking data out of the database and putting the data in the
 //! database
-//! - contains Signer interface interactions, allowing exports of data to the
+//! - contains Vault interface interactions, allowing exports of data to the
 //! interface
-//! - deals with address generation for Signer
+//! - deals with address generation for Vault
 //!
 //! # Features
 //!
-//! Feature `"signer"` corresponds to everything happening in Signer air-gapped
+//! Feature `"signer"` corresponds to everything happening in Vault air-gapped
 //! device.
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
-//! **without** air-gap, including the generation of the database for Signer
+//! Feature `"active"` corresponds to all Vault-related things happening
+//! **without** air-gap, including the generation of the database for Vault
 //! during the build.
 //!
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
@@ -65,7 +65,7 @@ use hot_default::reset_hot_database;
 /// Generate or restore "cold" database with default values, **for release
 /// build**.
 ///
-/// Resulting database should be copied verbatim into Signer files during the
+/// Resulting database should be copied verbatim into Vault files during the
 /// build.
 ///
 /// The location of the generated database is either optional user-provided
@@ -84,7 +84,7 @@ use hot_default::reset_hot_database;
 /// Note that resulting database history is not initialized and general
 /// verifier is not set.
 ///
-/// This operation is performed **not** on Signer device, and is governed by
+/// This operation is performed **not** on Vault device, and is governed by
 /// the active side.
 #[cfg(feature = "active")]
 pub fn default_cold_release(database: Option<&sled::Db>) -> Result<()> {

@@ -39,17 +39,17 @@ Transactions content is shown before signing; no hash signing is allowed, but si
 
 #### History feature
 
-The Signer now logs all operations it performs. It it important to remember that this is not log of account operations, but log of device history. This history could be cleared if needed, but not modified by other means. Detected presence of network connection is also logged.
+The Vault now logs all operations it performs. It it important to remember that this is not log of account operations, but log of device history. This history could be cleared if needed, but not modified by other means. Detected presence of network connection is also logged.
 
 #### N+1 derivation
 
-Much requested feature that makes Signer automatically increment numbered seeds on creation.
+Much requested feature that makes Vault automatically increment numbered seeds on creation.
 
 #### Network and metadata updates
 
 All network data updates now could be performed through scanning QR codes. Whenever some update is needed, most probably you should just scan some QR video. Don't worry about skipped frames, it's fountain code so you only need enough frames.
 
-All updates could be signed, and signing key will be trusted on first use, so Signer device should be linked to single source of authority on correct metadata.
+All updates could be signed, and signing key will be trusted on first use, so Vault device should be linked to single source of authority on correct metadata.
 
 #### Key re-use in different networks
 

@@ -1,12 +1,12 @@
 //! Displaying and updating history log
 //!
-//! The Signer keeps a history log of all events that change the database and
+//! The Vault keeps a history log of all events that change the database and
 //! affect security. It is stored in [`HISTORY`] tree of the cold database.
 //!
 //! Each history log [`Entry`] contains [`Event`] set and a timestamp. Database
 //! key for [`Entry`] value is [`Order`], SCALE-encoded number of the entry.
 //!
-//! In addition to keeping the log, Signer also displays [`HISTORY`] tree
+//! In addition to keeping the log, Vault also displays [`HISTORY`] tree
 //! checksum for user to possibly keep the track of.
 // TODO: substantial part of this will go obsolete with interface updates;
 // some functions are not called at the moment from the user interface - kept
@@ -82,7 +82,7 @@ pub fn get_history_entry_by_order(database: &sled::Db, order: u32) -> Result<Ent
     found.ok_or_else(|| Error::HistoryEntryNotFound(order.stamp()))
 }
 
-/// Clear Signer history and make a log [`Entry`] that history was cleared.
+/// Clear Vault history and make a log [`Entry`] that history was cleared.
 #[cfg(feature = "signer")]
 pub fn clear_history(database: &sled::Db) -> Result<()> {
     let batch = make_batch_clear_tree(database, HISTORY)?;
@@ -153,13 +153,13 @@ pub fn history_entry_system(database: &sled::Db, event: Event) -> Result<()> {
     enter_events(database, events)
 }
 
-/// Process the fact that the Signer device was online.
+/// Process the fact that the Vault device was online.
 ///
 /// - Add history log entry with `Event::DeviceWasOnline`.
 /// - Update [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) with
 /// `device_was_online = true` flag.
 ///
-/// Unacknowledged non-safe [`DangerRecord`] block the use of Signer in the
+/// Unacknowledged non-safe [`DangerRecord`] block the use of Vault in the
 /// frontend.
 #[cfg(feature = "signer")]
 pub fn device_was_online(database: &sled::Db) -> Result<()> {
@@ -172,14 +172,14 @@ pub fn device_was_online(database: &sled::Db) -> Result<()> {
         .apply(database)
 }
 
-/// Acknowledge that the Signer device was online and reset the
+/// Acknowledge that the Vault device was online and reset the
 /// [`DangerRecord`] back to safe.
 ///
 /// - Add history log entry with `Event::ResetDangerRecord`.
 /// - Reset [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) to
 /// `safe`, i.e. with `device_was_online = false` flag.
 ///
-/// Acknowledged and reset [`DangerRecord`] allow to resume the use of Signer in
+/// Acknowledged and reset [`DangerRecord`] allow to resume the use of Vault in
 /// the frontend. Use it wisely.
 #[cfg(feature = "signer")]
 pub fn reset_danger_status_to_safe(database: &sled::Db) -> Result<()> {
@@ -192,7 +192,7 @@ pub fn reset_danger_status_to_safe(database: &sled::Db) -> Result<()> {
         .apply(database)
 }
 
-/// Record in history log that certain seed was shown on Signer screen,
+/// Record in history log that certain seed was shown on Vault screen,
 /// presumably for backup.
 ///
 /// Seeds are distinguished by the seed name.

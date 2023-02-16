@@ -1,7 +1,7 @@
 //! Making and restoring **hot** database with default content
 //!
 //! Hot database is the database that exists on network-connected device and
-//! that could be used to manage Signer updates.
+//! that could be used to manage Vault updates.
 //!
 //! Hot database contains following trees:
 //!

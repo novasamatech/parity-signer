@@ -1,10 +1,10 @@
-//! Address key associated non-secret information stored in Signer database
+//! Address key associated non-secret information stored in Vault database
 //!
-//! Signer database has a tree `ADDRTREE` with [`AddressKey`] in key form
+//! Vault database has a tree `ADDRTREE` with [`AddressKey`] in key form
 //! as a key and encoded [`AddressDetails`] as a value.
 //! [`AddressDetails`] contains non-secret information associated with address key.  
 //!
-//! `ADDRTREE` is operated mainly from within the Signer.
+//! `ADDRTREE` is operated mainly from within the Vault.
 //!
 //! Release and test versions of the cold database are generated on the Active side.
 
@@ -19,13 +19,13 @@ use crate::{
     keyring::{AddressKey, NetworkSpecsKey},
 };
 
-/// Address key associated non-secret information stored in Signer database  
+/// Address key associated non-secret information stored in Vault database
 ///
 /// Info that should be available for any address key.  
 /// No secrets are stored there.  
 #[derive(Decode, PartialEq, Eq, Encode, Debug, Clone)]
 pub struct AddressDetails {
-    /// seed name (as it is known to the Signer device)  
+    /// seed name (as it is known to the Vault device)
     pub seed_name: String,
 
     /// derivation path, only with soft (`/`) and hard (`//`) junctions (i.e. no password)  

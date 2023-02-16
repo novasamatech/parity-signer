@@ -2,8 +2,8 @@
 //! client
 //!
 //! Active side deals with both preparation of cold database that would be
-//! loaded in Signer on build and with hot database operations. Cold database
-//! could be the *release* cold database (the actual one for Signer build) or
+//! loaded in Vault on build and with hot database operations. Cold database
+//! could be the *release* cold database (the actual one for Vault build) or
 //! the *test* cold database (with test Alice identities, used for tests).
 
 use crate::error::MetadataError;
@@ -23,7 +23,7 @@ pub enum Wasm {
     DecodingMetadata,
 
     /// Metadata extracted from `wasm` file is not suitable to be used in
-    /// Signer.
+    /// Vault.
     ///
     /// Associated data is [`MetadataError`] specifying what exactly is wrong
     /// with the metadata.
@@ -42,7 +42,7 @@ pub enum Wasm {
 #[derive(Debug)]
 pub enum Check {
     /// Metadata extracted from the metadata file is not suitable to be used in
-    /// Signer.
+    /// Vault.
     ///
     /// Associated data is [`MetadataError`] specifying what exactly is wrong
     /// with the metadata.

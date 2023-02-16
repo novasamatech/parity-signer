@@ -277,7 +277,7 @@ pub enum Error {
         what: Changed,
     },
 
-    /// Fetched network specs are not suitable for use in Signer.
+    /// Fetched network specs are not suitable for use in Vault.
     #[error("Problem with network specs from {url}. {error}")]
     FaultySpecs {
         /// URL address used for RPC cal

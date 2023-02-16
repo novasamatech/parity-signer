@@ -30,7 +30,7 @@ pub enum Error {
     /// found that the version found in signable extensions does not match
     /// the version of the metadata used for parsing.
     ///
-    /// Transaction parsing in Signer is done by consecutively checking all
+    /// Transaction parsing in Vault is done by consecutively checking all
     /// available metadata for a given network name, starting with the highest
     /// available version, and looking for a matching network version in the
     /// parsed extensions.
@@ -113,7 +113,7 @@ pub enum ParserMetadataError {
 /// `53xx00` and `53xx02` transactions contain encoded transaction data, and
 /// are parsed prior to signing using the network metadata. Transaction is
 /// generated in client, for certain address and within certain network.
-/// To parse the transaction and to generate the signature, Signer must
+/// To parse the transaction and to generate the signature, Vault must
 /// have the network information (network specs and correct network metadata)
 /// and the public address-associated information in its database.
 ///
@@ -158,11 +158,11 @@ pub enum ParserMetadataError {
 /// metadata. Each call first byte is the index of the pallet.
 ///
 /// Metadata with `RuntimeMetadataV12` or `RuntimeMetadataV13` has only type
-/// names associated with call arguments. Signer finds what the types really
+/// names associated with call arguments. Vault finds what the types really
 /// are and how to decode them by using the types information that must be in
-/// Signer database.
+/// Vault database.
 /// For `RuntimeMetadataV12` or `RuntimeMetadataV13` the second byte in call is
-/// the index of the method within the pallet, and thes Signer finds the types
+/// the index of the method within the pallet, and thes Vault finds the types
 /// used by the method and proceeds to decode the call data piece by piece.
 ///
 /// Metadata with `RuntimeMetadataV14` has types data in-built in the metadata
@@ -185,7 +185,7 @@ pub enum ParserMetadataError {
 /// - SCALE-encoded `String` contents of the message
 /// - genesis hash of the network in which the transaction was generated
 ///
-/// Signer assumes that every byte of the transaction will be processed, and
+/// Vault assumes that every byte of the transaction will be processed, and
 /// shows an error if this is not the case.
 #[derive(Debug, thiserror::Error)]
 pub enum ParserDecodingError {

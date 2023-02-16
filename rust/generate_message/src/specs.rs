@@ -100,7 +100,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // Command line **must** contain encryption override.
             //
             // Command may contain signer title override to set up the network
-            // title that is displayed in Signer.
+            // title that is displayed in Vault.
             //
             // In some cases the command may contain token override as well.
             Content::Address { s: address } => {
@@ -141,7 +141,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // referred to by network address book title. This key combination
             // is intended to be used to:
             // - add to the hot database same network with different encryption
-            // - change token (if possible for given network) or Signer
+            // - change token (if possible for given network) or Vault
             // displayed network title
             //
             // Payload files are not created.
@@ -202,7 +202,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
             // referred to by network address book title. This key combination
             // is intended to be used to:
             // - add to the hot database same network with different encryption
-            // - change token (if possible for given network) or Signer
+            // - change token (if possible for given network) or Vault
             // displayed network title
             //
             // Payload files are created.
@@ -361,7 +361,7 @@ where
 /// Network address book title for new address book entries is constructed as
 /// `<network_name>-<encryption>`. Field `title` in network specs
 /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs), i.e.
-/// the title under which Signer displays the network, is also constructed as
+/// the title under which Vault displays the network, is also constructed as
 /// `<network_name>-<encryption>` for non-default networks, unless overridden by
 /// the user.
 fn specs_pt_n<P>(

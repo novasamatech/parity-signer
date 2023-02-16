@@ -56,10 +56,10 @@ pub enum ErrorDisplayed {
     DbNotInitialized,
     /// Tried to load metadata for unknown network.
     LoadMetaUnknownNetwork {
-        /// Name of the network not known to the Signer.
+        /// Name of the network not known to the Vault.
         name: String,
     },
-    /// Tried to add specs already present in Signer.
+    /// Tried to add specs already present in Vault.
     SpecsKnown {
         name: String,
         encryption: Encryption,
@@ -229,7 +229,7 @@ fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDis
     let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
 
     *DB.write().unwrap() = val;
-    init_logging("Signer".to_string());
+    init_logging("Vault".to_string());
     Ok(navigator::init_navigation(
         DB.clone().read().unwrap().as_ref().unwrap().clone(),
         seed_names,

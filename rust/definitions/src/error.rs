@@ -123,7 +123,7 @@ pub enum Error {
 ///
 /// All variants could be encountered both on the active side
 /// (when checking the message content while signing it)
-/// and on the Signer side (when processing the received messages)
+/// and on the Vault side (when processing the received messages)
 #[derive(Debug)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum TransferContent {
@@ -149,7 +149,7 @@ impl TransferContent {
     }
 }
 
-/// Intrinsic problems of the metadata making it unsuitable for Signer use
+/// Intrinsic problems of the metadata making it unsuitable for Vault use
 #[derive(Debug, PartialEq, thiserror::Error)]
 #[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MetadataError {
