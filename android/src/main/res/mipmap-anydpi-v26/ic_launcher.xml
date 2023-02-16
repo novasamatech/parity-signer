@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_launcher_background"/>
-    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+	<background android:drawable="@color/ic_launcher_background" />
+	<foreground>
+<!--		icon is 72dp while should be 108-->
+		<inset
+			android:drawable="@mipmap/ic_launcher_foreground"
+			android:inset="18%" />
+	</foreground>
 </adaptive-icon>
