@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "airgap_airplane_error.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -1,6 +1,6 @@
 //
 //  CameraPreviewUIView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 06/10/2022.
 //

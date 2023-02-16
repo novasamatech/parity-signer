@@ -1,13 +1,13 @@
 //
 //  Tab.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 17/08/2022.
 //
 
 import Foundation
 
-/// Defines available tabs within main Signer navigation
+/// Defines available tabs within main `Polkadot Vault` navigation
 enum Tab: CaseIterable, Equatable {
     case keys
     case scanner

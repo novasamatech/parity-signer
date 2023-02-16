@@ -1,6 +1,6 @@
 //
 //  SettingsRowView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 12/12/2022.
 //

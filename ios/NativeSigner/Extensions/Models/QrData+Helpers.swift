@@ -1,6 +1,6 @@
 //
 //  QrData+Helpers.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 08/12/2022.
 //

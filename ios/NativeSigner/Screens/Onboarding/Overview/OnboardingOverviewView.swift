@@ -1,6 +1,6 @@
 //
 //  OnboardingOverviewView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 30/01/2023.
 //
@@ -135,19 +135,19 @@ struct FeatureOverviewView: View {
 
 extension OnboardingOverviewView {
     final class ViewModel: ObservableObject {
-        private weak var stateMachine: OnboardingStateMachine!
+        private let onNextTap: () -> Void
         @Published var currentSelectedPage: Int = 0
 
-        init(stateMachine: OnboardingStateMachine) {
-            self.stateMachine = stateMachine
+        init(onNextTap: @escaping () -> Void) {
+            self.onNextTap = onNextTap
         }
 
         func onSkipTap() {
-            stateMachine.onOverviewFinishTap()
+            onNextTap()
         }
 
         func onContinueTap() {
-            stateMachine.onOverviewFinishTap()
+            onNextTap()
         }
     }
 }
@@ -155,7 +155,9 @@ extension OnboardingOverviewView {
 #if DEBUG
     struct OnboardingOverviewView_Previews: PreviewProvider {
         static var previews: some View {
-            OnboardingOverviewView(viewModel: .init(stateMachine: OnboardingStateMachine()))
+            OnboardingOverviewView(
+                viewModel: .init(onNextTap: {})
+            )
         }
     }
 #endif

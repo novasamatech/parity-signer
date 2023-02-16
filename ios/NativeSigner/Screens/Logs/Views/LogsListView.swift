@@ -1,6 +1,6 @@
 //
 //  LogsListView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 02/12/2022.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -135,7 +135,7 @@ extension LogsListView {
                 events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
             )])))
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SignerDataModel())
+            .environmentObject(SharedDataModel())
         }
     }
 #endif

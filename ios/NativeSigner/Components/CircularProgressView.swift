@@ -1,6 +1,6 @@
 //
 //  CircularProgressView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 01/09/2022.
 //

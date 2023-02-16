@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 19.7.2021.
 //
@@ -11,7 +11,7 @@ struct MainScreenContainer: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var passwordProtectionStatePublisher: PasswordProtectionStatePublisher
-    @StateObject var data: SignerDataModel
+    @StateObject var data: SharedDataModel
     @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {

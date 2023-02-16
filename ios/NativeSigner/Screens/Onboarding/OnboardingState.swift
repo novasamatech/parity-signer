@@ -1,6 +1,6 @@
 //
 //  OnboardingState.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 30/01/2023.
 //
@@ -22,13 +22,13 @@ final class OnboardingStateMachine: ObservableObject {
     func currentView() -> some View {
         switch currentState {
         case .overview:
-            OnboardingOverviewView(viewModel: .init(stateMachine: self))
+            OnboardingOverviewView(viewModel: .init(onNextTap: { self.onOverviewFinishTap() }))
         case .terms:
-            OnboardingAgreementsView(viewModel: .init(stateMachine: self))
+            OnboardingAgreementsView(viewModel: .init(onNextTap: { self.onAgreementNextTap() }))
         case .airgap:
             EmptyView()
         case .screenshots:
-            EmptyView()
+            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.onScreenshotNextTap() }))
         }
     }
 
@@ -37,6 +37,10 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func onAgreementNextTap() {
+        currentState = .screenshots
+    }
+
+    func onScreenshotNextTap() {
         // This is just temporary, on last step we need to revert to first one
         currentState = .overview
     }

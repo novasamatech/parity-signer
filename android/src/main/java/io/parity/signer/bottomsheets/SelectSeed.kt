@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
 import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.SignerMainViewModel
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Bg100
@@ -23,7 +23,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 
 @Composable
-fun SelectSeed(seeds: MSeeds, signerMainViewModel: SignerMainViewModel) {
+fun SelectSeed(seeds: MSeeds, sharedViewModel: SharedViewModel) {
 	val cards = seeds.seedNameCards
 
 	Surface(
@@ -43,11 +43,11 @@ fun SelectSeed(seeds: MSeeds, signerMainViewModel: SignerMainViewModel) {
 						Modifier
 							.clickable {
 								val authentication = ServiceLocator.authentication
-								authentication.authenticate(signerMainViewModel.activity) {
+								authentication.authenticate(sharedViewModel.activity) {
 									val seedName = cards[item].seedName
-									val seedPhrase = signerMainViewModel.getSeed(seedName)
+									val seedPhrase = sharedViewModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {
-										signerMainViewModel.navigate(
+										sharedViewModel.navigate(
 											Action.GO_FORWARD,
 											seedName,
 											seedPhrase

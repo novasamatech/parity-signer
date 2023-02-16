@@ -1,6 +1,6 @@
 //
 //  UnlockDeviceView.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 27/01/2023.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 struct UnlockDeviceView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,14 +42,14 @@ struct UnlockDeviceView: View {
 
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
-        private weak var data: SignerDataModel!
+        private weak var data: SharedDataModel!
         private let seedsMediator: SeedsMediating
 
         init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
             self.seedsMediator = seedsMediator
         }
 
-        func use(data: SignerDataModel) {
+        func use(data: SharedDataModel) {
             self.data = data
         }
 

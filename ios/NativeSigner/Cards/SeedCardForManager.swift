@@ -1,6 +1,6 @@
 //
 //  AddressCardSelector.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 14.10.2021.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SeedCardForManager: View {
-    @EnvironmentObject private var data: SignerDataModel
+    @EnvironmentObject private var data: SharedDataModel
     var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {

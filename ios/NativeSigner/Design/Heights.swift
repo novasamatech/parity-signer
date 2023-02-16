@@ -1,6 +1,6 @@
 //
 //  Heights.swift
-//  NativeSigner
+//  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 23/08/2022.
 //
