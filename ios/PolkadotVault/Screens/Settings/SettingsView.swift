@@ -133,7 +133,7 @@ extension SettingsView {
         }
 
         func wipe() {
-            data.wipe()
+            data.onboard()
         }
     }
 }
