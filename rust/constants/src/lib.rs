@@ -1,7 +1,7 @@
-//! Constants used throughout in [Signer](https://github.com/paritytech/parity-signer)
-//! and Signer-supporting ecosystem.  
+//! Constants used throughout in [Vault](https://github.com/paritytech/parity-signer)
+//! and Vault-supporting ecosystem.
 //!
-//! Signer uses **cold** database.
+//! Vault uses **cold** database.
 //!
 //! The database used on a non air-gapper device for updates generation is
 //! called **hot** database.
@@ -16,7 +16,7 @@
 //! sign updates for a given network
 //! - [`METATREE`], with network metadata
 //! - [`ADDRTREE`], with user addresses public information
-//! - [`SETTREE`], containing general verifier, types information, and Signer
+//! - [`SETTREE`], containing general verifier, types information, and Vault
 //! danger status
 //! - [`TRANSACTION`], used to store temporarily transaction data while the
 //! user accepts or declines it
@@ -35,18 +35,18 @@
 //! - tree names in cold database alone or shared between cold and hot databases
 //! - key names in [`SPECSTREE`] tree of cold database alone or shared between
 //! cold and hot databases
-//! - recurring throughout the Signer seed phrase for Alice
+//! - recurring throughout the Vault seed phrase for Alice
 //! - QR graphic settings, used for both static and animated PNG QR codes
 //!
 //! # Features
-//! Feature `"signer"` corresponds to everything related exclusively to Signer
+//! Feature `"signer"` corresponds to everything related exclusively to Vault
 //! air-gapped device. It includes:
 //!
 //! - keys for [`TRANSACTION`] tree, used for temporary storage for various
 //! kinds of transactions while they are shown to user for approval
 //! - display settings for history log and word guesser
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
+//! Feature `"active"` corresponds to all Vault-related things happening
 //! exclusively **without** air-gap. It includes:
 //!
 //! - default database addresses for hot database and cold release database
@@ -65,7 +65,7 @@
 #[cfg(feature = "test")]
 pub mod test_values;
 
-/// Default folder for cold database generated during the Signer build
+/// Default folder for cold database generated during the Vault build
 #[cfg(feature = "active")]
 pub const COLD_DB_NAME_RELEASE: &str = "../database/database_cold_release";
 
@@ -87,7 +87,7 @@ pub const ADDRTREE: &[u8] = b"addresses";
 /// Tree name for the tree storing database settings
 ///
 /// In cold database, the settings tree contains general verifier, types
-/// information, Signer danger status.
+/// information, Vault danger status.
 ///
 /// In hot database, the settings tree contains types information.
 pub const SETTREE: &[u8] = b"settings";
@@ -95,7 +95,7 @@ pub const SETTREE: &[u8] = b"settings";
 /// Tree name for the tree temporarily storing transaction entries
 pub const TRANSACTION: &[u8] = b"transaction";
 
-/// Tree name for the tree storing Signer history
+/// Tree name for the tree storing Vault history
 pub const HISTORY: &[u8] = b"history";
 
 /// Key in settings tree [`SETTREE`] for encoded types information
@@ -104,7 +104,7 @@ pub const TYPES: &[u8] = b"types";
 /// Key in settings tree [`SETTREE`] for general verifier information
 pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 
-/// Key in settings tree [`SETTREE`] for Signer danger status
+/// Key in settings tree [`SETTREE`] for Vault danger status
 pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key in transactions tree [`TRANSACTION`] for updates data
@@ -175,7 +175,7 @@ pub const CHUNK_SIZE: u16 = 1072;
 /// Main color for QR codes (both static and animated ones)
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
-/// Main color for **dangerous** QR codes (static only, in Signer)
+/// Main color for **dangerous** QR codes (static only, in Vault)
 #[cfg(feature = "signer")]
 pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
 
@@ -187,7 +187,7 @@ pub fn qr_palette() -> Vec<u8> {
     [MAIN_COLOR.to_vec(), BACK_COLOR.to_vec()].concat()
 }
 
-/// Color palette for **dangerous** QR codes (static only, in Signer)
+/// Color palette for **dangerous** QR codes (static only, in Vault)
 #[cfg(feature = "signer")]
 pub fn qr_palette_danger() -> Vec<u8> {
     [MAIN_COLOR_DANGER.to_vec(), BACK_COLOR.to_vec()].concat()

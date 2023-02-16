@@ -3537,7 +3537,7 @@ fn shell_no_token_warning_on_metadata() {
     let line = fs::read_to_string("for_tests/load_metadata_shellV200_unverified.txt").unwrap();
     let output = produce_output(&db, line.trim()).unwrap();
 
-    let warning_1 = "Received metadata has incomplete set of signed extensions. As a result, Signer may be unable to parse signable transactions using this metadata.".to_string();
+    let warning_1 = "Received metadata has incomplete set of signed extensions. As a result, Vault may be unable to parse signable transactions using this metadata.".to_string();
     let warning_2 = "Received network information is not verified.".to_string();
 
     let reply_known = TransactionCardSet {

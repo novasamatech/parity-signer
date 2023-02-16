@@ -1,6 +1,6 @@
 # Links to rust docs of the apps
 
- - [Parity Signer](../rustdocs/signer/index.html)
+ - [Polkadot Vault](../rustdocs/signer/index.html)
  - [Navigation](../rustdocs/navigator/index.html)
  - [Transaction parser](../rustdocs/parser/index.html)
  - [Data handling logic](../rustdocs/db_handling/index.html)

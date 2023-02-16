@@ -51,7 +51,7 @@ pub enum Error {
     #[error("Bad signature.")]
     BadSignature,
 
-    /// There is a limited number of payloads supported by the Signer. Payload
+    /// There is a limited number of payloads supported by the Vault. Payload
     /// type is declared in the transaction prelude `53xxyy` in `yy` part.
     ///
     /// Currently supported payloads are:
@@ -110,7 +110,7 @@ pub enum Error {
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
     /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
-    /// the `SPECSTREE` tree of the Signer database with **same**
+    /// the `SPECSTREE` tree of the Vault database with **same**
     /// [`NetworkSpecsKey`], and the permanent components of the network
     /// specs stores and received are different.
     ///
@@ -131,7 +131,7 @@ pub enum Error {
 
     /// Network name and version from metadata received in `load_metadata`
     /// message already have a corresponding entry in `METATREE` tree of the
-    /// Signer database. However, the received metadata is different from
+    /// Vault database. However, the received metadata is different from
     /// the one already stored in the database.
     #[error(
         "Metadata for {name}{version} is already in the database and is \
@@ -140,7 +140,7 @@ pub enum Error {
     SameNameVersionDifferentMeta { name: String, version: u32 },
 
     /// There is a limited number of encryption algorithms supported by the
-    /// Signer. Encryption algorithm is declared in the transaction prelude
+    /// Vault. Encryption algorithm is declared in the transaction prelude
     /// `53xxyy` in `xx` part.
     ///
     /// For signable transactions (i.e. with prelude `53xx00`, `53xx02` and
@@ -223,7 +223,7 @@ pub enum Error {
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
     /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
-    /// the `SPECSTREE` tree of the Signer database with not necessarily
+    /// the `SPECSTREE` tree of the Vault database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and base58 prefix in stored network specs is different from the base58
     /// prefix in the received ones.
@@ -243,7 +243,7 @@ pub enum Error {
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
     /// received in `add_specs` payload are for a network that already has
     /// [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in
-    /// the `SPECSTREE` tree of the Signer database with not necessarily
+    /// the `SPECSTREE` tree of the Vault database with not necessarily
     /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
     /// and network name in stored network specs is different from the network
     /// name in the received ones.
@@ -262,7 +262,7 @@ pub enum Error {
     /// received `add_specs` payload already have an entry in `SPECSTREE` tree
     /// of the database.
     ///
-    /// Not exactly an error, but Signer can't do anything and complains.
+    /// Not exactly an error, but Vault can't do anything and complains.
     #[error(
         "Exactly same network specs for network {name} with encryption {} \
         are already in the database.",
@@ -283,7 +283,7 @@ pub enum Error {
     /// database is
     /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(verifier_value)))`.
     ///
-    /// Signer does not allow downgrading the verifiers.
+    /// Vault does not allow downgrading the verifiers.
     #[error(
         "Saved network {name} information was signed by verifier {}. \
         Received information is not signed.",
@@ -311,7 +311,7 @@ pub enum Error {
         "Network {name} current verifier is {}. Received add_specs message \
         is verified by {}, which is neither current network verifier not the \
         general verifier. Changing the network verifier to another non-general \
-        one would require wipe and reset of Signer.",
+        one would require wipe and reset of Vault.",
         old_verifier_value.show_error(),
         new_verifier_value.show_error(),
     )]
@@ -374,13 +374,13 @@ pub enum Error {
     /// same, as the one already stored in the `SETTREE` tree of the database
     /// under the key `TYPES`.
     ///
-    /// Not exactly an error, but Signer can't do anything and complains.
+    /// Not exactly an error, but Vault can't do anything and complains.
     #[error("Exactly same types information is already in the database.")]
     TypesKnown,
 
-    /// User attempted to load into Signer the metadata for the network that
+    /// User attempted to load into Vault the metadata for the network that
     /// has no [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) entry
-    /// in the `VERIFIERS` tree of the Signer database.
+    /// in the `VERIFIERS` tree of the Vault database.
     #[error(
         "Network {name} is not in the database. Add network specs before loading the metadata."
     )]
@@ -389,9 +389,9 @@ pub enum Error {
         name: String,
     },
 
-    /// User attempted to load into Signer the metadata for the network that
+    /// User attempted to load into Vault the metadata for the network that
     /// has no associated [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs)
-    /// entries in the `SPECSTREE` tree of the Signer database, although it has
+    /// entries in the `SPECSTREE` tree of the Vault database, although it has
     /// an associated
     /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier),
     /// i.e. it was known to user at some point and never disabled.
@@ -409,13 +409,13 @@ pub enum Error {
         /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
         valid_current_verifier: ValidCurrentVerifier,
 
-        /// Signer general verifier
+        /// Vault general verifier
         general_verifier: Verifier,
     },
 
-    /// User attempted to load into Signer the metadata for the network that
+    /// User attempted to load into Vault the metadata for the network that
     /// has a [`OrderedNetworkSpecs`](definitions::network_specs::OrderedNetworkSpecs) entry in the
-    /// `SPECSTREE` tree of the Signer database, but specs have a different
+    /// `SPECSTREE` tree of the Vault database, but specs have a different
     /// network name.
     ///
     /// Most likely, wrong genesis hash was attached to the metadata update.
@@ -475,7 +475,7 @@ pub enum Error {
     #[error(
         "Network {name} current verifier is {}. Received load_metadata message \
         is verified by {}. Changing verifier for the network would require wipe \
-        and reset of Signer.",
+        and reset of Vault.",
         old_verifier_value.show_error(),
         new_verifier_value.show_error(),
     )]
@@ -524,7 +524,7 @@ pub enum Error {
     /// `Some(old_general_verifier_value)`.
     ///
     /// General verifier with assigned [`VerifierValue`] could not be changed
-    /// without Signer wipe. If the Signer is reset with no general verifier,
+    /// without Vault wipe. If the Vault is reset with no general verifier,
     /// and the network in question is the default one (currently Polkadot,
     /// Kusama, and Westend), the network will still be recorded as the one
     /// verified by the general verifier and accepting verified `add_specs` for
@@ -536,7 +536,7 @@ pub enum Error {
         "Network {name} is verified by the general verifier which currently is {}. \
         Received load_metadata message is verified by {}. Changing the general \
         verifier or changing the network verifier to custom would require wipe \
-        and reset of Signer.",
+        and reset of Vault.",
         old_general_verifier_value.show_error(),
         new_general_verifier_value.show_error(),
     )]
@@ -553,9 +553,9 @@ pub enum Error {
 
     /// Network name and version from metadata received in `load_metadata`
     /// message already have a corresponding entry in `METATREE` tree of the
-    /// Signer database, with exactly same metadata.
+    /// Vault database, with exactly same metadata.
     ///
-    /// Not exactly an error, but Signer can't do anything and complains.
+    /// Not exactly an error, but Vault can't do anything and complains.
     #[error("Metadata for {name}{version} is already in the database.")]
     MetadataKnown {
         /// network name (identical for received and for stored metadata)

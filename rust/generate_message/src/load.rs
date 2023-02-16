@@ -332,8 +332,8 @@ where
 ///
 /// No checking of metadata and network specs integrity is done here, as there
 /// are no network specs. Base58 prefix change in the metadata would cause no
-/// error here. The Signer, if such contradicting metadata update is scanned,
-/// will produce an error, since the Signer must have matching network specs to
+/// error here. The Vault, if such contradicting metadata update is scanned,
+/// will produce an error, since the Vault must have matching network specs to
 /// accept the metadata.
 fn meta_d_u<P>(address: &str, files_dir: P) -> Result<()>
 where
@@ -570,7 +570,7 @@ fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
 
 /// Show warning if the metadata (`v14`) has incomplete set of signed extensions.
 fn warn(name: &str, version: u32) {
-    println!("Warning. Metadata {name}{version} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.");
+    println!("Warning. Metadata {name}{version} has incomplete set of signed extensions, and could cause Vault to fail in parsing signable transactions using this metadata.");
 }
 
 /// `unwasm -payload <wasm_file_path> <optional -d key>`

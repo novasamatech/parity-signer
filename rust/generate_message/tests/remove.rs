@@ -17,7 +17,7 @@ fn it_removes() {
             files_dir.path().to_string_lossy()
         ),
         "Address book has entries for following networks:\n
-polkadot at wss://rpc.polkadot.io, encryption sr25519, Signer display title Polkadot\n",
+polkadot at wss://rpc.polkadot.io, encryption sr25519, Vault display title Polkadot\n",
     );
     assert_cmd_stdout(
         &format!(

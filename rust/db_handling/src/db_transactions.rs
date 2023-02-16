@@ -5,7 +5,7 @@
 //! Each tree gets updated with its own [`Batch`], updates occur within a single
 //! transaction.
 //!
-//! For transactions scanned into Signer, currently a temporary database entry
+//! For transactions scanned into Vault, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
 
 // TODO this is a temporary solution, the data eventually could be stored in
@@ -51,11 +51,11 @@ use crate::{
 /// applied to each [`Tree`](sled::Tree).
 ///
 /// Cold database tree names and content information could be found in
-/// [`constants`] crate. All trees are routinely updated as Signer is used.
+/// [`constants`] crate. All trees are routinely updated as Vault is used.
 ///
 /// [`TrDbCold`] is applied to the cold database in an atomic transaction.
 ///
-/// [`TrDbCold`] is used both by the Signer side (for all database-related
+/// [`TrDbCold`] is used both by the Vault side (for all database-related
 /// actions) and the active side (to generate and populate the cold database).
 ///
 /// Note that all the checking is done as the [`TrDbCold`] is generated,
@@ -401,7 +401,7 @@ impl BatchStub {
     }
 }
 
-/// Draft for cold database atomic transaction, constructed for Signer update
+/// Draft for cold database atomic transaction, constructed for Vault update
 /// transaction (`add_specs`, `load_metadata`, `load_types`).
 ///
 /// [`TrDbColdStub`] is stored SCALE-encoded in [`TRANSACTION`] tree
@@ -544,7 +544,7 @@ impl TrDbColdStub {
     /// - Transform received in `add_specs` payload [`NetworkSpecs`]
     /// into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
     /// in the end of the network list, with order set to the total number of
-    /// network specs entries currently in Signer. When a network is removed,
+    /// network specs entries currently in Vault. When a network is removed,
     /// the order of the remaining networks gets rearranged, see details in
     /// function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
@@ -611,7 +611,7 @@ impl TrDbColdStub {
     /// Verifiers remain unchanged during the hold processing.
     ///
     /// The addresses are not removed and will be again visible from the user
-    /// interface when the properly verified network specs are loaded in Signer.
+    /// interface when the properly verified network specs are loaded in Vault.
     pub fn remove_network_specs(
         mut self,
         network_specs: &OrderedNetworkSpecs,
@@ -743,12 +743,12 @@ impl Default for TrDbColdStub {
 
 /// Temporary storage for signable transaction and associated data.
 ///
-/// Signable transaction received by the Signer must always be parsed prior to
+/// Signable transaction received by the Vault must always be parsed prior to
 /// signing, and when it is, [`TrDbColdSign`] is generated and the transaction
 /// details are shown to user.
 ///
 /// If the user signs the transaction or tries to sign and enters wrong
-/// password, the transaction data will be recorded in Signer history log.
+/// password, the transaction data will be recorded in Vault history log.
 ///
 /// While the user considers the transaction, [`TrDbColdSign`] is stored
 /// SCALE-encoded in [`TRANSACTION`] tree of the cold database under the key
@@ -820,7 +820,7 @@ impl TrDbColdSign {
     /// interface
     /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
     /// the cases when the user has entered the wrong password and no signature
-    /// was generated. Signer current policy is to log all wrong password entry
+    /// was generated. Vault current policy is to log all wrong password entry
     /// attempts.
     ///
     /// Required input:
@@ -922,7 +922,7 @@ pub struct TrDbColdSignOne {
 
 /// Signable transaction content
 ///
-/// Signer can sign:
+/// Vault can sign:
 /// - transactions
 /// - messages
 ///

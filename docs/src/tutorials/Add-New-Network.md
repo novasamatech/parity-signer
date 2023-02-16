@@ -1,23 +1,23 @@
 # Add New Network
 
-Parity Signer supports adding any substrate-based networks or updating and existing network via QR code.
+Polkadot Vault supports adding any substrate-based networks or updating and existing network via QR code.
 
-After you've installed [required software](#Prerequisites), you need to add *Network's Specs* to Signer and add *Network Metadata* for this network, so that Signer is able to decode, and you could read and verify transactions you are signing on this network.
+After you've installed [required software](#Prerequisites), you need to add *Network's Specs* to Vault and add *Network Metadata* for this network, so that Vault is able to decode, and you could read and verify transactions you are signing on this network.
 
 If you need to update metadata for already existing network you only need to update *Network Metadata*.
-Off-the-shelf Signer comes with networks that you can update by scanning a multipart QR codes that contain recent metadata for these networks at [Metadata Update Portal](https://metadata.parity.io/).
+Off-the-shelf Vault comes with networks that you can update by scanning a multipart QR codes that contain recent metadata for these networks at [Metadata Update Portal](https://metadata.parity.io/).
 
 *Network Specs*
 
 1. [Get](#get-network-spec)
 2. [Sign](#sign-network-spec)
-3. [Feed into Signer](#feed-network-spec-into-signer)
+3. [Feed into Vault](#feed-network-spec-into-signer)
 
 *Network Metadata*
 
 4. [Get](#get-network-metadata)
 5. [Sign](#sign-network-metadata)
-6. [Feed into Signer](#feed-network-metadata-into-signer)
+6. [Feed into Vault](#feed-network-metadata-into-signer)
 
 ### Prerequisites
 
@@ -112,9 +112,9 @@ cargo run --release make --goal qr --crypto sr25519 --msg add-specs --payload si
 
 Now your `<spec-qr>` is in `parity-signer/rust/files/signed`
 
-### Feed Network Specs into Signer
+### Feed Network Specs into Vault
 
-In Signer open scanner, scan your your `<spec-qr>` and approve chain specs.
+In Vault open scanner, scan your your `<spec-qr>` and approve chain specs.
 
 <br/>
 
@@ -167,9 +167,9 @@ cargo run --release make --goal qr --crypto sr25519 --msg load-metadata --payloa
 
 This QR might take some time to be generated. After it is finished you can find your `<metadata-qr>` in `parity-signer/rust/files/signed`. It is a multipart QR-"movie", if you image viewer does not render it correctly, we suggest to open it in a browser.
 
-### Feed Network Metadata into Signer
+### Feed Network Metadata into Vault
 
-In Signer open scanner, scan your `<metadata-qr>` and accept new metadata.
+In Vault open scanner, scan your `<metadata-qr>` and accept new metadata.
 
 <br/>
 
@@ -177,4 +177,4 @@ In Signer open scanner, scan your `<metadata-qr>` and accept new metadata.
 
 <br/>
 
-Congratulations! You've fetched network specs, signed them, fed them into Signer, fetched recent metadata for the network, signed and fed it into Signer as well. Now you are ready to safely sign transactions on this network.
+Congratulations! You've fetched network specs, signed them, fed them into Vault, fetched recent metadata for the network, signed and fed it into Vault as well. Now you are ready to safely sign transactions on this network.
