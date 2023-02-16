@@ -682,9 +682,8 @@
 "Onboarding.Screenshots.Action.Next" = "Next";
 
 "Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
-"Onboarding.Airgap.Label.Content" = "Please Follow this steps to enable Air Gap mode and keep it enabled all the time";
+"Onboarding.Airgap.Label.Content" = "Please Follow these steps to enable Air Gap mode and keep it enabled all the time";
 "Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
-"Onboarding.Airgap.Label.Bluetooth" = "Turn off Bluetooth";
 "Onboarding.Airgap.Label.Wifi" = "Turn off Wifi Connection";
 "Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
 "Onboarding.Airgap.Label.Cables.Confirmation" = "Cables are disconnected";

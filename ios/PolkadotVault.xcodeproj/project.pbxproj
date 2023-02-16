@@ -160,7 +160,6 @@
 		6D850BDE292F7B4D00BA9017 /* EnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */; };
 		6D850BE2292F85F200BA9017 /* SecuredTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE1292F85F200BA9017 /* SecuredTextField.swift */; };
 		6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE3292FAA6700BA9017 /* RoundedContainerBackground.swift */; };
-		6D850BE629308B2A00BA9017 /* KeyboardAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE529308B2A00BA9017 /* KeyboardAvoidance.swift */; };
 		6D88CFF028C60815001FB0A1 /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFEF28C60815001FB0A1 /* CircleButton.swift */; };
 		6D88CFF228C60AED001FB0A1 /* FullScreenRoundedModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */; };
 		6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */; };
@@ -233,6 +232,9 @@
 		6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643F28B929EA003D540B /* KeyDetailsView.swift */; };
 		6DC9C486294B7F57000E6899 /* NetworkSelectionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */; };
 		6DCC572728D8C0490014278A /* BackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCC572628D8C0490014278A /* BackupModal.swift */; };
+		6DD860E5299CAAA70000D81E /* OnboardingAirgapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E4299CAAA70000D81E /* OnboardingAirgapView.swift */; };
+		6DD860E8299CAD140000D81E /* OnboadingAirgapView+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */; };
+		6DD860EA299CED3F0000D81E /* AirgapMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E9299CED3F0000D81E /* AirgapMediator.swift */; };
 		6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */; };
 		6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1828C8C9AF00FB6195 /* Animations.swift */; };
 		6DDD73732940471900F04CE7 /* Event+AdditionalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD73722940471900F04CE7 /* Event+AdditionalValue.swift */; };
@@ -472,7 +474,6 @@
 		6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPasswordModal.swift; sourceTree = "<group>"; };
 		6D850BE1292F85F200BA9017 /* SecuredTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredTextField.swift; sourceTree = "<group>"; };
 		6D850BE3292FAA6700BA9017 /* RoundedContainerBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedContainerBackground.swift; sourceTree = "<group>"; };
-		6D850BE529308B2A00BA9017 /* KeyboardAvoidance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidance.swift; sourceTree = "<group>"; };
 		6D88CFEF28C60815001FB0A1 /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
 		6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenRoundedModal.swift; sourceTree = "<group>"; };
 		6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionsModal.swift; sourceTree = "<group>"; };
@@ -544,6 +545,9 @@
 		6DC5643F28B929EA003D540B /* KeyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsView.swift; sourceTree = "<group>"; };
 		6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSelectionSettings.swift; sourceTree = "<group>"; };
 		6DCC572628D8C0490014278A /* BackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModal.swift; sourceTree = "<group>"; };
+		6DD860E4299CAAA70000D81E /* OnboardingAirgapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingAirgapView.swift; sourceTree = "<group>"; };
+		6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboadingAirgapView+Components.swift"; sourceTree = "<group>"; };
+		6DD860E9299CED3F0000D81E /* AirgapMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirgapMediator.swift; sourceTree = "<group>"; };
 		6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6DD9FF1828C8C9AF00FB6195 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		6DDD73722940471900F04CE7 /* Event+AdditionalValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+AdditionalValue.swift"; sourceTree = "<group>"; };
@@ -1291,7 +1295,6 @@
 				6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */,
 				6D932CE5292E0CE6008AD883 /* PrimaryTextField.swift */,
 				6D850BE1292F85F200BA9017 /* SecuredTextField.swift */,
-				6D850BE529308B2A00BA9017 /* KeyboardAvoidance.swift */,
 				6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */,
 				6D5FDDCF2977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift */,
 			);
@@ -1368,6 +1371,7 @@
 		6D9921B3297EC1DA004891B6 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				6DD860E6299CAD030000D81E /* Airgap */,
 				6DDF43932987851700881AFF /* Overview */,
 				6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */,
 				6D7DF6532987ADEF00A8438E /* OnboardingState.swift */,
@@ -1517,6 +1521,16 @@
 				6DCC572628D8C0490014278A /* BackupModal.swift */,
 			);
 			path = Backup;
+			sourceTree = "<group>";
+		};
+		6DD860E6299CAD030000D81E /* Airgap */ = {
+			isa = PBXGroup;
+			children = (
+				6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */,
+				6DD860E4299CAAA70000D81E /* OnboardingAirgapView.swift */,
+				6DD860E9299CED3F0000D81E /* AirgapMediator.swift */,
+			);
+			path = Airgap;
 			sourceTree = "<group>";
 		};
 		6DD9FF1428C8B83C00FB6195 /* Alerts */ = {
@@ -1942,6 +1956,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DD860E8299CAD140000D81E /* OnboadingAirgapView+Components.swift in Sources */,
 				6D3423352994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift in Sources */,
 				6DF5E7A42923DD4400F2B5B4 /* Text+Markdown.swift in Sources */,
 				6DDEF13228AE6039004CA2FD /* signer.udl in Sources */,
@@ -2072,7 +2087,6 @@
 				6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */,
-				6D850BE629308B2A00BA9017 /* KeyboardAvoidance.swift in Sources */,
 				6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */,
 				6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */,
 				6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */,
@@ -2116,12 +2130,14 @@
 				6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
+				6DD860EA299CED3F0000D81E /* AirgapMediator.swift in Sources */,
 				6DB99037295C160D001101DC /* ConnectivityAlertOverlay.swift in Sources */,
 				6DFAF36B28AF7F8A0048763B /* Spacing.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
 				6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */,
 				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
+				6DD860E5299CAAA70000D81E /* OnboardingAirgapView.swift in Sources */,
 				6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */,
 				6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */,
 				6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */,
