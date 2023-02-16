@@ -11,80 +11,88 @@ struct OnboardingAirgapView: View {
     @StateObject var viewModel: ViewModel
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .center, spacing: 0) {
-                // Header text
-                Localizable.Onboarding.Airgap.Label.title.text
-                    .font(PrimaryFont.titleL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, Spacing.extraExtraLarge)
-                    .padding(.horizontal, Spacing.large)
-                Localizable.Onboarding.Airgap.Label.content.text
-                    .font(PrimaryFont.bodyM.font)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, Spacing.extraSmall)
-                    .padding(.vertical, Spacing.medium)
-                // Airgap connectivity
-                VStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        cell(.aiplaneMode, isChecked: viewModel.isAirplaneModeChecked)
-                            .padding(.bottom, Spacing.small)
-                        Divider()
-                        cell(.wifi, isChecked: viewModel.isWifiChecked)
-                            .padding(.top, Spacing.small)
-                    }
-                    .padding(Spacing.medium)
-                }
-                .strokeContainerBackground()
-                .padding(.horizontal, Spacing.medium)
-                .padding(.vertical, Spacing.extraSmall)
-                // Cables connectivity
-                VStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        HStack(alignment: .center, spacing: Spacing.large) {
-                            Asset.airgapCables.swiftUIImage
-                                .padding(.leading, Spacing.extraSmall)
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            Localizable.Onboarding.Airgap.Label.cables.text
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                .font(PrimaryFont.bodyL.font)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .center, spacing: 0) {
+                    // Header text
+                    Localizable.Onboarding.Airgap.Label.title.text
+                        .font(PrimaryFont.titleL.font)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, Spacing.extraExtraLarge)
+                        .padding(.horizontal, Spacing.large)
+                    Localizable.Onboarding.Airgap.Label.content.text
+                        .font(PrimaryFont.bodyM.font)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, Spacing.extraSmall)
+                        .padding(.vertical, Spacing.medium)
+                    // Airgap connectivity
+                    VStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            cell(.aiplaneMode, isChecked: viewModel.isAirplaneModeChecked)
+                                .padding(.bottom, Spacing.small)
+                            Divider()
+                            cell(.wifi, isChecked: viewModel.isWifiChecked)
+                                .padding(.top, Spacing.small)
                         }
-                        .padding(.bottom, Spacing.medium)
-                        Divider()
-                        HStack(alignment: .center, spacing: Spacing.large) {
-                            Group {
-                                if viewModel.isCableCheckBoxSelected {
-                                    Asset.checkboxChecked.swiftUIImage
-                                        .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                } else {
-                                    Asset.checkboxEmpty.swiftUIImage
-                                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                }
+                        .padding(Spacing.medium)
+                    }
+                    .strokeContainerBackground()
+                    .padding(.horizontal, Spacing.medium)
+                    .padding(.vertical, Spacing.extraSmall)
+                    // Cables connectivity
+                    VStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack(alignment: .center, spacing: Spacing.large) {
+                                Asset.airgapCables.swiftUIImage
+                                    .padding(.leading, Spacing.extraSmall)
+                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                Localizable.Onboarding.Airgap.Label.cables.text
+                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                    .font(PrimaryFont.bodyL.font)
                             }
-                            .padding(.leading, Spacing.extraSmall)
-                            Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                .font(PrimaryFont.bodyL.font)
+                            .padding(.bottom, Spacing.medium)
+                            Divider()
+                            HStack(alignment: .center, spacing: Spacing.large) {
+                                Group {
+                                    if viewModel.isCableCheckBoxSelected {
+                                        Asset.checkboxChecked.swiftUIImage
+                                            .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                    } else {
+                                        Asset.checkboxEmpty.swiftUIImage
+                                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    }
+                                }
+                                .padding(.leading, Spacing.extraSmall)
+                                Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .font(PrimaryFont.bodyL.font)
+                            }
+                            .padding(.top, Spacing.medium)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.toggleCheckbox()
+                            }
                         }
-                        .padding(.top, Spacing.medium)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            viewModel.toggleCheckbox()
-                        }
+                        .padding(Spacing.medium)
                     }
-                    .padding(Spacing.medium)
+                    .strokeContainerBackground()
+                    .padding(.horizontal, Spacing.medium)
+                    .padding(.vertical, Spacing.extraSmall)
+                    Spacer()
+                    PrimaryButton(
+                        action: viewModel.onDoneTap,
+                        text: Localizable.Onboarding.Screenshots.Action.next.key,
+                        style: .primary(isDisabled: $viewModel.isActionDisabled)
+                    )
+                    .padding(Spacing.large)
                 }
-                .strokeContainerBackground()
-                .padding(.horizontal, Spacing.medium)
-                .padding(.vertical, Spacing.extraSmall)
-                PrimaryButton(
-                    action: viewModel.onDoneTap,
-                    text: Localizable.Onboarding.Screenshots.Action.next.key,
-                    style: .primary(isDisabled: $viewModel.isActionDisabled)
+                .background(Asset.backgroundPrimary.swiftUIColor)
+                .frame(
+                    minWidth: geo.size.width,
+                    minHeight: geo.size.height
                 )
-                .padding(Spacing.large)
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }

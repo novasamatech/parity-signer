@@ -678,7 +678,7 @@
 
 "Onboarding.Screenshots.Label.Title" = "Please confirm you understand the screenshots' risks";
 "Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
-"Onboarding.Screenshots.Label.Confirmation" = "I confirm I'm aware of taking screenshots danger";
+"Onboarding.Screenshots.Label.Confirmation" = "I confirm that no cables are connected to the device";
 "Onboarding.Screenshots.Action.Next" = "Next";
 
 "Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
