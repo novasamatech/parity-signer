@@ -191,6 +191,7 @@
 		6DA2ACAC2939E87600AAEADC /* Event+Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA2ACAB2939E87600AAEADC /* Event+Value.swift */; };
 		6DA2ACAE2939EAC300AAEADC /* Event+isImportant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA2ACAD2939EAC300AAEADC /* Event+isImportant.swift */; };
 		6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA2ACAF293A17DF00AAEADC /* Address+DisplayablePath.swift */; };
+		6DA317C1299E3DDF005DD060 /* OnboardingAirgapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E4299CAAA70000D81E /* OnboardingAirgapView.swift */; };
 		6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */; };
 		6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */; };
 		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
@@ -232,7 +233,6 @@
 		6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643F28B929EA003D540B /* KeyDetailsView.swift */; };
 		6DC9C486294B7F57000E6899 /* NetworkSelectionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9C485294B7F57000E6899 /* NetworkSelectionSettings.swift */; };
 		6DCC572728D8C0490014278A /* BackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCC572628D8C0490014278A /* BackupModal.swift */; };
-		6DD860E5299CAAA70000D81E /* OnboardingAirgapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E4299CAAA70000D81E /* OnboardingAirgapView.swift */; };
 		6DD860E8299CAD140000D81E /* OnboadingAirgapView+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */; };
 		6DD860EA299CED3F0000D81E /* AirgapMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD860E9299CED3F0000D81E /* AirgapMediator.swift */; };
 		6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */; };
@@ -2137,7 +2137,6 @@
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
 				6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */,
 				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
-				6DD860E5299CAAA70000D81E /* OnboardingAirgapView.swift in Sources */,
 				6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */,
 				6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */,
 				6DA2ACB0293A17DF00AAEADC /* Address+DisplayablePath.swift in Sources */,
@@ -2188,6 +2187,7 @@
 				6D042AF22901B3FB00B3F4F7 /* QRCodeImageGenerator.swift in Sources */,
 				6D95E97528B500EE00E28A11 /* Heights.swift in Sources */,
 				6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */,
+				6DA317C1299E3DDF005DD060 /* OnboardingAirgapView.swift in Sources */,
 				6DFE588D297A72B1002BFDBF /* JailbreakDetectionPublisher.swift in Sources */,
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */,
