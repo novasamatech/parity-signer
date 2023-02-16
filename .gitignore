@@ -83,8 +83,8 @@ android/release
 android/debug
 
 # iOS
-ios/NativeSigner/Database/Database/*
-ios/NativeSigner/Generated
+ios/PolkadotVault/Database/Database/*
+ios/PolkadotVault/Generated
 
 # rust
 rust/target
