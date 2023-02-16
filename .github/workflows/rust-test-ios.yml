@@ -35,7 +35,7 @@ jobs:
           override:           true
 
       - name:                 Install cargo-nextest
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@2cfb0024938d23011106cbf127b393bc83fddba1 # v1.3.1
         with:
           crate:              cargo-nextest
           version:            0.9
