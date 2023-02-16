@@ -1,14 +1,12 @@
-![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
+![Polkadot Vault](./tutorials/images/logo-parity-signer.svg)
 
-[<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
-[<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
-[<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
+<div align="center">
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="./res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="./res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="./res/app-store-badge.png" width="150"></a><br><br>
+</div>
 
-# Parity Signer - Turn your smartphone into a hardware wallet
+# Polkadot Vault - Turn your smartphone into a hardware wallet
 
-![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
-
-Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
+Polkadot Vault is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
 You can create accounts in Substrate-based networks, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
 
@@ -16,27 +14,27 @@ You must turn off or even physically remove the smartphone's Wifi, Mobile Networ
 
 **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./about/Security-And-Privacy.md) for more details.**
 
-Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
+Have a look at the tutorial on our wiki to learn how to use [Polkadot Vault together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
 
-Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
+Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
 ## Key features
 
-- This is not a complete crypto wallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app that only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps).
-- The Signer alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Signer could still lead to loss of funds and/or secrets.
-- When properly used, Signer provides best achievable security with Substrate networks to-date.
+- This is not a complete crypto wallet in itself. The Vault does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app that only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps).
+- The Vault alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Vault could still lead to loss of funds and/or secrets.
+- When properly used, Vault provides best achievable security with Substrate networks to-date.
 
 ## System requirements
 
-Currently Signer is available only for iOS. Android version is coming soon.
+Currently Vault is available only for iOS. Android version is coming soon.
 
 ## Getting Started
 
 **These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
 
-If you are upgrading from older version of Signer, please see [changelog](./about/Changelog.md) and [upgrading Signer](./tutorials/Upgrading.md)
+If you are upgrading from older version of Vault, please see [changelog](./about/Changelog.md) and [upgrading Vault](./tutorials/Upgrading.md)
 
-Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
+Please note that the Vault app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
 
 [Getting started guide](./tutorials/Start.md)
 
@@ -50,7 +48,7 @@ Please note that the Signer app is an advanced tool designed for maximum securit
 
 ### About
 
-- [About Parity Signer](./README.md)
+- [About Polkadot Vault](./README.md)
 - [FAQ](./about/FAQ.md)
 - [Security-And-Privacy](./about/Security-And-Privacy.md)
 - [Hierarchical-Deterministic-Key-Derivation](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
@@ -66,4 +64,4 @@ Older versions of this app could be useful for development, however, they are no
 
 ## License
 
-Parity-Signer is [GPL 3.0 licensed](LICENSE).
+Polkadot-Vault is [GPL 3.0 licensed](LICENSE).

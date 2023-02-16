@@ -1,15 +1,15 @@
-//! Default data for [Signer](https://github.com/paritytech/parity-signer)
-//! and Signer-supporting ecosystem.  
+//! Default data for [Vault](https://github.com/paritytech/parity-signer)
+//! and Vault-supporting ecosystem.
 //!
-//! This crate deals with data loaded into Signer on build and retained on reset.
+//! This crate deals with data loaded into Vault on build and retained on reset.
 //!
-//! Signer supports by default three networks: Polkadot, Kusama, and Westend,
+//! Vault supports by default three networks: Polkadot, Kusama, and Westend,
 //! both on the cold and the hot side. More default networks could be considered
 //! in the future.
 //!
 //! # Defaults in the cold database
 //!
-//! Default build of the cold database for Signer includes:
+//! Default build of the cold database for Vault includes:
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
@@ -32,12 +32,12 @@
 //! - default types information
 //!
 //! # Features
-//! Feature `"signer"` corresponds to everything related to Signer air-gapped
-//! device. Currently the only Signer-related default is `Verifier` with Parity
-//! public key, that could be set up as a general verifier after Signer wipe by
+//! Feature `"signer"` corresponds to everything related to Vault air-gapped
+//! device. Currently the only Vault-related default is `Verifier` with Parity
+//! public key, that could be set up as a general verifier after Vault wipe by
 //! the user.
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
+//! Feature `"active"` corresponds to all Vault-related things happening
 //! **without** air-gap. This includes generating default:
 //! - network specs sets for cold and hot databases
 //! - verifiers for cold databases

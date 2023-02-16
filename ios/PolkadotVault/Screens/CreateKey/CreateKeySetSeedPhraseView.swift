@@ -76,7 +76,7 @@ struct CreateKeySetSeedPhraseView: View {
                 }
             }
         }
-        .background(Asset.backgroundSecondary.swiftUIColor)
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
         }

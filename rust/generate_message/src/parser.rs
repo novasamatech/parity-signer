@@ -12,7 +12,7 @@ use parity_scale_codec::Decode;
 
 use clap::{Args, Parser, Subcommand};
 
-/// Parity Signer data manipulation tool.
+/// Polkadot Vault data manipulation tool.
 #[derive(Debug, Parser)]
 pub struct Cli {
     #[clap(subcommand)]
@@ -136,8 +136,8 @@ pub enum Command {
     /// [`SETTREE`](constants::SETTREE)
     ///
     /// Note that the general verifier is not specified and history is not
-    /// started. This will be done only in Signer itself. Before initialization,
-    /// the cold release database could not be used by Signer.
+    /// started. This will be done only in Vault itself. Before initialization,
+    /// the cold release database could not be used by Vault.
     MakeColdRelease {
         /// Path to release db
         path: Option<PathBuf>,
@@ -748,7 +748,7 @@ pub struct Derivations {
     pub goal: Goal,
 
     /// Address book title for network in which addresses with imported
-    /// derivations will be made in Signer
+    /// derivations will be made in Vault
     #[arg(long)]
     pub title: String,
 
@@ -771,7 +771,7 @@ pub struct Override {
 
     /// Network title override, so that user can specify the network title in
     /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
-    /// that determines under what title the network is displayed in the Signer
+    /// that determines under what title the network is displayed in the Vault
     #[arg(long)]
     pub title: Option<String>,
 

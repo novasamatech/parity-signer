@@ -1,8 +1,8 @@
-# Signer structure
+# Vault structure
 
 ## Architectural structure
 
-On top level, Signer consists of following parts:
+On top level, Vault consists of following parts:
 
 1. Rust backend core
 2. FFI interface
@@ -12,15 +12,15 @@ On top level, Signer consists of following parts:
 ### Rust backend
 
 There are 3 actual endpoints in `rust` folder: `signer`, which is source of
-library used for Signer itself; `generate_message`, which is used to update
-Signer repo with new built-in network information and to generate
+library used for Vault itself; `generate_message`, which is used to update
+Vault repo with new built-in network information and to generate
 over-the-airgap updates; and `qr_reader_pc` which is a minimalistic app to parse
 qr codes that we had to write since there was no reasonably working alternative.
 
 Sub-folders of the `rust` folder:
 
 - `constants` — constant values defined for the whole workspace.
-- `db_handling` — all database-related operations for Signer and
+- `db_handling` — all database-related operations for Vault and
   `generate_message` tool. Most of the business logic is contained here.
 - `defaults` — built-in and test data for database
 - `definitions` — objects used across the workspace are defined here
@@ -28,22 +28,22 @@ Sub-folders of the `rust` folder:
   processes. Most contents are gitignored.
 - `generate_message` — tool to generate over-the-airgap updates and maintain
   network info database on hot side
-- `navigator` — navigation for Signer app; it is realized in rust to unify app
+- `navigator` — navigation for Vault app; it is realized in rust to unify app
   behavior across the platforms
 - `parser` - parses signable transactions. This is internal logic for
   `transaction_parsing` that is used when signable transaction is identified, but
 it could be used as a standalone lib for the same purpose.
 - `printing_balance` — small lib to render tokens with proper units
-- `qr_reader_pc` — small standalone PC app to parse QR codes in Signer
+- `qr_reader_pc` — small standalone PC app to parse QR codes in Vault
   ecosystem. Also is capable of parsing multiframe payloads (theoretically, in
 practice it is not feasible due to PC webcam low performance)
-- `qr_reader_phone` — logic to parse QR payloads in Signer
+- `qr_reader_phone` — logic to parse QR payloads in Vault
 - `qrcode_rtx` — multiframe erasure-encoded payload generator for signer update
   QR animation.
 - `qrcode_static` — generation of static qr codes used all over the workspace
 - `signer` — FFI interface crate to generate bindings that bridge native code
   and rust backend
-- `transaction_parsing` — high-level parser for all QR payloads sent into Signer
+- `transaction_parsing` — high-level parser for all QR payloads sent into Vault
 - `transaction_signing` — all operations that could be performed when user
   accepts payload parsed with `transaction_parsing`
 
@@ -53,7 +53,7 @@ For interfacing rust code and native interface we use
 [uniffi](https://mozilla.github.io/uniffi-rs/) framework. It is a framework
 intended to aid building cross-platform software in Rust especially for the
 cases of re-using components written in Rust in the smartphone application
-development contexts. Other than Signer itself one of the most notable users of
+development contexts. Other than Vault itself one of the most notable users of
 the `uniffi` framework are the [Mozilla Application Services](
 https://github.com/mozilla/application-services/)
 
@@ -120,11 +120,11 @@ there at lower computational cost for CI pipelines.
 For storage of all data except secrets, a sled database is used. Choice of db
 was based on its lightweightness, reliability, portability.
 
-[Signer database structure](../rustdocs/db_handling/cold_default/index.html)
+[Vault database structure](../rustdocs/db_handling/cold_default/index.html)
 
 ## Functional structure
 
-Signer has the following systems:
+Vault has the following systems:
 
 - Secure key management
 - Signing
@@ -156,7 +156,7 @@ compatibility.
 
 ### Secure key management
 
-Keypairs used in Signer are generated from secret seed phrase, derivation path
+Keypairs used in Vault are generated from secret seed phrase, derivation path
 and optional secret password, in accordance with specifications described in
 **subkey manual** using code imported directly from substrate codebase for best
 conformance.
@@ -274,7 +274,7 @@ Thus, user has opportunity to read the whole transaction before signing.
 ### Airgap data transfer
 
 Transactions are encoded in accordance to UOS standard in QR codes. QR codes can
-be sent into Signer - through static frames or dynamic multiframe animations -
+be sent into Vault - through static frames or dynamic multiframe animations -
 and back - only as static frames. QR codes are decoded through native image
 recognition system and decoded through rust backend; output QR codes are
 generated in png format by backend. There are 2 formats of multiframe QR codes:
@@ -289,15 +289,15 @@ performed in under 10 seconds; practically this works in under 1 minute.
 
 ### Airgap updating
 
-Signer can download new networks and metadata updates from QR data. To prevent
+Vault can download new networks and metadata updates from QR data. To prevent
 malicious updates from compromising security, a system of certificates is
 implemented. 
 
-Updates could be generated by any user; they can also be distributed in signed form to delegate validity check job to trusted parties. These trusted parties should sign metadata with their asymmetric key - certificate - and they become verifiers once their update is uploaded to Signer. There are 2 tiers of certificates - "general" and "custom", with the first allowing more comfortable use of Signer at cost of only one general verifier allowed.
+Updates could be generated by any user; they can also be distributed in signed form to delegate validity check job to trusted parties. These trusted parties should sign metadata with their asymmetric key - certificate - and they become verifiers once their update is uploaded to Vault. There are 2 tiers of certificates - "general" and "custom", with the first allowing more comfortable use of Vault at cost of only one general verifier allowed.
 
 Rules about verifier certificates are designed around simplicity of security protocol: one trusted party becomes main source of trust and updates generated by it are just accepted. If that party does not have all required updates available, other party can be added as custom verifier. That verifier is not allowed to change specs at will and suspicious activity by custom verifier would interfere with network usage thus stopping user from doing potentially harmful stuff. This allows less strenuous security policy on user side.
 
-It is important to note that certificates could not be effectively revoked considering airgapped nature of the app, thus it is recommended to keep their keys on airgapped Signer devices if updates signed by these certificates are distributed publicly.
+It is important to note that certificates could not be effectively revoked considering airgapped nature of the app, thus it is recommended to keep their keys on airgapped Vault devices if updates signed by these certificates are distributed publicly.
 
 [More on certificates](./UOS.md#update)
 
@@ -308,7 +308,7 @@ in the background (on low-priority thread) and attempts to monitor the network
 availability. This detector is implemented differently on different platforms
 and has different features and limitations; however, it does not and could not
 provide full connectivity monitoring and proper maintaining of airgap is
-dependent on user. Signer device should always be kept in airplane mode and all
+dependent on user. Vault device should always be kept in airplane mode and all
 other connectivity should be disabled.
 
 The basic idea of network detection alertness is that when network connectivity
@@ -317,14 +317,14 @@ is detected, 3 things happen:
 1. Event is logged in history
 2. Visual indication of network status is presented to user (shield in corner of
 screen and message in alert activated by the shield)
-3. Certain Signer functions are disabled (user authentication, seed and key
+3. Certain Vault functions are disabled (user authentication, seed and key
 creation, etc.) - features that bring secret material into active app memory
 from storage
 
 When network connectivity is lost, only visual indication changes. To restore
-clean state of Signer, user should acknowledge safety alert by pressing on
+clean state of Vault, user should acknowledge safety alert by pressing on
 shield icon, reading and accepting the warning. Upon acknowledging, it is logged
-in history, visual indication changes to green and all normal Signer functions
+in history, visual indication changes to green and all normal Vault functions
 are restored.
 
 #### Network detector in iOS
@@ -352,7 +352,7 @@ sole source of security; user is responsible for device isolation.
 
 ### Logging
 
-All events that happen in Signer are logged by backend in history tree of
+All events that happen in Vault are logged by backend in history tree of
 database. From user interface, all events are presented in chronological order
 on log screen. On the same screen, history checksum could be seen and custom
 text entries could be added to database. Checksum uses time added to history
@@ -369,8 +369,8 @@ first event in recorded history.
 
 ### Self-signing updating capability
 
-Signer can sign network and metadata updates that could be used for other
-signers. User can select any update component present in Signer and any key
+Vault can sign network and metadata updates that could be used for other
+signers. User can select any update component present in Vault and any key
 available for any network and generate a qr code which, upon decoding, can be
 used by `generate_message` or similar tool to generate over-the-airgap update.
 [See detailed documentation](./UOS.md)
@@ -386,7 +386,7 @@ User interface is organized through View-Action-DataModel abstraction.
 
 #### View
 
-Signer visual representation is abstracted in 3 visual layers placed on top of
+Vault visual representation is abstracted in 3 visual layers placed on top of
 each other: `screen`, `modal` and `alert`. This structure is mostly an
 adaptation of iOS design guidelines, as android native UI is much flexible and
 it is easier to adopt it to iOS design patterns than vice versa. Up to one of

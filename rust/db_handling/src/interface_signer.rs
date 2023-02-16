@@ -1,4 +1,4 @@
-//! Utils to communicate with the Signer frontend
+//! Utils to communicate with the Vault frontend
 use bip39::{Language, Mnemonic};
 use definitions::helpers::IdenticonStyle;
 use hex;
@@ -45,9 +45,9 @@ use crate::{Error, Result};
 /// Return a `Vec` with all seed names with seed key identicons if seed key is
 /// available.
 ///
-/// Function processes all seeds known to Signer KMS (which are input as
+/// Function processes all seeds known to Vault KMS (which are input as
 /// `&[String]`), including seeds without any corresponding addresses currently
-/// known to Signer (orphans).
+/// known to Vault (orphans).
 ///
 /// If the same seed has more than one seed key in the database, i.e. it has
 /// been used to create seed keys with more than one
@@ -165,12 +165,12 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerIma
 }
 
 /// Return a `Vec` with address-associated public data for all addresses from the
-/// Signer database.
+/// Vault database.
 ///
 /// Function is used to show users all possible addresses, when selecting the
 /// address to generate
 /// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) for signing
-/// updates with the Signer.
+/// updates with the Vault.
 pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
     Ok(get_all_addresses(database)?
         .into_iter()
@@ -276,7 +276,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
     Ok(MKeysNew { root, set })
 }
 
-/// Get address-associated public data for all addresses from the Signer
+/// Get address-associated public data for all addresses from the Vault
 /// database with given seed name and network [`NetworkSpecsKey`].
 pub fn addresses_set_seed_name_network(
     database: &sled::Db,
@@ -291,7 +291,7 @@ pub fn addresses_set_seed_name_network(
         .collect())
 }
 
-/// Return `Vec` with network information for all networks in the Signer database,
+/// Return `Vec` with network information for all networks in the Vault database,
 /// with bool indicator which one is currently selected.
 pub fn show_all_networks_with_flag(
     database: &sled::Db,
@@ -312,7 +312,7 @@ pub fn show_all_networks_with_flag(
     Ok(MNetworkMenu { networks })
 }
 
-/// Make `Vec` with network information for all networks in the Signer database,
+/// Make `Vec` with network information for all networks in the Vault database,
 /// without any selection.
 pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
     let networks = get_all_networks(database)?;
@@ -720,7 +720,7 @@ pub fn show_types_status(database: &sled::Db) -> Result<MTypesInfo> {
 }
 
 /// Generate new random seed phrase, make identicon for `sr25519` public key,
-/// and send to Signer screen.
+/// and send to Vault screen.
 pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup> {
     let seed_phrase = generate_random_phrase(24)?;
     let sr25519_pair =

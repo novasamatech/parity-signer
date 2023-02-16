@@ -25,7 +25,7 @@ There is currently no testnet, so we just check that the signature is formatted 
 5. Scan QR
 6. Go to Settings, and change to Substrate (either the hosted Flaming Fir or a custom chain)
 7. Run the same transaction
-8. Expect the message: "Signer does not currently support a chain with the genesis hash: 0x....."
+8. Expect the message: "Vault does not currently support a chain with the genesis hash: 0x....."
 9. Go to `constants.js`
 10. Add the appropriate genesis hash
 11. Uncomment the checks for `isSubstrateDev` in `PayloadDetailsCard.js`

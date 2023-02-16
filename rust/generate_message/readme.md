@@ -3,15 +3,15 @@
 
 ## Overview
 
-This crate is intended to support the [Signer](https://github.com/paritytech/parity-signer) from the active (non air-gapped) side.
+This crate is intended to support the [Vault](https://github.com/paritytech/parity-signer) from the active (non air-gapped) side.
 
 This crate is mainly used to:
 
  - fetch network data through rpc calls
- - prepare Signer update and derivation import payloads
- - generate Signer update QR codes, either signed or unsigned, and derivations import QR codes, to be scanned into Signer
+ - prepare Vault update and derivation import payloads
+ - generate Vault update QR codes, either signed or unsigned, and derivations import QR codes, to be scanned into Vault
  - maintain the hot database on the network-connected device, to store and manage the data that went into update QR codes
- - maintain Signer default network metadata set in `defaults` crate and prepare the cold database for the Signer release
+ - maintain Vault default network metadata set in `defaults` crate and prepare the cold database for the Vault release
 
 ## Crate documentation
 

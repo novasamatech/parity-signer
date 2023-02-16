@@ -13,8 +13,8 @@ pub enum Error {
 
     /// User has entered a wrong password for a passworded address.
     ///
-    /// For cases when Signer database checksum is not verified.
-    /// Signer log records that password was entered incorrectly.
+    /// For cases when Vault database checksum is not verified.
+    /// Vault log records that password was entered incorrectly.
     #[error("Wrong password.")]
     WrongPassword,
 
@@ -28,9 +28,9 @@ pub enum Error {
     CryptoError(sp_core::crypto::SecretStringError),
 
     /// User has entered a wrong password for a passworded address for cases
-    /// when the Signer database checksum is verified.
+    /// when the Vault database checksum is verified.
     ///
-    /// Signer log records that password was entered incorrectly.
+    /// Vault log records that password was entered incorrectly.
     /// This changes the database checksum, and for the next attempt it must be
     /// updated.
     ///

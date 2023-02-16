@@ -69,7 +69,7 @@ pub fn show_metadata(database: &sled::Db) -> Result<()> {
 /// - URL address at which RPC calls are made for the network
 /// - network encryption
 /// - additional marker that the network is a default one
-/// - network title as it will be displayed in Signer, from
+/// - network title as it will be displayed in Vault, from
 /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in
 /// [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 ///
@@ -81,7 +81,7 @@ pub fn show_metadata(database: &sled::Db) -> Result<()> {
 /// and Westend. Other entries appear as a result of the database usage.
 ///
 /// Address book title is `<network_name>-<network_encryption>` and does not
-/// necessarily coincide with network title as displayed by the Signer.
+/// necessarily coincide with network title as displayed by the Vault.
 ///
 /// Address book title is used to address networks when making `add_specs`
 /// update payloads or inspecting existing network specs.
@@ -109,7 +109,7 @@ pub fn show_networks(database: &sled::Db) -> Result<()> {
     for x in set.iter() {
         if x.address_book_entry.def {
             println!(
-                "{} at {}, encryption {} (default), Signer display title {}",
+                "{} at {}, encryption {} (default), Vault display title {}",
                 x.title,
                 x.address_book_entry.address,
                 x.address_book_entry.encryption.show(),
@@ -117,7 +117,7 @@ pub fn show_networks(database: &sled::Db) -> Result<()> {
             );
         } else {
             println!(
-                "{} at {}, encryption {}, Signer display title {}",
+                "{} at {}, encryption {}, Vault display title {}",
                 x.title,
                 x.address_book_entry.address,
                 x.address_book_entry.encryption.show(),
