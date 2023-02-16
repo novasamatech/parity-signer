@@ -26,9 +26,9 @@ final class OnboardingStateMachine: ObservableObject {
         case .terms:
             OnboardingAgreementsView(viewModel: .init(onNextTap: { self.onAgreementNextTap() }))
         case .airgap:
-            EmptyView()
+            OnboardingAirgapView(viewModel: .init(onNextTap: { self.onAirgapNextTap() }))
         case .screenshots:
-            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.onScreenshotNextTap() }))
+            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.resetState() }))
         }
     }
 
@@ -37,11 +37,14 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func onAgreementNextTap() {
+        currentState = .airgap
+    }
+
+    func onAirgapNextTap() {
         currentState = .screenshots
     }
 
-    func onScreenshotNextTap() {
-        // This is just temporary, on last step we need to revert to first one
+    func resetState() {
         currentState = .overview
     }
 }

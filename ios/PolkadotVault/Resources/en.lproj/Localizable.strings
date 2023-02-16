@@ -678,13 +678,12 @@
 
 "Onboarding.Screenshots.Label.Title" = "Please confirm you understand the screenshots' risks";
 "Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
-"Onboarding.Screenshots.Label.Confirmation" = "I confirm I'm aware of taking screenshots danger";
+"Onboarding.Screenshots.Label.Confirmation" = "I confirm that no cables are connected to the device";
 "Onboarding.Screenshots.Action.Next" = "Next";
 
 "Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
-"Onboarding.Airgap.Label.Content" = "Please Follow this steps to enable Air Gap mode and keep it enabled all the time";
+"Onboarding.Airgap.Label.Content" = "Please Follow these steps to enable Air Gap mode and keep it enabled all the time";
 "Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
-"Onboarding.Airgap.Label.Bluetooth" = "Turn off Bluetooth";
 "Onboarding.Airgap.Label.Wifi" = "Turn off Wifi Connection";
 "Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
 "Onboarding.Airgap.Label.Cables.Confirmation" = "Cables are disconnected";
