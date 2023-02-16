@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks.airgap
+package io.parity.signer.screens.onboarding.eachstartchecks
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 
-class AirGapViewModel : ViewModel() {
+class EachStartViewModel : ViewModel() {
 
 	private val networkExposedStateKeeper = ServiceLocator.networkExposedStateKeeper
 

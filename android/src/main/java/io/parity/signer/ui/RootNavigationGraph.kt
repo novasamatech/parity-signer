@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.parity.signer.domain.findActivity
-import io.parity.signer.screens.onboarding.eachstartchecks.airgap.enableAirgapAppFlow
+import io.parity.signer.screens.onboarding.eachstartchecks.enableEachStartAppFlow
 import io.parity.signer.screens.onboarding.initialUnlockAppScreenFlow
 import io.parity.signer.screens.onboarding.splash.splashScreen
 import io.parity.signer.screens.onboarding.termsconsent.termsConsentAppFlow
@@ -51,7 +51,7 @@ fun RootNavigationGraph(
 		) {
 			splashScreen(navController)
 			termsConsentAppFlow(navController)
-			enableAirgapAppFlow(navController)
+			enableEachStartAppFlow(navController)
 			initialUnlockAppScreenFlow(navController)
 			mainSignerAppFlow(navController)
 		}
