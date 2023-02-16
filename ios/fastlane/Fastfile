@@ -10,8 +10,8 @@ platform :ios do
   import ("lanes/lane_testflight.rb")
 
   # shared variables
-  main_target = "NativeSigner"
-  main_scheme = "NativeSigner"
+  main_target = "PolkadotVault"
+  main_scheme = "PolkadotVault"
   configuration = "Release"
   desc "Runs unit tests for main scheme"
   desc "Example usage: fastlane run_unit_tests"

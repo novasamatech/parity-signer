@@ -7,7 +7,7 @@
 --wraparguments before-first
 
 # file options
---exclude NativeSigner/Generated/
+--exclude PolkadotVault/Generated/
 
 # rules
 --enable blockComments

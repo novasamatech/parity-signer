@@ -77,8 +77,8 @@ jobs:
         run:                  |
           cd ios
           xcodebuild \
-          -project NativeSigner.xcodeproj \
-          -scheme NativeSigner \
+          -project PolkadotVault.xcodeproj \
+          -scheme PolkadotVault \
           -sdk iphonesimulator \
           -destination 'platform=iOS Simulator,name=iPhone 14' \
           test \

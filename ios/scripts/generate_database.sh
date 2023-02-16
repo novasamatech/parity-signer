@@ -9,7 +9,7 @@ env -i PATH="${PATH}" \
 
 # Move database to assets
 
-rm -rf ../../ios/NativeSigner/Database
-mkdir ../../ios/NativeSigner/Database/
-mkdir ../../ios/NativeSigner/Database/Database/
-cp -R ../database/database_cold_release/ ../../ios/NativeSigner/Database/Database
+rm -rf ../../ios/PolkadotVault/Database
+mkdir ../../ios/PolkadotVault/Database/
+mkdir ../../ios/PolkadotVault/Database/Database/
+cp -R ../database/database_cold_release/ ../../ios/PolkadotVault/Database/Database

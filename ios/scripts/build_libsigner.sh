@@ -19,5 +19,5 @@ do
   "${HOME}"/.cargo/bin/cargo build --locked --target "$i" --release --no-default-features
 done
 
-lipo -create -output "../../ios/NativeSigner/lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
+lipo -create -output "../../ios/PolkadotVault/lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
 lipo -create -output "lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
