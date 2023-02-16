@@ -1,5 +1,5 @@
 //
-//  RustNative.swift
+//  SharedDataModel.swift
 //  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 22.7.2021.
@@ -88,7 +88,7 @@ private extension SharedDataModel {
     }
 }
 
-extension SharedDataModel {
+private extension SharedDataModel {
     /// Restores the `Polkadot Vault` to factory new state
     /// Should be called before app uninstall/upgrade!
     func wipe() {
@@ -104,9 +104,7 @@ extension SharedDataModel {
 }
 
 extension SharedDataModel {
-    /// Remove general verifier; wipes everything, obviously
     func removeGeneralVerifier() {
-        wipe()
         onboard(verifierRemoved: true)
     }
 }
