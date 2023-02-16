@@ -66,6 +66,7 @@ struct NetworkSelectionSettings: View {
             Spacer()
             Asset.chevronRight.swiftUIImage
                 .frame(width: Sizes.rightChevronContainerSize, height: Sizes.rightChevronContainerSize)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
         }
         .contentShape(Rectangle())
         .padding(.horizontal, Spacing.medium)
