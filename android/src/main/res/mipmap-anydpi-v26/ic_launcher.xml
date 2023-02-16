@@ -5,6 +5,6 @@
 <!--		icon is 72dp while should be 108-->
 		<inset
 			android:drawable="@mipmap/ic_launcher_foreground"
-			android:inset="18%" />
+			android:inset="16.66%" />
 	</foreground>
 </adaptive-icon>
