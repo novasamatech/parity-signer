@@ -1,7 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "airgap_wifi_error.svg",
+      "filename" : "wifi_disabled_light.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "wifi_disabled_dark.svg",
       "idiom" : "universal"
     }
   ],

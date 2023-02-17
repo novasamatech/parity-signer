@@ -2,7 +2,7 @@
 language = "en"
 multilingual = false
 src = "src"
-title = "Parity-Signer"
+title = "Polkadot-Vault"
 authors = [
         "parity-devops@parity.io"
 ]

@@ -15,9 +15,9 @@ fun TAC() {
 	MarkdownText(
 		content =
 		"""
-**PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
+**POLKADOT VAULT MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
-**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
+**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Polkadot Vault mobile application (the "**App**").
 
 In this document, when we refer to "**we**", "**us**" or "**our**", we mean Parity; and when we refer to "**you**" or "**your**" we mean you, the person downloading, accessing and/or using the App.
 
@@ -97,9 +97,9 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
 **5.  Intellectual property**
 
-  5.1  As we refer to above, we grant to you a licence to use the software code in the App on the terms of GPL 3.0. This right does not apply to the Parity name and mark, the Parity Signer product names, and any texts, designs, graphics, photographs and images contained in the App, which you are not entitled to use (other than through the use of the App on your Device in accordance with this EULA) or modify in any circumstances . We reserve all other rights.
+  5.1  As we refer to above, we grant to you a licence to use the software code in the App on the terms of GPL 3.0. This right does not apply to the Parity name and mark, the Polkadot Vault product names, and any texts, designs, graphics, photographs and images contained in the App, which you are not entitled to use (other than through the use of the App on your Device in accordance with this EULA) or modify in any circumstances . We reserve all other rights.
 
-  5.2  We are the owner or licensee of all intellectual property rights in the App and its content, the Parity name and mark and Parity Signer product names and images. Those works are protected by intellectual property laws and treaties around the world. All such rights are reserved.
+  5.2  We are the owner or licensee of all intellectual property rights in the App and its content, the Parity name and mark and Polkadot Vault product names and images. Those works are protected by intellectual property laws and treaties around the world. All such rights are reserved.
 
   5.3  You are not granted any right to use, and may not use, any of our intellectual property rights other than as set out in this EULA. You must not use the App (or any part of it or its content) for commercial purposes.
 

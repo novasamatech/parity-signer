@@ -1,32 +1,32 @@
 //! Making and restoring **cold** database with default content
 //!
-//! Cold database is the database that is operated from inside the Signer.
+//! Cold database is the database that is operated from inside the Vault.
 //!
 //! Cold database contains following trees:
 //!
 //! - `ADDRTREE` with public addresses data
-//! - `HISTORY` with Signer history log
+//! - `HISTORY` with Vault history log
 //! - `METATREE` with network metadata
-//! - `SETTREE` with settings: types information, Signer dangerous exposures
-//! record and Signer database general verifier
+//! - `SETTREE` with settings: types information, Vault dangerous exposures
+//! record and Vault database general verifier
 //! - `SPECSTREE` with network specs
 //! - `TRANSACTION` for temporary storage of the transaction data
 //! - `VERIFIERS` with network verifiers data
 //!
 //! For release, the cold database is generated on the hot side and then copied
-//! verbatim into Signer files during the build.
+//! verbatim into Vault files during the build.
 //!
 //! Before the database could be used, it must be initiated:
 //!
 //! - History log old entries (if any are present) are removed and a new entry
 //! `Event::DatabaseInitiated` is added
 //! - General verifier is set and this event is recorded in the history log. By
-//! default, Signer sets up Parity-associated key as a general verifier. This
+//! default, Vault sets up Parity-associated key as a general verifier. This
 //! could be later on changed by the user.
 //!
-//! Signer then reads and updates the database as it operates.
+//! Vault then reads and updates the database as it operates.
 //!
-//! There are two ways to reset the database from the Signer user interface.
+//! There are two ways to reset the database from the Vault user interface.
 //! Either would remove all the keys and restore the database to the release
 //! state. The difference would be only in the general verifier setting:
 //!
@@ -34,9 +34,9 @@
 //! with Parity-associated key inside
 //! - `Remove general certificate` would set the general verifier to `None`.
 //! User would then be able to set up own general verifier, preferably
-//! immediately afterwards, by loading to Signer any verified data.
+//! immediately afterwards, by loading to Vault any verified data.
 //! Setting up a new general verifier would remove all data associated with the
-//! general verifier from the Signer database to avoid confusion as to who
+//! general verifier from the Vault database to avoid confusion as to who
 //! verified what information.
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
@@ -143,7 +143,7 @@ fn default_cold_network_specs() -> Batch {
 ///
 /// General verifier is set up separately, during the database initiation
 /// [`init_db`]. Without general verifier (i.e. a value in the [`SETTREE`] tree
-/// under the key [`GENERALVERIFIER`]) the database is not usable by the Signer.
+/// under the key [`GENERALVERIFIER`]) the database is not usable by the Vault.
 #[cfg(feature = "active")]
 fn default_cold_settings_init_later() -> Result<Batch> {
     let mut batch = Batch::default();
@@ -179,7 +179,7 @@ fn default_cold_verifiers() -> Batch {
 /// - network verifiers
 ///
 /// Note that the resulting database is not initiated and is not ready to be
-/// used by the Signer.
+/// used by the Vault.
 #[cfg(any(feature = "active", feature = "test"))]
 fn cold_database_no_init(database: &sled::Db, purpose: Purpose) -> Result<()> {
     use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
@@ -206,12 +206,12 @@ fn cold_database_no_init(database: &sled::Db, purpose: Purpose) -> Result<()> {
 /// Function simultaneously sets up the general verifier and marks the new start
 /// of the history log.
 ///
-/// Could be used both from the Signer side (with `Wipe all data` and with
+/// Could be used both from the Vault side (with `Wipe all data` and with
 /// `Remove general certificate` procedures) and from the active side, when
 /// when preparing the test databases.
 ///
 /// After applying this function the database becomes ready to be used by the
-/// Signer.
+/// Vault.
 pub fn init_db(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.insert(GENERALVERIFIER, general_verifier.encode());
@@ -234,17 +234,17 @@ pub fn init_db(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
     Ok(())
 }
 
-/// Initiate Signer database with default general verifier (Parity-associated
+/// Initiate Vault database with default general verifier (Parity-associated
 /// key).
 ///
-/// Function is applied during the initial start of the Signer and during
+/// Function is applied during the initial start of the Vault and during
 /// `Wipe all data` procedure.
 #[cfg(feature = "signer")]
 pub fn signer_init_with_cert(database: &sled::Db) -> Result<()> {
     init_db(database, default_general_verifier())
 }
 
-/// Initiate Signer database with general verifier set up to `Verifier(None)`.
+/// Initiate Vault database with general verifier set up to `Verifier(None)`.
 ///
 /// Function is applied during `Remove general certificate` procedure.
 #[cfg(feature = "signer")]

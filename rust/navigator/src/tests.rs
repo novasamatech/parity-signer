@@ -3045,7 +3045,7 @@ fn flow_test_1() {
         concat!(
             "GoForward on RecoverSeedPhrase screen with ",
             "seed phrase (seed phrase vaidity was already checked ",
-            "elsewhere - currently in crate Signer). Expected updated ",
+            "elsewhere - currently in crate Vault). Expected updated ",
             "Keys screen with no modals, with known stable content since ",
             "this is Alice"
         )
@@ -6203,7 +6203,7 @@ fn flow_test_1() {
         concat!(
             "Switched to Settings from Log with non-initiated database. ",
             "Expected Settings screen with error on screen, and no alerts ",
-            "(we should still allow to reset Signer)"
+            "(we should still allow to reset Vault)"
         )
     );
 

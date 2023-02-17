@@ -1,22 +1,22 @@
 # Scope
 
-This is interpretation of UOS format used by Parity Signer. Since upstream
+This is interpretation of UOS format used by Polkadot Vault. Since upstream
 version of the published format diverges from actually implemented too much,
 this document was produced as representation of current state of UOS format
-compatible with Parity Signer. This document only covers networks compatible
-with Parity Signer (i.e. Substrate-based networks). This document also describes
-special payloads that are used for maintaining Parity Signer instance.
+compatible with Polkadot Vault. This document only covers networks compatible
+with Polkadot Vault (i.e. Substrate-based networks). This document also describes
+special payloads that are used for maintaining Polkadot Vault instance.
 
 Thus, effectively, this document describes input and output format for QR codes
-used by Parity Signer.
+used by Polkadot Vault.
 
 # Terminology
 
-Signer receives information over the air-gap as QR codes. QR codes are read as
-`u8` vectors, and must always be parsed by Signer before use.
+Vault receives information over the air-gap as QR codes. QR codes are read as
+`u8` vectors, and must always be parsed by Vault before use.
 
 QR codes could contain information that user wants to sign with one of the
-Signer keys or the update information to ensure smooth Signer operation without
+Vault keys or the update information to ensure smooth Vault operation without
 reset or connecting to the network.
 
 ## QR code types
@@ -28,7 +28,7 @@ reset or connecting to the network.
 
    - Message
 
-- Update, for Signer inner functionality:
+- Update, for Vault inner functionality:
 
    - add network specs
 
@@ -57,7 +57,7 @@ Actual content is shifted by half-byte, otherwise it is a normal byte sequence.
 
 ## Multiframe QR
 
-The information transferred through QR channel into Signer is always enveloped
+The information transferred through QR channel into Vault is always enveloped
 in multiframe packages (although minimal number of multiframe packages is 1).
 There are two standards for the multiframe: `RaptorQ` erasure coding and legacy
 non-erasure multiframe. The type of envelope is determined by the first bit of
@@ -84,14 +84,14 @@ Each QR code in `RaptorQ` encoded multipart payload contains following parts:
 + `payload_size` **MUST NOT** exceed `7FFFFFFF`
 + `payload_size` **MUST** be identical in all codes encoding the payload
 + `payload_size` and `RaptorQ serialized packet` **MUST** be stored by the Cold
-  Signer, in no particular order, until their amount is sufficient to decode
+  Vault, in no particular order, until their amount is sufficient to decode
 the payload.
 + Hot Wallet **MUST** continuously loop through all the frames showing each
   frame for at least 1/30 seconds (recommended frame rate: 4 FPS).
-+ Cold Signer **MUST** be able to start scanning the Multipart Payload _at any
++ Cold Vault **MUST** be able to start scanning the Multipart Payload _at any
   frame_.
-+ Cold Signer **MUST NOT** expect the frames to come in any particular order.
-+ Cold Signer **SHOULD** show a progress indicator of how many frames it has
++ Cold Vault **MUST NOT** expect the frames to come in any particular order.
++ Cold Vault **SHOULD** show a progress indicator of how many frames it has
   successfully scanned out of the estimated minimum required amount.
 + Hot Wallet **SHOULD** generate sufficient number of recovery frames
   (recommended overhead: 100%; minimal reasonable overhead: square root of
@@ -104,7 +104,7 @@ single payload and treated as data vector ("QR code content").
 
 ##### *Legacy Multipart Payload*
 
-In real implementation, the Parity Signer ecosystem generalized all payloads as
+In real implementation, the Polkadot Vault ecosystem generalized all payloads as
 multipart messages. 
 
 | bytes position | `[0]`  | `[1..3]` | `[3..5]`      | `[5..]`     |
@@ -115,14 +115,14 @@ multipart messages.
   big-endian 16-bit unsigned integer.
 + `frame_count` **MUST** the total number of frames, represented as big-endian
   16-bit unsigned integer.
-+ `part_data` **MUST** be stored by the Cold Signer, ordered by `frame` number,
++ `part_data` **MUST** be stored by the Cold Vault, ordered by `frame` number,
   until all frames are scanned.
 + Hot Wallet **MUST** continuously loop through all the frames showing each
   frame for about 2 seconds.
-+ Cold Signer **MUST** be able to start scanning the Multipart Payload _at any
++ Cold Vault **MUST** be able to start scanning the Multipart Payload _at any
   frame_.
-+ Cold Signer **MUST NOT** expect the frames to come in any particular order.
-+ Cold Signer **SHOULD** show a progress indicator of how many frames it has
++ Cold Vault **MUST NOT** expect the frames to come in any particular order.
++ Cold Vault **SHOULD** show a progress indicator of how many frames it has
   successfully scanned out of the total count.
 
 Once all frames are combined, the `part_data` must be concatenated into a
@@ -178,7 +178,7 @@ sign the update:
 Derivations import and testing are always unsigned, with `<encryption code>`
 always `0xff`.
 
-Signer supports following `<payload code>` variants:
+Vault supports following `<payload code>` variants:
 
 <table>
     <tr>
@@ -228,7 +228,7 @@ but currently both mortal and immortal transactions from polkadot-js are `0x02`.
 Rust (hexadecimal string is getting changed to raw bytes soon).
 If QR code is not processable, nothing happens and the scanner keeps trying to
 catch a processable one.
-2. Analyze prelude: is it Substrate? is it a known payload type? If not, Signer
+2. Analyze prelude: is it Substrate? is it a known payload type? If not, Vault
 always produces an error and suggests to scan supported payload.
 
 Further processing is done based on the payload type.
@@ -253,7 +253,7 @@ Public key is the key that can sign the transaction. Its length depends on the
 | Ecdsa | 33 |
 
 Call data is `Vec<u8>` representation of transaction content. Call data must be
-parsed by Signer prior to signature generation and becomes a part of signed
+parsed by Vault prior to signature generation and becomes a part of signed
 blob. Within transaction, the call data is SCALE-encoded, i.e. effectively is
 prefixed with compact of its length in bytes.
 
@@ -276,7 +276,7 @@ Thus, the transaction structure could also be represented as:
 Bold-marked transaction pieces are used in the blob for which the signature is
 produced. If the blob is short, 257 bytes or below, the signature is produced
 for it as is. For blobs longer than 257 bytes, 32 byte hash (`blake2_256`) is
-signed instead. This is inherited from earlier Signer versions, and is currently
+signed instead. This is inherited from earlier Vault versions, and is currently
 compatible with polkadot-js.
 
 ### Transaction parsing sequence
@@ -291,28 +291,28 @@ compatible with polkadot-js.
     (everything that remains in between the transaction author public kay and
     the network genesis hash)
 
-    If the data length is insufficient, Signer produces an error and suggests to
+    If the data length is insufficient, Vault produces an error and suggests to
 load non-damaged transaction.
 
-2. Search the Signer database for the network specs (from the network genesis
+2. Search the Vault database for the network specs (from the network genesis
 hash and encryption).
 
-    If the network specs are not found, Signer shows:
+    If the network specs are not found, Vault shows:
 
     - public key and encryption of the transaction author key
     - error message, that suggests to add network with found genesis hash
 
-3. Search the Signer database for the address key (from the transaction author
-public key and encryption). Signer will try to interpret and display the
+3. Search the Vault database for the address key (from the transaction author
+public key and encryption). Vault will try to interpret and display the
 transaction in any case. Signing will be possible only if the parsing is
-successful and the address key is known to Signer and is extended to the network
+successful and the address key is known to Vault and is extended to the network
 in question.
 
     - Address key not found. Signing not possible. Output shows:
 
         - public key and encryption of the transaction author key
         - call and extensions parsing result
-        - warning message, that suggests to add the address into Signer
+        - warning message, that suggests to add the address into Vault
 
     - Address key is found, but it is not extended to the network used. Signing
     not possible. Output shows:
@@ -323,7 +323,7 @@ in question.
         - warning message, that suggests extending the address into the network
         used
 
-    - Address key is found and is extended to the network used. Signer will
+    - Address key is found and is extended to the network used. Vault will
     proceed to try and interpret the call and extensions. Detailed author
     information will be shown regardless of the parsing outcome.
     The signing will be allowed only if the parsing is successful.
@@ -332,17 +332,17 @@ in question.
 the compact is cut off, the part with length that was indicated in the compact
 goes into call data, the part that remains goes into extensions data.
 
-    If no compact is found or the length is insufficient, Signer produces an
+    If no compact is found or the length is insufficient, Vault produces an
 error that call and extensions could not be separated.
 
-5. Get the metadata set from the Signer database, by the network name from the
+5. Get the metadata set from the Vault database, by the network name from the
 network specs. Metadata is used to interpret extensions and then the call
 itself.
 
-    If there are no metadata entries for the network at all, Signer produces an
+    If there are no metadata entries for the network at all, Vault produces an
 error and asks to load the metadata.
 
-    `RuntimeMetadata` versions supported by Signer are `V12`, `V13`, and `V14`.
+    `RuntimeMetadata` versions supported by Vault are `V12`, `V13`, and `V14`.
 The crucial feature of the `V14` is that the metadata contains the description
 of the types used in the call and extensions production. `V12` and `V13` are
 legacy versions and provide only text identifires for the types, and in order to
@@ -350,7 +350,7 @@ use them, the supplemental types information is needed.
 
 5. Process the extensions.
 
-    Signer already knows in which network the transaction was made, but does not
+    Vault already knows in which network the transaction was made, but does not
 yet know the metadata version. Metadata version must be one of the signable
 extensions. At the same time, the extensions and their order are recorded in the
 network metadata. Thus, all metadata entries from the set are checked, from
@@ -366,7 +366,7 @@ all attempts with existing metadata have failed.
 and in between the networks, however, they can be and sometimes are different.
 
     In legacy metadata (`RuntimeMetadata` version being `V12` and `V13`)
-extensions have identifiers only, and in Signer the extensions for `V12` and
+extensions have identifiers only, and in Vault the extensions for `V12` and
 `V13` are hardcoded as:
 
     - `Era` era
@@ -378,11 +378,11 @@ extensions have identifiers only, and in Signer the extensions for `V12` and
     - `H256` block hash
 
     If the extensions could not be decoded as the standard set or not all
-extensions blob is used, the Signer rejects this metadata version and adds error
+extensions blob is used, the Vault rejects this metadata version and adds error
 into the error set.
 
     Metadata `V14` has extensions with both identifiers and properly described
-types, and Signer decodes extensions as they are recorded in the metadata. For
+types, and Vault decodes extensions as they are recorded in the metadata. For
 this,
 [`ExtrinsicMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.ExtrinsicMetadata.html)
 part of the metadata
@@ -396,7 +396,7 @@ correct length blobs from the whole SCALE-encoded extensions blob and decode
 them properly.
 
     If any of these small decodings fails, the metadata version gets rejected by
-the Signer and an error is added to the error set. Same happens if after all
+the Vault and an error is added to the error set. Same happens if after all
 extensions are scanned, some part of extensions blob remains unused.
 
     There are some special extensions that must be treated separately. The
@@ -440,29 +440,29 @@ extensions:
     - exactly one `GenesisHash` <- this is not so currently, fix it
     - exactly one metadata version
 
-    If the extension set is different, this results in Signer error for this
+    If the extension set is different, this results in Vault error for this
 particular metadata version, this error goes into error set.
 
     The extensions in the metadata are checked on the metadata loading step,
 long before any transactions are even produced. Metadata with incomplete
 extensions causes a warning on `load_metadata` update generation step, and
-another one when an update with such metadata gets loaded into Signer.
-Nevertheless, such metadata loading into Signer is allowed, as there could be
+another one when an update with such metadata gets loaded into Vault.
+Nevertheless, such metadata loading into Vault is allowed, as there could be
 other uses for metadata except signable transaction signing. Probably.
 
     If the metadata version in extensions does not match the metadata version
-of the metadata used, this results in Signer error for this particular metadata
+of the metadata used, this results in Vault error for this particular metadata
 version, this error goes into error set.
 
     If the extensions are completely decoded, with correct set of the special
 extensions and the metadata version from the extensions match the metadata
 version of the metadata used, the extensions are considered correctly parsed,
-and Signer can proceed to the call decoding.
+and Vault can proceed to the call decoding.
 
-    If all metadata entries from the Signer database were tested and no suitable
-solution is found, Signer produces an error stating that all attempts to decode
+    If all metadata entries from the Vault database were tested and no suitable
+solution is found, Vault produces an error stating that all attempts to decode
 extensions have failed. This could be used by variety of reasons (see above),
-but so far the most common one observed was users having the metadata in Signer
+but so far the most common one observed was users having the metadata in Vault
 not up-to-date with the metadata on chain. Thus, the error must have a
 recommendation to update the metadata first.
 
@@ -489,9 +489,9 @@ found using the call index (second `u8` of the call data). Each call has
 associated set of argument names and argument types, however, the argument type
 is just a text identifier. The type definitions are not in the metadata and
 transactions decoding requires supplemental types information. By default, the
-Signer contains types information that was constructed for Westend when Westend
+Vault contains types information that was constructed for Westend when Westend
 was still using `V13` metadata and it was so far reasonably sufficient for
-simple transactions parsing. If the Signer does not find the type information in
+simple transactions parsing. If the Vault does not find the type information in
 the database **and** has to decode the transaction using `V12` or `V13`
 metadata, error is produced, indicating that there are no types. Elsewise, for
 each encountered argument type the encoded data size is determined, and the
@@ -534,9 +534,9 @@ there for details.
 the process, the transaction is considered parsed and is displayed to the user,
 either ready for signing (if all other checks have passed) or as read-only.
 
-7. If the user chooses to sign the transaction, the Signer produces QR code with
+7. If the user chooses to sign the transaction, the Vault produces QR code with
 signature, that should be read back into the hot side. As soon as the signature
-QR code is generated, the Signer considers the transaction signed.
+QR code is generated, the Vault considers the transaction signed.
 
     All signed transactions are entered in the history log, and could be seen
 and decoded again from the history log. Transactions not signed by the user do
@@ -546,10 +546,10 @@ not go in the history log.
 to enter the password correctly. Each incorrect password entry is reflected in
 the history.
 
-    In the time interval between Signer displaying the parsed transaction and
+    In the time interval between Vault displaying the parsed transaction and
 the user approving it, the transaction details needed to generate the signature
 and history log details are temporarily stored in the database. The temporary
-storage gets cleared each time before and after use. Signer extracts the stored
+storage gets cleared each time before and after use. Vault extracts the stored
 transaction data only if the database checksum stored in navigator state is
 same as the the current checksum of the database. If the password is entered
 incorrectly, the database is updated with "wrong password" history entry, and
@@ -627,7 +627,7 @@ Message has following structure:
 </table>
 
 `[u8]` slice is represented as String if all bytes are valid UTF-8. If not all
-bytes are valid UTF-8, the Signer produces an error.
+bytes are valid UTF-8, the Vault produces an error.
 
 It is critical that the message payloads are always clearly distinguishable from
 the transaction payloads, i.e. it is never possible to trick user to sign
@@ -652,7 +652,7 @@ Note that the `verifier public key` and `signature` parts appear only in signed
 uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed by the update
 payload.
 
-Every time user receives an unsigned update, the Signer displays a warning that
+Every time user receives an unsigned update, the Vault displays a warning that
 the update is not verified. Generally, the use of unsigned updates is
 discouraged.
 
@@ -683,7 +683,7 @@ update itself and for generating update signature, could be found in Rust module
 
 ### `add_specs` update payload, payload code `c1`
 
-Introduces a new network to Signer, i.e. adds network specs to the Signer
+Introduces a new network to Vault, i.e. adds network specs to the Vault
 database.
 
 Update payload is `ContentAddSpecs` in `to_transfer()` form, i.e. **double**
@@ -692,7 +692,7 @@ length).
 
 Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
 
-Network specs are stored in dedicated `SPECSTREE` tree of the Signer database.
+Network specs are stored in dedicated `SPECSTREE` tree of the Vault database.
 Network specs identifier is `NetworkSpecsKey`, a key built from encryption used
 by the network and the network genesis hash. There could be networks with
 multiple encryption algorithms supported, thus the encryption is part of the
@@ -724,12 +724,12 @@ changed by simply loading new ones over the old ones:
     there and may return at some point)
     - logo
     - path (default derivation path for network, `//<network_name>`)
-    - title (network title as it gets displayed in the Signer)
+    - title (network title as it gets displayed in the Vault)
 
 ### `load_metadata` update payload, payload code `80`
 
-Loads metadata for a network already known to Signer, i.e. for a network with
-network specs in the Signer database.
+Loads metadata for a network already known to Vault, i.e. for a network with
+network specs in the Vault database.
 
 Update payload is `ContentLoadMeta` in `to_transfer()` form, and consists of
 concatenated SCALE-encoded metadata `Vec<u8>` and network genesis hash (H256,
@@ -737,23 +737,23 @@ always 32 bytes).
 
 Same blob is used to generate the signature.
 
-Network metadata is stored in dedicated `METATREE` tree of the Signer database.
+Network metadata is stored in dedicated `METATREE` tree of the Vault database.
 Network metadata identifier in is `MetaKey`, a key built from the network name
 and network metadata version.
 
 ### `load_metadata` compressed update payload, payload code `88` <- proposal only
 
-Loads metadata for a network already known to Signer, i.e. for a network with
-network specs in the Signer database. Exactly same as `load_metadata` code `80`
+Loads metadata for a network already known to Vault, i.e. for a network with
+network specs in the Vault database. Exactly same as `load_metadata` code `80`
 payload, except the payload is (a) compressed to decrease the QR code size and
 (b) SCALE-encoded to have the exact payload length.
 
 Signature is made for decompressed payload, i.e. the same signature would be
 valid for `80` and `88` payloads.
 
-### Metadata suitable for Signer
+### Metadata suitable for Vault
 
-Network metadata that can get into Signer and can be used by Signer only if it
+Network metadata that can get into Vault and can be used by Vault only if it
 complies with following requirements:
 
 - metadata vector starts with `b"meta"` prelude
@@ -792,35 +792,35 @@ length).
 
 Payload signature is generated for SCALE-encoded `Vec<TypeEntry>`.
 
-Types information is stored in `SETTREE` tree of the Signer database, under key
+Types information is stored in `SETTREE` tree of the Vault database, under key
 `TYPES`.
 
 ### Verifiers
 
-Signer can accept both verified and non-verified updates, however, information
+Vault can accept both verified and non-verified updates, however, information
 once verified can not be replaced or updated by a weaker verifier without full
-Signer reset.
+Vault reset.
 
 A verifier could be `Some(_)` with corresponding public key inside or `None`.
 All verifiers for the data follow trust on first use principle.
 
-Signer uses:
+Vault uses:
 - a single general verifier
-- a network verifier for each of the networks introduced to the Signer
+- a network verifier for each of the networks introduced to the Vault
 
-General verifier information is stored in `SETTREE` tree of the Signer database,
+General verifier information is stored in `SETTREE` tree of the Vault database,
 under key `GENERALVERIFIER`. General verifier is always set to a value, be it
 `Some(_)` or `None`. Removing the general verifier means setting it to `None`.
 If no general verifier entry is found in the database, the database is
-considered corrupted and the Signer must be reset.
+considered corrupted and the Vault must be reset.
 
 Network verifier information is stored in dedicated `VERIFIERS` tree of the
-Signer database. Network verifier identifier is `VerifierKey`, a key built from
+Vault database. Network verifier identifier is `VerifierKey`, a key built from
 the network genesis hash. Same network verifier is used for network specs with
 any encryption algorithm and for network metadata. Network verifier could be
 valid or invalid. Valid network verifier could be general or custom. Verifiers
 installed as a result of an update are always valid. Invalid network verifier
-blocks the use of the network unless the Signer is reset, it appears if user
+blocks the use of the network unless the Vault is reset, it appears if user
 marks custom verifier as no longer trusted.
 
 Updating verifier could cause some data verified by the old verifier to be
@@ -831,14 +831,14 @@ receives a warning if accepting new update would cause hold data to be removed.
 #### General verifier
 
 General verifier is the strongest and the most reliable verifier known to the
-Signer. General verifier could sign all kinds of updates. By default the Signer
+Vault. General verifier could sign all kinds of updates. By default the Vault
 uses Parity-associated key as general verifier, but users can remove it and set
 their own. There could be only one general verifier at any time.
 
-General verifier could be removed only by complete wipe of the Signer, through
-`Remove general certificate` button in the Settings. This will reset the Signer
+General verifier could be removed only by complete wipe of the Vault, through
+`Remove general certificate` button in the Settings. This will reset the Vault
 database to the default content and set the general verifier as `None`, that
-will be updated to the first verifier encountered by the Signer.
+will be updated to the first verifier encountered by the Vault.
 
 Expected usage for this is that the user removes old general verifier and
 immediately afterwards loads an update from the preferred source, thus setting
@@ -890,13 +890,13 @@ network metadata entries.
     - concatenated update payload, verifier signature (only if the update is
     signed) and reserved tail.
 
-    If the data length is insufficient, Signer produces an error and suggests to
+    If the data length is insufficient, Vault produces an error and suggests to
 load non-damaged update.
 
 2. Using the payload type from the prelude, determine the update payload length
 and cut payload from the concatenated verifier signature and reserved tail.
 
-    If the data length is insufficient, Signer produces an error and suggests to
+    If the data length is insufficient, Vault produces an error and suggests to
 load non-damaged update.
 
 3. (only if the update is signed, i.e. the encryption is **not** `0xff`)
@@ -904,40 +904,40 @@ Cut verifier signature, its length matching the encryption (64 or 65 `u8`
 immediately after the update payload). Remaining data is reserved tail,
 currently it is not used.
 
-    If the data length is insufficient, Signer produces an error and suggests to
+    If the data length is insufficient, Vault produces an error and suggests to
 load non-damaged update.
 
-4. Verify the signature for the payload. If this fails, Signer produces an error
+4. Verify the signature for the payload. If this fails, Vault produces an error
 indicating that the update has invalid signature.
 
 ### `add_specs` processing sequence
 
 1. Update payload is transformed into `ContentAddSpecs` and the incoming
-`NetworkSpecsToSend` are retrieved, or the Signer produces an error indicating
+`NetworkSpecsToSend` are retrieved, or the Vault produces an error indicating
 that the `add_specs` payload is damaged.
 
-2. Signer checks that there is no change in invariant specs occuring.
+2. Vault checks that there is no change in invariant specs occuring.
 
-    If there are entries in the `SPECSTREE` of the Signer database with same
+    If there are entries in the `SPECSTREE` of the Vault database with same
 genesis hash as in newly received specs (the encryption not necessarily
-matches), the Signer checks that the name and base58 prefix in the received
-specs are same as in the specs already in the Signer database.
+matches), the Vault checks that the name and base58 prefix in the received
+specs are same as in the specs already in the Vault database.
 
-3. Signer checks the verifier entry for the received genesis hash.
+3. Vault checks the verifier entry for the received genesis hash.
 
-    If there are no entries, i.e. the network is altogether new to the Signer,
+    If there are no entries, i.e. the network is altogether new to the Vault,
 the specs could be added into the database. During the same database transaction
 the network verifier is set up:
 
-    | `add_specs` update verification | General verifier in Signer database | Action |
+    | `add_specs` update verification | General verifier in Vault database | Action |
     | :- | :- | :- |
     | unverified, `0xff` update encryption code | `None` or `Some(_)` | (1) set network verifier to custom, `None` (regardless of the general verifier); (2) add specs |
     | verified by `a` | `None` | (1) set network verifier to general; (2) set general verifier to `Some(a)`, process the general hold; (3) add specs |
     | verified by `a` | `Some(b)` | (1) set network verifier to custom, `Some(a)`; (2) add specs |
     | verified by `a` | `Some(a)` | (1) set network verifier to general; (2) add specs |
 
-    If there are entries, i.e. the network was known to the Signer at some
-point after the last Signer reset, the network verifier in the database and the
+    If there are entries, i.e. the network was known to the Vault at some
+point after the last Vault reset, the network verifier in the database and the
 verifier of the update are compared. The specs could be added in the database if
 
     1. there are no verifier mismatches encountered (i.e. verifier same or
@@ -949,7 +949,7 @@ verifier of the update are compared. The specs could be added in the database if
 with **updated** verifier and the user accepts the update, the verifier will get
 updated and the specs will stay in the database.
 
-    | `add_specs` update verification | Network verifier in Signer database | General verifier in Signer database | Action |
+    | `add_specs` update verification | Network verifier in Vault database | General verifier in Vault database | Action |
     | :- | :- | :- | :- |
     | unverified, `0xff` update encryption code | custom, `None` | `None` | accept specs if good |
     | unverified, `0xff` update encryption code | custom, `None` | `Some(a)` | accept specs if good |
@@ -964,16 +964,16 @@ updated and the specs will stay in the database.
 
     Before the `NetworkSpecsToSend` are added in the `SPECSTREE`, they get
 transformed into `NetworkSpecs`, and have the `order` field (display order in
-Signer network lists) added. Each new network specs entry gets added in the end
+Vault network lists) added. Each new network specs entry gets added in the end
 of the list.
 
 ### `load_meta` processing sequence
 
 1. Update payload is transformed into `ContentLoadMeta`, from which the metadata
-and the genesis hash are retrieved, or the Signer produces an error indicating
+and the genesis hash are retrieved, or the Vault produces an error indicating
 that the `load_metadata` payload is damaged.
 
-2. Signer checks that the received metadata fulfills all Signer metadata
+2. Vault checks that the received metadata fulfills all Vault metadata
 requirements outlined [above](#metadata-suitable-for-signer). Otherwise an
 error is produced indicating that the received metadata is invalid.
 
@@ -981,55 +981,55 @@ error is produced indicating that the received metadata is invalid.
 metadata version and optional base58 prefix (if it is recorded in the metadata).
 
 3. Network genesis hash is used to generate `VerifierKey` and check if the
-network has an established network verifier in the Signer database. If there
+network has an established network verifier in the Vault database. If there
 is no network verifier associated with genesis hash, an error is produced,
 indicating that the network metadata could be loaded only for networks
-introduced to Signer.
+introduced to Vault.
 
-4. `SPECSTREE` tree of the Signer database is scanned in search of entries with
+4. `SPECSTREE` tree of the Vault database is scanned in search of entries with
 genesis hash matching the one received in payload.
 
-    Signer accepts `load_metadata` updates only for the networks that have at
+    Vault accepts `load_metadata` updates only for the networks that have at
 least one network specs entry in the database.
 
     Note that if the verifier in step (3) above is found, it not necessarily
 means that the specs are found (for example, if a network verified by general
 verifier was removed by user).
 
-    If the specs are found, the Signer checks that the network name and, if
+    If the specs are found, the Vault checks that the network name and, if
 present, base58 prefix from the received metadata match the ones in network
-specs from the database. If the values do not match, the Signer produces an
+specs from the database. If the values do not match, the Vault produces an
 error.
 
-5. Signer compares the verifier of the received update and the verifier for the
+5. Vault compares the verifier of the received update and the verifier for the
 network from the database. The update verifier must be exactly the same as the
-verifier already in the database. If there is mismatch, Signer produces an
+verifier already in the database. If there is mismatch, Vault produces an
 error, indication that the `load_metadata` update for the network must be signed
 by the specified verifier (general or custom) or unsigned.
 
-6. If the update has passed all checks above, the Signer searches for the
-metadata entry in the `METATREE` of the Signer database, using network name and
+6. If the update has passed all checks above, the Vault searches for the
+metadata entry in the `METATREE` of the Vault database, using network name and
 version from update to produce `MetaKey`.
 
     If the key is not found in the database, the metadata could be added.
     
     If the key is found in the database and metadata is **exactly the same**,
-the Signer produces an error indicating that the metadata is already in the
+the Vault produces an error indicating that the metadata is already in the
 database. This is expected to be quite common outcome.
 
     If the key is found in the database and the metadata is **different**, the
-Signer produces an error. Metadata must be not acceptable. This situation can
+Vault produces an error. Metadata must be not acceptable. This situation can
 occur if there was a silent metadata update or if the metadata is corrupted.
 
 ### `load_types` processing sequence
 
 1. Update payload is transformed into `ContentLoadTypes`, from which the types
-description vector `Vec<TypeEntry>` is retrieved, or the Signer produces an
+description vector `Vec<TypeEntry>` is retrieved, or the Vault produces an
 error indicating that the `load_types` payload is damaged.
 
 2. `load_types` updates must be signed by the general verifier.
 
-    | `load_types` update verification | General verifier in Signer database | Action |
+    | `load_types` update verification | General verifier in Vault database | Action |
     | :- | :- | :- |
     | unverified, `0xff` update encryption code | `None` | load types if the types are not yet in the database |
     | verified by `a` | `None` | (1) set general verifier to `Some(a)`, process the general hold; (2) load types, warn if the types are the same as before |
@@ -1037,10 +1037,10 @@ error indicating that the `load_types` payload is damaged.
     | verified by `a` | `Some(a)` | load types if the types are not yet in the database |
 
     If the `load_types` verifier is same as the general verifier in the database
-and the types are same as the types in the database, the Signer produces an
+and the types are same as the types in the database, the Vault produces an
 error indicating that the types are already known.
 
-    Each time the types are loaded, the Signer produces a warning. `load_types`
+    Each time the types are loaded, the Vault produces a warning. `load_types`
 is rare and quite unexpected operation.
 
 ## Derivations import, payload code `de`
@@ -1064,16 +1064,16 @@ derivations are applied.
 
 When processing derivations import, all data after prelude is transformed into
 `ContentDerivations`. Network genesis hash, encryption and derivations set are
-derived from it, or the Signer produces an error indicating that the derivation
+derived from it, or the Vault produces an error indicating that the derivation
 import payload is corrupted.
 
-Signer checks that the network for which the derivations are imported has
-network specs in the Signer database. If not, an error is produced.
+Vault checks that the network for which the derivations are imported has
+network specs in the Vault database. If not, an error is produced.
 
-Signer checks that the derivation set contains only valid derivations. If any
+Vault checks that the derivation set contains only valid derivations. If any
 derivation is unsuitable, an error is produced indicating this.
 
-If the user accepts the derivations import for some seed, Signer generates a key
+If the user accepts the derivations import for some seed, Vault generates a key
 for each derivation for user-provided seed.
 
 If one of the derived keys already exists, it gets ingored, i.e. no error is
@@ -1082,7 +1082,7 @@ produced.
 If there are two derivations with identical path within the payload, only one
 derived key is created.
 
-In case of key collision Signer always produces an error and imports no
+In case of key collision Vault always produces an error and imports no
 derivations. Key collision means that the public keys produced for two
 *different* derivation paths coincide. For example, `//1` and `//01` derivations
 would result in identical public key, and there would be uncertainty which path
@@ -1091,7 +1091,7 @@ should be in the record.
 Key collision can occur:
 
 - if there are two colliding derivations within payload
-- if there already exists a derivation in Signer, with which the newly received
+- if there already exists a derivation in Vault, with which the newly received
 derivation would collide
 
 The public key is determined for seed and derivation path combination for given
@@ -1103,5 +1103,5 @@ network `Network 2` must result in an error.
 ## Testing parser card display
 
 Whole payload is `53fff0`. This is test payload, used to display all cards
-available in Signer interface.
+available in Vault interface.
 

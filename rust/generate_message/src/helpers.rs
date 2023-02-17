@@ -734,7 +734,7 @@ pub fn specs_agnostic(
 /// Update [`NetworkSpecs`] already existing in the database with
 /// **exactly same** encryption.
 ///
-/// Could be used to overwrite token (if possible for the network) or the Signer
+/// Could be used to overwrite token (if possible for the network) or the Vault
 /// display title. If no title override is used, the title remains as it was.
 ///
 /// Output flag indicates if the value has changed, and the database entry
