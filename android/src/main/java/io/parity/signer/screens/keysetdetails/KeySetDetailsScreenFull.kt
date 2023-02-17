@@ -42,6 +42,9 @@ fun KeySetDetailsScreenFull(
 					scope.launch { bottomSheetState.hide() }
 					navController.navigate(KeySetDetailsNavSubgraph.backup)
 				},
+				onCancel =  {
+					scope.launch { bottomSheetState.hide() }
+				}
 			)
 		},
 		mainContent = {

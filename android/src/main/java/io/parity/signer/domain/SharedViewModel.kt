@@ -23,7 +23,6 @@ class SharedViewModel() : ViewModel() {
 		// Imitate ios behavior
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			seedStorage.init(context)
 			totalRefresh()
 		}
 	}
@@ -75,6 +74,9 @@ class SharedViewModel() : ViewModel() {
 	 * This returns the app into starting state;
 	 */
 	fun totalRefresh() {
+		if (!seedStorage.isInitialized()) {
+			seedStorage.init(context)
+		}
 		if (!context.isDbCreatedAndOnboardingPassed()) {
 			initAssetsAndTotalRefresh()
 		} else {

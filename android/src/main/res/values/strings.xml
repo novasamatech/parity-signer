@@ -273,8 +273,8 @@
 	<string name="scan_screen_error_missing_key_set_message">Some keys can not be imported until their key sets are recovered.</string>
 	<string name="scan_screen_error_missing_network_title">Please add missing networks and their metadata.</string>
 	<string name="scan_screen_error_missing_network_message">Some keys can not be imported until their networks are added.</string>
-	<string name="scan_screen_error_key_already_exists_title">Derived keys already exist</string>
-	<string name="scan_screen_error_key_already_exists_message">All of the scanned derived keys are already imported</string>
+	<string name="scan_screen_error_derivation_no_keys_and_no_errors_title">Derived keys are not imported</string>
+	<string name="scan_screen_error_derivation_no_keys_and_no_errors_message">All of the scanned derived keys are already imported or root of those derivations doesn\'t exist on device</string>
 	<string name="import_derivations_error_key_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
 	<string name="import_derivations_error_network_missing">Some keys can not be imported until their networks are added. Please add missing networks and their metadata. </string>
 	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>

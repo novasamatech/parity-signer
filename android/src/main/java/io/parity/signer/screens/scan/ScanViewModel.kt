@@ -166,8 +166,8 @@ class ScanViewModel : ViewModel() {
 							}
 						} else {
 							presentableError.value = PresentableErrorModel(
-								title = context.getString(R.string.scan_screen_error_key_already_exists_title),
-								message = context.getString(R.string.scan_screen_error_key_already_exists_message),
+								title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
+								message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
 							)
 							return
 						}
