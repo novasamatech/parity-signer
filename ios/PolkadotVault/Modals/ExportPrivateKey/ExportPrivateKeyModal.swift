@@ -45,7 +45,8 @@ struct ExportPrivateKeyModal: View {
                         AnimatedQRCodeView(
                             viewModel: Binding<AnimatedQRCodeViewModel>.constant(
                                 .init(
-                                    qrCodes: [viewModel.qrCode.payload]
+                                    qrCodes: [viewModel.qrCode.payload],
+                                    style: .private
                                 )
                             )
                         )
