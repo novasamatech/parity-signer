@@ -35,6 +35,8 @@ class SeedStorage {
 	private lateinit var sharedPreferences: SharedPreferences
 	private val KEYSTORE_NAME = "AndroidKeyStore"
 
+	fun isInitialized(): Boolean = this::sharedPreferences.isInitialized
+
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */

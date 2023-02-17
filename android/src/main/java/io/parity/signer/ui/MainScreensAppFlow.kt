@@ -8,14 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
 import io.parity.signer.domain.SharedViewModel
+import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.onboarding.UnlockAppAuthScreen
 import io.parity.signer.screens.onboarding.WaitingScreen
 import io.parity.signer.ui.rustnavigationselectors.*
@@ -34,10 +38,19 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		if (authenticated.value) {
 			SignerMainSubgraph(sharedViewModel)
 		} else {
-			UnlockAppAuthScreen { sharedViewModel.totalRefresh() }
+			val currentActivity = LocalContext.current.findActivity() as FragmentActivity
+			UnlockAppAuthScreen {
+				val authentication = ServiceLocator.authentication
+				authentication.authenticate(currentActivity) {
+					sharedViewModel.totalRefresh()
+				}
+			}
 		}
 		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "main rust-handled screen navigation subgraph opened")
+			Log.d(
+				NAVIGATION_TAG,
+				"main rust-handled screen navigation subgraph opened"
+			)
 		}
 	}
 }
