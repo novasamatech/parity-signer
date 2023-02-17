@@ -12,7 +12,9 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Typography
 
@@ -30,11 +32,21 @@ fun Documents() {
 			modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
 		) {
 			Tab(
-				content = { Text("Terms of service", style = Typography.button) },
+				content = {
+					Text(
+						text = stringResource(R.string.documents_terms_of_service),
+						style = Typography.button
+					)
+				},
 				selected = document == 0,
 				onClick = { document = 0 })
 			Tab(
-				content = { Text("Privacy policy", style = Typography.button) },
+				content = {
+					Text(
+						text = stringResource(R.string.documents_privacy_policy),
+						style = Typography.button
+					)
+				},
 				selected = document == 1,
 				onClick = { document = 1 })
 		}
