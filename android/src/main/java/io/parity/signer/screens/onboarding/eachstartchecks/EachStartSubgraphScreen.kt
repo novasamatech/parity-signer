@@ -32,9 +32,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 			EnableAirgapScreen()
 		} else {
 			//first show enable screen lock if needed
-			SetScreenLockScreen {
-				//todo dmitry callback
-			}
+			SetScreenLockScreen()
 		}
 	}
 }

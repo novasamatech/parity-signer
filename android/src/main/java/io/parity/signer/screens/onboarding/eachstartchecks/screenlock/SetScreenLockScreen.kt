@@ -22,15 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.startActivityForResult
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.domain.Callback
 import io.parity.signer.domain.findActivity
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
 
 @Composable
-fun SetScreenLockScreen(onGoToSettings: Callback) {
+fun SetScreenLockScreen() {
 	Column(modifier = Modifier.padding(24.dp)) {
 		Spacer(Modifier.weight(0.5f))
 		Image(
@@ -38,15 +38,15 @@ fun SetScreenLockScreen(onGoToSettings: Callback) {
 			contentDescription = null,
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.pink500),
 			modifier = Modifier
-				.padding(horizontal = 8.dp)
-				.size(80.dp)
-				.align(Alignment.CenterHorizontally)
+                .padding(horizontal = 8.dp)
+                .size(80.dp)
+                .align(Alignment.CenterHorizontally)
 		)
 		Spacer(modifier = Modifier.padding(top = 32.dp))
 		Text(
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp),
+                .fillMaxWidth(1f)
+                .padding(horizontal = 8.dp),
 			text = stringResource(R.string.screen_lock_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleL,
@@ -55,25 +55,35 @@ fun SetScreenLockScreen(onGoToSettings: Callback) {
 		Spacer(modifier = Modifier.padding(top = 16.dp))
 		Text(
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp),
+                .fillMaxWidth(1f)
+                .padding(horizontal = 8.dp),
 			text = stringResource(R.string.screen_lock_description),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
 		Spacer(modifier = Modifier.padding(top = 40.dp))
-		val activity = LocalContext.current.findActivity()!!
+		val activity = LocalContext.current.findActivity()
 		PrimaryButtonWide(label = stringResource(R.string.screen_lock_open_settings_button)) {
 			val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
-			if (intent.resolveActivity(activity.packageManager) != null) {
-				startActivityForResult(activity, intent, OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE, null)
+			if (intent.resolveActivity(activity!!.packageManager) != null) {
+				startActivityForResult(
+					activity,
+					intent,
+					OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE,
+					null
+				)
 			} else {
 				val generalIntent = Intent(Settings.ACTION_SETTINGS)
 				if (generalIntent.resolveActivity(activity.packageManager) != null) {
-					startActivityForResult(activity, generalIntent, OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE, null)
+					startActivityForResult(
+						activity,
+						generalIntent,
+						OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE,
+						null
+					)
 				} else {
-				 Log.e("screen lock", "Settings activity not found")
+					Log.e("screen lock", "Settings activity not found")
 				}
 			}
 		}
@@ -94,5 +104,7 @@ private const val OPEN_SCREEN_LOCK_SETTINGS_REQUEST_CODE = 42
 )
 @Composable
 private fun PreviewSetScreenLockScreen() {
-	SetScreenLockScreen {}
+	SignerNewTheme() {
+		SetScreenLockScreen()
+	}
 }
