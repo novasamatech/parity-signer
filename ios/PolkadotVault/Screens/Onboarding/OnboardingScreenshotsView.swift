@@ -19,17 +19,19 @@ struct OnboardingScreenshotsView: View {
                         Localizable.Onboarding.Screenshots.Label.title.text
                             .font(PrimaryFont.titleL.font)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.center)
                             .padding(.top, Spacing.extraExtraLarge)
                             .padding(.horizontal, Spacing.large)
                         Localizable.Onboarding.Screenshots.Label.content.text
                             .font(PrimaryFont.bodyM.font)
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, Spacing.extraSmall)
                             .padding(.vertical, Spacing.medium)
                         Spacer()
-                            .frame(minHeight: Spacing.flexibleComponentSpacer)
+                            .frame(minHeight: Spacing.flexibleSmallComponentSpacer)
                         if viewModel.isCheckboxSelected {
                             Asset.screenshotConfirmed.swiftUIImage
                         } else {
@@ -38,7 +40,7 @@ struct OnboardingScreenshotsView: View {
                                 .padding(.bottom, Spacing.screenshotIconCompensation)
                         }
                         Spacer()
-                            .frame(minHeight: Spacing.flexibleComponentSpacer)
+                            .frame(minHeight: Spacing.flexibleSmallComponentSpacer)
                         HStack {
                             Spacer()
                         }

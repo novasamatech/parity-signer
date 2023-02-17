@@ -47,4 +47,14 @@ enum Spacing {
             return 60
         }
     }
+
+    /// Spacing for dedicated spacer: 30 / 60 pts
+    static var flexibleSmallComponentSpacer: CGFloat {
+        switch UIScreen.main.bounds.width {
+        case DeviceConstants.compactDeviceWidth:
+            return 30
+        default:
+            return 60
+        }
+    }
 }
