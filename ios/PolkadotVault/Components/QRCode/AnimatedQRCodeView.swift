@@ -7,8 +7,10 @@
 
 import QRCode
 import SwiftUI
+
 struct AnimatedQRCodeViewModel: Equatable {
     var qrCodes: [[UInt8]]
+    var style: QRCodeImageGenerator.Style = .public
 }
 
 /// Component that displays given QR code with unifid insets
@@ -39,7 +41,7 @@ struct AnimatedQRCodeView: View {
         _viewModel = viewModel
         self.qrCodesGenerator = qrCodesGenerator
         let images = viewModel.qrCodes.wrappedValue.compactMap {
-            qrCodesGenerator.generateQRCode(from: $0)
+            qrCodesGenerator.generateQRCode(from: $0, style: viewModel.style.wrappedValue)
         }
         _imagesIterator = State(wrappedValue: images.makeIterator())
         _images = State(wrappedValue: images)

@@ -122,11 +122,11 @@ extension OnboardingAirgapView {
         @Published var isActionDisabled: Bool = true
         @Published var isAirplaneModeChecked: Bool = false
         @Published var isWifiChecked: Bool = false
-        private let airgapMediator: AirgapMediator
+        private let airgapMediator: AirgapMediating
         private let onNextTap: () -> Void
 
         init(
-            airgapMediator: AirgapMediator = AirgapMediator(),
+            airgapMediator: AirgapMediating = AirgapMediatorAssembler().assemble(),
             onNextTap: @escaping () -> Void
         ) {
             self.airgapMediator = airgapMediator

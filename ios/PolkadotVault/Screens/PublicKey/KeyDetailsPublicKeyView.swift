@@ -47,53 +47,64 @@ struct KeyDetailsPublicKeyView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Navigation bar
-            NavigationBarView(
-                viewModel: .init(
-                    title: Localizable.PublicKeyDetails.Label.title.string,
-                    subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
-                    leftButtons: [.init(
-                        type: .xmark,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
-                    )],
-                    rightButtons: [.init(type: .more, action: { isShowingActionSheet.toggle() })]
-                )
-            )
-            VStack {
-                VStack(spacing: 0) {
-                    AnimatedQRCodeView(
-                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(
-                            .init(
-                                qrCodes: [viewModel.qrCode.payload]
-                            )
-                        )
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                // Navigation bar
+                NavigationBarView(
+                    viewModel: .init(
+                        title: Localizable.PublicKeyDetails.Label.title.string,
+                        subtitle: viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string,
+                        leftButtons: [.init(
+                            type: .xmark,
+                            action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        )],
+                        rightButtons: [.init(type: .more, action: { isShowingActionSheet.toggle() })]
                     )
-                    .padding(0.5)
-                    QRCodeAddressFooterView(viewModel: viewModel.footer, backgroundColor: Asset.fill6Solid.swiftUIColor)
-                }
-                .strokeContainerBackground()
-                // Exposed key alert
-                if viewModel.isKeyExposed {
-                    HStack {
-                        Localizable.KeyScreen.Label.hotkey.text
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Spacer().frame(maxWidth: Spacing.medium)
-                        Asset.exclamationRed.swiftUIImage
+                )
+                ScrollView {
+                    VStack {
+                        VStack(spacing: 0) {
+                            AnimatedQRCodeView(
+                                viewModel: Binding<AnimatedQRCodeViewModel>.constant(
+                                    .init(
+                                        qrCodes: [viewModel.qrCode.payload]
+                                    )
+                                )
+                            )
+                            .padding(0.5)
+                            QRCodeAddressFooterView(
+                                viewModel: viewModel.footer,
+                                backgroundColor: Asset.fill6Solid.swiftUIColor
+                            )
+                        }
+                        .strokeContainerBackground()
+                        // Exposed key alert
+                        if viewModel.isKeyExposed {
+                            HStack {
+                                Localizable.KeyScreen.Label.hotkey.text
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Spacer().frame(maxWidth: Spacing.medium)
+                                Asset.exclamationRed.swiftUIImage
+                            }
+                            .padding()
+                            .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            .font(PrimaryFont.bodyM.font)
+                            .strokeContainerBackground(CornerRadius.small, state: .error)
+                        }
                     }
-                    .padding()
-                    .foregroundColor(Asset.accentRed300.swiftUIColor)
-                    .font(PrimaryFont.bodyM.font)
-                    .strokeContainerBackground(CornerRadius.small, state: .error)
+                    .padding([.leading, .trailing], Spacing.large)
+                    .padding([.top, .bottom], Spacing.flexibleComponentSpacer)
+                    Spacer()
                 }
             }
-            .padding([.leading, .trailing], Spacing.large)
-            .padding([.top, .bottom], Spacing.flexibleComponentSpacer)
-            Spacer()
-        }
-        .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+            .frame(
+                minWidth: geo.size.width,
+                minHeight: geo.size.height
+            )
+            .background(Asset.backgroundPrimary.swiftUIColor)
+            .onAppear {
+                navigation.performFake(navigation: .init(action: .rightButtonAction))
+            }
         }
         // Action sheet
         .fullScreenCover(

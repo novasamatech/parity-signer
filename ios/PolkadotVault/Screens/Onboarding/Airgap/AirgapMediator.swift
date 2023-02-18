@@ -14,7 +14,11 @@ enum AirgapComponent: Equatable, Hashable {
     case wifi
 }
 
-final class AirgapMediator {
+protocol AirgapMediating: AnyObject {
+    func startMonitoringAirgap(_ update: @escaping (Bool, Bool) -> Void)
+}
+
+final class AirgapMediator: AirgapMediating {
     private let adaptee: NWPathMonitor
     private let monitoringQueue: DispatchQueue
     private let notificationQueue: DispatchQueue
@@ -44,5 +48,11 @@ final class AirgapMediator {
             }
         }
         adaptee.start(queue: monitoringQueue)
+    }
+}
+
+final class AirgapMediatingStub: AirgapMediating {
+    func startMonitoringAirgap(_ update: @escaping (Bool, Bool) -> Void) {
+        update(true, false)
     }
 }

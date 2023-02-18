@@ -249,6 +249,8 @@ private struct KeySummaryView: View {
                 .font(PrimaryFont.titleXL.font)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall)
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center)
             HStack {
                 Text(viewModel.base58.truncateMiddle())
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
