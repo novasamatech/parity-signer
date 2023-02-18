@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.documents.PP
+import io.parity.signer.components.documents.PpText
 import io.parity.signer.components.documents.TacText
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Typography
@@ -64,7 +64,7 @@ fun Documents() {
 					TacText()
 				}
 				1 -> {
-					PP()
+					PpText()
 				}
 				else -> {
 					Text("document selection error")

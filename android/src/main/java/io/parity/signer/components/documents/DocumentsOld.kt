@@ -62,7 +62,7 @@ fun DocumentsOld() {
 					TacText()
 				}
 				1 -> {
-					PP()
+					PpText()
 				}
 				else -> {
 					Text("document selection error")

@@ -1,15 +1,44 @@
 package io.parity.signer.components.documents
 
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.base.MarkdownText
+import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.toRichTextStr
+import io.parity.signer.domain.Callback
+import io.parity.signer.ui.theme.SignerNewTheme
 
 /**
  * Privacy policy content
  */
+
 @Composable
-fun PP() {
+fun PpScreen(onBack: Callback) {
+	Column(
+		Modifier
+			.verticalScroll(rememberScrollState())
+	) {
+		ScreenHeader(
+			title = stringResource(R.string.documents_terms_of_service),
+			onBack = onBack
+		)
+		PpText(modifier = Modifier.padding(16.dp))
+	}
+}
+
+@Composable
+fun PpText(modifier: Modifier = Modifier) {
 	MarkdownText(
+		modifier = modifier,
 		content =
 		"""
 # Privacy Policy
@@ -239,4 +268,22 @@ Statutory information
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
 						""".toRichTextStr()
 	)
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewPp() {
+	SignerNewTheme {
+		//doesn't work in dark mode? Check runtime, it's preview broken for this library
+		PpScreen({})
+	}
 }
