@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.components.documents
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,8 @@ import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Typography
 
 @Composable
-fun Documents() {
+@Deprecated("for onboarding use screen in onboarding, this one should not be used")
+fun DocumentsOld() {
 	var document by remember { mutableStateOf(0) }
 	Column {
 		//Note to designer:
@@ -58,7 +59,7 @@ fun Documents() {
 			when (document) {
 				0 -> {
 					InstructionsSquare()
-					TAC()
+					TacText()
 				}
 				1 -> {
 					PP()

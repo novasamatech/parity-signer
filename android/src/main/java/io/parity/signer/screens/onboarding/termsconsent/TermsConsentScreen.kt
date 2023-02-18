@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
-import io.parity.signer.components.Documents
+import io.parity.signer.components.documents.DocumentsOld
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
 import io.parity.signer.ui.theme.Action400
@@ -67,7 +67,7 @@ private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	var ppAccept by remember { mutableStateOf(false) }
 
 	Box(modifier = modifier) {
-		Documents()
+		DocumentsOld()
 		Column(Modifier.padding(horizontal = 20.dp)) {
 			Spacer(Modifier.weight(1f))
 			Surface(color = MaterialTheme.colors.Bg100) {

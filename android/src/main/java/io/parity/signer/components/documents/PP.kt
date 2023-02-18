@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.components.documents
 
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.base.MarkdownText
