@@ -294,6 +294,8 @@
 	<string name="screen_lock_open_settings_button">Go to Settings</string>
     <string name="documents_terms_of_service">Terms of service</string>
 	<string name="documents_privacy_policy">Privacy policy</string>
+	<string name="documents_accepted_checkmark">I’ve read and accept the Terms of Service and Privacy Policy</string>
+	<string name="documents_accept_cta_button">I Agree</string>
 
 
 </resources>
