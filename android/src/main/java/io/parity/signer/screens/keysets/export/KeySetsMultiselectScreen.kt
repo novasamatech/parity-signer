@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.components.items.KeySetItemMultiselect
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.domain.KeySetsSelectModel
