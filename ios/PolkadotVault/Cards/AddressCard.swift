@@ -9,6 +9,7 @@ import SwiftUI
 
 /// Card for showing any address.
 /// Accepts Address object
+/// Deprecated, used in: SufficientCryptoReady, SignSufficientCrypto
 struct AddressCard: View {
     @EnvironmentObject private var data: SharedDataModel
     var card: MAddressCard
