@@ -21,15 +21,6 @@ enum ShownDocument: String, CaseIterable, Identifiable {
         rawValue
     }
 
-    var label: String {
-        switch self {
-        case .toc:
-            return "Terms of service"
-        case .privacyPolicy:
-            return "Privacy policy"
-        }
-    }
-
     var text: AttributedString {
         switch self {
         case .toc:

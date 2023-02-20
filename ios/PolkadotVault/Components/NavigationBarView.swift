@@ -188,7 +188,7 @@ struct NavigationBarView: View {
                     viewModel: NavigationBarViewModel(
                         title: "Create Derived Key",
                         leftButtons: [.init(type: .xmark)],
-                        rightButtons: [.init(type: .action(Localizable.done.key))]
+                        rightButtons: [.init(type: .action("Done"))]
                     )
                 )
             }

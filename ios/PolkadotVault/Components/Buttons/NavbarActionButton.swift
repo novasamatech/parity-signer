@@ -55,11 +55,11 @@ struct NavbarActionButton_Previews: PreviewProvider {
         VStack(alignment: .leading, spacing: 10) {
             NavbarActionButton(
                 action: {},
-                title: Localizable.done.key
+                title: "Done"
             )
             NavbarActionButton(
                 action: {},
-                title: Localizable.done.key,
+                title: "Done",
                 isDisabled: .constant(true)
             )
         }

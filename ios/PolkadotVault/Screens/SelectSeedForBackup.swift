@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Probably deprecated
 struct SelectSeedForBackup: View {
     let content: MSeeds
     @EnvironmentObject var navigation: NavigationCoordinator
