@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.documents.PpScreen
+import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
@@ -51,12 +53,16 @@ fun SettingsScreen(
 			SettingsScreenGeneralView(
 				rootNavigator,
 				onWipeData = { confirmWipe = true },
+				onShowTerms = { settingsState = SettingsState.TERMS_OF_SERVICE },
+				onShowPrivacyPolicy = { settingsState = SettingsState.PRIVACY_POLICY },
 				isStrongBoxProtected,
 				appVersion,
 				networkState
 			)
-		SettingsState.TERMS_OF_SERVICE -> TODO()
-		SettingsState.PRIVACY_POLICY -> TODO()
+		SettingsState.TERMS_OF_SERVICE ->
+			TosScreen(onBack = { settingsState = SettingsState.GENERAL_SCREEN })
+		SettingsState.PRIVACY_POLICY ->
+			PpScreen(onBack = { settingsState = SettingsState.GENERAL_SCREEN })
 	}
 
 	AndroidCalledConfirm(
@@ -82,6 +88,8 @@ private enum class SettingsState {
 private fun SettingsScreenGeneralView(
 	rootNavigator: Navigator,
 	onWipeData: Callback,
+	onShowTerms: Callback,
+	onShowPrivacyPolicy: Callback,
 	isStrongBoxProtected: Boolean,
 	appVersion: String,
 	networkState: State<NetworkState?>
@@ -96,9 +104,14 @@ private fun SettingsScreenGeneralView(
 				SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
 					rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
 				}
-				SettingsElement(name = stringResource(R.string.settings_docs)) {
-					rootNavigator.navigate(Action.SHOW_DOCUMENTS)
-				}
+				SettingsElement(
+					name = stringResource(R.string.documents_privacy_policy),
+					onClick = onShowPrivacyPolicy
+				)
+				SettingsElement(
+					name = stringResource(R.string.documents_terms_of_service),
+					onClick = onShowTerms
+				)
 				SettingsElement(
 					name = stringResource(R.string.settings_wipe_data),
 					isDanger = true,

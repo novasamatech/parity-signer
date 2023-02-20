@@ -1,6 +1,7 @@
 package io.parity.signer.components.documents
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,8 @@ fun TosScreen(onBack: Callback) {
 		)
 		TosText(modifier = Modifier.padding(16.dp))
 	}
+
+	BackHandler(onBack = onBack)
 }
 
 
