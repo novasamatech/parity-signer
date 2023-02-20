@@ -2,7 +2,10 @@ package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -20,10 +23,10 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
@@ -40,8 +43,49 @@ fun SettingsScreen(
 	wipeToFactory: Callback,
 	networkState: State<NetworkState?>
 ) {
-	var confirm by remember { mutableStateOf(false) }
+	var confirmWipe by remember { mutableStateOf(false) }
+	var settingsState by remember { mutableStateOf(SettingsState.GENERAL_SCREEN) }
 
+	when (settingsState) {
+		SettingsState.GENERAL_SCREEN ->
+			SettingsScreenGeneralView(
+				rootNavigator,
+				onWipeData = { confirmWipe = true },
+				isStrongBoxProtected,
+				appVersion,
+				networkState
+			)
+		SettingsState.TERMS_OF_SERVICE -> TODO()
+		SettingsState.PRIVACY_POLICY -> TODO()
+	}
+
+	AndroidCalledConfirm(
+		show = confirmWipe,
+		header = "Wipe ALL data?",
+		text = "Factory reset the Signer app. This operation can not be reverted!",
+		back = { confirmWipe = false },
+		forward = { wipeToFactory() },
+		backText = "Cancel",
+		forwardText = "Wipe"
+	)
+
+	DisposableEffect(key1 = Unit) {
+		onDispose { settingsState = SettingsState.GENERAL_SCREEN }
+	}
+}
+
+private enum class SettingsState {
+	GENERAL_SCREEN, TERMS_OF_SERVICE, PRIVACY_POLICY,
+}
+
+@Composable
+private fun SettingsScreenGeneralView(
+	rootNavigator: Navigator,
+	onWipeData: Callback,
+	isStrongBoxProtected: Boolean,
+	appVersion: String,
+	networkState: State<NetworkState?>
+) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(title = stringResource(R.string.settings_title))
 		Box(modifier = Modifier.weight(1f)) {
@@ -59,10 +103,8 @@ fun SettingsScreen(
 					name = stringResource(R.string.settings_wipe_data),
 					isDanger = true,
 					skipChevron = true,
-				) {
-					confirm = true
-				}
-
+					onClick = onWipeData
+				)
 				Text(
 					text = stringResource(
 						R.string.settings_hardware_key,
@@ -84,22 +126,12 @@ fun SettingsScreen(
 			ExposedIcon(
 				networkState = networkState, navigator = rootNavigator,
 				modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 16.dp)
+					.align(Alignment.BottomEnd)
+					.padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
 		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
 	}
-
-	AndroidCalledConfirm(
-		show = confirm,
-		header = "Wipe ALL data?",
-		text = "Factory reset the Signer app. This operation can not be reverted!",
-		back = { confirm = false },
-		forward = { wipeToFactory() },
-		backText = "Cancel",
-		forwardText = "Wipe"
-	)
 }
 
 @Composable
@@ -111,16 +143,16 @@ internal fun SettingsElement(
 ) {
 	Row(
 		modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(vertical = 14.dp),
+			.clickable(onClick = onClick)
+			.padding(vertical = 14.dp),
 	) {
 		Text(
 			text = name,
 			style = SignerTypeface.TitleS,
 			color = if (isDanger) MaterialTheme.colors.red400 else MaterialTheme.colors.primary,
 			modifier = Modifier
-                .padding(start = 24.dp)
-                .weight(1f)
+				.padding(start = 24.dp)
+				.weight(1f)
 		)
 		if (!skipChevron) {
 			Image(

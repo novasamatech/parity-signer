@@ -22,7 +22,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
  */
 
 @Composable
-fun TacScreen(onBack: Callback) {
+fun TosScreen(onBack: Callback) {
 	Column(
 		Modifier
 			.verticalScroll(rememberScrollState())
@@ -31,13 +31,13 @@ fun TacScreen(onBack: Callback) {
 			title = stringResource(R.string.documents_terms_of_service),
 			onBack = onBack
 		)
-		TacText(modifier = Modifier.padding(16.dp))
+		TosText(modifier = Modifier.padding(16.dp))
 	}
 }
 
 
 @Composable
-fun TacText(modifier: Modifier = Modifier) {
+fun TosText(modifier: Modifier = Modifier) {
 	MarkdownText(
 		modifier = modifier,
 		content =
@@ -254,6 +254,6 @@ If the Appstore Provider is Apple, you acknowledge and agree that Apple and its 
 private fun PreviewTAC() {
 	SignerNewTheme {
 		//doesn't work in dark mode? Check runtime, it's preview broken for this library
-		TacScreen({})
+		TosScreen({})
 	}
 }

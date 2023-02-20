@@ -59,7 +59,7 @@ fun DocumentsOld() {
 			when (document) {
 				0 -> {
 					InstructionsSquare()
-					TacText()
+					TosText()
 				}
 				1 -> {
 					PpText()

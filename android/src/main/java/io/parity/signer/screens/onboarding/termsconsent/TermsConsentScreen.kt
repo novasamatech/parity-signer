@@ -15,7 +15,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.documents.PpScreen
-import io.parity.signer.components.documents.TacScreen
+import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
 
@@ -64,7 +64,7 @@ private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 					onPp = { state = TermsConsentScreenState.PRIVACY_POLICY },
 				)
 			TermsConsentScreenState.TERMS_OF_SERVICE ->
-				TacScreen(onBack = { state = TermsConsentScreenState.GENERAL_SCREEN })
+				TosScreen(onBack = { state = TermsConsentScreenState.GENERAL_SCREEN })
 			TermsConsentScreenState.PRIVACY_POLICY ->
 				PpScreen(onBack = { state = TermsConsentScreenState.GENERAL_SCREEN })
 		}
@@ -75,7 +75,7 @@ private fun TermsConsentScreen(onBoard: () -> Unit, modifier: Modifier) {
 	}
 }
 
-enum class TermsConsentScreenState {
+private enum class TermsConsentScreenState {
 	GENERAL_SCREEN, TERMS_OF_SERVICE, PRIVACY_POLICY,
 }
 
