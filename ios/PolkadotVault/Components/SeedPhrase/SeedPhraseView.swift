@@ -58,7 +58,7 @@ struct SeedPhraseView: View {
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .minimumScaleFactor(1)
                         .lineLimit(1)
-                        .privacySensitive()
+                        .privacySensitive(!viewModel.redactedReason.isEmpty)
                 }
                 .frame(height: 24)
                 .padding([.bottom, .top], Spacing.extraExtraSmall)
@@ -66,9 +66,10 @@ struct SeedPhraseView: View {
         }
         .padding(Spacing.medium)
         .containerBackground(CornerRadius.small)
-        .redacted(
-            reason: applicationStatePublisher.applicationState == .inactive ? .privacy : []
-        )
+        .redacted(reason: viewModel.redactedReason)
+        .onAppear {
+            viewModel.use(applicationStatePublisher: applicationStatePublisher)
+        }
     }
 
     private func layout() -> [GridItem] {
@@ -79,11 +80,21 @@ struct SeedPhraseView: View {
 extension SeedPhraseView {
     final class ViewModel: ObservableObject {
         let dataModel: SeedPhraseViewModel
+        private let cancelBag = CancelBag()
+        private weak var applicationStatePublisher: ApplicationStatePublisher!
+        @Published var redactedReason: RedactionReasons = []
 
         init(
             dataModel: SeedPhraseViewModel
         ) {
             self.dataModel = dataModel
+        }
+
+        func use(applicationStatePublisher: ApplicationStatePublisher) {
+            self.applicationStatePublisher = applicationStatePublisher
+            applicationStatePublisher.$applicationState.sink { [weak self] updatedValue in
+                self?.redactedReason = updatedValue == .inactive ? .privacy : []
+            }.store(in: cancelBag)
         }
     }
 }
