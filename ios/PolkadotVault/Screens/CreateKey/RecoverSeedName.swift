@@ -14,44 +14,62 @@ struct RecoverSeedName: View {
     @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Localizable.displayName.text.font(PrimaryFont.labelS.font)
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Asset.fill12.swiftUIColor)
-                    .frame(height: 39)
-                TextField(Localizable.seed.string, text: $seedName, prompt: Localizable.seedName.text)
-                    .focused($nameFocused)
+        VStack(alignment: .leading, spacing: 0) {
+            NavigationBarView(
+                viewModel: .init(
+                    title: nil,
+                    leftButtons: [.init(
+                        type: .xmark,
+                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                    )],
+                    rightButtons: [.init(
+                        type: .activeAction(
+                            Localizable.RecoverSeedName.Action.next.key,
+                            .constant(
+                                (seedName.isEmpty) || ServiceLocator.seedsMediator
+                                    .checkSeedCollision(seedName: seedName)
+                            )
+                        ),
+                        action: {
+                            self.nameFocused = false
+                            self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
+                        }
+                    )]
+                )
+            )
+            VStack(alignment: .leading, spacing: 0) {
+                Localizable.RecoverSeedName.Label.title.text
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.titleL.font)
+                    .padding(.top, Spacing.extraSmall)
+                Localizable.RecoverSeedName.Label.content.text
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyL.font)
-                    .disableAutocorrection(true)
-                    .keyboardType(.asciiCapable)
+                    .padding(.vertical, Spacing.extraSmall)
+                TextField("", text: $seedName)
                     .submitLabel(.done)
+                    .primaryTextFieldStyle(
+                        Localizable.seedName.string,
+                        text: $seedName
+                    )
+                    .focused($nameFocused)
                     .onSubmit {
                         if !seedName.isEmpty, !ServiceLocator.seedsMediator.checkSeedCollision(seedName: seedName) {
                             navigation.perform(navigation: .init(action: .goForward, details: seedName))
                         }
                     }
-                    .onAppear(perform: {
+                    .onAppear {
                         seedName = content.seedName
                         nameFocused = content.keyboard
-                    })
-                    .padding(.horizontal, 8)
+                    }
+                    .padding(.vertical, Spacing.medium)
+                Localizable.RecoverSeedName.Label.footer.text
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                Spacer()
             }
-            Localizable.displayNameVisibleOnlyToYou.text.font(.callout)
-            Spacer()
-            PrimaryButton(
-                action: {
-                    navigation.perform(navigation: .init(action: .goForward, details: seedName))
-                },
-                text: Localizable.next.key,
-                style: .primary(isDisabled: .constant(
-                    (seedName.isEmpty) || ServiceLocator.seedsMediator
-                        .checkSeedCollision(seedName: seedName)
-                ))
-            )
-            Spacer()
-        }.padding()
+            .padding(.horizontal, Spacing.large)
+        }
     }
 }
 

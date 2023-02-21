@@ -15,13 +15,35 @@ struct RecoverSeedPhrase: View {
     let content: MRecoverSeedPhrase
 
     var body: some View {
-        ZStack {
+        VStack(alignment: .leading, spacing: 0) {
+            NavigationBarView(
+                viewModel: .init(
+                    title: nil,
+                    leftButtons: [
+                        .init(
+                            type: .arrow,
+                            action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        )
+                    ],
+                    rightButtons: [.init(type: .empty, action: {})]
+                )
+            )
             ScrollView {
-                VStack {
+                VStack(alignment: .leading, spacing: 0) {
+                    Localizable.RecoverSeedPhrase.Label.title.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.titleL.font)
+                        .padding(.top, Spacing.extraSmall)
                     Text(content.seedName)
-                    VStack(alignment: .leading) {
-                        Localizable.seedPhrase.text.font(PrimaryFont.labelS.font)
-                        VStack {
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.bodyL.font)
+                        .padding(.vertical, Spacing.extraSmall)
+                    Localizable.seedPhrase.text
+                        .font(PrimaryFont.labelS.font)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .padding(.vertical, Spacing.extraSmall)
+                    VStack(alignment: .leading, spacing: Spacing.small) {
+                        VStack(alignment: .leading, spacing: 0) {
                             Text(
                                 content.draftPhrase()
                             )
@@ -29,40 +51,36 @@ struct RecoverSeedPhrase: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .font(.robotoMonoBold)
                             .foregroundColor(Asset.accentPink300.swiftUIColor)
-                            .padding(12)
-                            Divider().foregroundColor(Asset.fill12.swiftUIColor)
+                            .padding(Spacing.small)
                             HStack {
-                                Text(">").foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                    .font(.robotoMonoBold)
-                                TextField(Localizable.seed.string, text: $userInput, prompt: Localizable.seedName.text)
-                                    .focused($focus)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                    .font(PrimaryFont.bodyL.font)
-                                    .disableAutocorrection(true)
-                                    .textInputAutocapitalization(.never)
-                                    .keyboardType(.asciiCapable)
-                                    .submitLabel(.done)
-                                    .onChange(of: userInput, perform: { word in
-                                        navigation.perform(navigation: .init(action: .textEntry, details: word))
-                                        shadowUserInput = word
-                                    })
-                                    .onSubmit {}
-                                    .onChange(of: shadowUserInput, perform: { _ in
-                                        userInput = " " + content.userInput
-                                    })
-                                    .onChange(of: content, perform: { input in
-                                        userInput = " " + input.userInput
-                                    })
-                                    .onAppear(perform: {
-                                        userInput = " " + content.userInput
-                                        focus = content.keyboard
-                                    })
-                                    .padding(.horizontal, 12)
-                                    .padding(.top, 0)
-                                    .padding(.bottom, 10)
+                                Spacer()
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Asset.fill12.swiftUIColor))
+                        .strokeContainerBackground(state: .actionableInfo)
+                        HStack {
+                            TextField(
+                                Localizable.seedName.string,
+                                text: $userInput
+                            )
+                            .focused($focus)
+                            .submitLabel(.done)
+                            .primaryTextFieldStyle(Localizable.seedName.string, text: $userInput)
+                            .onChange(of: userInput, perform: { word in
+                                navigation.perform(navigation: .init(action: .textEntry, details: word))
+                                shadowUserInput = word
+                            })
+                            .onSubmit {}
+                            .onChange(of: shadowUserInput, perform: { _ in
+                                userInput = " " + content.userInput
+                            })
+                            .onChange(of: content, perform: { input in
+                                userInput = " " + input.userInput
+                            })
+                            .onAppear(perform: {
+                                userInput = " " + content.userInput
+                                focus = content.keyboard
+                            })
+                        }
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack {
                                 ForEach(content.guessSet, id: \.self) { guess in
@@ -79,6 +97,9 @@ struct RecoverSeedPhrase: View {
                                 }
                             }
                         }
+                        Localizable.RecoverSeedPhrase.Label.footer.text
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .font(PrimaryFont.captionM.font)
                         Spacer()
                         HStack {
                             PrimaryButton(
@@ -89,15 +110,22 @@ struct RecoverSeedPhrase: View {
                                         navigate: true
                                     )
                                 },
-                                text: Localizable.next.key,
+                                text: Localizable.RecoverSeedPhrase.Action.recover.key,
                                 style: .primary(isDisabled: .constant(content.readySeed == nil))
                             )
                             .padding(Spacing.medium)
                         }
-                    }.padding(.horizontal)
+                    }
                 }
+                .padding(.horizontal, Spacing.large)
             }
         }
+    }
+}
+
+private extension MRecoverSeedPhrase {
+    func draftPhrase() -> String {
+        draft.joined(separator: " ")
     }
 }
 
