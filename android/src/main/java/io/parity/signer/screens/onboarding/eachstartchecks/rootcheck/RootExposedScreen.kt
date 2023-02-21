@@ -31,7 +31,7 @@ fun RootExposedScreen() {
 	val iconTint = Color(0xFFFD4935)
 
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
-		Spacer(modifier = Modifier.weight(1f))
+		Spacer(modifier = Modifier.weight(0.45f))
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
@@ -65,7 +65,7 @@ fun RootExposedScreen() {
 			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
-		Spacer(modifier = Modifier.weight(1f))
+		Spacer(modifier = Modifier.weight(0.6f))
 	}
 }
 

@@ -296,7 +296,7 @@
 	<string name="documents_accepted_checkmark">I’ve read and accept the Terms of Service and Privacy Policy</string>
 	<string name="documents_accept_cta_button">I Agree</string>
 	<string name="documents_approve_title">Please Agree to our Terms of Service and Privacy Policy</string>
-    <string name="root_exposed_title">Please try again with not Rooted device</string>
+	<string name="root_exposed_title">Please try again with not Rooted device</string>
 	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
 
 
