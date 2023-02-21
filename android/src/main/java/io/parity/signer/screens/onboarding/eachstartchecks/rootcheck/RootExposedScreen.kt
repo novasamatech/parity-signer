@@ -15,23 +15,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.textTertiary
 
 
 @Composable
 fun RootExposedScreen() {
 	val iconBackground = Color(0x1FAC7D1F)
 	val iconTint = Color(0xFFFD4935)
-	Column() {
+
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
+		Spacer(modifier = Modifier.weight(1f))
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
 				.size(156.dp)
-				.background(iconBackground, CircleShape),
+				.background(iconBackground, CircleShape)
 		) {
 			Image(
 				imageVector = Icons.Rounded.Warning,
@@ -41,12 +46,12 @@ fun RootExposedScreen() {
 					.size(80.dp)
 			)
 		}
-
+		Spacer(modifier = Modifier.padding(top = 12.dp))
 		Text(
 			modifier = Modifier
 				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp),
-			text = "Please try again with not rooted device",
+				.padding(horizontal = 32.dp, vertical = 12.dp),
+			text = stringResource(R.string.root_exposed_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleL,
 			textAlign = TextAlign.Center,
@@ -54,12 +59,13 @@ fun RootExposedScreen() {
 		Text(
 			modifier = Modifier
 				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp),
-			text = "We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device",
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleL,
+				.padding(horizontal = 40.dp),
+			text = stringResource(R.string.root_exposed_description),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
+		Spacer(modifier = Modifier.weight(1f))
 	}
 }
 
@@ -74,7 +80,9 @@ fun RootExposedScreen() {
 )
 @Composable
 private fun PreviewRootExposedScreen() {
-	SignerNewTheme() {
-		RootExposedScreen()
+	Box(modifier = Modifier.fillMaxSize(1f)) {
+		SignerNewTheme() {
+			RootExposedScreen()
+		}
 	}
 }
