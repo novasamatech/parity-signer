@@ -85,6 +85,9 @@ val Colors.red400: Color
 val Colors.red500: Color
 	get() = Color(0xFFFE8D81)
 
+val Colors.accentGreen: Color
+	get() = Color(0xFF56F39A)
+
 val Colors.snackBarBackground: Color
 	get() = Color(0xFF454549)
 

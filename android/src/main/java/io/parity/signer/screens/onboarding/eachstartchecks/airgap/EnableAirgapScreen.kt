@@ -17,6 +17,7 @@ import io.parity.signer.R
 import io.parity.signer.ui.theme.Text600
 
 
+//todo switch to another screen
 @Composable
 fun EnableAirgapScreen() {
 	Box(
