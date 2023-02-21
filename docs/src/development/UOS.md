@@ -1,44 +1,25 @@
 # Scope
 
-This is interpretation of UOS format used by Polkadot Vault. Since upstream
-version of the published format diverges from actually implemented too much,
-this document was produced as representation of current state of UOS format
-compatible with Polkadot Vault. This document only covers networks compatible
-with Polkadot Vault (i.e. Substrate-based networks). This document also describes
-special payloads that are used for maintaining Polkadot Vault instance.
+This document provides an interpretation of the UOS format used by Polkadot Vault. The upstream version of the published format has diverged significantly from the actual implementation, so this document represents the current state of the UOS format that is compatible with Polkadot Vault. It only applies to networks compatible with Polkadot Vault, i.e. Substrate-based networks. The document also describes special payloads used to maintain a Polkadot Vault instance.
 
-Thus, effectively, this document describes input and output format for QR codes
-used by Polkadot Vault.
+Therefore, this document effectively describes the input and output format for QR codes used by Polkadot Vault.
 
 # Terminology
 
-Vault receives information over the air-gap as QR codes. QR codes are read as
-`u8` vectors, and must always be parsed by Vault before use.
+The Vault receives information over an air-gap as QR codes. These codes are read as `u8` vectors and must always be parsed by the Vault before use.
 
-QR codes could contain information that user wants to sign with one of the
-Vault keys or the update information to ensure smooth Vault operation without
-reset or connecting to the network.
+QR codes can contain information that a user wants to sign with one of the Vault keys, or they may contain update information to ensure smooth operation of the Vault without the need for a reset or connection to the network.
 
-## QR code types
+## QR code content types
 
-- Signable, to generate and export signature:
-
-   - Transaction: from call, gets later processed on chain if signature goes
-   through online client
-
-   - Message
-
-- Update, for Vault inner functionality:
-
-   - add network specs
-
-   - load metadata
-
-   - load types
-
-- Derivations import, for bulk derivations import
-
-- Testing
+1. Transaction/extrinsic - a single transaction that is to be signed
+2. Bulk transactions - a set of transactions that are to be signed in a single
+   session
+3. Message - a message that is to be signed with a key
+4. Chain metadata: up-to-date metadata allows the Vault to read transactions content
+5. Chain specs: adds new network to the Vault
+6. Metadata types: is used to update older versions runtime metadata (`V13` and below)
+7. Key derivations: is used to import\export Vault key paths
 
 # QR code structure
 
@@ -191,15 +172,15 @@ Vault supports following `<payload code>` variants:
     </tr>
     <tr>
         <td><code>0x03</code></td>
-        <td>message, <b>content under discussion</b></td>
+        <td>message</td>
+    </tr>
+    <tr>
+        <td><code>0x04</code></td>
+        <td>bulk transactions</td>
     </tr>
     <tr>
         <td><code>0x80</code></td>
         <td>load metadata update</td>
-    </tr>
-    <tr>
-        <td><code>0x88</code></td>
-        <td>load compressed metadata update, <b>proposal only</b></td>
     </tr>
     <tr>
         <td><code>0x81</code></td>
@@ -212,10 +193,6 @@ Vault supports following `<payload code>` variants:
     <tr>
         <td><code>0xde</code></td>
         <td>derivations import</td>
-    </tr>
-    <tr>
-        <td><code>0xf0</code></td>
-        <td>testing parser card display</td>
     </tr>
 </table>
 
@@ -235,7 +212,7 @@ Further processing is done based on the payload type.
 
 ## Transaction
 
-Transaction has following structure:
+Transaction has the following structure:
 
 <table>
     <tr>
@@ -551,7 +528,7 @@ the user approving it, the transaction details needed to generate the signature
 and history log details are temporarily stored in the database. The temporary
 storage gets cleared each time before and after use. Vault extracts the stored
 transaction data only if the database checksum stored in navigator state is
-same as the the current checksum of the database. If the password is entered
+same as the current checksum of the database. If the password is entered
 incorrectly, the database is updated with "wrong password" history entry, and
 the checksum in the state gets updated accordingly. Eventually, all transaction
 info can and will be moved into state itself and temporary storage will not be
@@ -618,11 +595,14 @@ Transaction:
 
 ## Message
 
-Message has following structure:
+Message has the following structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>public key</td><td><code>[u8]` slice</td><td>network genesis hash</td>
+        <td>prelude</td>
+        <td>public key</td>
+        <td><code>[u8]</code> slice</td>
+        <td>network genesis hash</td>
     </tr>
 </table>
 
@@ -635,8 +615,14 @@ transaction posing as a message.
 
 Current proposal is to enable message signing only with Sr25519 encryption
 algorithm, with designated signing context, different from the signing context
-used for transactions signing. The proposal is currently under discussion,
-therefore the message signing is temporarily disabled.
+used for transactions signing.
+
+## Bulk transactions
+Bulk transactions is a SCALE-encoded `TransactionBulk` structure that consists of concatenated `Vec<u8>` transactions.
+
+Bulking is a way to sign multiple translations at once and reduce the number of QR codes to scan.
+
+Bulk transactions are processed in exactly the same way as single transactions.
 
 ## Update
 
@@ -741,16 +727,6 @@ Network metadata is stored in dedicated `METATREE` tree of the Vault database.
 Network metadata identifier in is `MetaKey`, a key built from the network name
 and network metadata version.
 
-### `load_metadata` compressed update payload, payload code `88` <- proposal only
-
-Loads metadata for a network already known to Vault, i.e. for a network with
-network specs in the Vault database. Exactly same as `load_metadata` code `80`
-payload, except the payload is (a) compressed to decrease the QR code size and
-(b) SCALE-encoded to have the exact payload length.
-
-Signature is made for decompressed payload, i.e. the same signature would be
-valid for `80` and `88` payloads.
-
 ### Metadata suitable for Vault
 
 Network metadata that can get into Vault and can be used by Vault only if it
@@ -776,7 +752,7 @@ and would get rejected with an error.
 
 ### `load_types` update payload, payload code `81`
 
-Loads types information.
+Load types information.
 
 Type information is needed to decode transactions made in networks with metadata
 RuntimeMetadata version `V12` or `V13`.
@@ -916,7 +892,7 @@ indicating that the update has invalid signature.
 `NetworkSpecsToSend` are retrieved, or the Vault produces an error indicating
 that the `add_specs` payload is damaged.
 
-2. Vault checks that there is no change in invariant specs occuring.
+2. Vault checks that there is no change in invariant specs occurring.
 
     If there are entries in the `SPECSTREE` of the Vault database with same
 genesis hash as in newly received specs (the encryption not necessarily
@@ -1045,7 +1021,7 @@ is rare and quite unexpected operation.
 
 ## Derivations import, payload code `de`
 
-Derivations import has following structure:
+Derivations import has the following structure:
 
 <table>
     <tr>
@@ -1053,55 +1029,33 @@ Derivations import has following structure:
     </tr>
 </table>
 
-Derivations imports are unsigned, and always have the same prelude, `53ffde`.
+Derivations import payload is a SCALE-encoded `ExportAddrs` structure.
 
-Update payload is `ContentDerivations` in `to_transfer()` form. 
+It does *not* contain any private keys or seed phrases.
 
-`ContentDerivations` includes derivation paths set to be imported, network
-genesis hash and encryption for the network in which the import would be made.
-User, if approving the derivations import, is specifying the seed, for which the
-derivations are applied.
+`ExportAddrs` structure holds the following information about each key:
+- name and public key of the seed the derived key belongs to
+- `ss58` address of the derived key (`h160` for ethereum based chains)
+- derivation path
+- encryption type
+- genesis hash of the network the key is used in
 
 When processing derivations import, all data after prelude is transformed into
-`ContentDerivations`. Network genesis hash, encryption and derivations set are
-derived from it, or the Vault produces an error indicating that the derivation
+`ExportAddrs`. Network genesis hash, encryption and derivations set are
+derived from it, or the Vault produces a warning indicating that the derivation
 import payload is corrupted.
 
 Vault checks that the network for which the derivations are imported has
-network specs in the Vault database. If not, an error is produced.
+network specs in the Vault database. If not, a warning is produced.
 
 Vault checks that the derivation set contains only valid derivations. If any
-derivation is unsuitable, an error is produced indicating this.
+derivation is unsuitable, a warning is produced indicating this.
 
-If the user accepts the derivations import for some seed, Vault generates a key
-for each derivation for user-provided seed.
+If the user accepts the derivations import, Vault generates a key for each valid
+derivation.
 
-If one of the derived keys already exists, it gets ingored, i.e. no error is
+If one of the derived keys already exists, it gets ignored, i.e. no error is
 produced.
 
 If there are two derivations with identical path within the payload, only one
 derived key is created.
-
-In case of key collision Vault always produces an error and imports no
-derivations. Key collision means that the public keys produced for two
-*different* derivation paths coincide. For example, `//1` and `//01` derivations
-would result in identical public key, and there would be uncertainty which path
-should be in the record.
-
-Key collision can occur:
-
-- if there are two colliding derivations within payload
-- if there already exists a derivation in Vault, with which the newly received
-derivation would collide
-
-The public key is determined for seed and derivation path combination for given
-encryption algorithm. The public key is not determined by the network. If there
-is already derived key with derivation path `//1` in network `Network 1`,
-adding through derivations import a derivation with path `//01` into another
-network `Network 2` must result in an error.
-
-## Testing parser card display
-
-Whole payload is `53fff0`. This is test payload, used to display all cards
-available in Vault interface.
-
