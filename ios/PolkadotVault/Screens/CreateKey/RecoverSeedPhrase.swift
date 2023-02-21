@@ -97,6 +97,9 @@ struct RecoverSeedPhrase: View {
                                 }
                             }
                         }
+                        Localizable.RecoverSeedPhrase.Label.footer.text
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .font(PrimaryFont.captionM.font)
                         Spacer()
                         HStack {
                             PrimaryButton(
