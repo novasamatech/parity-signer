@@ -12,12 +12,14 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirplanemodeActive
+import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,18 +33,18 @@ fun AirgapScreen() {
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 		Text(
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp, vertical = 12.dp),
-			text = "Set Up Air Gap Mode",
+                .fillMaxWidth(1f)
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+			text = stringResource(R.string.airgap_onboarding_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleL,
 			textAlign = TextAlign.Center,
 		)
 		Text(
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp),
-			text = "Please Follow this steps to enable Air Gap mode and keep it enabled all the time",
+                .fillMaxWidth(1f)
+                .padding(horizontal = 24.dp),
+			text = stringResource(R.string.airgap_onboarding_subtitle),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
@@ -58,11 +60,41 @@ fun AirgapScreen() {
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
 				AirgapItem(AirgapItemType.WIFI, true)
-				SignerDivider()
+				SignerDivider(modifier = Modifier.padding(start = 40.dp))
 				AirgapItem(AirgapItemType.AIRPLANE_MODE, false)
 			}
 		}
 
+		Surface(
+			shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
+			border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
+			color = MaterialTheme.colors.fill6,
+			modifier = Modifier.padding(16.dp)
+		) {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+			) {
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Image(
+						imageVector = Icons.Filled.Cable,
+						contentDescription = null,
+						colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+						modifier = Modifier
+							.size(20.dp)
+					)
+					Text(
+						text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
+						color = MaterialTheme.colors.textSecondary,
+						style = SignerTypeface.TitleS,
+						modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                            .weight(1f)
+					)
+				}
+				SignerDivider()
+				AirgapItem(AirgapItemType.AIRPLANE_MODE, false)
+			}
+		}
 	}
 }
 
@@ -80,8 +112,8 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
-				.size(40.dp)
-				.background(color, CircleShape)
+                .size(40.dp)
+                .background(color, CircleShape)
 		) {
 			Image(
 				imageVector = icon,
@@ -93,16 +125,16 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 		}
 
 		val text = when (type) {
-			AirgapItemType.WIFI -> "Turn off Wifi Connection"
-			AirgapItemType.AIRPLANE_MODE -> "Enable Airplane Mode"
+			AirgapItemType.WIFI -> stringResource(R.string.airgap_onboarding_wifi_header)
+			AirgapItemType.AIRPLANE_MODE -> stringResource(R.string.airgap_onboarding_airplane_mode_header)
 		}
 		Text(
 			text = text,
 			color = color,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 14.dp)
-				.weight(1f)
+                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .weight(1f)
 		)
 	}
 }
