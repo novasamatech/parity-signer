@@ -141,7 +141,9 @@ private extension NavigationCoordinator {
              .manageNetworks,
              .nNetworkDetails,
              .deriveKey,
-             .newSeed:
+             .newSeed,
+             .recoverSeedName,
+             .recoverSeedPhrase:
             updatedShouldSkipInjectedViews = true
         default:
             updatedShouldSkipInjectedViews = false
