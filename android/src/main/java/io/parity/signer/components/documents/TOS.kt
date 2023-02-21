@@ -1,18 +1,48 @@
-package io.parity.signer.components
+package io.parity.signer.components.documents
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import io.parity.signer.R
 import io.parity.signer.components.base.MarkdownText
+import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.toRichTextStr
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 
 /**
  * Terms and conditions content.
  */
+
 @Composable
-fun TAC() {
+fun TosScreen(onBack: Callback) {
+	Column(
+		Modifier
+			.verticalScroll(rememberScrollState())
+	) {
+		ScreenHeader(
+			title = stringResource(R.string.documents_terms_of_service),
+			onBack = onBack
+		)
+		TosText(modifier = Modifier.padding(16.dp))
+	}
+
+	BackHandler(onBack = onBack)
+}
+
+
+@Composable
+fun TosText(modifier: Modifier = Modifier) {
 	MarkdownText(
+		modifier = modifier,
 		content =
 		"""
 **POLKADOT VAULT MOBILE APPLICATION - END USER LICENCE AGREEMENT**
@@ -227,6 +257,6 @@ If the Appstore Provider is Apple, you acknowledge and agree that Apple and its 
 private fun PreviewTAC() {
 	SignerNewTheme {
 		//doesn't work in dark mode? Check runtime, it's preview broken for this library
-		TAC()
+		TosScreen({})
 	}
 }

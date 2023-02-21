@@ -68,6 +68,33 @@ private fun CheckboxIcon(
 	)
 }
 
+@Composable
+fun CheckboxWithTextSecondary(
+	checked: Boolean,
+	text: String,
+	modifier: Modifier = Modifier,
+	onValueChange: (Boolean) -> Unit,
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = modifier.toggleable(
+			value = checked,
+			role = Role.Checkbox,
+			onValueChange = { onValueChange(it) }
+		)
+	) {
+		CheckboxIcon(
+			checked = checked,
+		)
+		Spacer(Modifier.width(16.dp))
+		Text(
+			text,
+			color = MaterialTheme.colors.secondary,
+			style = SignerTypeface.BodyM,
+		)
+	}
+}
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -91,6 +118,19 @@ private fun PreviewCheckboxWithText() {
 				checked = false,
 				onValueChange = {},
 				text = "Description of this checkbox very long two lines",
+			)
+			SignerDivider()
+			SignerDivider()
+			CheckboxWithTextSecondary(
+				checked = true,
+				onValueChange = {},
+				text = "Description of this checkbox secondary",
+			)
+			SignerDivider()
+			CheckboxWithTextSecondary(
+				checked = false,
+				onValueChange = {},
+				text = "Description of this checkbox secondary",
 			)
 		}
 	}
