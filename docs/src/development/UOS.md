@@ -19,7 +19,7 @@ QR codes can contain information that a user wants to sign with one of the Vault
 4. Chain metadata: up-to-date metadata allows the Vault to read transactions content
 5. Chain specs: adds new network to the Vault
 6. Metadata types: is used to update older versions runtime metadata (`V13` and below)
-7. Key derivations: is used to import\export Vault key paths
+7. Key derivations: is used to import and export Vault key paths
 
 # QR code structure
 
