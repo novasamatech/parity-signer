@@ -16,6 +16,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.screens.onboarding.eachstartchecks.airgap.EnableAirgapScreen
+import io.parity.signer.screens.onboarding.eachstartchecks.rootcheck.RootExposedScreen
 import io.parity.signer.screens.onboarding.eachstartchecks.screenlock.SetScreenLockScreen
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
@@ -29,7 +30,9 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 			mutableStateOf(viewModel.checkIsAuthPossible(context))
 		}
 
-		if (isAuthPossible.value) {
+		if (viewModel.isDeviceRooted()) {
+			RootExposedScreen()
+		} else if (isAuthPossible.value) {
 			// next screen - airgap
 			LaunchedEffect(viewModel) {
 				Log.d(NAVIGATION_TAG, "airgap screen opened")

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.RootUtils
 import io.parity.signer.domain.mapState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,5 +23,9 @@ class EachStartViewModel : ViewModel() {
 	val isFinished: Flow<Boolean> = isFlightModeEnabled.map { value: Boolean -> !value }
 
 	fun checkIsAuthPossible(context: Context): Boolean = Authentication.canAuthenticate(context)
+
+	fun isDeviceRooted(): Boolean {
+		return RootUtils.isDeviceRooted()
+	}
 
 }
