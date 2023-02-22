@@ -69,6 +69,16 @@ val Colors.appliedSeparator: Color
 	get() = if (isLight) Color(0x14000000) else Color(0x14FFFFFF)
 
 
+val Colors.accentPink: Color
+	get() = if (isLight) Color(0xFFE6007A) else Color(0xFFF272B6)
+
+val Colors.accentRed: Color
+	get() = if (isLight) Color(0xFFFD4935) else Color(0xFFFE8D81)
+
+val Colors.accentGreen: Color
+	get() = if (isLight) Color(0xFF48CC81) else Color(0xFF56F39A)
+
+
 
 val Colors.pink500: Color
 	get() = Color(0xFFE6007A)
@@ -84,9 +94,6 @@ val Colors.red400: Color
 
 val Colors.red500: Color
 	get() = Color(0xFFFE8D81)
-
-val Colors.accentGreen: Color
-	get() = Color(0xFF56F39A)
 
 val Colors.snackBarBackground: Color
 	get() = Color(0xFF454549)
