@@ -14,11 +14,6 @@ struct Identicon: View {
     let identicon: Data
     var rowHeight: CGFloat?
 
-    init(identicon: [UInt8], rowHeight: CGFloat? = Heights.identiconInCell) {
-        self.identicon = Data(identicon)
-        self.rowHeight = rowHeight
-    }
-
     init(identicon: SignerImage, rowHeight: CGFloat? = Heights.identiconInCell) {
         self.identicon = Data(identicon.svgPayload)
         self.rowHeight = rowHeight
@@ -39,6 +34,8 @@ struct Identicon: View {
                 .clipShape(Circle())
         }
     }
+
+
 }
 
 #if DEBUG
@@ -46,7 +43,9 @@ struct Identicon: View {
     struct Identicon_Previews: PreviewProvider {
         static var previews: some View {
             VStack(alignment: .center, spacing: 10) {
-                Identicon(identicon: PreviewData.exampleIdenticon)
+                Identicon(
+                    identicon: .svg(image: PreviewData.exampleIdenticon)
+                )
                 Identicon(
                     identicon: try! Data(
                         contentsOf: Bundle.main.url(

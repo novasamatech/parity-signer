@@ -18,4 +18,15 @@ extension SignerImage {
             return []
         }
     }
+
+    /// Convienience accessor for `png` payload for `SignerImage`
+    /// Returns `[]` for `.svg` value
+    var pngPayload: [UInt8] {
+        switch self {
+        case .svg:
+            return []
+        case let .png(payload):
+            return payload
+        }
+    }
 }

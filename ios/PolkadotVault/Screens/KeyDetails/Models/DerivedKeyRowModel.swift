@@ -21,7 +21,7 @@ struct DerivedKeyActionModel: Equatable {
 
 struct DerivedKeyRowViewModel: Equatable {
     let addressKey: String
-    let identicon: [UInt8]
+    let identicon: SignerImage
     let network: String
     let path: String
     let hasPassword: Bool
@@ -32,7 +32,7 @@ struct DerivedKeyRowViewModel: Equatable {
     init(_ key: MKeyAndNetworkCard) {
         addressKey = key.key.addressKey
         path = key.key.address.path
-        identicon = key.key.address.identicon.svgPayload
+        identicon = key.key.address.identicon
         network = key.network.networkLogo
         hasPassword = key.key.address.hasPwd
         base58 = key.key.base58
@@ -43,7 +43,7 @@ struct DerivedKeyRowViewModel: Equatable {
 extension DerivedKeyRowViewModel {
     init(
         addressKey: String = "",
-        identicon: [UInt8],
+        identicon: SignerImage,
         network: String,
         path: String,
         hasPassword: Bool,
