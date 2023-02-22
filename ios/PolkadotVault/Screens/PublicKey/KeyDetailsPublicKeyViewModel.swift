@@ -16,7 +16,7 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
     init(_ keyDetails: MKeyDetails) {
         qrCode = keyDetails.qr
         footer = .init(
-            identicon: keyDetails.address.identicon.svgPayload,
+            identicon: keyDetails.address.identicon,
             rootKeyName: keyDetails.address.seedName,
             path: keyDetails.address.path,
             hasPassword: keyDetails.address.hasPwd,

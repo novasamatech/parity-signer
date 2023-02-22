@@ -15,7 +15,7 @@ extension PreviewData {
     )
 
     static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         rootKeyName: "Dotsama parachains",
         path: "//polkadot//path",
         hasPassword: true,
@@ -25,7 +25,7 @@ extension PreviewData {
     )
 
     static let qrCodeAddressFooterViewModelNoPath = QRCodeAddressFooterViewModel(
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         rootKeyName: "Dotsama parachains",
         path: "",
         hasPassword: false,
@@ -35,7 +35,7 @@ extension PreviewData {
     )
 
     static let qrCodeAddressFooterViewModelVeryLongPath = QRCodeAddressFooterViewModel(
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         rootKeyName: "Dotsama Crowdloans and Parity is a not just a very long name but the longest name",
         path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
         hasPassword: false,
@@ -85,7 +85,7 @@ extension PreviewData {
     )
 
     static let exampleDerivedKeyOverview = DerivedKeyOverviewViewModel(
-        identicon: PreviewData.exampleIdenticon,
+        identicon: .svg(image: PreviewData.exampleIdenticon),
         path: "//polkadot",
         hasPassword: false,
         network: "Polkadot",
@@ -94,35 +94,35 @@ extension PreviewData {
 
     static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
         DerivedKeyOverviewViewModel(
-            identicon: PreviewData.exampleIdenticon,
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             path: "",
             hasPassword: false,
             network: "Kusama",
             networkLogo: "kusama"
         ),
         DerivedKeyOverviewViewModel(
-            identicon: PreviewData.exampleIdenticon,
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             path: "//polkadot",
             hasPassword: false,
             network: "Polkadot",
             networkLogo: "polkadot"
         ),
         DerivedKeyOverviewViewModel(
-            identicon: PreviewData.exampleIdenticon,
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             path: "//astar",
             hasPassword: false,
             network: "Astar",
             networkLogo: "astar"
         ),
         DerivedKeyOverviewViewModel(
-            identicon: PreviewData.exampleIdenticon,
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             path: "//kusama",
             hasPassword: true,
             network: "Kusama",
             networkLogo: "kusama"
         ),
         DerivedKeyOverviewViewModel(
-            identicon: PreviewData.exampleIdenticon,
+            identicon: .svg(image: PreviewData.exampleIdenticon),
             path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
             hasPassword: true,
             network: "Kusama",
@@ -162,6 +162,6 @@ extension PreviewData {
         name: "Parity Keys",
         network: "polkadot",
         base58: "1219xC79CXV31543DDXoQMjuA",
-        identicon: PreviewData.exampleIdenticon
+        identicon: .svg(image: PreviewData.exampleIdenticon)
     )
 }

@@ -42,7 +42,7 @@ extension TransactionPreviewRenderable {
                 name: author.address.seedName,
                 network: transaction.networkInfo?.networkLogo,
                 base58: author.base58,
-                identicon: author.address.identicon.svgPayload,
+                identicon: author.address.identicon,
                 hasPassword: author.address.hasPwd
             )
         } else {
@@ -101,7 +101,7 @@ struct TransactionSignatureRenderable: Equatable {
     let name: String
     let network: String?
     let base58: String
-    let identicon: [UInt8]
+    let identicon: SignerImage
     let hasPassword: Bool
 
     init(
@@ -109,7 +109,7 @@ struct TransactionSignatureRenderable: Equatable {
         name: String = "",
         network: String? = nil,
         base58: String = "",
-        identicon: [UInt8] = [],
+        identicon: SignerImage = .svg(image: []),
         hasPassword: Bool = false
     ) {
         self.path = path
