@@ -7,7 +7,6 @@ import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
-import io.parity.signer.components.Documents
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
@@ -35,7 +34,12 @@ fun ScreenSelector(
 
 	when (screenData) {
 		is ScreenData.DeriveKey -> {} // migrated
-		ScreenData.Documents -> Documents()
+		ScreenData.Documents -> {
+			submitErrorState(
+				"This screen was called from settings but we don't call it anymore.\n" +
+					"While I cannot guarantee that rust won't make this state for whatever reason."
+			)
+		}
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.KeyDetailsMulti -> {
 			//migrated, now part of KeySetDetails subgraph and old data used

@@ -7,12 +7,6 @@
 
 import Foundation
 
-extension MRecoverSeedPhrase {
-    func draftPhrase() -> String {
-        draft.joined(separator: " ")
-    }
-}
-
 extension Verifier {
     func show() -> String {
         switch v {
