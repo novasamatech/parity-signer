@@ -69,7 +69,10 @@ struct SettingsView: View {
             PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingBackup) {
-            BackupSelectKeyView(viewModel: .init(isPresented: $viewModel.isPresentingBackup))
+            BackupSelectKeyView(viewModel: .init(
+                isPresented: $viewModel.isPresentingBackup,
+                resetWarningAction: .init(alert: $data.alert)
+            ))
         }
     }
 }
