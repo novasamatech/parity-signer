@@ -9,14 +9,14 @@ import SwiftUI
 
 struct DerivedKeyOverviewViewModel: Equatable, Identifiable {
     let id = UUID()
-    let identicon: [UInt8]
+    let identicon: SignerImage
     let path: String
     let hasPassword: Bool
     let network: String
     let networkLogo: String
 
     init(
-        identicon: [UInt8],
+        identicon: SignerImage,
         path: String,
         hasPassword: Bool,
         network: String,
@@ -33,7 +33,7 @@ struct DerivedKeyOverviewViewModel: Equatable, Identifiable {
 extension DerivedKeyOverviewViewModel {
     init(_ key: MKeyAndNetworkCard) {
         path = key.key.address.path
-        identicon = key.key.address.identicon.svgPayload
+        identicon = key.key.address.identicon
         hasPassword = key.key.address.hasPwd
         network = key.network.networkTitle
         networkLogo = key.network.networkLogo
@@ -88,7 +88,7 @@ struct DerivedKeyOverviewRow: View {
             VStack(alignment: .leading) {
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         path: "",
                         hasPassword: false,
                         network: "Kusama",
@@ -97,7 +97,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         path: "//polkadot",
                         hasPassword: false,
                         network: "Polkadot",
@@ -106,7 +106,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         path: "//astar",
                         hasPassword: false,
                         network: "Astar",
@@ -115,7 +115,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         path: "//kusama",
                         hasPassword: true,
                         network: "Kusama",
@@ -124,7 +124,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
                         hasPassword: true,
                         network: "Kusama",

@@ -109,7 +109,7 @@ struct KeySetRow: View {
                         seed: PreviewData.seedNameCard,
                         keyName: "Main Polkadot",
                         derivedKeys: "5 Derived Key",
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         networks: ["polkadot", "kusama", "astar", "westend", "phala"]
                     ),
                     selectedItems: Binding<[KeySetViewModel]>.constant([]),
@@ -120,7 +120,7 @@ struct KeySetRow: View {
                         seed: PreviewData.seedNameCard,
                         keyName: "Kusama",
                         derivedKeys: nil,
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         networks: []
                     ),
                     selectedItems: Binding<[KeySetViewModel]>.constant([]),
@@ -131,7 +131,7 @@ struct KeySetRow: View {
                         seed: PreviewData.seedNameCard,
                         keyName: "Dotsama crowdloans with very long title",
                         derivedKeys: "435 Derived Keys",
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         networks: [
                             "polkadot",
                             "kusama",
@@ -158,14 +158,14 @@ struct KeySetRow: View {
                         seed: PreviewData.seedNameCard,
                         keyName: "Dotsama crowdloans with very long title",
                         derivedKeys: "3 Derived Keys",
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         networks: ["polkadot", "kusama", "astar", "westend", "phala"]
                     ),
                     selectedItems: Binding<[KeySetViewModel]>.constant([KeySetViewModel(
                         seed: PreviewData.seedNameCard,
                         keyName: "Dotsama crowdloans",
                         derivedKeys: "3 Derived Keys",
-                        identicon: PreviewData.exampleIdenticon,
+                        identicon: .svg(image: PreviewData.exampleIdenticon),
                         networks: ["polkadot", "kusama", "astar", "westend", "phala"]
                     )]),
                     isExportKeysSelected: Binding<Bool>.constant(true)
