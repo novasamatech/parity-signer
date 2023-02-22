@@ -79,13 +79,15 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
                 let action = parse_transaction(database, &encoded, true)?;
-                if let TransactionAction::Sign {
-                    actions: a,
-                    checksum: c,
-                } = action
-                {
-                    checksum = c;
-                    actions.push(a[0].clone());
+                match action {
+                    TransactionAction::Sign {
+                        actions: a,
+                        checksum: c,
+                    } => {
+                        checksum = c;
+                        actions.push(a[0].clone());
+                    }
+                    _ => return Ok(action),
                 }
             }
 
