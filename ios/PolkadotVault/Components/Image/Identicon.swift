@@ -11,31 +11,38 @@ import SwiftUI
 /// UI container to display identicon
 /// Can take `[UInt8]`, `Data` or `SignerImage` as input
 struct Identicon: View {
-    let identicon: Data
+    let identicon: SignerImage
     var rowHeight: CGFloat?
 
     init(identicon: SignerImage, rowHeight: CGFloat? = Heights.identiconInCell) {
-        self.identicon = Data(identicon.svgPayload)
-        self.rowHeight = rowHeight
-    }
-
-    init(identicon: Data, rowHeight: CGFloat? = Heights.identiconInCell) {
         self.identicon = identicon
         self.rowHeight = rowHeight
     }
 
     var body: some View {
-        if let rowHeight = rowHeight {
-            SVGView(data: identicon)
-                .frame(width: rowHeight, height: rowHeight)
-                .clipShape(Circle())
-        } else {
-            SVGView(data: identicon)
-                .clipShape(Circle())
+        switch identicon {
+        case let .svg(image: svgImage):
+            if let rowHeight = rowHeight {
+                SVGView(data: Data(svgImage))
+                    .frame(width: rowHeight, height: rowHeight)
+                    .clipShape(Circle())
+            } else {
+                SVGView(data: Data(svgImage))
+                    .clipShape(Circle())
+            }
+        case let .png(image: pngImage):
+            if let rowHeight = rowHeight {
+                Image(uiImage: UIImage(data: Data(pngImage)) ?? UIImage())
+                    .resizable(resizingMode: .stretch)
+                    .frame(width: rowHeight, height: rowHeight)
+                    .clipShape(Circle())
+            } else {
+                Image(uiImage: UIImage(data: Data(pngImage)) ?? UIImage())
+                    .resizable(resizingMode: .stretch)
+                    .clipShape(Circle())
+            }
         }
     }
-
-
 }
 
 #if DEBUG
@@ -47,11 +54,15 @@ struct Identicon: View {
                     identicon: .svg(image: PreviewData.exampleIdenticon)
                 )
                 Identicon(
-                    identicon: try! Data(
-                        contentsOf: Bundle.main.url(
-                            forResource: "identicon_example",
-                            withExtension: "svg"
-                        )!
+                    identicon: .svg(
+                        image: Array(
+                            try! Data(
+                                contentsOf: Bundle.main.url(
+                                    forResource: "identicon_example",
+                                    withExtension: "svg"
+                                )!
+                            )
+                        )
                     ),
                     rowHeight: 200
                 )
@@ -60,11 +71,15 @@ struct Identicon: View {
             .previewLayout(.sizeThatFits)
             VStack(alignment: .center, spacing: 10) {
                 Identicon(
-                    identicon: try! Data(
-                        contentsOf: Bundle.main.url(
-                            forResource: "identicon_example",
-                            withExtension: "svg"
-                        )!
+                    identicon: .svg(
+                        image: Array(
+                            try! Data(
+                                contentsOf: Bundle.main.url(
+                                    forResource: "identicon_example",
+                                    withExtension: "svg"
+                                )!
+                            )
+                        )
                     ),
                     rowHeight: nil
                 )
