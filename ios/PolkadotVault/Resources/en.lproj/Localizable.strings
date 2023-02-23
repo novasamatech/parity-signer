@@ -122,7 +122,7 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
-"KeyDetails.Label.EmptyState.Header" = "Key Set Don't Have Any Derived Keys";
+"KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
 "KeyDetails.Action.Create" = "Create Derived key";
@@ -373,19 +373,19 @@
 "Settings.NetworkDetails.More.Action.Sign" = "Sign Network Specs";
 "Settings.NetworkDetails.More.Action.Delete" = "Delete network";
 "Settings.NetworkDetails.More.Delete.Label.Title" = "Remove Network?";
-"Settings.NetworkDetails.More.Delete.Label.Content" = "This network will be removed for whole device";
+"Settings.NetworkDetails.More.Delete.Label.Content" = "This network will be removed for the whole device";
 "Settings.NetworkDetails.More.Delete.Action.Remove" = "Remove";
 "Settings.NetworkDetails.More.Delete.Action.Cancel" = "Cancel";
 "Settings.NetworkDetails.DeleteNetwork.Label.Confirmation" = "Network %@ Has Been Removed";
 
 "Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
-"Settings.Modal.WipeAll.Label.Content" = "Factory reset the Polkadot Vault app. This operation can not be reverted!";
+"Settings.Modal.WipeAll.Label.Content" = "Reset the Vault app to factory settings. This operation cannot be reversed!";
 "Settings.Modal.WipeAll.Action.Wipe" = "Remove";
 "Settings.Modal.WipeAll.Action.Cancel" = "Cancel";
 
 "Settings.Modal.GeneralVerifier.Label.Title" = "Wipe All Data?";
-"Settings.Modal.GeneralVerifier.Label.Content" = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there’s no need to use this procedure in most cases. Misusing this feature may lead to los of funds!";
-"Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, remove all data";
+"Settings.Modal.GeneralVerifier.Label.Content" = "Remove all data and set general verifier information blank.\n\nWARNING: This operation cannot be reversed so do not proceed unless you are sure you wish to erase important verification information. In most cases, there is no need to wipe all data. Using this feature inappropriately may lead to loss of funds!";
+"Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, Remove all Data";
 "Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
 
 "Settings.TermsOfService.Label.Title" = "Terms of service";
@@ -404,20 +404,20 @@
 "ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
 "ImportKeys.Label.EmptyPath" = "Derivation path name is empty";
 "ImportKeys.Action.Import" = "Import Keys";
-"ImportKeys.Error.Label.KeySetMissing" = "Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.";
+"ImportKeys.Error.Label.KeySetMissing" = "Some keys cannot be imported until their key sets are recovered. Please recover the missing key sets.";
 "ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
-"ImportKeys.Error.Label.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata.";
+"ImportKeys.Error.Label.NetworkMissing" = "Some keys cannot be imported until their networks are added. Please add missing networks and their metadata.";
 "ImportKeys.Error.Action.NetworkMissing" = "Add Network";
 "ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
 "ImportKeys.Error.Label.BadFormat" = "Some keys paths are in bad format so they can't be imported.";
 "ImportKeys.Snackbar.Success.Single" = "1 Key Has Been Imported";
 "ImportKeys.Snackbar.Success.Multiple" = "%@ Keys Has Been Imported";
 "ImportKeys.Snackbar.Failure.Unknown" = "Import Keys Has Failed";
-"ImportKeys.ErrorModal.MissingNetwork.Label.Title" = "Please add missing networks and their metadata.";
-"ImportKeys.ErrorModal.MissingNetwork.Label.Content" = "Some keys can not be imported until their networks are added.";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Title" = "Please add missing networks and their metadata";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Content" = "Some keys cannot be imported until their networks are added.";
 "ImportKeys.ErrorModal.MissingNetwork.Action.ok" = "Got It";
-"ImportKeys.ErrorModal.MissingKeySets.Label.Title" = "Please recover the missing Key Sets.";
-"ImportKeys.ErrorModal.MissingKeySets.Label.Content" = "Some keys can not be imported until their key sets are recovered.";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Title" = "Please recover the missing Key Sets";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Content" = "Some keys cannot be imported until their key sets are recovered.";
 "ImportKeys.ErrorModal.MissingKeySets.Action.ok" = "Got It";
 "ImportKeys.ErrorModal.BadFormat.Label.Title" = "Import keys paths in bad format";
 "ImportKeys.ErrorModal.BadFormat.Label.Content" = "Some keys paths are in bad format so they cannot be imported";
@@ -432,7 +432,7 @@
 
 "EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
 "EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
-"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter banana split password";
+"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter Banana split password";
 "EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
 "EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
 "EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
@@ -446,7 +446,7 @@
 "CreateDerivedKey.Label.Header.Path" = "Derivation Path";
 "CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
 "CreateDerivedKey.Label.EmpyyPath" = "Derivation path name is empty";
-"CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Action.Add" = "Create Derived Key";
 "CreateDerivedKey.Label.Network.Single" = "Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
@@ -471,14 +471,14 @@
 "CreateDerivedKey.Snackbar.Created" = "Derived Key has been created";
 
 "CreateDerivedKey.Modal.Confirmation.Title" = "Write Down Your\nDerivation Path Name";
-"CreateDerivedKey.Modal.Confirmation.Content" = "Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Modal.Confirmation.Content" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Modal.Confirmation.Header" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Confirmation.Confirmation" = "I have written down my derivation path name";
 "CreateDerivedKey.Modal.Confirmation.Action" = "Done";
 "CreateDerivedKey.Modal.Confirmation.EmptyPath" = "Derivation Path Name Is Empty";
 
 "CreateDerivedKey.InfoModal.DerivedKeys.Title" = "Derived Keys";
-"CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.";
+"CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is to easily back up (and restore from a back up) a derivation path compared to seed phrase.";
 "CreateDerivedKey.InfoModal.DerivedKeys.Action" = "Got It";
 "CreateDerivedKey.InfoModal.DerivationPaths.Title" = "Derivation Paths";
 "CreateDerivedKey.InfoModal.DerivationPaths.Content" = "If you would like to create and manage several accounts on the network using the same seed, you can use derivation paths. We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase. Many Polkadot key generation tools support hard and soft derivation. For instance, if you intend to create an account to be used on the Polkadot chain, you can derive a hard key child account using // after the mnemonic phrase.";
@@ -489,7 +489,7 @@
 "CreateDerivedKey.InfoModal.DerivationMethods.Hard.Title" = "// Hard derivation";
 "CreateDerivedKey.InfoModal.DerivationMethods.Hard.Content" = "A hard derivation path does not allow either of these - even if you know a derived private key, it's not feasible to figure out the private key of the root address, and it's impossible to prove that the first account is linked with the second.";
 "CreateDerivedKey.InfoModal.DerivationMethods.Password.Title" = "/// Password derivation";
-"CreateDerivedKey.InfoModal.DerivationMethods.Password.Content" = "In this type of derivation, if the mnemonic phrase would leak, accounts cannot be derived without the initial password. In fact, for soft- and hard-derived accounts, if someone knows the mnemonic phrase and the derivation path, they will have access to your account. For password-derived accounts, the password is applied on the derivation path. You can know the mnemonic phrase and the derivation path, but without the password it is not possible to access the account. In mathematical terms, if we have a written derivation path and a password, we can calculate the real derivation path as f(written derivation path, password); where f is a function. We can then calculate the account key pair using f(seed, real derivation path). Note that unlike hard and soft derivations that can be mixed, only a single password should be specified per derivation.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Password.Content" = "In this type of derivation, if the mnemonic phrase were to leak, accounts could not be derived without the initial password. In fact, for soft- and hard-derived accounts, if someone knows the mnemonic phrase and the derivation path, they will have access to your account. For password-derived accounts, the password is applied on the derivation path. You can know the mnemonic phrase and the derivation path, but without the password it is not possible to access the account. In mathematical terms, if we have a written derivation path and a password, we can calculate the real derivation path as f(written derivation path, password); where f is a function. We can then calculate the account key pair using f(seed, real derivation path). Note that unlike hard and soft derivations that can be mixed, only a single password should be specified per derivation.";
 "CreateDerivedKey.InfoModal.DerivationMethods.Action" = "Got It";
 
 "Onboarding.Agreements.Label.Title" = "Please Agree to our Terms of Service and Privacy Policy";
@@ -498,8 +498,8 @@
 "Onboarding.Agreements.Label.Confirmation" = "I’ve read and accept the Terms of Service and Privacy Policy";
 "Onboarding.Agreements.Action.Accept" = "I Accept";
 
-"Error.Jailbreak.Label.Title" = "Please try again with not Jailbroken device";
-"Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device";
+"Error.Jailbreak.Label.Title" = "Warning! This Device has been Jailbroken";
+"Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device.";
 
 "Error.DevicePincodeRequired.Label.Title" = "Set Up A Passcode";
 "Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Polkadot Vault requires passcode confirmation. Using the application without a password is not allowed.";
@@ -509,7 +509,7 @@
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
 
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
-"Error.LockedDevice.Label.Subtitle" = "The device has been locked because of failed authentication, please unlock the device to keep using the Polkadot Vault";
+"Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
 
 "OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
@@ -521,17 +521,17 @@
 "OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
 "OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
 
-"Onboarding.Screenshots.Label.Title" = "Please confirm you understand the screenshots' risks";
+"Onboarding.Screenshots.Label.Title" = "Please confirm you understand the risks of screenshots";
 "Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
-"Onboarding.Screenshots.Label.Confirmation" = "I confirm that no cables are connected to the device";
+"Onboarding.Screenshots.Label.Confirmation" = "I'm aware of the risks involved in taking screenshots";
 "Onboarding.Screenshots.Action.Next" = "Next";
 
 "Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
-"Onboarding.Airgap.Label.Content" = "Please Follow these steps to enable Air Gap mode and keep it enabled all the time";
+"Onboarding.Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
 "Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
-"Onboarding.Airgap.Label.Wifi" = "Turn off Wifi Connection";
+"Onboarding.Airgap.Label.Wifi" = "Turn off WiFi Connection";
 "Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
-"Onboarding.Airgap.Label.Cables.Confirmation" = "Cables are disconnected";
+"Onboarding.Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
 "Onboarding.Airgap.Action.Next" = "Next";
 
 "NewSeed.Name.Label.Title" = "Key Set Name";
@@ -541,7 +541,7 @@
 "NewSeed.Name.Action.Next" = "Next";
 "NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
 "NewSeed.Backup.Action.Create" = "Create Key Set";
-"NewSeed.Backup.Label.Info" = "Write it down on a paper and keep it in a safe place. You can also use Banana Split for maximum security";
+"NewSeed.Backup.Label.Info" = "Write it down on a piece of paper and keep it in a safe place. You can also use Banana Split for maximum security";
 "NewSeed.Backup.Label.Info.Underline" = "Banana Split";
 "NewSeed.Backup.Label.Confirmation" = "I’ve written down my secret\nrecovery phrase";
 "NewSeed.Backup.BananaSplit.Label.Title" = "Banana Split";
