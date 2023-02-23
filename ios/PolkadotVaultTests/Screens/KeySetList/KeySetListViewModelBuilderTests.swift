@@ -20,10 +20,10 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys: String? = nil
-        let identicon: [UInt8] = [123]
+        let identicon = SignerImage.svg(image: [123])
         let seedNameCard = SeedNameCard(
             seedName: name,
-            identicon: .svg(image: identicon),
+            identicon: identicon,
             usedInNetworks: ["polkadot", "kusama", "westend"],
             derivedKeysCount: 0
         )
@@ -42,10 +42,10 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys = "1 Key"
-        let identicon: [UInt8] = [123]
+        let identicon = SignerImage.svg(image: [123])
         let seedNameCard = SeedNameCard(
             seedName: name,
-            identicon: .svg(image: identicon),
+            identicon: identicon,
             usedInNetworks: ["polkadot", "kusama", "westend"],
             derivedKeysCount: 1
         )
@@ -64,10 +64,10 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys = "3 Keys"
-        let identicon: [UInt8] = [123]
+        let identicon = SignerImage.svg(image: [123])
         let seedNameCard = SeedNameCard(
             seedName: name,
-            identicon: .svg(image: identicon),
+            identicon: identicon,
             usedInNetworks: ["polkadot", "kusama", "westend"],
             derivedKeysCount: 3
         )
