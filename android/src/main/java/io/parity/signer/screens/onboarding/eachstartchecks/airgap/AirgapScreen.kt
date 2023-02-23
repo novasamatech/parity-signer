@@ -16,16 +16,20 @@ import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.CheckboxWithText
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.ui.theme.*
 
@@ -33,6 +37,8 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun AirgapScreen() {
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
+		val isCableChecked = remember { mutableStateOf(false) }
+
 		Text(
 			modifier = Modifier
 				.fillMaxWidth(1f)
@@ -95,8 +101,12 @@ fun AirgapScreen() {
 					)
 				}
 				SignerDivider()
-
-				AirgapItem(AirgapItemType.AIRPLANE_MODE, false)
+				CheckboxWithText(checked = isCableChecked.value,
+					text = stringResource(R.string.airgap_onboarding_disconnect_cable_checkbox_description),
+					modifier = Modifier.padding(16.dp),
+				) {
+					newIsChecked -> isCableChecked.value = newIsChecked
+				}
 			}
 		}
 	}
