@@ -25,7 +25,7 @@ struct OnboardingAirgapView: View {
                         .font(PrimaryFont.bodyM.font)
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, Spacing.extraSmall)
+                        .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.medium)
                     // Airgap connectivity
                     VStack(spacing: 0) {
@@ -66,6 +66,8 @@ struct OnboardingAirgapView: View {
                                 }
                                 .padding(.leading, Spacing.extraSmall)
                                 Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
+                                    .multilineTextAlignment(.leading)
+                                    .fixedSize(horizontal: false, vertical: true)
                                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                                     .font(PrimaryFont.bodyL.font)
                             }
