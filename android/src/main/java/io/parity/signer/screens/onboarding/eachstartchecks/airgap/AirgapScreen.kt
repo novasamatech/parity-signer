@@ -76,7 +76,8 @@ fun AirgapScreen() {
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
+				Row(verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier.padding(16.dp),) {
 					Image(
 						imageVector = Icons.Filled.Cable,
 						contentDescription = null,
@@ -94,6 +95,7 @@ fun AirgapScreen() {
 					)
 				}
 				SignerDivider()
+
 				AirgapItem(AirgapItemType.AIRPLANE_MODE, false)
 			}
 		}
@@ -108,6 +110,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 		MaterialTheme.colors.fill6.compositeOver(MaterialTheme.colors.background)
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier.padding(16.dp),
 	) {
 		val icon = when (type) {
 			AirgapItemType.WIFI -> Icons.Filled.Wifi
