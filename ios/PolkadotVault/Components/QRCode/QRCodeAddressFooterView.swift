@@ -49,9 +49,9 @@ struct QRCodeAddressFooterView: View {
                     size: Heights.identiconInCell
                 )
             }
-            HStack(alignment: .top, spacing: Spacing.small) {
+            HStack(alignment: .center, spacing: Spacing.small) {
                 VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                    HStack(spacing: Spacing.extraExtraSmall) {
+                    HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                         Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
                             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                             .font(PrimaryFont.bodyM.font)
