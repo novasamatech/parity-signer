@@ -87,13 +87,13 @@ fun AirgapScreen() {
 					Image(
 						imageVector = Icons.Filled.Cable,
 						contentDescription = null,
-						colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+						colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 						modifier = Modifier
-							.size(20.dp)
+							.size(24.dp)
 					)
 					Text(
 						text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
-						color = MaterialTheme.colors.textSecondary,
+						color = MaterialTheme.colors.textTertiary,
 						style = SignerTypeface.TitleS,
 						modifier = Modifier
 							.padding(horizontal = 16.dp, vertical = 14.dp)
