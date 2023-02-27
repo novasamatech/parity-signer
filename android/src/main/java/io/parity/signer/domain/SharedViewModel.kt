@@ -50,7 +50,7 @@ class SharedViewModel() : ViewModel() {
 
 	// Observables for screens state
 	val networkState: StateFlow<NetworkState> =
-		networkExposedStateKeeper.airplaneModeState
+		networkExposedStateKeeper.airGapModeState
 	val actionResult: StateFlow<ActionResult?> = _actionResult
 	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth

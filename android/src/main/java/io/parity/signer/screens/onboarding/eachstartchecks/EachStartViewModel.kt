@@ -18,7 +18,7 @@ class EachStartViewModel : ViewModel() {
 	private val networkExposedStateKeeper = ServiceLocator.networkExposedStateKeeper
 
 	val isFlightModeEnabled: StateFlow<Boolean> =
-		networkExposedStateKeeper.airplaneModeState.mapState(viewModelScope) { value: NetworkState -> value == NetworkState.Active }
+		networkExposedStateKeeper.airGapModeState.mapState(viewModelScope) { value: NetworkState -> value == NetworkState.Active }
 
 	val isFinished: Flow<Boolean> = isFlightModeEnabled.map { value: Boolean -> !value }
 
