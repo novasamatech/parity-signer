@@ -1,5 +1,7 @@
 package io.parity.signer.domain
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,6 +28,10 @@ class NetworkExposedStateKeeper(
 		MutableStateFlow(null)
 	val wifiDisabledState: StateFlow<Boolean?> = _wifiDisabledState
 
+	private val _bluetoothDisabledState: MutableStateFlow<Boolean?> =
+		MutableStateFlow(null)
+	val bluetoothDisabledState: StateFlow<Boolean?> = _bluetoothDisabledState
+
 	private val _airGapModeState: MutableStateFlow<NetworkState> =
 		MutableStateFlow(NetworkState.None)
 	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
@@ -33,8 +39,10 @@ class NetworkExposedStateKeeper(
 	init {
 		registerAirplaneBroadcastReceiver()
 		registerWifiBroadcastReceiver()
+		registerBluetoothBroadcastReceiver()
 		reactOnAirplaneMode()
 		reactOnWifiAwareState()
+		reactOnBluetooth()
 	}
 
 	/**
@@ -53,6 +61,16 @@ class NetworkExposedStateKeeper(
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
 				reactOnAirplaneMode()
+			}
+		}
+		appContext.registerReceiver(receiver, intentFilter)
+	}
+
+	private fun registerBluetoothBroadcastReceiver() {
+		val intentFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+			override fun onReceive(context: Context, intent: Intent) {
+				reactOnBluetooth()
 			}
 		}
 		appContext.registerReceiver(receiver, intentFilter)
@@ -85,6 +103,13 @@ class NetworkExposedStateKeeper(
 		updateGeneralAirgap(airplaneModeOff)
 	}
 
+	private fun reactOnBluetooth() {
+		val bluetooth =
+			appContext.applicationContext.getSystemService(BluetoothManager::class.java)?.adapter
+		val btEnabled = bluetooth?.isEnabled == true
+		_bluetoothDisabledState.value = !btEnabled
+		updateGeneralAirgap(btEnabled)
+	}
 
 	private fun registerWifiBroadcastReceiver() {
 		val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
@@ -99,12 +124,9 @@ class NetworkExposedStateKeeper(
 	private fun reactOnWifiAwareState() {
 		val wifi =
 			appContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-		if (wifi != null) {
-			_wifiDisabledState.value = !wifi.isWifiEnabled
-			updateGeneralAirgap(wifi.isWifiEnabled)
-		} else {
-			_wifiDisabledState.value = true
-		}
+		val wifiEnabled = wifi?.isWifiEnabled == true
+		_wifiDisabledState.value = !wifiEnabled
+		updateGeneralAirgap(wifiEnabled)
 	}
 
 	/**
