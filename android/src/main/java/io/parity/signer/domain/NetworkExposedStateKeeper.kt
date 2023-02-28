@@ -98,7 +98,7 @@ class NetworkExposedStateKeeper(
 			appContext.contentResolver,
 			Settings.Global.AIRPLANE_MODE_ON,
 			0
-		) != 0
+		) == 0
 		_airplaneModeEnabled.value = !airplaneModeOff
 		updateGeneralAirgap(airplaneModeOff)
 	}
