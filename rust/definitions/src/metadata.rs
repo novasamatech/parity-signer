@@ -34,6 +34,7 @@ use sp_version::RuntimeVersion;
 #[cfg(feature = "active")]
 use sp_wasm_interface::HostFunctions;
 use std::collections::HashMap;
+use sc_executor_common::wasm_runtime::HeapAllocStrategy;
 
 #[cfg(feature = "active")]
 use crate::{crypto::Encryption, error_active::Wasm, helpers::unhex, keyring::AddressBookKey};
@@ -173,7 +174,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
     let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::WasmError)?;
     let wasmi_runtime = create_runtime(
         runtime_blob,
-        64,
+        HeapAllocStrategy::Static{extra_pages: 64},
         SubstrateHostFunctions::host_functions(),
         false,
     )
