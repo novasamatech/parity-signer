@@ -18,17 +18,17 @@ class NetworkExposedStateKeeper(
 	private val rustInteractor: UniffiInteractor
 ) {
 
-	private val _airGapModeState: MutableStateFlow<NetworkState> =
-		MutableStateFlow(NetworkState.None)
-	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
-
-	private val _airPlaneMode: MutableStateFlow<Boolean?> =
+	private val _airplaneModeEnabled: MutableStateFlow<Boolean?> =
 		MutableStateFlow(null)
-	val airPlaneMode: StateFlow<Boolean?> = _airPlaneMode
+	val airPlaneMode: StateFlow<Boolean?> = _airplaneModeEnabled
 
 	private val _wifiDisabledState: MutableStateFlow<Boolean?> =
 		MutableStateFlow(null)
 	val wifiDisabledState: StateFlow<Boolean?> = _wifiDisabledState
+
+	private val _airGapModeState: MutableStateFlow<NetworkState> =
+		MutableStateFlow(NetworkState.None)
+	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
 
 	init {
 		registerAirplaneBroadcastReceiver()
@@ -58,16 +58,8 @@ class NetworkExposedStateKeeper(
 		appContext.registerReceiver(receiver, intentFilter)
 	}
 
-	/**
-	 * Checks if airplane mode was off
-	 */
-	private fun reactOnAirplaneMode() {
-		if (Settings.Global.getInt(
-				appContext.contentResolver,
-				Settings.Global.AIRPLANE_MODE_ON,
-				0
-			) == 0
-		) {
+	private fun updateGeneralAirgap(isBreached: Boolean) {
+		if (isBreached) {
 			if (airGapModeState.value != NetworkState.Active) {
 				_airGapModeState.value = NetworkState.Active
 				if (appContext.isDbCreatedAndOnboardingPassed()) {
@@ -83,6 +75,16 @@ class NetworkExposedStateKeeper(
 		}
 	}
 
+	private fun reactOnAirplaneMode() {
+		val airplaneModeOff = Settings.Global.getInt(
+			appContext.contentResolver,
+			Settings.Global.AIRPLANE_MODE_ON,
+			0
+		) != 0
+		_airplaneModeEnabled.value = !airplaneModeOff
+		updateGeneralAirgap(airplaneModeOff)
+	}
+
 
 	private fun registerWifiBroadcastReceiver() {
 		val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
@@ -95,9 +97,11 @@ class NetworkExposedStateKeeper(
 	}
 
 	private fun reactOnWifiAwareState() {
-		val wifi = appContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+		val wifi =
+			appContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
 		if (wifi != null) {
 			_wifiDisabledState.value = !wifi.isWifiEnabled
+			updateGeneralAirgap(wifi.isWifiEnabled)
 		} else {
 			_wifiDisabledState.value = true
 		}
