@@ -22,7 +22,7 @@ class NetworkExposedStateKeeper(
 
 	private val _airplaneModeEnabled: MutableStateFlow<Boolean?> =
 		MutableStateFlow(null)
-	val airPlaneMode: StateFlow<Boolean?> = _airplaneModeEnabled
+	val airPlaneModeEnabled: StateFlow<Boolean?> = _airplaneModeEnabled
 
 	private val _wifiDisabledState: MutableStateFlow<Boolean?> =
 		MutableStateFlow(null)

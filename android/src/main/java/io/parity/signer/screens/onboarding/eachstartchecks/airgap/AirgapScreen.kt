@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -26,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.CheckboxWithText
 import io.parity.signer.components.base.PrimaryButtonWide
@@ -33,9 +36,29 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
-
 @Composable
 fun AirgapScreen(
+	onCta: Callback,
+) {
+
+	val viewModel = viewModel<AirGapViewModel>()
+	val state = viewModel.state.collectAsState()
+	DisposableEffect(Unit) {
+		viewModel.init()
+		onDispose {
+			viewModel.unInit()
+		}
+	}
+
+	AirgapScreen(
+		state = state.value,
+		onCablesConfirmCheckbox = viewModel::onCableCheckboxClicked,
+		onCta = onCta
+	)
+}
+
+@Composable
+private fun AirgapScreen(
 	state: AirGapScreenState,
 	onCablesConfirmCheckbox: Callback,
 	onCta: Callback,
@@ -70,7 +93,7 @@ fun AirgapScreen(
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
-				AirgapItem(AirgapItemType.AIRPLANE_MODE, state.aieplaneModeEnabled)
+				AirgapItem(AirgapItemType.AIRPLANE_MODE, state.airplaneModeEnabled)
 				SignerDivider(modifier = Modifier.padding(start = 40.dp))
 				AirgapItem(AirgapItemType.WIFI, state.wifiDisabled)
 				SignerDivider(modifier = Modifier.padding(start = 40.dp))
@@ -121,18 +144,23 @@ fun AirgapScreen(
 		PrimaryButtonWide(
 			label = stringResource(R.string.button_next),
 			modifier = Modifier.padding(24.dp),
-			isEnabled = state.aieplaneModeEnabled && state.wifiDisabled && state.cablesDisconnected,
+			isEnabled = state.isReadyToProceed(),
 			onClicked = onCta,
 		)
 	}
 }
 
 data class AirGapScreenState(
-	val aieplaneModeEnabled: Boolean,
+	val airplaneModeEnabled: Boolean,
 	val wifiDisabled: Boolean,
 	val bluetoothDisabled: Boolean,
 	val cablesDisconnected: Boolean = false, //false default
-)
+) {
+}
+
+private fun AirGapScreenState.isReadyToProceed() =
+	airplaneModeEnabled && wifiDisabled
+		&& bluetoothDisabled && cablesDisconnected
 
 @Composable
 private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
@@ -217,7 +245,7 @@ private fun PreviewAirgapScreen() {
 	Box(modifier = Modifier.fillMaxSize(1f)) {
 		SignerNewTheme() {
 			val state = AirGapScreenState(
-				aieplaneModeEnabled = true,
+				airplaneModeEnabled = true,
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)

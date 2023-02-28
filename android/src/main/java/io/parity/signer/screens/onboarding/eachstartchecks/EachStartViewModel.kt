@@ -15,13 +15,6 @@ import kotlinx.coroutines.flow.map
 
 class EachStartViewModel : ViewModel() {
 
-	private val networkExposedStateKeeper = ServiceLocator.networkExposedStateKeeper
-
-	val isFlightModeEnabled: StateFlow<Boolean> =
-		networkExposedStateKeeper.airGapModeState.mapState(viewModelScope) { value: NetworkState -> value == NetworkState.Active }
-
-	val isFinished: Flow<Boolean> = isFlightModeEnabled.map { value: Boolean -> !value }
-
 	fun checkIsAuthPossible(context: Context): Boolean = Authentication.canAuthenticate(context)
 
 	fun isDeviceRooted(): Boolean {
