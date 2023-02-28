@@ -12,6 +12,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirplanemodeActive
+import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Cable
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -69,9 +70,11 @@ fun AirgapScreen(
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
+				AirgapItem(AirgapItemType.AIRPLANE_MODE, state.aieplaneModeEnabled)
+				SignerDivider(modifier = Modifier.padding(start = 40.dp))
 				AirgapItem(AirgapItemType.WIFI, state.wifiDisabled)
 				SignerDivider(modifier = Modifier.padding(start = 40.dp))
-				AirgapItem(AirgapItemType.AIRPLANE_MODE, state.aieplaneModeEnabled)
+				AirgapItem(AirgapItemType.BLUETOOTH, state.bluetoothDisabled)
 			}
 		}
 
@@ -127,6 +130,7 @@ fun AirgapScreen(
 data class AirGapScreenState(
 	val aieplaneModeEnabled: Boolean,
 	val wifiDisabled: Boolean,
+	val bluetoothDisabled: Boolean,
 	val cablesDisconnected: Boolean = false, //false default
 )
 
@@ -143,6 +147,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 		val icon = when (type) {
 			AirgapItemType.WIFI -> Icons.Filled.Wifi
 			AirgapItemType.AIRPLANE_MODE -> Icons.Filled.AirplanemodeActive
+			AirgapItemType.BLUETOOTH -> Icons.Filled.Bluetooth
 		}
 		Box(contentAlignment = Alignment.BottomEnd) {
 //			icon
@@ -182,6 +187,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 		val text = when (type) {
 			AirgapItemType.WIFI -> stringResource(R.string.airgap_onboarding_wifi_header)
 			AirgapItemType.AIRPLANE_MODE -> stringResource(R.string.airgap_onboarding_airplane_mode_header)
+			AirgapItemType.BLUETOOTH -> stringResource(R.string.airgap_onboarding_bluetooth_header)
 		}
 		Text(
 			text = text,
@@ -195,7 +201,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 }
 
 
-private enum class AirgapItemType { WIFI, AIRPLANE_MODE }
+private enum class AirgapItemType { WIFI, AIRPLANE_MODE, BLUETOOTH }
 
 
 @Preview(
@@ -212,7 +218,8 @@ private fun PreviewAirgapScreen() {
 		SignerNewTheme() {
 			val state = AirGapScreenState(
 				aieplaneModeEnabled = true,
-				wifiDisabled = false
+				wifiDisabled = false,
+				bluetoothDisabled = true
 			)
 			AirgapScreen(state, {}, {})
 		}

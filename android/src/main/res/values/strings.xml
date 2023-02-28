@@ -302,8 +302,9 @@
 	<string name="airgap_onboarding_title">Set Up Air Gap Mode</string>
 	<string name="airgap_onboarding_subtitle">Please Follow this steps to enable Air Gap mode and keep it enabled all the time</string>
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
+	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
-    <string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
+	<string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
 
 
 </resources>
