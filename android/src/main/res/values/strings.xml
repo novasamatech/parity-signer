@@ -126,9 +126,9 @@
 	<string name="camera_no_permission_text">Camera permission not granted</string>
 	<string name="general_got_it">Got it</string>
 	<string name="exposed_now_title">Network Connected</string>
-	<string name="exposed_now_message">Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.</string>
+	<string name="exposed_now_message">Polkadot Vault detects currently connected network; please enable airplane mode, disable Wifi and BT, disconnect all cables and handle security breach according with your security protocol.</string>
 	<string name="exposed_past_title">Network Was Connected!</string>
-	<string name="exposed_past_message">Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
+	<string name="exposed_past_message">Your Polkadot Vault device has connected to a mobile, WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
