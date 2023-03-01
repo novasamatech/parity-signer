@@ -1,6 +1,5 @@
 package io.parity.signer.components.base
 
-import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.pink500
+import io.parity.signer.ui.theme.textTertiary
 
 /**
  * Active checkbox field that responds to click anywhere within it

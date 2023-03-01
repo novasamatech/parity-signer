@@ -126,9 +126,9 @@
 	<string name="camera_no_permission_text">Camera permission not granted</string>
 	<string name="general_got_it">Got it</string>
 	<string name="exposed_now_title">Network Connected</string>
-	<string name="exposed_now_message">Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.</string>
+	<string name="exposed_now_message">Polkadot Vault detects currently connected network; please enable airplane mode, disable Wifi and BT, disconnect all cables and handle security breach according with your security protocol.</string>
 	<string name="exposed_past_title">Network Was Connected!</string>
-	<string name="exposed_past_message">Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
+	<string name="exposed_past_message">Your Polkadot Vault device has connected to a mobile, WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.</string>
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
@@ -191,7 +191,6 @@
 	<string name="password_hide_password">Hide password</string>
 	<string name="password_show_password">Show password</string>
 	<string name="password_error_wrong_password">The password you entered is incorrect. Please try again.</string>
-	<string name="enable_airplane_mode_error">Please enable airplane mode</string>
 	<string name="wrong_password_title">Did you forget your password?</string>
 	<string name="wrong_password_message">Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.</string>
 	<string name="transaction_generic_error_title">Error processing Transaction</string>
@@ -296,6 +295,15 @@
 	<string name="documents_accepted_checkmark">I’ve read and accept the Terms of Service and Privacy Policy</string>
 	<string name="documents_accept_cta_button">I Agree</string>
 	<string name="documents_approve_title">Please Agree to our Terms of Service and Privacy Policy</string>
+	<string name="root_exposed_title">Please try again with not Rooted device</string>
+	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
+	<string name="airgap_onboarding_disconnect_cable_header">Disconnect all cables</string>
+	<string name="airgap_onboarding_title">Set Up Air Gap Mode</string>
+	<string name="airgap_onboarding_subtitle">Please Follow this steps to enable Air Gap mode and keep it enabled all the time</string>
+	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
+	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
+	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
+	<string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
 
 
 </resources>
