@@ -86,7 +86,7 @@ fun KeySetDetailsScreenView(
 //							painter = painterResource(id = R.drawable.ic_tune_28),
 //							contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
 //							modifier = Modifier
-////                            .clickable { //todo dmitry fix selector for new API
+////                            .clickable { //todo dmitry fix selector for new API issue #1672
 ////                                navigator.navigate(
 ////                                    Action.NETWORK_SELECTOR,
 ////                                    ""
