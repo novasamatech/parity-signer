@@ -82,19 +82,19 @@ fun KeySetDetailsScreenView(
 							style = SignerTypeface.BodyM,
 							modifier = Modifier.weight(1f),
 						)
-						Icon(
-							painter = painterResource(id = R.drawable.ic_tune_28),
-							contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-							modifier = Modifier
-//                            .clickable { //todo dmitry fix selector for new API
-//                                navigator.navigate(
-//                                    Action.NETWORK_SELECTOR,
-//                                    ""
-//                                )
-//                            }
-								.size(28.dp),
-							tint = MaterialTheme.colors.textTertiary,
-						)
+//						Icon(
+//							painter = painterResource(id = R.drawable.ic_tune_28),
+//							contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
+//							modifier = Modifier
+////                            .clickable { //todo dmitry fix selector for new API
+////                                navigator.navigate(
+////                                    Action.NETWORK_SELECTOR,
+////                                    ""
+////                                )
+////                            }
+//								.size(28.dp),
+//							tint = MaterialTheme.colors.pink300,
+//						)
 					}
 					for (key in model.keysAndNetwork) {
 						KeyDerivedItem(model = key.key) {
@@ -105,8 +105,7 @@ fun KeySetDetailsScreenView(
 					}
 				}
 			} else {
-				Column(
-				) {
+				Column() {
 					//seed
 					model.root?.let {
 						SeedKeyDetails(
