@@ -12,7 +12,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
-import io.parity.signer.screens.scan.elements.PresentableErrorModel
+import io.parity.signer.screens.scan.errors.PresentableErrorModel
 import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues

@@ -1,5 +1,6 @@
-package io.parity.signer.domain
+package io.parity.signer.screens.scan.errors
 
+import io.parity.signer.domain.encodeHex
 import io.parity.signer.uniffi.ErrorDisplayed
 
 /**
