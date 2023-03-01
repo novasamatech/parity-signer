@@ -41,17 +41,14 @@ fun KeySetItem(
 		) {
 			IdentIcon(
 				identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
 				)
 			)
 			Column(Modifier.weight(1f)) {
 				Text(
 					text = model.seedName,
 					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.LabelM,
+					style = SignerTypeface.TitleS,
 				)
 				if (model.derivedKeysCount > 0.toUInt()) {
 					Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -61,7 +58,7 @@ fun KeySetItem(
 							count = model.derivedKeysCount.toInt(),
 							model.derivedKeysCount.toInt(),
 						),
-						color = MaterialTheme.colors.textDisabled,
+						color = MaterialTheme.colors.textSecondary,
 						style = SignerTypeface.BodyM,
 					)
 				}
@@ -69,10 +66,11 @@ fun KeySetItem(
 			Image(
 				imageVector = Icons.Filled.ChevronRight,
 				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
 				modifier = Modifier
-					.size(28.dp)
 					.padding(end = 8.dp)
+					.size(28.dp)
+
 			)
 		}
 	}
@@ -92,9 +90,7 @@ private fun PreviewKeySetItem() {
 	SignerNewTheme {
 		KeySetItem(
 			KeySetModel(
-				"My special key set",
-				PreviewData.exampleIdenticonPng,
-				2.toUInt()
+				"My special key set", PreviewData.exampleIdenticonPng, 2.toUInt()
 			)
 		)
 	}

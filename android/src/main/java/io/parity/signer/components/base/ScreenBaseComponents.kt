@@ -153,7 +153,6 @@ fun ScreenHeaderClose(
 }
 
 
-//todo dmitry DerivationPathScreen.kt:350 migrate to this view when merged
 @Composable
 fun ScreenHeaderWithButton(
 	canProceed: Boolean,

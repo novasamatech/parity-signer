@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
 import io.parity.signer.domain.KeyModel
@@ -20,12 +21,15 @@ fun SeedKeyDetails(
 	model: KeyModel,
 	modifier: Modifier = Modifier
 ) {
-	Column(modifier = modifier.fillMaxWidth(),
-		horizontalAlignment = Alignment.CenterHorizontally) {
+	Column(
+		modifier = modifier.fillMaxWidth(),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
 		Text(
 			text = model.seedName,
 			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleXl
+			style = SignerTypeface.TitleXl,
+			textAlign = TextAlign.Center
 		)
 		ShowBase58Collapsible(model.base58)
 	}

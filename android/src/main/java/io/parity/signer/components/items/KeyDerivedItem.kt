@@ -56,8 +56,8 @@ fun KeyDerivedItem(
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Text(
 						text = model.path,
-						color = MaterialTheme.colors.primary,
-						style = SignerTypeface.LabelM,
+						color = MaterialTheme.colors.textTertiary,
+						style = SignerTypeface.CaptionM,
 					)
 					if (model.hasPwd) {
 						Icon(
@@ -71,8 +71,8 @@ fun KeyDerivedItem(
 				Spacer(modifier = Modifier.padding(top = 4.dp))
 				Text(
 					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.primary,
+					style = SignerTypeface.BodyL,
 				)
 			}
 			Image(

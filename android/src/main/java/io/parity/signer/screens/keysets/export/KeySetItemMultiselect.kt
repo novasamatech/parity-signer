@@ -62,7 +62,7 @@ fun KeySetItemMultiselect(
 							count = model.derivedKeysCount.toInt(),
 							model.derivedKeysCount.toInt(),
 						),
-						color = MaterialTheme.colors.textDisabled,
+						color = MaterialTheme.colors.textSecondary,
 						style = SignerTypeface.BodyM,
 					)
 				}
