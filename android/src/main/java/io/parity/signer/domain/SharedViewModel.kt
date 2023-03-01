@@ -90,6 +90,11 @@ class SharedViewModel() : ViewModel() {
 		ServiceLocator.uniffiInteractor.wasRustInitialized.value = true
 		networkExposedStateKeeper.updateAlertStateFromHistory()
 		navigator.navigate(Action.START)
+		if (allNames.isEmpty()) {
+			//workaround to hide create new bottom sheet while #1618 is not merged
+			//https://github.com/paritytech/parity-signer/pull/1618
+			navigator.navigate(Action.GO_BACK)
+		}
 	}
 
 	/**
