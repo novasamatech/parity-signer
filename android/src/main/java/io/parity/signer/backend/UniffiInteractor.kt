@@ -3,6 +3,7 @@ package io.parity.signer.backend
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toNetworkModel
+import io.parity.signer.screens.scan.errors.TransactionError
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -130,6 +131,11 @@ class UniffiInteractor() {
 sealed class UniffiResult<T> {
 	data class Success<T>(val result: T) : UniffiResult<T>()
 	data class Error<Any>(val error: ErrorDisplayed) : UniffiResult<Any>()
+}
+
+sealed class BackendNavigationResult {
+	data class Success(val result: ActionResult) : BackendNavigationResult()
+	data class Error(val error: TransactionError) : BackendNavigationResult()
 }
 
 fun <T> UniffiResult<T>.mapError(): T? {

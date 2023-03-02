@@ -34,7 +34,6 @@ fun TransactionErrors(errors: String, modifier: Modifier = Modifier) {
 	}
 }
 
-
 @Preview(
 	name = "light theme",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
