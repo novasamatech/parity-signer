@@ -304,7 +304,7 @@
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
 	<string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
-
+	<string name="navigation_error_general_message">Please restart Polkadot Vault app and try again.\nInternal error description: %1$s</string>
 
 </resources>
 

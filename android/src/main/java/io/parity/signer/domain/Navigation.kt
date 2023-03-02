@@ -21,7 +21,6 @@ fun SharedViewModel.navigate(
 	navigator.navigate(button, details, seedPhrase)
 }
 
-
 interface Navigator {
 	/**
 	 * For old Rust-backed navigation actions
@@ -187,3 +186,5 @@ sealed class LocalNavAction {
 sealed class LocalNavRequest {
 	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
 }
+
+data class NavigationError(val message: String)

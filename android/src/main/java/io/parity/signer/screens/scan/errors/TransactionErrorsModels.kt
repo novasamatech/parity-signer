@@ -29,16 +29,11 @@ sealed class TransactionError {
 }
 
 
-private tailrec fun findErrorDisplayed(exception: Throwable): ErrorDisplayed? {
-	if (exception is ErrorDisplayed) {
-		return exception
+tailrec fun Throwable.findErrorDisplayed(): ErrorDisplayed? {
+	if (this is ErrorDisplayed) {
+		return this
 	}
-	val cause = exception.cause
-	return if (cause != null) {
-		findErrorDisplayed(cause)
-	} else {
-		null
-	}
+	return this.cause?.findErrorDisplayed()
 }
 
 

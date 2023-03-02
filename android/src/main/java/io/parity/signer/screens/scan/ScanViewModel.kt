@@ -5,7 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
-import io.parity.signer.backend.UniffiResult
+import io.parity.signer.backend.OperationResult
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -60,7 +60,7 @@ class ScanViewModel : ViewModel() {
 		val navigateResponse =
 			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
 		val screenData =
-			(navigateResponse as? UniffiResult.Success)?.result?.screenData
+			(navigateResponse as? OperationResult.Ok)?.result?.screenData
 		val transactions: List<MTransaction> =
 			(screenData as? ScreenData.Transaction)?.f
 				?: run {
@@ -302,7 +302,7 @@ class ScanViewModel : ViewModel() {
 		val navigateResponse =
 			uniffiInteractor.navigate(Action.GO_FORWARD, password)
 		val actionResult =
-			(navigateResponse as? UniffiResult.Success)?.result
+			(navigateResponse as? OperationResult.Ok)?.result
 				?: run {
 					Log.e(
 						TAG, "Error in entering password for a key, " +
