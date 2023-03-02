@@ -11,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme

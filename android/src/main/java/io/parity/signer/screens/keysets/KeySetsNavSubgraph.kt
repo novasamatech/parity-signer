@@ -50,9 +50,7 @@ fun KeySetsNavSubgraph(
 				)
 			}
 			BottomSheetWrapperRoot(onClosedAction = {
-				navController.navigate(
-					KeySetsNavSubgraph.home
-				)
+				navController.popBackStack(KeySetsNavSubgraph.home, false)
 			}) {
 				KeySetsMenuBottomSheet(navigator = navController)
 			}
@@ -60,7 +58,9 @@ fun KeySetsNavSubgraph(
 		composable(KeySetsNavSubgraph.export) {
 			KeySetsExportScreenFull(
 				model = model,
-				onClose = { navController.navigate(KeySetsNavSubgraph.home) },
+				onClose = {
+					navController.popBackStack(KeySetsNavSubgraph.home, false)
+				},
 			)
 		}
 	}
