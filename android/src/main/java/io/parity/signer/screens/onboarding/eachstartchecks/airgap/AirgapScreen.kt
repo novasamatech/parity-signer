@@ -38,7 +38,6 @@ import io.parity.signer.ui.theme.*
 fun AirgapScreen(
 	onCta: Callback,
 ) {
-
 	val viewModel = viewModel<AirGapViewModel>()
 	val state = viewModel.state.collectAsState()
 	DisposableEffect(Unit) {
