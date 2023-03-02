@@ -57,12 +57,12 @@ class SeedStorage {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
 				.setRequestStrongBoxBacked(true)
-				.setUserAuthenticationRequired(true)
+				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
 				.build()
 		} else {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setUserAuthenticationRequired(true)
+				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
 				.build()
 		}
 
