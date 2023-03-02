@@ -3,6 +3,8 @@ package io.parity.signer.screens.keysets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -13,6 +15,7 @@ import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.export.KeySetsExportScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.uniffi.Action
 
 /**
  * Navigation Subgraph with compose nav controller for those Key Set screens which are not part of general
@@ -38,6 +41,13 @@ fun KeySetsNavSubgraph(
 					localNavigator = navController,
 					networkState = networkState,
 				)
+			}
+			LaunchedEffect(key1 = Unit,) {
+				if (model.keys.isEmpty()) {
+					//workaround to hide create new bottom sheet while #1618 is not merged
+					//https://github.com/paritytech/parity-signer/pull/1618
+					rootNavigator.navigate(Action.GO_BACK)
+				}
 			}
 		}
 		composable(KeySetsNavSubgraph.homeMenu) {
