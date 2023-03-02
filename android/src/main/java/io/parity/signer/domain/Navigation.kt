@@ -50,6 +50,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 		}
 
 		try {
+			//todo dmitry uniffi use here ios/PolkadotVault/Core/Adapters/BackendNavigationAdapter.swift:34
 			val navigationAction = backendAction(action, details, seedPhrase)
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
 			if (navigationAction.screenData is ScreenData.KeyDetails) {
@@ -161,7 +162,11 @@ class EmptyNavigator : Navigator {
 
 class FakeNavigator : Navigator {
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
+		try {
 		backendAction(action, details, seedPhrase)
+		} catch (_: ErrorDisplayed){
+
+		}
 		//do nothing
 	}
 
