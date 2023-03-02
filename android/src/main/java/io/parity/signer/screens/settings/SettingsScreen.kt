@@ -2,10 +2,7 @@ package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -15,10 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.alerts.AndroidCalledConfirm
+import io.parity.signer.components.base.BottomSheetConfirmDialog
+import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
