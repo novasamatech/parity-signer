@@ -304,6 +304,10 @@
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
 	<string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
+	<string name="settings_confirmation_wipe_all_message">Remove all data and set general verifier information blank. \n\n%1$s This operation cannot be reversed so do not proceed unless you are sure you wish to erase important verification information. In most cases, there is no need to wipe all data. Using this feature inappropriately may lead to loss of funds!</string>
+	<string name="settings_confirmation_wipe_all_message_highlited_warning">Warning:</string>
+	<string name="settings_confirmation_wipe_all_title">Wipe All Data?</string>
+	<string name="settings_confirmation_wipe_all_message_yes_label">I Understand, Remove all Data</string>
 	<string name="navigation_error_general_message">Please restart Polkadot Vault app and try again.\nInternal error description: %1$s</string>
 
 </resources>
