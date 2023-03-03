@@ -31,7 +31,7 @@ import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreen
+import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
@@ -89,7 +89,7 @@ fun CombinedScreensSelector(
 			}
 		is ScreenData.Settings ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				SettingsScreen(
+				SettingsScreenSubgraph(
 					rootNavigator = rootNavigator,
 					isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
 					appVersion = sharedViewModel.getAppVersion(),

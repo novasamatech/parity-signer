@@ -1,9 +1,7 @@
 package io.parity.signer.screens.onboarding.eachstartchecks.airgap
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,7 +38,6 @@ import io.parity.signer.ui.theme.*
 fun AirgapScreen(
 	onCta: Callback,
 ) {
-
 	val viewModel = viewModel<AirGapViewModel>()
 	val state = viewModel.state.collectAsState()
 	DisposableEffect(Unit) {
@@ -63,84 +60,88 @@ private fun AirgapScreen(
 	onCablesConfirmCheckbox: Callback,
 	onCta: Callback,
 ) {
-	Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-		Text(
+	Column() {
+		Column(
 			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp, vertical = 12.dp),
-			text = stringResource(R.string.airgap_onboarding_title),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleL,
-			textAlign = TextAlign.Center,
-		)
-		Text(
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp),
-			text = stringResource(R.string.airgap_onboarding_subtitle),
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyL,
-			textAlign = TextAlign.Center,
-		)
-
-		Surface(
-			shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-			border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
-			color = MaterialTheme.colors.fill6,
-			modifier = Modifier.padding(16.dp)
+				.verticalScroll(rememberScrollState())
+				.weight(1f, true)
 		) {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
-			) {
-				AirgapItem(AirgapItemType.AIRPLANE_MODE, state.airplaneModeEnabled)
-				SignerDivider(modifier = Modifier.padding(start = 40.dp))
-				AirgapItem(AirgapItemType.WIFI, state.wifiDisabled)
-				SignerDivider(modifier = Modifier.padding(start = 40.dp))
-				AirgapItem(AirgapItemType.BLUETOOTH, state.bluetoothDisabled)
-			}
-		}
+			Text(
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.padding(horizontal = 24.dp, vertical = 12.dp),
+				text = stringResource(R.string.airgap_onboarding_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleL,
+				textAlign = TextAlign.Center,
+			)
+			Text(
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.padding(horizontal = 24.dp),
+				text = stringResource(R.string.airgap_onboarding_subtitle),
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyL,
+				textAlign = TextAlign.Center,
+			)
 
-		Surface(
-			shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-			border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
-			color = MaterialTheme.colors.fill6,
-			modifier = Modifier.padding(16.dp)
-		) {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
+			Surface(
+				shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
+				border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
+				color = MaterialTheme.colors.fill6,
+				modifier = Modifier.padding(16.dp)
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.padding(16.dp),
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
 				) {
-					Image(
-						imageVector = Icons.Filled.Cable,
-						contentDescription = null,
-						colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-						modifier = Modifier
-							.size(24.dp)
-					)
-					Text(
-						text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
-						color = MaterialTheme.colors.textTertiary,
-						style = SignerTypeface.TitleS,
-						modifier = Modifier
-							.padding(horizontal = 16.dp, vertical = 14.dp)
-							.weight(1f)
-					)
+					AirgapItem(AirgapItemType.AIRPLANE_MODE, state.airplaneModeEnabled)
+					SignerDivider(modifier = Modifier.padding(start = 40.dp))
+					AirgapItem(AirgapItemType.WIFI, state.wifiDisabled)
+					SignerDivider(modifier = Modifier.padding(start = 40.dp))
+					AirgapItem(AirgapItemType.BLUETOOTH, state.bluetoothDisabled)
 				}
-				SignerDivider()
-				CheckboxWithText(
-					checked = state.cablesDisconnected,
-					text = stringResource(R.string.airgap_onboarding_disconnect_cable_checkbox_description),
-					modifier = Modifier.padding(16.dp),
-				) { newIsChecked ->
-					onCablesConfirmCheckbox()
+			}
+
+			Surface(
+				shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
+				border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
+				color = MaterialTheme.colors.fill6,
+				modifier = Modifier.padding(16.dp)
+			) {
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
+				) {
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier.padding(16.dp),
+					) {
+						Image(
+							imageVector = Icons.Filled.Cable,
+							contentDescription = null,
+							colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+							modifier = Modifier
+								.size(24.dp)
+						)
+						Text(
+							text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.TitleS,
+							modifier = Modifier
+								.padding(horizontal = 16.dp, vertical = 14.dp)
+								.weight(1f)
+						)
+					}
+					SignerDivider()
+					CheckboxWithText(
+						checked = state.cablesDisconnected,
+						text = stringResource(R.string.airgap_onboarding_disconnect_cable_checkbox_description),
+						modifier = Modifier.padding(16.dp),
+					) { newIsChecked ->
+						onCablesConfirmCheckbox()
+					}
 				}
 			}
 		}
-		Spacer(modifier = Modifier.weight(1f))
 		PrimaryButtonWide(
 			label = stringResource(R.string.button_next),
 			modifier = Modifier.padding(24.dp),
@@ -155,8 +156,7 @@ data class AirGapScreenState(
 	val wifiDisabled: Boolean,
 	val bluetoothDisabled: Boolean,
 	val cablesDisconnected: Boolean = false, //false default
-) {
-}
+)
 
 private fun AirGapScreenState.isReadyToProceed() =
 	airplaneModeEnabled && wifiDisabled
@@ -255,3 +255,24 @@ private fun PreviewAirgapScreen() {
 }
 
 
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewAirgapScreenSmall() {
+	Box(modifier = Modifier.size(width = 250.dp, height = 450.dp)) {
+		SignerNewTheme() {
+			val state = AirGapScreenState(
+				airplaneModeEnabled = true,
+				wifiDisabled = false,
+				bluetoothDisabled = true
+			)
+			AirgapScreen(state, {}, {})
+		}
+	}
+}

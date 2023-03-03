@@ -18,6 +18,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.isDbCreatedAndOnboardingPassed
 import io.parity.signer.screens.onboarding.eachstartchecks.airgap.AirgapScreen
 import io.parity.signer.screens.onboarding.eachstartchecks.rootcheck.RootExposedScreen
 import io.parity.signer.screens.onboarding.eachstartchecks.screenlock.SetScreenLockScreen
@@ -29,14 +32,22 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 		val viewModel: EachStartViewModel = viewModel()
 		val context: Context = LocalContext.current
 
+		val goToNextFlow: Callback = {
+			globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+				popUpTo(0)
+			}
+		}
+
 		val state = remember {
 			mutableStateOf(
 				if (viewModel.isDeviceRooted()) {
 					EachStartSubgraphScreenSteps.ROOT_EXPOSED
-				} else if (viewModel.checkIsAuthPossible(context)) {
+				} else if (!viewModel.checkIsAuthPossible(context)) {
+					EachStartSubgraphScreenSteps.SET_SCREEN_LOCK_BLOCKER
+				} else if (viewModel.networkState.value == NetworkState.Active || !context.isDbCreatedAndOnboardingPassed()){
 					EachStartSubgraphScreenSteps.AIR_GAP
 				} else {
-					EachStartSubgraphScreenSteps.SET_SCREEN_LOCK_BLOCKER
+					goToNextFlow()
 				}
 			)
 		}
@@ -71,9 +82,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 				EachStartSubgraphScreenSteps.AIR_GAP -> {
 					AirgapScreen {
 						//go to next screen
-						globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
-							popUpTo(0)
-						}
+						goToNextFlow()
 					}
 				}
 			}
