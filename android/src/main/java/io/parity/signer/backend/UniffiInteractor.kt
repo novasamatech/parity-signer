@@ -192,3 +192,15 @@ fun <T> UniffiResult<T>.mapError(): T? {
 	}
 }
 
+@Deprecated("Handle error state")
+fun <T, V> OperationResult<T, V>.mapError(): T? {
+	return when (this) {
+		is OperationResult.Err -> {
+			submitErrorState("uniffi interaction exception $error")
+			null
+		}
+		is OperationResult.Ok -> {
+			result
+		}
+	}
+}

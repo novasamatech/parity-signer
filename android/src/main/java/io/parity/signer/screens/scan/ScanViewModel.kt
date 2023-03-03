@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.backend.OperationResult
+import io.parity.signer.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -138,7 +139,8 @@ class ScanViewModel : ViewModel() {
 					null -> {
 						//proceed, all good, now check if we need to update for derivations keys
 						if (transactions.hasImportableKeys()) {
-							val importDerivedKeys = transactions.flatMap { it.allImportDerivedKeys() }
+							val importDerivedKeys =
+								transactions.flatMap { it.allImportDerivedKeys() }
 							if (importDerivedKeys.isEmpty()) {
 								this.transactions.value = TransactionsState(transactions)
 							}
@@ -152,7 +154,8 @@ class ScanViewModel : ViewModel() {
 											transactions = transactions,
 											updatedKeys = updatedKeys
 										)
-									this.transactions.value = TransactionsState(newTransactionsState)
+									this.transactions.value =
+										TransactionsState(newTransactionsState)
 								}
 								is RepoResult.Failure -> {
 									Toast.makeText(
@@ -290,11 +293,13 @@ class ScanViewModel : ViewModel() {
 				Log.w(TAG, "signature transactions failure ${phrases.error}")
 				null
 			}
-			is RepoResult.Success -> backendAction(
-				Action.GO_FORWARD,
-				comment,
-				phrases.result
-			)
+			is RepoResult.Success -> {
+				uniffiInteractor.navigate(
+					Action.GO_FORWARD,
+					comment,
+					phrases.result
+				).mapError()
+			}
 		}
 	}
 
@@ -349,9 +354,10 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun resetRustModalToNewScan() {
+		val fakeNavigator = FakeNavigator()
 		// Dismissing password modal goes to `Log` screen
-		backendAction(Action.GO_BACK, "", "")
+		fakeNavigator.backAction()
 		// Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
-		backendAction(Action.NAVBAR_SCAN, "", "")
+		fakeNavigator.navigate(Action.NAVBAR_SCAN, "", "")
 	}
 }

@@ -13,6 +13,7 @@ import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.BottomBarSingleton
 import io.parity.signer.components.panels.toAction
+import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
 import io.parity.signer.screens.scan.camera.ScanScreen
@@ -102,7 +103,7 @@ fun ScanNavSubgraph(
 			signature = signature.value,
 			modifier = Modifier.statusBarsPadding(),
 			onBack = {
-				backendAction(Action.GO_BACK, "", "")
+				FakeNavigator().backAction()
 				scanViewModel.clearState()
 			},
 			onApprove = {

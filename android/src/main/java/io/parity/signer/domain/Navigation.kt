@@ -175,10 +175,10 @@ class FakeNavigator : Navigator {
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		try {
 		backendAction(action, details, seedPhrase)
-		} catch (_: ErrorDisplayed){
-
+		} catch (e: ErrorDisplayed){
+			Log.e("fake navigation error", e.message ?: e.toString())
 		}
-		//do nothing
+		//do nothing with result
 	}
 
 	override fun navigate(action: LocalNavRequest) {
