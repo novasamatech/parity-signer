@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
+import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.createderivation.DerivationCreateViewModel
 import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
@@ -87,7 +88,8 @@ fun DerivationPathScreen(
 	}
 
 	Column(modifier = modifier) {
-		DerivationPathHeader(
+		ScreenHeaderWithButton(
+			title = stringResource(R.string.derivation_path_screen_title),
 			canProceed = canProceed,
 			onClose = onClose,
 			onDone = onDoneLocal,
@@ -341,61 +343,6 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 				.align(Alignment.CenterVertically)
 				.padding(start = 18.dp, end = 18.dp)
 		)
-	}
-}
-
-/**
- * io/parity/signer/screens/keysets/create/NewKeySetNameScreen.kt:107
- */
-@Composable
-private fun DerivationPathHeader(
-	canProceed: Boolean,
-	onClose: Callback,
-	onDone: Callback,
-) {
-	Box(
-		modifier = Modifier.padding(
-			start = 24.dp,
-			end = 8.dp,
-			top = 8.dp,
-			bottom = 8.dp
-		),
-		contentAlignment = Alignment.Center,
-	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.CenterStart,
-		) {
-			CloseIcon(
-				noBackground = true,
-				onCloseClicked = onClose,
-			)
-		}
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.Center,
-		) {
-			Text(
-				text = stringResource(R.string.derivation_path_screen_title),
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleS,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth(1f)
-			)
-		}
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.CenterEnd,
-		) {
-			PrimaryButtonGreyDisabled(
-				label = stringResource(R.string.generic_done),
-				isEnabled = canProceed,
-			) {
-				if (canProceed) {
-					onDone()
-				}
-			}
-		}
 	}
 }
 
