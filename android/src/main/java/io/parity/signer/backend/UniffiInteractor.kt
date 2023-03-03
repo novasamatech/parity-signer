@@ -33,26 +33,45 @@ class UniffiInteractor(val appContext: Context) {
 		action: Action,
 		details: String = "",
 		seedPhrase: String = "",
-	): OperationResult<ActionResult, NavigationError> = withContext(Dispatchers.IO) {
-		try {
-			OperationResult.Ok(backendAction(action, details, seedPhrase))
-		} catch (e: Throwable) {
-			OperationResult.Err(NavigationError(appContext.getString(R.string.navigation_error_general_message,
-				e.findErrorDisplayed()?.message ?: e.message)))
+	): OperationResult<ActionResult, NavigationError> =
+		withContext(Dispatchers.IO) {
+			try {
+				OperationResult.Ok(backendAction(action, details, seedPhrase))
+			} catch (e: ErrorDisplayed) {
+				OperationResult.Err(
+					NavigationError(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
+			}
 		}
-	}
 
-	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError>
-	= withContext(Dispatchers.IO) {
-		try {
-			OperationResult.Ok(backendAction(Action.TRANSACTION_FETCHED, payload, ""))
-		} catch (e: ErrorDisplayed) {
-			OperationResult.Err(e.toTransactionError())
-		} catch (e: Throwable) {
-			OperationResult.Err(TransactionError.Generic(appContext.getString(R.string.navigation_error_general_message,
-				e.findErrorDisplayed()?.message ?: e.message)))
+	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
+		withContext(Dispatchers.IO) {
+			try {
+				OperationResult.Ok(
+					backendAction(
+						Action.TRANSACTION_FETCHED,
+						payload,
+						""
+					)
+				)
+			} catch (e: ErrorDisplayed) {
+				OperationResult.Err(e.toTransactionError())
+			} catch (e: Throwable) {
+				OperationResult.Err(
+					TransactionError.Generic(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
+			}
 		}
-	}
 
 	//todo dmitry do
 //	"Error.Navigation.Label.Prefix" = "Internal navigation error.";
