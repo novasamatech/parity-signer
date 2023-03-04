@@ -14,7 +14,7 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 thiserror = "1.0.38"
 
 [features]
-default = ["test"]
+default = []
 active = [
 	"definitions/active",
 	"lazy_static",
@@ -25,10 +25,6 @@ signer = [
 	"definitions/signer",
 	"sp-core",
 	"sp-runtime",
-]
-test = [
-	"active",
-	"signer",
 ]
 
 [lib]

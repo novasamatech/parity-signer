@@ -62,11 +62,9 @@
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
-#[cfg(feature = "test")]
 pub mod test_values;
 
 /// Default folder for cold database generated during the Vault build
-#[cfg(feature = "active")]
 pub const COLD_DB_NAME_RELEASE: &str = "../database/database_cold_release";
 
 /// Tree name for the tree storing the network specs in cold database
@@ -108,60 +106,47 @@ pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key in transactions tree [`TRANSACTION`] for updates data
-#[cfg(feature = "signer")]
 pub const STUB: &[u8] = b"stub";
 
 /// Key in transactions tree [`TRANSACTION`] for signable transactions
-#[cfg(feature = "signer")]
 pub const SIGN: &[u8] = b"sign";
 
 /// Key in transactions tree [`TRANSACTION`] for derivations import data
-#[cfg(feature = "signer")]
 pub const DRV: &[u8] = b"derivations";
 
 /// Maximum number of words displayed to user based on user input in seed
 /// recovery process
-#[cfg(feature = "signer")]
 pub const MAX_WORDS_DISPLAY: usize = 8;
 
 /// Number of entries on log history page
-#[cfg(feature = "signer")]
 pub const HISTORY_PAGE_SIZE: usize = 20;
 
 /// Default folder for hot database
-#[cfg(feature = "active")]
 pub const HOT_DB_NAME: &str = "../database/database_hot";
 
 /// Tree name for the tree storing the network specs in hot database
-#[cfg(feature = "active")]
 pub const SPECSTREEPREP: &[u8] = b"chainspecs_prep";
 
 /// Tree name for the tree storing the network block hash at the time of
 /// metadata fetch, in hot database
-#[cfg(feature = "active")]
 pub const META_HISTORY: &[u8] = b"metadata_history";
 
 /// Tree name for the tree storing the address book in hot database, with data
 /// necessary for RPC calls
-#[cfg(feature = "active")]
 pub const ADDRESS_BOOK: &[u8] = b"address_book";
 
 /// Default `color` to be used in generating network specs with no color
 /// information provided
-#[cfg(feature = "active")]
 pub const COLOR: &str = "#660D35";
 
 /// Default `secondary_color` to be used in generating network specs with no
 /// color information provided
-#[cfg(feature = "active")]
 pub const SECONDARY_COLOR: &str = "#262626";
 
 /// Folder to save payloads ready for signing, for `generate_message` crate
-#[cfg(feature = "active")]
 pub const FOLDER: &str = "../files/in_progress";
 
 /// Folder to save completed update messages, for `generate_message` crate
-#[cfg(feature = "active")]
 pub const EXPORT_FOLDER: &str = "../files/completed";
 
 /// Alice seed phrase
@@ -169,14 +154,12 @@ pub const ALICE_SEED_PHRASE: &str =
     "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
 /// Data chunk size for fountain QR code generation
-#[cfg(feature = "active")]
 pub const CHUNK_SIZE: u16 = 1072;
 
 /// Main color for QR codes (both static and animated ones)
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
 /// Main color for **dangerous** QR codes (static only, in Vault)
-#[cfg(feature = "signer")]
 pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
 
 /// Background color for QR codes (both static and animated ones)
@@ -188,7 +171,6 @@ pub fn qr_palette() -> Vec<u8> {
 }
 
 /// Color palette for **dangerous** QR codes (static only, in Vault)
-#[cfg(feature = "signer")]
 pub fn qr_palette_danger() -> Vec<u8> {
     [MAIN_COLOR_DANGER.to_vec(), BACK_COLOR.to_vec()].concat()
 }

@@ -22,8 +22,6 @@ use sp_core::{blake2_256, H256};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
-#[cfg(feature = "test")]
-use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -392,7 +390,6 @@ impl SignMessageDisplay {
 
 /// Events that could be recorded in the history log
 #[derive(PartialEq, Eq, Debug, Decode, Encode, Clone)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {

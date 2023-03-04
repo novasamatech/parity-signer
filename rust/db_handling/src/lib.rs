@@ -53,7 +53,6 @@ mod error;
 
 pub use error::{Error, Result};
 
-#[cfg(feature = "test")]
 #[cfg(test)]
 pub mod tests;
 

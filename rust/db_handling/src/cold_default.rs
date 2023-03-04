@@ -60,10 +60,8 @@ use definitions::{history::Event, network_specs::Verifier};
 use defaults::default_general_verifier;
 #[cfg(feature = "active")]
 use defaults::{default_chainspecs, default_types_content, default_verifiers, release_metadata};
-#[cfg(feature = "test")]
 use defaults::{nav_test_metadata, test_metadata};
 
-#[cfg(feature = "test")]
 use crate::identities::generate_test_identities;
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
@@ -84,12 +82,9 @@ enum Purpose {
     Release,
 
     /// Old metadata set, used mostly in `transaction_parsing` tests
-    #[cfg(feature = "test")]
     Test,
 
     /// Not so old metadata set, used for `navigator` tests
-    // TODO combine all testing together
-    #[cfg(feature = "test")]
     TestNavigator,
 }
 
@@ -103,10 +98,8 @@ fn default_cold_metadata(purpose: Purpose) -> Result<Batch> {
     let metadata_set = match purpose {
         Purpose::Release => release_metadata()?,
 
-        #[cfg(feature = "test")]
         Purpose::Test => test_metadata()?,
 
-        #[cfg(feature = "test")]
         Purpose::TestNavigator => nav_test_metadata()?,
     };
     for x in metadata_set.iter() {
@@ -257,7 +250,6 @@ pub fn signer_init_no_cert(database: &sled::Db) -> Result<()> {
 /// Function wipes everything in the database directory and loads into database
 /// defaults for types information and danger status. Then the database is
 /// initiated with given general verifier.
-#[cfg(feature = "test")]
 pub fn populate_cold_no_networks(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
     database.clear()?;
     TrDbCold::new()
@@ -276,7 +268,6 @@ pub fn populate_cold_no_networks(database: &sled::Db, general_verifier: Verifier
 /// - network verifiers
 ///
 /// Then the database is initiated with given general verifier.
-#[cfg(feature = "test")]
 pub fn populate_cold_no_metadata(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
     use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
 
@@ -296,7 +287,6 @@ pub fn populate_cold_no_metadata(database: &sled::Db, general_verifier: Verifier
 
 /// Generate initiated test cold database with default content, and create in it
 /// Alice default addresses.
-#[cfg(feature = "test")]
 pub fn populate_cold(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
     cold_database_no_init(database, Purpose::Test)?;
     init_db(database, general_verifier)?;
@@ -310,7 +300,6 @@ pub(crate) fn populate_cold_release(database: &sled::Db) -> Result<()> {
 }
 
 /// Generate **not initiated** test cold database for `navigator` testing.
-#[cfg(feature = "test")]
 pub fn populate_cold_nav_test(database: &sled::Db) -> Result<()> {
     cold_database_no_init(database, Purpose::TestNavigator)
 }

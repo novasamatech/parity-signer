@@ -536,7 +536,6 @@ impl MetaHistoryEntry {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
     use super::*;
     use std::fs::read_to_string;

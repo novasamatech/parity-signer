@@ -438,7 +438,6 @@ impl AddressBookKey {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
     use super::*;
 

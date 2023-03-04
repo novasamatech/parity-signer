@@ -27,7 +27,7 @@ regex = { version = "1.7.1" }
 
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
-constants = { path = "../constants", features = ["test"] }
+constants = { path = "../constants" }
 parser = { path = "../parser", default-features = false }
 db_handling = {path = "../db_handling"}
 

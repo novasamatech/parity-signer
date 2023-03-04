@@ -457,7 +457,6 @@ pub fn default_types_content() -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&default_types_vec()?))
 }
 
-#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests {
     use super::*;

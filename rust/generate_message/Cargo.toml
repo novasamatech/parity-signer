@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 clap = { version = "4.1", features = ["derive"] }
-constants = {path = "../constants", default-features = false, features = ["active"]}
+constants = {path = "../constants"}
 db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
 definitions = {path = "../definitions", default-features = false, features = ["active"]}
 hex = "0.4.3"
