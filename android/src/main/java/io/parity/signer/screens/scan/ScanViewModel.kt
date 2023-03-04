@@ -46,7 +46,7 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val presentableError: MutableStateFlow<PresentableErrorModel?> =
+	val presentableError: MutableStateFlow<PresentableErrorModel?> = //todo dmitry there should be transaction errors from error folder above
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
@@ -59,131 +59,137 @@ class ScanViewModel : ViewModel() {
 		}
 		transactionIsInProgress.value = true
 		val navigateResponse =
-			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
-		val screenData =
-			(navigateResponse as? OperationResult.Ok)?.result?.screenData
-		val transactions: List<MTransaction> =
-			(screenData as? ScreenData.Transaction)?.f
-				?: run {
-					Log.e(
-						TAG, "Error in getting transaction from qr payload, " +
-							"screenData is $screenData, navigation resp is $navigateResponse"
+			uniffiInteractor.performTransaction(payload)
+
+		when (navigateResponse) {
+			is OperationResult.Err -> {
+				//todo dmitry show errors here - new UI.
+			}
+			is OperationResult.Ok -> {
+				val screenData = navigateResponse.result.screenData
+				val transactions: List<MTransaction> =
+					(screenData as? ScreenData.Transaction)?.f ?: run {
+						Log.e(
+							TAG, "Error in getting transaction from qr payload, " +
+								"screenData is $screenData, navigation resp is $navigateResponse"
+						)
+						clearState()
+						return
+					}
+
+				// Handle transactions with just error payload
+				if (transactions.all { it.isDisplayingErrorOnly() }) {
+					presentableError.value = PresentableErrorModel(
+						details = transactions.joinToString("\n") { it.transactionIssues() }
 					)
+					FakeNavigator().navigate(Action.GO_BACK) //fake call
 					clearState()
 					return
 				}
 
-		// Handle transactions with just error payload
-		if (transactions.all { it.isDisplayingErrorOnly() }) {
-			presentableError.value = PresentableErrorModel(
-				details = transactions.joinToString("\n") { it.transactionIssues() }
-			)
-			uniffiInteractor.navigate(Action.GO_BACK) //fake call
-			clearState()
-			return
-		}
+				when (transactions.firstOrNull()?.ttype) {
+					TransactionType.SIGN -> {
+						val seedNames = transactions
+							.filter { it.ttype == TransactionType.SIGN }
+							.mapNotNull { it.authorInfo?.address?.seedName }
+						val actionResult = signTransaction("", seedNames)
 
-		when (transactions.firstOrNull()?.ttype) {
-			TransactionType.SIGN -> {
-				val seedNames = transactions
-					.filter { it.ttype == TransactionType.SIGN }
-					.mapNotNull { it.authorInfo?.address?.seedName }
-				val actionResult = signTransaction("", seedNames)
-
-				//password protected key, show password
-				when (val modalData = actionResult?.modalData) {
-					is ModalData.EnterPassword -> {
-						passwordModel.value =
-							modalData.f.toEnterPasswordModel(withShowError = false)
-					}
-					is ModalData.SignatureReady -> {
-						signature.value = modalData.f
-					}
-					//ignore the rest modals
-					else -> {
-						//actually we won't ask for signature in this case ^^^
+						//password protected key, show password
+						when (val modalData = actionResult?.modalData) {
+							is ModalData.EnterPassword -> {
+								passwordModel.value =
+									modalData.f.toEnterPasswordModel(withShowError = false)
+							}
+							is ModalData.SignatureReady -> {
+								signature.value = modalData.f
+							}
+							//ignore the rest modals
+							else -> {
+								//actually we won't ask for signature in this case ^^^
 //						we can get result.navResult.alertData with error from Rust but it's not in new design
-					}
-				}
-				this.transactions.value = TransactionsState(transactions)
-			}
-			TransactionType.IMPORT_DERIVATIONS -> {
-				val fakeNavigator = FakeNavigator()
-				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
-				fakeNavigator.navigate(Action.GO_BACK)
-				when (transactions.dominantImportError()) {
-					DerivedKeyError.BadFormat -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_bad_format_title),
-							message = context.getString(R.string.scan_screen_error_bad_format_message),
-						)
-						clearState()
-						return
-					}
-					DerivedKeyError.KeySetMissing -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_missing_key_set_title),
-							message = context.getString(R.string.scan_screen_error_missing_key_set_message),
-						)
-						clearState()
-						return
-					}
-					DerivedKeyError.NetworkMissing -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_missing_network_title),
-							message = context.getString(R.string.scan_screen_error_missing_network_message),
-						)
-						clearState()
-						return
-					}
-					null -> {
-						//proceed, all good, now check if we need to update for derivations keys
-						if (transactions.hasImportableKeys()) {
-							val importDerivedKeys =
-								transactions.flatMap { it.allImportDerivedKeys() }
-							if (importDerivedKeys.isEmpty()) {
-								this.transactions.value = TransactionsState(transactions)
 							}
+						}
+						this.transactions.value = TransactionsState(transactions)
+					}
+					TransactionType.IMPORT_DERIVATIONS -> {
+						val fakeNavigator = FakeNavigator()
+						// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
+						fakeNavigator.navigate(Action.GO_BACK)
+						when (transactions.dominantImportError()) {
+							DerivedKeyError.BadFormat -> {
+								presentableError.value = PresentableErrorModel(
+									title = context.getString(R.string.scan_screen_error_bad_format_title),
+									message = context.getString(R.string.scan_screen_error_bad_format_message),
+								)
+								clearState()
+								return
+							}
+							DerivedKeyError.KeySetMissing -> {
+								presentableError.value = PresentableErrorModel(
+									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
+									message = context.getString(R.string.scan_screen_error_missing_key_set_message),
+								)
+								clearState()
+								return
+							}
+							DerivedKeyError.NetworkMissing -> {
+								presentableError.value = PresentableErrorModel(
+									title = context.getString(R.string.scan_screen_error_missing_network_title),
+									message = context.getString(R.string.scan_screen_error_missing_network_message),
+								)
+								clearState()
+								return
+							}
+							null -> {
+								//proceed, all good, now check if we need to update for derivations keys
+								if (transactions.hasImportableKeys()) {
+									val importDerivedKeys =
+										transactions.flatMap { it.allImportDerivedKeys() }
+									if (importDerivedKeys.isEmpty()) {
+										this.transactions.value = TransactionsState(transactions)
+									}
 
-							when (val result =
-								importKeysService.updateWithSeed(importDerivedKeys)) {
-								is RepoResult.Success -> {
-									val updatedKeys = result.result
-									val newTransactionsState =
-										updateTransactionsWithImportDerivations(
-											transactions = transactions,
-											updatedKeys = updatedKeys
-										)
-									this.transactions.value =
-										TransactionsState(newTransactionsState)
-								}
-								is RepoResult.Failure -> {
-									Toast.makeText(
-										/* context = */ context,
-										/* text = */
-										context.getString(R.string.import_derivations_failure_update_toast),
-										/* duration = */ Toast.LENGTH_LONG
-									).show()
-									clearState()
+									when (val result =
+										importKeysService.updateWithSeed(importDerivedKeys)) {
+										is RepoResult.Success -> {
+											val updatedKeys = result.result
+											val newTransactionsState =
+												updateTransactionsWithImportDerivations(
+													transactions = transactions,
+													updatedKeys = updatedKeys
+												)
+											this.transactions.value =
+												TransactionsState(newTransactionsState)
+										}
+										is RepoResult.Failure -> {
+											Toast.makeText(
+												/* context = */ context,
+												/* text = */
+												context.getString(R.string.import_derivations_failure_update_toast),
+												/* duration = */ Toast.LENGTH_LONG
+											).show()
+											clearState()
+										}
+									}
+								} else {
+									presentableError.value = PresentableErrorModel(
+										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
+										message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
+									)
+									return
 								}
 							}
-						} else {
-							presentableError.value = PresentableErrorModel(
-								title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
-								message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
-							)
-							return
 						}
 					}
+					else -> {
+						// Transaction with error OR
+						// Transaction that does not require signing (i.e. adding network or metadata)
+						// will set them below for any case and show anyway
+						this.transactions.value = TransactionsState(transactions)
+					}
+					//handle alert error rust/navigator/src/navstate.rs:396
 				}
 			}
-			else -> {
-				// Transaction with error OR
-				// Transaction that does not require signing (i.e. adding network or metadata)
-				// will set them below for any case and show anyway
-				this.transactions.value = TransactionsState(transactions)
-			}
-			//handle alert error rust/navigator/src/navstate.rs:396
 		}
 	}
 
