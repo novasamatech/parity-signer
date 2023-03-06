@@ -35,7 +35,6 @@ use sled::IVec;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 
-#[cfg(feature = "signer")]
 use crate::helpers::{get_multisigner, unhex};
 use crate::{
     crypto::Encryption,
@@ -93,7 +92,6 @@ impl NetworkSpecsKey {
     ///
     /// This function checks only that hexadecimal format is valid, no check
     /// of encryption validity is done here.  
-    #[cfg(feature = "signer")]
     pub fn from_hex(hex_line: &str) -> Result<Self> {
         Ok(Self(unhex(hex_line)?))
     }
@@ -204,7 +202,6 @@ impl AddressKey {
     ///
     /// Could result in error if public key length does not match the
     /// expected length for chosen encryption algorithm.  
-    #[cfg(feature = "signer")]
     pub fn from_parts(
         public: &[u8],
         encryption: &Encryption,
@@ -228,7 +225,6 @@ impl AddressKey {
     ///
     /// This function checks only that hexadecimal format is valid, no length
     /// check happens here.  
-    #[cfg(feature = "signer")]
     pub fn from_hex(hex_address_key: &str) -> Result<Self> {
         Ok(Self::decode(&mut &unhex(hex_address_key)?[..])?)
     }
@@ -366,7 +362,6 @@ impl Order {
     ///
     /// If `Order` could not be decoded, i.e. entry is corrupted, produces an
     /// error.  
-    #[cfg(feature = "signer")]
     pub fn from_ivec(ivec: &IVec) -> Result<Self> {
         Ok(Self(<u32>::decode(&mut &ivec[..])?))
     }
@@ -438,7 +433,6 @@ impl AddressBookKey {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
     use super::*;
 

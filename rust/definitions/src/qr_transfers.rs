@@ -26,13 +26,11 @@ use parity_scale_codec::{Decode, Encode};
 use std::path::Path;
 
 use crate::error::Result;
-#[cfg(feature = "signer")]
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecs;
 use crate::types::TypeEntry;
 use sp_core::H256;
 
-#[cfg(feature = "signer")]
 use crate::navigation::SignerImage;
 
 /// `load_metadata` QR code content  
@@ -233,7 +231,6 @@ impl ContentLoadTypes {
     ///
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
-    #[cfg(feature = "signer")]
     pub fn show(&self) -> (String, SignerImage) {
         use sp_core::blake2_256;
 

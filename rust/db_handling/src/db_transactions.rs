@@ -10,19 +10,15 @@
 
 // TODO this is a temporary solution, the data eventually could be stored in
 // `navigator` state.
-#[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
 use sled::{transaction::TransactionResult, Batch, Transactional};
-#[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use constants::{ADDRESS_BOOK, META_HISTORY, SPECSTREEPREP};
 use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
-#[cfg(feature = "signer")]
 use constants::{GENERALVERIFIER, SIGN, STUB, TYPES};
 
-#[cfg(feature = "signer")]
 use definitions::{
     history::{
         Event, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay,
@@ -38,10 +34,8 @@ use definitions::{
 };
 
 use crate::helpers::open_tree;
-#[cfg(feature = "signer")]
 use crate::Error;
 use crate::Result;
-#[cfg(feature = "signer")]
 use crate::{
     helpers::{make_batch_clear_tree, verify_checksum},
     manage_history::events_to_batch,
@@ -350,7 +344,6 @@ impl Default for TrDbHot {
 /// When applying [`BatchStub`], i.e. transforming it into [`Batch`], the
 /// removals are always applied before additions, to avoid accidental replacing
 /// of just added value.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 struct BatchStub {
     /// Vector of keys to be removed from the database.
@@ -360,7 +353,6 @@ struct BatchStub {
     additions: Vec<(Vec<u8>, Vec<u8>)>,
 }
 
-#[cfg(feature = "signer")]
 impl BatchStub {
     /// Generate empty [`BatchStub`].
     fn empty() -> Self {
@@ -424,7 +416,6 @@ impl BatchStub {
 /// Note that all the checking is done before the [`TrDbColdStub`] is written
 /// into [`TRANSACTION`] tree, `apply` method will check only that the checksum
 /// known to the user is the same as the one database has currently.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdStub {
     /// `BatchStub` to be transformed into `Batch` for [`ADDRTREE`] tree.
@@ -448,7 +439,6 @@ pub struct TrDbColdStub {
     verifiers_stub: BatchStub,
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdStub {
     /// Construct new empty [`TrDbColdStub`].
     pub fn new() -> Self {
@@ -733,7 +723,6 @@ impl TrDbColdStub {
     }
 }
 
-#[cfg(feature = "signer")]
 impl Default for TrDbColdStub {
     /// Default value for [`TrDbColdStub`]. Empty.
     fn default() -> Self {
@@ -762,14 +751,12 @@ impl Default for TrDbColdStub {
 /// corresponding [`MultiSigner`] value
 /// - relevant history [`Event`] set: warnings that were shown during the
 /// parsing
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
     /// Bulk of transactions to sign.
     pub signing_bulk: Vec<TrDbColdSignOne>,
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdSign {
     /// Recover [`TrDbColdSign`] from storage in the cold database.
     ///
@@ -888,7 +875,6 @@ impl TrDbColdSign {
     }
 }
 
-#[cfg(feature = "signer")]
 impl From<TrDbColdSignOne> for TrDbColdSign {
     fn from(t: TrDbColdSignOne) -> Self {
         Self {
@@ -897,7 +883,6 @@ impl From<TrDbColdSignOne> for TrDbColdSign {
     }
 }
 
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSignOne {
     /// data to sign
@@ -931,7 +916,6 @@ pub struct TrDbColdSignOne {
 /// extensions.
 ///
 /// Messages contain SCALE-encoded text messages.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode, Clone)]
 pub enum SignContent {
     /// `53xx00` or `53xx02` transaction
@@ -947,7 +931,6 @@ pub enum SignContent {
     Message(String),
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdSignOne {
     /// Construct [`TrDbColdSign`] from components.
     ///
