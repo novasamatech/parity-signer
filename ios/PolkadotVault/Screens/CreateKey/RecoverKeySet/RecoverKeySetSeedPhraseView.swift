@@ -1,13 +1,13 @@
 //
-//  RecoverSeedPhrase.swift
-//  Polkadot Vault
+//  RecoverKeySetSeedPhraseView.swift
+//  PolkadotVault
 //
-//  Created by Alexander Slesarev on 8.12.2021.
+//  Created by Krzysztof Rodak on 06/03/2023.
 //
 
 import SwiftUI
 
-struct RecoverSeedPhrase: View {
+struct RecoverKeySetSeedPhraseView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject var navigation: NavigationCoordinator
     @FocusState private var focus: Bool
@@ -44,44 +44,13 @@ struct RecoverSeedPhrase: View {
                         WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
                             switch gridElement {
                             case let .seedPhraseElement(element):
-                                HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                                    Text(element.position)
-                                        .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
-                                        .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
-                                        .lineLimit(1)
-                                        .padding(.leading, Spacing.extraSmall)
-                                    Text(element.word)
-                                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                                        .lineLimit(1)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .padding(.trailing, Spacing.small)
-                                }
-                                .font(PrimaryFont.labelS.font)
-                                .frame(height: Heights.seedPhraseCapsuleHeight)
-                                .containerBackground()
-                                .padding(.bottom, Spacing.extraExtraSmall)
-                                .padding(.trailing, Spacing.extraExtraSmall)
+                                seedPhraseCapsule(element)
                             case .input:
-                                TextField(
-                                    "",
-                                    text: $viewModel.userInput
-                                )
-                                .focused($focus)
-                                .inlineTextFieldStyle(text: $viewModel.userInput)
-                                .onChange(of: viewModel.userInput, perform: { word in
-                                    viewModel.onUserInput(word)
-                                })
-                                .frame(minWidth: 50, maxWidth: 100)
-                                .onAppear {
-                                    focus = true
-                                }
-                                .padding(.bottom, Spacing.extraExtraSmall)
-                                .padding(.trailing, Spacing.extraExtraSmall)
+                                recoveryTextInput()
                             }
                         }
                         .padding(.leading, Spacing.extraSmall)
                         .padding(.top, Spacing.extraSmall)
-                        .padding(.trailing, Spacing.extraExtraSmall)
                         .padding(.bottom, Spacing.extraExtraSmall)
                         Spacer()
                     }
@@ -94,17 +63,7 @@ struct RecoverSeedPhrase: View {
                             Spacer()
                                 .frame(width: Spacing.large, height: Spacing.large)
                             ForEach(viewModel.content.guessSet, id: \.self) { guess in
-                                Text(guess)
-                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                    .font(PrimaryFont.labelS.font)
-                                    .padding([.top, .bottom], Spacing.extraSmall)
-                                    .padding([.leading, .trailing], Spacing.small)
-                                    .background(Asset.accentPink12.swiftUIColor)
-                                    .clipShape(Capsule())
-                                    .onTapGesture {
-                                        viewModel.onGuessTap(guess)
-                                    }
-                                    .padding(.trailing, Spacing.extraExtraSmall)
+                                guessCapsule(guess)
                             }
                             Spacer()
                                 .frame(width: Spacing.large - Spacing.extraExtraSmall, height: Spacing.large)
@@ -119,9 +78,64 @@ struct RecoverSeedPhrase: View {
             }
         }
     }
+
+    @ViewBuilder
+    func seedPhraseCapsule(_ element: SeedPhraseElement) -> some View {
+        HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+            Text(element.position)
+                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
+                .lineLimit(1)
+                .padding(.leading, Spacing.extraSmall)
+            Text(element.word)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .lineLimit(1)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.trailing, Spacing.small)
+        }
+        .font(PrimaryFont.labelS.font)
+        .frame(height: Heights.seedPhraseCapsuleHeight)
+        .containerBackground()
+        .padding(.bottom, Spacing.extraExtraSmall)
+        .padding(.trailing, Spacing.extraExtraSmall)
+    }
+
+    @ViewBuilder
+    func recoveryTextInput() -> some View {
+        TextField(
+            "",
+            text: $viewModel.userInput
+        )
+        .focused($focus)
+        .inlineTextFieldStyle(text: $viewModel.userInput)
+        .onChange(of: viewModel.userInput, perform: { word in
+            viewModel.onUserInput(word)
+        })
+        .frame(minWidth: 50, maxWidth: 100)
+        .onAppear {
+            focus = true
+        }
+        .padding(.bottom, Spacing.extraExtraSmall)
+        .padding(.trailing, Spacing.extraExtraSmall)
+    }
+
+    @ViewBuilder
+    func guessCapsule(_ guess: String) -> some View {
+        Text(guess)
+            .foregroundColor(Asset.accentPink300.swiftUIColor)
+            .font(PrimaryFont.labelS.font)
+            .padding([.top, .bottom], Spacing.extraSmall)
+            .padding([.leading, .trailing], Spacing.small)
+            .background(Asset.accentPink12.swiftUIColor)
+            .clipShape(Capsule())
+            .onTapGesture {
+                viewModel.onGuessTap(guess)
+            }
+            .padding(.trailing, Spacing.extraExtraSmall)
+    }
 }
 
-extension RecoverSeedPhrase {
+extension RecoverKeySetSeedPhraseView {
     struct SeedPhraseElement: Equatable, Identifiable, Hashable {
         let id = UUID()
         let position: String
@@ -147,11 +161,12 @@ extension RecoverSeedPhrase {
     }
 }
 
-extension RecoverSeedPhrase {
+extension RecoverKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
         @Published var seedPhraseGrid: [GridElement] = []
         var content: MRecoverSeedPhrase {
             didSet {
+                print(content)
                 regenerateGrid()
             }
         }
@@ -216,9 +231,9 @@ extension RecoverSeedPhrase {
         private func regenerateGrid() {
             var updatedGrid: [GridElement] = content.draft.enumerated()
                 .map { .seedPhraseElement(.init(position: String($0.offset + 1), word: $0.element)) }
-            if updatedGrid.count < 24 {
-                updatedGrid.append(.input(textInput))
-            }
+//            if updatedGrid.count < 24 {
+            updatedGrid.append(.input(textInput))
+//            }
             seedPhraseGrid = updatedGrid
         }
     }

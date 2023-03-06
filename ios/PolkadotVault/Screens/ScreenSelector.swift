@@ -45,11 +45,9 @@ struct ScreenSelector: View {
         case .newSeed:
             EnterKeySetNameView(viewModel: .init())
         case let .recoverSeedName(value):
-            RecoverSeedName(
-                content: value
-            )
+            RecoverKeySetNameView(viewModel: .init(content: value))
         case let .recoverSeedPhrase(value):
-            RecoverSeedPhrase(viewModel: .init(content: value))
+            RecoverKeySetSeedPhraseView(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
         case let .vVerifier(value):
