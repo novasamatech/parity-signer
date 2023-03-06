@@ -1,9 +1,7 @@
 //! Common helper functions
 
-#[cfg(feature = "signer")]
 use constants::IDENTICON_IMG_SIZE;
 use hex;
-#[cfg(feature = "signer")]
 use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519};
 use sp_core::{
     crypto::{Ss58AddressFormat, Ss58Codec},
@@ -11,17 +9,14 @@ use sp_core::{
     Hasher, KeccakHasher, H160, H256,
 };
 use sp_runtime::MultiSigner;
-#[cfg(feature = "signer")]
 use std::convert::TryInto;
 
-#[cfg(feature = "signer")]
 use plot_icon::{generate_png, EMPTY_PNG};
 
-#[cfg(all(feature = "signer", target_os = "ios"))]
+#[cfg(target_os = "ios")]
 use plot_icon::generate_svg;
 
 use crate::crypto::Encryption;
-#[cfg(feature = "signer")]
 use crate::error::Error;
 use crate::error::Result;
 
@@ -71,12 +66,10 @@ pub enum IdenticonStyle {
     Blockies,
 }
 
-#[cfg(feature = "signer")]
 use crate::navigation::SignerImage;
 
 /// Print identicon from
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
-#[cfg(feature = "signer")]
 pub fn make_identicon_from_multisigner(
     multisigner: &MultiSigner,
     style: IdenticonStyle,
@@ -102,7 +95,6 @@ pub fn make_identicon_from_multisigner(
     }
 }
 
-#[cfg(feature = "signer")]
 pub fn make_identicon_from_id20(id: &[u8; 20]) -> SignerImage {
     use eth_blockies::eth_blockies_png_data;
 
@@ -114,19 +106,18 @@ pub fn make_identicon_from_id20(id: &[u8; 20]) -> SignerImage {
     SignerImage::Png { image }
 }
 
-#[cfg(feature = "signer")]
 pub fn make_identicon_from_account(account: AccountId32) -> SignerImage {
     make_identicon(&<[u8; 32]>::from(account))
 }
 
-#[cfg(all(feature = "signer", target_os = "ios"))]
+#[cfg(target_os = "ios")]
 fn make_identicon(into_id: &[u8]) -> SignerImage {
     let image = generate_svg(into_id).to_string().into_bytes();
 
     SignerImage::Svg { image }
 }
 
-#[cfg(all(feature = "signer", not(target_os = "ios")))]
+#[cfg(not(target_os = "ios"))]
 fn make_identicon(into_id: &[u8]) -> SignerImage {
     let image = match generate_png(into_id, IDENTICON_IMG_SIZE as u16) {
         Ok(a) => a,
@@ -138,7 +129,6 @@ fn make_identicon(into_id: &[u8]) -> SignerImage {
 
 /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
 /// from public key and [`Encryption`](crate::crypto::Encryption)
-#[cfg(feature = "signer")]
 pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSigner> {
     match encryption {
         Encryption::Ed25519 => {
@@ -253,7 +243,6 @@ pub fn base58_or_eth_to_multisigner(
 /// Print id pic for metadata hash
 ///
 /// Currently uses PNG identicon generator, could be changed later.
-#[cfg(feature = "signer")]
 pub fn pic_meta(meta_hash: &[u8]) -> SignerImage {
     make_identicon(meta_hash)
 }
@@ -261,7 +250,6 @@ pub fn pic_meta(meta_hash: &[u8]) -> SignerImage {
 /// Print id pic for hash of SCALE-encoded types data
 ///
 /// Currently uses PNG identicon generator, could be changed later.
-#[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> SignerImage {
     make_identicon(types_hash)
 }

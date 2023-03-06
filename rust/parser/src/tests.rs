@@ -1,7 +1,11 @@
 use std::convert::TryInto;
 use std::str::FromStr;
 
-use crate::{parse_and_display_set, Error};
+use crate::method::OlderMeta;
+use crate::Error;
+use crate::{parse_set, MetadataBundle};
+use defaults::default_types_vec;
+use definitions::metadata::info_from_metadata;
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::Decode;
@@ -36,6 +40,72 @@ fn specs() -> ShortSpecs {
         name: "westend".to_string(),
         unit: "WND".to_string(),
     }
+}
+
+pub(crate) fn parse_and_display_set(
+    data: &[u8],
+    metadata: &RuntimeMetadata,
+    short_specs: &ShortSpecs,
+) -> Result<String, Error> {
+    let meta_info = info_from_metadata(metadata)?;
+    if meta_info.name != short_specs.name {
+        return Err(Error::NetworkNameMismatch {
+            name_metadata: meta_info.name,
+            name_network_specs: short_specs.name.to_string(),
+        });
+    }
+    let metadata_bundle = match metadata {
+        RuntimeMetadata::V12(_) | RuntimeMetadata::V13(_) => {
+            let older_meta = match metadata {
+                RuntimeMetadata::V12(meta_v12) => OlderMeta::V12(meta_v12),
+                RuntimeMetadata::V13(meta_v13) => OlderMeta::V13(meta_v13),
+                _ => unreachable!(),
+            };
+            let types = match default_types_vec() {
+                Ok(a) => {
+                    if a.is_empty() {
+                        return Err(Error::NoTypes);
+                    }
+                    a
+                }
+                Err(_) => return Err(Error::DefaultTypes),
+            };
+            MetadataBundle::Older {
+                older_meta,
+                types,
+                network_version: meta_info.version,
+            }
+        }
+        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci {
+            meta_v14,
+            network_version: meta_info.version,
+        },
+        _ => unreachable!(), // just checked in the info_from_metadata function if the metadata is acceptable one
+    };
+    let (method_cards_result, extensions_cards, _, _) =
+        parse_set(data, &metadata_bundle, short_specs, None)?;
+    let mut method = String::new();
+    let mut extensions = String::new();
+    match method_cards_result {
+        Ok(method_cards) => {
+            for (i, x) in method_cards.iter().enumerate() {
+                if i > 0 {
+                    method.push_str(",\n");
+                }
+                method.push_str(&x.card.show_no_docs(x.indent));
+            }
+        }
+        Err(e) => method = format!("{e}"),
+    }
+    for (i, x) in extensions_cards.iter().enumerate() {
+        if i > 0 {
+            extensions.push_str(",\n");
+        }
+        extensions.push_str(&x.card.show_no_docs(x.indent));
+    }
+    Ok(format!(
+        "\nMethod:\n\n{method}\n\n\nExtensions:\n\n{extensions}"
+    ))
 }
 
 #[subxt::subxt(runtime_metadata_path = "for_tests/westend9111.scale")]

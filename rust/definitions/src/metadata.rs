@@ -348,7 +348,6 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
 
 /// Metadata as checked [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// with network info extracted from it, for transaction decoding
-#[cfg(feature = "signer")]
 pub struct MetaSetElement {
     /// Network name, from metadata `Version` constant
     name: String,
@@ -369,7 +368,6 @@ pub struct MetaSetElement {
     runtime_metadata: RuntimeMetadata,
 }
 
-#[cfg(feature = "signer")]
 impl MetaSetElement {
     /// Generates `MetaSetElement` from Vault database tree `METATREE` (key, value)
     /// entry  
@@ -536,7 +534,6 @@ impl MetaHistoryEntry {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
     use super::*;
     use std::fs::read_to_string;

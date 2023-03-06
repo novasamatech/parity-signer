@@ -1,10 +1,7 @@
 //! Errors occurring in Vault
-#[cfg(feature = "test")]
-use variant_count::VariantCount;
 
 /// Content that should have been verified by the general verifier
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum GeneralVerifierForContent {
     /// Network data.
     /// Associated data is the network name.
@@ -16,7 +13,6 @@ pub enum GeneralVerifierForContent {
 
 /// Errors in transaction parsing
 #[derive(Debug)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserError {
     SeparateMethodExtensions,
 
@@ -138,7 +134,6 @@ pub enum ParserError {
 /// Vault assumes that every byte of the transaction will be processed, and
 /// shows an error if this is not the case.
 #[derive(Debug)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserDecodingError {
     /// Transaction was announced by the prelude to be mortal (`53xx00`),
     /// but has `Era::Immortal` in extensions
@@ -307,7 +302,6 @@ pub enum ParserDecodingError {
 /// If the metadata does not follow those criteria, transactions could not be
 /// parsed, and therefore, could not be signed.
 #[derive(Debug)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserMetadataError {
     /// Metadata extensions have no `Era`
     NoEra,
