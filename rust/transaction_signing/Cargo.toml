@@ -10,8 +10,8 @@ hex = "0.4.3"
 parity-scale-codec = "3.4.0"
 zeroize = { version = "1.5.7", features = ["std"] }
 
-definitions = { path = "../definitions", default-features = false, features = ["signer"] }
-db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
+definitions = { path = "../definitions", default-features = false }
+db_handling = { path = "../db_handling", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 thiserror = "1.0.39"

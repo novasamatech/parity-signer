@@ -6,13 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-eth-blockies = { version = "1.0.0", optional = true }
-constants = { path = "../constants", optional = true }
+eth-blockies = "1.0.0"
+constants = { path = "../constants" }
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
 parity-scale-codec = {version = "3.4.0", features = ["derive"]}
-plot_icon = {version = "0.2.0", optional = true}
+plot_icon = "0.2.0"
 sc-executor-common = {git = "https://github.com/paritytech/substrate"}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
@@ -24,15 +24,11 @@ sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional =
 thiserror = "1.0.39"
 
 [features]
+default = []
 active = [
 	"sc-executor-wasmi",
 	"sp-io",
 	"sp-wasm-interface",
-]
-signer = [
-	"plot_icon",
-    "constants",
-    "eth-blockies",
 ]
 
 [lib]

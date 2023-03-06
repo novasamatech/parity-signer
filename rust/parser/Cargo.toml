@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 bitvec = "1.0.1"
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false}
 frame-metadata = { version = "15.0.0", default-features = false, features = ["std", "legacy"]}
 hex = "0.4.3"
 lazy_static = "1.4.0"

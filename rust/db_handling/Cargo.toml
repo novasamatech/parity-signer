@@ -13,7 +13,7 @@ definitions = {path = "../definitions", default-features = false}
 hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.4.0", features = ["derive"]}
-plot_icon = {version = "0.2.0", default-features = false, features = ["pix"], optional = true}
+plot_icon = {version = "0.2.0", default-features = false, features = ["pix"]}
 regex = "1.7.1"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
@@ -30,7 +30,6 @@ tempfile = { version = "3.4" }
 [features]
 default = []
 active = ["defaults/active", "definitions/active", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
-signer = ["defaults/signer", "definitions/signer", "plot_icon", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
 
 [lib]
 name = "db_handling"

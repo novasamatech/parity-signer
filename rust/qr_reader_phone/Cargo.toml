@@ -14,7 +14,7 @@ thiserror = "1.0.39"
 
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
 
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false}
 
 [lib]
 name = "qr_reader_phone"

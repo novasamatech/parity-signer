@@ -9,8 +9,8 @@ edition = "2021"
 definitions = {path = "../definitions", default-features = false, optional = true}
 lazy_static = {version = "1.4.0", optional = true}
 regex = {version = "1.7.1", optional = true}
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 thiserror = "1.0.39"
 
 [features]
@@ -19,12 +19,6 @@ active = [
 	"definitions/active",
 	"lazy_static",
 	"regex",
-	"sp-core",
-]
-signer = [
-	"definitions/signer",
-	"sp-core",
-	"sp-runtime",
 ]
 
 [lib]

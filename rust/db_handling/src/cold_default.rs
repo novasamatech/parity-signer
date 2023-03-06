@@ -38,14 +38,14 @@
 //! Setting up a new general verifier would remove all data associated with the
 //! general verifier from the Vault database to avoid confusion as to who
 //! verified what information.
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use parity_scale_codec::Encode;
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use sled::Batch;
 
 #[cfg(feature = "active")]
 use constants::{DANGER, TYPES};
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use constants::{GENERALVERIFIER, HISTORY};
 
 #[cfg(feature = "active")]
@@ -53,17 +53,16 @@ use definitions::{
     danger::DangerRecord,
     keyring::{MetaKey, NetworkSpecsKey},
 };
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use definitions::{history::Event, network_specs::Verifier};
 
-#[cfg(feature = "signer")]
 use defaults::default_general_verifier;
 #[cfg(feature = "active")]
 use defaults::{default_chainspecs, default_types_content, default_verifiers, release_metadata};
 use defaults::{nav_test_metadata, test_metadata};
 
 use crate::identities::generate_test_identities;
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use crate::{
     db_transactions::TrDbCold, helpers::make_batch_clear_tree, manage_history::events_in_batch,
 };
@@ -232,7 +231,6 @@ pub fn init_db(database: &sled::Db, general_verifier: Verifier) -> Result<()> {
 ///
 /// Function is applied during the initial start of the Vault and during
 /// `Wipe all data` procedure.
-#[cfg(feature = "signer")]
 pub fn signer_init_with_cert(database: &sled::Db) -> Result<()> {
     init_db(database, default_general_verifier())
 }
@@ -240,7 +238,6 @@ pub fn signer_init_with_cert(database: &sled::Db) -> Result<()> {
 /// Initiate Vault database with general verifier set up to `Verifier(None)`.
 ///
 /// Function is applied during `Remove general certificate` procedure.
-#[cfg(feature = "signer")]
 pub fn signer_init_no_cert(database: &sled::Db) -> Result<()> {
     init_db(database, Verifier { v: None })
 }
