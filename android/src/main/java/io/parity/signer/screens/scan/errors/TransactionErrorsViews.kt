@@ -35,9 +35,9 @@ fun TransactionErrorBottomSheet(
 	onOk: Callback
 ) {
 	Column(
-		Modifier
-			.fillMaxWidth(1f)
-			.verticalScroll(rememberScrollState())
+        Modifier
+            .fillMaxWidth(1f)
+            .verticalScroll(rememberScrollState())
 	) {
 		Text(
 			text = model.title,
@@ -55,35 +55,37 @@ fun TransactionErrorBottomSheet(
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
-				.padding(horizontal = 32.dp)
-				.padding(bottom = 16.dp),
+                .padding(horizontal = 32.dp)
+                .padding(bottom = 16.dp),
 		)
 
 		if (model.descriptionSteps.isNotEmpty()) {
 			Column(
 				modifier = Modifier
-					.fillMaxWidth(1f)
-					.padding(horizontal = 24.dp)
-					.background(
-						MaterialTheme.colors.fill6,
-						RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-					)
-					.border(
-						1.dp,
-						MaterialTheme.colors.fill12,
-						RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-					)
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 24.dp)
+                    .background(
+                        MaterialTheme.colors.fill6,
+                        RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+                    )
+                    .border(
+                        1.dp,
+                        MaterialTheme.colors.fill12,
+                        RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+                    )
 			) {
 				model.descriptionSteps.forEachIndexed() { index, step ->
 					Row(
 						modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
 					) {
-						Text(
-							text = (index + 1).toString(),
-							color = MaterialTheme.colors.textTertiary,
-							style = SignerTypeface.BodyL,
-							modifier = Modifier.defaultMinSize(minWidth = 16.dp)
-						)
+						if (model.descriptionSteps.size > 1) {
+							Text(
+								text = (index + 1).toString(),
+								color = MaterialTheme.colors.textTertiary,
+								style = SignerTypeface.BodyL,
+								modifier = Modifier.padding(end = 16.dp)
+							)
+						}
 						Text(
 							text = step,
 							color = MaterialTheme.colors.primary,
@@ -121,10 +123,9 @@ data class TransactionErrorModel(
 )
 @Composable
 private fun PreviewTransactionErrorBottomSheet() {
-
-	val model =
-		TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 	SignerNewTheme {
+		val model =
+			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
