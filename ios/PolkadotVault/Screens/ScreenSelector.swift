@@ -49,9 +49,7 @@ struct ScreenSelector: View {
                 content: value
             )
         case let .recoverSeedPhrase(value):
-            RecoverSeedPhrase(
-                content: value
-            )
+            RecoverSeedPhrase(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
         case let .vVerifier(value):
