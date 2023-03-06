@@ -3,10 +3,7 @@ package io.parity.signer.screens.scan.errors
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -81,9 +78,16 @@ fun TransactionErrorBottomSheet(
 						modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
 					) {
 						Text(
+							text = (index + 1).toString(),
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.BodyL,
+							modifier = Modifier.defaultMinSize(minWidth = 16.dp)
+						)
+						Text(
 							text = step,
 							color = MaterialTheme.colors.primary,
 							style = SignerTypeface.BodyL,
+							modifier = Modifier.defaultMinSize(minWidth = 16.dp)
 						)
 					}
 				}
@@ -101,7 +105,7 @@ fun TransactionErrorBottomSheet(
 data class TransactionErrorModel(
 	val title: String,
 	val subtitle: String,
-	val descriptionSteps: List<String>
+	val descriptionSteps: List<String> = emptyList()
 )
 
 
@@ -117,10 +121,8 @@ data class TransactionErrorModel(
 @Composable
 private fun PreviewTransactionErrorBottomSheet() {
 
-	val model = TransactionErrorModel(
-		"Please add the Network",
-		"Please add the Network", listOf("step one", "step two")
-	)
+	val model =
+		TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 	SignerNewTheme {
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
