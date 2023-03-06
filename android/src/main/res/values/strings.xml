@@ -308,6 +308,7 @@
 	<string name="settings_confirmation_wipe_all_message_highlited_warning">Warning:</string>
 	<string name="settings_confirmation_wipe_all_title">Wipe All Data?</string>
 	<string name="settings_confirmation_wipe_all_message_yes_label">I Understand, Remove all Data</string>
+	<string name="derivation_key_empty_path_placeholder">Derivation Path is Empty</string>
 
 </resources>
 

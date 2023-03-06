@@ -16,8 +16,10 @@ import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
 class SharedViewModel() : ViewModel() {
-	val context: Context = ServiceLocator.appContext.applicationContext
-	val activity: FragmentActivity = ServiceLocator.activityScope!!.activity
+	val context: Context
+		get() = ServiceLocator.appContext.applicationContext
+	val activity: FragmentActivity
+		get() = ServiceLocator.activityScope!!.activity
 
 	init {
 		// Imitate ios behavior
@@ -26,6 +28,7 @@ class SharedViewModel() : ViewModel() {
 			totalRefresh()
 		}
 	}
+
 	val navigator by lazy { SignerNavigator(this) }
 
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
@@ -41,7 +44,8 @@ class SharedViewModel() : ViewModel() {
 		ServiceLocator.networkExposedStateKeeper
 
 	// Navigator
-	internal val _actionResult = MutableStateFlow<ActionResult?>(null
+	internal val _actionResult = MutableStateFlow<ActionResult?>(
+		null
 	)
 
 	internal val _localNavAction = MutableStateFlow<LocalNavAction>(

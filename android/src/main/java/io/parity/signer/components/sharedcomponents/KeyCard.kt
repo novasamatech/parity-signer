@@ -114,12 +114,12 @@ fun KeyCard(model: KeyCardModel) {
 }
 
 @Composable
-private fun NetworkLabel(networkName: String) {
+fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 	Text(
 		networkName,
 		color = MaterialTheme.colors.textTertiary,
 		style = SignerTypeface.CaptionM,
-		modifier = Modifier
+		modifier = modifier
 			.background(
 				MaterialTheme.colors.fill12,
 				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
@@ -193,15 +193,6 @@ data class KeyCardModel(
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
-		fun fromAddress(
-			address_card: MAddressCard,
-			networkTitle: String
-		): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				cardBase = KeyCardModelBase.fromAddress(address_card)
-			)
-
 		fun fromAddress(
 			address: Address,
 			base58: String,

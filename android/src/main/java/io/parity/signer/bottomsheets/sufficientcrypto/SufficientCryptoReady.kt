@@ -1,14 +1,19 @@
 package io.parity.signer.bottomsheets
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import io.parity.signer.bottomsheets.sufficientcrypto.SufficientCryptoReadyViewModel
 import io.parity.signer.components.*
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
@@ -31,7 +36,9 @@ fun SufficientCryptoReady(
 		) {
 			HeaderBar("Your signature", "Scan this into your application")
 			Image(
-				bitmap = sufficientCrypto.sufficient.intoImageBitmap(),
+				bitmap = SufficientCryptoReadyViewModel.getQrCodeBitmapFromQrCodeData(
+					sufficientCrypto.sufficient
+				)?.intoImageBitmap() ?: ImageBitmap(1, 1),
 				contentDescription = "Signed update",
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
