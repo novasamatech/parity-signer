@@ -11,7 +11,7 @@ definitions = {path = "../definitions", default-features = false, features = ["s
 hex = "0.4.3"
 lazy_static = "1.4.0"
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.38"
+thiserror = "1.0.39"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = { version = "1.5.7", features = ["std"] }
