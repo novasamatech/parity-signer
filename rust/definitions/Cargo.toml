@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-eth-blockies = "1.0.0"
-constants = { path = "../constants" }
+eth-blockies = { version = "1.0.0", optional = true }
+constants = { path = "../constants", optional = true }
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
@@ -31,6 +31,8 @@ active = [
 ]
 signer = [
 	"plot_icon",
+    "constants",
+    "eth-blockies",
 ]
 
 [lib]
