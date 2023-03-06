@@ -14,7 +14,7 @@ definitions = { path = "../definitions", default-features = false, features = ["
 db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
-thiserror = "1.0.38"
+thiserror = "1.0.39"
 anyhow = "1.0.69"
 sled = "0.34"
 
