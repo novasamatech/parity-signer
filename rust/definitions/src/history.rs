@@ -20,10 +20,7 @@
 use parity_scale_codec::{Decode, Encode};
 use sp_core::{blake2_256, H256};
 use sp_runtime::MultiSigner;
-#[cfg(feature = "signer")]
 use std::convert::TryInto;
-#[cfg(feature = "test")]
-use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -392,7 +389,6 @@ impl SignMessageDisplay {
 
 /// Events that could be recorded in the history log
 #[derive(PartialEq, Eq, Debug, Decode, Encode, Clone)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {
@@ -526,7 +522,6 @@ pub struct Entry {
 ///
 /// Uses mock values and is needed to test [`Event`] format in displaying all events
 /// in user interface.  
-#[cfg(feature = "signer")]
 pub fn all_events_preview() -> Vec<Event> {
     let meta_values = MetaValues {
         name: String::from("westend"),

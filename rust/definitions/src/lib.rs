@@ -22,7 +22,6 @@ pub mod error;
 
 pub mod error_active;
 
-#[cfg(feature = "signer")]
 pub mod error_signer;
 
 pub mod helpers;

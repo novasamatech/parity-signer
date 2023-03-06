@@ -15,15 +15,9 @@
 //!
 //! # Features
 //!
-//! Feature `"signer"` corresponds to everything happening in Vault air-gapped
-//! device.
-//!
 //! Feature `"active"` corresponds to all Vault-related things happening
 //! **without** air-gap, including the generation of the database for Vault
 //! during the build.
-//!
-//! Feature `"test"` includes both `"signer"` and `"active"` features, along
-//! with some testing, and is the default one.  
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
@@ -44,7 +38,6 @@ mod hot_default;
 
 pub mod identities;
 
-#[cfg(feature = "signer")]
 pub mod interface_signer;
 
 pub mod manage_history;
@@ -53,7 +46,6 @@ mod error;
 
 pub use error::{Error, Result};
 
-#[cfg(feature = "test")]
 #[cfg(test)]
 pub mod tests;
 

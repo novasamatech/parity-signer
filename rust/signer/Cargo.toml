@@ -13,8 +13,8 @@ uniffi = { version = "0.22.0" }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
-db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
-definitions = { path = "../definitions", default-features = false, features = ["signer"] }
+db_handling = { path = "../db_handling", default-features = false }
+definitions = { path = "../definitions", default-features = false }
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
 transaction_parsing = { path = "../transaction_parsing" }
