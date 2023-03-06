@@ -10,11 +10,11 @@ hex = "0.4.3"
 parity-scale-codec = "3.4.0"
 zeroize = { version = "1.5.7", features = ["std"] }
 
-definitions = { path = "../definitions", default-features = false, features = ["signer"] }
-db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
+definitions = { path = "../definitions", default-features = false }
+db_handling = { path = "../db_handling", default-features = false }
 sp-core = { version = "18.0.0", default-features = false, features = ["full_crypto"] }
 sp-runtime = { version = "20.0.0", default-features = false }
-thiserror = "1.0.38"
+thiserror = "1.0.39"
 anyhow = "1.0.69"
 sled = "0.34"
 

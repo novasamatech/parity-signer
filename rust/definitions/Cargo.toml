@@ -12,7 +12,7 @@ frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
 parity-scale-codec = {version = "3.4.0", features = ["derive"]}
-plot_icon = {version = "0.2.0", optional = true}
+plot_icon = "0.2.0"
 sc-executor-common = {version = "0.20.0"}
 sc-executor-wasmi = {version = "0.20.0", optional = true}
 sled = "0.34.6"
@@ -21,23 +21,14 @@ sp-io = {version = "19.0.0", optional = true}
 sp-runtime = {version = "20.0.0", default-features = false}
 sp-version = {version = "18.0.0"}
 sp-wasm-interface = {version = "12.0.0", optional = true, default-features = false, features = ["wasmi"]}
-thiserror = "1.0.38"
-variant_count = {version = "1.1.0", optional = true}
+thiserror = "1.0.39"
 
 [features]
-default = ["test"]
+default = []
 active = [
 	"sc-executor-wasmi",
 	"sp-io",
 	"sp-wasm-interface",
-]
-signer = [
-	"plot_icon",
-]
-test = [
-	"active",
-	"signer",
-	"variant_count",
 ]
 
 [lib]

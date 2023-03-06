@@ -1,18 +1,15 @@
 //! Common helper functions for database operations
 
 use parity_scale_codec::Decode;
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 use sled::{Batch, Db, Tree};
-#[cfg(feature = "signer")]
 use sp_core::H256;
 
-#[cfg(feature = "signer")]
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
 use definitions::network_specs::NetworkSpecs;
-#[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
     helpers::multisigner_to_public,
@@ -24,7 +21,7 @@ use definitions::{
     keyring::MetaKey, metadata::MetaValues, network_specs::OrderedNetworkSpecs,
     qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use definitions::{
     keyring::{AddressKey, MetaKeyPrefix},
     users::AddressDetails,
@@ -32,9 +29,8 @@ use definitions::{
 
 use crate::{Error, Result};
 
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use crate::db_transactions::TrDbCold;
-#[cfg(feature = "signer")]
 use crate::manage_history::events_to_batch;
 
 /// Open a tree in the database.
@@ -77,7 +73,6 @@ pub fn get_all_networks(database: &sled::Db) -> Result<Vec<OrderedNetworkSpecs>>
 ///
 /// Note that `CurrentVerifier::Dead` or damaged verifier data result in
 /// errors.
-#[cfg(feature = "signer")]
 pub fn try_get_valid_current_verifier(
     database: &sled::Db,
     verifier_key: &VerifierKey,
@@ -137,7 +132,6 @@ pub fn try_get_valid_current_verifier(
 ///
 /// Entry here is expected to be in the database, failure to find it results in
 /// an error.
-#[cfg(feature = "signer")]
 pub fn get_valid_current_verifier(
     database: &sled::Db,
     verifier_key: &VerifierKey,
@@ -149,7 +143,6 @@ pub fn get_valid_current_verifier(
 /// Specs invariants that are expected to stay unchanged for the network over
 /// time and can not be different for same genesis hash and different encryption
 /// algorithms.
-#[cfg(feature = "signer")]
 pub struct SpecsInvariants {
     pub base58prefix: u16,
 
@@ -175,7 +168,6 @@ pub struct SpecsInvariants {
 /// identical base58 prefix and network name. Network name is, and base58 prefix
 /// could be a part of the network metadata, and therefore must not depend on
 /// encryption used.
-#[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(
     database: &sled::Db,
     genesis_hash: H256,
@@ -234,7 +226,6 @@ pub fn genesis_hash_in_specs(
 ///
 /// Vault works only with an initiated database, i.e. the one with general
 /// verifier set up. Failure to find general verifier is always an error.
-#[cfg(feature = "signer")]
 pub fn get_general_verifier(database: &sled::Db) -> Result<Verifier> {
     let settings = open_tree(database, SETTREE)?;
     let verifier_encoded = settings
@@ -287,7 +278,6 @@ pub fn prep_types(database: &sled::Db) -> Result<ContentLoadTypes> {
 ///
 /// If the [`NetworkSpecsKey`] and associated [`OrderedNetworkSpecs`] are not found in
 /// the [`SPECSTREE`], the result is `Ok(None)`.
-#[cfg(feature = "signer")]
 pub fn try_get_network_specs(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -308,7 +298,6 @@ pub fn try_get_network_specs(
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
-#[cfg(feature = "signer")]
 pub fn get_network_specs(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -321,7 +310,6 @@ pub fn get_network_specs(
 /// [`AddressKey`].
 ///
 /// If no entry with provided [`AddressKey`] is found, the result is `Ok(None)`.
-#[cfg(feature = "signer")]
 pub fn try_get_address_details(
     database: &sled::Db,
     address_key: &AddressKey,
@@ -342,7 +330,6 @@ pub fn try_get_address_details(
 /// [`AddressKey`].
 ///
 /// Address is expected to exist, not finding it results in an error.
-#[cfg(feature = "signer")]
 pub fn get_address_details(
     database: &sled::Db,
     address_key: &AddressKey,
@@ -356,7 +343,6 @@ pub fn get_address_details(
 /// The resulting set could be an empty one. It is used to display metadata
 /// available for the network and to find the metadata to be deleted, when the
 /// network gets deleted.
-#[cfg(feature = "signer")]
 pub(crate) fn get_meta_values_by_name(
     database: &sled::Db,
     network_name: &str,
@@ -480,7 +466,6 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
 /// Note that if the network supports multiple encryption algorithms, the
 /// removal of network with one of the encryptions will cause the networks
 /// with other encryptions be removed as well.
-#[cfg(feature = "signer")]
 pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Result<()> {
     let mut address_batch = Batch::default();
     let mut meta_batch = Batch::default();
@@ -582,7 +567,6 @@ pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Res
 /// [`Encryption`](definitions::crypto::Encryption) algorithm supported by the
 /// network. Therefore if the network supports more than one encryption
 /// algorithm, removing metadata for one will affect all encryptions.
-#[cfg(feature = "signer")]
 pub fn remove_metadata(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -623,7 +607,6 @@ pub fn remove_metadata(
 /// confusion regarding what data was verified by whom. Note that this situation
 /// in **not** related to the `remove_types_info` function and is handled
 /// elsewhere.
-#[cfg(feature = "signer")]
 pub fn remove_types_info(database: &sled::Db) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
@@ -643,7 +626,7 @@ pub fn remove_types_info(database: &sled::Db) -> Result<()> {
 
 /// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
 /// vector of additions.
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {
         batch.insert(address_key.key(), address_details.encode());
@@ -656,7 +639,6 @@ pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetai
 /// Used in retrieving temporary stored data from
 /// [`TRANSACTION`](constants::TRANSACTION) tree of the database.
 // TODO Goes obsolete if the temporary storage goes.
-#[cfg(feature = "signer")]
 pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
     let real_checksum = database.checksum()?;
     if checksum != real_checksum {
@@ -669,7 +651,6 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
 ///
 /// Currently, the only flag contributing to the danger status is whether the
 /// device was online. This may change eventually.
-#[cfg(feature = "signer")]
 pub fn get_danger_status(database: &sled::Db) -> Result<bool> {
     let settings = open_tree(database, SETTREE)?;
     let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;

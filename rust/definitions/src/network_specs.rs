@@ -272,7 +272,6 @@
 //! The balance should be therefore represented as `10 uWND`.  
 
 use parity_scale_codec::{Decode, Encode};
-#[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_core::H256;
@@ -284,13 +283,11 @@ use crate::{
     navigation::SignerImage,
 };
 
-#[cfg(feature = "signer")]
 use crate::helpers::{
     make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
 };
 use crate::{crypto::Encryption, keyring::NetworkSpecsKey};
 
-#[cfg(feature = "signer")]
 use crate::navigation::MVerifierDetails;
 
 /// Network parameters stored SCALE-encoded in the **cold** database
@@ -420,7 +417,6 @@ impl NetworkSpecs {
     /// `order` is network number on the list of networks in Vault.
     ///
     /// This happens when Vault receives new network specs through QR update.
-    #[cfg(feature = "signer")]
     pub fn to_store(&self, order: u8) -> OrderedNetworkSpecs {
         OrderedNetworkSpecs {
             specs: self.to_owned(),
@@ -429,7 +425,6 @@ impl NetworkSpecs {
     }
 
     /// Makes [`ShortSpecs`] from [`NetworkSpecs`]
-    #[cfg(feature = "signer")]
     pub fn short(&self) -> ShortSpecs {
         ShortSpecs {
             base58prefix: self.base58prefix,
@@ -508,7 +503,6 @@ pub enum VerifierValue {
     Standard { m: MultiSigner },
 }
 
-#[cfg(feature = "signer")]
 impl Verifier {
     /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
@@ -533,7 +527,6 @@ impl Verifier {
     }
 }
 
-#[cfg(feature = "signer")]
 impl VerifierValue {
     /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
