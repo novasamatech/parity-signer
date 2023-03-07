@@ -74,9 +74,9 @@
 "Seed" = "Seed";
 "seed_name" = "Enter Key Set Name";
 "SEED PHRASE" = "Secret Recovery Phrase";
-"RecoverSeedPhrase.Action.Recover" = "Recover Key Set";
+"RecoverSeedPhrase.Action.Done" = "Done";
 "RecoverSeedPhrase.Label.Title" = "Recover Key Set";
-"RecoverSeedPhrase.Label.Footer" = "Tap \"←\" when textfield is empty to delete last selected seed word";
+"RecoverSeedPhrase.Label.Header" = "Secret Recovery Phrase";
 
 // Sign Sufficient Crypto
 "Select key for signing" = "Select key for signing";

@@ -817,7 +817,7 @@ impl SeedDraft {
     /// Note that `user_text` input by default starts with ' ' (space). If user
     /// removes this space, it results in removing whole previous word.
     pub fn text_field_update(&mut self, user_text: &str) {
-        if self.saved.len() < BIP_CAP {
+        if self.saved.len() <= BIP_CAP {
             if user_text.is_empty() {
                 // user has removed all text, including the first default symbol
                 // if there are words in draft, remove the last one
