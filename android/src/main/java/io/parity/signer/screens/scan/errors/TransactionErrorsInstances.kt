@@ -11,6 +11,7 @@ import io.parity.signer.ui.theme.textTertiary
 
 const val COMPOSE_URL_TAG_ANNOTATION = "URL"
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 	return when (this) {
@@ -21,18 +22,16 @@ fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 				append("Go to Portal where your network is stored")
 				append("\n\n")
 				withStyle(SpanStyle(color = MaterialTheme.colors.pink300)) {
-					//don't make it clickable as device should in airgapped!!!
-//					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.parity.io") {
+					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.parity.io") {
 						append("metadata.parity.io")
-//					}
+					}
 				}
 				append(" for Polkadot, Kusama, and Westend")
 				append("\n\n")
 				withStyle(SpanStyle(color = MaterialTheme.colors.pink300)) {
-					//don't make it clickable as device should in airgapped!!!
-//					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.novasama.io") {
+					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.novasama.io") {
 					append("metadata.novasama.io")
-//				}
+				}
 				}
 				append(" for Parachains and Solochains")
 				append("\n\n")

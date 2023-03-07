@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan.errors
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -97,6 +99,7 @@ fun TransactionErrorBottomSheet(
 						}
 
 						val uriHandler = LocalUriHandler.current
+						val context = LocalContext.current
 						val layoutResult = remember {
 							mutableStateOf<TextLayoutResult?>(null)
 						}
@@ -117,7 +120,9 @@ fun TransactionErrorBottomSheet(
 										)
 											.firstOrNull()
 											?.let { result ->
-												uriHandler.openUri(result.item)
+												Toast.makeText(context, context.getString(R.string.general_error_link_clicked_on_airgap_device), Toast.LENGTH_LONG).show()
+												//this device is airgapped, don't open links!
+//												uriHandler.openUri(result.item)
 											}
 									}
 								}
