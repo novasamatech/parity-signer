@@ -65,9 +65,7 @@ use definitions::{
 };
 
 #[cfg(feature = "active")]
-use crate::{
-    helpers::{make_batch_clear_tree},
-};
+use crate::helpers::make_batch_clear_tree;
 use crate::{
     db_transactions::TrDbCold,
     helpers::{get_all_networks, open_tree, upd_id_batch},
