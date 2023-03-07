@@ -77,6 +77,8 @@
 "RecoverSeedPhrase.Action.Done" = "Done";
 "RecoverSeedPhrase.Label.Title" = "Recover Key Set";
 "RecoverSeedPhrase.Label.Header" = "Secret Recovery Phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
 // Sign Sufficient Crypto
 "Select key for signing" = "Select key for signing";

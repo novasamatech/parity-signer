@@ -122,7 +122,8 @@ extension CreateKeySetSeedPhraseView {
             seedsMediator.restoreSeed(
                 seedName: dataModel.seed,
                 seedPhrase: dataModel.seedPhrase,
-                navigate: true
+                navigate: true,
+                shouldCheckForCollision: true
             )
         }
 
