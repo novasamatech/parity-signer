@@ -3,15 +3,13 @@ package io.parity.signer.screens.scan.errors
 import android.content.res.Configuration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.tooling.preview.Preview
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.pink300
 import io.parity.signer.ui.theme.textTertiary
 
+const val COMPOSE_URL_TAG_ANNOTATION = "URL"
 
 @Composable
 fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
@@ -23,16 +21,21 @@ fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 				append("Go to Portal where your network is stored")
 				append("\n\n")
 				withStyle(SpanStyle(color = MaterialTheme.colors.pink300)) {
-					append("metadata.parity.io")
+					//don't make it clickable as device should in airgapped!!!
+//					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.parity.io") {
+						append("metadata.parity.io")
+//					}
 				}
 				append(" for Polkadot, Kusama, and Westend")
 				append("\n\n")
 				withStyle(SpanStyle(color = MaterialTheme.colors.pink300)) {
+					//don't make it clickable as device should in airgapped!!!
+//					withAnnotation(COMPOSE_URL_TAG_ANNOTATION, "https://metadata.novasama.io") {
 					append("metadata.novasama.io")
+//				}
 				}
 				append(" for Parachains and Solochains")
 				append("\n\n")
-//				withAnnotation()
 				withStyle(SpanStyle(color = MaterialTheme.colors.textTertiary)) {
 					append("ask network's developers directly if you haven’t found it in the portals")
 				}
@@ -70,7 +73,8 @@ fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 @Composable
 private fun PreviewTransactionErrorMetadataForUnknownNetwork() {
 	SignerNewTheme {
-		val model = TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
+		val model =
+			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
