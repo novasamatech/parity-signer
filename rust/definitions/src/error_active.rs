@@ -15,6 +15,7 @@ use crate::error::MetadataError;
 pub enum Wasm {
     /// Failed to make `Metadata_metadata` call on data extracted from `wasm`
     /// file.
+    #[cfg(feature = "active")]
     #[error(transparent)]
     Executor(#[from] sc_executor_common::error::Error),
 
@@ -34,6 +35,7 @@ pub enum Wasm {
     #[error(transparent)]
     File(#[from] std::io::Error),
 
+    #[cfg(feature = "active")]
     #[error(transparent)]
     WasmError(#[from] sc_executor_common::error::WasmError),
 }

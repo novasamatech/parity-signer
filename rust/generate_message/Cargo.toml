@@ -20,8 +20,8 @@ regex = "1.7.1"
 serde_json = "1.0.94"
 sled = "0.34.6"
 sp-core = {version = "18.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = { version = "20.0.0", default-features = false }
-sp-keyring = { version = "20.0.0", default-features = false }
+sp-runtime = { version = "21.0.0", default-features = false }
+sp-keyring = { version = "21.0.0", default-features = false }
 thiserror = "1.0.39"
 tokio = { version = "1", features = ["full"] }
 

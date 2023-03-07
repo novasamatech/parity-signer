@@ -18,6 +18,7 @@
 
 use frame_metadata::{decode_different::DecodeDifferent, v14::RuntimeMetadataV14, RuntimeMetadata};
 use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "active")]
 use sc_executor_common::wasm_runtime::HeapAllocStrategy;
 #[cfg(feature = "active")]
 use sc_executor_common::{

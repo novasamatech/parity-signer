@@ -17,9 +17,9 @@ parity-scale-codec = {version = "3.4.0", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
 regex = "1.7.1"
 scale-info = "2.3.1"
-sp-arithmetic = {version = "13.0.0"}
+sp-arithmetic = {version = "14.0.0" }
 sp-core = {version = "18.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "20.0.0", default-features = false}
+sp-runtime = {version = "21.0.0", default-features = false}
 thiserror = "1.0.39"
 
 [dev-dependencies]

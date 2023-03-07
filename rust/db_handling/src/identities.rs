@@ -33,21 +33,16 @@
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
 use parity_scale_codec::Decode;
-#[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 use regex::Regex;
 use sled::Batch;
 use sp_core::H256;
-#[cfg(feature = "active")]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use sp_runtime::MultiSignature;
-#[cfg(feature = "active")]
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
-#[cfg(feature = "active")]
 use zeroize::Zeroize;
 
-#[cfg(feature = "active")]
 use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
@@ -57,7 +52,6 @@ use definitions::helpers::print_multisigner_as_base58_or_eth;
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::ExportedSet;
 use definitions::network_specs::NetworkSpecs;
-#[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
     helpers::multisigner_to_public,
@@ -72,8 +66,11 @@ use definitions::{
 
 #[cfg(feature = "active")]
 use crate::{
+    helpers::{make_batch_clear_tree},
+};
+use crate::{
     db_transactions::TrDbCold,
-    helpers::{get_all_networks, make_batch_clear_tree, open_tree, upd_id_batch},
+    helpers::{get_all_networks, open_tree, upd_id_batch},
     manage_history::events_to_batch,
 };
 use crate::{
@@ -384,7 +381,6 @@ pub fn inject_derivations_has_pwd(
 }
 
 /// Get all existing addresses from the database.
-#[cfg(feature = "active")]
 pub fn get_all_addresses(database: &sled::Db) -> Result<Vec<(MultiSigner, AddressDetails)>> {
     let identities = open_tree(database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
@@ -431,7 +427,6 @@ pub fn get_multisigner_by_address(
 }
 
 /// Get all existing addresses for a given seed name from the database.
-#[cfg(feature = "active")]
 pub fn get_addresses_by_seed_name(
     database: &sled::Db,
     seed_name: &str,
@@ -472,7 +467,6 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String> {
 ///     <tr><td><code>//Alice//1///&ltpassword1&gt</code></td><td>+</td><td><code>//Alice///&ltpassword0&gt</code></td></tr>
 ///
 /// </table>
-#[cfg(feature = "active")]
 pub(crate) fn is_potentially_exposed(
     path: &str,
     path_is_passworded: bool,
@@ -490,7 +484,6 @@ pub(crate) fn is_potentially_exposed(
 /// exposed.
 ///
 /// Input set is already filtered by seed name elsewhere.
-#[cfg(feature = "active")]
 fn has_parent_with_exposed_secret(
     new_cropped_path: &str,
     new_is_passworded: bool,
@@ -533,7 +526,6 @@ fn exposed_set(
 }
 
 /// Data associated with address generation
-#[cfg(feature = "active")]
 pub(crate) struct PrepData {
     /// information to be added into [`Batch`](sled::Batch) for [`ADDRTREE`]
     /// update
@@ -581,7 +573,6 @@ pub(crate) struct PrepData {
 /// a string, a reference to which is sent into inner logic of
 /// [`sp_core::crypto`]. Combined secret string is then zeroized here regardless
 /// of the address generation success.
-#[cfg(feature = "active")]
 pub(crate) fn create_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
@@ -839,7 +830,6 @@ fn do_create_address(
 ///
 /// This function inputs secret seed phrase as `&str`. It is passed as `&str`
 /// into `create_address` and used there.
-#[cfg(feature = "active")]
 fn populate_addresses(
     database: &sled::Db,
     seed_name: &str,

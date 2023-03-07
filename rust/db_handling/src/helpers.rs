@@ -1,7 +1,6 @@
 //! Common helper functions for database operations
 
 use parity_scale_codec::Decode;
-#[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 use sled::{Batch, Db, Tree};
 use sp_core::H256;
@@ -9,6 +8,7 @@ use sp_core::H256;
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
+#[cfg(feature = "active")]
 use definitions::network_specs::NetworkSpecs;
 use definitions::{
     danger::DangerRecord,
@@ -21,7 +21,6 @@ use definitions::{
     keyring::MetaKey, metadata::MetaValues, network_specs::OrderedNetworkSpecs,
     qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
-#[cfg(feature = "active")]
 use definitions::{
     keyring::{AddressKey, MetaKeyPrefix},
     users::AddressDetails,
@@ -29,7 +28,6 @@ use definitions::{
 
 use crate::{Error, Result};
 
-#[cfg(feature = "active")]
 use crate::db_transactions::TrDbCold;
 use crate::manage_history::events_to_batch;
 
@@ -626,7 +624,6 @@ pub fn remove_types_info(database: &sled::Db) -> Result<()> {
 
 /// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
 /// vector of additions.
-#[cfg(feature = "active")]
 pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {
         batch.insert(address_key.key(), address_details.encode());
