@@ -76,6 +76,15 @@ struct RecoverKeySetSeedPhraseView: View {
                 viewModel.use(navigation: navigation)
                 focus = true
             }
+            .fullScreenCover(
+                isPresented: $viewModel.isPresentingError
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.presentableError,
+                    isShowingBottomAlert: $viewModel.isPresentingError
+                )
+                .clearModalBackground()
+            }
         }
     }
 
@@ -163,21 +172,24 @@ extension RecoverKeySetSeedPhraseView {
 
 extension RecoverKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
-        @Published var seedPhraseGrid: [GridElement] = []
-        var content: MRecoverSeedPhrase {
-            didSet {
-                print(content)
-                regenerateGrid()
-            }
-        }
-
         private let seedsMediator: SeedsMediating
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
+        private weak var navigation: NavigationCoordinator!
+
+        @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = " "
         @Published var previousUserInput: String = " "
 
-        weak var navigation: NavigationCoordinator!
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .recoverySeedPhraseIncorrectPhrase()
+
+        var content: MRecoverSeedPhrase {
+            didSet {
+                regenerateGrid()
+                shouldPresentError()
+            }
+        }
 
         init(
             content: MRecoverSeedPhrase,
@@ -221,20 +233,29 @@ extension RecoverKeySetSeedPhraseView {
         }
 
         func onDoneTap() {
+            var seedPhrase = content.readySeed ?? ""
+            if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+                presentableError = .seedPhraseAlreadyExists()
+                isPresentingError = true
+                return
+            }
             seedsMediator.restoreSeed(
                 seedName: content.seedName,
                 seedPhrase: content.readySeed ?? "",
-                navigate: true
+                navigate: true,
+                shouldCheckForCollision: false
             )
         }
 
         private func regenerateGrid() {
             var updatedGrid: [GridElement] = content.draft.enumerated()
                 .map { .seedPhraseElement(.init(position: String($0.offset + 1), word: $0.element)) }
-//            if updatedGrid.count < 24 {
             updatedGrid.append(.input(textInput))
-//            }
             seedPhraseGrid = updatedGrid
+        }
+
+        private func shouldPresentError() {
+            isPresentingError = content.draft.count == 24 && (content.readySeed?.isEmpty ?? true)
         }
     }
 }
