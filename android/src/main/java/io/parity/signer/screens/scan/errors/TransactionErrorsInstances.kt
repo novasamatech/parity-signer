@@ -38,28 +38,27 @@ fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 			)
 		}
 		is TransactionError.NetworkAlreadyAdded -> TransactionErrorModel(
-			title = "$name Network has already been added",
-			subtitle = "Go to Settings > Networks to check all the added networks.",
+			title = stringResource(R.string.transaction_error_network_already_added_title, name),
+			subtitle = stringResource(R.string.transaction_error_network_already_added_subtitle),
 		)
 		is TransactionError.NoMetadataForNetwork -> {
 			TransactionErrorModel(
-				title = "Please download the $name Network Metadata",
-				subtitle = "There’s no metadata downloaded for the Unique network on what you’re trying to sign the transaction",
+				title = stringResource(R.string.transaction_error_no_metadata_for_network_title, name),
+				subtitle = stringResource(R.string.transaction_error_no_metadata_for_network_subtitle),
 				descriptionSteps = getDescriptionForUpdateMetadata(),
 			)
 		}
 		is TransactionError.OutdatedMetadata -> {
-			//todo dmitry
 			TransactionErrorModel(
-				title = "Please update Your $name Network Metadata",
-				subtitle = "Unique network's 3220 metadata is different to the 3219 data you're using in the app. Please update it to sign the transaction.",
+				title = stringResource(R.string.transaction_error_outdated_metadata_title, name),
+				subtitle = stringResource(R.string.transaction_error_outdated_metadata_subtitle),
 				descriptionSteps = getDescriptionForUpdateMetadata(),
 			)
 		}
 		is TransactionError.UnknownNetwork -> {
 			TransactionErrorModel(
-				title = "Please add the Network you want to Transact in",
-				subtitle = "You're trying to sign a transaction in a network which has not been added",
+				title = stringResource(R.string.transaction_error_unknown_network_title),
+				subtitle = stringResource(R.string.transaction_error_unknown_network_subtitle),
 				descriptionSteps = getDescriptionForUpdateMetadata(),
 			)
 		}
@@ -159,7 +158,7 @@ private fun PreviewTransactionErrorGeneric() {
 private fun PreviewTransactionErrorUnknownNetwork() {
 	SignerNewTheme {
 		val model =
-			TransactionError.UnknownNetwork("Westend").toBottomSheetModel()
+			TransactionError.UnknownNetwork("Westend", "crc3322").toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
@@ -199,7 +198,7 @@ private fun PreviewTransactionErrorNoMetadataForNetwork() {
 private fun PreviewTransactionErrorNetworkAlreadyAdded() {
 	SignerNewTheme {
 		val model =
-			TransactionError.NetworkAlreadyAdded("Westend").toBottomSheetModel()
+			TransactionError.NetworkAlreadyAdded("Westend", "crc3322").toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
@@ -219,7 +218,7 @@ private fun PreviewTransactionErrorNetworkAlreadyAdded() {
 private fun PreviewTransactionErrorMetadataAlreadyAdded() {
 	SignerNewTheme {
 		val model =
-			TransactionError.MetadataAlreadyAdded("Westend").toBottomSheetModel()
+			TransactionError.MetadataAlreadyAdded("Westend", 4356u).toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
@@ -239,7 +238,7 @@ private fun PreviewTransactionErrorMetadataAlreadyAdded() {
 private fun PreviewTransactionErrorOutdatedMetadata() {
 	SignerNewTheme {
 		val model =
-			TransactionError.OutdatedMetadata("Westend").toBottomSheetModel()
+			TransactionError.OutdatedMetadata("Westend", 3256u, 3257u).toBottomSheetModel()
 		TransactionErrorBottomSheet(
 			model = model, onOk = {}
 		)
