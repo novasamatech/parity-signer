@@ -1,16 +1,15 @@
 //
-//  RecoverSeedName.swift
-//  Polkadot Vault
+//  RecoverKeySetNameView.swift
+//  PolkadotVault
 //
-//  Created by Alexander Slesarev on 8.12.2021.
+//  Created by Krzysztof Rodak on 06/03/2023.
 //
 
 import SwiftUI
 
-struct RecoverSeedName: View {
-    @State private var seedName: String = ""
+struct RecoverKeySetNameView: View {
+    @StateObject var viewModel: ViewModel
     @FocusState private var nameFocused: Bool
-    let content: MRecoverSeedName
     @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
@@ -20,19 +19,16 @@ struct RecoverSeedName: View {
                     title: nil,
                     leftButtons: [.init(
                         type: .xmark,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: viewModel.onBackTap
                     )],
                     rightButtons: [.init(
                         type: .activeAction(
                             Localizable.RecoverSeedName.Action.next.key,
-                            .constant(
-                                (seedName.isEmpty) || ServiceLocator.seedsMediator
-                                    .checkSeedCollision(seedName: seedName)
-                            )
+                            .constant(!viewModel.isActionAvailable())
                         ),
                         action: {
                             self.nameFocused = false
-                            self.navigation.perform(navigation: .init(action: .goForward, details: seedName))
+                            viewModel.onNextTap()
                         }
                     )]
                 )
@@ -46,21 +42,20 @@ struct RecoverSeedName: View {
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyL.font)
                     .padding(.vertical, Spacing.extraSmall)
-                TextField("", text: $seedName)
+                TextField("", text: $viewModel.seedName)
                     .submitLabel(.done)
                     .primaryTextFieldStyle(
                         Localizable.seedName.string,
-                        text: $seedName
+                        text: $viewModel.seedName
                     )
                     .focused($nameFocused)
                     .onSubmit {
-                        if !seedName.isEmpty, !ServiceLocator.seedsMediator.checkSeedCollision(seedName: seedName) {
-                            navigation.perform(navigation: .init(action: .goForward, details: seedName))
-                        }
+                        nameFocused = false
+                        viewModel.onSubmitTap()
                     }
                     .onAppear {
-                        seedName = content.seedName
-                        nameFocused = content.keyboard
+                        nameFocused = true
+                        viewModel.onAppear()
                     }
                     .padding(.vertical, Spacing.medium)
                 Localizable.RecoverSeedName.Label.footer.text
@@ -70,11 +65,51 @@ struct RecoverSeedName: View {
             }
             .padding(.horizontal, Spacing.large)
         }
+        .onAppear {
+            viewModel.use(navigation: navigation)
+        }
     }
 }
 
-// struct RecoverSeedName_Previews: PreviewProvider {
-// static var previews: some View {
-// RecoverSeedName()
-// }
-// }
+extension RecoverKeySetNameView {
+    final class ViewModel: ObservableObject {
+        @Published var seedName: String = ""
+        weak var navigation: NavigationCoordinator!
+        private let content: MRecoverSeedName
+
+        private let seedsMediator: SeedsMediating
+
+        init(
+            content: MRecoverSeedName,
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+        ) {
+            self.content = content
+            self.seedsMediator = seedsMediator
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
+        func onAppear() {
+            seedName = content.seedName
+        }
+
+        func onBackTap() {
+            navigation.perform(navigation: .init(action: .goBack))
+        }
+
+        func onNextTap() {
+            navigation.perform(navigation: .init(action: .goForward, details: seedName))
+        }
+
+        func isActionAvailable() -> Bool {
+            !seedName.isEmpty && !seedsMediator.checkSeedCollision(seedName: seedName)
+        }
+
+        func onSubmitTap() {
+            guard isActionAvailable() else { return }
+            onNextTap()
+        }
+    }
+}

@@ -28,7 +28,7 @@ struct NetworkSettingsDetails: View {
                     VStack(alignment: .center, spacing: 0) {
                         NetworkLogoIcon(networkName: viewModel.networkDetails.logo, size: Heights.networkLogoInHeader)
                             .padding(.bottom, Spacing.small)
-                        Text(viewModel.networkDetails.name)
+                        Text(viewModel.networkDetails.name.capitalized)
                             .font(PrimaryFont.titleM.font)
                             .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .padding(.bottom, Spacing.large)

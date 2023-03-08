@@ -188,4 +188,14 @@ struct ErrorBottomModalViewModel {
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }
+
+    static func recoverySeedPhraseIncorrectPhrase(
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.RecoverSeedPhrase.Error.IncorrectPhrase.title.string,
+            content: Localizable.RecoverSeedPhrase.Error.IncorrectPhrase.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
 }

@@ -36,7 +36,7 @@ protocol SeedsMediating: AnyObject {
     ///   - seedName: seed name
     ///   - seedPhrase: seed phrase to be saved
     @discardableResult
-    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool) -> Bool
+    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool, shouldCheckForCollision: Bool) -> Bool
     /// Checks for existance of `seedName` in Keychain
     /// Each seed name needs to be unique, this helps to not overwrite old seeds
     /// - Parameter seedName: seedName to be checked
@@ -122,9 +122,14 @@ final class SeedsMediator: SeedsMediating {
     }
 
     @discardableResult
-    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool = true) -> Bool {
+    func restoreSeed(
+        seedName: String,
+        seedPhrase: String,
+        navigate: Bool = true,
+        shouldCheckForCollision: Bool
+    ) -> Bool {
         guard !seedName.isEmpty, let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
-        if navigate, checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+        if shouldCheckForCollision, checkSeedPhraseCollision(seedPhrase: seedPhrase) {
             return false
         }
         let saveSeedResult = keychainAccessAdapter.saveSeed(
