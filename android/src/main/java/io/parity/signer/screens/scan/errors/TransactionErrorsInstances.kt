@@ -19,21 +19,21 @@ fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
 	return when (this) {
 		is TransactionError.Generic -> {
 			TransactionErrorModel(
-				title = "Something has gone wrong.",
-				subtitle = "View the details below to find out more.",
+				title = stringResource(R.string.transaction_error_generic_title),
+				subtitle = stringResource(R.string.transaction_error_generic_subtitle),
 				descriptionSteps = listOf(AnnotatedString(message))
 			)
 		}
 		is TransactionError.MetadataAlreadyAdded -> {
 			TransactionErrorModel(
-				title = "This $name Network $version Metadata version has already been added",
-				subtitle = "Go to Settings > Networks. Tap on the network you need to check and modify the latest metadata."
+				title = stringResource(R.string.transaction_error_metadata_already_added_title, name, version),
+				subtitle = stringResource(R.string.transaction_error_metadata_already_added_subtitle)
 			)
 		}
 		is TransactionError.MetadataForUnknownNetwork -> {
 			TransactionErrorModel(
-				title = "Please add the Network",//todo dmitry work on it!!!
-				subtitle = "You’re trying to update metadata on a network that hasn’t yet been added.",
+				title = stringResource(R.string.transaction_error_meta_unknown_network_title),
+				subtitle = stringResource(R.string.transaction_error_meta_unknown_network_subtitle),
 				descriptionSteps = getDescriptionForUpdateMetadata()
 			)
 		}
