@@ -11,7 +11,7 @@ struct NetworkCapsuleView: View {
     let network: String
 
     var body: some View {
-        Text(network)
+        Text(network.capitalized)
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             .font(PrimaryFont.captionM.font)
             .padding([.top, .bottom], Spacing.extraExtraSmall)
