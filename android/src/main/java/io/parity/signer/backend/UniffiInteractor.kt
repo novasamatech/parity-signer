@@ -73,11 +73,6 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	//todo dmitry do
-//	"Error.Navigation.Label.Prefix" = "Internal navigation error.";
-//"Error.Navigation.Label.Message" = "Please restart Polkadot Vault app and try again.\nInternal error description: %@";
-//"Error.Navigation.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
-
 	fun historyDeviceWasOnline() {
 		if (wasRustInitialized.value) {
 			io.parity.signer.uniffi.historyDeviceWasOnline()
