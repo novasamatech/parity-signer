@@ -130,7 +130,7 @@ struct CreateDerivedKeyView: View {
                 HStack(spacing: 0) {
                     NetworkLogoIcon(networkName: network.logo, size: Heights.networkLogoInCapsule)
                         .padding(.trailing, Spacing.extraSmall)
-                    Text(network.title)
+                    Text(network.title.capitalized)
                         .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                         .font(PrimaryFont.bodyM.font)
                         .padding(.trailing, Spacing.extraSmall)

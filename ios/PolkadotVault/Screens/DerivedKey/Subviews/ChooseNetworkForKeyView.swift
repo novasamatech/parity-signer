@@ -58,7 +58,7 @@ struct ChooseNetworkForKeyView: View {
         HStack(alignment: .center, spacing: 0) {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
-            Text(network.title)
+            Text(network.title.capitalized)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.titleS.font)
             Spacer()
