@@ -74,9 +74,11 @@
 "Seed" = "Seed";
 "seed_name" = "Enter Key Set Name";
 "SEED PHRASE" = "Secret Recovery Phrase";
-"RecoverSeedPhrase.Action.Recover" = "Recover Key Set";
+"RecoverSeedPhrase.Action.Done" = "Done";
 "RecoverSeedPhrase.Label.Title" = "Recover Key Set";
-"RecoverSeedPhrase.Label.Footer" = "Tap \"←\" when textfield is empty to delete last selected seed word";
+"RecoverSeedPhrase.Label.Header" = "Secret Recovery Phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
 // Sign Sufficient Crypto
 "Select key for signing" = "Select key for signing";
@@ -258,22 +260,22 @@
 "TransactionSign.Error.Generic.Title" = "Error signing Transaction";
 "TransactionSign.Error.UnknownNetwork.Title" = "Please Add The Network\nYou Want To Transact in";
 "TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Polkadot Vault.";
-"TransactionSign.Error.UnknownNetwork.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
 
-"TransactionSign.Error.UnknownNetwork.Step1" = "Go to Portal where your network is stored\nparity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.UnknownNetwork.Step1.Highlight.first" = "parity.metadata.io";
-"TransactionSign.Error.UnknownNetwork.Step1.Highlight.second" = "nova-wallet.github.io/metadata-portal";
+"TransactionSign.Error.UnknownNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.second" = "metadata.novasama.io";
 "TransactionSign.Error.UnknownNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
 "TransactionSign.Error.UnknownNetwork.Step2" = "Choose the network you need";
 "TransactionSign.Error.UnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
 
 "TransactionSign.Error.OutdatedMetadata.Title" = "Please Update %@ Network Metadata";
 "TransactionSign.Error.OutdatedMetadata.Message" = "%@ network's %@ metadata is different to the %@ data you're using in the app. Please update it to sign the transaction.";
-"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
 
-"TransactionSign.Error.OutdatedMetadata.Step1" = "Go to Portal where your network is stored\nparity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.first" = "parity.metadata.io";
-"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.second" = "nova-wallet.github.io/metadata-portal";
+"TransactionSign.Error.OutdatedMetadata.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.second" = "metadata.novasama.io";
 "TransactionSign.Error.OutdatedMetadata.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
 
 "TransactionSign.Error.OutdatedMetadata.Step2" = "Choose the network you need";
@@ -287,20 +289,20 @@
 
 "TransactionSign.Error.MetadataUnknownNetwork.Title" = "Please Add %@ Network";
 "TransactionSign.Error.MetadataUnknownNetwork.Message" = "You’re trying to update metadata on %@ network that hasn’t yet been added.";
-"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.MetadataUnknownNetwork.Step1" = "Go to Portal where your network is stored\nparity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.first" = "parity.metadata.io";
-"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.second" = "nova-wallet.github.io/metadata-portal";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.second" = "metadata.novasama.io";
 "TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
 "TransactionSign.Error.MetadataUnknownNetwork.Step2" = "Choose the network you need";
 "TransactionSign.Error.MetadataUnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
 
 "TransactionSign.Error.NoMetadataForNetwork.Title" = "Please Download %@ Network Metadata";
 "TransactionSign.Error.NoMetadataForNetwork.Message" = "There’s no metadata downloaded for %@ network on what you’re trying to sign the transaction";
-"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.font" = "parity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.NoMetadataForNetwork.Step1" = "Go to Portal where your network is stored\nparity.metadata.io for Polkadot, Kusama, and Westend\nnova-wallet.github.io/metadata-portal for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
-"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.first" = "parity.metadata.io";
-"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.second" = "nova-wallet.github.io/metadata-portal";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.NoMetadataForNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.second" = "metadata.novasama.io";
 "TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
 "TransactionSign.Error.NoMetadataForNetwork.Step2" = "Choose the network you need";
 "TransactionSign.Error.NoMetadataForNetwork.Step3" = "Scan the Metadata animated QR code";

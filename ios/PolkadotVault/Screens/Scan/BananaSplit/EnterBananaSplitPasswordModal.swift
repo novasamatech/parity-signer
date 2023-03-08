@@ -152,34 +152,7 @@ extension EnterBananaSplitPasswordModal {
                 let result = try qrparserTryDecodeQrSequence(data: qrCodeData, password: password, cleaned: false)
                 if case let .bBananaSplitRecoveryResult(b: bananaResult) = result,
                    case let .recoveredSeed(s: seedPhrase) = bananaResult {
-                    if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
-                        dismissWithError(.seedPhraseAlreadyExists())
-                        return
-                    }
-                    navigation.performFake(navigation: .init(action: .navbarKeys))
-                    // Key Set List state has different "modalData" state depending on whether user has at least one key
-                    // or not
-                    // So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
-                    // calling
-                    // .rightButtonAction
-                    if !seedsMediator.seedNames.isEmpty {
-                        navigation.performFake(navigation: .init(action: .rightButtonAction))
-                    }
-                    navigation.performFake(navigation: .init(action: .recoverSeed))
-                    navigation.performFake(navigation: .init(action: .goForward, details: seedName))
-                    // We should do additional check on whether seed can be successfully saved and not call navigation
-                    // further if there are any issues (i.e. somehow seedname is still empty, etc)
-                    guard seedsMediator.restoreSeed(seedName: seedName, seedPhrase: seedPhrase, navigate: false) else {
-                        dismissWithError(.alertError(
-                            message: Localizable.EnterBananaSplitPasswordModal.Error
-                                .LocalRestoreFailed.message.string
-                        ))
-                        return
-                    }
-                    navigation.performFake(navigation: .init(action: .goBack))
-                    navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
-                    isKeyRecovered = true
-                    isPresented = false
+                    performKeySetRecovery(seedPhrase)
                 }
             } catch QrSequenceDecodeError.BananaSplitWrongPassword {
                 invalidPasswordAttempts += 1
@@ -195,6 +168,42 @@ extension EnterBananaSplitPasswordModal {
             } catch {
                 dismissWithError(.alertError(message: error.localizedDescription))
             }
+        }
+
+        private func performKeySetRecovery(_ seedPhrase: String) {
+            if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+                dismissWithError(.seedPhraseAlreadyExists())
+                return
+            }
+            navigation.performFake(navigation: .init(action: .navbarKeys))
+            // Key Set List state has different "modalData" state depending on whether user has at least one key
+            // or not
+            // So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
+            // calling
+            // .rightButtonAction
+            if !seedsMediator.seedNames.isEmpty {
+                navigation.performFake(navigation: .init(action: .rightButtonAction))
+            }
+            navigation.performFake(navigation: .init(action: .recoverSeed))
+            navigation.performFake(navigation: .init(action: .goForward, details: seedName))
+            // We should do additional check on whether seed can be successfully saved and not call navigation
+            // further if there are any issues (i.e. somehow seedname is still empty, etc)
+            guard seedsMediator.restoreSeed(
+                seedName: seedName,
+                seedPhrase: seedPhrase,
+                navigate: false,
+                shouldCheckForCollision: false
+            ) else {
+                dismissWithError(.alertError(
+                    message: Localizable.EnterBananaSplitPasswordModal.Error
+                        .LocalRestoreFailed.message.string
+                ))
+                return
+            }
+            navigation.performFake(navigation: .init(action: .goBack))
+            navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
+            isKeyRecovered = true
+            isPresented = false
         }
 
         private func dismissWithError(_ model: ErrorBottomModalViewModel) {

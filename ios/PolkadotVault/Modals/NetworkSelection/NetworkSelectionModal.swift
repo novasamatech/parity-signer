@@ -66,7 +66,7 @@ struct NetworkSelectionModal: View {
         HStack(alignment: .center, spacing: 0) {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
-            Text(network.title)
+            Text(network.title.capitalized)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.labelM.font)
             Spacer()

@@ -33,6 +33,7 @@ enum Heights {
     static let identiconSmall: CGFloat = 16
     static let tabbarHeight: CGFloat = 49
     static let textFieldHeight: CGFloat = 48
+    static let seedPhraseCapsuleHeight: CGFloat = 32
     static let minTextEditorHeight: CGFloat = 96
     static let maxTextEditorHeight: CGFloat = 230
     static let tabbarAssetHeight: CGFloat = 28
