@@ -31,7 +31,7 @@ fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel
 				title = context.getString(
 					R.string.transaction_error_metadata_already_added_title,
 					name,
-					version,
+					version.toString(),
 				),
 				subtitle = context.getString(R.string.transaction_error_metadata_already_added_subtitle)
 			)
