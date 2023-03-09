@@ -313,9 +313,9 @@
 	<string name="general_error_link_clicked_on_airgap_device">No internet! Use different device.</string>
 	<string name="transaction_error_steps_1">Go to Portal where your network is stored</string>
 	<string name="transaction_error_steps_2_url_core_networks">metadata.parity.io</string>
-	<string name="transaction_error_steps_2_core_networks_description"> for Polkadot, Kusama, and Westend</string>
+	<string name="transaction_error_steps_2_core_networks_description">" for Polkadot, Kusama, and Westend"</string>
 	<string name="transaction_error_steps_3_url_parachains">metadata.novasama.io</string>
-	<string name="transaction_error_steps_3_description_parachains"> for Parachains and Solochains</string>
+	<string name="transaction_error_steps_3_description_parachains">" for Parachains and Solochains"</string>
 	<string name="transaction_error_steps_4_notes_for_other_networks">ask network\'s developers directly if you haven’t found it in the portals</string>
 	<string name="transaction_error_steps_choose_network">Choose the network you need</string>
 	<string name="transaction_error_steps_scan_qr_code">Scan \"Chain spec\" QR to add the missing network</string>
