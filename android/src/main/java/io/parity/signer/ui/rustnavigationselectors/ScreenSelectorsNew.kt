@@ -34,10 +34,7 @@ import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.keysBySeedName
+import io.parity.signer.uniffi.*
 
 @Composable
 fun CombinedScreensSelector(
@@ -59,13 +56,21 @@ fun CombinedScreensSelector(
 			)
 		}
 		is ScreenData.Keys -> {
-			val keys = keysBySeedName(screenData.f)
-			KeySetDetailsNavSubgraph(
-				model = keys.toKeySetDetailsModel(),
-				rootNavigator = rootNavigator,
-				networkState = networkState,
-				singleton = sharedViewModel,
-			)
+			val keys = try {
+				keysBySeedName(screenData.f)
+			} catch (e: ErrorDisplayed) {
+				rootNavigator.backAction()
+				submitErrorState("unexpected error in keysBySeedName $e")
+				null
+			}
+			keys?.let {
+				KeySetDetailsNavSubgraph(
+					model = keys.toKeySetDetailsModel(),
+					rootNavigator = rootNavigator,
+					networkState = networkState,
+					singleton = sharedViewModel,
+				)
+			}
 		}
 		is ScreenData.KeyDetails ->
 			Box(modifier = Modifier.statusBarsPadding()) {
