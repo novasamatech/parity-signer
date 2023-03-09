@@ -121,7 +121,7 @@ class ScanViewModel : ViewModel() {
 							DerivedKeyError.BadFormat -> {
 								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_bad_format_title),
-									message = context.getString(R.string.scan_screen_error_bad_format_message),
+									subtitle = context.getString(R.string.scan_screen_error_bad_format_message),
 								)
 								clearState()
 								return
@@ -129,7 +129,7 @@ class ScanViewModel : ViewModel() {
 							DerivedKeyError.KeySetMissing -> {
 								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
-									message = context.getString(R.string.scan_screen_error_missing_key_set_message),
+									subtitle = context.getString(R.string.scan_screen_error_missing_key_set_message),
 								)
 								clearState()
 								return
@@ -137,7 +137,7 @@ class ScanViewModel : ViewModel() {
 							DerivedKeyError.NetworkMissing -> {
 								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_network_title),
-									message = context.getString(R.string.scan_screen_error_missing_network_message),
+									subtitle = context.getString(R.string.scan_screen_error_missing_network_message),
 								)
 								clearState()
 								return
@@ -176,7 +176,7 @@ class ScanViewModel : ViewModel() {
 								} else {
 									transactionError.value = TransactionErrorModel(
 										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
-										message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
+										subtitle = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
 									)
 									return
 								}
