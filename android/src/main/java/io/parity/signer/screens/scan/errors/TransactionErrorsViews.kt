@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.errors
 
+import android.content.Context
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -42,7 +43,7 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun TransactionErrorBottomSheet(
-	model: TransactionErrorModel,
+	error: TransactionErrorModel,
 	onOk: Callback
 ) {
 	Column(
@@ -51,7 +52,7 @@ fun TransactionErrorBottomSheet(
 			.verticalScroll(rememberScrollState())
 	) {
 		Text(
-			text = model.title,
+			text = error.title,
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleM,
 			modifier = Modifier.padding(
@@ -62,7 +63,7 @@ fun TransactionErrorBottomSheet(
 			),
 		)
 		Text(
-			text = model.subtitle,
+			text = error.subtitle,
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
@@ -70,7 +71,7 @@ fun TransactionErrorBottomSheet(
 				.padding(bottom = 16.dp),
 		)
 
-		if (model.descriptionSteps.isNotEmpty()) {
+		if (error.descriptionSteps.isNotEmpty()) {
 			Column(
 				modifier = Modifier
 					.fillMaxWidth(1f)
@@ -85,11 +86,11 @@ fun TransactionErrorBottomSheet(
 						RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 					)
 			) {
-				model.descriptionSteps.forEachIndexed() { index, step ->
+				error.descriptionSteps.forEachIndexed() { index, step ->
 					Row(
 						modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
 					) {
-						if (model.descriptionSteps.size > 1) {
+						if (error.descriptionSteps.size > 1) {
 							Text(
 								text = (index + 1).toString(),
 								color = MaterialTheme.colors.textTertiary,
@@ -120,7 +121,11 @@ fun TransactionErrorBottomSheet(
 										)
 											.firstOrNull()
 											?.let { result ->
-												Toast.makeText(context, context.getString(R.string.general_error_link_clicked_on_airgap_device), Toast.LENGTH_LONG).show()
+												Toast.makeText(
+													context,
+													context.getString(R.string.general_error_link_clicked_on_airgap_device),
+													Toast.LENGTH_LONG
+												).show()
 												//this device is airgapped, don't open links!
 //												uriHandler.openUri(result.item)
 											}
@@ -146,7 +151,26 @@ data class TransactionErrorModel(
 	val title: String,
 	val subtitle: String,
 	val descriptionSteps: List<AnnotatedString> = emptyList()
-)
+) {
+	constructor(
+		title: String,
+		message: String,
+		details: String? = null,
+	) : this(
+		title = title,
+		subtitle = message,
+		descriptionSteps = details?.let { listOf(AnnotatedString(it)) } ?: emptyList(),
+	)
+
+	constructor(
+		context: Context,
+		details: String,
+	) : this(
+		title = context.getString(R.string.transaction_generic_error_title),
+		subtitle = context.getString(R.string.transaction_generic_error_description),
+		descriptionSteps = listOf(AnnotatedString(details)),
+	)
+}
 
 
 @Preview(
@@ -164,7 +188,28 @@ private fun PreviewTransactionErrorBottomSheet() {
 		val model =
 			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewTransactionErrorBottomSheetCustom() {
+	SignerNewTheme {
+		val context = LocalContext.current
+		val model =
+			TransactionErrorModel(context = context, details = "Bad input data. Metadata for westend9330 is already in the database.")
+		TransactionErrorBottomSheet(
+			error = model, onOk = {}
 		)
 	}
 }

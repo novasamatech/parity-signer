@@ -13,7 +13,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
-import io.parity.signer.screens.scan.errors.PresentableErrorModel
+import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
@@ -46,7 +46,7 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val presentableError: MutableStateFlow<PresentableErrorModel?> = //todo dmitry there should be transaction errors from error folder above
+	val transactionError: MutableStateFlow<TransactionErrorModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
@@ -79,7 +79,8 @@ class ScanViewModel : ViewModel() {
 
 				// Handle transactions with just error payload
 				if (transactions.all { it.isDisplayingErrorOnly() }) {
-					presentableError.value = PresentableErrorModel(
+					transactionError.value = TransactionErrorModel(
+						context = context,
 						details = transactions.joinToString("\n") { it.transactionIssues() }
 					)
 					FakeNavigator().navigate(Action.GO_BACK) //fake call
@@ -117,7 +118,7 @@ class ScanViewModel : ViewModel() {
 						fakeNavigator.navigate(Action.GO_BACK)
 						when (transactions.dominantImportError()) {
 							DerivedKeyError.BadFormat -> {
-								presentableError.value = PresentableErrorModel(
+								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_bad_format_title),
 									message = context.getString(R.string.scan_screen_error_bad_format_message),
 								)
@@ -125,7 +126,7 @@ class ScanViewModel : ViewModel() {
 								return
 							}
 							DerivedKeyError.KeySetMissing -> {
-								presentableError.value = PresentableErrorModel(
+								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
 									message = context.getString(R.string.scan_screen_error_missing_key_set_message),
 								)
@@ -133,7 +134,7 @@ class ScanViewModel : ViewModel() {
 								return
 							}
 							DerivedKeyError.NetworkMissing -> {
-								presentableError.value = PresentableErrorModel(
+								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_network_title),
 									message = context.getString(R.string.scan_screen_error_missing_network_message),
 								)
@@ -172,7 +173,7 @@ class ScanViewModel : ViewModel() {
 										}
 									}
 								} else {
-									presentableError.value = PresentableErrorModel(
+									transactionError.value = TransactionErrorModel(
 										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 										message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
 									)
@@ -268,7 +269,7 @@ class ScanViewModel : ViewModel() {
 			transactions.value != null
 			|| signature.value != null
 			|| passwordModel.value != null
-			|| presentableError.value != null
+			|| transactionError.value != null
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
 			|| bananaSplitPassword.value != null
@@ -285,7 +286,7 @@ class ScanViewModel : ViewModel() {
 		signature.value = null
 		passwordModel.value = null
 		bananaSplitPassword.value = null
-		presentableError.value = null
+		transactionError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false
 	}

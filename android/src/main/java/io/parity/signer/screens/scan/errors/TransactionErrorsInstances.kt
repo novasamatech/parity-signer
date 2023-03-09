@@ -118,7 +118,7 @@ private fun PreviewTransactionErrorMetadataForUnknownNetwork() {
 		val model =
 			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -140,7 +140,7 @@ private fun PreviewTransactionErrorGeneric() {
 		val model =
 			TransactionError.Generic(errorMessage).toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -160,7 +160,7 @@ private fun PreviewTransactionErrorUnknownNetwork() {
 		val model =
 			TransactionError.UnknownNetwork("Westend", "crc3322").toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -180,7 +180,7 @@ private fun PreviewTransactionErrorNoMetadataForNetwork() {
 		val model =
 			TransactionError.NoMetadataForNetwork("Westend").toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -200,7 +200,7 @@ private fun PreviewTransactionErrorNetworkAlreadyAdded() {
 		val model =
 			TransactionError.NetworkAlreadyAdded("Westend", "crc3322").toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -220,7 +220,7 @@ private fun PreviewTransactionErrorMetadataAlreadyAdded() {
 		val model =
 			TransactionError.MetadataAlreadyAdded("Westend", 4356u).toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }
@@ -240,7 +240,7 @@ private fun PreviewTransactionErrorOutdatedMetadata() {
 		val model =
 			TransactionError.OutdatedMetadata("Westend", 3256u, 3257u).toBottomSheetModel()
 		TransactionErrorBottomSheet(
-			model = model, onOk = {}
+			error = model, onOk = {}
 		)
 	}
 }

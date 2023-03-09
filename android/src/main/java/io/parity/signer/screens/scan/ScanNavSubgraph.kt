@@ -18,14 +18,13 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
-import io.parity.signer.screens.scan.errors.PresentableErrorModel
-import io.parity.signer.screens.scan.errors.ScanErrorBottomSheet
+import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
+import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
 import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.backendAction
 import kotlinx.coroutines.launch
 
 /**
@@ -42,11 +41,11 @@ fun ScanNavSubgraph(
 	val signature = scanViewModel.signature.collectAsState()
 	val bananaSplitPassword = scanViewModel.bananaSplitPassword.collectAsState()
 
-	val presentableError = scanViewModel.presentableError.collectAsState()
+	val transactionError = scanViewModel.transactionError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	val showingModals = presentableError.value != null ||
+	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
 
 	val navigateToPrevious = {
@@ -75,8 +74,8 @@ fun ScanNavSubgraph(
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
 			onCustomError = { error ->
-				scanViewModel.presentableError.value =
-					PresentableErrorModel(details = error)
+				scanViewModel.transactionError.value =
+					TransactionErrorModel(context = context, details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
 			onErrorWrongPassword = {
@@ -143,11 +142,11 @@ fun ScanNavSubgraph(
 		)
 	}
 	//Bottom sheets
-	presentableError.value?.let { presentableErrorValue ->
+	transactionError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
-			ScanErrorBottomSheet(
+			TransactionErrorBottomSheet(
 				error = presentableErrorValue,
-				onOK = scanViewModel::clearState,
+				onOk = scanViewModel::clearState,
 			)
 		}
 	} ?: passwordModel.value?.let { passwordModelValue ->
