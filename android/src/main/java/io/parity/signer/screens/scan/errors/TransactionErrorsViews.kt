@@ -148,6 +148,7 @@ fun TransactionErrorBottomSheet(
 					text = error.description,
 					color = MaterialTheme.colors.primary,
 					style = SignerTypeface.BodyL,
+					modifier = Modifier.padding(16.dp)
 				)
 			}
 		}
