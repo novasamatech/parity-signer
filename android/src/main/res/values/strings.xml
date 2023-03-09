@@ -321,7 +321,7 @@
 	<string name="transaction_error_steps_scan_qr_code">Scan \"Chain spec\" QR to add the missing network</string>
 	<string name="transaction_error_generic_title">Something has gone wrong</string>
 	<string name="transaction_error_generic_subtitle">View the details below to find out more.</string>
-	<string name="transaction_error_metadata_already_added_title">This %1$s Network %1$s Metadata version has already been added</string>
+	<string name="transaction_error_metadata_already_added_title">This %1$s Network %2$s Metadata version has already been added</string>
 	<string name="transaction_error_metadata_already_added_subtitle"><![CDATA[Go to Settings > Networks. Tap on the network you need to check and modify the latest metadata.]]></string>
 	<string name="transaction_error_meta_unknown_network_title">Please add the Network</string>
 	<string name="transaction_error_meta_unknown_network_subtitle">You’re trying to update metadata on a network that hasn’t yet been added.</string>

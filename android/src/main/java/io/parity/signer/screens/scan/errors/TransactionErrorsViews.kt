@@ -34,13 +34,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
 
-/**
- * todo dmitry similar to ios/PolkadotVault/Modals/Errors/ErrorBottomModalViewModel.swift:10
- *
- * todo dmitry ios/PolkadotVault/Core/Adapters/BackendNavigationAdapter.swift:48
- */
-
-
 @Composable
 fun TransactionErrorBottomSheet(
 	error: TransactionErrorModel,

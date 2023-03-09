@@ -14,6 +14,7 @@ import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.toBottomSheetModel
 import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
@@ -63,7 +64,7 @@ class ScanViewModel : ViewModel() {
 
 		when (navigateResponse) {
 			is OperationResult.Err -> {
-				//todo dmitry show errors here - new UI.
+				transactionError.value = navigateResponse.error.toBottomSheetModel(context)
 			}
 			is OperationResult.Ok -> {
 				val screenData = navigateResponse.result.screenData
