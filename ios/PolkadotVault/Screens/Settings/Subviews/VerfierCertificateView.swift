@@ -85,6 +85,7 @@ extension VerfierCertificateView {
         let content: MVerifierDetails
 
         private weak var data: SharedDataModel!
+        private weak var navigation: NavigationCoordinator!
 
         init(content: MVerifierDetails) {
             self.content = content
@@ -92,6 +93,10 @@ extension VerfierCertificateView {
 
         func use(data: SharedDataModel) {
             self.data = data
+        }
+
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
         }
 
         func loadData() {
@@ -103,7 +108,8 @@ extension VerfierCertificateView {
         }
 
         func onRemoveConfirmationTap() {
-            data.removeGeneralVerifier()
+            data.onboard(verifierRemoved: true)
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }

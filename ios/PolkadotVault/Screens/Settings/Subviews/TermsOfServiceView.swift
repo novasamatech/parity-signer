@@ -24,7 +24,7 @@ struct TermsOfServiceView: View {
                 )
             )
             ScrollView {
-                Text(ShownDocument.toc.text)
+                Text(TextResources.termsAndConditions.text)
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .padding(.horizontal, Spacing.large)

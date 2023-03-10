@@ -60,16 +60,11 @@ struct ScreenSelector: View {
             SignSufficientCrypto(
                 content: value
             )
-        case let .selectSeedForBackup(value):
-            SelectSeedForBackup(
-                content: value
-            )
-        case .documents:
-            OnboardingAgreementsView(
-                viewModel: .init(onNextTap: { data.onboard() })
-            )
-
         // Screens handled outside of Rust navigation
+        case .selectSeedForBackup:
+            EmptyView()
+        case .documents:
+            EmptyView()
         case .scan:
             EmptyView()
         case .transaction:

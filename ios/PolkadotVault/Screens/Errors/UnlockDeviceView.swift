@@ -10,6 +10,7 @@ import SwiftUI
 struct UnlockDeviceView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var data: SharedDataModel
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,7 +35,10 @@ struct UnlockDeviceView: View {
             .padding(.horizontal, Spacing.large)
             Spacer()
         }
-        .onAppear { viewModel.use(data: data) }
+        .onAppear {
+            viewModel.use(data: data)
+            viewModel.use(navigation: navigation)
+        }
         .multilineTextAlignment(.center)
         .background(Asset.backgroundPrimary.swiftUIColor)
     }
@@ -43,6 +47,7 @@ struct UnlockDeviceView: View {
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
         private weak var data: SharedDataModel!
+        private weak var navigation: NavigationCoordinator!
         private let seedsMediator: SeedsMediating
 
         init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
@@ -53,9 +58,14 @@ extension UnlockDeviceView {
             self.data = data
         }
 
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
-            data.totalRefresh()
+            navigation.perform(navigation: .init(action: .start))
+            data.updateWarnings()
         }
     }
 }

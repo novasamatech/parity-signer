@@ -8,10 +8,59 @@
 import Foundation
 import SwiftUI
 
+protocol AppLaunchMediating: AnyObject {
+    func onboard(verifierRemoved: Bool)
+    func initialiseFirstRun()
+    func initialiseOnboardedUserRun()
+}
+
+final class AppLaunchMediator: AppLaunchMediating {
+    private let navigationInitialisationService: NavigationInitialisationService
+    private let seedsMediator: SeedsMediating
+    private let databaseMediator: DatabaseMediating
+
+    init(
+        navigationInitialisationService: NavigationInitialisationService = NavigationInitialisationService(),
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+        databaseMediator: DatabaseMediating = DatabaseMediator()
+    ) {
+        self.navigationInitialisationService = navigationInitialisationService
+        self.seedsMediator = seedsMediator
+        self.databaseMediator = databaseMediator
+    }
+
+    func onboard(verifierRemoved: Bool) {
+        seedsMediator.refreshSeeds()
+        localDataCleanup()
+        databaseMediator.recreateDatabaseFile()
+        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved)
+        seedsMediator.refreshSeeds()
+    }
+
+    func initialiseFirstRun() {
+        localDataCleanup()
+    }
+
+    func initialiseOnboardedUserRun() {
+        seedsMediator.initialRefreshSeeds()
+        do {
+            try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
+        } catch {}
+    }
+}
+
+private extension AppLaunchMediator {
+    func localDataCleanup() {
+        seedsMediator.removeAllSeeds()
+        databaseMediator.wipeDatabase()
+    }
+}
+
 final class SharedDataModel: ObservableObject {
     private let seedsMediator: SeedsMediating
+    private let databaseMediator: DatabaseMediating
+    private let appLaunchMediator: AppLaunchMediating
 
-    @ObservedObject private(set) var navigation: NavigationCoordinator
     @ObservedObject private var connectivityMediator: ConnectivityMediator
 
     // Data state
@@ -21,49 +70,35 @@ final class SharedDataModel: ObservableObject {
     // Alert indicator
     @Published var alert: Bool = false
 
-    private let bundle: BundleProtocol
-    private let databaseMediator: DatabaseMediating
-
     init(
-        navigation: NavigationCoordinator = NavigationCoordinator(),
         connectivityMediator: ConnectivityMediator = ConnectivityMediator(),
-        bundle: BundleProtocol = Bundle.main,
         databaseMediator: DatabaseMediating = DatabaseMediator(),
+        appLaunchMediator: AppLaunchMediating = AppLaunchMediator(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
-        self.navigation = navigation
         self.connectivityMediator = connectivityMediator
         self.seedsMediator = seedsMediator
-        self.bundle = bundle
         self.databaseMediator = databaseMediator
+        self.appLaunchMediator = appLaunchMediator
         onboardingDone = databaseMediator.isDatabaseAvailable()
 
-        seedsMediator.set(signerDataModel: self)
+        seedsMediator.set(sharedDataModel: self)
         setUpConnectivityMonitoring()
         finaliseInitialisation()
     }
 
-    func totalRefresh() {
-        navigation.perform(navigation: .init(action: .start))
-        checkAlert()
+    func updateWarnings() {
+        do {
+            alert = try historyGetWarnings()
+        } catch {
+            alert = true
+        }
     }
 
     func onboard(verifierRemoved: Bool = false) {
-        wipe()
-        guard databaseMediator.recreateDatabaseFile() else {
-            return
-        }
-        do {
-            try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
-            if verifierRemoved {
-                try historyInitHistoryNoCert()
-            } else {
-                try historyInitHistoryWithCert()
-            }
-            onboardingDone = true
-            totalRefresh()
-            seedsMediator.refreshSeeds()
-        } catch {}
+        appLaunchMediator.onboard(verifierRemoved: verifierRemoved)
+        onboardingDone = true
+        updateWarnings()
     }
 }
 
@@ -74,73 +109,10 @@ private extension SharedDataModel {
 
     func finaliseInitialisation() {
         if onboardingDone {
-            seedsMediator.initialRefreshSeeds()
-            do {
-                try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
-            } catch {}
-            totalRefresh()
+            appLaunchMediator.initialiseOnboardedUserRun()
         } else {
-            // remove secrets first
-            seedsMediator.removeAllSeeds()
-            // then everything else
-            databaseMediator.wipeDatabase()
+            appLaunchMediator.initialiseFirstRun()
         }
-    }
-}
-
-private extension SharedDataModel {
-    /// Restores the `Polkadot Vault` to factory new state
-    /// Should be called before app uninstall/upgrade!
-    func wipe() {
-        seedsMediator.refreshSeeds()
-        guard authenticated else { return }
-        // remove secrets first
-        seedsMediator.removeAllSeeds()
-        // then everything else
-        databaseMediator.wipeDatabase()
-        onboardingDone = false
-        seedsMediator.seedNames = []
-    }
-}
-
-extension SharedDataModel {
-    func removeGeneralVerifier() {
-        onboard(verifierRemoved: true)
-    }
-}
-
-extension SharedDataModel {
-    func sign(seedName: String, comment: String) {
-        navigation.perform(
-            navigation:
-            .init(
-                action: .goForward,
-                details: comment,
-                seedPhrase: seedsMediator.getSeed(seedName: seedName)
-            )
-        )
-    }
-}
-
-/// Address-related operations in data model
-extension SharedDataModel {
-    /// Creates address in database with checks and features
-    func createAddress(path: String, seedName: String) {
-        let seedPhrase = seedsMediator.getSeed(seedName: seedName)
-        if !seedPhrase.isEmpty {
-            navigation.perform(navigation: .init(action: .goForward, details: path, seedPhrase: seedPhrase))
-        }
-    }
-}
-
-extension SharedDataModel {
-    /// Check if alert was triggered
-    func checkAlert() {
-        guard onboardingDone else { return }
-        do {
-            alert = try historyGetWarnings()
-        } catch {
-            alert = true
-        }
+        updateWarnings()
     }
 }

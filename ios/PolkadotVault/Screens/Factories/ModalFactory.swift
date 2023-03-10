@@ -1,18 +1,16 @@
 //
-//  ModalSelector.swift
-//  Polkadot Vault
+//  ModalFactory.swift
+//  PolkadotVault
 //
-//  Created by Alexander Slesarev on 7.12.2021.
+//  Created by Krzysztof Rodak on 10/03/2023.
 //
 
 import SwiftUI
 
-struct ModalSelector: View {
-    @EnvironmentObject private var data: SharedDataModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
-
-    var body: some View {
-        switch navigation.actionResult.modalData {
+final class ModalFactory {
+    @ViewBuilder
+    func modal(for modalData: ModalData?) -> some View {
+        switch modalData {
         case let .sufficientCryptoReady(value):
             SufficientCryptoReady(content: value)
         case let .newSeedBackup(value):
@@ -41,9 +39,3 @@ struct ModalSelector: View {
         }
     }
 }
-
-// struct ModalSelector_Previews: PreviewProvider {
-// static var previews: some View {
-// ModalSelector()
-// }
-// }

@@ -10,6 +10,7 @@ import SwiftUI
 struct OnboardingScreenshotsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject var data: SharedDataModel
+    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
         GeometryReader { geo in
@@ -77,7 +78,10 @@ struct OnboardingScreenshotsView: View {
                 )
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .onAppear { viewModel.use(data: data) }
+            .onAppear {
+                viewModel.use(data: data)
+                viewModel.use(navigation: navigation)
+            }
         }
     }
 }
@@ -89,6 +93,7 @@ extension OnboardingScreenshotsView {
 
         private let onNextTap: () -> Void
         private weak var data: SharedDataModel!
+        private weak var navigation: NavigationCoordinator!
 
         init(onNextTap: @escaping () -> Void) {
             self.onNextTap = onNextTap
@@ -98,9 +103,14 @@ extension OnboardingScreenshotsView {
             self.data = data
         }
 
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
+        }
+
         func onDoneTap() {
             onNextTap()
             data.onboard()
+            navigation.perform(navigation: .init(action: .start))
         }
 
         func toggleCheckbox() {

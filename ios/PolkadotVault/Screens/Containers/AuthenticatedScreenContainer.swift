@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
-
+    @StateObject var viewModel: ViewModel
     @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
     @State private var isShowingQRScanner: Bool = false
@@ -42,7 +41,7 @@ struct AuthenticatedScreenContainer: View {
                 VStack(spacing: 0) {
                     ScreenSelector()
                 }
-                ModalSelector()
+                viewModel.modalFactory.modal(for: navigation.actionResult.modalData)
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -107,6 +106,22 @@ struct AuthenticatedScreenContainer: View {
                 isShowingBottomAlert: $navigation.genericError.isPresented
             )
             .clearModalBackground()
+        }
+    }
+}
+
+extension AuthenticatedScreenContainer {
+    final class ViewModel: ObservableObject {
+        private let navigation: NavigationCoordinator
+        let modalFactory: ModalFactory
+
+        init(
+            navigation: NavigationCoordinator = NavigationCoordinator(),
+            modalFactory: ModalFactory = ModalFactory()
+        ) {
+            self.navigation = navigation
+            self.modalFactory = modalFactory
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }

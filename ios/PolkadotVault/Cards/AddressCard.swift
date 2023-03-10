@@ -11,7 +11,6 @@ import SwiftUI
 /// Accepts Address object
 /// Deprecated, used in: SufficientCryptoReady, SignSufficientCrypto
 struct AddressCard: View {
-    @EnvironmentObject private var data: SharedDataModel
     var card: MAddressCard
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28

@@ -137,6 +137,7 @@ extension SettingsView {
 
         func wipe() {
             data.onboard()
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }

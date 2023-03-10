@@ -18,7 +18,6 @@ struct TransactionPreview: View {
     @State private var isLogNoteVisible: Bool = false
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack {
@@ -260,10 +259,6 @@ extension TransactionPreview {
             self.navigation = navigation
         }
 
-        func use(data: SharedDataModel) {
-            self.data = data
-        }
-
         func onAppear() {
             updateImportDerivationsIfNeeeded()
         }
@@ -382,7 +377,6 @@ extension TransactionPreview {
                 signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
             ))
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
@@ -391,7 +385,6 @@ extension TransactionPreview {
                 signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
             ))
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
 //        .preferredColorScheme(.dark)
         }
     }

@@ -12,6 +12,7 @@ struct MainScreenContainer: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var passwordProtectionStatePublisher: PasswordProtectionStatePublisher
     @StateObject var data: SharedDataModel
+    @StateObject var viewModel: ViewModel
     @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
@@ -19,7 +20,7 @@ struct MainScreenContainer: View {
         case true:
             if data.onboardingDone {
                 if data.authenticated {
-                    AuthenticatedScreenContainer()
+                    AuthenticatedScreenContainer(viewModel: .init())
                         .environmentObject(data)
                         .environmentObject(onboarding)
                 } else {
@@ -34,4 +35,8 @@ struct MainScreenContainer: View {
             DevicePincodeRequired(viewModel: .init())
         }
     }
+}
+
+extension MainScreenContainer {
+    final class ViewModel: ObservableObject {}
 }

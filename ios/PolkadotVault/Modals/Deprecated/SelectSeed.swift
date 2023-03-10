@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SelectSeed: View {
     let content: MSeeds
-    @EnvironmentObject var data: SharedDataModel
+    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
         ZStack {
@@ -24,7 +24,15 @@ struct SelectSeed: View {
                             HStack {
                                 Button(
                                     action: {
-                                        data.sign(seedName: seedNameCard.seedName, comment: seedNameCard.seedName)
+                                        navigation.perform(
+                                            navigation:
+                                            .init(
+                                                action: .goForward,
+                                                details: seedNameCard.seedName,
+                                                seedPhrase: ServiceLocator.seedsMediator
+                                                    .getSeed(seedName: seedNameCard.seedName)
+                                            )
+                                        )
                                     },
                                     label: {
                                         SeedCardForManager(seedNameCard: seedNameCard)

@@ -23,12 +23,12 @@ final class ForgetKeySetAction {
     }
 
     func forgetKeySet(_ keySet: String) {
-        // This calls `navigation.perform(navigation: .init(action: .removeSeed), skipDebounce: true)` underneath,
-        // which will call Rust state machine and user will be taken to Logs tab to see new history card regarding key
-        // set
-        // removal
-        // I'll move it outside of `seedsMediator` when all removal actions are refactored
-        seedsMediator.removeSeed(seedName: keySet)
+        // Remove from keychain first
+        let isRemoved = seedsMediator.removeSeed(seedName: keySet)
+        guard isRemoved else { return }
+        // Now update UI state -> this moves user to Logs
+        navigation.performFake(navigation: .init(action: .removeSeed))
+
         // We need this call to Rust state machine to move user manually from Logs to Keys tab as per new design
         navigation.perform(navigation: .init(action: .navbarKeys))
         // After moving user to Keys, present snackbar from bottom as action confirmation

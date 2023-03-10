@@ -23,9 +23,9 @@ struct PolkadotVaultApp: App {
             } else {
                 MainScreenContainer(
                     data: SharedDataModel(
-                        navigation: navigation,
                         connectivityMediator: connectivityMediator
                     ),
+                    viewModel: .init(),
                     onboarding: OnboardingStateMachine()
                 )
                 .font(PrimaryFont.bodyL.font)
