@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.AutoSizeText
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -50,7 +50,7 @@ fun NetworkIcon(
 			.background(networkColors.background, CircleShape),
 			contentAlignment = Alignment.Center
 		) {
-			Text(
+			AutoSizeText(
 				text = chars,
 				color = networkColors.text,
 			)
