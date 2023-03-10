@@ -309,6 +309,31 @@
 	<string name="settings_confirmation_wipe_all_title">Wipe All Data?</string>
 	<string name="settings_confirmation_wipe_all_message_yes_label">I Understand, Remove all Data</string>
 	<string name="derivation_key_empty_path_placeholder">Derivation Path is Empty</string>
+	<string name="navigation_error_general_message">Please restart Polkadot Vault app and try again.\nInternal error description: %1$s</string>
+	<string name="general_error_link_clicked_on_airgap_device">No internet! Use different device.</string>
+	<string name="transaction_error_steps_1">Go to Portal where your network is stored</string>
+	<string name="transaction_error_steps_2_url_core_networks">metadata.parity.io</string>
+	<string name="transaction_error_steps_2_core_networks_description">" for Polkadot, Kusama, and Westend"</string>
+	<string name="transaction_error_steps_3_url_parachains">metadata.novasama.io</string>
+	<string name="transaction_error_steps_3_description_parachains">" for Parachains and Solochains"</string>
+	<string name="transaction_error_steps_4_notes_for_other_networks">ask network\'s developers directly if you haven’t found it in the portals</string>
+	<string name="transaction_error_steps_choose_network">Choose the network you need</string>
+	<string name="transaction_error_steps_scan_qr_code">Scan \"Chain spec\" QR to add the missing network</string>
+	<string name="transaction_error_generic_title">Something has gone wrong</string>
+	<string name="transaction_error_generic_subtitle">View the details below to find out more.</string>
+	<string name="transaction_error_metadata_already_added_title">This %1$s Network %2$s Metadata version has already been added</string>
+	<string name="transaction_error_metadata_already_added_subtitle"><![CDATA[Go to Settings > Networks. Tap on the network you need to check and modify the latest metadata.]]></string>
+	<string name="transaction_error_meta_unknown_network_title">Please add the Network</string>
+	<string name="transaction_error_meta_unknown_network_subtitle">You’re trying to update metadata on a network that hasn’t yet been added.</string>
+	<string name="transaction_error_network_already_added_title">%1$s Network has already been added</string>
+	<string name="transaction_error_network_already_added_subtitle"><![CDATA[Go to Settings > Networks to check all the added networks.]]></string>
+	<string name="transaction_error_no_metadata_for_network_title">Please download the %1$s Network Metadata</string>
+	<string name="transaction_error_no_metadata_for_network_subtitle">There’s no metadata downloaded for the Unique network on what you’re trying to sign the transaction</string>
+	<string name="transaction_error_outdated_metadata_title">Please update Your %1$s Network Metadata</string>
+	<string name="transaction_error_outdated_metadata_subtitle">Unique network\'s 3220 metadata is different to the 3219 data you\'re using in the app. Please update it to sign the transaction.</string>
+	<string name="transaction_error_unknown_network_title">Please add the Network you want to Transact in</string>
+	<string name="transaction_error_unknown_network_subtitle">You\'re trying to sign a transaction in a network which has not been added</string>
+
 
 </resources>
 

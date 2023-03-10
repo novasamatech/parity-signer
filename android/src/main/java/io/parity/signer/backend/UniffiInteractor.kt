@@ -1,8 +1,14 @@
 package io.parity.signer.backend
 
+import android.content.Context
+import io.parity.signer.R
+import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toNetworkModel
+import io.parity.signer.screens.scan.errors.TransactionError
+import io.parity.signer.screens.scan.errors.findErrorDisplayed
+import io.parity.signer.screens.scan.errors.toTransactionError
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +18,7 @@ import kotlinx.coroutines.flow.collectLatest
  * Wrapper for uniffi calls into rust. Made for centralized handling errors
  * and to have those functions scoped in specific namespace
  */
-class UniffiInteractor() {
+class UniffiInteractor(val appContext: Context) {
 
 	/**
 	 * Rust db is initializing only when main screen is shown
@@ -27,13 +33,45 @@ class UniffiInteractor() {
 		action: Action,
 		details: String = "",
 		seedPhrase: String = "",
-	): UniffiResult<ActionResult> = withContext(Dispatchers.IO) {
-		try {
-			UniffiResult.Success(backendAction(action, details, seedPhrase))
-		} catch (e: ErrorDisplayed) {
-			UniffiResult.Error(e)
+	): OperationResult<ActionResult, NavigationError> =
+		withContext(Dispatchers.IO) {
+			try {
+				OperationResult.Ok(backendAction(action, details, seedPhrase))
+			} catch (e: ErrorDisplayed) {
+				OperationResult.Err(
+					NavigationError(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
+			}
 		}
-	}
+
+	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
+		withContext(Dispatchers.IO) {
+			try {
+				OperationResult.Ok(
+					backendAction(
+						Action.TRANSACTION_FETCHED,
+						payload,
+						""
+					)
+				)
+			} catch (e: ErrorDisplayed) {
+				OperationResult.Err(e.toTransactionError())
+			} catch (e: Throwable) {
+				OperationResult.Err(
+					TransactionError.Generic(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
+			}
+		}
 
 	fun historyDeviceWasOnline() {
 		if (wasRustInitialized.value) {
@@ -132,6 +170,11 @@ sealed class UniffiResult<T> {
 	data class Error<Any>(val error: ErrorDisplayed) : UniffiResult<Any>()
 }
 
+sealed class OperationResult<out T, out E> {
+	data class Ok<out T>(val result: T) : OperationResult<T, Nothing>()
+	data class Err<out E>(val error: E) : OperationResult<Nothing, E>()
+}
+
 fun <T> UniffiResult<T>.mapError(): T? {
 	return when (this) {
 		is UniffiResult.Error -> {
@@ -144,3 +187,15 @@ fun <T> UniffiResult<T>.mapError(): T? {
 	}
 }
 
+@Deprecated("Handle error state")
+fun <T, V> OperationResult<T, V>.mapError(): T? {
+	return when (this) {
+		is OperationResult.Err -> {
+			submitErrorState("uniffi interaction exception $error")
+			null
+		}
+		is OperationResult.Ok -> {
+			result
+		}
+	}
+}

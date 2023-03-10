@@ -32,7 +32,7 @@ class RootExceptionHandler(
 	private val TAG = "SignerExceptionHandler"
 
 	override fun uncaughtException(t: Thread, e: Throwable) {
-		val rustStr = findErrorDisplayed(e)
+		val rustStr = findErrorDisplayedStr(e)
 		if (rustStr != null) {
 			Log.e(TAG, "Rust caused ErrorDisplay message was: ${rustStr.s}")
 			submitErrorState("rust error not handled, fix it!")
@@ -41,13 +41,13 @@ class RootExceptionHandler(
 		}
 	}
 
-	private tailrec fun findErrorDisplayed(exception: Throwable): ErrorDisplayed.Str? {
+	private tailrec fun findErrorDisplayedStr(exception: Throwable): ErrorDisplayed.Str? {
 		if (exception is ErrorDisplayed.Str) {
 			return exception
 		}
 		val cause = exception.cause
 		return if (cause != null) {
-			findErrorDisplayed(cause)
+			findErrorDisplayedStr(cause)
 		} else {
 			null
 		}
