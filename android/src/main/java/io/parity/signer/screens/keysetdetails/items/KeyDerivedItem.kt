@@ -1,4 +1,4 @@
-package io.parity.signer.components.items
+package io.parity.signer.screens.keysetdetails.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image

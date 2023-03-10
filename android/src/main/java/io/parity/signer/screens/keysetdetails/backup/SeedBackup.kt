@@ -15,7 +15,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.BottomSheetSubtitle
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.items.SlimKeyItem
+import io.parity.signer.screens.keysetdetails.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
