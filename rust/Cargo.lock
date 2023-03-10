@@ -2802,9 +2802,9 @@ checksum = "4339fc7a1021c9c1621d87f5e3505f2805c8c105420ba2f2a4df86814590c142"
 
 [[package]]
 name = "quircs"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "088cd18eb88277186050867dbfc7079eba83a753e4bc2b51c0feef6908679f4a"
+checksum = "66a4a2aa9fe525f10ce4ee99dbb78dc3faf31bd0667d50729a6c0eb89e17eca5"
 dependencies = [
  "num-derive",
  "num-traits",
