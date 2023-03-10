@@ -10,30 +10,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
-fun NetworkIcon(networkName: String) {
-	val context = LocalContext.current
-	val icon = context.getIconForNetwork(networkName)
+fun NetworkIcon(networkName: String, modifier: Modifier = Modifier) {
+	val icon = getIconForNetwork(networkName)
 	if (icon != null) {
 		Image(
 			painter = icon,
 			contentDescription = null,
-			modifier = Modifier
-				.size(36.dp)
-				.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
+			modifier = modifier,
 		)
 	} else {
 		//todo dmitry implement unknown icons
@@ -42,21 +32,21 @@ fun NetworkIcon(networkName: String) {
 
 @Composable
 @SuppressLint("DiscouragedApi")
-private fun Context.getIconForNetwork(networkName: String): Painter? {
-	val resource = resources.getIdentifier(/* name = */ "network_$networkName",
-		/* defType = */
-		"drawable",
-		/* defPackage = */
-		packageName
-	)
+private fun getIconForNetwork(networkName: String): Painter? {
+//	val resource = resources.getIdentifier(/* name = */ "network_$networkName",
+//		/* defType = */"drawable",/* defPackage = */packageName)
 
-	return if (resource > 0) {
-		painterResource(id = resource)
+	val id = when (networkName) {
+		"polkadot" -> R.drawable.network_polkadot
+		else -> -1
+	}
+
+	return if (id > 0) {
+		painterResource(id = id)
 	} else {
 		null
 	}
 }
-
 
 
 @Preview(
@@ -72,7 +62,6 @@ private fun PreviewNetworkIcon() {
 	SignerNewTheme {
 		Column {
 			NetworkIcon("polkadot")
-			SignerDivider()
 			NetworkIcon("some_unknown")
 		}
 	}

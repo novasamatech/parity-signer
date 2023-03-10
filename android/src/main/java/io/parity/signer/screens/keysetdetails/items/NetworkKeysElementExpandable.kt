@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -47,14 +48,17 @@ fun NetworkKeysElementExpandable(network: NetworkModel, keys: List<KeyModel>) {
 			modifier = Modifier.clickable { collapsed.value = !collapsed.value },
 			verticalAlignment = Alignment.CenterVertically
 		) {
-//			IdentIcon(
-//				identicon = network.logo, size = 36.dp, modifier = Modifier.padding(
-//					top = 16.dp,
-//					bottom = 16.dp,
-//					start = 16.dp,
-//					end = 12.dp
-//				)
-//			)
+
+			NetworkIcon(networkName = network.logo,
+				modifier = Modifier
+					.padding(
+						top = 16.dp,
+						bottom = 16.dp,
+						start = 16.dp,
+						end = 12.dp
+					)
+					.size(36.dp),
+			)
 			Text(
 				text = network.title,
 				color = MaterialTheme.colors.primary,
