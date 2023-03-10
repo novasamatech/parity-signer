@@ -22,7 +22,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.KeyModel
@@ -49,7 +48,7 @@ fun NetworkKeysElementExpandable(network: NetworkModel, keys: List<KeyModel>) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 
-			NetworkIcon(networkName = network.logo,
+			NetworkIcon(networkLogoName = network.logo,
 				modifier = Modifier
 					.padding(
 						top = 16.dp,

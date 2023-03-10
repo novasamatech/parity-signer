@@ -34,10 +34,10 @@ data class UnknownNetworkColorDrawable(val background: Color, val text: Color)
 
 
 @Composable
-fun UnknownNetworkColors.getUnknownNetworkColorsDrawable(): UnknownNetworkColorDrawable {
+fun UnknownNetworkColors.toUnknownNetworkColorsDrawable(): UnknownNetworkColorDrawable {
 	val accentForegroundText = Color.White
 	val accentForegroundTextAlt = Color.Black
-	when (this) {
+	return when (this) {
 		UnknownNetworkColors.pink300 ->  UnknownNetworkColorDrawable(background = MaterialTheme.colors.pink300, text = accentForegroundText)
 		UnknownNetworkColors.pink500 -> UnknownNetworkColorDrawable(background = MaterialTheme.colors.pink500, text = accentForegroundText)
 		UnknownNetworkColors.grey -> TODO() //todo dmitry finish
