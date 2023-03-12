@@ -93,6 +93,8 @@ private fun getIconForNetwork(networkName: String): Painter? {
 @Composable
 private fun getResourceIdForNetwork(networkName: String) =
 	when (networkName) {
+		//those svg's are not supported by android vector drawable - too big or links to text png inside.
+//		"mangata-parachain" -> R.drawable.network_mangata_parachain,
 		"Integritee_Polkadot" -> R.drawable.network_integritee_polkadot
 		"interlay-parachain" -> R.drawable.network_interlay_parachain
 		"ipci" -> R.drawable.network_ipci
@@ -112,7 +114,6 @@ private fun getResourceIdForNetwork(networkName: String) =
 		"litmus-parachain" -> R.drawable.network_litmus_parachain
 		"loom" -> R.drawable.network_loom
 		"mainnet" -> R.drawable.network_mainnet
-		"mangata-parachain" -> R.drawable.network_mangata_parachain
 		"mangata" -> R.drawable.network_mangata
 		"manta" -> R.drawable.network_manta
 		"mars" -> R.drawable.network_mars
