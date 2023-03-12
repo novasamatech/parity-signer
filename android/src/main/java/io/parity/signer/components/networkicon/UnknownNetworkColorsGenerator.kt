@@ -27,26 +27,26 @@ class UnknownNetworkColorsGenerator {
 }
 
 enum class UnknownNetworkColors {
-	pink300, pink500, grey, green, dark_green
+	PINK300, PINK500, GREY, GREEN_LIGHT, GREEN_DARK, BLUE, BLUE_DARK
 }
 
 data class UnknownNetworkColorDrawable(val background: Color, val text: Color)
 
 
+/**
+ * it's composable to be able to access theme colors.
+ */
 @Composable
 fun UnknownNetworkColors.toUnknownNetworkColorsDrawable(): UnknownNetworkColorDrawable {
-	val accentForegroundText = Color.White
-	val accentForegroundTextAlt = Color.Black
 	return when (this) {
-		UnknownNetworkColors.pink300 ->  UnknownNetworkColorDrawable(background = MaterialTheme.colors.pink300, text = accentForegroundText)
-		UnknownNetworkColors.pink500 -> UnknownNetworkColorDrawable(background = MaterialTheme.colors.pink500, text = accentForegroundText)
-		UnknownNetworkColors.grey -> TODO() //todo dmitry finish
-		UnknownNetworkColors.green -> TODO()
-		UnknownNetworkColors.dark_green -> TODO()
+		UnknownNetworkColors.PINK300 ->  UnknownNetworkColorDrawable(background = Color(0xFFF272B6), text = Color.White)
+		UnknownNetworkColors.PINK500 -> UnknownNetworkColorDrawable(background = Color(0xFFE6007A), text = Color.White)
+		UnknownNetworkColors.GREY -> UnknownNetworkColorDrawable(background = Color(0xFF9E9E9E), text = Color.Black)
+		UnknownNetworkColors.GREEN_LIGHT -> UnknownNetworkColorDrawable(background = Color(0xFF98DF48), text = Color.Black)
+		UnknownNetworkColors.GREEN_DARK -> UnknownNetworkColorDrawable(background = Color(0xFF3F5E1C), text = Color.White)
+		UnknownNetworkColors.BLUE -> UnknownNetworkColorDrawable(background = Color(0xFF656DFC), text = Color.Black)
+		UnknownNetworkColors.BLUE_DARK -> UnknownNetworkColorDrawable(background = Color(0xFF031F6D), text = Color.White)
 	}
 }
 
 
-
-
-//todo dmitry ios colors in ios/PolkadotVault/Components/Image/UnknownNetworkColorsGenerator.swift:44

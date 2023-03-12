@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -39,22 +40,32 @@ fun NetworkIcon(
 				.size(size),
 		)
 	} else {
-		//todo dmitry implement unknown icons
 		val networkColors = ServiceLocator.unknownNetworkColorsGenerator
 			.getBackground(networkLogoName)
 			.toUnknownNetworkColorsDrawable()
 		val chars = networkLogoName.take(2).uppercase()
+		UnknownNetworkIcon(networkColors, chars, size, modifier)
+	}
+}
 
-		Box(modifier = modifier
+@Composable
+private fun UnknownNetworkIcon(
+	networkColors: UnknownNetworkColorDrawable,
+	chars: String,
+	size: Dp,
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier
 			.size(size)
+			.padding(size/6)
 			.background(networkColors.background, CircleShape),
-			contentAlignment = Alignment.Center
-		) {
-			AutoSizeText(
-				text = chars,
-				color = networkColors.text,
-			)
-		}
+		contentAlignment = Alignment.Center
+	) {
+		AutoSizeText(
+			text = chars,
+			color = networkColors.text,
+		)
 	}
 }
 
@@ -86,15 +97,40 @@ private fun getIconForNetwork(networkName: String): Painter? {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewNetworkIcon() {
+private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
 		Column {
 			NetworkIcon("polkadot")
 			NetworkIcon("some_unknown")
 			NetworkIcon("polkadot", size = 16.dp)
-			NetworkIcon("some_unknown", size = 16.dp)
+			NetworkIcon("some_unknown2", size = 16.dp)
 			NetworkIcon("polkadot", size = 56.dp)
-			NetworkIcon("some_unknown", size = 56.dp)
+			NetworkIcon("some_unknown3", size = 56.dp)
+		}
+	}
+}
+
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewNetworkIconUnknownIcons() {
+	SignerNewTheme {
+		Column {
+			val colors = UnknownNetworkColors.values()
+			colors.forEach { color ->
+				UnknownNetworkIcon(
+					networkColors = color.toUnknownNetworkColorsDrawable(),
+					chars = "SO",
+					size = 24.dp
+				)
+			}
 		}
 	}
 }
