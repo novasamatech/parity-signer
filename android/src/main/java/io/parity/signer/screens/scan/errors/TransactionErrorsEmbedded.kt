@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.elements
+package io.parity.signer.screens.scan.errors
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-fun TransactionErrors(errors: String, modifier: Modifier = Modifier) {
+fun TransactionErrorEmbedded(errors: String, modifier: Modifier = Modifier) {
 	Surface(
 		modifier = modifier.fillMaxWidth(1f),
 		border = BorderStroke(1.dp, MaterialTheme.colors.fill12),
@@ -34,7 +34,6 @@ fun TransactionErrors(errors: String, modifier: Modifier = Modifier) {
 	}
 }
 
-
 @Preview(
 	name = "light theme",
 	uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -48,7 +47,7 @@ fun TransactionErrors(errors: String, modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewTransactionErrors() {
 	SignerNewTheme {
-		TransactionErrors(
+		TransactionErrorEmbedded(
 			"Bad input data. Metadata for westend9330 is already in the database.",
 		)
 	}
