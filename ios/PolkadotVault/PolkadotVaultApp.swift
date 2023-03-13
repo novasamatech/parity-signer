@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct PolkadotVaultApp: App {
-    @StateObject var connectivityMediator = ConnectivityMediator()
+    @StateObject var connectivityMediator = ServiceLocator.connectivityMediator
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
@@ -22,9 +22,7 @@ struct PolkadotVaultApp: App {
                 JailbreakDetectedView()
             } else {
                 MainScreenContainer(
-                    data: SharedDataModel(
-                        connectivityMediator: connectivityMediator
-                    ),
+                    data: SharedDataModel(),
                     viewModel: .init(),
                     onboarding: OnboardingStateMachine()
                 )

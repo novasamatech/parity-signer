@@ -49,9 +49,14 @@ extension UnlockDeviceView {
         private weak var data: SharedDataModel!
         private weak var navigation: NavigationCoordinator!
         private let seedsMediator: SeedsMediating
+        private let warningStateMediator: WarningStateMediator
 
-        init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
+        init(
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+        ) {
             self.seedsMediator = seedsMediator
+            self.warningStateMediator = warningStateMediator
         }
 
         func use(data: SharedDataModel) {
@@ -65,7 +70,7 @@ extension UnlockDeviceView {
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
             navigation.perform(navigation: .init(action: .start))
-            data.updateWarnings()
+            warningStateMediator.updateWarnings()
         }
     }
 }

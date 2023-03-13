@@ -12,7 +12,6 @@ struct KeyDetailsPublicKeyView: View {
     private let actionModel: KeyDetailsPublicKeyActionModel
     private let forgetKeyActionHandler: ForgetSingleKeyAction
     private let exportPrivateKeyService: ExportPrivateKeyService
-    private let resetWarningAction: ResetConnectivtyWarningsAction
 
     // This view is recreated few times because of Rust navigation, for now we need to store modal view model in static
     // property because it can't be created earlier as it would trigger passcode request on the device
@@ -36,14 +35,12 @@ struct KeyDetailsPublicKeyView: View {
         forgetKeyActionHandler: ForgetSingleKeyAction,
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
-        exportPrivateKeyService: ExportPrivateKeyService,
-        resetWarningAction: ResetConnectivtyWarningsAction
+        exportPrivateKeyService: ExportPrivateKeyService
     ) {
         self.forgetKeyActionHandler = forgetKeyActionHandler
         self.viewModel = viewModel
         self.actionModel = actionModel
         self.exportPrivateKeyService = exportPrivateKeyService
-        self.resetWarningAction = resetWarningAction
     }
 
     var body: some View {
@@ -171,7 +168,7 @@ struct KeyDetailsPublicKeyView: View {
             ErrorBottomModal(
                 viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
                     continueAction: {
-                        resetWarningAction.resetConnectivityWarnings()
+                        ServiceLocator.warningStateMediator.resetConnectivityWarnings()
                         shouldPresentExportKeysWarningModal.toggle()
                     }()
                 ),
@@ -184,7 +181,7 @@ struct KeyDetailsPublicKeyView: View {
     func checkForActionsPresentation() {
         if shouldPresentExportKeysWarningModal {
             shouldPresentExportKeysWarningModal.toggle()
-            if data.alert {
+            if ServiceLocator.warningStateMediator.alert {
                 isPresentingConnectivityAlert.toggle()
             } else {
                 KeyDetailsPublicKeyView.exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey()
@@ -205,29 +202,25 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
                 forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
-                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(false))
+                exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
         }
         .previewLayout(.sizeThatFits)

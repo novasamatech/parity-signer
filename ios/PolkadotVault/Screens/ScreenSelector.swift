@@ -19,8 +19,7 @@ struct ScreenSelector: View {
                 viewModel: .init(
                     keyName: keyName
                 ),
-                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation)
             )
         case .settings:
             SettingsView(viewModel: .init())
@@ -36,8 +35,7 @@ struct ScreenSelector: View {
                     forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                     viewModel: KeyDetailsPublicKeyViewModel(value),
                     actionModel: KeyDetailsPublicKeyActionModel(value),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
                 )
             } else {
                 EmptyView()

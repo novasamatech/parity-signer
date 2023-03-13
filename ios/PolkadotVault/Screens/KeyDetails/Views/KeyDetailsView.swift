@@ -15,7 +15,6 @@ struct KeyDetailsView: View {
     @EnvironmentObject private var appState: AppState
 
     let forgetKeyActionHandler: ForgetKeySetAction
-    let resetWarningAction: ResetConnectivtyWarningsAction
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -68,12 +67,7 @@ struct KeyDetailsView: View {
                 selectKeysOverlay
             } else {
                 VStack(spacing: 0) {
-                    ConnectivityAlertOverlay(
-                        viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                            alert: $data
-                                .alert
-                        ))
-                    )
+                    ConnectivityAlertOverlay(viewModel: .init())
                 }
             }
         }
@@ -84,7 +78,7 @@ struct KeyDetailsView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
-            onDismiss: { viewModel.onActionSheetDismissal(data.alert) }
+            onDismiss: viewModel.onActionSheetDismissal
         ) {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
@@ -122,14 +116,11 @@ struct KeyDetailsView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: { viewModel.onActionSheetDismissal(data.alert) }
+            onDismiss: viewModel.onActionSheetDismissal
         ) {
             ErrorBottomModal(
                 viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: {
-                        resetWarningAction.resetConnectivityWarnings()
-                        viewModel.shouldPresentBackupModal.toggle()
-                    }()
+                    continueAction: viewModel.onConnectivityAlertTap()
                 ),
                 isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
             )

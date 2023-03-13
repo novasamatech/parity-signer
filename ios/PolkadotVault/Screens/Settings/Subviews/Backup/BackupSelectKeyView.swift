@@ -101,17 +101,17 @@ extension BackupSelectKeyView {
         private weak var connectivityMediator: ConnectivityMediator!
         private weak var navigation: NavigationCoordinator!
         private weak var data: SharedDataModel!
-        private let resetWarningAction: ResetConnectivtyWarningsAction
         let seedsMediator: SeedsMediating
+        private let warningStateMediator: WarningStateMediator
 
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            resetWarningAction: ResetConnectivtyWarningsAction
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
             _isPresented = isPresented
             self.seedsMediator = seedsMediator
-            self.resetWarningAction = resetWarningAction
+            self.warningStateMediator = warningStateMediator
         }
 
         func use(connectivityMediator: ConnectivityMediator) {
@@ -123,7 +123,7 @@ extension BackupSelectKeyView {
         }
 
         func onSeedNameTap(_ seedName: String) {
-            if connectivityMediator.isConnectivityOn || data.alert {
+            if connectivityMediator.isConnectivityOn || warningStateMediator.alert {
                 isPresentingConnectivityAlert = true
                 awaitingSeedName = seedName
             } else {
@@ -136,7 +136,7 @@ extension BackupSelectKeyView {
         }
 
         func onConnectivityWarningTap() {
-            resetWarningAction.resetConnectivityWarnings()
+            warningStateMediator.resetConnectivityWarnings()
             isPresentingConnectivityAlert = false
             guard let awaitingSeedName else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -162,7 +162,7 @@ extension BackupSelectKeyView {
     struct BackupSelectKeyView_Previews: PreviewProvider {
         static var previews: some View {
             BackupSelectKeyView(
-                viewModel: .init(isPresented: .constant(true), resetWarningAction: .init(alert: .constant(false)))
+                viewModel: .init(isPresented: .constant(true))
             )
         }
     }

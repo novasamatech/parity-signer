@@ -42,12 +42,7 @@ struct SettingsView: View {
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            ConnectivityAlertOverlay(
-                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                    alert: $data
-                        .alert
-                ))
-            )
+            ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.use(navigation: navigation)
@@ -69,10 +64,11 @@ struct SettingsView: View {
             PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingBackup) {
-            BackupSelectKeyView(viewModel: .init(
-                isPresented: $viewModel.isPresentingBackup,
-                resetWarningAction: .init(alert: $data.alert)
-            ))
+            BackupSelectKeyView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingBackup
+                )
+            )
         }
     }
 }

@@ -16,6 +16,7 @@ extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetAllNetworksService
+        private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
         let exportPrivateKeyService: PrivateKeyQRCodeService
         let keyName: String
@@ -54,12 +55,14 @@ extension KeyDetailsView {
             keyName: String,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
-            networksService: GetAllNetworksService = GetAllNetworksService()
+            networksService: GetAllNetworksService = GetAllNetworksService(),
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
             self.keyName = keyName
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
+            self.warningStateMediator = warningStateMediator
             updateRenderables()
             subscribeToNetworkChanges()
         }
@@ -162,12 +165,18 @@ extension KeyDetailsView.ViewModel {
             navigation.perform(navigation: deriveKey.actionModel.tapAction)
         }
     }
+
+    func onConnectivityAlertTap() {
+        warningStateMediator.resetConnectivityWarnings()
+        shouldPresentBackupModal.toggle()
+    }
 }
 
 // MARK: - Modals
 
 extension KeyDetailsView.ViewModel {
-    func onActionSheetDismissal(_ isAlertVisible: Bool) {
+    func onActionSheetDismissal() {
+        let isAlertVisible = warningStateMediator.alert
         DispatchQueue.main.async {
             if self.shouldPresentRemoveConfirmationModal {
                 self.shouldPresentRemoveConfirmationModal.toggle()

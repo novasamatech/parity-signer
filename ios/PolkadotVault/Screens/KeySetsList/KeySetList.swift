@@ -71,12 +71,7 @@ struct KeySetList: View {
                 // Add Key Set
                 if !isExportKeysSelected {
                     VStack(spacing: 0) {
-                        ConnectivityAlertOverlay(
-                            viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                                alert: $data
-                                    .alert
-                            ))
-                        )
+                        ConnectivityAlertOverlay(viewModel: .init())
                         PrimaryButton(
                             action: {
                                 // We need to call this conditionally, as if there are no seeds,

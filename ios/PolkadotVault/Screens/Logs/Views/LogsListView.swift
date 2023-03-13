@@ -32,12 +32,7 @@ struct LogsListView: View {
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            ConnectivityAlertOverlay(
-                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                    alert: $data
-                        .alert
-                ))
-            )
+            ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.use(navigation: navigation)
