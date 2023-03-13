@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -94,9 +93,11 @@ private fun getIconForNetwork(networkName: String): Painter? {
 @Composable
 private fun getResourceIdForNetwork(networkName: String) =
 	when (networkName) {
-		//those svg's are not supported by android vector drawable - too big or links to text png inside.
-		//network-compose
-//		"mangata-parachain" -> R.drawable.network_mangata_parachain,
+		//those svg's are not supported by android vector drawable -
+		// too big or links to text png inside. Added as png
+		"composable" -> R.drawable.network_composable
+		"mangata-parachain" -> R.drawable.network_mangata_parachain
+		//svgs below
 		"Integritee_Polkadot" -> R.drawable.network_integritee_polkadot
 		"interlay-parachain" -> R.drawable.network_interlay_parachain
 		"ipci" -> R.drawable.network_ipci
