@@ -60,8 +60,8 @@ fun KeySetDetailsScreenView(
 			if (model.keysAndNetwork.isNotEmpty()) {
 				Column(
 					modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .verticalScroll(rememberScrollState()),
+						.padding(horizontal = 8.dp)
+						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(8.dp),
 				) {
 					//seed
@@ -76,7 +76,9 @@ fun KeySetDetailsScreenView(
 					for (networkAndKeys in models.entries) {
 						NetworkKeysElementExpandable(
 							network = networkAndKeys.key.toNetworkModel(),
-							keys = networkAndKeys.value.map { it.key }) { key, network ->
+							keys = networkAndKeys.value
+								.map { it.key }
+								.sortedBy { it.path }) { key, network ->
 							val selectKeyDetails =
 								"${key.addressKey}\n${network.key}"
 							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
@@ -100,9 +102,9 @@ fun KeySetDetailsScreenView(
 
 			ExposedIcon(
 				networkState = networkState, navigator = navigator,
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 24.dp)
+				Modifier
+					.align(Alignment.BottomEnd)
+					.padding(end = 16.dp, bottom = 24.dp)
 			)
 		}
 		BottomBar2(navigator, BottomBar2State.KEYS)
@@ -118,19 +120,19 @@ fun KeySetDetailsHeader(
 ) {
 	Row(
 		modifier = Modifier
-            .fillMaxWidth(1f)
-            .defaultMinSize(minHeight = 56.dp)
+			.fillMaxWidth(1f)
+			.defaultMinSize(minHeight = 56.dp)
 	) {
 		Image(
 			imageVector = Icons.Filled.ChevronLeft,
 			contentDescription = stringResource(R.string.description_back_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .clickable(onClick = onBack)
-                .padding(8.dp)
-                .size(24.dp)
-                .align(Alignment.CenterVertically)
+				.padding(horizontal = 8.dp)
+				.clickable(onClick = onBack)
+				.padding(8.dp)
+				.size(24.dp)
+				.align(Alignment.CenterVertically)
 		)
 		//center
 		Spacer(modifier = Modifier.weight(1f))
@@ -140,21 +142,21 @@ fun KeySetDetailsHeader(
 			contentDescription = stringResource(R.string.key_sets_details_screem_create_derived_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-                .clickable(onClick = onAddKey)
-                .padding(8.dp)
-                .size(24.dp)
-                .align(Alignment.CenterVertically)
+				.clickable(onClick = onAddKey)
+				.padding(8.dp)
+				.size(24.dp)
+				.align(Alignment.CenterVertically)
 		)
 		Image(
 			imageVector = Icons.Filled.MoreHoriz,
 			contentDescription = stringResource(R.string.description_menu_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-                .padding(end = 8.dp)
-                .clickable(onClick = onMenu)
-                .padding(8.dp)
-                .size(24.dp)
-                .align(Alignment.CenterVertically)
+				.padding(end = 8.dp)
+				.clickable(onClick = onMenu)
+				.padding(8.dp)
+				.size(24.dp)
+				.align(Alignment.CenterVertically)
 		)
 	}
 }
@@ -198,8 +200,8 @@ fun SeedKeyViewItem(
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
-                        .padding(end = 16.dp)
-                        .size(28.dp)
+						.padding(end = 16.dp)
+						.size(28.dp)
 				)
 			}
 		}
@@ -210,19 +212,19 @@ fun SeedKeyViewItem(
 private fun KeySetDetailsEmptyList(onAdd: Callback) {
 	Column(
 		modifier = Modifier
-            .fillMaxHeight(1f)
-            .padding(horizontal = 16.dp),
+			.fillMaxHeight(1f)
+			.padding(horizontal = 16.dp),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Spacer(modifier = Modifier.weight(0.5f))
 
 		Column(
 			modifier = Modifier
-                .background(
-                    color = MaterialTheme.colors.pink300.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.bigCornerRadius)),
-                )
-                .padding(24.dp)
+				.background(
+					color = MaterialTheme.colors.pink300.copy(alpha = 0.12f),
+					shape = RoundedCornerShape(dimensionResource(id = R.dimen.bigCornerRadius)),
+				)
+				.padding(24.dp)
 		)
 		{
 			Text(
