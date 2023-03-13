@@ -10,7 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.*
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -37,14 +40,14 @@ fun IdentIconWithNetwork(
 		modifier = modifier
 			.size(size)
 			.clip(CircleShape)
-			.clip(SubIconCutShape)
+			.clip(SubIconCutShape(1f/2))
 	)
 }
 
 /**
  * This is a shape with cuts out a rectangle in the center
  */
-object SubIconCutShape : Shape {
+class SubIconCutShape(val cutoutProportion: Float) : Shape {
 	override fun createOutline(
 		size: Size,
 		layoutDirection: LayoutDirection,
@@ -53,24 +56,20 @@ object SubIconCutShape : Shape {
 		val outlinePath = Path()
 		outlinePath.addRect(Rect(Offset(0f, 0f), size))
 
-		val cutoutHeight = size.height * 0.3f
-		val cutoutWidth = size.width * 0.75f
-		val center = Offset(size.width / 2f, size.height / 2f)
+		val cutoutRadius =
+			kotlin.math.min(size.height, size.width) * cutoutProportion
 
 		val cutoutPath = Path()
 		cutoutPath.addRoundRect(
 			RoundRect(
 				Rect(
-					topLeft = center - Offset(
-						cutoutWidth / 2f,
-						cutoutHeight / 2f
+					topLeft = Offset(
+						size.width - cutoutRadius,
+						size.height - cutoutRadius
 					),
-					bottomRight = center + Offset(
-						cutoutWidth / 2f,
-						cutoutHeight / 2f
-					)
+					bottomRight = Offset(size.width, size.height)
 				),
-				cornerRadius = CornerRadius(16f, 16f)
+				cornerRadius = CornerRadius(cutoutRadius, cutoutRadius)
 			)
 		)
 
