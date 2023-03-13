@@ -2,6 +2,7 @@ package io.parity.signer.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
@@ -34,14 +36,18 @@ fun IdentIconWithNetwork(
 	size: Dp = 28.dp,
 	modifier: Modifier = Modifier,
 ) {
-	Image(
-		identicon.toBytes().intoImageBitmap(),
-		stringResource(R.string.description_identicon),
-		modifier = modifier
-			.size(size)
-			.clip(CircleShape)
-			.clip(SubIconCutShape(1f/2))
-	)
+	Box(contentAlignment = Alignment.BottomEnd) {
+		val cutoutProportion = 1f / 2
+		Image(
+			identicon.toBytes().intoImageBitmap(),
+			stringResource(R.string.description_identicon),
+			modifier = modifier
+				.size(size)
+				.clip(CircleShape)
+				.clip(SubIconCutShape(cutoutProportion))
+		)
+		NetworkIcon(networkLogoName = network.title, size = size * cutoutProportion - 2.dp)
+	}
 }
 
 /**
