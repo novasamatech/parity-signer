@@ -3,13 +3,16 @@ package io.parity.signer.domain
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
+import io.parity.signer.backend.OperationResult
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.components.toImageContent
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.uniffi.*
+import kotlinx.coroutines.runBlocking
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
@@ -20,7 +23,6 @@ fun SharedViewModel.navigate(
 ) {
 	navigator.navigate(button, details, seedPhrase)
 }
-
 
 interface Navigator {
 	/**
@@ -44,6 +46,8 @@ interface Navigator {
  */
 class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		if (singleton.localNavAction.value != LocalNavAction.None) {
 			//if state machine navigation triggered - remove platform layers on top
@@ -51,7 +55,14 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 		}
 
 		try {
-			val navigationAction = backendAction(action, details, seedPhrase)
+			val navigationAction = runBlocking {
+				val result = uniffiInteractor.navigate(action, details, seedPhrase)
+				when (result) {
+					is OperationResult.Err -> singleton._actionResult.value?.copy(alertData = AlertData.ErrorData(result.error.message))
+					is OperationResult.Ok -> result.result
+				}
+			} ?: return
+
 			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
 			if (navigationAction.screenData is ScreenData.KeyDetails) {
 				singleton.lastOpenedKeyDetails =
@@ -162,8 +173,12 @@ class EmptyNavigator : Navigator {
 
 class FakeNavigator : Navigator {
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
+		try {
 		backendAction(action, details, seedPhrase)
-		//do nothing
+		} catch (e: ErrorDisplayed){
+			Log.e("fake navigation error", e.message ?: e.toString())
+		}
+		//do nothing with result
 	}
 
 	override fun navigate(action: LocalNavRequest) {
@@ -187,3 +202,5 @@ sealed class LocalNavAction {
 sealed class LocalNavRequest {
 	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
 }
+
+data class NavigationError(val message: String)

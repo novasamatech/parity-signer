@@ -25,7 +25,7 @@ import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.getData
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.screens.scan.elements.TransactionErrors
+import io.parity.signer.screens.scan.errors.TransactionErrorEmbedded
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
@@ -286,7 +286,7 @@ private fun AddLogElement() {
 internal fun TransactionIssues(transaction: MTransaction) {
 	transaction.transactionIssues().let {
 		if (it.isNotEmpty()) {
-			TransactionErrors(
+			TransactionErrorEmbedded(
 				errors = it,
 				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 			)
