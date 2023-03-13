@@ -5,14 +5,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
-import io.parity.signer.backend.UniffiResult
+import io.parity.signer.backend.OperationResult
+import io.parity.signer.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
-import io.parity.signer.screens.scan.elements.PresentableErrorModel
+import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.toBottomSheetModel
 import io.parity.signer.screens.scan.importderivations.*
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
@@ -45,7 +47,7 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val presentableError: MutableStateFlow<PresentableErrorModel?> =
+	val transactionError: MutableStateFlow<TransactionErrorModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
@@ -58,129 +60,138 @@ class ScanViewModel : ViewModel() {
 		}
 		transactionIsInProgress.value = true
 		val navigateResponse =
-			uniffiInteractor.navigate(Action.TRANSACTION_FETCHED, payload)
-		val screenData =
-			(navigateResponse as? UniffiResult.Success)?.result?.screenData
-		val transactions: List<MTransaction> =
-			(screenData as? ScreenData.Transaction)?.f
-				?: run {
-					Log.e(
-						TAG, "Error in getting transaction from qr payload, " +
-							"screenData is $screenData, navigation resp is $navigateResponse"
+			uniffiInteractor.performTransaction(payload)
+
+		when (navigateResponse) {
+			is OperationResult.Err -> {
+				transactionError.value = navigateResponse.error.toBottomSheetModel(context)
+			}
+			is OperationResult.Ok -> {
+				val screenData = navigateResponse.result.screenData
+				val transactions: List<MTransaction> =
+					(screenData as? ScreenData.Transaction)?.f ?: run {
+						Log.e(
+							TAG, "Error in getting transaction from qr payload, " +
+								"screenData is $screenData, navigation resp is $navigateResponse"
+						)
+						clearState()
+						return
+					}
+
+				// Handle transactions with just error payload
+				if (transactions.all { it.isDisplayingErrorOnly() }) {
+					transactionError.value = TransactionErrorModel(
+						context = context,
+						details = transactions.joinToString("\n") { it.transactionIssues() }
 					)
+					FakeNavigator().navigate(Action.GO_BACK) //fake call
 					clearState()
 					return
 				}
 
-		// Handle transactions with just error payload
-		if (transactions.all { it.isDisplayingErrorOnly() }) {
-			presentableError.value = PresentableErrorModel(
-				details = transactions.joinToString("\n") { it.transactionIssues() }
-			)
-			uniffiInteractor.navigate(Action.GO_BACK) //fake call
-			clearState()
-			return
-		}
+				when (transactions.firstOrNull()?.ttype) {
+					TransactionType.SIGN -> {
+						val seedNames = transactions
+							.filter { it.ttype == TransactionType.SIGN }
+							.mapNotNull { it.authorInfo?.address?.seedName }
+						val actionResult = signTransaction("", seedNames)
 
-		when (transactions.firstOrNull()?.ttype) {
-			TransactionType.SIGN -> {
-				val seedNames = transactions
-					.filter { it.ttype == TransactionType.SIGN }
-					.mapNotNull { it.authorInfo?.address?.seedName }
-				val actionResult = signTransaction("", seedNames)
-
-				//password protected key, show password
-				when (val modalData = actionResult?.modalData) {
-					is ModalData.EnterPassword -> {
-						passwordModel.value =
-							modalData.f.toEnterPasswordModel(withShowError = false)
-					}
-					is ModalData.SignatureReady -> {
-						signature.value = modalData.f
-					}
-					//ignore the rest modals
-					else -> {
-						//actually we won't ask for signature in this case ^^^
+						//password protected key, show password
+						when (val modalData = actionResult?.modalData) {
+							is ModalData.EnterPassword -> {
+								passwordModel.value =
+									modalData.f.toEnterPasswordModel(withShowError = false)
+							}
+							is ModalData.SignatureReady -> {
+								signature.value = modalData.f
+							}
+							//ignore the rest modals
+							else -> {
+								//actually we won't ask for signature in this case ^^^
 //						we can get result.navResult.alertData with error from Rust but it's not in new design
-					}
-				}
-				this.transactions.value = TransactionsState(transactions)
-			}
-			TransactionType.IMPORT_DERIVATIONS -> {
-				val fakeNavigator = FakeNavigator()
-				// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
-				fakeNavigator.navigate(Action.GO_BACK)
-				when (transactions.dominantImportError()) {
-					DerivedKeyError.BadFormat -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_bad_format_title),
-							message = context.getString(R.string.scan_screen_error_bad_format_message),
-						)
-						clearState()
-						return
-					}
-					DerivedKeyError.KeySetMissing -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_missing_key_set_title),
-							message = context.getString(R.string.scan_screen_error_missing_key_set_message),
-						)
-						clearState()
-						return
-					}
-					DerivedKeyError.NetworkMissing -> {
-						presentableError.value = PresentableErrorModel(
-							title = context.getString(R.string.scan_screen_error_missing_network_title),
-							message = context.getString(R.string.scan_screen_error_missing_network_message),
-						)
-						clearState()
-						return
-					}
-					null -> {
-						//proceed, all good, now check if we need to update for derivations keys
-						if (transactions.hasImportableKeys()) {
-							val importDerivedKeys = transactions.flatMap { it.allImportDerivedKeys() }
-							if (importDerivedKeys.isEmpty()) {
-								this.transactions.value = TransactionsState(transactions)
 							}
+						}
+						this.transactions.value = TransactionsState(transactions)
+					}
+					TransactionType.IMPORT_DERIVATIONS -> {
+						val fakeNavigator = FakeNavigator()
+						// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
+						fakeNavigator.navigate(Action.GO_BACK)
+						when (transactions.dominantImportError()) {
+							DerivedKeyError.BadFormat -> {
+								transactionError.value = TransactionErrorModel(
+									title = context.getString(R.string.scan_screen_error_bad_format_title),
+									subtitle = context.getString(R.string.scan_screen_error_bad_format_message),
+								)
+								clearState()
+								return
+							}
+							DerivedKeyError.KeySetMissing -> {
+								transactionError.value = TransactionErrorModel(
+									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
+									subtitle = context.getString(R.string.scan_screen_error_missing_key_set_message),
+								)
+								clearState()
+								return
+							}
+							DerivedKeyError.NetworkMissing -> {
+								transactionError.value = TransactionErrorModel(
+									title = context.getString(R.string.scan_screen_error_missing_network_title),
+									subtitle = context.getString(R.string.scan_screen_error_missing_network_message),
+								)
+								clearState()
+								return
+							}
+							null -> {
+								//proceed, all good, now check if we need to update for derivations keys
+								if (transactions.hasImportableKeys()) {
+									val importDerivedKeys =
+										transactions.flatMap { it.allImportDerivedKeys() }
+									if (importDerivedKeys.isEmpty()) {
+										this.transactions.value = TransactionsState(transactions)
+									}
 
-							when (val result =
-								importKeysService.updateWithSeed(importDerivedKeys)) {
-								is RepoResult.Success -> {
-									val updatedKeys = result.result
-									val newTransactionsState =
-										updateTransactionsWithImportDerivations(
-											transactions = transactions,
-											updatedKeys = updatedKeys
-										)
-									this.transactions.value = TransactionsState(newTransactionsState)
-								}
-								is RepoResult.Failure -> {
-									Toast.makeText(
-										/* context = */ context,
-										/* text = */
-										context.getString(R.string.import_derivations_failure_update_toast),
-										/* duration = */ Toast.LENGTH_LONG
-									).show()
-									clearState()
+									when (val result =
+										importKeysService.updateWithSeed(importDerivedKeys)) {
+										is RepoResult.Success -> {
+											val updatedKeys = result.result
+											val newTransactionsState =
+												updateTransactionsWithImportDerivations(
+													transactions = transactions,
+													updatedKeys = updatedKeys
+												)
+											this.transactions.value =
+												TransactionsState(newTransactionsState)
+										}
+										is RepoResult.Failure -> {
+											Toast.makeText(
+												/* context = */ context,
+												/* text = */
+												context.getString(R.string.import_derivations_failure_update_toast),
+												/* duration = */ Toast.LENGTH_LONG
+											).show()
+											clearState()
+										}
+									}
+								} else {
+									transactionError.value = TransactionErrorModel(
+										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
+										subtitle = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
+									)
+									return
 								}
 							}
-						} else {
-							presentableError.value = PresentableErrorModel(
-								title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
-								message = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
-							)
-							return
 						}
 					}
+					else -> {
+						// Transaction with error OR
+						// Transaction that does not require signing (i.e. adding network or metadata)
+						// will set them below for any case and show anyway
+						this.transactions.value = TransactionsState(transactions)
+					}
+					//handle alert error rust/navigator/src/navstate.rs:396
 				}
 			}
-			else -> {
-				// Transaction with error OR
-				// Transaction that does not require signing (i.e. adding network or metadata)
-				// will set them below for any case and show anyway
-				this.transactions.value = TransactionsState(transactions)
-			}
-			//handle alert error rust/navigator/src/navstate.rs:396
 		}
 	}
 
@@ -259,7 +270,7 @@ class ScanViewModel : ViewModel() {
 			transactions.value != null
 			|| signature.value != null
 			|| passwordModel.value != null
-			|| presentableError.value != null
+			|| transactionError.value != null
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
 			|| bananaSplitPassword.value != null
@@ -276,7 +287,7 @@ class ScanViewModel : ViewModel() {
 		signature.value = null
 		passwordModel.value = null
 		bananaSplitPassword.value = null
-		presentableError.value = null
+		transactionError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false
 	}
@@ -290,11 +301,13 @@ class ScanViewModel : ViewModel() {
 				Log.w(TAG, "signature transactions failure ${phrases.error}")
 				null
 			}
-			is RepoResult.Success -> backendAction(
-				Action.GO_FORWARD,
-				comment,
-				phrases.result
-			)
+			is RepoResult.Success -> {
+				uniffiInteractor.navigate(
+					Action.GO_FORWARD,
+					comment,
+					phrases.result
+				).mapError()
+			}
 		}
 	}
 
@@ -302,7 +315,7 @@ class ScanViewModel : ViewModel() {
 		val navigateResponse =
 			uniffiInteractor.navigate(Action.GO_FORWARD, password)
 		val actionResult =
-			(navigateResponse as? UniffiResult.Success)?.result
+			(navigateResponse as? OperationResult.Ok)?.result
 				?: run {
 					Log.e(
 						TAG, "Error in entering password for a key, " +
@@ -349,9 +362,10 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun resetRustModalToNewScan() {
+		val fakeNavigator = FakeNavigator()
 		// Dismissing password modal goes to `Log` screen
-		backendAction(Action.GO_BACK, "", "")
+		fakeNavigator.backAction()
 		// Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
-		backendAction(Action.NAVBAR_SCAN, "", "")
+		fakeNavigator.navigate(Action.NAVBAR_SCAN, "", "")
 	}
 }

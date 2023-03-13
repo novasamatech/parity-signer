@@ -28,7 +28,7 @@ object ServiceLocator {
 	@Volatile private var _activityScope: ActivityScope? = null
 	val activityScope: ActivityScope? get() = _activityScope
 
-	val uniffiInteractor by lazy { UniffiInteractor() }
+	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
 
 	val seedStorage: SeedStorage = SeedStorage()
 	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
