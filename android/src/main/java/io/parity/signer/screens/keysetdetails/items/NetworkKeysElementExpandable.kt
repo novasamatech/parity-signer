@@ -35,24 +35,29 @@ import io.parity.signer.ui.theme.textDisabled
 
 
 @Composable
-fun NetworkKeysElementExpandable(network: NetworkModel, keys: List<KeyModel>) {
+fun NetworkKeysElementExpandable(
+	network: NetworkModel,
+	keys: List<KeyModel>,
+	onKeyClick: (KeyModel, NetworkModel) -> Unit,
+) {
 	val collapsed = remember { mutableStateOf(true) }
-	NetworkKeysElementExpandablePrivate(network, keys, collapsed)
+	NetworkKeysElementExpandablePrivate(network, keys, collapsed, onKeyClick)
 }
 
 @Composable
 private fun NetworkKeysElementExpandablePrivate(
 	network: NetworkModel,
 	keys: List<KeyModel>,
-	collapsed: MutableState<Boolean>
+	collapsed: MutableState<Boolean>,
+	onKeyClick: (KeyModel, NetworkModel) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
-            .background(
-                MaterialTheme.colors.fill6,
-                RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-            )
-            .animateContentSize()
+			.background(
+				MaterialTheme.colors.fill6,
+				RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+			)
+			.animateContentSize()
 	) {
 		//network row
 		Row(
@@ -63,13 +68,13 @@ private fun NetworkKeysElementExpandablePrivate(
 			NetworkIcon(
 				networkLogoName = network.logo,
 				modifier = Modifier
-                    .padding(
-                        top = 16.dp,
-                        bottom = 16.dp,
-                        start = 16.dp,
-                        end = 12.dp
-                    )
-                    .size(36.dp),
+					.padding(
+						top = 16.dp,
+						bottom = 16.dp,
+						start = 16.dp,
+						end = 12.dp
+					)
+					.size(36.dp),
 			)
 			Text(
 				text = network.title,
@@ -79,13 +84,13 @@ private fun NetworkKeysElementExpandablePrivate(
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				modifier = Modifier
-                    .padding(
-                        top = 20.dp,
-                        bottom = 20.dp,
-                        end = 16.dp,
-                        start = 12.dp
-                    )
-                    .background(MaterialTheme.colors.fill6, CircleShape),
+					.padding(
+						top = 20.dp,
+						bottom = 20.dp,
+						end = 16.dp,
+						start = 12.dp
+					)
+					.background(MaterialTheme.colors.fill6, CircleShape),
 				contentAlignment = Alignment.Center,
 			) {
 				Image(
@@ -103,9 +108,7 @@ private fun NetworkKeysElementExpandablePrivate(
 		if (!collapsed.value) {
 			keys.forEach { key ->
 				SignerDivider()
-				KeyDerivedItem(model = key) {
-//					todo dmitry finish
-				}
+				KeyDerivedItem(model = key, onClick = { onKeyClick(key, network) })
 			}
 		}
 	}
@@ -127,7 +130,7 @@ private fun PreviewNetworkKeysElementExpandable() {
 		NetworkKeysElementExpandable(
 			NetworkModel.createStub(),
 			listOf(KeyModel.createStub())
-		)
+		) { _, _ -> }
 	}
 }
 
@@ -151,7 +154,7 @@ private fun PreviewNetworkKeysElementExpanded() {
 			NetworkModel.createStub(),
 			listOf(KeyModel.createStub()),
 			state,
-		)
+		) { _, _ -> }
 	}
 }
 

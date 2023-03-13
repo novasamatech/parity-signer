@@ -26,6 +26,10 @@ data class KeySetDetailsModel(
 					network = NetworkInfoModel.createStub()
 				),
 				KeyAndNetworkModel(
+					key = KeyModel.createStub(),
+					network = NetworkInfoModel.createStub(networkName = "Some")
+				),
+				KeyAndNetworkModel(
 					key = KeyModel.createStub()
 						.copy(path = "//polkadot//path3"),
 					network = NetworkInfoModel.createStub()
@@ -203,9 +207,9 @@ data class NetworkInfoModel(
 	val networkSpecsKey: String
 ) {
 	companion object {
-		fun createStub(): NetworkInfoModel = NetworkInfoModel(
-			networkTitle = "network title",
-			networkLogo = "network logo",
+		fun createStub(networkName: String? = null): NetworkInfoModel = NetworkInfoModel(
+			networkTitle = networkName ?: "Westend",
+			networkLogo = networkName?.lowercase() ?: "westend",
 			networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
 		)
 	}
@@ -237,6 +241,12 @@ data class NetworkModel(
 		)
 	}
 }
+
+fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
+	key = networkSpecsKey,
+	logo = networkLogo,
+	title = networkTitle,
+)
 
 fun Network.toNetworkModel(): NetworkModel = NetworkModel(
 	key = key,
