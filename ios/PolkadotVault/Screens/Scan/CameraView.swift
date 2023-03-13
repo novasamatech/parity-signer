@@ -35,7 +35,6 @@ struct CameraView: View {
                 }
                 .onChange(of: model.captured) { newValue in
                     progressViewModel.current = newValue
-                    UIApplication.shared.isIdleTimerDisabled = newValue > 0
                 }
                 .onChange(of: model.requestPassword) { newValue in
                     guard newValue else { return }
@@ -122,7 +121,6 @@ struct CameraView: View {
             viewModel.use(navigation: navigation)
         }
         .onDisappear {
-            UIApplication.shared.isIdleTimerDisabled = false
             model.shutdown()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
