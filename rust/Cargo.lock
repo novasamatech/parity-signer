@@ -4031,16 +4031,12 @@ version = "19.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e44cd1552b99c46e5c633e0369870fe0d99a5a0c574eebc9bc4882fbbd9b4f53"
 dependencies = [
- "impl-serde",
  "parity-scale-codec",
- "parity-wasm",
  "scale-info",
- "serde",
  "sp-core-hashing-proc-macro",
  "sp-runtime",
  "sp-std 7.0.0",
  "sp-version-proc-macro",
- "thiserror",
 ]
 
 [[package]]
