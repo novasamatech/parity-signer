@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,7 +36,15 @@ import io.parity.signer.ui.theme.textDisabled
 @Composable
 fun NetworkKeysElementExpandable(network: NetworkModel, keys: List<KeyModel>) {
 	val collapsed = remember { mutableStateOf(true) }
+	NetworkKeysElementExpandablePrivate(network, keys, collapsed)
+}
 
+@Composable
+private fun NetworkKeysElementExpandablePrivate(
+	network: NetworkModel,
+	keys: List<KeyModel>,
+	collapsed: MutableState<Boolean>
+) {
 	Column(
 		modifier = Modifier.background(
 			MaterialTheme.colors.fill6,
@@ -48,7 +57,8 @@ fun NetworkKeysElementExpandable(network: NetworkModel, keys: List<KeyModel>) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 
-			NetworkIcon(networkLogoName = network.logo,
+			NetworkIcon(
+				networkLogoName = network.logo,
 				modifier = Modifier
 					.padding(
 						top = 16.dp,
@@ -112,3 +122,29 @@ private fun PreviewNetworkKeysElementExpandable() {
 		)
 	}
 }
+
+@Preview(
+	name = "light",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewNetworkKeysElementExpanded() {
+	SignerNewTheme {
+		val state = remember {
+			mutableStateOf(false)
+		}
+		NetworkKeysElementExpandablePrivate(
+			NetworkModel.createStub(),
+			listOf(KeyModel.createStub()),
+			state,
+		)
+	}
+}
+
+
