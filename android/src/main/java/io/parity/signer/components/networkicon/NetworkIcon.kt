@@ -59,7 +59,6 @@ private fun UnknownNetworkIcon(
 	Box(
 		modifier = modifier
 			.size(size)
-			.padding(size / 10)
 			.background(networkColors.background, CircleShape),
 		contentAlignment = Alignment.Center
 	) {
@@ -185,7 +184,9 @@ private fun getResourceIdForNetwork(networkName: String) =
 @Composable
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
-		Column {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+		) {
 			NetworkIcon("polkadot")
 			NetworkIcon("some_unknown")
 			NetworkIcon("polkadot", size = 18.dp)
