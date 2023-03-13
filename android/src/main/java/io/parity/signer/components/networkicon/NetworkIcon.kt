@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,7 @@ fun NetworkIcon(
 		val networkColors = ServiceLocator.unknownNetworkColorsGenerator
 			.getBackground(networkLogoName)
 			.toUnknownNetworkColorsDrawable()
-		val chars = networkLogoName.take(2).uppercase()
+		val chars = networkLogoName.take(1).uppercase()
 		UnknownNetworkIcon(networkColors, chars, size, modifier)
 	}
 }
@@ -58,12 +59,13 @@ private fun UnknownNetworkIcon(
 	Box(
 		modifier = modifier
 			.size(size)
-			.padding(size / 6)
+			.padding(size / 10)
 			.background(networkColors.background, CircleShape),
 		contentAlignment = Alignment.Center
 	) {
 		AutoSizeText(
 			text = chars,
+			fontWeight = FontWeight.Bold,
 			color = networkColors.text,
 		)
 	}
@@ -94,6 +96,7 @@ private fun getIconForNetwork(networkName: String): Painter? {
 private fun getResourceIdForNetwork(networkName: String) =
 	when (networkName) {
 		//those svg's are not supported by android vector drawable - too big or links to text png inside.
+		//network-compose
 //		"mangata-parachain" -> R.drawable.network_mangata_parachain,
 		"Integritee_Polkadot" -> R.drawable.network_integritee_polkadot
 		"interlay-parachain" -> R.drawable.network_interlay_parachain
@@ -185,8 +188,8 @@ private fun PreviewNetworkIconSizes() {
 		Column {
 			NetworkIcon("polkadot")
 			NetworkIcon("some_unknown")
-			NetworkIcon("polkadot", size = 16.dp)
-			NetworkIcon("some_unknown2", size = 16.dp)
+			NetworkIcon("polkadot", size = 18.dp)
+			NetworkIcon("some_unknown2", size = 18.dp)
 			NetworkIcon("polkadot", size = 56.dp)
 			NetworkIcon("some_unknown3", size = 56.dp)
 		}
@@ -210,7 +213,7 @@ private fun PreviewNetworkIconUnknownIcons() {
 			colors.forEach { color ->
 				UnknownNetworkIcon(
 					networkColors = color.toUnknownNetworkColorsDrawable(),
-					chars = "SO",
+					chars = "W",
 					size = 24.dp
 				)
 			}
