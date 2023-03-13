@@ -106,9 +106,11 @@ private fun NetworkKeysElementExpandablePrivate(
 			}
 		}
 		if (!collapsed.value) {
+			var first = true
 			keys.forEach { key ->
-				SignerDivider()
+				SignerDivider(modifier = if (first) Modifier else Modifier.padding(start = 48.dp))
 				KeyDerivedItem(model = key, onClick = { onKeyClick(key, network) })
+				first = false
 			}
 		}
 	}
@@ -152,7 +154,7 @@ private fun PreviewNetworkKeysElementExpanded() {
 		}
 		NetworkKeysElementExpandablePrivate(
 			NetworkModel.createStub(),
-			listOf(KeyModel.createStub()),
+			listOf(KeyModel.createStub(), KeyModel.createStub()),
 			state,
 		) { _, _ -> }
 	}
