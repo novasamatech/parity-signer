@@ -34,6 +34,7 @@ import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MAddressCard
+import java.util.*
 
 
 @Composable
@@ -186,7 +187,9 @@ data class KeyCardModel(
 
 		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle,
+				network = networkTitle.replaceFirstChar {
+					if (it.isLowerCase()) it.titlecase() else it.toString()
+				},
 				cardBase = KeyCardModelBase.fromKeyModel(model)
 			)
 
@@ -199,7 +202,9 @@ data class KeyCardModel(
 			networkTitle: String
 		): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle,
+				network = networkTitle.replaceFirstChar {
+					if (it.isLowerCase()) it.titlecase() else it.toString()
+				},
 				cardBase = KeyCardModelBase.fromAddress(address, base58)
 			)
 

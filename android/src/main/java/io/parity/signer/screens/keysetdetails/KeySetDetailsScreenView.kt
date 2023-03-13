@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -22,19 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.items.KeyDerivedItem
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.*
+import io.parity.signer.screens.keysetdetails.items.NetworkKeysElementExpandable
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -62,31 +59,28 @@ fun KeySetDetailsScreenView(
 		Box(modifier = Modifier.weight(1f)) {
 			if (model.keysAndNetwork.isNotEmpty()) {
 				Column(
-					modifier = Modifier.verticalScroll(rememberScrollState())
+					modifier = Modifier
+						.padding(horizontal = 8.dp)
+						.verticalScroll(rememberScrollState()),
+					verticalArrangement = Arrangement.spacedBy(8.dp),
 				) {
 					//seed
 					model.root?.let {
 						SeedKeyDetails(
 							model = it,
-							Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+							Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
 						)
 					}
-					//filter row
-					Row(
-						modifier = Modifier.padding(horizontal = 24.dp),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-							color = MaterialTheme.colors.textTertiary,
-							style = SignerTypeface.BodyM,
-							modifier = Modifier.weight(1f),
-						)
-					}
-					for (key in model.keysAndNetwork) {
-						KeyDerivedItem(model = key.key) {
+
+					val models = model.keysAndNetwork.groupBy { it.network }
+					for (networkAndKeys in models.entries) {
+						NetworkKeysElementExpandable(
+							network = networkAndKeys.key.toNetworkModel(),
+							keys = networkAndKeys.value
+								.map { it.key }
+								.sortedBy { it.path }) { key, network ->
 							val selectKeyDetails =
-								"${key.key.addressKey}\n${key.network.networkSpecsKey}"
+								"${key.addressKey}\n${network.key}"
 							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 						}
 					}
@@ -232,23 +226,23 @@ private fun KeySetDetailsEmptyList(onAdd: Callback) {
 				)
 				.padding(24.dp)
 		)
-				{
-					Text(
-						text = stringResource(R.string.key_set_details_no_keys_title),
-						color = MaterialTheme.colors.primary,
-						style = SignerTypeface.TitleM,
-						textAlign = TextAlign.Center,
-					)
+		{
+			Text(
+				text = stringResource(R.string.key_set_details_no_keys_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleM,
+				textAlign = TextAlign.Center,
+			)
 
-					SecondaryButtonWide(
-						label = stringResource(R.string.key_sets_details_screem_create_derived_button),
-						withBackground = true,
-						modifier = Modifier
-							.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
-						onClicked = onAdd
-					)
-				}
-				Spacer(modifier = Modifier.weight(0.5f))
+			SecondaryButtonWide(
+				label = stringResource(R.string.key_sets_details_screem_create_derived_button),
+				withBackground = true,
+				modifier = Modifier
+					.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
+				onClicked = onAdd
+			)
+		}
+		Spacer(modifier = Modifier.weight(0.5f))
 	}
 }
 

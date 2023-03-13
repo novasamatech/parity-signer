@@ -23,15 +23,16 @@ import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.domain.DisableScreenshots
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.intoImageBitmap
+import io.parity.signer.components.sharedcomponents.KeyCardModelBase
+import io.parity.signer.components.toImageContent
+import io.parity.signer.components.toNetworkCardModel
+import io.parity.signer.domain.*
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.appliedStroke
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.MKeyDetails
 import io.parity.signer.uniffi.encodeToQr
 import kotlinx.coroutines.runBlocking
 
@@ -114,6 +115,25 @@ class PrivateKeyExportModel(
 			network = NetworkCardModel("Polkadot", "NetworkLogo")
 		)
 	}
+}
+
+fun MKeyDetails.toPrivateKeyExportModel(): PrivateKeyExportModel {
+	return PrivateKeyExportModel(
+		qrData = qr.getData(),
+		keyCard = KeyCardModel(
+			network = networkInfo.networkTitle.replaceFirstChar {
+				if (it.isLowerCase()) it.titlecase() else it.toString()
+			},
+			cardBase = KeyCardModelBase(
+				identIcon = address.identicon.toImageContent(),
+				seedName = address.seedName,
+				hasPassword = address.hasPwd,
+				path = address.path,
+				base58 = base58,
+			)
+		),
+		networkInfo.toNetworkCardModel()
+	)
 }
 
 @Preview(

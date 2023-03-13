@@ -1,4 +1,4 @@
-package io.parity.signer.components.items
+package io.parity.signer.screens.keysetdetails.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -53,22 +53,24 @@ fun KeyDerivedItem(
 				)
 			)
 			Column(Modifier.weight(1f)) {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					Text(
-						text = model.path,
-						color = MaterialTheme.colors.textTertiary,
-						style = SignerTypeface.CaptionM,
-					)
-					if (model.hasPwd) {
-						Icon(
-							painterResource(id = R.drawable.ic_lock_16),
-							contentDescription = stringResource(R.string.key_lock_item),
-							tint = MaterialTheme.colors.textTertiary,
-							modifier = Modifier.padding(start = 8.dp)
+				if (model.path.isNotEmpty() || model.hasPwd) {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						Text(
+							text = model.path,
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.CaptionM,
 						)
+						if (model.hasPwd) {
+							Icon(
+								painterResource(id = R.drawable.ic_lock_16),
+								contentDescription = stringResource(R.string.key_lock_item),
+								tint = MaterialTheme.colors.textTertiary,
+								modifier = Modifier.padding(start = 8.dp)
+							)
+						}
 					}
+					Spacer(modifier = Modifier.padding(top = 4.dp))
 				}
-				Spacer(modifier = Modifier.padding(top = 4.dp))
 				Text(
 					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 					color = MaterialTheme.colors.primary,
