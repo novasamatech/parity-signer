@@ -68,13 +68,6 @@ fun KeySetDetailsMultiselectScreen(
 					style = SignerTypeface.BodyM,
 					modifier = Modifier.weight(1f),
 				)
-				Icon(
-					painter = painterResource(id = R.drawable.ic_tune_28),
-					contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-					modifier = Modifier
-						.size(28.dp),
-					tint = MaterialTheme.colors.textDisabled,
-				)
 			}
 			for (key in model.keysAndNetwork) {
 				KeyDerivedItemMultiselect(
