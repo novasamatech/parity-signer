@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysetdetails.items
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,10 +47,12 @@ private fun NetworkKeysElementExpandablePrivate(
 	collapsed: MutableState<Boolean>
 ) {
 	Column(
-		modifier = Modifier.background(
-			MaterialTheme.colors.fill6,
-			RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-		)
+		modifier = Modifier
+            .background(
+                MaterialTheme.colors.fill6,
+                RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+            )
+            .animateContentSize()
 	) {
 		//network row
 		Row(
@@ -60,13 +63,13 @@ private fun NetworkKeysElementExpandablePrivate(
 			NetworkIcon(
 				networkLogoName = network.logo,
 				modifier = Modifier
-					.padding(
-						top = 16.dp,
-						bottom = 16.dp,
-						start = 16.dp,
-						end = 12.dp
-					)
-					.size(36.dp),
+                    .padding(
+                        top = 16.dp,
+                        bottom = 16.dp,
+                        start = 16.dp,
+                        end = 12.dp
+                    )
+                    .size(36.dp),
 			)
 			Text(
 				text = network.title,
@@ -76,8 +79,13 @@ private fun NetworkKeysElementExpandablePrivate(
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				modifier = Modifier
-					.padding(top = 20.dp, bottom = 20.dp, end = 16.dp, start = 12.dp)
-					.background(MaterialTheme.colors.fill6, CircleShape),
+                    .padding(
+                        top = 20.dp,
+                        bottom = 20.dp,
+                        end = 16.dp,
+                        start = 12.dp
+                    )
+                    .background(MaterialTheme.colors.fill6, CircleShape),
 				contentAlignment = Alignment.Center,
 			) {
 				Image(
