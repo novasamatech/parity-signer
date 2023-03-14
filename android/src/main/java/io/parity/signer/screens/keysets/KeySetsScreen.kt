@@ -185,7 +185,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticonPng,
-			listOf("westend", "some"),
+			listOf("kusama", "some"),
 			3.toUInt()
 		),
 	)
