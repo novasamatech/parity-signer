@@ -13,8 +13,6 @@ struct KeyDetailsView: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var appState: AppState
 
-    let forgetKeyActionHandler: ForgetKeySetAction
-
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -90,7 +88,7 @@ struct KeyDetailsView: View {
         .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
-                mainAction: forgetKeyActionHandler.forgetKeySet(viewModel.removeSeed),
+                mainAction: viewModel.onRemoveKeySetConfirmationTap(),
                 // We need to fake right button action here or Rust machine will break
                 // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
                 // so we need to inform Rust we actually hid it
@@ -253,114 +251,3 @@ private struct KeySummaryView: View {
         .padding(.horizontal, Spacing.large)
     }
 }
-
-// #if DEBUG
-//    struct KeyDetailsView_Previews: PreviewProvider {
-//        static var previews: some View {
-//            VStack {
-//                KeyDetailsView(
-//                    dataModel: .init(
-//                        keySummary: KeySummaryViewModel(
-//                            keyName: "Main Polkadot",
-//                            base58: "15Gsc678...0HA04H0A"
-//                        ),
-//                        derivedKeys: [
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "// polkadot",
-//                                    hasPassword: false,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "// polkadot",
-//                                    hasPassword: false,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "//astar//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-//                                    hasPassword: true,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "//verylongpathsolongitrequirestwolinesoftextormaybeevenmore",
-//                                    hasPassword: false,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "// acala",
-//                                    hasPassword: true,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "// moonbeam",
-//                                    hasPassword: true,
-//                                    base58: "15Gsc678654FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            ),
-//                            DerivedKeyRowModel(
-//                                viewModel: DerivedKeyRowViewModel(
-//                                    identicon: PreviewData.exampleIdenticon,
-//                                    path: "// kilt",
-//                                    hasPassword: true,
-//                                    base58: "15Gsc6786546423FDSG0HA04H0A"
-//                                ),
-//                                actionModel: DerivedKeyActionModel(
-//                                    tapAction: .init(action: .rightButtonAction)
-//                                )
-//                            )
-//                        ]
-//                    ),
-//                    viewModel: .init(
-//                        keysData: PreviewData.mKeyNew,
-//                        exportPrivateKeyService: PrivateKeyQRCodeService(
-//                            navigation: NavigationCoordinator(),
-//                            keys: PreviewData.mkeys
-//                        )
-//                    ),
-//                    forgetKeyActionHandler: .init(navigation: NavigationCoordinator()),
-//                    resetWarningAction: ResetConnectivtyWarningsAction(alert: Binding<Bool>.constant(true))
-//                )
-//            }
-//            .preferredColorScheme(.dark)
-//            .previewLayout(.sizeThatFits)
-//            .environmentObject(NavigationCoordinator())
-//            .environmentObject(ConnectivityMediator())
-//            .environmentObject(SharedDataModel())
-//            .environmentObject(AppState())
-//        }
-//    }
-// #endif

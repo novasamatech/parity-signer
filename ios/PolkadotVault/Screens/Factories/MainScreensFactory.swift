@@ -1,23 +1,22 @@
 //
-//  ScreenSelector.swift
-//  Polkadot Vault
+//  MainScreensFactory.swift
+//  PolkadotVault
 //
-//  Created by Alexander Slesarev on 26.11.2021.
+//  Created by Krzysztof Rodak on 14/03/2023.
 //
 
 import SwiftUI
 
-struct ScreenSelector: View {
-    @EnvironmentObject var navigation: NavigationCoordinator
-
-    var body: some View {
-        switch navigation.actionResult.screenData {
+final class MainScreensFactory {
+    @ViewBuilder
+    // swiftlint:disable function_body_length
+    func screen(for screenData: ScreenData) -> some View {
+        switch screenData {
         case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
                     keyName: keyName
-                ),
-                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation)
+                )
             )
         case .settings:
             SettingsView(viewModel: .init())
@@ -30,7 +29,6 @@ struct ScreenSelector: View {
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                     viewModel: KeyDetailsPublicKeyViewModel(value),
                     actionModel: KeyDetailsPublicKeyActionModel(value),
                     exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
@@ -57,22 +55,12 @@ struct ScreenSelector: View {
                 content: value
             )
         // Screens handled outside of Rust navigation
-        case .selectSeedForBackup:
-            EmptyView()
-        case .documents:
-            EmptyView()
-        case .scan:
-            EmptyView()
-        case .transaction:
-            EmptyView()
-        case .keyDetailsMulti:
+        case .documents,
+             .selectSeedForBackup,
+             .scan,
+             .transaction,
+             .keyDetailsMulti:
             EmptyView()
         }
     }
 }
-
-// struct ScreenSelector_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ScreenSelector()
-//    }
-// }

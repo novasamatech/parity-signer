@@ -18,7 +18,9 @@ extension KeyDetailsView {
         private let networksService: GetAllNetworksService
         private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
-        let exportPrivateKeyService: PrivateKeyQRCodeService
+        private let forgetKeyActionHandler: ForgetKeySetAction
+        private let exportPrivateKeyService: PrivateKeyQRCodeService
+
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
@@ -49,19 +51,21 @@ extension KeyDetailsView {
         @Published var backupModal: BackupModalViewModel?
 
         /// Name of seed to be removed with `Remove Seed` action
-        var removeSeed: String = ""
+        private var removeSeed: String = ""
 
         init(
             keyName: String,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetAllNetworksService = GetAllNetworksService(),
+            forgetKeyActionHandler: ForgetKeySetAction = ForgetKeySetAction(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
             self.keyName = keyName
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
+            self.forgetKeyActionHandler = forgetKeyActionHandler
             self.warningStateMediator = warningStateMediator
             updateRenderables()
             subscribeToNetworkChanges()
@@ -79,6 +83,7 @@ extension KeyDetailsView {
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+            forgetKeyActionHandler.use(navigation: navigation)
         }
 
         func subscribeToNetworkChanges() {
@@ -124,6 +129,10 @@ extension KeyDetailsView {
         func onBackTap() {
             appState.userData.keysData = nil
             navigation.perform(navigation: .init(action: .goBack))
+        }
+
+        func onRemoveKeySetConfirmationTap() {
+            forgetKeyActionHandler.forgetKeySet(removeSeed)
         }
     }
 }

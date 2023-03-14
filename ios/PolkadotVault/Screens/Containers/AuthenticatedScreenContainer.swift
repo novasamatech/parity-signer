@@ -39,7 +39,7 @@ struct AuthenticatedScreenContainer: View {
             }
             ZStack {
                 VStack(spacing: 0) {
-                    ScreenSelector()
+                    viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)
                 }
                 viewModel.modalFactory.modal(for: navigation.actionResult.modalData)
             }
@@ -114,13 +114,16 @@ extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
         private let navigation: NavigationCoordinator
         let modalFactory: ModalFactory
+        let mainScreenFactory: MainScreensFactory
 
         init(
             navigation: NavigationCoordinator = NavigationCoordinator(),
-            modalFactory: ModalFactory = ModalFactory()
+            modalFactory: ModalFactory = ModalFactory(),
+            mainScreenFactory: MainScreensFactory = MainScreensFactory()
         ) {
             self.navigation = navigation
             self.modalFactory = modalFactory
+            self.mainScreenFactory = mainScreenFactory
             navigation.perform(navigation: .init(action: .start))
         }
     }

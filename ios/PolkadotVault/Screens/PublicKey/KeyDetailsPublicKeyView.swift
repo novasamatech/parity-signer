@@ -31,7 +31,7 @@ struct KeyDetailsPublicKeyView: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     init(
-        forgetKeyActionHandler: ForgetSingleKeyAction,
+        forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
         viewModel: KeyDetailsPublicKeyViewModel,
         actionModel: KeyDetailsPublicKeyActionModel,
         exportPrivateKeyService: ExportPrivateKeyService
@@ -99,6 +99,7 @@ struct KeyDetailsPublicKeyView: View {
             )
             .background(Asset.backgroundPrimary.swiftUIColor)
             .onAppear {
+                forgetKeyActionHandler.use(navigation: navigation)
                 navigation.performFake(navigation: .init(action: .rightButtonAction))
             }
         }
@@ -198,25 +199,25 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: ForgetSingleKeyAction(),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: ForgetSingleKeyAction(),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: ForgetSingleKeyAction(),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isRootKey: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
             )
             KeyDetailsPublicKeyView(
-                forgetKeyActionHandler: ForgetSingleKeyAction(navigation: NavigationCoordinator()),
+                forgetKeyActionHandler: ForgetSingleKeyAction(),
                 viewModel: PreviewData.exampleKeyDetailsPublicKey(isKeyExposed: false, isRootKey: false),
                 actionModel: KeyDetailsPublicKeyActionModel(removeSeed: ""),
                 exportPrivateKeyService: ExportPrivateKeyService(keyDetails: PreviewData.mkeyDetails)
