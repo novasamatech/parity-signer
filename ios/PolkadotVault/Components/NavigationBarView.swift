@@ -68,32 +68,34 @@ struct NavigationBarView: View {
 
     var body: some View {
         HStack(alignment: .center) {
-            HStack(alignment: .center, spacing: Spacing.medium) {
-                ForEach(viewModel.leftButtons, id: \.id) {
-                    buttonView($0)
-                }
-                Spacer()
-                VStack {
-                    if let title = viewModel.title {
-                        Text(title)
-                            .font(PrimaryFont.titleS.font)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+            ZStack {
+                HStack(alignment: .center, spacing: Spacing.extraSmall) {
+                    ForEach(viewModel.leftButtons, id: \.id) {
+                        buttonView($0)
                     }
-                    if let subtitle = viewModel.subtitle {
-                        Text(subtitle)
-                            .font(PrimaryFont.captionM.font)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                    }
-                }
-
-                Spacer()
-                HStack(alignment: .center, spacing: Spacing.medium) {
+                    Spacer()
                     ForEach(viewModel.rightButtons, id: \.id) {
                         buttonView($0)
                     }
                 }
+                .padding([.leading, .trailing], Spacing.extraExtraSmall)
+                HStack(alignment: .center, spacing: 0) {
+                    Spacer()
+                    VStack {
+                        if let title = viewModel.title {
+                            Text(title)
+                                .font(PrimaryFont.titleS.font)
+                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                        }
+                        if let subtitle = viewModel.subtitle {
+                            Text(subtitle)
+                                .font(PrimaryFont.captionM.font)
+                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        }
+                    }
+                    Spacer()
+                }
             }
-            .padding([.leading, .trailing], Spacing.extraExtraSmall)
             .frame(maxWidth: .infinity)
             .frame(height: Heights.navigationBarHeight)
         }
@@ -181,7 +183,7 @@ struct NavigationBarView: View {
                         title: "Public Key",
                         subtitle: "Derived Key",
                         leftButtons: [.init(type: .xmark)],
-                        rightButtons: [.init(type: .more)]
+                        rightButtons: [.init(type: .plus), .init(type: .more)]
                     )
                 )
                 NavigationBarView(

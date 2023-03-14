@@ -10,7 +10,6 @@ import SwiftUI
 struct TransactionDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {

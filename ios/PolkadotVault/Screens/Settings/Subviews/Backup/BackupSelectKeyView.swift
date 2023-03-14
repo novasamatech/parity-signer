@@ -10,7 +10,6 @@ import SwiftUI
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     var body: some View {
@@ -65,7 +64,6 @@ struct BackupSelectKeyView: View {
         }
         .onAppear {
             viewModel.use(connectivityMediator: connectivityMediator)
-            viewModel.use(data: data)
         }
     }
 
@@ -100,30 +98,25 @@ extension BackupSelectKeyView {
         private var awaitingSeedName: String?
         private weak var connectivityMediator: ConnectivityMediator!
         private weak var navigation: NavigationCoordinator!
-        private weak var data: SharedDataModel!
-        private let resetWarningAction: ResetConnectivtyWarningsAction
         let seedsMediator: SeedsMediating
+        private let warningStateMediator: WarningStateMediator
 
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            resetWarningAction: ResetConnectivtyWarningsAction
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
             _isPresented = isPresented
             self.seedsMediator = seedsMediator
-            self.resetWarningAction = resetWarningAction
+            self.warningStateMediator = warningStateMediator
         }
 
         func use(connectivityMediator: ConnectivityMediator) {
             self.connectivityMediator = connectivityMediator
         }
 
-        func use(data: SharedDataModel) {
-            self.data = data
-        }
-
         func onSeedNameTap(_ seedName: String) {
-            if connectivityMediator.isConnectivityOn || data.alert {
+            if connectivityMediator.isConnectivityOn || warningStateMediator.alert {
                 isPresentingConnectivityAlert = true
                 awaitingSeedName = seedName
             } else {
@@ -136,7 +129,7 @@ extension BackupSelectKeyView {
         }
 
         func onConnectivityWarningTap() {
-            resetWarningAction.resetConnectivityWarnings()
+            warningStateMediator.resetConnectivityWarnings()
             isPresentingConnectivityAlert = false
             guard let awaitingSeedName else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -162,7 +155,7 @@ extension BackupSelectKeyView {
     struct BackupSelectKeyView_Previews: PreviewProvider {
         static var previews: some View {
             BackupSelectKeyView(
-                viewModel: .init(isPresented: .constant(true), resetWarningAction: .init(alert: .constant(false)))
+                viewModel: .init(isPresented: .constant(true))
             )
         }
     }

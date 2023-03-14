@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ConnectivityAlertOverlay: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .trailing) {
@@ -19,17 +17,13 @@ struct ConnectivityAlertOverlay: View {
                     Spacer()
                     ConnectivityAlertButton(
                         action: viewModel.onTapAction,
-                        isConnectivityOn: connectivityMediator.isConnectivityOn
+                        isConnectivityOn: viewModel.connectivityMediator.isConnectivityOn
                     )
                     .padding(Spacing.medium)
                 }
             } else {
                 EmptyView()
             }
-        }
-        .onAppear {
-            viewModel.use(data: data)
-            viewModel.use(connectivityMediator: connectivityMediator)
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert
@@ -47,28 +41,29 @@ extension ConnectivityAlertOverlay {
     final class ViewModel: ObservableObject {
         @Published var isPresentingConnectivityAlert = false
         @Published var isConnectivityAlertOn = false
-        private weak var connectivityMediator: ConnectivityMediator!
-        private weak var data: SharedDataModel!
-        private let resetWarningAction: ResetConnectivtyWarningsAction
+        let connectivityMediator: ConnectivityMediator
+        private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
 
-        init(resetWarningAction: ResetConnectivtyWarningsAction) {
-            self.resetWarningAction = resetWarningAction
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
-            data.$alert.sink {
-                self.isConnectivityAlertOn = $0
-            }.store(in: cancelBag)
-        }
-
-        func use(connectivityMediator: ConnectivityMediator) {
+        init(
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            connectivityMediator: ConnectivityMediator = ServiceLocator.connectivityMediator
+        ) {
+            self.warningStateMediator = warningStateMediator
             self.connectivityMediator = connectivityMediator
+            listenToConnectivityUpdates()
+        }
+
+        func listenToConnectivityUpdates() {
+            warningStateMediator.$alert.sink {
+                self.isConnectivityAlertOn = $0
+            }
+            .store(in: cancelBag)
             connectivityMediator.$isConnectivityOn.sink {
                 guard $0 else { return }
                 self.isConnectivityAlertOn = $0
-            }.store(in: cancelBag)
+            }
+            .store(in: cancelBag)
         }
 
         func errorModalViewModel() -> ErrorBottomModalViewModel {
@@ -83,7 +78,7 @@ extension ConnectivityAlertOverlay {
         }
 
         func onTapContinueAction() {
-            resetWarningAction.resetConnectivityWarnings()
+            warningStateMediator.resetConnectivityWarnings()
         }
     }
 }

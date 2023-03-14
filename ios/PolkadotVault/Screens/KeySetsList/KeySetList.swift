@@ -9,7 +9,6 @@ import SwiftUI
 
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @Binding var dataModel: MSeeds
@@ -71,12 +70,7 @@ struct KeySetList: View {
                 // Add Key Set
                 if !isExportKeysSelected {
                     VStack(spacing: 0) {
-                        ConnectivityAlertOverlay(
-                            viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                                alert: $data
-                                    .alert
-                            ))
-                        )
+                        ConnectivityAlertOverlay(viewModel: .init())
                         PrimaryButton(
                             action: {
                                 // We need to call this conditionally, as if there are no seeds,
@@ -257,7 +251,6 @@ private struct KeyListEmptyState: View {
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
             .environmentObject(AppState.preview)
         }
     }

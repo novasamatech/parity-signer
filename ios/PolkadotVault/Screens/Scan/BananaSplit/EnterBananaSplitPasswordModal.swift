@@ -188,10 +188,9 @@ extension EnterBananaSplitPasswordModal {
             navigation.performFake(navigation: .init(action: .goForward, details: seedName))
             // We should do additional check on whether seed can be successfully saved and not call navigation
             // further if there are any issues (i.e. somehow seedname is still empty, etc)
-            guard seedsMediator.restoreSeed(
+            guard seedsMediator.createSeed(
                 seedName: seedName,
                 seedPhrase: seedPhrase,
-                navigate: false,
                 shouldCheckForCollision: false
             ) else {
                 dismissWithError(.alertError(
@@ -200,6 +199,11 @@ extension EnterBananaSplitPasswordModal {
                 ))
                 return
             }
+            navigation.performFake(navigation: .init(
+                action: .goForward,
+                details: BackendConstants.true,
+                seedPhrase: seedPhrase
+            ))
             navigation.performFake(navigation: .init(action: .goBack))
             navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
             isKeyRecovered = true

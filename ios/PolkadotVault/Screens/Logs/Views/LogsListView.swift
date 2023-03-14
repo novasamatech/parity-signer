@@ -10,7 +10,6 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -32,12 +31,7 @@ struct LogsListView: View {
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            ConnectivityAlertOverlay(
-                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                    alert: $data
-                        .alert
-                ))
-            )
+            ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.use(navigation: navigation)
@@ -135,7 +129,6 @@ extension LogsListView {
                 events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
             )])))
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
         }
     }
 #endif
