@@ -248,12 +248,6 @@ data class NetworkModel(
 fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	key = networkSpecsKey,
 	logo = networkLogo,
-	title = networkTitle,
-)
-
-fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
-	key = networkSpecsKey,
-	logo = networkLogo,
 	title = networkTitle.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},

@@ -17,10 +17,7 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
@@ -37,23 +34,24 @@ fun IdentIconWithNetwork(
 	modifier: Modifier = Modifier,
 ) {
 	Box(contentAlignment = Alignment.BottomEnd) {
-		val cutoutProportion = 1f / 2
+		val cutoutSize = size/2
 		Image(
 			identicon.toBytes().intoImageBitmap(),
 			stringResource(R.string.description_identicon),
 			modifier = modifier
 				.size(size)
 				.clip(CircleShape)
-				.clip(SubIconCutShape(cutoutProportion))
+				.clip(SubIconCutShape(cutoutSize))
 		)
-		NetworkIcon(networkLogoName = network.title, size = size * cutoutProportion - 2.dp)
+		NetworkIcon(networkLogoName = network.title, size = cutoutSize)
 	}
 }
 
 /**
  * This is a shape with cuts out a rectangle in the center
  */
-class SubIconCutShape(val cutoutProportion: Float) : Shape {
+class SubIconCutShape(val innerIconSize: Dp) : Shape {
+	private val cutoutBorderRadius = 2.dp
 	override fun createOutline(
 		size: Size,
 		layoutDirection: LayoutDirection,
@@ -62,18 +60,21 @@ class SubIconCutShape(val cutoutProportion: Float) : Shape {
 		val outlinePath = Path()
 		outlinePath.addRect(Rect(Offset(0f, 0f), size))
 
-		val cutoutRadius =
-			kotlin.math.min(size.height, size.width) * cutoutProportion
+		val cutoutRadius:Float = kotlin.math.min(size.height, kotlin.math.min(size.width,
+			(innerIconSize + cutoutBorderRadius * 2).value * density.density))
 
 		val cutoutPath = Path()
+		val borderWidth = cutoutBorderRadius.value * density.density
 		cutoutPath.addRoundRect(
 			RoundRect(
 				Rect(
 					topLeft = Offset(
-						size.width - cutoutRadius,
-						size.height - cutoutRadius
+						size.width - cutoutRadius + borderWidth,
+						size.height - cutoutRadius + borderWidth,
 					),
-					bottomRight = Offset(size.width, size.height)
+					bottomRight = Offset(
+						size.width + borderWidth,
+						size.height + borderWidth)
 				),
 				cornerRadius = CornerRadius(cutoutRadius, cutoutRadius)
 			)
