@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,9 +16,13 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
@@ -33,18 +38,20 @@ fun IdentIconWithNetwork(
 	size: Dp = 28.dp,
 	modifier: Modifier = Modifier,
 ) {
-	Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
-		val cutoutSize = size/2
-		Image(
-			identicon.toBytes().intoImageBitmap(),
-			stringResource(R.string.description_identicon),
-			modifier = Modifier
-				.size(size)
-				.clip(CircleShape)
-				.clip(SubIconCutShape(cutoutSize))
-		)
-		//todo dmitry think about right to left
-		NetworkIcon(networkLogoName = networkLogoName, size = cutoutSize)
+	//cutout always on right side, so force icon end be on right as well
+	CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+		Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
+			val cutoutSize = size / 2
+			Image(
+				identicon.toBytes().intoImageBitmap(),
+				stringResource(R.string.description_identicon),
+				modifier = Modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .clip(SubIconCutShape(cutoutSize))
+			)
+			NetworkIcon(networkLogoName = networkLogoName, size = cutoutSize)
+		}
 	}
 }
 
@@ -61,8 +68,12 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 		val outlinePath = Path()
 		outlinePath.addRect(Rect(Offset(0f, 0f), size))
 
-		val cutoutRadius:Float = kotlin.math.min(size.height, kotlin.math.min(size.width,
-			(innerIconSize + cutoutBorderRadius * 2).value * density.density))
+		val cutoutRadius: Float = kotlin.math.min(
+			size.height, kotlin.math.min(
+				size.width,
+				(innerIconSize + cutoutBorderRadius * 2).value * density.density
+			)
+		)
 
 		val cutoutPath = Path()
 		val borderWidth = cutoutBorderRadius.value * density.density
@@ -75,7 +86,8 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 					),
 					bottomRight = Offset(
 						size.width + borderWidth,
-						size.height + borderWidth)
+						size.height + borderWidth
+					)
 				),
 				cornerRadius = CornerRadius(cutoutRadius, cutoutRadius)
 			)
