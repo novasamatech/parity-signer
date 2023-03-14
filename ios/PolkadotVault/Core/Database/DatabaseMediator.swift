@@ -16,6 +16,7 @@ protocol DatabaseMediating: AnyObject {
     func isDatabaseAvailable() -> Bool
     /// Attempts to recreate database
     /// - Returns: `true` if database is recreated successfully, `false` if any of process steps fails
+    @discardableResult
     func recreateDatabaseFile() -> Bool
     /// Wipes database file
     /// - Returns: `true` if database was deleted or didn't exist, `false` if any of process steps fails
@@ -56,6 +57,7 @@ final class DatabaseMediator: DatabaseMediating {
         fileManager.fileExists(atPath: databasePath)
     }
 
+    @discardableResult
     func recreateDatabaseFile() -> Bool {
         guard let source = bundle.url(forResource: Constants.resource, withExtension: "") else { return false }
         do {

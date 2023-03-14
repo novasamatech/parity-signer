@@ -119,12 +119,16 @@ extension CreateKeySetSeedPhraseView {
         }
 
         func onCreateTap() {
-            seedsMediator.restoreSeed(
+            seedsMediator.createSeed(
                 seedName: dataModel.seed,
                 seedPhrase: dataModel.seedPhrase,
-                navigate: true,
                 shouldCheckForCollision: true
             )
+            navigation.perform(navigation: .init(
+                action: .goForward,
+                details: BackendConstants.true,
+                seedPhrase: dataModel.seedPhrase
+            ))
         }
 
         func onInfoBoxTap() {

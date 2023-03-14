@@ -9,7 +9,6 @@ import Foundation
 
 struct FetchSeedsPayload {
     let seeds: [String]
-    let authenticated: Bool?
 }
 
 /// Protocol that provides access to Keychain's C-like API using modern approach
@@ -67,16 +66,16 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
             let seedNames = resultAsItems
                 .compactMap { seed in seed[kSecAttrAccount as String] as? String }
                 .sorted()
-            return .success(FetchSeedsPayload(seeds: seedNames, authenticated: true))
+            return .success(FetchSeedsPayload(seeds: seedNames))
         }
         // Keychain returned success but no data
         // We should confirm why we are not updating `authenticated` state in that case in original code
         if case errSecSuccess = osStatus {
-            return .success(FetchSeedsPayload(seeds: [], authenticated: nil))
+            return .success(FetchSeedsPayload(seeds: []))
         }
         // Kechain stores no data for given query
         if case errSecItemNotFound = osStatus {
-            return .success(FetchSeedsPayload(seeds: [], authenticated: true))
+            return .success(FetchSeedsPayload(seeds: []))
         }
         // Different result status, return generic error
         return .failure(.fetchError)

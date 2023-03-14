@@ -21,10 +21,6 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
-    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
-    /// `SharedDataModel`)
-    /// - Parameter signerDataModel: reference to `SharedDataModel`
-    func set(signerDataModel: SharedDataModel)
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
@@ -36,7 +32,7 @@ protocol SeedsMediating: AnyObject {
     ///   - seedName: seed name
     ///   - seedPhrase: seed phrase to be saved
     @discardableResult
-    func restoreSeed(seedName: String, seedPhrase: String, navigate: Bool, shouldCheckForCollision: Bool) -> Bool
+    func createSeed(seedName: String, seedPhrase: String, shouldCheckForCollision: Bool) -> Bool
     /// Checks for existance of `seedName` in Keychain
     /// Each seed name needs to be unique, this helps to not overwrite old seeds
     /// - Parameter seedName: seedName to be checked
@@ -54,7 +50,7 @@ protocol SeedsMediating: AnyObject {
     func getSeedBackup(seedName: String) -> String
     /// Removes seed and all deriverd keys
     /// - Parameter seedName: seed name to delete
-    func removeSeed(seedName: String)
+    func removeSeed(seedName: String) -> Bool
     /// Clear all seeds from Keychain
     func removeAllSeeds()
 
@@ -71,30 +67,22 @@ protocol SeedsMediating: AnyObject {
 /// IMPORTANT! The keys in Keychain are not removed on app uninstall!
 /// Remember to wipe the app with wipe button in settings.
 final class SeedsMediator: SeedsMediating {
-    private enum Constants {
-        static let `true` = "true"
-        static let `false` = "false"
-    }
-
     private let queryProvider: KeychainQueryProviding
     private let keychainAccessAdapter: KeychainAccessAdapting
-    private weak var signerDataModel: SharedDataModel!
     private let databaseMediator: DatabaseMediating
-
+    private let authenticationStateMediator: AuthenticatedStateMediator
     @Published var seedNames: [String] = []
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
         keychainAccessAdapter: KeychainAccessAdapting = KeychainAccessAdapter(),
-        databaseMediator: DatabaseMediating = DatabaseMediator()
+        databaseMediator: DatabaseMediating = DatabaseMediator(),
+        authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator
     ) {
         self.queryProvider = queryProvider
         self.keychainAccessAdapter = keychainAccessAdapter
         self.databaseMediator = databaseMediator
-    }
-
-    func set(signerDataModel: SharedDataModel) {
-        self.signerDataModel = signerDataModel
+        self.authenticationStateMediator = authenticationStateMediator
     }
 
     func refreshSeeds() {
@@ -110,22 +98,19 @@ final class SeedsMediator: SeedsMediating {
         switch result {
         case let .success(payload):
             seedNames = payload.seeds
-            if let authenticated = payload.authenticated {
-                signerDataModel.authenticated = authenticated
-            }
+            authenticationStateMediator.authenticated = true
             if !firstRun {
                 attemptToUpdate(seedNames: seedNames)
             }
         case .failure:
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
         }
     }
 
     @discardableResult
-    func restoreSeed(
+    func createSeed(
         seedName: String,
         seedPhrase: String,
-        navigate: Bool = true,
         shouldCheckForCollision: Bool
     ) -> Bool {
         guard !seedName.isEmpty, let finalSeedPhrase = seedPhrase.data(using: .utf8) else { return false }
@@ -141,19 +126,6 @@ final class SeedsMediator: SeedsMediating {
             seedNames.append(seedName)
             seedNames.sort()
             attemptToUpdate(seedNames: seedNames)
-            if navigate {
-                signerDataModel.navigation.perform(navigation: .init(
-                    action: .goForward,
-                    details: Constants.true,
-                    seedPhrase: seedPhrase
-                ))
-            } else {
-                signerDataModel.navigation.performFake(navigation: .init(
-                    action: .goForward,
-                    details: Constants.true,
-                    seedPhrase: seedPhrase
-                ))
-            }
             return true
         case .failure:
             return false
@@ -182,7 +154,7 @@ final class SeedsMediator: SeedsMediating {
             }
             return resultSeed
         case .failure:
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return ""
         }
     }
@@ -193,7 +165,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(seed):
             return seed
         case .failure:
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return ""
         }
     }
@@ -204,7 +176,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(seed):
             return seed
         case .failure:
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return [:]
         }
     }
@@ -213,10 +185,10 @@ final class SeedsMediator: SeedsMediating {
         getSeeds(seedNames: Set(seedNames))
     }
 
-    func removeSeed(seedName: String) {
+    func removeSeed(seedName: String) -> Bool {
         refreshSeeds()
-        guard signerDataModel.authenticated else {
-            return
+        guard authenticationStateMediator.authenticated else {
+            return false
         }
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
         switch result {
@@ -225,15 +197,15 @@ final class SeedsMediator: SeedsMediating {
                 .filter { $0 != seedName }
                 .sorted()
             attemptToUpdate(seedNames: seedNames)
-            signerDataModel.navigation.perform(navigation: .init(action: .removeSeed), skipDebounce: true)
+            return true
         case .failure:
-            ()
-            // We should inform user with some dedicated UI state for that error, maybe just system alert
+            return false
         }
     }
 
     func removeAllSeeds() {
         keychainAccessAdapter.removeAllSeeds()
+        seedNames = []
     }
 
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
@@ -245,7 +217,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(isThereCollision):
             return isThereCollision
         case .failure:
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return false
         }
     }
@@ -256,7 +228,7 @@ private extension SeedsMediator {
         do {
             try updateSeedNames(seedNames: seedNames)
         } catch {
-            signerDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
         }
     }
 }

@@ -9,12 +9,15 @@ import SwiftUI
 
 @main
 struct PolkadotVaultApp: App {
-    @StateObject var connectivityMediator = ConnectivityMediator()
+    @StateObject var connectivityMediator = ServiceLocator.connectivityMediator
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
-    @StateObject var passwordProtectionStatePublisher = PasswordProtectionStatePublisher()
+
+    init() {
+        AppLaunchMediator().finaliseInitialisation()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -22,10 +25,7 @@ struct PolkadotVaultApp: App {
                 JailbreakDetectedView()
             } else {
                 MainScreenContainer(
-                    data: SharedDataModel(
-                        navigation: navigation,
-                        connectivityMediator: connectivityMediator
-                    ),
+                    viewModel: .init(),
                     onboarding: OnboardingStateMachine()
                 )
                 .font(PrimaryFont.bodyL.font)
@@ -35,7 +35,6 @@ struct PolkadotVaultApp: App {
                 .environmentObject(appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
-                .environmentObject(passwordProtectionStatePublisher)
             }
         }
     }

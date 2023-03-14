@@ -233,18 +233,22 @@ extension RecoverKeySetSeedPhraseView {
         }
 
         func onDoneTap() {
-            var seedPhrase = content.readySeed ?? ""
+            let seedPhrase = content.readySeed ?? ""
             if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
                 presentableError = .seedPhraseAlreadyExists()
                 isPresentingError = true
                 return
             }
-            seedsMediator.restoreSeed(
+            seedsMediator.createSeed(
                 seedName: content.seedName,
-                seedPhrase: content.readySeed ?? "",
-                navigate: true,
+                seedPhrase: seedPhrase,
                 shouldCheckForCollision: false
             )
+            navigation.perform(navigation: .init(
+                action: .goForward,
+                details: BackendConstants.true,
+                seedPhrase: seedPhrase
+            ))
         }
 
         private func regenerateGrid() {

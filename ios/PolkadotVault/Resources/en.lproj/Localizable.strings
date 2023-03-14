@@ -337,7 +337,7 @@
 "Settings.Label.Verifier" = "Verifier Certificate";
 "Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
-"Settings.Label.Terms" = "Terms and Conditions";
+"Settings.Label.Terms" = "Terms of Service";
 "Settings.Label.Version" = "App version %@";
 "Settings.Label.Wipe" = "Wipe all Data";
 "Settings.Action.Cancel" = "Cancel";
@@ -390,7 +390,7 @@
 "Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, Remove all Data";
 "Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
 
-"Settings.TermsOfService.Label.Title" = "Terms of service";
+"Settings.TermsOfService.Label.Title" = "Terms of Service";
 "Settings.PrivacyPolicy.Label.Title" = "Privacy Policy";
 
 "Settings.SelectKey.Title" = "Select Key Set";

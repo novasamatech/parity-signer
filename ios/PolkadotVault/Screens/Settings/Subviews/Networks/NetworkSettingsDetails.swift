@@ -355,7 +355,8 @@ extension NetworkSettingsDetails {
         }
 
         func onMoreActionSheetDismissal() {
-            // Due to iOS 15 handling of following .fullscreen presentation after dismissal, we need to enforce sync on main queue
+            // Due to iOS 15 handling of following .fullscreen presentation after dismissal, we need to enforce sync on
+            // main queue
             DispatchQueue.main.async {
                 if self.shouldSignSpecs {
                     self.navigation.perform(navigation: .init(action: .signNetworkSpecs))

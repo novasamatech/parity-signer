@@ -10,7 +10,6 @@ import SwiftUI
 struct VerfierCertificateView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -63,9 +62,6 @@ struct VerfierCertificateView: View {
             Spacer()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(data: data)
-        }
         .fullScreenCover(isPresented: $viewModel.isPresentingRemoveConfirmation) {
             VerticalActionsBottomModal(
                 viewModel: .removeGeneralVerifier,
@@ -83,15 +79,20 @@ extension VerfierCertificateView {
         @Published var isPresentingRemoveConfirmation = false
 
         let content: MVerifierDetails
+        private let onboardingMediator: OnboardingMediator
 
-        private weak var data: SharedDataModel!
+        private weak var navigation: NavigationCoordinator!
 
-        init(content: MVerifierDetails) {
+        init(
+            content: MVerifierDetails,
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+        ) {
             self.content = content
+            self.onboardingMediator = onboardingMediator
         }
 
-        func use(data: SharedDataModel) {
-            self.data = data
+        func use(navigation: NavigationCoordinator) {
+            self.navigation = navigation
         }
 
         func loadData() {
@@ -103,7 +104,8 @@ extension VerfierCertificateView {
         }
 
         func onRemoveConfirmationTap() {
-            data.removeGeneralVerifier()
+            onboardingMediator.onboard(verifierRemoved: true)
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }

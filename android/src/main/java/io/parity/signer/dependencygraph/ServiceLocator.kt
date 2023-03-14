@@ -3,6 +3,7 @@ package io.parity.signer.dependencygraph
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.backend.UniffiInteractor
+import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
@@ -28,13 +29,13 @@ object ServiceLocator {
 	@Volatile private var _activityScope: ActivityScope? = null
 	val activityScope: ActivityScope? get() = _activityScope
 
-	val uniffiInteractor by lazy { UniffiInteractor() }
+	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
 
 	val seedStorage: SeedStorage = SeedStorage()
 	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
 	val networkExposedStateKeeper by lazy { NetworkExposedStateKeeper(appContext, uniffiInteractor) }
 	val authentication = Authentication()
-
+	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator = UnknownNetworkColorsGenerator()
 
 	class ActivityScope(val activity: FragmentActivity) {
 		val seedRepository: SeedRepository = SeedRepository(seedStorage,
