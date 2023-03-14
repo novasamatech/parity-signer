@@ -34,7 +34,7 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun KeyDerivedItem(
 	model: KeyModel,
-	network: String,//todo dmitry if we can pass network in model - remove from here
+	network: String,
 	onClick: () -> Unit = {},
 ) {
 	Surface(
@@ -105,7 +105,7 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 				top = 16.dp,
 				bottom = 16.dp,
 				start = 24.dp,
-				end = 12.dp
+				end = 12.dp,
 			)
 		)
 		if (model.key.path.isNotEmpty()) {

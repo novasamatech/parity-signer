@@ -57,7 +57,6 @@ fun MKeyAndNetworkCard.toKeyAndNetworkModel() = KeyAndNetworkModel(
 /**
  * Local copy of shared [MKeysCard] class
  */
-//todo dmitry check identicon usage and if we can pass network here always
 data class KeyModel(
 	val identicon: ImageContent,
 	val addressKey: String,
