@@ -2,8 +2,10 @@ package io.parity.signer.screens.keysets
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -20,7 +22,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
@@ -32,60 +33,69 @@ fun KeySetItem2(
 	model: KeySetModel,
 	onClick: () -> Unit = {},
 ) {
+	val background = MaterialTheme.colors.backgroundSecondary
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-		color = MaterialTheme.colors.backgroundSecondary,
+		color = background,
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Column() {
-
-//title
+			if (model.derivedKeysCount > 0.toUInt()) {
+				Text(
+					text = pluralStringResource(
+						id = R.plurals.key_sets_item_derived_subtitle,
+						count = model.derivedKeysCount.toInt(),
+						model.derivedKeysCount.toInt(),
+					),
+					color = MaterialTheme.colors.textTertiary,
+					style = SignerTypeface.BodyM,
+					modifier = Modifier.padding(horizontal = 16.dp)
+						.padding(top = 16.dp)
+				)
+			}
+			//title
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier.padding(horizontal = 16.dp)
+					.padding(top = 4.dp, bottom = 24.dp),
 			) {
-				IdentIcon(
-					identicon = model.identicon,
-					size = 36.dp,
-					modifier = Modifier.padding(
-						top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
-					)
-				)
+
 				Column(Modifier.weight(1f)) {
 					Text(
 						text = model.seedName,
 						color = MaterialTheme.colors.primary,
-						style = SignerTypeface.TitleS,
+						style = SignerTypeface.TitleL,
 					)
-					if (model.derivedKeysCount > 0.toUInt()) {
-						Spacer(modifier = Modifier.padding(top = 4.dp))
-						Text(
-							text = pluralStringResource(
-								id = R.plurals.key_sets_item_derived_subtitle,
-								count = model.derivedKeysCount.toInt(),
-								model.derivedKeysCount.toInt(),
-							),
-							color = MaterialTheme.colors.textSecondary,
-							style = SignerTypeface.BodyM,
-						)
-					}
 				}
 				Image(
 					imageVector = Icons.Filled.ChevronRight,
 					contentDescription = null,
-					colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 					modifier = Modifier
 						.padding(end = 8.dp)
 						.size(28.dp)
 				)
 			}
 			//icons
-			Row() {
-				//todo dmitry do
-				val size = 36.dp
+			if (model.usedInNetworks.isNotEmpty()) {
+				Row(
+					modifier = Modifier.padding(horizontal = 12.dp)
+						.padding(bottom = 16.dp)
+				) {
 					model.usedInNetworks.take(7).forEachIndexed { index, network ->
-						NetworkIcon(networkLogoName = network, size = size,
-							modifier = Modifier.offset(x = -size/3* index))
+						Box(
+							modifier = Modifier
+								.offset(x = (-10).dp * index)
+								.background(background, CircleShape)
+								.size(40.dp),
+							contentAlignment = Alignment.Center
+						) {
+							NetworkIcon(
+								networkLogoName = network, size = 32.dp,
+							)
+						}
 					}
+				}
 			}
 		}
 	}
