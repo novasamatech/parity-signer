@@ -5,6 +5,7 @@ import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
+import java.util.*
 
 /**
  * reflection of uniffi models so compose will work properly
@@ -24,6 +25,10 @@ data class KeySetDetailsModel(
 				KeyAndNetworkModel(
 					key = KeyModel.createStub(),
 					network = NetworkInfoModel.createStub()
+				),
+				KeyAndNetworkModel(
+					key = KeyModel.createStub(),
+					network = NetworkInfoModel.createStub(networkName = "Some")
 				),
 				KeyAndNetworkModel(
 					key = KeyModel.createStub()
@@ -203,16 +208,18 @@ data class NetworkInfoModel(
 	val networkSpecsKey: String
 ) {
 	companion object {
-		fun createStub(): NetworkInfoModel = NetworkInfoModel(
-			networkTitle = "network title",
-			networkLogo = "network logo",
+		fun createStub(networkName: String? = null): NetworkInfoModel = NetworkInfoModel(
+			networkTitle = networkName ?: "Westend",
+			networkLogo = networkName?.lowercase() ?: "westend",
 			networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
 		)
 	}
 }
 
 fun MscNetworkInfo.toNetworkInfoModel() =
-	NetworkInfoModel(networkTitle, networkLogo, networkSpecsKey)
+	NetworkInfoModel(networkTitle.replaceFirstChar {
+		if (it.isLowerCase()) it.titlecase() else it.toString()
+	}, networkLogo, networkSpecsKey)
 
 fun QrData.getData(): List<UByte> =
 	when (this) {
@@ -238,15 +245,27 @@ data class NetworkModel(
 	}
 }
 
+fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
+	key = networkSpecsKey,
+	logo = networkLogo,
+	title = networkTitle.replaceFirstChar {
+		if (it.isLowerCase()) it.titlecase() else it.toString()
+	},
+)
+
 fun Network.toNetworkModel(): NetworkModel = NetworkModel(
 	key = key,
 	logo = logo,
-	title = title,
+	title = title.replaceFirstChar {
+		if (it.isLowerCase()) it.titlecase() else it.toString()
+	},
 )
 fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 	key = key,
 	logo = logo,
-	title = title,
+	title = title.replaceFirstChar {
+		if (it.isLowerCase()) it.titlecase() else it.toString()
+	},
 )
 
 

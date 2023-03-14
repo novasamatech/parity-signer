@@ -52,14 +52,14 @@ fun NetworkCard(
 class NetworkCardModel(
 	val networkTitle: String,
 	val networkLogo: String,
-) {
-
-	constructor(network: MscNetworkInfo) : this(
-		network.networkTitle,
-		network.networkLogo,
+)
+fun MscNetworkInfo.toNetworkCardModel(): NetworkCardModel =
+	NetworkCardModel(
+		networkTitle = networkTitle.replaceFirstChar {
+			if (it.isLowerCase()) it.titlecase() else it.toString()
+		},
+		networkLogo = networkLogo,
 	)
-}
-
 
 
 internal class NetworkCardPreviewParameter :

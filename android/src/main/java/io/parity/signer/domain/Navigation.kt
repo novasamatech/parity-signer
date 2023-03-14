@@ -4,13 +4,10 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
 import io.parity.signer.backend.OperationResult
-import io.parity.signer.components.NetworkCardModel
-import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.components.sharedcomponents.KeyCardModelBase
-import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.runBlocking
 
@@ -106,20 +103,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 					navigate(Action.GO_BACK) // close bottom sheet from rust stack
 					return
 				}
-				val model = PrivateKeyExportModel(
-					qrData = secretKeyDetailsQR.qr.getData(),
-					keyCard = KeyCardModel(
-						network = secretKeyDetailsQR.networkInfo.networkTitle,
-						cardBase = KeyCardModelBase(
-							identIcon = secretKeyDetailsQR.address.identicon.toImageContent(),
-							seedName = secretKeyDetailsQR.address.seedName,
-							hasPassword = secretKeyDetailsQR.address.hasPwd,
-							path = secretKeyDetailsQR.address.path,
-							base58 = secretKeyDetailsQR.base58,
-						)
-					),
-					NetworkCardModel(secretKeyDetailsQR.networkInfo)
-				)
+				val model = secretKeyDetailsQR.toPrivateKeyExportModel()
 				navigate(Action.GO_BACK) // close bottom sheet from rust stack
 				singleton._localNavAction.value =
 					LocalNavAction.ShowExportPrivateKey(

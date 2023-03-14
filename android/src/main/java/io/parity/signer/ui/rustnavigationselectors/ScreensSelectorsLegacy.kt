@@ -108,10 +108,13 @@ fun ModalSelector(
 		when (modalData) {
 			is ModalData.NewSeedMenu -> {} //new bottom sheet
 			is ModalData.SeedMenu -> {} //migrated
-			is ModalData.NetworkSelector -> NetworkSelector(
-				modalData.f,
-				button2,
-			)
+			is ModalData.NetworkSelector -> {
+				//seed details have no selector anymore but keys are grouped by network
+				submitErrorState(
+					"unreacheble state reached - network selector action is removed from " +
+						"key set details and never called now $modalData"
+				)
+			}
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> {
 				//this is part of Derivation flow and should never called here
