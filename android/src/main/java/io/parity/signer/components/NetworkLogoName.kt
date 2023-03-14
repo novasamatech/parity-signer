@@ -6,19 +6,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.ui.theme.Web3Typography
 
 @Composable
 fun NetworkLogoName(logo: String, name: String) {
-	Text(
-		logo,
-		style = Web3Typography.h4,
-		color = MaterialTheme.colors.Text600
-	)
+	NetworkIcon(networkLogoName = logo, size = 36.dp)
 	Spacer(Modifier.width(15.dp))
 	Text(
 		name,
@@ -30,5 +25,5 @@ fun NetworkLogoName(logo: String, name: String) {
 @Preview(showBackground = true)
 @Composable
 private fun NetworkLogoName() {
-	NetworkLogoName("Logo", "name")
+	NetworkLogoName("kusama", "kusama")
 }
