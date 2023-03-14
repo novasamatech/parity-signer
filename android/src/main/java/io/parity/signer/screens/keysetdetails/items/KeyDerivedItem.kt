@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.NetworkLabel
 import io.parity.signer.domain.*
@@ -34,6 +34,7 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun KeyDerivedItem(
 	model: KeyModel,
+	network: String,//todo dmitry if we can pass network in model - remove from here
 	onClick: () -> Unit = {},
 ) {
 	Surface(
@@ -44,8 +45,9 @@ fun KeyDerivedItem(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			IdentIcon(
-				identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
+			IdentIconWithNetwork(
+				identicon = model.identicon, networkLogoName = network,
+				size = 36.dp, modifier = Modifier.padding(
 					top = 16.dp,
 					bottom = 16.dp,
 					start = 16.dp,
@@ -95,8 +97,9 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 		modifier = Modifier.fillMaxWidth(1f),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
-		IdentIcon(
+		IdentIconWithNetwork(
 			identicon = model.key.identicon,
+			networkLogoName = model.network.networkLogo,
 			size = 36.dp,
 			modifier = Modifier.padding(
 				top = 16.dp,
@@ -146,11 +149,11 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		KeyDerivedItem(
-			KeyModel.createStub()
+			KeyModel.createStub(),
+			"kusama"
 		)
 	}
 }
-
 
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,

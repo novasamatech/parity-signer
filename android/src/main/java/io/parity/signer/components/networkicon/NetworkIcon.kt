@@ -83,6 +83,7 @@ private fun getIconForNetwork(networkName: String): Painter? {
 		null
 	}
 }
+//todo dmitry test it in nova portal
 
 /**
  * Those icons and names taken from iOS where they taken from

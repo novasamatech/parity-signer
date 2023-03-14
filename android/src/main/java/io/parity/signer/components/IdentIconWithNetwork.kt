@@ -33,12 +33,12 @@ fun IdentIconWithNetwork(
 	size: Dp = 28.dp,
 	modifier: Modifier = Modifier,
 ) {
-	Box(contentAlignment = Alignment.BottomEnd) {
+	Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 		val cutoutSize = size/2
 		Image(
 			identicon.toBytes().intoImageBitmap(),
 			stringResource(R.string.description_identicon),
-			modifier = modifier
+			modifier = Modifier
 				.size(size)
 				.clip(CircleShape)
 				.clip(SubIconCutShape(cutoutSize))
