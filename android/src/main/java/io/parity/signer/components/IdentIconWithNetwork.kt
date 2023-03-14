@@ -29,7 +29,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 @Composable
 fun IdentIconWithNetwork(
 	identicon: ImageContent,
-	network: NetworkModel,
+	networkLogoName: String,
 	size: Dp = 28.dp,
 	modifier: Modifier = Modifier,
 ) {
@@ -43,7 +43,8 @@ fun IdentIconWithNetwork(
 				.clip(CircleShape)
 				.clip(SubIconCutShape(cutoutSize))
 		)
-		NetworkIcon(networkLogoName = network.title, size = cutoutSize)
+		//todo dmitry think about right to left
+		NetworkIcon(networkLogoName = networkLogoName, size = cutoutSize)
 	}
 }
 
@@ -102,7 +103,7 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
 		val icon = PreviewData.exampleIdenticonPng
-		val network = NetworkModel.createStub()
+		val network = NetworkModel.createStub().logo
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
@@ -134,11 +135,11 @@ private fun PreviewNetworkIconUnknownIcons() {
 	SignerNewTheme {
 		Column {
 			IdentIconWithNetwork(
-				icon, network,
+				icon, network.logo,
 				size = 24.dp
 			)
 			IdentIconWithNetwork(
-				icon, network2,
+				icon, network2.logo,
 				size = 24.dp
 			)
 		}
