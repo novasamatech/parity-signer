@@ -10,7 +10,6 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -130,7 +129,6 @@ extension LogsListView {
                 events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
             )])))
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
         }
     }
 #endif

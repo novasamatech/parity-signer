@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class WarningStateMediator {
+final class WarningStateMediator: ObservableObject {
     @Published var alert: Bool = false
 
     private let connectivityMediator: ConnectivityMediator

@@ -10,7 +10,6 @@ import SwiftUI
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     var body: some View {
@@ -65,7 +64,6 @@ struct BackupSelectKeyView: View {
         }
         .onAppear {
             viewModel.use(connectivityMediator: connectivityMediator)
-            viewModel.use(data: data)
         }
     }
 
@@ -100,7 +98,6 @@ extension BackupSelectKeyView {
         private var awaitingSeedName: String?
         private weak var connectivityMediator: ConnectivityMediator!
         private weak var navigation: NavigationCoordinator!
-        private weak var data: SharedDataModel!
         let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
 
@@ -116,10 +113,6 @@ extension BackupSelectKeyView {
 
         func use(connectivityMediator: ConnectivityMediator) {
             self.connectivityMediator = connectivityMediator
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
         }
 
         func onSeedNameTap(_ seedName: String) {

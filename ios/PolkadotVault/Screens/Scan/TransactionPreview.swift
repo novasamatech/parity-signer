@@ -232,7 +232,6 @@ extension TransactionPreview {
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
         private weak var navigation: NavigationCoordinator!
-        private weak var data: SharedDataModel!
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService

@@ -17,6 +17,8 @@ enum ServiceLocator {
     static var seedsMediator: SeedsMediating = SeedsMediator()
     static var warningStateMediator: WarningStateMediator = WarningStateMediator()
     static var connectivityMediator: ConnectivityMediator = ConnectivityMediator()
+    static var authenticationStateMediator: AuthenticatedStateMediator = AuthenticatedStateMediator()
+    static var onboardingMediator: OnboardingMediator = OnboardingMediator()
 
     static var networkColorsGenerator = UnknownNetworkColorsGenerator()
 }

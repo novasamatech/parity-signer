@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct ScreenSelector: View {
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
-    @EnvironmentObject private var stateMachine: OnboardingStateMachine
 
     var body: some View {
         switch navigation.actionResult.screenData {

@@ -14,7 +14,10 @@ struct PolkadotVaultApp: App {
     @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
-    @StateObject var passwordProtectionStatePublisher = PasswordProtectionStatePublisher()
+
+    init() {
+        AppLaunchMediator().finaliseInitialisation()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -22,7 +25,6 @@ struct PolkadotVaultApp: App {
                 JailbreakDetectedView()
             } else {
                 MainScreenContainer(
-                    data: SharedDataModel(),
                     viewModel: .init(),
                     onboarding: OnboardingStateMachine()
                 )
@@ -33,7 +35,6 @@ struct PolkadotVaultApp: App {
                 .environmentObject(appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
-                .environmentObject(passwordProtectionStatePublisher)
             }
         }
     }

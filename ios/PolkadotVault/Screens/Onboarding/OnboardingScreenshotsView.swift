@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OnboardingScreenshotsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var data: SharedDataModel
     @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
@@ -79,7 +78,6 @@ struct OnboardingScreenshotsView: View {
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
             .onAppear {
-                viewModel.use(data: data)
                 viewModel.use(navigation: navigation)
             }
         }
@@ -92,15 +90,15 @@ extension OnboardingScreenshotsView {
         @Published var isActionDisabled: Bool = true
 
         private let onNextTap: () -> Void
-        private weak var data: SharedDataModel!
         private weak var navigation: NavigationCoordinator!
+        private let onboardingMediator: OnboardingMediator
 
-        init(onNextTap: @escaping () -> Void) {
+        init(
+            onNextTap: @escaping () -> Void,
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+        ) {
             self.onNextTap = onNextTap
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
+            self.onboardingMediator = onboardingMediator
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -109,7 +107,7 @@ extension OnboardingScreenshotsView {
 
         func onDoneTap() {
             onNextTap()
-            data.onboard()
+            onboardingMediator.onboard()
             navigation.perform(navigation: .init(action: .start))
         }
 
@@ -126,7 +124,6 @@ extension OnboardingScreenshotsView {
             OnboardingScreenshotsView(
                 viewModel: .init(onNextTap: {})
             )
-            .environmentObject(SharedDataModel())
         }
     }
 #endif

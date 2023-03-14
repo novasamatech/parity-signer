@@ -29,7 +29,6 @@ struct KeyDetailsPublicKeyView: View {
 
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SharedDataModel
 
     init(
         forgetKeyActionHandler: ForgetSingleKeyAction,

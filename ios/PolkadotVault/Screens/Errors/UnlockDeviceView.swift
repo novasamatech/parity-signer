@@ -9,7 +9,6 @@ import SwiftUI
 
 struct UnlockDeviceView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
@@ -36,7 +35,6 @@ struct UnlockDeviceView: View {
             Spacer()
         }
         .onAppear {
-            viewModel.use(data: data)
             viewModel.use(navigation: navigation)
         }
         .multilineTextAlignment(.center)
@@ -46,7 +44,6 @@ struct UnlockDeviceView: View {
 
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
-        private weak var data: SharedDataModel!
         private weak var navigation: NavigationCoordinator!
         private let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
@@ -57,10 +54,6 @@ extension UnlockDeviceView {
         ) {
             self.seedsMediator = seedsMediator
             self.warningStateMediator = warningStateMediator
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
         }
 
         func use(navigation: NavigationCoordinator) {

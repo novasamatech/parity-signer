@@ -21,10 +21,6 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
-    /// Sets weak dependency to parent due to current architecture limitation (we should not store this class in
-    /// `SharedDataModel`)
-    /// - Parameter sharedDataModel: reference to `SharedDataModel`
-    func set(sharedDataModel: SharedDataModel)
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
@@ -73,23 +69,20 @@ protocol SeedsMediating: AnyObject {
 final class SeedsMediator: SeedsMediating {
     private let queryProvider: KeychainQueryProviding
     private let keychainAccessAdapter: KeychainAccessAdapting
-    private weak var sharedDataModel: SharedDataModel!
     private let databaseMediator: DatabaseMediating
-
+    private let authenticationStateMediator: AuthenticatedStateMediator
     @Published var seedNames: [String] = []
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
         keychainAccessAdapter: KeychainAccessAdapting = KeychainAccessAdapter(),
-        databaseMediator: DatabaseMediating = DatabaseMediator()
+        databaseMediator: DatabaseMediating = DatabaseMediator(),
+        authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator
     ) {
         self.queryProvider = queryProvider
         self.keychainAccessAdapter = keychainAccessAdapter
         self.databaseMediator = databaseMediator
-    }
-
-    func set(sharedDataModel: SharedDataModel) {
-        self.sharedDataModel = sharedDataModel
+        self.authenticationStateMediator = authenticationStateMediator
     }
 
     func refreshSeeds() {
@@ -105,12 +98,12 @@ final class SeedsMediator: SeedsMediating {
         switch result {
         case let .success(payload):
             seedNames = payload.seeds
-            sharedDataModel.authenticated = true
+            authenticationStateMediator.authenticated = true
             if !firstRun {
                 attemptToUpdate(seedNames: seedNames)
             }
         case .failure:
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
         }
     }
 
@@ -161,7 +154,7 @@ final class SeedsMediator: SeedsMediating {
             }
             return resultSeed
         case .failure:
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return ""
         }
     }
@@ -172,7 +165,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(seed):
             return seed
         case .failure:
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return ""
         }
     }
@@ -183,7 +176,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(seed):
             return seed
         case .failure:
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return [:]
         }
     }
@@ -194,7 +187,7 @@ final class SeedsMediator: SeedsMediating {
 
     func removeSeed(seedName: String) -> Bool {
         refreshSeeds()
-        guard sharedDataModel.authenticated else {
+        guard authenticationStateMediator.authenticated else {
             return false
         }
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
@@ -224,7 +217,7 @@ final class SeedsMediator: SeedsMediating {
         case let .success(isThereCollision):
             return isThereCollision
         case .failure:
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
             return false
         }
     }
@@ -235,7 +228,7 @@ private extension SeedsMediator {
         do {
             try updateSeedNames(seedNames: seedNames)
         } catch {
-            sharedDataModel.authenticated = false
+            authenticationStateMediator.authenticated = false
         }
     }
 }

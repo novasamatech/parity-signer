@@ -9,7 +9,6 @@ import SwiftUI
 
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @Binding var dataModel: MSeeds
@@ -252,7 +251,6 @@ private struct KeyListEmptyState: View {
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
             .environmentObject(NavigationCoordinator())
-            .environmentObject(SharedDataModel())
             .environmentObject(AppState.preview)
         }
     }

@@ -11,7 +11,6 @@ struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var appState: AppState
 
     let forgetKeyActionHandler: ForgetKeySetAction
