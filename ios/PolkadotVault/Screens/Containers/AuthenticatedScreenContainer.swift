@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @EnvironmentObject private var data: SharedDataModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
-
+    @StateObject var viewModel: ViewModel
     @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @GestureState private var dragOffset = CGSize.zero
     @State private var isShowingQRScanner: Bool = false
@@ -40,9 +39,9 @@ struct AuthenticatedScreenContainer: View {
             }
             ZStack {
                 VStack(spacing: 0) {
-                    ScreenSelector()
+                    viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)
                 }
-                ModalSelector()
+                viewModel.modalFactory.modal(for: navigation.actionResult.modalData)
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -107,6 +106,25 @@ struct AuthenticatedScreenContainer: View {
                 isShowingBottomAlert: $navigation.genericError.isPresented
             )
             .clearModalBackground()
+        }
+    }
+}
+
+extension AuthenticatedScreenContainer {
+    final class ViewModel: ObservableObject {
+        private let navigation: NavigationCoordinator
+        let modalFactory: ModalFactory
+        let mainScreenFactory: MainScreensFactory
+
+        init(
+            navigation: NavigationCoordinator = NavigationCoordinator(),
+            modalFactory: ModalFactory = ModalFactory(),
+            mainScreenFactory: MainScreensFactory = MainScreensFactory()
+        ) {
+            self.navigation = navigation
+            self.modalFactory = modalFactory
+            self.mainScreenFactory = mainScreenFactory
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }

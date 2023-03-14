@@ -10,7 +10,6 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -42,16 +41,10 @@ struct SettingsView: View {
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            ConnectivityAlertOverlay(
-                viewModel: .init(resetWarningAction: ResetConnectivtyWarningsAction(
-                    alert: $data
-                        .alert
-                ))
-            )
+            ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.use(navigation: navigation)
-            viewModel.use(data: data)
             viewModel.loadData()
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingWipeConfirmation) {
@@ -69,10 +62,11 @@ struct SettingsView: View {
             PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingBackup) {
-            BackupSelectKeyView(viewModel: .init(
-                isPresented: $viewModel.isPresentingBackup,
-                resetWarningAction: .init(alert: $data.alert)
-            ))
+            BackupSelectKeyView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingBackup
+                )
+            )
         }
     }
 }
@@ -86,16 +80,16 @@ extension SettingsView {
         @Published var isPresentingBackup = false
 
         private weak var navigation: NavigationCoordinator!
-        private weak var data: SharedDataModel!
+        private let onboardingMediator: OnboardingMediator
 
-        init() {}
+        init(
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+        ) {
+            self.onboardingMediator = onboardingMediator
+        }
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
-        }
-
-        func use(data: SharedDataModel) {
-            self.data = data
         }
 
         func loadData() {
@@ -136,7 +130,8 @@ extension SettingsView {
         }
 
         func wipe() {
-            data.onboard()
+            onboardingMediator.onboard()
+            navigation.perform(navigation: .init(action: .start))
         }
     }
 }
@@ -155,7 +150,6 @@ struct SettingsViewRenderable: Equatable {
         static var previews: some View {
             SettingsView(viewModel: .init())
                 .environmentObject(NavigationCoordinator())
-                .environmentObject(SharedDataModel())
         }
     }
 #endif

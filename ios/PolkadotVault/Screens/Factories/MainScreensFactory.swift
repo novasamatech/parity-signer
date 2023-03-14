@@ -1,26 +1,22 @@
 //
-//  ScreenSelector.swift
-//  Polkadot Vault
+//  MainScreensFactory.swift
+//  PolkadotVault
 //
-//  Created by Alexander Slesarev on 26.11.2021.
+//  Created by Krzysztof Rodak on 14/03/2023.
 //
 
 import SwiftUI
 
-struct ScreenSelector: View {
-    @EnvironmentObject private var data: SharedDataModel
-    @EnvironmentObject var navigation: NavigationCoordinator
-    @EnvironmentObject private var stateMachine: OnboardingStateMachine
-
-    var body: some View {
-        switch navigation.actionResult.screenData {
+final class MainScreensFactory {
+    @ViewBuilder
+    // swiftlint:disable function_body_length
+    func screen(for screenData: ScreenData) -> some View {
+        switch screenData {
         case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
                     keyName: keyName
-                ),
-                forgetKeyActionHandler: ForgetKeySetAction(navigation: navigation),
-                resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                )
             )
         case .settings:
             SettingsView(viewModel: .init())
@@ -33,11 +29,9 @@ struct ScreenSelector: View {
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(
-                    forgetKeyActionHandler: ForgetSingleKeyAction(navigation: navigation),
                     viewModel: KeyDetailsPublicKeyViewModel(value),
                     actionModel: KeyDetailsPublicKeyActionModel(value),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value),
-                    resetWarningAction: ResetConnectivtyWarningsAction(alert: $data.alert)
+                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
                 )
             } else {
                 EmptyView()
@@ -60,28 +54,13 @@ struct ScreenSelector: View {
             SignSufficientCrypto(
                 content: value
             )
-        case let .selectSeedForBackup(value):
-            SelectSeedForBackup(
-                content: value
-            )
-        case .documents:
-            OnboardingAgreementsView(
-                viewModel: .init(onNextTap: { data.onboard() })
-            )
-
         // Screens handled outside of Rust navigation
-        case .scan:
-            EmptyView()
-        case .transaction:
-            EmptyView()
-        case .keyDetailsMulti:
+        case .documents,
+             .selectSeedForBackup,
+             .scan,
+             .transaction,
+             .keyDetailsMulti:
             EmptyView()
         }
     }
 }
-
-// struct ScreenSelector_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ScreenSelector()
-//    }
-// }

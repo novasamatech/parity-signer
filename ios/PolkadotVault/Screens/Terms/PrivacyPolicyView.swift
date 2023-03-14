@@ -21,7 +21,7 @@ struct PrivacyPolicyView: View {
                 )
             )
             ScrollView {
-                Text(ShownDocument.privacyPolicy.text)
+                Text(TextResources.privacyPolicy.text)
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .padding(.horizontal, Spacing.large)

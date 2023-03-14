@@ -9,7 +9,6 @@ import SwiftUI
 
 struct DevicePincodeRequired: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var data: SharedDataModel
 
     var body: some View {
         VStack(spacing: 0) {

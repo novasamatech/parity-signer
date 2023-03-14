@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SeedCardForManager: View {
-    @EnvironmentObject private var data: SharedDataModel
     var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {
