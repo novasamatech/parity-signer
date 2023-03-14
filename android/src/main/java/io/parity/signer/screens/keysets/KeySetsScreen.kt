@@ -59,7 +59,7 @@ fun KeySetsScreen(
 				) {
 					val cards = model.keys
 					items(cards.size) { i ->
-						KeySetItem(model = cards[i]) {
+						KeySetItem2(model = cards[i]) {
 							rootNavigator.navigate(Action.SELECT_SEED, cards[i].seedName)
 						}
 						if (i == cards.lastIndex) {
@@ -158,7 +158,7 @@ private fun KeySetsEmptyList() {
 			textAlign = TextAlign.Center,
 		)
 		//space for button to make text in the center of the rest of screen
-		Spacer(modifier = Modifier.padding(top = (56+24+24).dp))
+		Spacer(modifier = Modifier.padding(top = (56 + 24 + 24).dp))
 		Spacer(modifier = Modifier.weight(0.5f))
 	}
 }
