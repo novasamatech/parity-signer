@@ -133,20 +133,6 @@ fun BottomBarButton2(
 )
 @Composable
 private fun PreviewBottomBar2() {
-	val mockModel = KeySetsSelectModel(
-		listOf(
-			KeySetModel(
-				"first seed name",
-				PreviewData.exampleIdenticonPng,
-				1.toUInt()
-			),
-			KeySetModel(
-				"second seed name",
-				PreviewData.exampleIdenticonPng,
-				3.toUInt()
-			),
-		)
-	)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			BottomBar2(EmptyNavigator(), BottomBar2State.KEYS)

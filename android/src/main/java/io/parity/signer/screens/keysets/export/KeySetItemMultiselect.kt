@@ -90,10 +90,8 @@ fun KeySetItemMultiselect(
 @Composable
 private fun PreviewKeySetItemMultiselect() {
 	SignerNewTheme {
-		val model = KeySetModel(
-			"My special key set",
-			PreviewData.exampleIdenticonPng,
-			2.toUInt()
+		val model = KeySetModel.createStub(
+			"My special key set", 2
 		)
 		KeySetItemMultiselect(
 			model,

@@ -107,11 +107,13 @@ private fun PreviewKeySetsSelectScreenFull() {
 		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			3.toUInt()
 		),
 	)
@@ -120,6 +122,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 			KeySetModel(
 				"second seed name",
 				PreviewData.exampleIdenticonPng,
+				listOf("westend", "some"),
 				3.toUInt()
 			)
 		)
@@ -176,11 +179,13 @@ private fun PreviewKeySetsSelectScreenFew() {
 		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			3.toUInt()
 		),
 	)

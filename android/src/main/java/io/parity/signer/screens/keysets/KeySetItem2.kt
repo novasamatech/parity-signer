@@ -21,13 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun KeySetItem(
+fun KeySetItem2(
 	model: KeySetModel,
 	onClick: () -> Unit = {},
 ) {
@@ -36,42 +37,56 @@ fun KeySetItem(
 		color = MaterialTheme.colors.backgroundSecondary,
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			IdentIcon(
-				identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
-					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
-				)
-			)
-			Column(Modifier.weight(1f)) {
-				Text(
-					text = model.seedName,
-					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.TitleS,
-				)
-				if (model.derivedKeysCount > 0.toUInt()) {
-					Spacer(modifier = Modifier.padding(top = 4.dp))
-					Text(
-						text = pluralStringResource(
-							id = R.plurals.key_sets_item_derived_subtitle,
-							count = model.derivedKeysCount.toInt(),
-							model.derivedKeysCount.toInt(),
-						),
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.BodyM,
-					)
-				}
-			}
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
-				modifier = Modifier
-					.padding(end = 8.dp)
-					.size(28.dp)
+		Column() {
 
-			)
+//title
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				IdentIcon(
+					identicon = model.identicon,
+					size = 36.dp,
+					modifier = Modifier.padding(
+						top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+					)
+				)
+				Column(Modifier.weight(1f)) {
+					Text(
+						text = model.seedName,
+						color = MaterialTheme.colors.primary,
+						style = SignerTypeface.TitleS,
+					)
+					if (model.derivedKeysCount > 0.toUInt()) {
+						Spacer(modifier = Modifier.padding(top = 4.dp))
+						Text(
+							text = pluralStringResource(
+								id = R.plurals.key_sets_item_derived_subtitle,
+								count = model.derivedKeysCount.toInt(),
+								model.derivedKeysCount.toInt(),
+							),
+							color = MaterialTheme.colors.textSecondary,
+							style = SignerTypeface.BodyM,
+						)
+					}
+				}
+				Image(
+					imageVector = Icons.Filled.ChevronRight,
+					contentDescription = null,
+					colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+					modifier = Modifier
+						.padding(end = 8.dp)
+						.size(28.dp)
+				)
+			}
+			//icons
+			Row() {
+				//todo dmitry do
+				val size = 36.dp
+					model.usedInNetworks.take(7).forEachIndexed { index, network ->
+						NetworkIcon(networkLogoName = network, size = size,
+							modifier = Modifier.offset(x = -size/3* index))
+					}
+			}
 		}
 	}
 }
@@ -88,8 +103,13 @@ fun KeySetItem(
 @Composable
 private fun PreviewKeySetItem() {
 	SignerNewTheme {
-		KeySetItem(
-			KeySetModel.createStub("My special key set", 2)
+		KeySetItem2(
+			KeySetModel(
+				"My special key set",
+				PreviewData.exampleIdenticonPng,
+				listOf("westend", "some", "polkadot", "www", "kusama"),
+				2.toUInt()
+			)
 		)
 	}
 }
