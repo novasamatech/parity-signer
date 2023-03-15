@@ -41,7 +41,8 @@ data class SigningTransactionModel(
 					seedName = "Parity Keys",
 					base58 = "1219xC79CXV31543DDXoQMjuA",
 					identIcon = PreviewData.exampleIdenticonPng,
-					hasPassword = true
+					hasPassword = true,
+					networkLogo = "kusama"
 				)
 			)
 	}
@@ -103,6 +104,7 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 				path = author.address.toDisplayablePathString(),
 				seedName = author.address.seedName,
 				base58 = author.base58,
+				networkLogo = value.networkInfo?.networkLogo,
 				identIcon = author.address.identicon.toImageContent(),//.svgPayload, on iOS
 				hasPassword = author.address.hasPwd
 			)

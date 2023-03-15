@@ -96,7 +96,7 @@ fun TransactionSummaryView(
 					style = SignerTypeface.CaptionM,
 					modifier = Modifier.padding(bottom = 8.dp)
 				)
-				KeyCardSignature(model = keyModel)
+				KeyCardSignature(model = keyModel,)
 			}
 		}
 	}

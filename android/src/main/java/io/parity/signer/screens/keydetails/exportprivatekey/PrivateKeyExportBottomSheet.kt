@@ -128,6 +128,7 @@ fun MKeyDetails.toPrivateKeyExportModel(): PrivateKeyExportModel {
 				identIcon = address.identicon.toImageContent(),
 				seedName = address.seedName,
 				hasPassword = address.hasPwd,
+				networkLogo = networkInfo.networkLogo,
 				path = address.path,
 				base58 = base58,
 			)

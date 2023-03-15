@@ -29,6 +29,7 @@ import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.NetworkInfoModel
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
@@ -185,12 +186,12 @@ data class KeyCardModel(
 ) {
 	companion object {
 
-		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
+		fun fromKeyModel(model: KeyModel, network: NetworkInfoModel): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle.replaceFirstChar {
+				network = network.networkTitle.replaceFirstChar {
 					if (it.isLowerCase()) it.titlecase() else it.toString()
 				},
-				cardBase = KeyCardModelBase.fromKeyModel(model)
+				cardBase = KeyCardModelBase.fromKeyModel(model, networkLogo = network.networkLogo)
 			)
 
 		/**
@@ -199,13 +200,13 @@ data class KeyCardModel(
 		fun fromAddress(
 			address: Address,
 			base58: String,
-			networkTitle: String
+			network: NetworkInfoModel
 		): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle.replaceFirstChar {
+				network = network.networkTitle.replaceFirstChar {
 					if (it.isLowerCase()) it.titlecase() else it.toString()
 				},
-				cardBase = KeyCardModelBase.fromAddress(address, base58)
+				cardBase = KeyCardModelBase.fromAddress(address, base58, network.networkLogo )
 			)
 
 		fun createStub() = KeyCardModel(
@@ -220,26 +221,28 @@ data class KeyCardModelBase(
 	val base58: String,
 	val path: String,
 	val identIcon: ImageContent,
+	val networkLogo: String?,
 	val seedName: String,
 	val hasPassword: Boolean = false,
 	val multiselect: Boolean? = null,
 ) {
 	companion object {
 
-		fun fromKeyModel(model: KeyModel): KeyCardModelBase =
+		fun fromKeyModel(model: KeyModel, networkLogo: String?): KeyCardModelBase =
 			KeyCardModelBase(
 				base58 = model.base58,
 				path = model.path,
 				identIcon = model.identicon,
 				seedName = model.seedName,
 				hasPassword = model.hasPwd,
+				networkLogo = networkLogo,
 			)
 
 		/**
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
 		fun fromAddress(
-			address_card: MAddressCard,
+			address_card: MAddressCard, networkLogo: String?
 		): KeyCardModelBase =
 			KeyCardModelBase(
 				base58 = address_card.base58,
@@ -247,11 +250,13 @@ data class KeyCardModelBase(
 				hasPassword = address_card.address.hasPwd,
 				identIcon = address_card.address.identicon.toImageContent(),
 				seedName = address_card.address.seedName,
+				networkLogo = networkLogo,
 			)
 
 		fun fromAddress(
 			address: Address,
 			base58: String,
+			networkLogo: String?,
 		): KeyCardModelBase =
 			KeyCardModelBase(
 				base58 = base58,
@@ -259,6 +264,7 @@ data class KeyCardModelBase(
 				hasPassword = address.hasPwd,
 				identIcon = address.identicon.toImageContent(),
 				seedName = address.seedName,
+				networkLogo = networkLogo,
 				multiselect = false,
 			)
 
@@ -267,6 +273,7 @@ data class KeyCardModelBase(
 			path = "//polkadot//path",
 			identIcon = PreviewData.exampleIdenticonPng,
 			seedName = "Seed Name",
+			networkLogo = "kusama",
 			hasPassword = false,
 			multiselect = null,
 		)
