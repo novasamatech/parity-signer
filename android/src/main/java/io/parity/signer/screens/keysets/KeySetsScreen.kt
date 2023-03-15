@@ -59,7 +59,7 @@ fun KeySetsScreen(
 				) {
 					val cards = model.keys
 					items(cards.size) { i ->
-						KeySetItem(model = cards[i]) {
+						KeySetItem2(model = cards[i]) {
 							rootNavigator.navigate(Action.SELECT_SEED, cards[i].seedName)
 						}
 						if (i == cards.lastIndex) {
@@ -107,11 +107,13 @@ private fun PreviewKeySetsSelectScreenFull() {
 		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			3.toUInt()
 		),
 	)
@@ -120,6 +122,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 			KeySetModel(
 				"second seed name",
 				PreviewData.exampleIdenticonPng,
+				listOf("westend", "some"),
 				3.toUInt()
 			)
 		)
@@ -155,7 +158,7 @@ private fun KeySetsEmptyList() {
 			textAlign = TextAlign.Center,
 		)
 		//space for button to make text in the center of the rest of screen
-		Spacer(modifier = Modifier.padding(top = (56+24+24).dp))
+		Spacer(modifier = Modifier.padding(top = (56 + 24 + 24).dp))
 		Spacer(modifier = Modifier.weight(0.5f))
 	}
 }
@@ -176,11 +179,13 @@ private fun PreviewKeySetsSelectScreenFew() {
 		KeySetModel(
 			"first seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
 			PreviewData.exampleIdenticonPng,
+			listOf("kusama", "some"),
 			3.toUInt()
 		),
 	)

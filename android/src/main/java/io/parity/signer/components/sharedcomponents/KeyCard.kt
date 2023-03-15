@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
@@ -88,7 +88,7 @@ fun KeyCard(model: KeyCardModel) {
 		//right()
 		Column(horizontalAlignment = Alignment.End) {
 			Box(contentAlignment = Alignment.TopEnd) {
-				IdentIcon(model.cardBase.identIcon, 36.dp)
+				IdentIconWithNetwork(model.cardBase.identIcon, model.network, 36.dp)
 				model.cardBase.multiselect?.let {
 					if (it) {
 						Icon(

@@ -130,11 +130,29 @@ fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
 data class KeySetModel(
 	val seedName: String,
 	val identicon: ImageContent,
-	val derivedKeysCount: UInt
-)
+	val usedInNetworks: List<String>,
+	val derivedKeysCount: UInt,
+) {
+	companion object {
+		fun createStub(name: String? = null, number: Int? = null) =
+			KeySetModel(
+				name ?: "first seed name",
+				PreviewData.exampleIdenticonPng,
+				listOf("westend", "some"),
+				number?.toUInt() ?: 1.toUInt()
+			)
+	}
+}
+
+
 
 fun SeedNameCard.toSeedModel() =
-	KeySetModel(seedName, identicon.toImageContent(), derivedKeysCount)
+	KeySetModel(
+		seedName,
+		identicon.toImageContent(),
+		usedInNetworks,
+		derivedKeysCount
+	)
 
 /**
  * Local copy of shared [MKeyDetails] class
@@ -208,11 +226,12 @@ data class NetworkInfoModel(
 	val networkSpecsKey: String
 ) {
 	companion object {
-		fun createStub(networkName: String? = null): NetworkInfoModel = NetworkInfoModel(
-			networkTitle = networkName ?: "Westend",
-			networkLogo = networkName?.lowercase() ?: "westend",
-			networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-		)
+		fun createStub(networkName: String? = null): NetworkInfoModel =
+			NetworkInfoModel(
+				networkTitle = networkName ?: "Westend",
+				networkLogo = networkName?.lowercase() ?: "westend",
+				networkSpecsKey = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+			)
 	}
 }
 
@@ -237,10 +256,10 @@ data class NetworkModel(
 	val title: String
 ) {
 	companion object {
-		fun createStub(): NetworkModel = NetworkModel(
+		fun createStub(networkName: String? = null): NetworkModel = NetworkModel(
 			key = "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-			logo = "polkadot",
-			title = "Polkadot",
+			logo = networkName ?: "polkadot",
+			title = networkName?.lowercase() ?: "Polkadot",
 		)
 	}
 }
@@ -260,6 +279,7 @@ fun Network.toNetworkModel(): NetworkModel = NetworkModel(
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
 )
+
 fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 	key = key,
 	logo = logo,
