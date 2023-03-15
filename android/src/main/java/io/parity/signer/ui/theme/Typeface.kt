@@ -97,19 +97,6 @@ val CryptoTypography = Typography(
 	),
 )
 
-// Special font for network labels
-private val Web3Font = Font(R.font.web3_regular)
-private val Web3FontFamily = FontFamily(Web3Font)
-
-@Deprecated("use new SignerTypeface")
-val Web3Typography = Typography(
-	defaultFontFamily = Web3FontFamily,
-	h4 = TextStyle(
-		fontFamily = Web3FontFamily,
-		fontSize = 16.sp
-	)
-)
-
 /**
  * Our Typefase schema is shared with iOS and not mapped to android [androidx.compose.material.Typography] so mainly defined here
  */
