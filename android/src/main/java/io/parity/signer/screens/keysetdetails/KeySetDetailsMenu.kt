@@ -93,19 +93,8 @@ fun KeyDetailsMenuGeneral(
 
 		MenuItemForBottomSheet(
 			Icons.Outlined.Circle,
-			label = stringResource(R.string.menu_option_select_key),
+			label = stringResource(R.string.menu_option_export_keys),
 			onclick = onSelectKeysClicked
-		)
-
-		MenuItemForBottomSheet(
-			iconId = R.drawable.ic_library_add_28,
-			label = stringResource(R.string.menu_option_derive_from_key),
-			onclick = {
-				if (networkState.value == NetworkState.None)
-					navigator.navigate(Action.NEW_KEY)
-				else
-					navigator.navigate(Action.SHIELD)
-			}
 		)
 
 		MenuItemForBottomSheet(
