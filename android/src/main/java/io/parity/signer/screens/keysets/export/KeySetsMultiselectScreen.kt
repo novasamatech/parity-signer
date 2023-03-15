@@ -127,24 +127,12 @@ fun ClickableLabel(
 @Composable
 private fun PreviewKeySetsSelectExportScreen() {
 	val keys = mutableListOf(
-		KeySetModel(
-			"first seed name",
-			PreviewData.exampleIdenticonPng,
-			1.toUInt()
-		),
-		KeySetModel(
-			"second seed name",
-			PreviewData.exampleIdenticonPng,
-			3.toUInt()
-		),
+		KeySetModel.createStub("first seed name", 1),
+		KeySetModel.createStub("second seed name", 3),
 	)
 	repeat(30) {
 		keys.add(
-			KeySetModel(
-				"second seed name",
-				PreviewData.exampleIdenticonPng,
-				3.toUInt()
-			)
+			KeySetModel.createStub("second seed name", 3)
 		)
 	}
 	val mockModel = KeySetsSelectModel(keys)

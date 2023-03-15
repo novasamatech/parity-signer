@@ -89,9 +89,7 @@ fun KeySetItem(
 private fun PreviewKeySetItem() {
 	SignerNewTheme {
 		KeySetItem(
-			KeySetModel(
-				"My special key set", PreviewData.exampleIdenticonPng, 2.toUInt()
-			)
+			KeySetModel.createStub("My special key set", 2)
 		)
 	}
 }

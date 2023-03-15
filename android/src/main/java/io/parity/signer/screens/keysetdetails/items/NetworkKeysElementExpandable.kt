@@ -109,7 +109,7 @@ private fun NetworkKeysElementExpandablePrivate(
 			var first = true
 			keys.forEach { key ->
 				SignerDivider(modifier = if (first) Modifier else Modifier.padding(start = 48.dp))
-				KeyDerivedItem(model = key, onClick = { onKeyClick(key, network) })
+				KeyDerivedItem(model = key, network.logo, onClick = { onKeyClick(key, network) })
 				first = false
 			}
 		}

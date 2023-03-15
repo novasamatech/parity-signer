@@ -1,4 +1,4 @@
-package io.parity.signer.components.items
+package io.parity.signer.screens.keysetdetails.items
 
 import SignerCheckbox
 import android.content.res.Configuration
@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.abbreviateString
@@ -33,6 +34,7 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun KeyDerivedItemMultiselect(
 	model: KeyModel,
+	networkLogo: String,
 	isSelected: Boolean = false,
 	onClick: (Boolean, String) -> Unit,
 ) {
@@ -44,8 +46,11 @@ fun KeyDerivedItemMultiselect(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			IdentIcon(
-				identicon = model.identicon, size = 36.dp, modifier = Modifier.padding(
+			IdentIconWithNetwork(
+				identicon = model.identicon,
+				networkLogoName = networkLogo,
+				size = 36.dp,
+				modifier = Modifier.padding(
 					top = 16.dp,
 					bottom = 16.dp,
 					start = 16.dp,
@@ -102,6 +107,7 @@ private fun PreviewKeyDerivedItemMultiselect() {
 	SignerNewTheme {
 		KeyDerivedItemMultiselect(
 			model = KeyModel.createStub(),
+			networkLogo = "kusama",
 			onClick = { _, _ -> },
 		)
 	}

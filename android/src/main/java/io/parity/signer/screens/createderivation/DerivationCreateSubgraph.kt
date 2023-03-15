@@ -113,8 +113,9 @@ fun DerivationCreateSubgraph(
 									deriveViewModel.proceedCreateKey(
 										context
 									)
+									closeAction()
+									rootNavigator.backAction()
 								}
-								closeAction()
 							},
 						)
 					}

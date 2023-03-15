@@ -19,8 +19,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -177,40 +179,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 			AirgapItemType.AIRPLANE_MODE -> Icons.Filled.AirplanemodeActive
 			AirgapItemType.BLUETOOTH -> Icons.Filled.Bluetooth
 		}
-		Box(contentAlignment = Alignment.BottomEnd) {
-//			icon
-			Box(
-				contentAlignment = Alignment.Center,
-				modifier = Modifier
-					.size(40.dp)
-					.background(color, CircleShape)
-			) {
-				Image(
-					imageVector = icon,
-					contentDescription = null,
-					colorFilter = ColorFilter.tint(backgroundColor),
-					modifier = Modifier
-						.size(20.dp)
-				)
-			}
-			//checkmark
-			if (isPassed) {
-				//because icon have paddings on a side we need to draw background separately with different paddings
-				Surface(
-					color = color,
-					shape = CircleShape,
-					modifier = Modifier.size(16.dp)
-				) {}
-				Image(
-					imageVector = Icons.Outlined.CheckCircle,
-					contentDescription = null,
-					colorFilter = ColorFilter.tint(backgroundColor),
-					modifier = Modifier
-						.size(18.dp)
-						.offset(x = 2.dp, y = 2.dp)
-				)
-			}
-		}
+		IconWithCheckmark(color, icon, backgroundColor, isPassed)
 
 		val text = when (type) {
 			AirgapItemType.WIFI -> stringResource(R.string.airgap_onboarding_wifi_header)
@@ -225,6 +194,49 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 				.padding(horizontal = 16.dp, vertical = 14.dp)
 				.weight(1f)
 		)
+	}
+}
+
+@Composable
+private fun IconWithCheckmark(
+	color: Color,
+	icon: ImageVector,
+	backgroundColor: Color,
+	isPassed: Boolean
+) {
+	Box(contentAlignment = Alignment.BottomEnd) {
+//			icon
+		Box(
+			contentAlignment = Alignment.Center,
+			modifier = Modifier
+				.size(40.dp)
+				.background(color, CircleShape)
+		) {
+			Image(
+				imageVector = icon,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(backgroundColor),
+				modifier = Modifier
+					.size(20.dp)
+			)
+		}
+		//checkmark
+		if (isPassed) {
+			//because icon have paddings on a side we need to draw background separately with different paddings
+			Surface(
+				color = color,
+				shape = CircleShape,
+				modifier = Modifier.size(16.dp)
+			) {}
+			Image(
+				imageVector = Icons.Outlined.CheckCircle,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(backgroundColor),
+				modifier = Modifier
+					.size(18.dp)
+					.offset(x = 2.dp, y = 2.dp)
+			)
+		}
 	}
 }
 
