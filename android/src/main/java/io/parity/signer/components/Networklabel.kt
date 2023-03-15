@@ -43,7 +43,7 @@ fun NetworkLabelWithIcon(networkName: String,
 			color = MaterialTheme.colors.textSecondary,
 			style = style,
 			modifier = Modifier
-				.padding(start = 6.dp, end = iconHeight / 2)
+				.padding(start = 6.dp, end = iconHeight / 3)
 		)
 	}
 }
