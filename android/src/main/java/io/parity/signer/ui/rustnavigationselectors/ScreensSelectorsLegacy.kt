@@ -12,7 +12,7 @@ import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
-import io.parity.signer.screens.networks.NetworkDetailsOld
+import io.parity.signer.screens.networks.details.NetworkDetailsOld
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
@@ -124,7 +124,7 @@ fun ModalSelector(
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
-			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
+			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(//todo network details
 				sharedViewModel = sharedViewModel
 			)
 			is ModalData.ManageMetadata -> {
@@ -134,7 +134,7 @@ fun ModalSelector(
 				modalData.f,
 			)
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
-			is ModalData.TypesInfo -> TypesInfo(
+			is ModalData.TypesInfo -> TypesInfo(//todo was in network lists,
 				modalData.f,
 				sharedViewModel = sharedViewModel
 			)

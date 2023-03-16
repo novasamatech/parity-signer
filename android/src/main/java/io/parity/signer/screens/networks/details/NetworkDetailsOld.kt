@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks
+package io.parity.signer.screens.networks.details
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -89,7 +89,7 @@ fun NetworkDetailsOld(
 						)
 					}
 				) {
-					MetadataCard(metadataRecord)
+					MetadataCardOld(metadataRecord)
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks
+package io.parity.signer.screens.networks.details
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +15,7 @@ import io.parity.signer.domain.abbreviateString
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable
-fun MetadataCard(metadataRecord: MMetadataRecord) {
+fun MetadataCardOld(metadataRecord: MMetadataRecord) {
 	Row {
 		IdentIcon(identicon = metadataRecord.metaIdPic.toImageContent())
 		Column {

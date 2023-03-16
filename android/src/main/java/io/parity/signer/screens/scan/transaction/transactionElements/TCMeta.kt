@@ -21,7 +21,7 @@ import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.MMetadataRecord
 
 @Composable
-fun TCMeta(meta: TransactionMetadataModel) {
+fun TCMeta(meta: MetadataModel) {
 	Column {
 		Text(
 			stringResource(R.string.transaction_metadata_header),
@@ -56,14 +56,14 @@ fun TCMeta(meta: TransactionMetadataModel) {
 /**
  * Local copy of shared [MMetadataRecord] class
  */
-data class TransactionMetadataModel(
+data class MetadataModel(
 	val specname: String,
 	val specsVersion: String,
 	val metaHash: String,
 ) {
 	companion object {
-		fun createStub(): TransactionMetadataModel =
-			TransactionMetadataModel(
+		fun createStub(): MetadataModel =
+			MetadataModel(
 				specname = "Westend",
 				specsVersion = "9230",
 				metaHash = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
@@ -71,8 +71,8 @@ data class TransactionMetadataModel(
 	}
 }
 
-fun MMetadataRecord.toTransactionMetadataModel(): TransactionMetadataModel =
-	TransactionMetadataModel(
+fun MMetadataRecord.toMetadataModel(): MetadataModel =
+	MetadataModel(
 		specname = specname,
 		specsVersion = specsVersion,
 		metaHash = metaHash,
@@ -90,7 +90,7 @@ fun MMetadataRecord.toTransactionMetadataModel(): TransactionMetadataModel =
 )
 @Composable
 private fun PreviewTCMeta() {
-	val model = TransactionMetadataModel.createStub()
+	val model = MetadataModel.createStub()
 	SignerNewTheme {
 		TCMeta(model)
 	}
