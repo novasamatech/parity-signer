@@ -73,7 +73,7 @@ fun TopBar(
 			modifier = Modifier.weight(0.6f, fill = true)
 		) {
 			Text(
-				actionResult.screenLabel ?: "",
+				getScreenLabel(actionResult.screenLabel),
 				style = if (actionResult.screenNameType == ScreenNameType.H1) {
 					MaterialTheme.typography.h2
 				} else {
@@ -126,5 +126,12 @@ fun TopBar(
 				NavbarShield(networkState = networkState)
 			}
 		}
+	}
+}
+
+private fun getScreenLabel(screenLabel: String): String {
+	return when (screenLabel) {
+		"Recover Seed" -> "Recover Key Set"
+		else -> screenLabel
 	}
 }

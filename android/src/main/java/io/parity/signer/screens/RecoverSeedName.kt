@@ -37,7 +37,7 @@ fun RecoverSeedName(
 			.padding(20.dp)
 	) {
 		Row {
-			HeadingOverline("DISPLAY NAME")
+			HeadingOverline("Key Set Name")
 			Spacer(Modifier.weight(1f))
 		}
 		SingleTextInput(
@@ -60,7 +60,7 @@ fun RecoverSeedName(
 		)
 
 		Text(
-			"Display name visible only on this device",
+			"Key set name visible only on this device",
 			style = MaterialTheme.typography.caption,
 			color = MaterialTheme.colors.Text600
 		)

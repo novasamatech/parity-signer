@@ -54,7 +54,7 @@ fun RecoverSeedPhrase(
 				style = MaterialTheme.typography.subtitle1
 			)
 		}
-		HeadingOverline("SEED PHRASE")
+		HeadingOverline("Secret Recovery Phrase")
 
 		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseBox(
@@ -72,7 +72,7 @@ fun RecoverSeedPhrase(
 		Spacer(Modifier.weight(0.1f))
 		if (recoverSeedPhrase.keyboard) {
 			BigButton(
-				text = "Next",
+				text = "Recover Key Set",
 				action = {
 					recoverSeedPhrase.seedName.let { seedName ->
 						seedPhraseReady?.let {
