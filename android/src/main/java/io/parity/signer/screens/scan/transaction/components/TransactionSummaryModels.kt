@@ -101,7 +101,7 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 		),
 		keyModel = value.authorInfo?.let { author ->
 			KeyCardModelBase(
-				path = author.address.toDisplayablePathString(),
+				path = author.address.path,
 				seedName = author.address.seedName,
 				base58 = author.base58,
 				networkLogo = value.networkInfo?.networkLogo,
@@ -112,9 +112,6 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 	)
 }
 
-fun Address.toDisplayablePathString(): String {
-	return if (hasPwd) "$path •••• " else path
-}
 
 data class TransactionSummaryModel(
 	val pallet: String,
