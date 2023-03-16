@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.ImageContent
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
@@ -191,7 +192,10 @@ data class KeyCardModel(
 				network = network.networkTitle.replaceFirstChar {
 					if (it.isLowerCase()) it.titlecase() else it.toString()
 				},
-				cardBase = KeyCardModelBase.fromKeyModel(model, networkLogo = network.networkLogo)
+				cardBase = KeyCardModelBase.fromKeyModel(
+					model,
+					networkLogo = network.networkLogo
+				)
 			)
 
 		/**
@@ -206,7 +210,11 @@ data class KeyCardModel(
 				network = network.networkTitle.replaceFirstChar {
 					if (it.isLowerCase()) it.titlecase() else it.toString()
 				},
-				cardBase = KeyCardModelBase.fromAddress(address, base58, network.networkLogo )
+				cardBase = KeyCardModelBase.fromAddress(
+					address,
+					base58,
+					network.networkLogo
+				)
 			)
 
 		fun createStub() = KeyCardModel(
@@ -294,7 +302,13 @@ data class KeyCardModelBase(
 @Composable
 private fun PreviewKeyCard() {
 	SignerNewTheme {
-		KeyCard(model = KeyCardModel.createStub())
+		val model = KeyCardModel.createStub()
+		KeyCard(model = model)
+		SignerDivider()
+		//todo dmitry fix me
+		KeyCard(model = model.copy(cardBase = model.cardBase.copy(
+			path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,
+		)))
 	}
 }
 
@@ -331,8 +345,6 @@ private fun PreviewKeySeedCard() {
 @Composable
 private fun PreviewNetworkLabel() {
 	SignerNewTheme {
-		Box(Modifier.size(width = 100.dp, height = 500.dp)) {
-			NetworkLabel("Polkadot")
-		}
+		NetworkLabel("Polkadot")
 	}
 }

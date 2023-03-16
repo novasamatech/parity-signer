@@ -174,6 +174,10 @@ private fun PreviewSlimKeyItem() {
 			SlimKeyItem(model)
 			SignerDivider()
 			SlimKeyItem(model.copy(key = model.key.copy(path = "")))
+			SignerDivider()
+			//todo dmitry fix it
+			SlimKeyItem(model.copy(key = model.key.copy(
+				path = "//kusama//some//very_long_path//somesomesome", hasPwd = true,)))
 		}
 	}
 }
