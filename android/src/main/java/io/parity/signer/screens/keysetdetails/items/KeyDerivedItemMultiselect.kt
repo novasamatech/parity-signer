@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.IdentIconWithNetwork
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.abbreviateString
@@ -105,10 +106,20 @@ fun KeyDerivedItemMultiselect(
 @Composable
 private fun PreviewKeyDerivedItemMultiselect() {
 	SignerNewTheme {
-		KeyDerivedItemMultiselect(
-			model = KeyModel.createStub(),
-			networkLogo = "kusama",
-			onClick = { _, _ -> },
-		)
+		Column {
+			KeyDerivedItemMultiselect(
+				model = KeyModel.createStub(),
+				networkLogo = "kusama",
+				onClick = { _, _ -> },
+			)
+			SignerDivider()
+			//todo dmitry fix long path issue
+			KeyDerivedItemMultiselect(
+				model = KeyModel.createStub().copy(
+					path = "//kusama//some//very_long_path//somesomesome", hasPwd = true,),
+				networkLogo = "kusama",
+				onClick = { _, _ -> },
+			)
+		}
 	}
 }

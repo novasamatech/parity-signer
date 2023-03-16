@@ -175,6 +175,13 @@ private fun PreviewKeyCardPassword() {
 			KeyCardPassword(model = KeyCardModelBase.createStub())
 			SignerDivider()
 			KeyCardSignature(model = KeyCardModelBase.createStub())
+			//todo dmitry fix me
+			KeyCardPassword(model = KeyCardModelBase.createStub().copy(
+				path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,))
+			SignerDivider()
+			KeyCardSignature(model = KeyCardModelBase.createStub().copy(
+				path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,
+			))
 		}
 	}
 }
