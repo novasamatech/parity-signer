@@ -12,7 +12,7 @@ import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
-import io.parity.signer.screens.networks.NetworkDetails
+import io.parity.signer.screens.networks.NetworkDetailsOld
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
@@ -51,11 +51,8 @@ fun ScreenSelector(
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
-		is ScreenData.ManageNetworks -> ManageNetworks(
-			screenData.f,
-			button2,
-		)
-		is ScreenData.NNetworkDetails -> NetworkDetails(
+		is ScreenData.ManageNetworks -> {}//migrated to new selector
+		is ScreenData.NNetworkDetails -> NetworkDetailsOld(
 			screenData.f,
 			button2
 		)

@@ -30,6 +30,8 @@ import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
+import io.parity.signer.screens.networks.NetworksList
+import io.parity.signer.screens.networks.toNetworksListModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -100,6 +102,13 @@ fun CombinedScreensSelector(
 					appVersion = sharedViewModel.getAppVersion(),
 					wipeToFactory = sharedViewModel::wipeToFactory,
 					networkState = networkState
+				)
+			}
+		is ScreenData.ManageNetworks ->
+			Box(modifier = Modifier.statusBarsPadding()) {
+				NetworksList(
+					model = screenData.f.toNetworksListModel(),
+					rootNavigator = rootNavigator
 				)
 			}
 		is ScreenData.NewSeed ->

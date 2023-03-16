@@ -16,7 +16,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
 
 @Composable
-fun NetworkDetails(
+fun NetworkDetailsOld(
 	networkDetails: MNetworkDetails,
 	button: (Action, String) -> Unit
 ) {

@@ -332,6 +332,7 @@
 	<string name="transaction_error_outdated_metadata_subtitle">Unique network\'s 3220 metadata is different to the 3219 data you\'re using in the app. Please update it to sign the transaction.</string>
 	<string name="transaction_error_unknown_network_title">Please add the Network you want to Transact in</string>
 	<string name="transaction_error_unknown_network_subtitle">You\'re trying to sign a transaction in a network which has not been added</string>
+    <string name="networks_screen_title">Networks</string>
 
 
 </resources>
