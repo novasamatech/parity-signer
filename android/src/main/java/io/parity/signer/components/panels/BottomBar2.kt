@@ -17,22 +17,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.KeySetModel
-import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.domain.Navigator
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
 /**
  * Bar to be shown on the bottom of screen;
  * Redesigned version
+ * @param onBeforeActionWhenClicked is when some actiond need to be done before
+ * we can navigate to tapped state. Workaround for state machine
  */
 @Composable
 fun BottomBar2(
 	navigator: Navigator,
 	state: BottomBar2State,
+	onBeforeActionWhenClicked: Callback? = null,
 ) {
 	BottomBarSingleton.lastUsedTab = state
 	BottomAppBar(
@@ -50,6 +51,7 @@ fun BottomBar2(
 				action = Action.NAVBAR_KEYS,
 				labelResId = R.string.bottom_bar_label_key_sets,
 				isEnabled = state == BottomBar2State.KEYS,
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 			BottomBarButton2(
 				navigator = navigator,
@@ -57,7 +59,8 @@ fun BottomBar2(
 				action = Action.NAVBAR_SCAN,
 				labelResId = R.string.bottom_bar_label_scanner,
 				isEnabled = state == BottomBar2State.SCANNER,
-			)
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				)
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_view_agenda_outlined_24,
@@ -65,7 +68,8 @@ fun BottomBar2(
 				action = Action.NAVBAR_LOG,
 				labelResId = R.string.bottom_bar_label_logs,
 				isEnabled = state == BottomBar2State.LOGS,
-			)
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				)
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_settings_outlined_24,
@@ -73,7 +77,8 @@ fun BottomBar2(
 				action = Action.NAVBAR_SETTINGS,
 				labelResId = R.string.bottom_bar_label_settings,
 				isEnabled = state == BottomBar2State.SETTINGS,
-			)
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				)
 		}
 	}
 }
@@ -91,6 +96,7 @@ fun BottomBarButton2(
 	action: Action,
 	@StringRes labelResId: Int,
 	isEnabled: Boolean,
+	onBeforeActionWhenClicked: Callback?
 ) {
 	val color = if (isEnabled) {
 		MaterialTheme.colors.pink500
@@ -100,7 +106,10 @@ fun BottomBarButton2(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-			.clickable { navigator.navigate(action) }
+			.clickable {
+				onBeforeActionWhenClicked?.invoke()
+				navigator.navigate(action)
+			}
 			.width(66.dp)
 	) {
 		Icon(

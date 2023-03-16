@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -31,12 +32,15 @@ import io.parity.signer.uniffi.MManageNetworks
 @Composable
 fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeader(title = stringResource(R.string.networks_screen_title),
-			onBack = { rootNavigator.backAction() })
+		ScreenHeader(
+			title = stringResource(R.string.networks_screen_title),
+			onBack = { rootNavigator.backAction() }
+		)
+		Spacer(modifier = Modifier.padding(top = 10.dp))
 		Column(
-			Modifier
-				.weight(1f)
-				.verticalScroll(rememberScrollState())
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
 		) {
 			model.networks.forEach { network ->
 				NetworkListItem(network) {
@@ -44,16 +48,19 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 				}
 			}
 		}
-		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
+		BottomBar2(rootNavigator, BottomBar2State.SETTINGS) {
+			rootNavigator.backAction()
+		}
 	}
 }
+
 
 @Composable
 private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 	Row(
-		Modifier
-			.padding(horizontal = 16.dp, vertical = 8.dp)
-			.clickable(onClick = callback)
+        Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = callback)
 	) {
 		NetworkIcon(networkLogoName = network.logo, size = 36.dp)
 		Text(
@@ -61,8 +68,8 @@ private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 			style = SignerTypeface.TitleS,
 			color = MaterialTheme.colors.primary,
 			modifier = Modifier
-				.padding(start = 24.dp)
-				.weight(1f)
+                .padding(start = 24.dp)
+                .weight(1f)
 		)
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
