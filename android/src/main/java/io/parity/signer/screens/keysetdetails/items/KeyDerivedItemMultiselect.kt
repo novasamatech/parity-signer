@@ -42,7 +42,8 @@ fun KeyDerivedItemMultiselect(
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = Color.Transparent,
-		modifier = Modifier.clickable { onClick(!isSelected, model.addressKey) }
+		modifier = Modifier.padding(vertical = 16.dp)
+			.clickable { onClick(!isSelected, model.addressKey) }
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -52,8 +53,6 @@ fun KeyDerivedItemMultiselect(
 				networkLogoName = networkLogo,
 				size = 36.dp,
 				modifier = Modifier.padding(
-					top = 16.dp,
-					bottom = 16.dp,
 					start = 16.dp,
 					end = 12.dp
 				)
@@ -86,7 +85,7 @@ fun KeyDerivedItemMultiselect(
 			SignerCheckbox(
 				isChecked = isSelected,
 				modifier = Modifier
-					.padding(end = 8.dp)
+					.padding(horizontal = 8.dp)
 			) {
 				onClick(!isSelected, model.addressKey)
 			}
@@ -113,7 +112,6 @@ private fun PreviewKeyDerivedItemMultiselect() {
 				onClick = { _, _ -> },
 			)
 			SignerDivider()
-			//todo dmitry fix long path issue
 			KeyDerivedItemMultiselect(
 				model = KeyModel.createStub().copy(
 					path = "//kusama//some//very_long_path//somesomesome", hasPwd = true,),

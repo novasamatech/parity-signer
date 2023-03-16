@@ -132,7 +132,6 @@ private fun PreviewKeyCardPassword() {
 			KeyCardPassword(model = KeyCardModelBase.createStub())
 			SignerDivider()
 			KeyCardSignature(model = KeyCardModelBase.createStub())
-			//todo dmitry fix me check if label with icon should be here
 			KeyCardPassword(model = KeyCardModelBase.createStub().copy(
 				path = "//kusama//some//very_long_path//somesomesome//somemoremore-path", hasPassword = true,))
 			SignerDivider()

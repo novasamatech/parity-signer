@@ -173,7 +173,6 @@ private fun PreviewSlimKeyItem() {
 			SignerDivider()
 			SlimKeyItem(model.copy(key = model.key.copy(path = "")))
 			SignerDivider()
-			//todo dmitry fix it
 			SlimKeyItem(
 				model.copy(
 					key = model.key.copy(
