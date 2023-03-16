@@ -12,10 +12,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,57 +48,38 @@ import java.util.*
 
 @Composable
 fun KeyCard(model: KeyCardModel) {
-	Row(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+
+	Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
-
-		//left
-		Column(Modifier.weight(1f)) {
-			KeyPath(model.cardBase.path, model.cardBase.hasPassword)
-
-			Spacer(Modifier.padding(top = 4.dp))
-
-			Text(
-				model.cardBase.seedName,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.LabelS,
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			Column(Modifier.weight(1f)) {
+				KeyPath(model.cardBase.path, model.cardBase.hasPassword)
+				Spacer(Modifier.padding(top = 4.dp))
+				Text(
+					model.cardBase.seedName,
+					color = MaterialTheme.colors.primary,
+					style = SignerTypeface.LabelS,
+				)
+			}
+			IdentIconWithNetwork(
+				identicon = model.cardBase.identIcon,
+				networkLogoName = model.network,
+				size = 36.dp,
+				modifier = Modifier.padding(start = 24.dp)
 			)
-
-			Spacer(Modifier.padding(top = 10.dp))
-
-			Box(modifier = Modifier.padding(end = 24.dp)) {
-				ShowBase58Collapsible(model.cardBase.base58)
-			}
 		}
-
-
-		//right()
-		Column(horizontalAlignment = Alignment.End) {
-			Box(contentAlignment = Alignment.TopEnd) {
-				IdentIconWithNetwork(model.cardBase.identIcon, model.network, 36.dp)
-				model.cardBase.multiselect?.let {
-					if (it) {
-						Icon(
-							Icons.Default.CheckCircle,
-							"Not multiselected",
-							tint = MaterialTheme.colors.Action400
-						)
-					} else {
-						Icon(
-							Icons.Outlined.Circle,
-							"Multiselected",
-							tint = MaterialTheme.colors.Action400
-						)
-					}
-				}
-			}
-
-			Spacer(Modifier.padding(top = 14.dp))
-
-			val networkName = model.network
-			NetworkLabel(networkName)
+		Spacer(Modifier.padding(top = 10.dp))
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			ShowBase58Collapsible(
+				base58 = model.cardBase.base58,
+				modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 24.dp)
+			)
+			NetworkLabel(model.network)
 		}
 	}
 }
@@ -112,20 +91,20 @@ fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 		color = MaterialTheme.colors.textTertiary,
 		style = SignerTypeface.CaptionM,
 		modifier = modifier
-			.background(
-				MaterialTheme.colors.fill12,
-				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-			)
-			.padding(horizontal = 8.dp, vertical = 2.dp)
+            .background(
+                MaterialTheme.colors.fill12,
+                RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+            )
+            .padding(horizontal = 8.dp, vertical = 2.dp)
 	)
 }
 
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-		Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -144,7 +123,7 @@ fun KeyPath(
 	iconSize: TextUnit = 14.sp,
 	textColor: Color = MaterialTheme.colors.textSecondary,
 	iconColor: Color = MaterialTheme.colors.textSecondary,
-	) {
+) {
 	val imageId = "iconId$$"
 	val annotatedString = buildAnnotatedString {
 		append(path)
@@ -178,13 +157,13 @@ fun KeyPath(
 }
 
 @Composable
-fun ShowBase58Collapsible(base58: String) {
+fun ShowBase58Collapsible(base58: String, modifier: Modifier = Modifier) {
 	val expanded = remember { mutableStateOf(false) }
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier
-			.clickable { expanded.value = !expanded.value }
-			.animateContentSize()
+		modifier = modifier
+            .clickable { expanded.value = !expanded.value }
+            .animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
@@ -336,7 +315,6 @@ private fun PreviewKeyCard() {
 		Column() {
 			KeyCard(model = model)
 			SignerDivider()
-			//todo dmitry fix me
 			KeyCard(
 				model = model.copy(
 					cardBase = model.cardBase.copy(
