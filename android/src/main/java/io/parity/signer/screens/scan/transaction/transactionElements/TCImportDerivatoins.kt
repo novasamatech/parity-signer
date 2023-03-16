@@ -29,6 +29,7 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
@@ -107,24 +108,7 @@ private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 		Row() {
 			IdentIcon(key.identicon, 16.dp)
 			Spacer(modifier = Modifier.padding(end = 8.dp))
-			Text(
-				key.derivationPath,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.CaptionM,
-			)
-			if (key.hadPwd) {
-				Text(
-					" •••• ",
-					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.CaptionM,
-				)
-				Icon(
-					imageVector = Icons.Outlined.Lock,
-					contentDescription = stringResource(R.string.description_locked_icon),
-					tint = MaterialTheme.colors.primary,
-					modifier = Modifier.size(14.dp)
-				)
-			}
+			KeyPath(path = key.derivationPath, hasPassword = key.hadPwd)
 		}
 		Text(
 			text = key.address,

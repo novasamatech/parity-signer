@@ -45,28 +45,7 @@ fun KeyCardPassword(
 
 		//left
 		Column(Modifier.weight(1f)) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					model.path,
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.CaptionM,
-				)
-				if (model.hasPassword) {
-					Text(
-						" •••• ",
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.CaptionM,
-					)
-					Icon(
-						Icons.Outlined.Lock,
-						contentDescription = stringResource(R.string.description_locked_icon),
-						tint = MaterialTheme.colors.textSecondary,
-						modifier = Modifier.size(14.dp)
-					)
-				}
-			}
+			KeyPath(path = model.path, hasPassword = model.hasPassword)
 
 			Spacer(Modifier.padding(top = 4.dp))
 
@@ -111,28 +90,7 @@ fun KeyCardSignature(
 
 		//left
 		Column(Modifier.weight(1f)) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					model.path,
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.CaptionM,
-				)
-				if (model.hasPassword) {
-					Text(
-						" •••• ",
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.CaptionM,
-					)
-					Icon(
-						Icons.Outlined.Lock,
-						contentDescription = stringResource(R.string.description_locked_icon),
-						tint = MaterialTheme.colors.textSecondary,
-						modifier = Modifier.size(14.dp)
-					)
-				}
-			}
+			KeyPath(path = model.path, hasPassword = model.hasPassword)
 
 			Spacer(Modifier.padding(top = 4.dp))
 
@@ -177,10 +135,10 @@ private fun PreviewKeyCardPassword() {
 			KeyCardSignature(model = KeyCardModelBase.createStub())
 			//todo dmitry fix me
 			KeyCardPassword(model = KeyCardModelBase.createStub().copy(
-				path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,))
+				path = "//kusama//some//very_long_path//somesomesome//somemoremore-path", hasPassword = true,))
 			SignerDivider()
 			KeyCardSignature(model = KeyCardModelBase.createStub().copy(
-				path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,
+				path = "//kusama//some//very_long_path//somesomesome//somemoremore-path", hasPassword = true,
 			))
 		}
 	}

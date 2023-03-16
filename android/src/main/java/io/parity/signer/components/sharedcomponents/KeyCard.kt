@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,10 +21,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.ImageContent
@@ -49,27 +58,7 @@ fun KeyCard(model: KeyCardModel) {
 
 		//left
 		Column(Modifier.weight(1f)) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					model.cardBase.path,
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.CaptionM,
-				)
-				if (model.cardBase.hasPassword) {
-					Text(
-						" •••• ",
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.CaptionM,
-					)
-					Icon(
-						Icons.Default.Lock,
-						contentDescription = stringResource(R.string.description_locked_icon),
-						tint = MaterialTheme.colors.textSecondary,
-					)
-				}
-			}
+			KeyPath(model.cardBase.path, model.cardBase.hasPassword)
 
 			Spacer(Modifier.padding(top = 4.dp))
 
@@ -145,6 +134,47 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 		)
 		ShowBase58Collapsible(base58)
 	}
+}
+
+
+@Composable
+fun KeyPath(
+	path: String, hasPassword: Boolean,
+	textStyle: TextStyle = SignerTypeface.CaptionM,
+	iconSize: TextUnit = 14.sp,
+	textColor: Color = MaterialTheme.colors.textSecondary,
+	iconColor: Color = MaterialTheme.colors.textSecondary,
+	) {
+	val imageId = "iconId$$"
+	val annotatedString = buildAnnotatedString {
+		append(path)
+		if (hasPassword) {
+			append(" •••• ")
+			appendInlineContent(id = imageId)
+		}
+	}
+	val inlineContentMap = mapOf(
+		imageId to InlineTextContent(
+			Placeholder(
+				iconSize,
+				iconSize,
+				PlaceholderVerticalAlign.TextCenter
+			)
+		) {
+			Icon(
+				Icons.Default.Lock,
+				contentDescription = stringResource(R.string.description_locked_icon),
+				tint = iconColor,
+			)
+		}
+	)
+
+	Text(
+		annotatedString,
+		inlineContent = inlineContentMap,
+		color = textColor,
+		style = textStyle,
+	)
 }
 
 @Composable
@@ -301,14 +331,21 @@ data class KeyCardModelBase(
 )
 @Composable
 private fun PreviewKeyCard() {
+	val model = KeyCardModel.createStub()
 	SignerNewTheme {
-		val model = KeyCardModel.createStub()
-		KeyCard(model = model)
-		SignerDivider()
-		//todo dmitry fix me
-		KeyCard(model = model.copy(cardBase = model.cardBase.copy(
-			path = "//kusama//some//very_long_path//somesomesome", hasPassword = true,
-		)))
+		Column() {
+			KeyCard(model = model)
+			SignerDivider()
+			//todo dmitry fix me
+			KeyCard(
+				model = model.copy(
+					cardBase = model.cardBase.copy(
+						path = "//kusama//some//very_long_path//somesomesome",
+						hasPassword = true,
+					)
+				)
+			)
+		}
 	}
 }
 
