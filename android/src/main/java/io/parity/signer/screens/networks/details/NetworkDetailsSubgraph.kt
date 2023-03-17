@@ -39,7 +39,8 @@ fun NetworkDetailsSubgraph(
 			onRemoveMetadataCallback = { metadataVersion ->
 				savedMetadataVersionAction.value = metadataVersion
 				menuController.navigate(NetworkDetailsMenuSubgraph.metadataDeleteConfirm)
-			}
+			},
+			onAddNetwork = {},//todo dmitry
 		)
 	}
 	val closeAction: Callback = {

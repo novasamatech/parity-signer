@@ -353,6 +353,7 @@
 	<string name="network_details_metadata_delete_label">Delete this metadata</string>
 	<string name="network_details_remove_metadata_confirm_title">Remove metadata?</string>
 	<string name="network_details_remove_metadata_confirm_description">This metadata will be removed for all networks</string>
+    <string name="network_details_add_network_metadata_label">Add Network Metadata</string>
 
 
 </resources>

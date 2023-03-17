@@ -3,10 +3,12 @@ package io.parity.signer.screens.networks.details
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -73,6 +75,7 @@ fun NetworkDetailsScreen(
 			Column(
 				verticalArrangement = Arrangement.spacedBy(8.dp),
 				modifier = Modifier
+					.padding(bottom = 8.dp)
 					.background(
 						MaterialTheme.colors.fill6,
 						RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
@@ -107,7 +110,6 @@ fun NetworkDetailsScreen(
 				SignerDivider()
 				VerifierContent(model.currentVerifier)
 			}
-			Spacer(modifier = Modifier.padding(top = 16.dp))
 
 			//metadata
 			if (model.meta.isNotEmpty()) {
@@ -117,6 +119,7 @@ fun NetworkDetailsScreen(
 					color = MaterialTheme.colors.textSecondary,
 					modifier = Modifier
 						.padding(horizontal = 16.dp)
+						.padding(top = 8.dp)
 						.fillMaxWidth(1f)
 				)
 				model.meta.forEach { metadata ->
@@ -177,20 +180,34 @@ fun NetworkDetailsScreen(
 					}
 				}
 			}
+			//add network
 			Row(
 				Modifier
-					.padding(horizontal = 16.dp)
-					.clickable(onClick = onAddNetwork)) {
-
+					.clickable(onClick = onAddNetwork)
+					.padding(vertical = 16.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Box(
+					modifier =
+					Modifier
+						.padding(start = 8.dp, end = 12.dp)
+						.background(MaterialTheme.colors.fill6, CircleShape)
+						.padding(4.dp)
+						.size(24.dp)
+				) {
+					Image(
+						imageVector = Icons.Default.Add,
+						contentDescription = stringResource(R.string.network_details_add_network_metadata_label),
+						colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+					)
+				}
 				Text(
-					text = stringResource(R.string.network_details_metadata_delete_label),
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.red500,
-					modifier = Modifier
-						.fillMaxWidth(1f)
+					text = stringResource(R.string.network_details_add_network_metadata_label),
+					style = SignerTypeface.TitleS,
+					color = MaterialTheme.colors.pink300,
+					modifier = Modifier.fillMaxWidth(1f)
 				)
 			}
-			//todo dmitry add network metadata here
 		}
 	}
 }
@@ -244,6 +261,28 @@ private fun VerifierContent(verifier: VerifierModel) {
 	}
 }
 
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewNetworkDetailsScreenSmall() {
+	val model = NetworkDetailsModel.createStub().copy(meta = emptyList())
+	SignerNewTheme {
+		NetworkDetailsScreen(
+			model,
+			rootNavigator = EmptyNavigator(),
+			onMenu = {},
+			onRemoveMetadataCallback = { _ -> },
+			onAddNetwork = { },
+		)
+	}
+}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -262,7 +301,8 @@ private fun PreviewNetworkDetailsScreen() {
 			model,
 			rootNavigator = EmptyNavigator(),
 			onMenu = {},
-			onRemoveMetadataCallback = { _ -> }
+			onRemoveMetadataCallback = { _ -> },
+			onAddNetwork = { },
 		)
 	}
 }
