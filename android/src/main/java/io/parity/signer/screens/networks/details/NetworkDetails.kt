@@ -50,7 +50,7 @@ fun NetworkDetailsScreen(
 				style = SignerTypeface.TitleM,
 				color = MaterialTheme.colors.primary,
 				modifier = Modifier
-					.padding(start = 24.dp)
+					.padding(horizontal = 24.dp)
 			)
 
 			Text(
@@ -59,6 +59,7 @@ fun NetworkDetailsScreen(
 				color = MaterialTheme.colors.secondary,
 				modifier = Modifier.fillMaxWidth(1f)
 			)
+			Spacer(modifier = Modifier.padding(top = 4.dp))
 			Column(
 				verticalArrangement = Arrangement.spacedBy(8.dp),
 				modifier = Modifier
@@ -138,6 +139,7 @@ fun NetworkDetailsScreen(
 					}
 				}
 			}
+			//todo dmitry add network metadata here
 		}
 	}
 }
