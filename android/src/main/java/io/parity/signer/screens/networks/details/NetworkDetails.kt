@@ -18,6 +18,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.transaction.transactionElements.TCNameValueOppositeElement
@@ -28,14 +29,16 @@ import io.parity.signer.ui.theme.fill6
 @Composable
 fun NetworkDetailsScreen(
 	model: NetworkDetailsModel,
-	rootNavigator: Navigator
+	rootNavigator: Navigator,
+	onMenu: Callback,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 
-		ScreenHeader(title = null, onBack = { rootNavigator.backAction() },
-			onMenu = {
-				//todo dmitry implement
-			})
+		ScreenHeader(
+			title = null,
+			onBack = { rootNavigator.backAction() },
+			onMenu = onMenu,
+		)
 		Column(
 			Modifier
 				.weight(1f)
@@ -161,6 +164,7 @@ private fun PreviewNetworkDetailsScreen() {
 		NetworkDetailsScreen(
 			model,
 			rootNavigator = EmptyNavigator(),
+			onMenu = {},
 		)
 	}
 }

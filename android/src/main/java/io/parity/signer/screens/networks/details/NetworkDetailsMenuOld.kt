@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun NetworkDetailsMenu(sharedViewModel: SharedViewModel) {
+fun NetworkDetailsMenuOld(sharedViewModel: SharedViewModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {

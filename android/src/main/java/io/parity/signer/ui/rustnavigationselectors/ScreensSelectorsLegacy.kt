@@ -124,9 +124,7 @@ fun ModalSelector(
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
-			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(//todo network details
-				sharedViewModel = sharedViewModel
-			)
+			is ModalData.NetworkDetailsMenu -> {} // migrated to network details screen
 			is ModalData.ManageMetadata -> {
 				ManageMetadata(modalData.f, sharedViewModel = sharedViewModel)
 			}
