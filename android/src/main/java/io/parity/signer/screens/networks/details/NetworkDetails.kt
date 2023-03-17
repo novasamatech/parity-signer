@@ -1,16 +1,17 @@
 package io.parity.signer.screens.networks.details
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,15 +23,18 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.transaction.transactionElements.TCNameValueOppositeElement
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun NetworkDetailsScreen(
 	model: NetworkDetailsModel,
 	rootNavigator: Navigator,
 	onMenu: Callback,
+	onRemoveMetadataCallback: (version: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 
@@ -103,6 +107,8 @@ fun NetworkDetailsScreen(
 				VerifierContent(model.currentVerifier)
 			}
 			Spacer(modifier = Modifier.padding(top = 16.dp))
+
+			//metadata
 			if (model.meta.isNotEmpty()) {
 				Text(
 					text = stringResource(R.string.network_details_header_metadata),
@@ -133,10 +139,40 @@ fun NetworkDetailsScreen(
 							value = metadata.metaHash,
 							valueInSameLine = false
 						)
-//						SignerDivider()
-//						Sign item todo dmitry
-//						SignerDivider()
-//						delete item
+						SignerDivider()
+						//sign metadata
+						Row(Modifier.clickable {
+							FakeNavigator().navigate(
+								Action.MANAGE_METADATA,
+								metadata.specsVersion
+							)
+							rootNavigator.navigate(Action.REMOVE_METADATA)
+						}) {
+							Text(
+								text = stringResource(R.string.network_details_metadata_sign_field_label),
+								style = SignerTypeface.BodyL,
+								color = MaterialTheme.colors.pink300,
+								modifier = Modifier
+									.weight(1f)
+							)
+							Image(
+								imageVector = Icons.Filled.ChevronRight,
+								contentDescription = null,
+								colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+							)
+						}
+						SignerDivider()
+						//delete metadata
+						Text(
+							text = stringResource(R.string.network_details_metadata_delete_label),
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.red500,
+							modifier = Modifier
+								.clickable {
+									onRemoveMetadataCallback(metadata.specsVersion)
+								}
+								.fillMaxWidth(1f)
+						)
 					}
 				}
 			}
@@ -212,6 +248,7 @@ private fun PreviewNetworkDetailsScreen() {
 			model,
 			rootNavigator = EmptyNavigator(),
 			onMenu = {},
+			onRemoveMetadataCallback = {_ ->}
 		)
 	}
 }

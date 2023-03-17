@@ -123,9 +123,7 @@ fun ModalSelector(
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> {} // migrated to network details screen
-			is ModalData.ManageMetadata -> {
-				ManageMetadata(modalData.f, sharedViewModel = sharedViewModel)
-			}
+			is ModalData.ManageMetadata -> {} // those actions now right in network details screen
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
 			)

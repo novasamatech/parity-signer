@@ -349,6 +349,10 @@
 	<string name="network_details_field_network_hash">Genesis hash</string>
 	<string name="network_details_verifier_unknown_type">unknown!</string>
 	<string name="network_details_verifier_encryption_field">encryption: %1$s</string>
+	<string name="network_details_metadata_sign_field_label">Sign this metadata</string>
+	<string name="network_details_metadata_delete_label">Delete this metadata</string>
+	<string name="network_details_remove_metadata_confirm_title">Remove metadata?</string>
+	<string name="network_details_remove_metadata_confirm_description">This metadata will be removed for all networks</string>
 
 
 </resources>
