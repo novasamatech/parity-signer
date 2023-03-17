@@ -30,8 +30,8 @@ import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
-import io.parity.signer.screens.networks.NetworksList
-import io.parity.signer.screens.networks.toNetworksListModel
+import io.parity.signer.screens.networks.list.NetworksList
+import io.parity.signer.screens.networks.list.toNetworksListModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot

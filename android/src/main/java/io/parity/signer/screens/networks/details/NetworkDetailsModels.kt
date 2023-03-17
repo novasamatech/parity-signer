@@ -2,46 +2,72 @@ package io.parity.signer.screens.networks.details
 
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
+import io.parity.signer.domain.encodeHex
 import io.parity.signer.screens.scan.transaction.transactionElements.MetadataModel
 import io.parity.signer.screens.scan.transaction.transactionElements.toMetadataModel
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.MNetworkDetails
 import io.parity.signer.uniffi.MVerifier
 
 
 data class NetworkDetailsModel(
 	val base58prefix: UShort,
-	val color: String,
+//	val color: String,
 	val decimals: UByte,
-	val encryptionType: String,
-	val genesisHash: List<UByte>,
+//	val encryptionType: String,
+	val genesisHash: String,
 	val logo: String,
 	val name: String,
-	val order: String,
-	val pathId: String,
-	val secondaryColor: String,
+//	val order: String,
+//	val pathId: String,
+//	val secondaryColor: String,
 	val title: String,
 	val unit: String,
 	val currentVerifier: VerifierModel,
 	val meta: List<MetadataModel>
-)
+) {
+	companion object {
+		fun createStub() = NetworkDetailsModel(
+			base58prefix = 0u,
+//			color =
+			decimals = 10.toUByte(),
+//			encryptionType =
+			genesisHash = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+			logo = "polkadot",
+			name = "Polkadot",
+//			order
+//			pathId
+//			secondaryColor
+			title = "Polkadot",
+			unit = "DOT",
+			currentVerifier = VerifierModel(
+				"General",
+				"vwvsWqqBYFK",
+				PreviewData.exampleIdenticonPng,
+				"src3322"
+			),
+			meta = listOf()//todo dmitry add
+		)
+	}
+}
 
 fun MNetworkDetails.toNetworkDetailsModel() = NetworkDetailsModel(
 	base58prefix = base58prefix,
-	color = color,
+//	color = color,
 	decimals = decimals,
-	encryptionType = encryption.name,
-	genesisHash = genesisHash,
+//	encryptionType = encryption.name,
+	genesisHash = genesisHash.toUByteArray()
+		.toByteArray().encodeHex(),
 	logo = logo,
 	name = name,
-	order = order,
-	pathId = pathId,
-	secondaryColor = secondaryColor,
+//	order = order,
+//	pathId = pathId,
+//	secondaryColor = secondaryColor,
 	title = title,
 	unit = unit,
 	currentVerifier = currentVerifier.toVerifierModel(),
 	meta = meta.map { it.toMetadataModel() },
 )
-
 
 data class VerifierModel(
 	val ttype: String,
