@@ -2,10 +2,7 @@ package io.parity.signer.screens.networks.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +39,7 @@ fun NetworkDetailsScreen(
 		Column(
 			Modifier
 				.weight(1f)
+				.padding(horizontal = 16.dp)
 				.verticalScroll(rememberScrollState()),
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
@@ -59,7 +57,7 @@ fun NetworkDetailsScreen(
 				text = "Chain Specs",
 				style = SignerTypeface.BodyL,
 				color = MaterialTheme.colors.secondary,
-				modifier = Modifier
+				modifier = Modifier.fillMaxWidth(1f)
 			)
 			Column(
 				verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,40 +98,43 @@ fun NetworkDetailsScreen(
 					name = "Verifier Certificate",
 					value = model.currentVerifier.ttype
 				)
-
-				if (model.meta.isNotEmpty()) {
-					Text(
-						text = "Metadata Available",
-						style = SignerTypeface.BodyL,
-						color = MaterialTheme.colors.secondary,
+			}
+			Spacer(modifier = Modifier.padding(top = 16.dp))
+			if (model.meta.isNotEmpty()) {
+				Text(
+					text = "Metadata Available",
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.secondary,
+					modifier = Modifier
+						.padding(8.dp)
+						.fillMaxWidth(1f)
+				)
+				model.meta.forEach { metadata ->
+					Spacer(modifier = Modifier.padding(top = 4.dp))
+					Column(
+						verticalArrangement = Arrangement.spacedBy(8.dp),
 						modifier = Modifier
-					)
-					model.meta.forEach { metadata ->
-						Spacer(modifier = Modifier.padding(top = 4.dp))
-						Column(
-							verticalArrangement = Arrangement.spacedBy(8.dp),
-							modifier = Modifier
-								.background(
-									MaterialTheme.colors.fill6,
-									RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-								)
-								.padding(16.dp),
-						) {
-							TCNameValueOppositeElement(
-								name = "Version",
-								value = metadata.specsVersion
+							.background(
+								MaterialTheme.colors.fill6,
+								RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 							)
-							SignerDivider()
-							TCNameValueOppositeElement(
-								name = "Hash",
-								value = metadata.metaHash
-							)
-							SignerDivider()
-							//Sign item
-							SignerDivider()
-							//delete item
-							SignerDivider()
-						}
+							.padding(16.dp),
+					) {
+						TCNameValueOppositeElement(
+							name = "Version",
+							value = metadata.specsVersion
+						)
+						SignerDivider()
+						TCNameValueOppositeElement(
+							name = "Hash",
+							value = metadata.metaHash,
+							valueInSameLine = false
+						)
+						SignerDivider()
+//						Sign item todo dmitry
+//						SignerDivider()
+//						delete item
+//						SignerDivider()
 					}
 				}
 			}

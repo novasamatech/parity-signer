@@ -46,7 +46,7 @@ data class NetworkDetailsModel(
 				PreviewData.exampleIdenticonPng,
 				"src3322"
 			),
-			meta = listOf()//todo dmitry add
+			meta = listOf(MetadataModel.createStub(), MetadataModel.createStub())
 		)
 	}
 }
