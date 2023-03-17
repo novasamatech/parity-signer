@@ -10,6 +10,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,9 +34,15 @@ import io.parity.signer.uniffi.Action
 fun BottomBar2(
 	navigator: Navigator,
 	state: BottomBar2State,
+	skipRememberCameraParent: Boolean = false,
 	onBeforeActionWhenClicked: Callback? = null,
 ) {
-	BottomBarSingleton.lastUsedTab = state
+	if (!skipRememberCameraParent) {
+		LaunchedEffect(key1 = Unit) {
+			CameraParentSingleton.lastPossibleParent =
+				CameraParentScreen.BottomBarScreen(state)
+		}
+	}
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
 		elevation = 8.dp,
@@ -60,7 +67,7 @@ fun BottomBar2(
 				labelResId = R.string.bottom_bar_label_scanner,
 				isEnabled = state == BottomBar2State.SCANNER,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
-				)
+			)
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_view_agenda_outlined_24,
@@ -69,7 +76,7 @@ fun BottomBar2(
 				labelResId = R.string.bottom_bar_label_logs,
 				isEnabled = state == BottomBar2State.LOGS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
-				)
+			)
 			BottomBarButton2(
 				navigator = navigator,
 				iconId = R.drawable.ic_settings_outlined_24,
@@ -78,7 +85,7 @@ fun BottomBar2(
 				labelResId = R.string.bottom_bar_label_settings,
 				isEnabled = state == BottomBar2State.SETTINGS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
-				)
+			)
 		}
 	}
 }

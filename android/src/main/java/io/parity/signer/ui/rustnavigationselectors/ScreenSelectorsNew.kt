@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
-import io.parity.signer.components.panels.BottomBarSingleton
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
@@ -139,7 +139,7 @@ fun CombinedScreensSelector(
 				"Selector",
 				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
 			)
-			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 		is ScreenData.DeriveKey -> {
 			Box(

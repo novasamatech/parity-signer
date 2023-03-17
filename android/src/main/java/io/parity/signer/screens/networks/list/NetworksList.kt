@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
@@ -21,6 +22,8 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.CameraParentScreen
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -38,18 +41,24 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 		)
 		Spacer(modifier = Modifier.padding(top = 10.dp))
 		Column(
-            Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+			Modifier
+				.weight(1f)
+				.verticalScroll(rememberScrollState())
 		) {
 			model.networks.forEach { network ->
 				NetworkListItem(network) {
 					rootNavigator.navigate(Action.GO_FORWARD, network.key)
+					CameraParentSingleton.lastPossibleParent =
+						CameraParentScreen.NetworkDetailsScreen(network.key)
 				}
 			}
 		}
-		BottomBar2(rootNavigator, BottomBar2State.SETTINGS) {
+		BottomBar2(rootNavigator, BottomBar2State.SETTINGS,
+			skipRememberCameraParent = true) {
 			rootNavigator.backAction()
+		}
+		LaunchedEffect(key1 = Unit,) {
+			CameraParentSingleton.lastPossibleParent = CameraParentScreen.NetworkListScreen
 		}
 	}
 }
@@ -58,9 +67,9 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 @Composable
 private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 	Row(
-        Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable(onClick = callback)
+		Modifier
+			.padding(horizontal = 16.dp, vertical = 8.dp)
+			.clickable(onClick = callback)
 	) {
 		NetworkIcon(networkLogoName = network.logo, size = 36.dp)
 		Text(

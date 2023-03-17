@@ -29,15 +29,10 @@ data class NetworkDetailsModel(
 	companion object {
 		fun createStub() = NetworkDetailsModel(
 			base58prefix = 0u,
-//			color =
 			decimals = 10.toUByte(),
-//			encryptionType =
 			genesisHash = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
 			logo = "polkadot",
 			name = "Polkadot",
-//			order
-//			pathId
-//			secondaryColor
 			title = "Polkadot",
 			unit = "DOT",
 			currentVerifier = VerifierModel(
@@ -53,16 +48,10 @@ data class NetworkDetailsModel(
 
 fun MNetworkDetails.toNetworkDetailsModel() = NetworkDetailsModel(
 	base58prefix = base58prefix,
-//	color = color,
 	decimals = decimals,
-//	encryptionType = encryption.name,
-	genesisHash = genesisHash.toUByteArray()
-		.toByteArray().encodeHex(),
+	genesisHash = genesisHash.toUByteArray().toByteArray().encodeHex(),
 	logo = logo,
 	name = name,
-//	order = order,
-//	pathId = pathId,
-//	secondaryColor = secondaryColor,
 	title = title,
 	unit = unit,
 	currentVerifier = currentVerifier.toVerifierModel(),
