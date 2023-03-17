@@ -134,10 +134,7 @@ fun ModalSelector(
 				modalData.f,
 			)
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
-			is ModalData.TypesInfo -> TypesInfo(//todo was in network lists,
-				modalData.f,
-				sharedViewModel = sharedViewModel
-			)
+			is ModalData.TypesInfo -> {} // this functionality removed after redesign
 			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
