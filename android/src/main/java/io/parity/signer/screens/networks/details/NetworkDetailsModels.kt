@@ -41,7 +41,7 @@ data class NetworkDetailsModel(
 			title = "Polkadot",
 			unit = "DOT",
 			currentVerifier = VerifierModel(
-				"General",
+				"custom",
 				"vwvsWqqBYFK",
 				PreviewData.exampleIdenticonPng,
 				"src3322"
