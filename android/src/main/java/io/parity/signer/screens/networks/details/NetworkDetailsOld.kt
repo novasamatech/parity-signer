@@ -51,7 +51,7 @@ fun NetworkDetailsOld(
 					.toByteArray().encodeHex()
 			)
 		}
-		Row {
+		Row {//todo dmitry implement
 			Text("Verifier certificate:")
 			when (networkDetails.currentVerifier.ttype) {
 				"general" -> {

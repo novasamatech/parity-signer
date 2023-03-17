@@ -30,6 +30,8 @@ import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
+import io.parity.signer.screens.networks.details.NetworkDetailsSubgraph
+import io.parity.signer.screens.networks.details.toNetworkDetailsModel
 import io.parity.signer.screens.networks.list.NetworksList
 import io.parity.signer.screens.networks.list.toNetworksListModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -111,6 +113,11 @@ fun CombinedScreensSelector(
 					rootNavigator = rootNavigator
 				)
 			}
+		is ScreenData.NNetworkDetails ->
+			NetworkDetailsSubgraph(
+				screenData.f.toNetworkDetailsModel(),
+				rootNavigator
+			)
 		is ScreenData.NewSeed ->
 			Box(
 				modifier = Modifier

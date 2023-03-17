@@ -134,11 +134,10 @@ fun NetworkDetailsScreen(
 							value = metadata.metaHash,
 							valueInSameLine = false
 						)
-						SignerDivider()
+//						SignerDivider()
 //						Sign item todo dmitry
 //						SignerDivider()
 //						delete item
-//						SignerDivider()
 					}
 				}
 			}

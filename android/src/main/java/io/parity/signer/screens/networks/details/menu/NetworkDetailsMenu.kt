@@ -9,9 +9,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SystemUpdateAlt
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,19 +16,13 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
-import io.parity.signer.uniffi.Action
 
 
 @Composable
-fun KeyDetailsMenuGeneral(
-	navigator: Navigator,
-	networkState: State<NetworkState?>,
+fun NetworkDetailsMenuGeneral(
 	onSignNetworkSpecs: Callback,
 	onDeleteClicked: Callback,
 	onCancel: Callback,
@@ -46,12 +37,7 @@ fun KeyDetailsMenuGeneral(
 		MenuItemForBottomSheet(
 			Icons.Outlined.SystemUpdateAlt,
 			label = stringResource(R.string.network_details_menu_sign_specs),
-			onclick = {
-				if (networkState.value == NetworkState.None)
-					onSignNetworkSpecs()
-				else
-					navigator.navigate(Action.SHIELD)
-			}
+			onclick = onSignNetworkSpecs
 		)
 
 		MenuItemForBottomSheet(
@@ -82,9 +68,8 @@ fun KeyDetailsMenuGeneral(
 @Composable
 private fun PreviewKeyDetailsMenuGeneral() {
 	SignerNewTheme {
-		val state = remember { mutableStateOf(NetworkState.None) }
-		KeyDetailsMenuGeneral(
-			EmptyNavigator(), state, {}, {}, {},
+		NetworkDetailsMenuGeneral(
+			{}, {}, {},
 		)
 	}
 }
