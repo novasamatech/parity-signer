@@ -12,7 +12,7 @@ frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
 parity-scale-codec = {version = "3.4.0", features = ["derive"]}
-plot_icon = "0.2.0"
+plot_icon = "0.3.0"
 sc-executor-common = {git = "https://github.com/paritytech/substrate"}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
