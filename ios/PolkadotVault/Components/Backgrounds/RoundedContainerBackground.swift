@@ -14,6 +14,7 @@ struct RoundedContainerBackground: ViewModifier {
     enum State {
         case list
         case standard
+        case textContainer
         case error
         case actionableInfo
 
@@ -23,6 +24,8 @@ struct RoundedContainerBackground: ViewModifier {
                 return Asset.backgroundSecondary.swiftUIColor
             case .standard:
                 return Asset.fill6.swiftUIColor
+            case .textContainer:
+                return Asset.fill12.swiftUIColor
             case .error:
                 return Asset.accentRed300.swiftUIColor.opacity(0.12)
             case .actionableInfo:

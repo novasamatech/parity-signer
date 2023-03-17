@@ -80,4 +80,5 @@ enum Sizes {
     static let roundedQuestionmark: CGFloat = 24
     /// Diameter for connectivity alert button, 56pt
     static let connectivityAlertDiameter: CGFloat = 56
+    static let pointCircle: CGFloat = 32
 }
