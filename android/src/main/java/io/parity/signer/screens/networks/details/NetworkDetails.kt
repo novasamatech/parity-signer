@@ -146,7 +146,7 @@ fun NetworkDetailsScreen(
 								Action.MANAGE_METADATA,
 								metadata.specsVersion
 							)
-							rootNavigator.navigate(Action.REMOVE_METADATA)
+							rootNavigator.navigate(Action.SIGN_METADATA)
 						}) {
 							Text(
 								text = stringResource(R.string.network_details_metadata_sign_field_label),

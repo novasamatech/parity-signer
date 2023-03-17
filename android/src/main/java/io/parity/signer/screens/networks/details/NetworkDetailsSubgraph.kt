@@ -55,6 +55,7 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
+						closeAction()
 						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
 						rootNavigator.navigate(Action.SIGN_NETWORK_SPECS)
 					},
@@ -73,6 +74,7 @@ fun NetworkDetailsSubgraph(
 					onRemoveNetwork = {
 						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
 						rootNavigator.navigate(Action.REMOVE_NETWORK)
+						closeAction()
 					},
 					onCancel = closeAction,
 				)
@@ -87,6 +89,7 @@ fun NetworkDetailsSubgraph(
 							savedMetadataVersionAction.value
 						)
 						rootNavigator.navigate(Action.REMOVE_METADATA)
+						closeAction()
 					},
 					onCancel = closeAction,
 				)
