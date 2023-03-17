@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use definitions::navigation::MAddressCard;
+use definitions::{navigation::MAddressCard, network_specs::OrderedNetworkSpecs};
 use sp_runtime::MultiSignature;
 use transaction_parsing::{produce_output, TransactionAction};
 use transaction_signing::{Error as SignError, SignatureType};
@@ -10,7 +10,7 @@ use crate::{Error, Result};
 const MAX_COUNT_SET: u8 = 3;
 
 /// The result of a step within the signing protocol
-/// between the user and the Signer.
+/// between the user and the Vault.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SignResult {
     /// A password for one of the passworded keys is requested.
@@ -24,10 +24,10 @@ pub enum SignResult {
 
 /// State of transaction screen.
 ///
-/// In general case Signer may sign a bulk of transactions
+/// In general case Vault may sign a bulk of transactions
 /// (more than one) and any subset of the transactions within
 /// a bulk may be signed by the passworded keys. This structure
-/// implements an interactive protocol between Signer and the user
+/// implements an interactive protocol between Vault and the user
 /// where user repeatedly enters all necessary passwords until all
 /// transactions are successfully signed or a password entry limit
 /// occurs.
@@ -67,25 +67,26 @@ pub struct TransactionState {
 }
 
 impl TransactionState {
-    pub fn current_password_author_info(&self) -> Option<MAddressCard> {
+    pub fn current_password_author_info(&self) -> Option<(MAddressCard, OrderedNetworkSpecs)> {
         match &self.action {
-            TransactionAction::Sign { actions, .. } => {
-                Some(actions[self.currently_signing].author_info.clone())
-            }
+            TransactionAction::Sign { actions, .. } => Some((
+                actions[self.currently_signing].author_info.clone(),
+                actions[self.currently_signing].network_info.clone(),
+            )),
             _ => None,
         }
     }
 
-    pub fn new(database: &sled::Db, details_str: &str) -> Self {
-        Self {
+    pub fn new(database: &sled::Db, details_str: &str) -> Result<Self> {
+        Ok(Self {
             seeds: vec![],
-            action: produce_output(database, details_str),
+            action: produce_output(database, details_str)?,
             counter: 1,
             passwords: HashMap::new(),
             comments: vec![],
             currently_signing: 0,
             signatures: vec![],
-        }
+        })
     }
 
     pub fn update_seeds(&mut self, seeds: &str) {

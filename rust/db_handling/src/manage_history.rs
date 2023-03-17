@@ -1,22 +1,20 @@
 //! Displaying and updating history log
 //!
-//! The Signer keeps a history log of all events that change the database and
+//! The Vault keeps a history log of all events that change the database and
 //! affect security. It is stored in [`HISTORY`] tree of the cold database.
 //!
 //! Each history log [`Entry`] contains [`Event`] set and a timestamp. Database
 //! key for [`Entry`] value is [`Order`], SCALE-encoded number of the entry.
 //!
-//! In addition to keeping the log, Signer also displays [`HISTORY`] tree
+//! In addition to keeping the log, Vault also displays [`HISTORY`] tree
 //! checksum for user to possibly keep the track of.
 // TODO: substantial part of this will go obsolete with interface updates;
 // some functions are not called at the moment from the user interface - kept
 // for now in case they make a return, commented.
-#[cfg(feature = "signer")]
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
 use sled::Batch;
 
-#[cfg(feature = "signer")]
 use constants::DANGER;
 use constants::HISTORY;
 use definitions::{
@@ -24,19 +22,15 @@ use definitions::{
     keyring::Order,
 };
 
-#[cfg(feature = "signer")]
 use definitions::danger::DangerRecord;
 
 use crate::helpers::open_tree;
-#[cfg(feature = "signer")]
 use crate::Error;
 use crate::Result;
-#[cfg(feature = "signer")]
 use crate::{db_transactions::TrDbCold, helpers::make_batch_clear_tree};
 
 /// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`](constants::HISTORY_PAGE_SIZE) number of
 /// entries per page.
-#[cfg(feature = "signer")]
 pub fn history_total_pages(database: &sled::Db) -> Result<u32> {
     use constants::HISTORY_PAGE_SIZE;
 
@@ -52,7 +46,6 @@ pub fn history_total_pages(database: &sled::Db) -> Result<u32> {
 }
 
 /// Get history log contents from the database.
-#[cfg(feature = "signer")]
 pub fn get_history(database: &sled::Db) -> Result<Vec<(Order, Entry)>> {
     let history = open_tree(database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
@@ -67,7 +60,6 @@ pub fn get_history(database: &sled::Db) -> Result<Vec<(Order, Entry)>> {
 
 /// Get from the database a history log [`Entry`] by `u32` order identifier
 /// received from the frontend.
-#[cfg(feature = "signer")]
 pub fn get_history_entry_by_order(database: &sled::Db, order: u32) -> Result<Entry> {
     let history = open_tree(database, HISTORY)?;
     let mut found = None;
@@ -82,8 +74,7 @@ pub fn get_history_entry_by_order(database: &sled::Db, order: u32) -> Result<Ent
     found.ok_or_else(|| Error::HistoryEntryNotFound(order.stamp()))
 }
 
-/// Clear Signer history and make a log [`Entry`] that history was cleared.
-#[cfg(feature = "signer")]
+/// Clear Vault history and make a log [`Entry`] that history was cleared.
 pub fn clear_history(database: &sled::Db) -> Result<()> {
     let batch = make_batch_clear_tree(database, HISTORY)?;
     let events = vec![Event::HistoryCleared];
@@ -128,7 +119,6 @@ pub(crate) fn events_in_batch(
 }
 
 /// Enter [`Event`] set into the database as a single database transaction.
-#[cfg(feature = "signer")]
 pub fn enter_events(database: &sled::Db, events: Vec<Event>) -> Result<()> {
     TrDbCold::new()
         .set_history(events_to_batch(database, events)?)
@@ -136,7 +126,6 @@ pub fn enter_events(database: &sled::Db, events: Vec<Event>) -> Result<()> {
 }
 
 /// Enter user-generated [`Event`] into the database.
-#[cfg(feature = "signer")]
 pub fn history_entry_user(database: &sled::Db, string_from_user: &str) -> Result<()> {
     let events = vec![Event::UserEntry {
         user_entry: string_from_user.to_string(),
@@ -146,22 +135,20 @@ pub fn history_entry_user(database: &sled::Db, string_from_user: &str) -> Result
 
 /// Enter system-generated [`Event`] into the database.
 // TODO possibly obsolete
-#[cfg(feature = "signer")]
 pub fn history_entry_system(database: &sled::Db, event: Event) -> Result<()> {
     // let events = vec![Event::SystemEntry(string_from_system)];
     let events = vec![event];
     enter_events(database, events)
 }
 
-/// Process the fact that the Signer device was online.
+/// Process the fact that the Vault device was online.
 ///
 /// - Add history log entry with `Event::DeviceWasOnline`.
 /// - Update [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) with
 /// `device_was_online = true` flag.
 ///
-/// Unacknowledged non-safe [`DangerRecord`] block the use of Signer in the
+/// Unacknowledged non-safe [`DangerRecord`] block the use of Vault in the
 /// frontend.
-#[cfg(feature = "signer")]
 pub fn device_was_online(database: &sled::Db) -> Result<()> {
     let events = vec![Event::DeviceWasOnline];
     let mut settings_batch = Batch::default();
@@ -172,16 +159,15 @@ pub fn device_was_online(database: &sled::Db) -> Result<()> {
         .apply(database)
 }
 
-/// Acknowledge that the Signer device was online and reset the
+/// Acknowledge that the Vault device was online and reset the
 /// [`DangerRecord`] back to safe.
 ///
 /// - Add history log entry with `Event::ResetDangerRecord`.
 /// - Reset [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) to
 /// `safe`, i.e. with `device_was_online = false` flag.
 ///
-/// Acknowledged and reset [`DangerRecord`] allow to resume the use of Signer in
+/// Acknowledged and reset [`DangerRecord`] allow to resume the use of Vault in
 /// the frontend. Use it wisely.
-#[cfg(feature = "signer")]
 pub fn reset_danger_status_to_safe(database: &sled::Db) -> Result<()> {
     let events = vec![Event::ResetDangerRecord];
     let mut settings_batch = Batch::default();
@@ -192,11 +178,10 @@ pub fn reset_danger_status_to_safe(database: &sled::Db) -> Result<()> {
         .apply(database)
 }
 
-/// Record in history log that certain seed was shown on Signer screen,
+/// Record in history log that certain seed was shown on Vault screen,
 /// presumably for backup.
 ///
 /// Seeds are distinguished by the seed name.
-#[cfg(feature = "signer")]
 pub fn seed_name_was_shown(database: &sled::Db, seed_name_was_shown: String) -> Result<()> {
     let events = vec![Event::SeedNameWasShown {
         seed_name_was_shown,

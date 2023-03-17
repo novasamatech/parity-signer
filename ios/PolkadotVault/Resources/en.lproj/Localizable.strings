@@ -1,0 +1,552 @@
+// History cards (Logs)
+"Comment_alt" = "Comment :";
+"in network" = "in network";
+"Key created" = "Key created";
+"Key removed" = "Key removed";
+"Network verifier set" = "Network verifier set";
+"Metadata signed" = "Metadata signed";
+"Secret was exported" = "Secret was exported";
+"Types signed" = "Types signed";
+"Transaction failed" = "Transaction failed";
+"Signed by: " = "Signed by: ";
+"HistoryCard.Database" = "Database initiated";
+"HistoryCard.DeviceConnected" = "Device was connected to network";
+"HistoryCard.VerifierSet" = "General verifier set";
+"HistoryCard.HistoryCleared" = "History cleared";
+"HistoryCard.KeysCleared" = "All keys were wiped";
+"HistoryCard.KeysCreated" = "Key created";
+"HistoryCard.KeysRemoved" = "Key removed";
+"HistoryCard.MetadataAdded" = "Metadata added";
+"HistoryCard.MetadataRemoved" = "Metadata removed";
+"HistoryCard.NetworkAdded" = "Network added";
+"HistoryCard.NetworkRemoved" = "Network removed";
+"HistoryCard.NetworkVerifier" = "Network verifier set";
+"HistoryCard.ResetDanger" = "Warnings acknowledged";
+"HistoryCard.SecretWasExported" = "Secret was exported";
+"HistoryCard.SeedCreated" = "Seed created";
+"HistoryCard.SeedRemoved" = "Seed removed";
+"HistoryCard.SeedShown" = "Seed was shown";
+"HistoryCard.NetworkSpecsSigned" = "Network specs signed";
+"HistoryCard.MetadataSigned" = "Metadata signed";
+"HistoryCard.TypesSigned" = "Types signed";
+"HistoryCard.SystemRecord" = "System record";
+"HistoryCard.SigningFailure" = "Signing failure";
+"HistoryCard.TransactionSigned" = "Generated signature";
+"HistoryCard.TypesAdded" = "New types info loaded";
+"HistoryCard.TypesRemoved" = "Types info removed";
+"HistoryCard.UserRecord" = "User record";
+"HistoryCard.Warning" = "Warning! %@";
+"HistoryCard.WrongPassword.Title" = "Wrong password entered";
+"HistoryCard.WrongPassword.Subtitle" = "operation was declined";
+"HistoryCard.MessageSignError" = "Message signing error!";
+"HistoryCard.MessageSigned" = "Generated signature for message";
+
+// Transaction cards
+"error_capitalised" = "Error!"; // errorCard
+"Immortal transaction" = "Immortal transaction"; // eraImmortalCard
+"Warning!" = "Warning!"; // warningCard
+"none_capitalised" = "None"; // noneCard
+"Unknown network" = "Unknown network"; // txSpecPlainCard card from Rust
+"TCName.TypesHash" = "Types hash:"; // typesInfoCard
+"TCName.Method" = "Method";
+"TCName.nonce" = "Nonce ";
+"TCName.BitVec" = "BitVec";
+"TCName.Tip" = "Tip";
+"TCName.GenesisHash" = "Genesis hash";
+"TCName.Version" = "Version";
+"TCName.TxVersion" = "TX version";
+"TCName.TxVersion.uppercased" = "TX version";
+"TCName.NetworkName" = "Network name";
+"TCName.Pallet" = "Pallet";
+"TCName.From" = "From";
+"TCName.IdentityField" = "IdentityField";
+"TCName.BlockHash" = "Block hash";
+"TCName.Phase" = "Phase";
+"TCName.Period" = "Period";
+"TCField.Path" = "Path: %@";
+"TCAuthor.SignedWith" = "Signed with %@";
+
+// Recover seed name
+"RecoverSeedName.Label.Title" = "Recover Key Set";
+"RecoverSeedName.Label.Content" = "Enter a name that will help you identify this key set";
+"RecoverSeedName.Label.Footer" = "Key set name visible only to you";
+"RecoverSeedName.Action.Next" = "Next";
+"Seed" = "Seed";
+"seed_name" = "Enter Key Set Name";
+"SEED PHRASE" = "Secret Recovery Phrase";
+"RecoverSeedPhrase.Action.Done" = "Done";
+"RecoverSeedPhrase.Label.Title" = "Recover Key Set";
+"RecoverSeedPhrase.Label.Header" = "Secret Recovery Phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
+"RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
+
+// Sign Sufficient Crypto
+"Select key for signing" = "Select key for signing";
+"Signature for metadata update" = "Signature for metadata update";
+"Signature for network specs" = "Signature for network specs";
+"Signature for types" = "Signature for types";
+"Your Signature" = "Your Signature";
+"Scan it into your application" = "Scan it into your application";
+"Signature.metadata" = "%@ version %@";
+
+// Copy for updated design
+"Shared.Label.PasswordedPathDelimeter" = "///••••";
+
+"TabBar.Keys" = "Keys";
+"TabBar.Logs" = "Logs";
+"TabBar.Scanner" = "Scanner";
+"TabBar.Settings" = "Settings";
+
+"KeySets.Title" = "Key Sets";
+"KeySets.Action.Add" = "Add Key Set";
+"KeySets.Label.DerivedKeys.single" = "%@ Key";
+"KeySets.Label.DerivedKeys.plural" = "%@ Keys";
+"KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
+"KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
+
+"KeySets.More.Action.Export" = "Export Key Sets";
+"KeySets.More.Action.ExportAll" = "Export All";
+"KeySets.More.Action.ExportSelected" = "Export Selected";
+"KeySetsModal.Action.Export" = "Export Keys";
+"KeySetsModal.Action.Derive" = "Derive from Key";
+"KeySetsModal.Action.Backup" = "Backup Key Set";
+"KeySetsModal.Action.Delete" = "Delete";
+
+"KeySetsModal.Confirmation.Label.Title" = "Forget this Key Set?";
+"KeySetsModal.Confirmation.Label.Content" = "This Key Set will be removed for all networks. This is not reversible.\nAre you sure?";
+"KeySetsModal.Confirmation.Action.Cancel" = "Cancel";
+"KeySetsModal.Confirmation.Action.Remove" = "Remove";
+"KeySetsModal.Confirmation.Snackbar" = "Key Set Has Been Removed";
+
+"AddKeySet.Title" = "Add Key Set";
+"AddKeySet.Button.Cancel" = "Cancel";
+"AddKeySet.Button.Add" = "Add new Key Set";
+"AddKeySet.Button.Recover" = "Recover Key Set";
+
+"KeyDetails.Label.Derived" = "Derived keys";
+"KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
+"KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
+
+"KeyDetails.Action.Create" = "Create Derived key";
+"KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
+"KeyDetails.Overlay.Label.Key.Single" = "key";
+"KeyDetails.Overlay.Label.Key.Plural" = "keys";
+"KeyDetails.Overlay.Action.Delete" = "Delete";
+"KeyDetails.Overlay.Action.SelectAll" = "Select All";
+"KeyDetails.Overlay.Action.Export" = "Export";
+"KeyDetails.Root.Label.PublicKey" = "Public key";
+"KeyDetails.Error.NoNetworks.Title" = "No Networks Available";
+"KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
+
+
+"PublicKeyDetails.Label.Title" = "Public Key";
+"PublicKeyDetails.Label.Subtitle" = "Derived Key";
+"PublicKeyDetails.Label.Keys" = "%@ Keys";
+
+"KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
+"KeyScreen.Action.Export" = "Export Private Key";
+
+"KeyExportWarning.Label.Header" = "Export Private Key";
+"KeyExportWarning.Label.Content" = "A private key can be used to sign transactions. This key will be marked as a hot key after export.";
+"KeyExportWarning.Action.Export" = "Export Private Key";
+"KeyExportWarning.Action.Cancel" = "Cancel";
+
+"KeyExport.Label.Header" = "Export Private Key";
+"KeyExport.Label.Hide" = "Private Key will be hidden in";
+
+"PublicKeyDetailsModal.Action.Networks" = "Address on Other Networks";
+"PublicKeyDetailsModal.Action.Share" = "Share Private Key";
+"PublicKeyDetailsModal.Action.ChangeNetwork" = "Change this Key's network";
+"PublicKeyDetailsModal.Action.Delete" = "Delete";
+
+"PublicKeyDetailsModal.Confirmation.Label.Title" = "Forget this Key?";
+"PublicKeyDetailsModal.Confirmation.Label.Content" = "This key for this network will be removed.\nAre you sure?";
+"PublicKeyDetailsModal.Confirmation.Action.Cancel" = "Cancel";
+"PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
+"PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
+
+"Connectivity.Label.Title" = "Network Connected";
+"Connectivity.Label.Content" = "Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
+"Connectivity.Action.Ok" = "Got It";
+"PastConnectivity.Label.Title" = "Network Was Connected!";
+"PastConnectivity.Label.Content" = "Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
+"PastConnectivity.Action.Back" = "Go Back";
+"PastConnectivity.Action.Continue" = "Acknowledge and Proceed";
+
+"BackupModal.Label.Secret" = "Secret Recovery Phrase";
+"BackupModal.Label.Derived" = "Derived keys";
+"BackupModal.Label.QRCode" = "Backup with QR Code";
+"BackupModal.Label.Snackbar" = "Private Keys will be hidden in";
+"BackupModal.Label.EmptyPath" = "Derivation Path Name Is Empty";
+
+"ErrorModal.Action.Ok" = "Got It";
+"GenericErrorModal.Label.Title" = "Something has gone wrong.";
+"GenericErrorModal.Label.MessagePrefix" = "View the details below to find out more.";
+"GenericErrorModal.Action.Ok" = "OK";
+"Error.Navigation.Label.Prefix" = "Internal navigation error.";
+"Error.Navigation.Label.Message" = "Please restart Polkadot Vault app and try again.\nInternal error description: %@";
+"Error.Navigation.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
+"Error.Navigation.Label.NoAction" = "No further action available from this state.\nLast action: \"%@\" details: \"%@\"";
+"Error.Service.Label.Prefix" = "Internal service error.";
+"Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
+"Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
+
+"KeysExport.KeySets.Label.Header" = "Export %@ %@";
+"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
+"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Key Sets";
+"KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
+"KeysExport.KeySets.Label.Key.Single" = "%@ Key";
+"KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
+
+
+"Scanner.Label.Scan.Main.Header" = "Scan QR code";
+"Scanner.Label.Scan.Main.Message" = "Sign transaction, add network or update metadata";
+"Scanner.Label.Scan.Multiple.Header" = "Scan Multiple QR codes";
+"Scanner.Label.Scan.Multiple.Message" = "Press the Sign button when you’re done scanning";
+"Scanner.Action.Cancel" = "Cancel";
+"Scanner.Action.Sign" = "Sign";
+"Scanner.Label.Progress" = "%d / %d complete";
+"Scanner.Label.Multipart" = "Scanning";
+"Scanner.Label.SignMultiple" = "Sign %d %@";
+"Scanner.Label.SignMultiple.Suffix.single" = "Transaction";
+"Scanner.Label.SignMultiple.Suffix.plural" = "Transactions";
+
+"TransactionPreview.Label.Title" = "Transaction Details";
+"TransactionPreview.Action.UnlockSign" = "Unlock key and sign";
+"TransactionPreview.Action.Approve" = "Approve";
+"TransactionPreview.Action.SelectSeed" = "Select seed";
+"TransactionPreview.Action.Cancel" = "Cancel";
+"TransactionPreview.Action.Done" = "Done";
+"CameraView.parsingMultidata" = "PARSING MULTIPART DATA";
+"CameraView.startOver" = "Start over";
+
+"Transaction.Verifier.Label.Header" = "Verifier Certificate";
+"Transaction.Verifier.Label.Key" = "Key";
+"Transaction.Verifier.Label.Crypto" = "Crypto";
+
+"Transaction.Metadata.Label.Header" = "Add Metadata";
+"Transaction.Metadata.Label.Metadata" = "Metadata";
+"Transaction.Metadata.Label.Metadata" = "Metadata";
+
+"Transaction.AddNetwork.Label.Header" = "New Network";
+"Transaction.AddNetwork.Label.GenesisHash" = "Genesis hash";
+"Transaction.AddNetwork.Label.Name" = "Network name";
+"Transaction.AddNetwork.Label.basePrefix" = "base58 prefix";
+"Transaction.AddNetwork.Label.Decimals" = "Decimals";
+"Transaction.AddNetwork.Label.Unit" = "Unit";
+"Transaction.AddNetwork.Label.Crypto" = "Crypto";
+"Transaction.AddNetwork.Label.Spec" = "Spec name";
+"Transaction.AddNetwork.Label.Logo" = "Logo";
+"Transaction.AddNetwork.Label.Path" = "Default path";
+
+"TransactionSign.Label.Details" = "Transaction Details";
+"TransactionSign.Label.Header.Single" = "Sign Transaction";
+"TransactionSign.Label.Header.Multiple" = "Sign %@ Transactions";
+"TransactionSign.Label.Header.Metadata" = "Add Metadata";
+"TransactionSign.Label.Header.Network" = "Add Network";
+
+"TransactionSign.Label.MultipleTransactionsInfo" = "Please note that by scanning this QR code into your application you’ll sign transactions using all keys shown in the transactions list above";
+"TransactionSign.Label.Sign" = "Sign With";
+"TransactionSign.Label.SignCode" = "Scan QR code to Sign Transaction";
+"TransactionSign.Action.Done" = "Done";
+"TransactionSign.Action.Note" = "Add Log Note";
+"TransactionSign.Action.Error" = "Got It";
+
+"TransactionSign.Label.Details.Pallet" = "Pallet";
+"TransactionSign.Label.Details.Method" = "Method";
+"TransactionSign.Label.Details.Destination" = "Dest";
+"TransactionSign.Label.Details.Value" = "Value";
+
+"TransactionSign.Error.Generic.Title" = "Error signing Transaction";
+"TransactionSign.Error.UnknownNetwork.Title" = "Please Add The Network\nYou Want To Transact in";
+"TransactionSign.Error.UnknownNetwork.Message" = "You're trying to sign a transaction in a network which has not been added to your Polkadot Vault.";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+
+"TransactionSign.Error.UnknownNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.second" = "metadata.novasama.io";
+"TransactionSign.Error.UnknownNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.UnknownNetwork.Step2" = "Choose the network you need";
+"TransactionSign.Error.UnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
+
+"TransactionSign.Error.OutdatedMetadata.Title" = "Please Update %@ Network Metadata";
+"TransactionSign.Error.OutdatedMetadata.Message" = "%@ network's %@ metadata is different to the %@ data you're using in the app. Please update it to sign the transaction.";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+
+"TransactionSign.Error.OutdatedMetadata.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.second" = "metadata.novasama.io";
+"TransactionSign.Error.OutdatedMetadata.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
+
+"TransactionSign.Error.OutdatedMetadata.Step2" = "Choose the network you need";
+"TransactionSign.Error.OutdatedMetadata.Step3" = "Scan the metadata’s QR code with the scanner";
+
+"TransactionSign.Error.NetworkAlreadyAdded.Title" = "%@ Network Has Already Been Added";
+"TransactionSign.Error.NetworkAlreadyAdded.Message" = "Go to Settings > Networks to check all the added networks.";
+
+"TransactionSign.Error.MetadataAlreadyAdded.Title" = "This %@ Network %@ Metadata Version Has Already Been Added";
+"TransactionSign.Error.MetadataAlreadyAdded.Message" = "Go to Settings > Networks. Tap on the network you need to check and modify the latest metadata.";
+
+"TransactionSign.Error.MetadataUnknownNetwork.Title" = "Please Add %@ Network";
+"TransactionSign.Error.MetadataUnknownNetwork.Message" = "You’re trying to update metadata on %@ network that hasn’t yet been added.";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.second" = "metadata.novasama.io";
+"TransactionSign.Error.MetadataUnknownNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.MetadataUnknownNetwork.Step2" = "Choose the network you need";
+"TransactionSign.Error.MetadataUnknownNetwork.Step3" = "Scan \"Chain spec\" QR to add the missing network";
+
+"TransactionSign.Error.NoMetadataForNetwork.Title" = "Please Download %@ Network Metadata";
+"TransactionSign.Error.NoMetadataForNetwork.Message" = "There’s no metadata downloaded for %@ network on what you’re trying to sign the transaction";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.font" = "metadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.NoMetadataForNetwork.Step1" = "Go to Portal where your network is stored\nmetadata.parity.io for Polkadot, Kusama, and Westend\nmetadata.novasama.io for Parachains and Solochains\nask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.first" = "metadata.parity.io";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.second" = "metadata.novasama.io";
+"TransactionSign.Error.NoMetadataForNetwork.Step1.Highlight.third" = "ask network's developers directly if you haven’t found it in the portals";
+"TransactionSign.Error.NoMetadataForNetwork.Step2" = "Choose the network you need";
+"TransactionSign.Error.NoMetadataForNetwork.Step3" = "Scan the Metadata animated QR code";
+
+
+"TransactionSign.Snackbar.Metadata" = "Metadata %@ %@ was added";
+"TransactionSign.Snackbar.NetworkAdded" = "Network %@ was added";
+
+"Transaction.EnterPassword.Action.Done" = "Done";
+"Transaction.EnterPassword.Label.Title" = "Enter the password for";
+"Transaction.EnterPassword.Label.Placeholder" = "Enter password";
+"Transaction.EnterPassword.Label.Explanation" = "Enter the password you used for your derivation path";
+"Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
+"Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
+"LogsList.Label.Title" = "All Logs";
+"LogsList.More.Action.Add" = "Add Note";
+"LogsList.More.Action.Clear" = "Clear Log";
+"LogsList.More.Action.Cancel" = "Cancel";
+
+"LogsList.ClearConfirmation.Label.Title" = "Are You Sure?";
+"LogsList.ClearConfirmation.Action.Cancel" = "Cancel";
+"LogsList.ClearConfirmation.Action.Clear" = "Clear Log";
+"LogsList.Modal.AddNote.Label.Title" = "Add Note";
+"LogsList.Modal.AddNote.Label.Header" = "Enter text to save as note visible in Logs list";
+"LogsList.Modal.AddNote.Label.Placeholder" = "Enter note";
+"LogsList.Modal.AddNote.Action.Done" = "Done";
+
+
+"Settings.Label.Title" = "Settings";
+"Settings.Label.Networks" = "Networks";
+"Settings.Label.Verifier" = "Verifier Certificate";
+"Settings.Label.Backup" = "Backup Secret Phrase";
+"Settings.Label.Policy" = "Privacy Policy";
+"Settings.Label.Terms" = "Terms of Service";
+"Settings.Label.Version" = "App version %@";
+"Settings.Label.Wipe" = "Wipe all Data";
+"Settings.Action.Cancel" = "Cancel";
+"Settings.Networks.Label.Title" = "Networks";
+"Settings.Networks.Action.Add" = "Add new network";
+"Settings.NetworkDetails.Label.Specs" = "Chain Specs";
+"Settings.NetworkDetails.Label.Name" = "Network name";
+"Settings.NetworkDetails.Label.basePrefix" = "base58 prefix";
+"Settings.NetworkDetails.Label.Decimals" = "decimals";
+"Settings.NetworkDetails.Label.Unit" = "unit";
+"Settings.NetworkDetails.Label.GenesisHash" = "Genesis hash";
+"Settings.NetworkDetails.Label.Metadata" = "Metadata Available";
+"Settings.NetworkDetails.Label.Version" = "Version";
+"Settings.NetworkDetails.Label.Hash" = "Hash";
+"Settings.NetworkDetails.Action.Add" = "Add Network Metadata";
+"Settings.NetworkDetails.Action.Sign" = "Sign this metadata";
+"Settings.NetworkDetails.Action.Delete" = "Delete this metadata";
+
+"Settings.NetworkDetails.Label.Verifier" = "Verifier Certificate";
+"Settings.NetworkDetails.Label.Verifier.Identicon" = "Identicon";
+"Settings.NetworkDetails.Label.Verifier.Key" = "Key";
+"Settings.NetworkDetails.Label.Verifier.Crypto" = "Crypto";
+"Settings.NetworkDetails.Label.Verifier.PublicKey" = "Public Key";
+"Settings.NetworkDetails.Label.Verifier.None" = "None";
+"Settings.NetworkDetails.Label.Verifier.Unknown" = "Unknown";
+"Settings.NetworkDetails.Label.Verifier.General" = "General";
+"Settings.NetworkDetails.Label.Verifier.Custom" = "Custom";
+
+"Settings.NetworkDetails.DeleteMetadata.Label.Title" = "Remove Metadata?";
+"Settings.NetworkDetails.DeleteMetadata.Label.Content" = "This metadata will be removed for all networks";
+"Settings.NetworkDetails.DeleteMetadata.Action.Remove" = "Remove";
+"Settings.NetworkDetails.DeleteMetadata.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteMetadata.Label.Confirmation" = "Metadata %@ Has Been Removed";
+
+"Settings.NetworkDetails.More.Action.Sign" = "Sign Network Specs";
+"Settings.NetworkDetails.More.Action.Delete" = "Delete network";
+"Settings.NetworkDetails.More.Delete.Label.Title" = "Remove Network?";
+"Settings.NetworkDetails.More.Delete.Label.Content" = "This network will be removed for the whole device";
+"Settings.NetworkDetails.More.Delete.Action.Remove" = "Remove";
+"Settings.NetworkDetails.More.Delete.Action.Cancel" = "Cancel";
+"Settings.NetworkDetails.DeleteNetwork.Label.Confirmation" = "Network %@ Has Been Removed";
+
+"Settings.Modal.WipeAll.Label.Title" = "Wipe All Data";
+"Settings.Modal.WipeAll.Label.Content" = "Reset the Vault app to factory settings. This operation cannot be reversed!";
+"Settings.Modal.WipeAll.Action.Wipe" = "Remove";
+"Settings.Modal.WipeAll.Action.Cancel" = "Cancel";
+
+"Settings.Modal.GeneralVerifier.Label.Title" = "Wipe All Data?";
+"Settings.Modal.GeneralVerifier.Label.Content" = "Remove all data and set general verifier information blank.\n\nWARNING: This operation cannot be reversed so do not proceed unless you are sure you wish to erase important verification information. In most cases, there is no need to wipe all data. Using this feature inappropriately may lead to loss of funds!";
+"Settings.Modal.GeneralVerifier.Action.Remove" = "I Understand, Remove all Data";
+"Settings.Modal.GeneralVerifier.Action.Cancel" = "Cancel";
+
+"Settings.TermsOfService.Label.Title" = "Terms of Service";
+"Settings.PrivacyPolicy.Label.Title" = "Privacy Policy";
+
+"Settings.SelectKey.Title" = "Select Key Set";
+"Settings.SelectKey.Header" = "Select a key set you want to Expose a Secret Recovery Phrase for";
+"Settings.BackupModal.Label.Header" = "Secret Recovery Phrase";
+"Settings.BackupModal.Label.Snackbar" = "Secret Recovery Phrase will be hidden in";
+
+"VerifierCertificate.Label.Title" = "Verifier Certificate";
+"VerifierCertificate.Action.Remove" = "Remove certificate";
+
+"ImportKeys.Label.Title.Single" = "Import Key";
+"ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
+"ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
+"ImportKeys.Label.EmptyPath" = "Derivation path name is empty";
+"ImportKeys.Action.Import" = "Import Keys";
+"ImportKeys.Error.Label.KeySetMissing" = "Some keys cannot be imported until their key sets are recovered. Please recover the missing key sets.";
+"ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
+"ImportKeys.Error.Label.NetworkMissing" = "Some keys cannot be imported until their networks are added. Please add missing networks and their metadata.";
+"ImportKeys.Error.Action.NetworkMissing" = "Add Network";
+"ImportKeys.Error.Label.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
+"ImportKeys.Error.Label.BadFormat" = "Some keys paths are in bad format so they can't be imported.";
+"ImportKeys.Snackbar.Success.Single" = "1 Key Has Been Imported";
+"ImportKeys.Snackbar.Success.Multiple" = "%@ Keys Has Been Imported";
+"ImportKeys.Snackbar.Failure.Unknown" = "Import Keys Has Failed";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Title" = "Please add missing networks and their metadata";
+"ImportKeys.ErrorModal.MissingNetwork.Label.Content" = "Some keys cannot be imported until their networks are added.";
+"ImportKeys.ErrorModal.MissingNetwork.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Title" = "Please recover the missing Key Sets";
+"ImportKeys.ErrorModal.MissingKeySets.Label.Content" = "Some keys cannot be imported until their key sets are recovered.";
+"ImportKeys.ErrorModal.MissingKeySets.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.BadFormat.Label.Title" = "Import keys paths in bad format";
+"ImportKeys.ErrorModal.BadFormat.Label.Content" = "Some keys paths are in bad format so they cannot be imported";
+"ImportKeys.ErrorModal.BadFormat.Action.ok" = "Got It";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Title" = "Derived keys already exist";
+"ImportKeys.ErrorModal.AlreadyExists.Label.Content" = "All of the scanned derived keys are already imported";
+"ImportKeys.ErrorModal.AlreadyExists.Action.ok" = "Got It";
+
+"NetworkFilter.Label.Header" = "Filter keys by network";
+"NetworkFilter.Action.Reset" = "Reset";
+"NetworkFilter.Action.Done" = "Done";
+
+"EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
+"EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
+"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter Banana split password";
+"EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
+"EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
+"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
+"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
+"EnterBananaSplitPasswordModal.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
+
+"CreateDerivedKey.Label.Title" = "Create Derived Key";
+"CreateDerivedKey.Label.Header.Network" = "Choose Network";
+"CreateDerivedKey.Label.Header.Path" = "Derivation Path";
+"CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
+"CreateDerivedKey.Label.EmpyyPath" = "Derivation path name is empty";
+"CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Action.Add" = "Create Derived Key";
+"CreateDerivedKey.Label.Network.Single" = "Network";
+"CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
+"CreateDerivedKey.Modal.Network.Title" = "Choose Network";
+"CreateDerivedKey.Modal.Network.OnAny" = "Allow use on any network";
+
+"CreateDerivedKey.Modal.Path.Title" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
+"CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
+"CreateDerivedKey.Modal.Path.Action.HardPath" = "//";
+"CreateDerivedKey.Modal.Path.Action.PasswordedPath" = "///Password";
+"CreateDerivedKey.Modal.Path.Footer.Path" = "Path name example //network//1";
+"CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
+"CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
+"CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
+"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation path name is empty";
+"CreateDerivedKey.Modal.Path.Error.Password" = "Passwords don’t match";
+"CreateDerivedKey.Modal.Path.Error.AlreadyExists" = "Key with this Derivation path name already exists";
+"CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";
+"CreateDerivedKey.Modal.Path.Info" = "Learn more about /soft, //hard,\n///password derivation methods";
+"CreateDerivedKey.Modal.Path.Info.highlight" = "/soft, //hard,\n///password";
+"CreateDerivedKey.Snackbar.Created" = "Derived Key has been created";
+
+"CreateDerivedKey.Modal.Confirmation.Title" = "Write Down Your\nDerivation Path Name";
+"CreateDerivedKey.Modal.Confirmation.Content" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
+"CreateDerivedKey.Modal.Confirmation.Header" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Confirmation.Confirmation" = "I have written down my derivation path name";
+"CreateDerivedKey.Modal.Confirmation.Action" = "Done";
+"CreateDerivedKey.Modal.Confirmation.EmptyPath" = "Derivation Path Name Is Empty";
+
+"CreateDerivedKey.InfoModal.DerivedKeys.Title" = "Derived Keys";
+"CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is to easily back up (and restore from a back up) a derivation path compared to seed phrase.";
+"CreateDerivedKey.InfoModal.DerivedKeys.Action" = "Got It";
+"CreateDerivedKey.InfoModal.DerivationPaths.Title" = "Derivation Paths";
+"CreateDerivedKey.InfoModal.DerivationPaths.Content" = "If you would like to create and manage several accounts on the network using the same seed, you can use derivation paths. We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase. Many Polkadot key generation tools support hard and soft derivation. For instance, if you intend to create an account to be used on the Polkadot chain, you can derive a hard key child account using // after the mnemonic phrase.";
+"CreateDerivedKey.InfoModal.DerivationPaths.Action" = "Got It";
+"CreateDerivedKey.InfoModal.DerivationMethods.Title" = "Derivation Methods";
+"CreateDerivedKey.InfoModal.DerivationMethods.Soft.Title" = "/ Soft derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Soft.Content" = "A soft derivation allows someone to potentially \"go backwards\" to figure out the initial account's private key if they know the derived account's private key. It is also possible to determine that different accounts generated from the same seed are linked to that seed.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Hard.Title" = "// Hard derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Hard.Content" = "A hard derivation path does not allow either of these - even if you know a derived private key, it's not feasible to figure out the private key of the root address, and it's impossible to prove that the first account is linked with the second.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Password.Title" = "/// Password derivation";
+"CreateDerivedKey.InfoModal.DerivationMethods.Password.Content" = "In this type of derivation, if the mnemonic phrase were to leak, accounts could not be derived without the initial password. In fact, for soft- and hard-derived accounts, if someone knows the mnemonic phrase and the derivation path, they will have access to your account. For password-derived accounts, the password is applied on the derivation path. You can know the mnemonic phrase and the derivation path, but without the password it is not possible to access the account. In mathematical terms, if we have a written derivation path and a password, we can calculate the real derivation path as f(written derivation path, password); where f is a function. We can then calculate the account key pair using f(seed, real derivation path). Note that unlike hard and soft derivations that can be mixed, only a single password should be specified per derivation.";
+"CreateDerivedKey.InfoModal.DerivationMethods.Action" = "Got It";
+
+"Onboarding.Agreements.Label.Title" = "Please Agree to our Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Label.PrivacyCell" = "Privacy Policy";
+"Onboarding.Agreements.Label.ToSCell" = "Terms of Service";
+"Onboarding.Agreements.Label.Confirmation" = "I’ve read and accept the Terms of Service and Privacy Policy";
+"Onboarding.Agreements.Action.Accept" = "I Accept";
+
+"Error.Jailbreak.Label.Title" = "Warning! This Device has been Jailbroken";
+"Error.Jailbreak.Label.Subtitle" = "We’ve detected that this Device Has Been Jailbroken and Isn’t Safe to Use. Please try again with another device.";
+
+"Error.DevicePincodeRequired.Label.Title" = "Set Up A Passcode";
+"Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Polkadot Vault requires passcode confirmation. Using the application without a password is not allowed.";
+"Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
+"Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
+
+"Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+
+"Error.LockedDevice.Label.Title" = "Please Unlock the App";
+"Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
+"Error.LockedDevice.Action.Unlock" = "Unlock the App";
+
+"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
+"OnboardingOverview.Action.Skip" = "Skip";
+"OnboardingOverview.Action.Continue" = "Continue";
+"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
+"OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
+"OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
+"OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
+"OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
+
+"Onboarding.Screenshots.Label.Title" = "Please confirm you understand the risks of screenshots";
+"Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
+"Onboarding.Screenshots.Label.Confirmation" = "I'm aware of the risks involved in taking screenshots";
+"Onboarding.Screenshots.Action.Next" = "Next";
+
+"Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
+"Onboarding.Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
+"Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
+"Onboarding.Airgap.Label.Wifi" = "Turn off WiFi Connection";
+"Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
+"Onboarding.Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
+"Onboarding.Airgap.Action.Next" = "Next";
+
+"NewSeed.Name.Label.Title" = "Key Set Name";
+"NewSeed.Name.Label.Header" = "Enter a name that will help you identify this key set";
+"NewSeed.Name.Label.Placeholder" = "Enter Key Set name";
+"NewSeed.Name.Label.Footer" = "Name examples: Main account, My validator, Dotsama crowdloans, etc";
+"NewSeed.Name.Action.Next" = "Next";
+"NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
+"NewSeed.Backup.Action.Create" = "Create Key Set";
+"NewSeed.Backup.Label.Info" = "Write it down on a piece of paper and keep it in a safe place. You can also use Banana Split for maximum security";
+"NewSeed.Backup.Label.Info.Underline" = "Banana Split";
+"NewSeed.Backup.Label.Confirmation" = "I’ve written down my secret\nrecovery phrase";
+"NewSeed.Backup.BananaSplit.Label.Title" = "Banana Split";
+"NewSeed.Backup.BananaSplit.Label.Content" = "Banana Split is a self-contained HTML page, which makes your paper backups more resilient and secure using Shamir's secret sharing scheme. You can encrypt and split particularly sensitive information so that it's not physically stored in one place — your master password, seed phrase, etc.\n\nFor more details visit\nhttps://bs.parity.io";
+"NewSeed.Backup.BananaSplit.Label.Content.Highlight.1" = "Shamir's secret sharing scheme.";
+"NewSeed.Backup.BananaSplit.Label.Content.Highlight.2" = "https://bs.parity.io";

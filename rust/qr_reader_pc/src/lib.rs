@@ -4,7 +4,7 @@
 
 //! # QR reader crate for PC
 //!
-//! `qr_reader_pc` is a utility to capture (via webcam) QR codes from Signer
+//! `qr_reader_pc` is a utility to capture (via webcam) QR codes from Vault
 //! and extracting data from it.
 
 use anyhow::anyhow;

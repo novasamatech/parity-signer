@@ -30,8 +30,8 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun ScreenHeader(
 	title: String?,
-	onBack: (() -> Unit)? = null,
-	onMenu: (() -> Unit)? = null,
+	onBack: Callback? = null,
+	onMenu: Callback? = null,
 ) {
 	Row(
 		modifier = Modifier
@@ -90,8 +90,8 @@ fun ScreenHeader(
 fun ScreenHeaderClose(
 	title: String,
 	subtitle: String? = null,
-	onClose: () -> Unit,
-	onMenu: (() -> Unit)? = null,
+	onClose: Callback,
+	onMenu: Callback? = null,
 	differentMenuIcon: ImageVector? = null,
 ) {
 	Row(
@@ -153,7 +153,6 @@ fun ScreenHeaderClose(
 }
 
 
-//todo dmitry DerivationPathScreen.kt:350 migrate to this view when merged
 @Composable
 fun ScreenHeaderWithButton(
 	canProceed: Boolean,

@@ -1,28 +1,18 @@
-#[cfg(feature = "test")]
 use pretty_assertions::{assert_eq, assert_ne};
-#[cfg(feature = "test")]
 use sled::{Batch, Tree};
-#[cfg(feature = "test")]
 use sp_core::sr25519::Public;
-#[cfg(feature = "test")]
 use sp_core::H256;
-#[cfg(feature = "test")]
 use sp_runtime::MultiSigner;
-#[cfg(feature = "test")]
 use std::{convert::TryInto, str::FromStr};
 
-#[cfg(feature = "test")]
 use constants::{
     test_values::{
         alice_sr_alice, alice_sr_root, empty_png, types_known, westend_9000, westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
-#[cfg(feature = "test")]
 use db_handling::Error;
-#[cfg(feature = "test")]
 use defaults::default_chainspecs;
-#[cfg(feature = "test")]
 use definitions::{
     crypto::Encryption,
     history::{
@@ -42,7 +32,6 @@ use definitions::{
     users::AddressDetails,
 };
 
-#[cfg(feature = "test")]
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -80,7 +69,6 @@ fn westend_genesis() -> H256 {
     H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn print_seed_names() {
     let dbname = tempdir().unwrap();
@@ -103,7 +91,6 @@ fn print_seed_names() {
     assert_eq!(cards, expected_cards);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn print_seed_names_with_orphan() {
     let dbname = tempdir().unwrap();
@@ -139,7 +126,6 @@ fn print_seed_names_with_orphan() {
     assert_eq!(cards, expected_cards);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn print_all_ids() {
     use definitions::navigation::SignerImage;
@@ -220,7 +206,6 @@ fn print_all_ids() {
     assert_eq!(keys, expected_keys);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn print_show_all_networks_flag_westend() {
     let dbname = tempdir().unwrap();
@@ -267,7 +252,6 @@ fn print_show_all_networks_flag_westend() {
     assert_eq!(menu, expected_menu);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn show_all_networks_no_flag() {
     let dbname = tempdir().unwrap();
@@ -278,19 +262,19 @@ fn show_all_networks_no_flag() {
     let expected_networks = vec![
         MMNetwork {
             key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
-            title: "Polkadot".to_string(),
+            title: "polkadot".to_string(),
             logo: "polkadot".to_string(),
             order: 0,
         },
         MMNetwork {
             key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
-            title: "Kusama".to_string(),
+            title: "kusama".to_string(),
             logo: "kusama".to_string(),
             order: 1,
         },
         MMNetwork {
             key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
-            title: "Westend".to_string(),
+            title: "westend".to_string(),
             logo: "westend".to_string(),
             order: 2,
         },
@@ -298,7 +282,6 @@ fn show_all_networks_no_flag() {
     assert_eq!(networks, expected_networks);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn first_standard_network() {
     let dbname = tempdir().unwrap();
@@ -309,7 +292,6 @@ fn first_standard_network() {
     assert_eq!(specs.unwrap().specs.name, "polkadot");
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn export_alice_westend() {
     use definitions::navigation::SignerImage;
@@ -353,7 +335,7 @@ fn export_alice_westend() {
             secret_exposed: false,
         },
         network_info: MSCNetworkInfo {
-            network_title: "Westend".to_string(),
+            network_title: "westend".to_string(),
             network_logo: "westend".to_string(),
             network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 .to_string(),
@@ -362,7 +344,6 @@ fn export_alice_westend() {
     assert_eq!(key, expected_key);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn backup_prep_alice() {
     let dbname = tempdir().unwrap();
@@ -374,7 +355,7 @@ fn backup_prep_alice() {
         seed_name: "Alice".to_string(),
         derivations: vec![
             DerivationPack {
-                network_title: "Polkadot".to_string(),
+                network_title: "polkadot".to_string(),
                 network_logo: "polkadot".to_string(),
                 network_order: 0.to_string(),
                 id_set: vec![DerivationEntry {
@@ -383,7 +364,7 @@ fn backup_prep_alice() {
                 }],
             },
             DerivationPack {
-                network_title: "Kusama".to_string(),
+                network_title: "kusama".to_string(),
                 network_logo: "kusama".to_string(),
                 network_order: 1.to_string(),
                 id_set: vec![DerivationEntry {
@@ -392,7 +373,7 @@ fn backup_prep_alice() {
                 }],
             },
             DerivationPack {
-                network_title: "Westend".to_string(),
+                network_title: "westend".to_string(),
                 network_logo: "westend".to_string(),
                 network_order: 2.to_string(),
                 id_set: vec![
@@ -411,7 +392,6 @@ fn backup_prep_alice() {
     assert_eq!(backup, expected_backup);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn derive_prep_alice() {
     let dbname = tempdir().unwrap();
@@ -425,7 +405,6 @@ fn derive_prep_alice() {
     assert_eq!(key, expected_key);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn derive_prep_alice_collided() {
     let dbname = tempdir().unwrap();
@@ -459,7 +438,6 @@ fn derive_prep_alice_collided() {
     assert_eq!(key, expected_key);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn derive_prep_alice_collided_with_password() {
     let dbname = tempdir().unwrap();
@@ -508,7 +486,6 @@ fn derive_prep_alice_collided_with_password() {
     assert_eq!(key, expected_key);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn westend_network_details() {
     let dbname = tempdir().unwrap();
@@ -574,7 +551,6 @@ fn westend_network_details() {
     assert_eq!(details, expected_details);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn westend_9010_metadata_details() {
     let dbname = tempdir().unwrap();
@@ -608,7 +584,6 @@ fn westend_9010_metadata_details() {
     assert_eq!(network, expected_network);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn types_status_and_history() {
     let dbname = tempdir().unwrap();
@@ -651,7 +626,6 @@ fn types_status_and_history() {
         .any(|h| h.1.events.contains(&expected_element)));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn path_is_known() {
     let dbname = tempdir().unwrap();
@@ -689,7 +663,6 @@ fn path_is_known() {
     assert_eq!(check, expected_check);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn path_is_unknown() {
     let dbname = tempdir().unwrap();
@@ -711,7 +684,6 @@ fn path_is_unknown() {
     assert_eq!(check, expected_check);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn path_is_unknown_passworded() {
     let dbname = tempdir().unwrap();
@@ -733,7 +705,6 @@ fn path_is_unknown_passworded() {
     assert_eq!(check, expected_check);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn get_danger_status_properly() {
     let dbname = tempdir().unwrap();
@@ -757,7 +728,6 @@ fn get_danger_status_properly() {
     );
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn display_general_verifier_properly() {
     let dbname = tempdir().unwrap();
@@ -787,7 +757,6 @@ fn display_general_verifier_properly() {
     assert_eq!(verifier, expected_verifier);
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn find_westend_verifier() {
     let dbname = tempdir().unwrap();
@@ -801,7 +770,6 @@ fn find_westend_verifier() {
     assert_eq!(westend_verifier, Some(ValidCurrentVerifier::General));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn not_find_mock_verifier() {
     let dbname = tempdir().unwrap();
@@ -818,7 +786,6 @@ fn not_find_mock_verifier() {
     }
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_generate_default_addresses_for_alice() {
     let dbname = tempdir().unwrap();
@@ -872,7 +839,6 @@ fn test_generate_default_addresses_for_alice() {
     assert!(identities.contains_key(test_key.key()).unwrap());
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_derive() {
     let dbname = tempdir().unwrap();
@@ -921,7 +887,6 @@ fn test_derive() {
     */
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_identity_deletion() {
     let dbname = tempdir().unwrap();
@@ -949,7 +914,6 @@ fn test_identity_deletion() {
     }
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn history_with_identities() {
     let dbname = tempdir().unwrap();
@@ -1053,7 +1017,6 @@ fn history_with_identities() {
     }
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn remove_seed_history() {
     let seed_name = "Alice";
@@ -1075,7 +1038,6 @@ fn remove_seed_history() {
     ));
 }
 
-#[cfg(feature = "test")]
 fn get_multisigner_path_set(database: &sled::Db) -> Vec<(MultiSigner, String)> {
     let identities = open_tree(database, ADDRTREE).unwrap();
     let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
@@ -1086,7 +1048,6 @@ fn get_multisigner_path_set(database: &sled::Db) -> Vec<(MultiSigner, String)> {
     multisigner_path_set
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn increment_identities_1() {
     let dbname = tempdir().unwrap();
@@ -1130,7 +1091,6 @@ fn increment_identities_1() {
     assert!(path_set.contains(&String::from("//Alice//3")));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn increment_identities_2() {
     let dbname = tempdir().unwrap();
@@ -1177,7 +1137,6 @@ fn increment_identities_2() {
     assert!(path_set.contains(&String::from("//Alice//4")));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn increment_identities_3() {
     let dbname = tempdir().unwrap();
@@ -1224,7 +1183,6 @@ fn increment_identities_3() {
     assert!(path_set.contains(&String::from("//Alice//1//2")));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn creating_derivation_1() {
     let dbname = tempdir().unwrap();
@@ -1273,7 +1231,6 @@ fn creating_derivation_1() {
     }
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn creating_derivation_2() {
     let dbname = tempdir().unwrap();
@@ -1309,7 +1266,6 @@ fn creating_derivation_2() {
     );
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn creating_derivation_3() {
     let dbname = tempdir().unwrap();
@@ -1345,7 +1301,6 @@ fn creating_derivation_3() {
     );
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn creating_derivation_4() {
     let dbname = tempdir().unwrap();
@@ -1386,7 +1341,6 @@ fn creating_derivation_4() {
     );
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn creating_derivation_5() {
     let dbname = tempdir().unwrap();
@@ -1448,7 +1402,6 @@ fn creating_derivation_5() {
     }
 }
 
-#[cfg(feature = "test")]
 fn insert_metadata_from_file(database: &sled::Db, filename: &str) {
     let meta_str = std::fs::read_to_string(filename).unwrap();
     let meta_values = MetaValues::from_str_metadata(meta_str.trim()).unwrap();
@@ -1463,13 +1416,11 @@ fn insert_metadata_from_file(database: &sled::Db, filename: &str) {
         .unwrap();
 }
 
-#[cfg(feature = "test")]
 fn metadata_len(database: &sled::Db) -> usize {
     let metadata = open_tree(database, METATREE).unwrap();
     metadata.len()
 }
 
-#[cfg(feature = "test")]
 fn metadata_contents(database: &sled::Db) -> Vec<(String, u32)> {
     let metadata = open_tree(database, METATREE).unwrap();
     let mut out: Vec<(String, u32)> = Vec::new();
@@ -1480,7 +1431,6 @@ fn metadata_contents(database: &sled::Db) -> Vec<(String, u32)> {
     out
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_metadata_transfer() {
     let dbname_hot = tempdir().unwrap();
@@ -1526,7 +1476,6 @@ fn test_metadata_transfer() {
     std::fs::remove_dir_all(dbname_cold).unwrap();
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_all_events() {
     let dbname = tempdir().unwrap();
@@ -1988,7 +1937,6 @@ fn test_all_events() {
     assert!(entries_contain_event(&entries, &Event::DatabaseInitiated));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn print_single_event() {
     let dbname = tempdir().unwrap();
@@ -2006,19 +1954,16 @@ fn print_single_event() {
     assert_eq!(entry.events, expected_events);
 }
 
-#[cfg(feature = "test")]
 fn check_for_network(database: &sled::Db, name: &str, version: u32) -> bool {
     let metadata: Tree = database.open_tree(METATREE).unwrap();
     let meta_key = MetaKey::from_parts(name, version);
     metadata.contains_key(meta_key.key()).unwrap()
 }
 
-#[cfg(feature = "test")]
 fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
     entries.iter().any(|e| e.events.contains(event))
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn remove_all_westend() {
     let dbname = tempdir().unwrap();
@@ -2150,7 +2095,6 @@ fn remove_all_westend() {
     ));
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn remove_westend_9010() {
     let dbname = tempdir().unwrap();
@@ -2172,7 +2116,6 @@ fn remove_westend_9010() {
     );
 }
 
-#[cfg(feature = "test")]
 #[test]
 fn test_export_secret_key() {
     let dbname = tempdir().unwrap();

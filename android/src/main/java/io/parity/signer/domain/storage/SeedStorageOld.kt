@@ -4,7 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.MainFlowViewModel
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.updateSeedNames
 import kotlinx.coroutines.*
@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
  * authentication.authenticate(activity) {refreshSeedNames()}
  * which is somewhat asynchronous
  */
-internal fun MainFlowViewModel.tellRustSeedNames() {
+internal fun SharedViewModel.tellRustSeedNames() {
 	val allNames = seedStorage.getSeedNames()
 	updateSeedNames(allNames.toList())
 }
@@ -26,7 +26,7 @@ internal fun MainFlowViewModel.tellRustSeedNames() {
  * @param createRoots is fake and should always be true. It's added for educational reasons
  */
 @Deprecated("Use SeedRepository directly")
-fun MainFlowViewModel.addSeed(
+fun SharedViewModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
 ) {
@@ -45,7 +45,7 @@ fun MainFlowViewModel.addSeed(
  * Fetch seed from strongbox; must be in unlocked scope
  */
 @Deprecated("Use SeedStorage or better SeedRepository")
-internal fun MainFlowViewModel.getSeed(
+internal fun SharedViewModel.getSeed(
 	seedName: String,
 	backup: Boolean = false
 ): String {
@@ -66,7 +66,7 @@ internal fun MainFlowViewModel.getSeed(
  * 3. Calls rust remove seed logic
  */
 @Deprecated("Use SeedStorage or better SeedRepository")
-fun MainFlowViewModel.removeSeed(seedName: String) {
+fun SharedViewModel.removeSeed(seedName: String) {
 	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			seedStorage.removeSeed(seedName)

@@ -719,14 +719,14 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_transaction_fetched(&self, details_str: &str) -> (Navstate, String) {
+    fn handle_transaction_fetched(&self, details_str: &str) -> Result<(Navstate, String)> {
         let errorline = String::new();
 
         let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-            TransactionState::new(&self.db, details_str),
+            TransactionState::new(&self.db, details_str)?,
         )));
 
-        (new_navstate, errorline)
+        Ok((new_navstate, errorline))
     }
 
     fn handle_remove_network(&self) -> (Navstate, String) {
@@ -1369,9 +1369,10 @@ impl State {
             Modal::EnterPassword => match new_navstate.screen {
                 Screen::Transaction(ref t) => {
                     t.current_password_author_info()
-                        .map(|author_info| ModalData::EnterPassword {
+                        .map(|(author_info, network_info)| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
+                                network_info: Some(network_info.into()),
                                 counter: t.counter() as u32,
                             },
                         })
@@ -1381,6 +1382,7 @@ impl State {
                         Some(ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
+                                network_info: None,
                                 counter: s.counter() as u32,
                             },
                         })
@@ -1482,7 +1484,7 @@ impl State {
             Action::BackupSeed => self.handle_backup_seed(details_str),
             Action::NetworkSelector => self.handle_network_selector(),
             Action::CheckPassword => self.handle_change_password(details_str),
-            Action::TransactionFetched => self.handle_transaction_fetched(details_str),
+            Action::TransactionFetched => self.handle_transaction_fetched(details_str)?,
             Action::RemoveNetwork => self.handle_remove_network(),
             Action::RemoveMetadata => self.handle_remove_metadata(),
             Action::RemoveTypes => self.handle_remove_types(),

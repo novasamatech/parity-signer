@@ -47,7 +47,10 @@ fun DerivationCreateSubgraph(
 				path = path.value,
 				isPathValid = deriveViewModel.checkPath(path.value) == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
 				selectedNetwork = selectedNetwork.value,
-				onClose = { rootNavigator.backAction() },
+				onClose = {
+					deriveViewModel.resetState()
+					rootNavigator.backAction()
+				},
 				onNetworkSelectClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.networks)
 				},
@@ -106,8 +109,13 @@ fun DerivationCreateSubgraph(
 							path = path.value,
 							onCancel = closeAction,
 							onDone = {
-								deriveViewModel.viewModelScope.launch { deriveViewModel.proceedCreateKey(context) }
-								closeAction()
+								deriveViewModel.viewModelScope.launch {
+									deriveViewModel.proceedCreateKey(
+										context
+									)
+									closeAction()
+									rootNavigator.backAction()
+								}
 							},
 						)
 					}

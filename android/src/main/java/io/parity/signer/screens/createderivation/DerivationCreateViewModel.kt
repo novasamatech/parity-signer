@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 
 class DerivationCreateViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.backendScope.uniffiInteractor
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val pathAnalyzer: DerivationPathAnalyzer = DerivationPathAnalyzer()
 
@@ -95,6 +95,7 @@ class DerivationCreateViewModel : ViewModel() {
 						context.getString(R.string.create_derivations_success),
 						Toast.LENGTH_SHORT
 					).show()
+					resetState()
 				} catch (e: Exception) {
 					Toast.makeText(
 						context, context.getString(R.string.create_derivations_failure, e.localizedMessage),
@@ -107,6 +108,10 @@ class DerivationCreateViewModel : ViewModel() {
 		} catch (e: java.lang.Exception) {
 			Log.e(TAG, e.toString())
 		}
+	}
+
+	fun resetState() {
+		_path.value = INITIAL_DERIVATION_PATH
 	}
 
 	enum class DerivationPathValidity {

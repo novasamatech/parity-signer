@@ -1,37 +1,63 @@
 package io.parity.signer.domain
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.wifi.WifiManager
 import android.provider.Settings
+import io.parity.signer.backend.UniffiInteractor
 import io.parity.signer.uniffi.historyAcknowledgeWarnings
-import io.parity.signer.uniffi.historyDeviceWasOnline
 import io.parity.signer.uniffi.historyGetWarnings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class NetworkExposedStateKeeper(private val appContext: Context) {
+class NetworkExposedStateKeeper(
+	private val appContext: Context,
+	private val rustInteractor: UniffiInteractor
+) {
 
-	private val _airplaneModeState: MutableStateFlow<NetworkState> =
+	private val _airplaneModeEnabled: MutableStateFlow<Boolean?> =
+		MutableStateFlow(null)
+	val airPlaneModeEnabled: StateFlow<Boolean?> = _airplaneModeEnabled
+
+	private val _wifiDisabledState: MutableStateFlow<Boolean?> =
+		MutableStateFlow(null)
+	val wifiDisabledState: StateFlow<Boolean?> = _wifiDisabledState
+
+	private val _bluetoothDisabledState: MutableStateFlow<Boolean?> =
+		MutableStateFlow(null)
+	val bluetoothDisabledState: StateFlow<Boolean?> = _bluetoothDisabledState
+
+	private val _airGapModeState: MutableStateFlow<NetworkState> =
 		MutableStateFlow(NetworkState.None)
-	val airplaneModeState: StateFlow<NetworkState> = _airplaneModeState
+	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
 
 	init {
-		reactOnAirplaneMode()
 		registerAirplaneBroadcastReceiver()
+		registerWifiBroadcastReceiver()
+		registerBluetoothBroadcastReceiver()
+		reactOnAirplaneMode()
+		reactOnWifiAwareState()
+		reactOnBluetooth()
 	}
 
+	/**
+	 * Expects that rust nav machine is initialized that should always be the case
+	 * as it's required to show UI calling this function
+	 */
 	fun acknowledgeWarning() {
-		if (airplaneModeState.value == NetworkState.Past) {
+		if (airGapModeState.value == NetworkState.Past) {
 			historyAcknowledgeWarnings()
-			_airplaneModeState.value = NetworkState.None
+			_airGapModeState.value = NetworkState.None
 		}
 	}
 
 	private fun registerAirplaneBroadcastReceiver() {
-		val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
+		val intentFilter = IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED)
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
 				reactOnAirplaneMode()
@@ -40,42 +66,80 @@ class NetworkExposedStateKeeper(private val appContext: Context) {
 		appContext.registerReceiver(receiver, intentFilter)
 	}
 
+	private fun registerBluetoothBroadcastReceiver() {
+		val intentFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+			override fun onReceive(context: Context, intent: Intent) {
+				reactOnBluetooth()
+			}
+		}
+		appContext.registerReceiver(receiver, intentFilter)
+	}
+
+	private fun updateGeneralAirgap(isBreached: Boolean) {
+		if (isBreached) {
+			if (airGapModeState.value != NetworkState.Active) {
+				_airGapModeState.value = NetworkState.Active
+				if (appContext.isDbCreatedAndOnboardingPassed()) {
+					rustInteractor.historyDeviceWasOnline()
+				}
+			}
+		} else {
+			if (airGapModeState.value == NetworkState.Active) {
+				_airGapModeState.value =
+					if (appContext.isDbCreatedAndOnboardingPassed())
+						NetworkState.Past else NetworkState.None
+			}
+		}
+	}
+
+	private fun reactOnAirplaneMode() {
+		val airplaneModeOff = Settings.Global.getInt(
+			appContext.contentResolver,
+			Settings.Global.AIRPLANE_MODE_ON,
+			0
+		) == 0
+		_airplaneModeEnabled.value = !airplaneModeOff
+		updateGeneralAirgap(airplaneModeOff)
+	}
+
+	private fun reactOnBluetooth() {
+		val bluetooth =
+			appContext.applicationContext.getSystemService(BluetoothManager::class.java)?.adapter
+		val btEnabled = bluetooth?.isEnabled == true
+		_bluetoothDisabledState.value = !btEnabled
+		updateGeneralAirgap(btEnabled)
+	}
+
+	private fun registerWifiBroadcastReceiver() {
+		val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+			override fun onReceive(context: Context, intent: Intent) {
+				reactOnWifiAwareState()
+			}
+		}
+		appContext.registerReceiver(receiver, intentFilter)
+	}
+
+	private fun reactOnWifiAwareState() {
+		val wifi =
+			appContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+		val wifiEnabled = wifi?.isWifiEnabled == true
+		_wifiDisabledState.value = !wifiEnabled
+		updateGeneralAirgap(wifiEnabled)
+	}
+
 	/**
-	 * Can't do initially as navigation should be init before we check rust.
+	 * Can't do initially as navigation should be initialized before we check rust.
 	 */
-	fun updateAlertState() {
-		_airplaneModeState.value = if (historyGetWarnings()) {
-			if (airplaneModeState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
+	fun updateAlertStateFromHistory() {
+		_airGapModeState.value = if (historyGetWarnings()) {
+			if (airGapModeState.value == NetworkState.Active) NetworkState.Active else NetworkState.Past
 		} else {
 			NetworkState.None
 		}
 	}
-
-	/**
-	 * Checks if airplane mode was off
-	 */
-	private fun reactOnAirplaneMode() {
-		if (Settings.Global.getInt(
-				appContext.contentResolver,
-				Settings.Global.AIRPLANE_MODE_ON,
-				0
-			) == 0
-		) {
-			if (airplaneModeState.value != NetworkState.Active) {
-				_airplaneModeState.value = NetworkState.Active
-				if (appContext.isDbCreatedAndOnboardingPassed()) {
-					historyDeviceWasOnline()
-				}
-			}
-		} else {
-			if (airplaneModeState.value == NetworkState.Active) {
-				_airplaneModeState.value = if (appContext.isDbCreatedAndOnboardingPassed())
-					NetworkState.Past else NetworkState.None
-			}
-		}
-	}
 }
-
 
 /**
  * Describes current state of network detection alertness

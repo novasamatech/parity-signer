@@ -31,24 +31,21 @@ import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreen
+import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.keysBySeedName
+import io.parity.signer.uniffi.*
 
 @Composable
 fun CombinedScreensSelector(
 	screenData: ScreenData,
 	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
-	mainFlowViewModel: MainFlowViewModel
+	sharedViewModel: SharedViewModel
 ) {
-	val rootNavigator = mainFlowViewModel.navigator
+	val rootNavigator = sharedViewModel.navigator
 	val seedNames =
-		mainFlowViewModel.seedStorage.lastKnownSeedNames.collectAsState()
+		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
@@ -59,13 +56,21 @@ fun CombinedScreensSelector(
 			)
 		}
 		is ScreenData.Keys -> {
-			val keys = keysBySeedName(screenData.f)
-			KeySetDetailsNavSubgraph(
-				model = keys.toKeySetDetailsModel(),
-				rootNavigator = rootNavigator,
-				networkState = networkState,
-				singleton = mainFlowViewModel,
-			)
+			val keys = try {
+				keysBySeedName(screenData.f)
+			} catch (e: ErrorDisplayed) {
+				rootNavigator.backAction()
+				submitErrorState("unexpected error in keysBySeedName $e")
+				null
+			}
+			keys?.let {
+				KeySetDetailsNavSubgraph(
+					model = keys.toKeySetDetailsModel(),
+					rootNavigator = rootNavigator,
+					networkState = networkState,
+					singleton = sharedViewModel,
+				)
+			}
 		}
 		is ScreenData.KeyDetails ->
 			Box(modifier = Modifier.statusBarsPadding()) {
@@ -89,11 +94,11 @@ fun CombinedScreensSelector(
 			}
 		is ScreenData.Settings ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				SettingsScreen(
+				SettingsScreenSubgraph(
 					rootNavigator = rootNavigator,
-					isStrongBoxProtected = mainFlowViewModel.seedStorage.isStrongBoxProtected,
-					appVersion = mainFlowViewModel.getAppVersion(),
-					wipeToFactory = mainFlowViewModel::wipeToFactory,
+					isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
+					appVersion = sharedViewModel.getAppVersion(),
+					wipeToFactory = sharedViewModel::wipeToFactory,
 					networkState = networkState
 				)
 			}
@@ -139,7 +144,7 @@ fun BottomSheetSelector(
 	modalData: ModalData?,
 	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
-	mainFlowViewModel: MainFlowViewModel,
+	sharedViewModel: SharedViewModel,
 	navigator: Navigator,
 ) {
 	SignerNewTheme {
@@ -165,7 +170,7 @@ fun BottomSheetSelector(
 					}) {
 						KeyDetailsMenuAction(
 							navigator = navigator,
-							keyDetails = mainFlowViewModel.lastOpenedKeyDetails
+							keyDetails = sharedViewModel.lastOpenedKeyDetails
 						)
 					}
 				is ModalData.NewSeedMenu ->
@@ -175,14 +180,14 @@ fun BottomSheetSelector(
 					}) {
 						NewSeedMenu(
 							networkState = networkState,
-							navigator = mainFlowViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.NewSeedBackup -> {
 					NewKeySetBackupScreenFull(
 						model = modalData.f.toNewSeedBackupModel(),
 						onBack = { navigator.backAction() },
-						onCreateKeySet = mainFlowViewModel::addSeed
+						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
 				is ModalData.LogRight ->
@@ -190,7 +195,7 @@ fun BottomSheetSelector(
 						navigator.backAction()
 					}) {
 						LogsMenu(
-							navigator = mainFlowViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.EnterPassword ->
@@ -210,7 +215,7 @@ fun BottomSheetSelector(
 					}
 				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(mainFlowViewModel = mainFlowViewModel)
+				is ModalData.LogComment -> LogComment(sharedViewModel = sharedViewModel)
 				else -> {}
 			}
 		}

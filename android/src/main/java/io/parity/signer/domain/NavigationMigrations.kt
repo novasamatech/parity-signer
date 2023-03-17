@@ -13,8 +13,9 @@ object NavigationMigrations {
 	): Boolean {
 
 		return when (localNavAction) {
-			else -> when (globalNavAction?.screenData) {
+			else -> when (globalNavAction.screenData) {
 				is ScreenData.SeedSelector -> false
+				is ScreenData.Settings -> false
 				is ScreenData.Keys -> false
 				else -> true
 			}

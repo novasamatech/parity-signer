@@ -30,12 +30,12 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
+        uses:                 Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
         with:
           workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@2cfb0024938d23011106cbf127b393bc83fddba1 # v1.3.1
         with:
           crate:              cargo-spellcheck
 
@@ -66,12 +66,12 @@ jobs:
           mdbook-version:     latest
 
       - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@2cfb0024938d23011106cbf127b393bc83fddba1 # v1.3.1
         with:
           crate:              mdbook-linkcheck
 
       - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@2cfb0024938d23011106cbf127b393bc83fddba1 # v1.3.1
         with:
           crate:              mdbook-mermaid
 

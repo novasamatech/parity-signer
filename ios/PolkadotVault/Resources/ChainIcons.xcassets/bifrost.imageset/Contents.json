@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Bifrost_Kusama.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

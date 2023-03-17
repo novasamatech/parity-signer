@@ -1,22 +1,22 @@
 //! Network specs, verifiers, and related types  
 //!
-//! Signer could be used only for networks introduced to the database.  
+//! Vault could be used only for networks introduced to the database.
 //!
 //! Each network has associated set of parameters called here network specs.
 //! Cold database stores [`OrderedNetworkSpecs`].
 //! Hot database stores [`NetworkSpecs`]. Air-gap transfers with
 //! `add_specs` payload also contain [`NetworkSpecs`].
 //! Network specs rarely change and are generally are introduced into
-//! Signer only once for each network.
+//! Vault only once for each network.
 //!
-//! Signer has verifier system storing public keys that Signer trusts are providing
+//! Vault has verifier system storing public keys that Vault trusts are providing
 //! correct updates to the information.  
 //!
 //! Cold database stores [`CurrentVerifier`] for each network and general verifier.  
 //!
 //! # Verifiers in cold database  
 //!
-//! Signer is expected to be safe to use as long as the information uploaded
+//! Vault is expected to be safe to use as long as the information uploaded
 //! into it through air-gap is the correct one.  
 //!
 //! Damaged network specs or network metadata could result in transactions
@@ -26,9 +26,9 @@
 //! by a trusted party to exclude accidental or intentional errors. It is
 //! especially important in keeping fast-changing network metadata updated.  
 //!
-//! ## Verifiers of data entering the Signer  
+//! ## Verifiers of data entering the Vault
 //!
-//! The data scanned into Signer has an associated [`Verifier`].  
+//! The data scanned into Vault has an associated [`Verifier`].
 //!
 //! If the information is verified, [`Verifier`] is `Some(VerifierValue)`.  
 //!
@@ -36,7 +36,7 @@
 //!
 //! Payloads with verified data contain trusted party public key and signature
 //! for the data transferred, that are checked when the data is processed in
-//! Signer. Unverified data gets processed as is, without any verification.
+//! Vault. Unverified data gets processed as is, without any verification.
 //! Unverified data should be used cautiously, and avoided unless absolutely
 //! necessary.  
 //!
@@ -45,18 +45,18 @@
 //! [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
 //! is available.  
 //!
-//! ## Verifiers of data already in the Signer  
+//! ## Verifiers of data already in the Vault
 //!
-//! There is [`CurrentVerifier`] for each network known to Signer, and
+//! There is [`CurrentVerifier`] for each network known to Vault, and
 //! general verifier [`Verifier`] for some selected networks and for types.  
 //!
 //! ### Network verifiers  
 //!
-//! Each network in Signer has an associated [`CurrentVerifier`], having two
-//! variants: `Valid` and `Dead`. Networks could be used by the Signer only if
+//! Each network in Vault has an associated [`CurrentVerifier`], having two
+//! variants: `Valid` and `Dead`. Networks could be used by the Vault only if
 //! their verifier is `CurrentVerifier::Valid` with associated
 //! [`ValidCurrentVerifier`] value. Networks having `CurrentVerifier::Dead` no
-//! longer could be used or updated, unless the Signer is completely wiped and
+//! longer could be used or updated, unless the Vault is completely wiped and
 //! reset.  
 //!
 //! Network verifier information is stored in `VERIFIERS` tree of the cold
@@ -69,7 +69,7 @@
 //! `ValidCurrentVerifier` has two variants: `General` and `Custom`.  
 //!
 //! `ValidCurrentVerifier::General` means that the network is verified by the
-//! general verifier known to Signer. As installed or freshly wiped Signer
+//! general verifier known to Vault. As installed or freshly wiped Vault
 //! has default networks Polkadot, Kusama, and Westend having
 //! `ValidCurrentVerifier::General`.  
 //!
@@ -86,27 +86,27 @@
 //!
 //! ### General verifier  
 //!
-//! General verifier is the default [`Verifier`] known to the Signer. It is the
-//! data source the Signer relies upon the most.  
+//! General verifier is the default [`Verifier`] known to the Vault. It is the
+//! data source the Vault relies upon the most.
 //!
-//! General verifier is set up during Signer initialization, and is by
+//! General verifier is set up during Vault initialization, and is by
 //! default Parity-associated key.  
 //!
 //! General verifier value is stored in `SETTREE` tree of the cold database
 //! under key `GENERALVERIFIER`.  
 //!
 //! General verifier is used for verification of network specs and metadata
-//! for some networks (ideally, the ones most used on particular Signer
+//! for some networks (ideally, the ones most used on particular Vault
 //! device), and types information. Data previously verified by any
 //! general verifier other than `None` could be updated only if the update
 //! is signed by the same verifier. When general verifier is `None`, it gets
 //! updated to [`Verifier`] of the first user-accepted verified updating payload
 //! (i.e. with trust on first use).  
 //!
-//! Users can remove existing general verifier, this will re-initialize Signer
-//! with general verifier set to `None` and reset the Signer data to defaults.  
+//! Users can remove existing general verifier, this will re-initialize Vault
+//! with general verifier set to `None` and reset the Vault data to defaults.
 //!
-//! It is not recommended to use Signer without any general verifier, so it is
+//! It is not recommended to use Vault without any general verifier, so it is
 //! best to set up the user-trusted party as the general verifier right after
 //! removing the old general verifier, by downloading and accepting some
 //! trusted data with network specs or types information.  
@@ -119,13 +119,13 @@
 //!
 //! Note that if the network specs get removed due to general verifier change,
 //! the addresses within this network are not deleted from the database, just
-//! never displayed in the user interface. Signer will recall them if the
+//! never displayed in the user interface. Vault will recall them if the
 //! network specs get re-loaded verified with correct general verifier.  
 //!
 //! Let's consider a case when user has removed the default general verifier.
-//! After the reset, general verifier value becomes `None`, however, the Signer
+//! After the reset, general verifier value becomes `None`, however, the Vault
 //! still has the network specs and metadata for default networks, and types
-//! information. User plans to operate the Signer with Parity-unrelated network,
+//! information. User plans to operate the Vault with Parity-unrelated network,
 //! and loads verified network specs for it. The received data verifier becomes
 //! the new general verifier, and the data for default networks and default
 //! types gets removed.  
@@ -139,7 +139,7 @@
 //! verifier.  
 //!
 //! General verifier could not be changed once set up with `Some(VerifierValue)`,
-//! unless the Signer is wiped and reset.  
+//! unless the Vault is wiped and reset.
 //!
 //! At the moment there is no mechanism allowing users to set up the verifiers
 //! except by loading and accepting the updates signed by these verifiers.  
@@ -149,33 +149,33 @@
 //!
 //! - `ValidCurrentVerifier::General` with general verifier `None` could be
 //! upgraded to `ValidCurrentVerifier::General` with general verifier
-//! `(Some(VerifierValue))`. Happens when Signer with no value set up for
+//! `(Some(VerifierValue))`. Happens when Vault with no value set up for
 //! the general verifier receives and accepts a verified update with any
 //! network specs or types.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(Some(VerifierValue))` could be
 //! upgraded to `ValidCurrentVerifier::General` with general verifier set to
 //! `(Some(VerifierValue))`.
-//! Happens when Signer receives and accepts network specs update verified
+//! Happens when Vault receives and accepts network specs update verified
 //! by general verifier for this network. Note: metadata update with
 //! verifier upgrade would be rejected.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(None)` could be upgraded to
 //! `ValidCurrentVerifier::General` with general verifier set to
 //! `(Some(VerifierValue))`.
-//! Happens when Signer receives and accepts network specs update verified
+//! Happens when Vault receives and accepts network specs update verified
 //! by general verifier for this network. Note: metadata update with
 //! verifier upgrade would be rejected.  
 //!
 //! If [`CurrentVerifier`] upgrade occurs, all pre-upgrade network information
-//! is wiped (Signer warns about that).  
+//! is wiped (Vault warns about that).
 //!
 //! If general verifier upgrade occurs, all pre-upgrade information verified
-//! by the general verifier is wiped (Signer warns about that).  
+//! by the general verifier is wiped (Vault warns about that).
 //!
 //! ### Deleting network specs  
 //!
-//! User can remove any network from Signer. "Remove network" means removing:
+//! User can remove any network from Vault. "Remove network" means removing:
 //! - all network specs associated with network genesis hash,
 //! - all metadata associated with network specs name,
 //! - all addresses within this network with any encryption,
@@ -191,7 +191,7 @@
 //! changes will happen, network verifier will stay
 //! `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(None))`. Otherwise,
 //! the network verifier will be changed to `CurrentVerifier::Dead`, and it
-//! would be impossible to use the network again unless the Signer is wiped.
+//! would be impossible to use the network again unless the Vault is wiped.
 //! This is a part of security policy.  
 //!
 //! # Network specs in cold database
@@ -207,19 +207,19 @@
 //!
 //! If the network supports more than one encryption algorithm, each encryption
 //! corresponds to different [`NetworkSpecsKey`], and any or all of them could be
-//! coexisting in Signer simultaneously.  
+//! coexisting in Vault simultaneously.
 //!
 //! [`OrderedNetworkSpecs`] are generally expected to remain unchanged over time.
 //!
 //! ## Adding new network specs  
 //!
-//! New networks could be added to Signer through scanning `add_specs` QR code
+//! New networks could be added to Vault through scanning `add_specs` QR code
 //! for the network.
 //!
 //! ## Updating network specs (replacing old ones with new ones without deleting
 //! old ones)
 //!
-//! Signer will not allow to update network specs if critical parameters
+//! Vault will not allow to update network specs if critical parameters
 //! have changed.  
 //! These critical parameters are:  
 //! - `base58prefix`, network-associated base58 prefix  
@@ -227,19 +227,19 @@
 //! - `name`, network name, as it appears in the network metadata  
 //! - `unit`  
 //!
-//! However, if non-critical parameters have changes, Signer will permit the
+//! However, if non-critical parameters have changes, Vault will permit the
 //! network specs updating.  
 //! These non-critical parameters are:  
 //! - `color`  
 //! - `logo`, network-associated logo picture  
 //! - `path_id`, default address derivation path for the network  
 //! - `secondary_color`  
-//! - `title`, network title, as it is displayed in Signer  
+//! - `title`, network title, as it is displayed in Vault
 //!
 //! Some quickly updating experimental networks are changing the genesis hash
 //! often. Network genesis hash participates in [`NetworkSpecsKey`]
 //! generation. This way, if the genesis hash got updated, the network would
-//! appear "unknown" to Signer, and to use it, network specs with new genesis hash
+//! appear "unknown" to Vault, and to use it, network specs with new genesis hash
 //! would have to be added. Adding network specs with new genesis hash does not
 //! require deleting network specs with old genesis hash.  
 //!
@@ -257,7 +257,7 @@
 //! `decimals` indicate the order of magnitude, by which the token `unit`
 //! exceeds the integer representing unit (see examples below).
 //! Both `decimals` and `unit` values could be queried through RPC calls for each
-//! Signer-compatible network.  
+//! Vault-compatible network.
 //! Sometimes the networks have several available decimals and units, or none at all.  
 //! This cases should be dealt with on case-by-case basis.  
 //!
@@ -272,7 +272,6 @@
 //! The balance should be therefore represented as `10 uWND`.  
 
 use parity_scale_codec::{Decode, Encode};
-#[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_core::H256;
@@ -284,25 +283,23 @@ use crate::{
     navigation::SignerImage,
 };
 
-#[cfg(feature = "signer")]
 use crate::helpers::{
     make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
 };
 use crate::{crypto::Encryption, keyring::NetworkSpecsKey};
 
-#[cfg(feature = "signer")]
 use crate::navigation::MVerifierDetails;
 
 /// Network parameters stored SCALE-encoded in the **cold** database
 /// `SPECSTREE` tree under [`NetworkSpecsKey`]
 ///
-/// These network parameters must be in Signer database for the Signer to be
+/// These network parameters must be in Vault database for the Vault to be
 /// able to operate with this network.
 #[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct OrderedNetworkSpecs {
     pub specs: NetworkSpecs,
 
-    /// Order in which the network is displayed by Signer
+    /// Order in which the network is displayed by Vault
     pub order: u8,
 }
 
@@ -310,7 +307,7 @@ pub struct OrderedNetworkSpecs {
 /// `SPECSTREEPREP` tree under [`NetworkSpecsKey`] and sent as QR code
 /// in `add_specs` messages
 ///
-/// These network parameters are sufficient to add network into Signer database.
+/// These network parameters are sufficient to add network into Vault database.
 #[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub struct NetworkSpecs {
     /// Network-specific prefix for address representation in
@@ -344,7 +341,7 @@ pub struct NetworkSpecs {
     /// Historically is there, not doing much at the moment.  
     pub secondary_color: String,
 
-    /// Network title, as it appears in Signer menus.  
+    /// Network title, as it appears in Vault menus.
     pub title: String,
 
     /// Token name, to display balance-related values properly.  
@@ -417,10 +414,9 @@ impl NetworkSpecs {
     /// Makes [`OrderedNetworkSpecs`] from [`NetworkSpecs`],
     /// needs `order` input
     ///
-    /// `order` is network number on the list of networks in Signer.
+    /// `order` is network number on the list of networks in Vault.
     ///
-    /// This happens when Signer receives new network specs through QR update.
-    #[cfg(feature = "signer")]
+    /// This happens when Vault receives new network specs through QR update.
     pub fn to_store(&self, order: u8) -> OrderedNetworkSpecs {
         OrderedNetworkSpecs {
             specs: self.to_owned(),
@@ -429,7 +425,6 @@ impl NetworkSpecs {
     }
 
     /// Makes [`ShortSpecs`] from [`NetworkSpecs`]
-    #[cfg(feature = "signer")]
     pub fn short(&self) -> ShortSpecs {
         ShortSpecs {
             base58prefix: self.base58prefix,
@@ -508,7 +503,6 @@ pub enum VerifierValue {
     Standard { m: MultiSigner },
 }
 
-#[cfg(feature = "signer")]
 impl Verifier {
     /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
@@ -533,7 +527,6 @@ impl Verifier {
     }
 }
 
-#[cfg(feature = "signer")]
 impl VerifierValue {
     /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
@@ -577,10 +570,10 @@ impl VerifierValue {
 /// Current network verifier
 #[derive(Decode, Encode, PartialEq, Eq, Debug, Clone)]
 pub enum CurrentVerifier {
-    /// Verifier is valid, Signer can use the network
+    /// Verifier is valid, Vault can use the network
     Valid(ValidCurrentVerifier),
 
-    /// Verifier is invalid, Signer would not be able to use the network
+    /// Verifier is invalid, Vault would not be able to use the network
     /// without wipe and reset
     Dead,
 }

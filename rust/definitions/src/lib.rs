@@ -1,11 +1,11 @@
-//! Definitions and common methods for types used in [Signer](https://github.com/paritytech/parity-signer)
-//! and Signer-supporting ecosystem.  
+//! Definitions and common methods for types used in [Vault](https://github.com/paritytech/parity-signer)
+//! and Vault-supporting ecosystem.
 //!
 //! ## Features
-//! Feature `"signer"` corresponds to everything related to Signer air-gapped
+//! Feature `"signer"` corresponds to everything related to Vault air-gapped
 //! device.
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
+//! Feature `"active"` corresponds to all Vault-related things happening
 //! **without** air-gap.
 //!
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
@@ -22,7 +22,6 @@ pub mod error;
 
 pub mod error_active;
 
-#[cfg(feature = "signer")]
 pub mod error_signer;
 
 pub mod helpers;

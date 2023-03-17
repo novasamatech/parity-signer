@@ -323,7 +323,7 @@ fn bulk_signing_test_unpassworded() {
         &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
     )
     .unwrap();
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
 
     tx_state.update_seeds(&seeds);
 
@@ -440,7 +440,7 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
     tx_state.update_seeds(&format!(
         "{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}"
     ));
@@ -3045,7 +3045,7 @@ fn flow_test_1() {
         concat!(
             "GoForward on RecoverSeedPhrase screen with ",
             "seed phrase (seed phrase vaidity was already checked ",
-            "elsewhere - currently in crate Signer). Expected updated ",
+            "elsewhere - currently in crate Vault). Expected updated ",
             "Keys screen with no modals, with known stable content since ",
             "this is Alice"
         )
@@ -6203,7 +6203,7 @@ fn flow_test_1() {
         concat!(
             "Switched to Settings from Log with non-initiated database. ",
             "Expected Settings screen with error on screen, and no alerts ",
-            "(we should still allow to reset Signer)"
+            "(we should still allow to reset Vault)"
         )
     );
 

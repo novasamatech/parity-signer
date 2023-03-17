@@ -9,7 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.ui.SignerMainNavigationGraph
+import io.parity.signer.ui.RootNavigationGraph
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @ExperimentalMaterialApi
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
 		setContent {
 			SignerNewTheme {
-				SignerMainNavigationGraph(navController = rememberNavController())
+				RootNavigationGraph(navController = rememberNavController())
 			}
 		}
 	}

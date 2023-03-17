@@ -1,18 +1,15 @@
 //! Common helper functions for database operations
 
 use parity_scale_codec::Decode;
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 use sled::{Batch, Db, Tree};
-#[cfg(feature = "signer")]
 use sp_core::H256;
 
-#[cfg(feature = "signer")]
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
 use definitions::network_specs::NetworkSpecs;
-#[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
     helpers::multisigner_to_public,
@@ -24,7 +21,7 @@ use definitions::{
     keyring::MetaKey, metadata::MetaValues, network_specs::OrderedNetworkSpecs,
     qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use definitions::{
     keyring::{AddressKey, MetaKeyPrefix},
     users::AddressDetails,
@@ -32,9 +29,8 @@ use definitions::{
 
 use crate::{Error, Result};
 
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 use crate::db_transactions::TrDbCold;
-#[cfg(feature = "signer")]
 use crate::manage_history::events_to_batch;
 
 /// Open a tree in the database.
@@ -57,7 +53,7 @@ pub fn make_batch_clear_tree(database: &sled::Db, tree_name: &[u8]) -> Result<Ba
 
 /// Get [`OrderedNetworkSpecs`] for all networks from the cold database.
 ///
-/// Function is used both on active and Signer side, but only for the cold
+/// Function is used both on active and Vault side, but only for the cold
 /// database.
 pub fn get_all_networks(database: &sled::Db) -> Result<Vec<OrderedNetworkSpecs>> {
     let chainspecs = open_tree(database, SPECSTREE)?;
@@ -68,7 +64,7 @@ pub fn get_all_networks(database: &sled::Db) -> Result<Vec<OrderedNetworkSpecs>>
     Ok(out)
 }
 
-/// Try to get [`ValidCurrentVerifier`] from the Signer database for a network,
+/// Try to get [`ValidCurrentVerifier`] from the Vault database for a network,
 /// using [`VerifierKey`].
 ///
 /// If the network is not known to the database, i.e. there is no verifier data
@@ -77,7 +73,6 @@ pub fn get_all_networks(database: &sled::Db) -> Result<Vec<OrderedNetworkSpecs>>
 ///
 /// Note that `CurrentVerifier::Dead` or damaged verifier data result in
 /// errors.
-#[cfg(feature = "signer")]
 pub fn try_get_valid_current_verifier(
     database: &sled::Db,
     verifier_key: &VerifierKey,
@@ -132,12 +127,11 @@ pub fn try_get_valid_current_verifier(
     }
 }
 
-/// Get [`ValidCurrentVerifier`] from the Signer database for a network, using
+/// Get [`ValidCurrentVerifier`] from the Vault database for a network, using
 /// [`VerifierKey`].
 ///
 /// Entry here is expected to be in the database, failure to find it results in
 /// an error.
-#[cfg(feature = "signer")]
 pub fn get_valid_current_verifier(
     database: &sled::Db,
     verifier_key: &VerifierKey,
@@ -149,7 +143,6 @@ pub fn get_valid_current_verifier(
 /// Specs invariants that are expected to stay unchanged for the network over
 /// time and can not be different for same genesis hash and different encryption
 /// algorithms.
-#[cfg(feature = "signer")]
 pub struct SpecsInvariants {
     pub base58prefix: u16,
 
@@ -161,7 +154,7 @@ pub struct SpecsInvariants {
 }
 
 /// Search for network genesis hash in [`OrderedNetworkSpecs`] entries in [`SPECSTREE`]
-/// of the Signer database.
+/// of the Vault database.
 ///
 /// Genesis hash is calculated from network [`VerifierKey`] input.
 // TODO too convoluted, historically so; replace VerifierKey with genesis hash;
@@ -175,7 +168,6 @@ pub struct SpecsInvariants {
 /// identical base58 prefix and network name. Network name is, and base58 prefix
 /// could be a part of the network metadata, and therefore must not depend on
 /// encryption used.
-#[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(
     database: &sled::Db,
     genesis_hash: H256,
@@ -230,11 +222,10 @@ pub fn genesis_hash_in_specs(
     }
 }
 
-/// Get general verifier [`Verifier`] from the Signer database.
+/// Get general verifier [`Verifier`] from the Vault database.
 ///
-/// Signer works only with an initiated database, i.e. the one with general
+/// Vault works only with an initiated database, i.e. the one with general
 /// verifier set up. Failure to find general verifier is always an error.
-#[cfg(feature = "signer")]
 pub fn get_general_verifier(database: &sled::Db) -> Result<Verifier> {
     let settings = open_tree(database, SETTREE)?;
     let verifier_encoded = settings
@@ -275,7 +266,7 @@ pub fn get_types(database: &sled::Db) -> Result<Vec<TypeEntry>> {
 /// Function prepares types information in qr payload format.
 ///
 /// Is used on the active side when preparing `load_types` qr payload and in
-/// Signer when preparing `SufficientCrypto` export qr code for `load_types`
+/// Vault when preparing `SufficientCrypto` export qr code for `load_types`
 /// payload.
 ///
 /// Not finding types data results in an error.
@@ -283,11 +274,10 @@ pub fn prep_types(database: &sled::Db) -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&get_types(database)?))
 }
 
-/// Try to get network specs [`OrderedNetworkSpecs`] from the Signer database.
+/// Try to get network specs [`OrderedNetworkSpecs`] from the Vault database.
 ///
 /// If the [`NetworkSpecsKey`] and associated [`OrderedNetworkSpecs`] are not found in
 /// the [`SPECSTREE`], the result is `Ok(None)`.
-#[cfg(feature = "signer")]
 pub fn try_get_network_specs(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -304,11 +294,10 @@ pub fn try_get_network_specs(
         .transpose()?)
 }
 
-/// Get network specs [`OrderedNetworkSpecs`] from the Signer database.
+/// Get network specs [`OrderedNetworkSpecs`] from the Vault database.
 ///
 /// Network specs here are expected to be found, not finding them results in an
 /// error.
-#[cfg(feature = "signer")]
 pub fn get_network_specs(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -317,11 +306,10 @@ pub fn get_network_specs(
         .ok_or_else(|| Error::NetworkSpecsNotFound(network_specs_key.clone()))
 }
 
-/// Try to get [`AddressDetails`] from the Signer database, using
+/// Try to get [`AddressDetails`] from the Vault database, using
 /// [`AddressKey`].
 ///
 /// If no entry with provided [`AddressKey`] is found, the result is `Ok(None)`.
-#[cfg(feature = "signer")]
 pub fn try_get_address_details(
     database: &sled::Db,
     address_key: &AddressKey,
@@ -338,11 +326,10 @@ pub fn try_get_address_details(
         .transpose()
 }
 
-/// Get [`AddressDetails`] from the Signer database, using
+/// Get [`AddressDetails`] from the Vault database, using
 /// [`AddressKey`].
 ///
 /// Address is expected to exist, not finding it results in an error.
-#[cfg(feature = "signer")]
 pub fn get_address_details(
     database: &sled::Db,
     address_key: &AddressKey,
@@ -351,12 +338,11 @@ pub fn get_address_details(
         .ok_or_else(|| Error::AddressNotFound(address_key.clone()))
 }
 
-/// Get [`MetaValues`] set from Signer database, for networks with a given name.
+/// Get [`MetaValues`] set from Vault database, for networks with a given name.
 ///
 /// The resulting set could be an empty one. It is used to display metadata
 /// available for the network and to find the metadata to be deleted, when the
 /// network gets deleted.
-#[cfg(feature = "signer")]
 pub(crate) fn get_meta_values_by_name(
     database: &sled::Db,
     network_name: &str,
@@ -462,12 +448,12 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
 /// - Modify `Verifier` data if necessary.
 ///
 /// Removing the network **may result** in blocking the network altogether until
-/// the Signer is reset. This happens only if the removed network
+/// the Vault is reset. This happens only if the removed network
 /// [`ValidCurrentVerifier`] was set to
 /// `ValidCurrentVerifier::Custom(Verifier(Some(_)))` and is a security measure.
 /// This should be used to deal with compromised `Custom` verifiers.
 ///
-/// Compromised general verifier is a major disaster and will require Signer
+/// Compromised general verifier is a major disaster and will require Vault
 /// reset in any case.
 ///
 /// Removing the network verified by the general verifier **does not** block the
@@ -480,7 +466,6 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
 /// Note that if the network supports multiple encryption algorithms, the
 /// removal of network with one of the encryptions will cause the networks
 /// with other encryptions be removed as well.
-#[cfg(feature = "signer")]
 pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Result<()> {
     let mut address_batch = Batch::default();
     let mut meta_batch = Batch::default();
@@ -577,12 +562,11 @@ pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Res
 /// network metadata, and proceeds to remove a single metadata entry
 /// corresponding to this version.
 ///
-/// Metadata in the Signer database is determined by the network name and
+/// Metadata in the Vault database is determined by the network name and
 /// network version, and has no information about the
 /// [`Encryption`](definitions::crypto::Encryption) algorithm supported by the
 /// network. Therefore if the network supports more than one encryption
 /// algorithm, removing metadata for one will affect all encryptions.
-#[cfg(feature = "signer")]
 pub fn remove_metadata(
     database: &sled::Db,
     network_specs_key: &NetworkSpecsKey,
@@ -608,22 +592,21 @@ pub fn remove_metadata(
         .apply(database)
 }
 
-/// User-initiated removal of the types information from the Signer database.
+/// User-initiated removal of the types information from the Vault database.
 ///
 /// Types information is not necessary to process transactions in networks with
 /// metadata having `RuntimeVersionV14`, as the types information after `V14`
 /// is a part of the metadata itself.
 ///
-/// Types information is installed in Signer by default and could be removed by
+/// Types information is installed in Vault by default and could be removed by
 /// user manually, through this function.
 ///
 /// Types information is verified by the general verifier. When the general
 /// verifier gets changed, the types information is also removed from the
-/// Signer database through so-called `GeneralHold` processing, to avoid
+/// Vault database through so-called `GeneralHold` processing, to avoid
 /// confusion regarding what data was verified by whom. Note that this situation
 /// in **not** related to the `remove_types_info` function and is handled
 /// elsewhere.
-#[cfg(feature = "signer")]
 pub fn remove_types_info(database: &sled::Db) -> Result<()> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
@@ -643,7 +626,7 @@ pub fn remove_types_info(database: &sled::Db) -> Result<()> {
 
 /// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
 /// vector of additions.
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "active")]
 pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {
         batch.insert(address_key.key(), address_details.encode());
@@ -651,12 +634,11 @@ pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetai
     batch
 }
 
-/// Verify checksum in Signer database.
+/// Verify checksum in Vault database.
 ///
 /// Used in retrieving temporary stored data from
 /// [`TRANSACTION`](constants::TRANSACTION) tree of the database.
 // TODO Goes obsolete if the temporary storage goes.
-#[cfg(feature = "signer")]
 pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
     let real_checksum = database.checksum()?;
     if checksum != real_checksum {
@@ -665,11 +647,10 @@ pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<()> {
     Ok(())
 }
 
-/// Get the danger status from the Signer database.
+/// Get the danger status from the Vault database.
 ///
 /// Currently, the only flag contributing to the danger status is whether the
 /// device was online. This may change eventually.
-#[cfg(feature = "signer")]
 pub fn get_danger_status(database: &sled::Db) -> Result<bool> {
     let settings = open_tree(database, SETTREE)?;
     let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;

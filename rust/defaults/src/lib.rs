@@ -1,15 +1,15 @@
-//! Default data for [Signer](https://github.com/paritytech/parity-signer)
-//! and Signer-supporting ecosystem.  
+//! Default data for [Vault](https://github.com/paritytech/parity-signer)
+//! and Vault-supporting ecosystem.
 //!
-//! This crate deals with data loaded into Signer on build and retained on reset.
+//! This crate deals with data loaded into Vault on build and retained on reset.
 //!
-//! Signer supports by default three networks: Polkadot, Kusama, and Westend,
+//! Vault supports by default three networks: Polkadot, Kusama, and Westend,
 //! both on the cold and the hot side. More default networks could be considered
 //! in the future.
 //!
 //! # Defaults in the cold database
 //!
-//! Default build of the cold database for Signer includes:
+//! Default build of the cold database for Vault includes:
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
@@ -32,12 +32,12 @@
 //! - default types information
 //!
 //! # Features
-//! Feature `"signer"` corresponds to everything related to Signer air-gapped
-//! device. Currently the only Signer-related default is `Verifier` with Parity
-//! public key, that could be set up as a general verifier after Signer wipe by
+//! Feature `"signer"` corresponds to everything related to Vault air-gapped
+//! device. Currently the only Vault-related default is `Verifier` with Parity
+//! public key, that could be set up as a general verifier after Vault wipe by
 //! the user.
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
+//! Feature `"active"` corresponds to all Vault-related things happening
 //! **without** air-gap. This includes generating default:
 //! - network specs sets for cold and hot databases
 //! - verifiers for cold databases
@@ -53,7 +53,6 @@
 
 #[cfg(feature = "active")]
 use sp_core::H256;
-#[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
@@ -78,7 +77,6 @@ use definitions::{
     types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
 };
 
-#[cfg(feature = "signer")]
 use definitions::network_specs::{Verifier, VerifierValue};
 
 mod error;
@@ -88,7 +86,6 @@ pub use error::{Error, Result};
 ///
 /// To be used in [`VerifierValue`] for general verifier in default cold
 /// database
-#[cfg(feature = "signer")]
 pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
     0xc4, 0x6a, 0x22, 0xb9, 0xda, 0x19, 0x54, 0x0a, 0x77, 0xcb, 0xde, 0x23, 0x19, 0x7e, 0x5f, 0xd9,
     0x04, 0x85, 0xc7, 0x2b, 0x4e, 0xcf, 0x3c, 0x59, 0x9e, 0xcc, 0xa6, 0x99, 0x8f, 0x39, 0xbd, 0x57,
@@ -96,7 +93,6 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
 
 /// Generate default general verifier [`Verifier`], with Parity public key
 /// inside.
-#[cfg(feature = "signer")]
 pub fn default_general_verifier() -> Verifier {
     Verifier {
         v: Some(VerifierValue::Standard {
@@ -319,7 +315,7 @@ pub fn nav_test_metadata() -> Result<Vec<MetaValues>> {
 /// Read metadata set for release cold database from `release_metadata` folder
 #[cfg(feature = "active")]
 pub fn release_metadata() -> Result<Vec<MetaValues>> {
-    metadata("../defaults/release_metadata")
+    Ok(vec![])
 }
 
 #[cfg(feature = "active")]
@@ -457,7 +453,6 @@ pub fn default_types_content() -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&default_types_vec()?))
 }
 
-#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests {
     use super::*;

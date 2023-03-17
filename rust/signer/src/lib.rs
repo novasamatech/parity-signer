@@ -29,13 +29,14 @@ use sled::Db;
 
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use navigator::Error as NavigatorError;
 use std::{
     collections::HashMap,
     fmt::Display,
     str::FromStr,
     sync::{Arc, RwLock},
 };
-use transaction_parsing::entry_to_transactions_with_decoding;
+use transaction_parsing::Error as TxParsingError;
 
 lazy_static! {
     static ref DB: Arc<RwLock<Option<Db>>> = Arc::new(RwLock::new(None));
@@ -53,13 +54,83 @@ pub enum ErrorDisplayed {
     },
     MutexPoisoned,
     DbNotInitialized,
+    /// Tried to load metadata for unknown network.
+    LoadMetaUnknownNetwork {
+        /// Name of the network not known to the Vault.
+        name: String,
+    },
+    /// Tried to add specs already present in Vault.
+    SpecsKnown {
+        name: String,
+        encryption: Encryption,
+    },
+    /// The metadata with this network version already in db.
+    MetadataKnown {
+        name: String,
+        version: u32,
+    },
+    /// Do not have an up-to-date version of metadata in db
+    MetadataOutdated {
+        name: String,
+        have: u32,
+        want: u32,
+    },
+    /// Tried to sign transaction with an unknown network
+    UnknownNetwork {
+        genesis_hash: H256,
+        encryption: Encryption,
+    },
+    /// No metadata for a known network found in store
+    NoMetadata {
+        name: String,
+    },
 }
 
-impl From<navigator::Error> for ErrorDisplayed {
-    fn from(e: navigator::Error) -> Self {
-        match e {
-            navigator::Error::MutexPoisoned => Self::MutexPoisoned,
-            navigator::Error::DbNotInitialized => Self::DbNotInitialized,
+impl From<NavigatorError> for ErrorDisplayed {
+    fn from(e: NavigatorError) -> Self {
+        match &e {
+            NavigatorError::MutexPoisoned => Self::MutexPoisoned,
+            NavigatorError::DbNotInitialized => Self::DbNotInitialized,
+            NavigatorError::TransactionParsing(t) => match t {
+                TxParsingError::LoadMetaUnknownNetwork { name } => {
+                    Self::LoadMetaUnknownNetwork { name: name.clone() }
+                }
+                TxParsingError::SpecsKnown { name, encryption } => Self::SpecsKnown {
+                    name: name.clone(),
+                    encryption: *encryption,
+                },
+                TxParsingError::MetadataKnown { name, version } => Self::MetadataKnown {
+                    name: name.clone(),
+                    version: *version,
+                },
+                TxParsingError::AllExtensionsParsingFailed {
+                    ref network_name,
+                    ref errors,
+                } => {
+                    if let Some((want, parser::Error::WrongNetworkVersion { in_metadata, .. })) =
+                        errors.get(0)
+                    {
+                        Self::MetadataOutdated {
+                            name: network_name.to_string(),
+                            have: *in_metadata,
+                            want: *want,
+                        }
+                    } else {
+                        Self::Str { s: format!("{e}") }
+                    }
+                }
+                TxParsingError::UnknownNetwork {
+                    genesis_hash,
+                    encryption,
+                } => Self::UnknownNetwork {
+                    genesis_hash: *genesis_hash,
+                    encryption: *encryption,
+                },
+                TxParsingError::NoMetadata { name } => Self::NoMetadata {
+                    name: name.to_string(),
+                },
+                _ => Self::Str { s: format!("{e}") },
+            },
             _ => Self::Str { s: format!("{e}") },
         }
     }
@@ -158,7 +229,7 @@ fn init_navigation(dbname: &str, seed_names: Vec<String>) -> Result<(), ErrorDis
     let val = Some(sled::open(dbname).map_err(|e| ErrorDisplayed::from(e.to_string()))?);
 
     *DB.write().unwrap() = val;
-    init_logging("Signer".to_string());
+    init_logging("Vault".to_string());
     Ok(navigator::init_navigation(
         DB.clone().read().unwrap().as_ref().unwrap().clone(),
         seed_names,

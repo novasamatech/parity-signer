@@ -3,6 +3,12 @@ interface ErrorDisplayed {
     Str(string s);
     MutexPoisoned();
     DbNotInitialized();
+    LoadMetaUnknownNetwork(string name);
+    SpecsKnown(string name, Encryption encryption);
+    MetadataKnown(string name, u32 version);
+    MetadataOutdated(string name, u32 have, u32 want);
+    UnknownNetwork(H256 genesis_hash, Encryption encryption);
+    NoMetadata(string name);
 };
 
 [Error]
@@ -709,6 +715,7 @@ dictionary MSignatureReady {
 
 dictionary MEnterPassword {
     MAddressCard author_info;
+    MSCNetworkInfo? network_info;
     u32 counter;
 };
 

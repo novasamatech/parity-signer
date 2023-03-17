@@ -11,10 +11,10 @@ hex = "0.4.3"
 qr_reader_phone = {path = "../qr_reader_phone"}
 anyhow = "1.0.69"
 image = "0.24.4"
-quircs = "0.10.0"
+quircs = "0.10.1"
 indicatif = "0.17.3"
 
 [dependencies.opencv]
-version = "0.76"
+version = "0.78"
 default-features = false
 features = ["videoio", "imgproc", "highgui"]

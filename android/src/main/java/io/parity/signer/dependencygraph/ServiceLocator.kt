@@ -3,9 +3,9 @@ package io.parity.signer.dependencygraph
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.backend.UniffiInteractor
+import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper
-import io.parity.signer.domain.getDbNameFromContext
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.SeedStorage
@@ -16,7 +16,6 @@ object ServiceLocator {
 
 	fun initAppDependencies(appContext: Context) {
 		this.appContext = appContext
-		_backendScope = BackendScope(appContext.getDbNameFromContext())
 	}
 
 	fun initActivityDependencies(activity: FragmentActivity) {
@@ -27,23 +26,16 @@ object ServiceLocator {
 		_activityScope = null
 	}
 
-	private var _backendScope: BackendScope? = null
-	val backendScope: BackendScope
-		get() = _backendScope
-			?: throw RuntimeException("dependency is not initialized yet")
-
 	@Volatile private var _activityScope: ActivityScope? = null
 	val activityScope: ActivityScope? get() = _activityScope
 
+	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
+
 	val seedStorage: SeedStorage = SeedStorage()
 	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
-	val networkExposedStateKeeper by lazy { NetworkExposedStateKeeper(appContext) }
+	val networkExposedStateKeeper by lazy { NetworkExposedStateKeeper(appContext, uniffiInteractor) }
 	val authentication = Authentication()
-
-
-	class BackendScope(dbname: String) {
-		val uniffiInteractor by lazy { UniffiInteractor(dbname) }
-	}
+	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator = UnknownNetworkColorsGenerator()
 
 	class ActivityScope(val activity: FragmentActivity) {
 		val seedRepository: SeedRepository = SeedRepository(seedStorage,

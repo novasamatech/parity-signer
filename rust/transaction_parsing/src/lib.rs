@@ -2,14 +2,13 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use db_handling::identities::TransactionBulk;
-use definitions::{helpers::unhex, navigation::TransactionCardSet};
+use definitions::helpers::unhex;
 use parity_scale_codec::Decode;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
 pub mod cards;
-use cards::Card;
 pub mod check_signature;
 mod derivations;
 pub use derivations::prepare_derivations_preview;
@@ -80,13 +79,15 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
                 let action = parse_transaction(database, &encoded, true)?;
-                if let TransactionAction::Sign {
-                    actions: a,
-                    checksum: c,
-                } = action
-                {
-                    checksum = c;
-                    actions.push(a[0].clone());
+                match action {
+                    TransactionAction::Sign {
+                        actions: a,
+                        checksum: c,
+                    } => {
+                        checksum = c;
+                        actions.push(a[0].clone());
+                    }
+                    _ => return Ok(action),
                 }
             }
 
@@ -95,14 +96,6 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
     }
 }
 
-pub fn produce_output(database: &sled::Db, payload: &str) -> TransactionAction {
-    match handle_scanner_input(database, payload) {
-        Ok(out) => out,
-        Err(e) => TransactionAction::Read {
-            r: Box::new(TransactionCardSet {
-                error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
-                ..Default::default()
-            }),
-        },
-    }
+pub fn produce_output(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
+    handle_scanner_input(database, payload)
 }

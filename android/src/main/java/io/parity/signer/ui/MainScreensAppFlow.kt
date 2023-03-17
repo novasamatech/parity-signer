@@ -1,12 +1,13 @@
 package io.parity.signer.ui
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,9 +16,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
-import io.parity.signer.domain.MainFlowViewModel
-import io.parity.signer.domain.MainFlowViewModelFactory
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.onboarding.UnlockAppAuthScreen
 import io.parity.signer.screens.onboarding.WaitingScreen
@@ -26,34 +27,41 @@ import io.parity.signer.ui.rustnavigationselectors.*
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.mainScreenRoute) {
-		val mainFlowViewModel: MainFlowViewModel = viewModel(
-			factory = MainFlowViewModelFactory(
-				appContext = LocalContext.current.applicationContext,
-				activity = LocalContext.current.findActivity() as FragmentActivity
-			)
-		)
+		val sharedViewModel: SharedViewModel = viewModel()
 
-		val authenticated = mainFlowViewModel.authenticated.collectAsState()
+		val authenticated = sharedViewModel.authenticated.collectAsState()
 
 		BackHandler {
-			mainFlowViewModel.navigator.backAction()
+			sharedViewModel.navigator.backAction()
 		}
 
 		if (authenticated.value) {
-			SignerMainSubgraph(mainFlowViewModel)
+			SignerMainSubgraph(sharedViewModel)
 		} else {
-			UnlockAppAuthScreen { mainFlowViewModel.totalRefresh() }
+			val currentActivity = LocalContext.current.findActivity() as FragmentActivity
+			UnlockAppAuthScreen {
+				val authentication = ServiceLocator.authentication
+				authentication.authenticate(currentActivity) {
+					sharedViewModel.totalRefresh()
+				}
+			}
+		}
+		LaunchedEffect(Unit) {
+			Log.d(
+				NAVIGATION_TAG,
+				"main rust-handled screen navigation subgraph opened"
+			)
 		}
 	}
 }
 
 
 @Composable
-fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
+fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 
-	val actionResultState = mainFlowViewModel.actionResult.collectAsState()
-	val shieldAlert = mainFlowViewModel.networkState.collectAsState()
-	val localNavAction = mainFlowViewModel.localNavAction.collectAsState()
+	val actionResultState = sharedViewModel.actionResult.collectAsState()
+	val shieldAlert = sharedViewModel.networkState.collectAsState()
+	val localNavAction = sharedViewModel.localNavAction.collectAsState()
 
 	val actionResult = actionResultState.value
 
@@ -75,7 +83,7 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 						)
 					) {
 						TopBar(
-							mainFlowViewModel = mainFlowViewModel,
+							sharedViewModel = sharedViewModel,
 							actionResult = actionResult,
 							networkState = shieldAlert,
 						)
@@ -88,7 +96,7 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 						)
 						&& actionResult.footer
 					) {
-						BottomBar(mainFlowViewModel = mainFlowViewModel)
+						BottomBar(sharedViewModel = sharedViewModel)
 					}
 				},
 			) { innerPadding ->
@@ -96,15 +104,15 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
 						networkState = shieldAlert,
-						navigate = mainFlowViewModel.navigator::navigate,
-						mainFlowViewModel = mainFlowViewModel
+						navigate = sharedViewModel.navigator::navigate,
+						sharedViewModel = sharedViewModel
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
 						localNavAction = localNavAction.value,
 						networkState = shieldAlert,
-						navigate = mainFlowViewModel.navigator::navigate,
-						mainFlowViewModel = mainFlowViewModel,
+						navigate = sharedViewModel.navigator::navigate,
+						sharedViewModel = sharedViewModel,
 					)
 				}
 			}
@@ -118,20 +126,20 @@ fun SignerMainSubgraph(mainFlowViewModel: MainFlowViewModel) {
 					screenData = actionResult.screenData,
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
-					mainFlowViewModel = mainFlowViewModel
+					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
-					mainFlowViewModel = mainFlowViewModel,
-					navigator = mainFlowViewModel.navigator,
+					sharedViewModel = sharedViewModel,
+					navigator = sharedViewModel.navigator,
 				)
 				AlertSelector(
 					alert = actionResult.alertData,
 					networkState = shieldAlert,
-					navigate = mainFlowViewModel.navigator::navigate,
-					acknowledgeWarning = mainFlowViewModel::acknowledgeWarning
+					navigate = sharedViewModel.navigator::navigate,
+					acknowledgeWarning = sharedViewModel::acknowledgeWarning
 				)
 			}
 		}

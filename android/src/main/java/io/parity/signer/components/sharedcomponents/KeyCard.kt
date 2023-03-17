@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
@@ -34,6 +34,7 @@ import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MAddressCard
+import java.util.*
 
 
 @Composable
@@ -87,7 +88,7 @@ fun KeyCard(model: KeyCardModel) {
 		//right()
 		Column(horizontalAlignment = Alignment.End) {
 			Box(contentAlignment = Alignment.TopEnd) {
-				IdentIcon(model.cardBase.identIcon, 36.dp)
+				IdentIconWithNetwork(model.cardBase.identIcon, model.network, 36.dp)
 				model.cardBase.multiselect?.let {
 					if (it) {
 						Icon(
@@ -114,12 +115,12 @@ fun KeyCard(model: KeyCardModel) {
 }
 
 @Composable
-private fun NetworkLabel(networkName: String) {
+fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 	Text(
 		networkName,
 		color = MaterialTheme.colors.textTertiary,
 		style = SignerTypeface.CaptionM,
-		modifier = Modifier
+		modifier = modifier
 			.background(
 				MaterialTheme.colors.fill12,
 				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
@@ -186,7 +187,9 @@ data class KeyCardModel(
 
 		fun fromKeyModel(model: KeyModel, networkTitle: String): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle,
+				network = networkTitle.replaceFirstChar {
+					if (it.isLowerCase()) it.titlecase() else it.toString()
+				},
 				cardBase = KeyCardModelBase.fromKeyModel(model)
 			)
 
@@ -194,21 +197,14 @@ data class KeyCardModel(
 		 * @param networkTitle probably from keyDetails.networkInfo.networkTitle
 		 */
 		fun fromAddress(
-			address_card: MAddressCard,
-			networkTitle: String
-		): KeyCardModel =
-			KeyCardModel(
-				network = networkTitle,
-				cardBase = KeyCardModelBase.fromAddress(address_card)
-			)
-
-		fun fromAddress(
 			address: Address,
 			base58: String,
 			networkTitle: String
 		): KeyCardModel =
 			KeyCardModel(
-				network = networkTitle,
+				network = networkTitle.replaceFirstChar {
+					if (it.isLowerCase()) it.titlecase() else it.toString()
+				},
 				cardBase = KeyCardModelBase.fromAddress(address, base58)
 			)
 

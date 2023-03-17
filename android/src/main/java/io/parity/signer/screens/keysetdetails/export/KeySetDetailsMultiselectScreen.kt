@@ -8,14 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.components.items.KeyDerivedItemMultiselect
+import io.parity.signer.screens.keysetdetails.items.KeyDerivedItemMultiselect
 import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.screens.keysets.export.ClickableLabel
@@ -68,17 +67,11 @@ fun KeySetDetailsMultiselectScreen(
 					style = SignerTypeface.BodyM,
 					modifier = Modifier.weight(1f),
 				)
-				Icon(
-					painter = painterResource(id = R.drawable.ic_tune_28),
-					contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-					modifier = Modifier
-						.size(28.dp),
-					tint = MaterialTheme.colors.textDisabled,
-				)
 			}
 			for (key in model.keysAndNetwork) {
 				KeyDerivedItemMultiselect(
 					model = key.key,
+					networkLogo = key.network.networkLogo,
 					isSelected = selected.value.contains(key.key.addressKey),
 				) { isSelected, key ->
 					if (isSelected) selected.value += key else selected.value -= key

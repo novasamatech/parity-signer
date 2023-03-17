@@ -2,6 +2,7 @@ package io.parity.signer.components
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import io.parity.signer.ui.theme.SignerOldTheme
 
 /**
  * Alert component used everywhere in Signer
@@ -17,6 +18,7 @@ fun AlertComponent(
 	forwardText: String = "Confirm",
 	showForward: Boolean = true,
 	) {
+	SignerOldTheme() {
 		if (show) {
 			AlertDialog(
 				onDismissRequest = back,
@@ -49,3 +51,4 @@ fun AlertComponent(
 			)
 		}
 	}
+}

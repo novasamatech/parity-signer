@@ -1,7 +1,5 @@
 use hex::FromHexError;
 use sp_core::H256;
-#[cfg(feature = "test")]
-use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -123,9 +121,8 @@ pub enum Error {
 ///
 /// All variants could be encountered both on the active side
 /// (when checking the message content while signing it)
-/// and on the Signer side (when processing the received messages)
+/// and on the Vault side (when processing the received messages)
 #[derive(Debug)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum TransferContent {
     /// `add_specs` message content
     AddSpecs,
@@ -149,9 +146,8 @@ impl TransferContent {
     }
 }
 
-/// Intrinsic problems of the metadata making it unsuitable for Signer use
-#[derive(Debug, thiserror::Error)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
+/// Intrinsic problems of the metadata making it unsuitable for Vault use
+#[derive(Debug, PartialEq, thiserror::Error)]
 pub enum MetadataError {
     /// Supported are `V12`, `V13`, and `V14` versions of
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html).
