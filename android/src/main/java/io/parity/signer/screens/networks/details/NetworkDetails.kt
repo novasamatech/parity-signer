@@ -34,6 +34,7 @@ fun NetworkDetailsScreen(
 	model: NetworkDetailsModel,
 	rootNavigator: Navigator,
 	onMenu: Callback,
+	onAddNetwork: Callback,
 	onRemoveMetadataCallback: (version: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
@@ -176,6 +177,19 @@ fun NetworkDetailsScreen(
 					}
 				}
 			}
+			Row(
+				Modifier
+					.padding(horizontal = 16.dp)
+					.clickable(onClick = onAddNetwork)) {
+
+				Text(
+					text = stringResource(R.string.network_details_metadata_delete_label),
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.red500,
+					modifier = Modifier
+						.fillMaxWidth(1f)
+				)
+			}
 			//todo dmitry add network metadata here
 		}
 	}
@@ -248,7 +262,7 @@ private fun PreviewNetworkDetailsScreen() {
 			model,
 			rootNavigator = EmptyNavigator(),
 			onMenu = {},
-			onRemoveMetadataCallback = {_ ->}
+			onRemoveMetadataCallback = { _ -> }
 		)
 	}
 }
