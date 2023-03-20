@@ -6,19 +6,19 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.69"
+anyhow = "1.0.70"
 constants = {path = "../constants"}
 defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
 hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.4.0", features = ["derive"]}
-plot_icon = {version = "0.2.0", default-features = false, features = ["pix"]}
+plot_icon = {version = "0.3.0", default-features = false, features = ["pix"]}
 regex = "1.7.1"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
-thiserror = "1.0.39"
+thiserror = "1.0.40"
 time = {version = "0.3.20", features = ["formatting", "macros"]}
 tiny-bip39 = {version = "1.0.0", default-features = false, optional = true}
 zeroize = { version = "1.5.7", optional = true, features = ["std"] }

@@ -52,9 +52,9 @@ struct DerivationPathNameView: View {
                             }
                         }
                         .onChange(of: viewModel.inputText) { newValue in
-                            self.viewModel.isPassworded = newValue
+                            viewModel.isPassworded = newValue
                                 .contains(DerivationPathComponent.passworded.description)
-                            self.viewModel.validateDerivationPath()
+                            viewModel.validateDerivationPath()
                         }
                         .padding(.bottom, Spacing.extraSmall)
                     if let derivationPathError = viewModel.derivationPathError {
@@ -87,7 +87,7 @@ struct DerivationPathNameView: View {
                             isValid: $viewModel.isPasswordValid,
                             focusedField: _focusedField,
                             onCommit: {
-                                self.focusedField = nil
+                                focusedField = nil
                                 focusedPath = false
                                 viewModel.onPasswordConfirmationDoneTap()
                             }

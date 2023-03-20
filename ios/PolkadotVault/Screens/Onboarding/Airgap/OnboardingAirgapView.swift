@@ -19,7 +19,7 @@ struct OnboardingAirgapView: View {
                         .font(PrimaryFont.titleL.font)
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .multilineTextAlignment(.center)
-                        .padding(.top, Spacing.extraExtraLarge)
+                        .padding(.top, Spacing.extraLarge)
                         .padding(.horizontal, Spacing.large)
                     Localizable.Onboarding.Airgap.Label.content.text
                         .font(PrimaryFont.bodyM.font)
@@ -90,13 +90,12 @@ struct OnboardingAirgapView: View {
                     )
                     .padding(Spacing.large)
                 }
-                .background(Asset.backgroundPrimary.swiftUIColor)
                 .frame(
                     minWidth: geo.size.width,
                     minHeight: geo.size.height
                 )
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(Asset.backgroundSystem.swiftUIColor)
         }
     }
 

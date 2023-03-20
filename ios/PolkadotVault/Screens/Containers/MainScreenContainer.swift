@@ -11,6 +11,7 @@ import SwiftUI
 struct MainScreenContainer: View {
     @StateObject var viewModel: ViewModel
     @StateObject var onboarding: OnboardingStateMachine
+    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         switch viewModel.viewState {
@@ -20,6 +21,9 @@ struct MainScreenContainer: View {
             UnlockDeviceView(viewModel: .init())
         case .onboarding:
             onboarding.currentView()
+                .onAppear {
+                    onboarding.use(navigation: navigation)
+                }
         case .noPincode:
             DevicePincodeRequired(viewModel: .init())
         }
