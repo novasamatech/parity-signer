@@ -85,7 +85,7 @@ final class CreateDerivedKeyService {
         _ network: String
     ) -> Result<DerivationCheck, ServiceError> {
         do {
-            return .success(try substratePathCheck(seedName: seedName, path: path, network: network))
+            return try .success(substratePathCheck(seedName: seedName, path: path, network: network))
         } catch {
             return .failure(.init(message: error.localizedDescription))
         }

@@ -13,7 +13,7 @@ struct TCCall: View {
     var body: some View {
         Button(
             action: {
-                self.showDoc.toggle()
+                showDoc.toggle()
             },
             label: {
                 VStack {

@@ -33,13 +33,13 @@ struct TapAndDelayDismissAnimator: ViewModifier {
             .onTapGesture {
                 guard isTapToDismissActive else { return }
                 withAnimation {
-                    self.isPresented = false
+                    isPresented = false
                 }
             }
             .onReceive(timer) { _ in
                 autodismissCounter -= 1
                 if autodismissCounter <= 0 {
-                    self.isPresented = false
+                    isPresented = false
                     stop()
                 }
             }
