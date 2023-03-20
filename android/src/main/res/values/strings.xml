@@ -357,6 +357,8 @@
 	<string name="network_details_verifier_public_key_for_custom">Public Key</string>
 	<string name="network_details_verifier_crypto_field">Crypto</string>
 	<string name="network_details_verifier_identicon_field">Identicon</string>
+	<string name="keys_backup_screen_title">Select Key Set</string>
+	<string name="keys_backup_screen_subtitle">Select a key set you want to Expose a Secret Recovery Phrase for</string>
 
 
 </resources>
