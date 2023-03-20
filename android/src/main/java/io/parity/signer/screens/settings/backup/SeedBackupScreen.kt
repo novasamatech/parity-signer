@@ -42,7 +42,7 @@ fun BackupScreen(
 	rootNavigator: Navigator,
 	onSelected: (selectedSeed: String) -> Unit,
 ) {
-	val viewModel = viewModel<BackupViewModel>()
+	val viewModel = viewModel<SeedBackupViewModel>()
 	val seeds = viewModel.getSeeds()
 	BackupScreenPrivate(seeds, rootNavigator, onSelected)
 }

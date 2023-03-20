@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 
 
-internal class BackupViewModel() : ViewModel() {
+internal class SeedBackupViewModel() : ViewModel() {
 
 	val seedStorage = ServiceLocator.seedStorage
 
