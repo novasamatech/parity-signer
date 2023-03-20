@@ -60,6 +60,7 @@ fun NetworkDetailsScreen(
 				style = SignerTypeface.TitleM,
 				color = MaterialTheme.colors.primary,
 				modifier = Modifier
+					.padding(top = 12.dp, bottom = 16.dp)
 					.padding(horizontal = 24.dp)
 			)
 
@@ -86,28 +87,28 @@ fun NetworkDetailsScreen(
 					name = stringResource(R.string.network_details_field_network_name),
 					value = model.title
 				)
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp) // already have paddings
 				TCNameValueOppositeElement(
 					name = stringResource(R.string.network_details_field_prefix),
 					value = model.base58prefix.toString()
 				)
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				TCNameValueOppositeElement(
 					name = stringResource(R.string.network_details_field_decimals),
 					value = model.decimals.toString()
 				)
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				TCNameValueOppositeElement(
 					name = stringResource(R.string.network_details_field_unit),
 					value = model.unit.toString()
 				)
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				TCNameValueOppositeElement(
 					name = stringResource(R.string.network_details_field_network_hash),
 					value = model.genesisHash,
 					valueInSameLine = false
 				)
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				VerifierContent(model.currentVerifier)
 			}
 
@@ -137,13 +138,13 @@ fun NetworkDetailsScreen(
 							name = stringResource(R.string.network_details_field_version),
 							value = metadata.specsVersion
 						)
-						SignerDivider()
+						SignerDivider(sidePadding = 0.dp)
 						TCNameValueOppositeElement(
 							name = stringResource(R.string.network_details_field_metadata_hash),
 							value = metadata.metaHash,
 							valueInSameLine = false
 						)
-						SignerDivider()
+						SignerDivider(sidePadding = 0.dp)
 						//sign metadata
 						Row(Modifier.clickable {
 							FakeNavigator().navigate(
@@ -165,7 +166,7 @@ fun NetworkDetailsScreen(
 								colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 							)
 						}
-						SignerDivider()
+						SignerDivider(sidePadding = 0.dp)
 						//delete metadata
 						Text(
 							text = stringResource(R.string.network_details_metadata_delete_label),
