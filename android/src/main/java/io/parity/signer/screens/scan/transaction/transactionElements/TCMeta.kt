@@ -44,7 +44,7 @@ fun TCMeta(meta: MetadataModel) {
 				name = stringResource(R.string.transaction_metadata_label),
 				value = "${meta.specname} ${meta.specsVersion}"
 			)
-			SignerDivider()
+			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(
 				value = meta.metaHash
 			)

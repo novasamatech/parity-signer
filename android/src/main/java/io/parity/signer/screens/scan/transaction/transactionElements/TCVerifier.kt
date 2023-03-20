@@ -44,7 +44,7 @@ fun TCVerifier(verifier: MVerifierDetails) {
 				value = verifier.publicKey,
 				valueInSameLine = false,
 			)
-			SignerDivider()
+			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_verifier_crypto),
 				value = verifier.encryption
