@@ -50,11 +50,16 @@ fun KeySetDetailsMultiselectScreen(
 		Column(
 			modifier = Modifier
 				.weight(1f)
-				.verticalScroll(rememberScrollState())
-		) {
+				.padding(horizontal = 8.dp)
+				.verticalScroll(rememberScrollState()),
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			) {
 			//seed - key set
 			model.root?.let {
-				SeedKeyDetails(model = it, Modifier.padding(horizontal = 24.dp, vertical = 16.dp))
+				SeedKeyDetails(
+					model = it,
+					Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+				)
 			}
 
 			val models = model.keysAndNetwork.groupBy { it.network }
@@ -106,7 +111,8 @@ fun KeySetDetailsMultiselectScreen(
 private fun PreviewKeySetDetailsMultiselectScreen() {
 
 	val stabModel = KeySetDetailsModel.createStub()
-	val state = remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
+	val state =
+		remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {})
