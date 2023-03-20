@@ -35,17 +35,17 @@ import io.parity.signer.ui.theme.textDisabled
 
 
 @Composable
-fun NetworkKeysElementExpandable(
+fun NetworkKeysExpandable(
 	network: NetworkModel,
 	keys: List<KeyModel>,
 	onKeyClick: (KeyModel, NetworkModel) -> Unit,
 ) {
 	val collapsed = remember { mutableStateOf(true) }
-	NetworkKeysElementExpandablePrivate(network, keys, collapsed, onKeyClick)
+	NetworkKeysExpandablePrivate(network, keys, collapsed, onKeyClick)
 }
 
 @Composable
-private fun NetworkKeysElementExpandablePrivate(
+private fun NetworkKeysExpandablePrivate(
 	network: NetworkModel,
 	keys: List<KeyModel>,
 	collapsed: MutableState<Boolean>,
@@ -129,7 +129,7 @@ private fun NetworkKeysElementExpandablePrivate(
 @Composable
 private fun PreviewNetworkKeysElementExpandable() {
 	SignerNewTheme {
-		NetworkKeysElementExpandable(
+		NetworkKeysExpandable(
 			NetworkModel.createStub(),
 			listOf(KeyModel.createStub())
 		) { _, _ -> }
@@ -152,9 +152,10 @@ private fun PreviewNetworkKeysElementExpanded() {
 		val state = remember {
 			mutableStateOf(false)
 		}
-		NetworkKeysElementExpandablePrivate(
+		val key = KeyModel.createStub()
+		NetworkKeysExpandablePrivate(
 			NetworkModel.createStub(),
-			listOf(KeyModel.createStub(), KeyModel.createStub()),
+			listOf(key, key.copy(path = key.path + "//somemore")),
 			state,
 		) { _, _ -> }
 	}

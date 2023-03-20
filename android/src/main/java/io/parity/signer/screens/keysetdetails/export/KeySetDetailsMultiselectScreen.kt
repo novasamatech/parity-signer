@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.screens.keysetdetails.items.KeyDerivedItemMultiselect
 import io.parity.signer.domain.*
+import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandableMultiselect
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.screens.keysets.export.ClickableLabel
 import io.parity.signer.ui.theme.*
@@ -56,27 +56,28 @@ fun KeySetDetailsMultiselectScreen(
 			model.root?.let {
 				SeedKeyDetails(model = it, Modifier.padding(horizontal = 24.dp, vertical = 16.dp))
 			}
-			//filter row
-			Row(
-				modifier = Modifier.padding(horizontal = 24.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-					color = MaterialTheme.colors.textDisabled,
-					style = SignerTypeface.BodyM,
-					modifier = Modifier.weight(1f),
-				)
-			}
-			for (key in model.keysAndNetwork) {
-				KeyDerivedItemMultiselect(
-					model = key.key,
-					networkLogo = key.network.networkLogo,
-					isSelected = selected.value.contains(key.key.addressKey),
-				) { isSelected, key ->
-					if (isSelected) selected.value += key else selected.value -= key
+
+			val models = model.keysAndNetwork.groupBy { it.network }
+			for (networkAndKeys in models.entries) {
+				NetworkKeysExpandableMultiselect( //todo dmitry
+					network = networkAndKeys.key.toNetworkModel(),
+					keys = networkAndKeys.value
+						.map { it.key }
+						.sortedBy { it.path },
+					selectedKeysAdr = selected.value,
+				) { isSelected, keyAdr ->
+					if (isSelected) selected.value += keyAdr else selected.value -= keyAdr
 				}
 			}
+//			for (key in model.keysAndNetwork) {
+//				KeyDerivedItemMultiselect(
+//					model = key.key,
+//					networkLogo = key.network.networkLogo,
+//					isSelected = selected.value.contains(key.key.addressKey),
+//				) { isSelected, key ->
+//					if (isSelected) selected.value += key else selected.value -= key
+//				}
+//			}
 		}
 		Row(
 			modifier = Modifier

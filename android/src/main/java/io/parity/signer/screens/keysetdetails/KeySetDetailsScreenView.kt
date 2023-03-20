@@ -31,7 +31,7 @@ import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar2
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.*
-import io.parity.signer.screens.keysetdetails.items.NetworkKeysElementExpandable
+import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandable
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -74,7 +74,7 @@ fun KeySetDetailsScreenView(
 
 					val models = model.keysAndNetwork.groupBy { it.network }
 					for (networkAndKeys in models.entries) {
-						NetworkKeysElementExpandable(
+						NetworkKeysExpandable(
 							network = networkAndKeys.key.toNetworkModel(),
 							keys = networkAndKeys.value
 								.map { it.key }
