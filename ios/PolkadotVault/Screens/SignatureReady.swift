@@ -31,16 +31,16 @@ struct SignatureReady: View {
         .gesture(
             DragGesture()
                 .onChanged { drag in
-                    self.offset = drag.translation.height
+                    offset = drag.translation.height
                 }
                 .onEnded { drag in
-                    self.oldOffset += drag.translation.height
-                    self.offset = 0
+                    oldOffset += drag.translation.height
+                    offset = 0
                 }
         )
         .gesture(
             TapGesture().onEnded { _ in
-                self.oldOffset = 0
+                oldOffset = 0
             }
         )
     }

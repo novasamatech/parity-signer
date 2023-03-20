@@ -21,7 +21,7 @@ struct CameraView: View {
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
                     DispatchQueue.main.async {
-                        self.viewModel.checkForTransactionNavigation(payload)
+                        viewModel.checkForTransactionNavigation(payload)
                     }
                 }
                 .onChange(of: model.total) { total in

@@ -107,18 +107,18 @@ struct CircularProgressView: View {
         .onAppear {
             applicationStatePublisher.$applicationState.sink { updatedState in
                 guard lastApplicationState != updatedState, counter > 0 else { return }
-                self.lastApplicationState = updatedState
+                lastApplicationState = updatedState
                 switch updatedState {
                 case .active:
                     guard let moveToBackgroundDate = moveToBackgroundDate else { return }
                     let timePassed = Date().timeIntervalSince(moveToBackgroundDate)
-                    self.counter = max(0, self.counter - timePassed)
-                    if self.counter < 0 {
-                        self.timer.upstream.connect().cancel()
-                        self.model.onCompletion()
+                    counter = max(0, counter - timePassed)
+                    if counter < 0 {
+                        timer.upstream.connect().cancel()
+                        model.onCompletion()
                     }
                 case .inactive:
-                    self.moveToBackgroundDate = .now
+                    moveToBackgroundDate = .now
                 }
             }.store(in: cancelBag)
         }

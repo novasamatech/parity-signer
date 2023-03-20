@@ -85,7 +85,7 @@ struct PaginatedScrollView: View {
                 .opacity(0.000001)
         ) // hack - this allows gesture recognizing even when background is transparent
         .frame(width: contentWidth)
-        .offset(x: self.currentScrollOffset, y: 0)
+        .offset(x: currentScrollOffset, y: 0)
         .simultaneousGesture(
             DragGesture(minimumDistance: 1, coordinateSpace: .local)
                 .onChanged { value in
@@ -107,8 +107,8 @@ struct PaginatedScrollView: View {
                             initialVelocity: 0
                         )
                     ) {
-                        self.currentPageIndex = newPageIndex
-                        self.currentScrollOffset = self.countCurrentScrollOffset()
+                        currentPageIndex = newPageIndex
+                        currentScrollOffset = countCurrentScrollOffset()
                     }
                 }
         )

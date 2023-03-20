@@ -119,7 +119,7 @@ private extension CameraService {
 
     func handleNewOperation(with qrCodePayload: String) {
         do {
-            let proposedTotalFrames = Int(try qrparserGetPacketsTotal(data: qrCodePayload, cleaned: false))
+            let proposedTotalFrames = try Int(qrparserGetPacketsTotal(data: qrCodePayload, cleaned: false))
             switch proposedTotalFrames {
             case 1:
                 decode(completeOperationPayload: [qrCodePayload])
