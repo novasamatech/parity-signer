@@ -63,14 +63,8 @@ struct LogEntryView: View {
                 .padding(.vertical, Spacing.small)
             }
         }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            viewModel.onEventTap()
-        }
         .padding(.leading, Spacing.large)
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
+        .contentShape(Rectangle())
     }
 }
 
@@ -78,24 +72,8 @@ extension LogEntryView {
     final class ViewModel: ObservableObject {
         let renderable: LogEntryRenderable
 
-        private weak var navigation: NavigationCoordinator!
-
         init(renderable: LogEntryRenderable) {
             self.renderable = renderable
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
-        func onEventTap() {
-            guard renderable.type != .basic else { return }
-            navigation.perform(
-                navigation: .init(
-                    action: .showLogDetails,
-                    details: renderable.navigationDetails
-                )
-            )
         }
     }
 }
@@ -114,7 +92,7 @@ extension LogEntryView {
                             type: .fullDetails,
                             dateHeader: "Dec 09",
                             timestamp: "13:42",
-                            navigationDetails: "0"
+                            navigationDetails: 0
                         )
                     )
                 )
@@ -128,7 +106,7 @@ extension LogEntryView {
                             type: .basic,
                             dateHeader: nil,
                             timestamp: "13:42",
-                            navigationDetails: "0"
+                            navigationDetails: 0
                         )
                     )
                 )
@@ -142,7 +120,7 @@ extension LogEntryView {
                             type: .fullDetails,
                             dateHeader: nil,
                             timestamp: "13:42",
-                            navigationDetails: "0"
+                            navigationDetails: 0
                         )
                     )
                 )
@@ -156,7 +134,7 @@ extension LogEntryView {
                             type: .basic,
                             dateHeader: "Dec 09",
                             timestamp: "13:42",
-                            navigationDetails: "0"
+                            navigationDetails: 0
                         )
                     )
                 )

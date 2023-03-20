@@ -26,6 +26,9 @@ struct LogsListView: View {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(viewModel.renderables, id: \.id) { renderable in
                             LogEntryView(viewModel: .init(renderable: renderable))
+                                .onTapGesture {
+                                    viewModel.onEventTap(renderable)
+                                }
                         }
                     }
                 }
@@ -63,25 +66,43 @@ struct LogsListView: View {
             LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
                 .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingDetails,
+            onDismiss: { viewModel.onEventDetailsDismiss() }
+        ) {
+            LogDetailsView(viewModel: .init(
+                isPresented: $viewModel.isPresentingDetails,
+                details: viewModel.selectedDetails
+            ))
+        }
     }
 }
 
 extension LogsListView {
     final class ViewModel: ObservableObject {
-        @Published var logs: MLog
+        private var logs: MLog = .init(log: [])
         @Published var renderables: [LogEntryRenderable] = []
         @Published var shouldPresentClearConfirmationModal = false
         @Published var shouldPresentAddNoteModal = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingClearConfirmationModal = false
         @Published var isPresentingAddNoteModal = false
+        @Published var selectedDetails: MLogDetails!
+        @Published var isPresentingDetails = false
 
         private weak var navigation: NavigationCoordinator!
+        private let logsService: LogsService
+        private let snackBarPresentation: BottomSnackbarPresentation
+        private let renderableBuilder: LogEntryRenderableBuilder
 
         init(
-            logs: MLog
+            logsService: LogsService = LogsService(),
+            snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
         ) {
-            self.logs = logs
+            self.logsService = logsService
+            self.snackBarPresentation = snackBarPresentation
+            self.renderableBuilder = renderableBuilder
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -89,14 +110,20 @@ extension LogsListView {
         }
 
         func loadData() {
-            if case let .log(updatedLogs) = navigation.performFake(navigation: .init(action: .navbarLog)).screenData {
-                logs = updatedLogs
+            logsService.getLogs { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case let .success(logs):
+                    self.logs = logs
+                    self.renderables = self.renderableBuilder.build(logs)
+                case let .failure(error):
+                    self.snackBarPresentation.viewModel = .init(title: error.description)
+                    self.snackBarPresentation.isSnackbarPresented = true
+                }
             }
-            renderables = LogEntryRenderableBuilder().build(logs)
         }
 
         func onMoreMenuTap() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
             isShowingActionSheet = true
         }
 
@@ -111,10 +138,36 @@ extension LogsListView {
             }
         }
 
+        func onEventTap(_ renderable: LogEntryRenderable) {
+            guard renderable.type != .basic else { return }
+            logsService.getLogDetails(renderable.navigationDetails) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case let .success(logDetails):
+                    self.selectedDetails = logDetails
+                    self.isPresentingDetails = true
+                case let .failure(error):
+                    self.selectedDetails = nil
+                    self.snackBarPresentation.viewModel = .init(title: error.description)
+                    self.snackBarPresentation.isSnackbarPresented = true
+                }
+            }
+        }
+
+        func onEventDetailsDismiss() {
+            selectedDetails = nil
+        }
+
         func clearLogsAction() {
-            if case let .log(updatedLogs) = navigation.performFake(navigation: .init(action: .clearLog)).screenData {
-                logs = updatedLogs
-                loadData()
+            logsService.cleaLogHistory { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .success:
+                    self.loadData()
+                case let .failure(error):
+                    self.snackBarPresentation.viewModel = .init(title: error.description)
+                    self.snackBarPresentation.isSnackbarPresented = true
+                }
             }
         }
     }
@@ -123,12 +176,8 @@ extension LogsListView {
 #if DEBUG
     struct LogsListView_Previews: PreviewProvider {
         static var previews: some View {
-            LogsListView(viewModel: .init(logs: MLog(log: [History(
-                order: 0,
-                timestamp: "43254353453",
-                events: [.databaseInitiated, .deviceWasOnline, .historyCleared, .identitiesWiped]
-            )])))
-            .environmentObject(NavigationCoordinator())
+            LogsListView(viewModel: .init())
+                .environmentObject(NavigationCoordinator())
         }
     }
 #endif
