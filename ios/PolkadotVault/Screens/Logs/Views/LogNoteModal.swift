@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LogNoteModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focused: Bool
     @State var animateBackground: Bool = false
@@ -74,7 +73,6 @@ struct LogNoteModal: View {
             .background(Asset.backgroundTertiary.swiftUIColor)
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             focused = true
         }
     }
@@ -82,23 +80,22 @@ struct LogNoteModal: View {
 
 extension LogNoteModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         @Binding var isPresented: Bool
         @Published var note: String = ""
         @Published var isActionDisabled: Bool = true
         private var cancelBag = CancelBag()
+        private let logsService: LogsService
+        private let snackBarPresentation: BottomSnackbarPresentation
 
         init(
-            isPresented: Binding<Bool>
+            isPresented: Binding<Bool>,
+            logsService: LogsService = LogsService(),
+            snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
         ) {
             _isPresented = isPresented
-            UITextView.appearance().backgroundColor = .green
+            self.logsService = logsService
+            self.snackBarPresentation = snackBarPresentation
             subscribeToUpdates()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-            navigation.performFake(navigation: .init(action: .createLogComment))
         }
 
         func onCancelTap() {
@@ -106,8 +103,16 @@ extension LogNoteModal {
         }
 
         func onDoneTap() {
-            navigation.performFake(navigation: .init(action: .goForward, details: note))
-            isPresented = false
+            logsService.addCommentToLogs(note) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .success:
+                    self.isPresented = false
+                case let .failure(error):
+                    self.snackBarPresentation.viewModel = .init(title: error.description)
+                    self.snackBarPresentation.isSnackbarPresented = true
+                }
+            }
         }
 
         private func subscribeToUpdates() {
@@ -127,7 +132,6 @@ extension LogNoteModal {
                     isPresented: .constant(true)
                 )
             )
-            .environmentObject(NavigationCoordinator())
             .preferredColorScheme(.light)
         }
     }

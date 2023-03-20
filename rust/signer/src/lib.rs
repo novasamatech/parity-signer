@@ -24,18 +24,18 @@
 
 mod ffi_types;
 
-use lazy_static::lazy_static;
-use sled::Db;
-
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
+use sled::Db;
 use std::{
     collections::HashMap,
     fmt::Display,
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
 
 lazy_static! {
@@ -403,6 +403,43 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
 /// Get all networks registered within this device
 fn get_all_networks() -> anyhow::Result<Vec<MMNetwork>, ErrorDisplayed> {
     db_handling::interface_signer::show_all_networks(&get_db()?).map_err(|e| e.to_string().into())
+}
+
+fn get_logs() -> anyhow::Result<MLog, ErrorDisplayed> {
+    let history = db_handling::manage_history::get_history(&get_db()?)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    let log: Vec<_> = history
+        .into_iter()
+        .map(|(order, entry)| History {
+            order: order.stamp(),
+            timestamp: entry.timestamp,
+            events: entry.events,
+        })
+        .collect();
+
+    Ok(MLog { log })
+}
+
+fn get_log_details(order: u32) -> anyhow::Result<MLogDetails, ErrorDisplayed> {
+    let e = db_handling::manage_history::get_history_entry_by_order(&get_db()?, order)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let timestamp = e.timestamp.clone();
+
+    let events = entry_to_transactions_with_decoding(&get_db()?, e)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    Ok(MLogDetails { timestamp, events })
+}
+
+fn clear_log_history() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::clear_history(&get_db()?)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::manage_history::history_entry_user(&get_db()?, string_from_user)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.
