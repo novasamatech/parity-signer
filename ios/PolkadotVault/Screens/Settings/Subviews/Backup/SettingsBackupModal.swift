@@ -94,7 +94,7 @@ struct SettingsBackupModal: View {
     private func animateDismissal() {
         Animations.chainAnimation(
             animateBackground.toggle(),
-            delayedAnimationClosure: { self.isShowingBackupModal = false }()
+            delayedAnimationClosure: { isShowingBackupModal = false }()
         )
     }
 }

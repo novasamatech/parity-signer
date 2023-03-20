@@ -79,7 +79,7 @@ struct OnboardingAgreementsView: View {
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.large)
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(Asset.backgroundSystem.swiftUIColor)
         .fullScreenCover(isPresented: $viewModel.isPresentingTermsOfService) {
             TermsOfServiceView(viewModel: .init(isPresented: $viewModel.isPresentingTermsOfService))
         }

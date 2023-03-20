@@ -208,4 +208,52 @@ extension Localizable {
         )
         return AttributedString(attributedString)
     }
+
+    static func setUpNetworkStepOneStepPartTwo() -> AttributedString {
+        let mainText = Localizable.Onboarding.SetUpNetworks.Step1.Label.Step1.two.string
+        let highlightedPart = Localizable.Onboarding.SetUpNetworks.Step1.Label.Step1.Two.highlight.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let highlightedRange = (mainText as NSString).range(of: highlightedPart)
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: highlightedRange
+        )
+        return AttributedString(attributedString)
+    }
+
+    static func setUpNetworkStepOneStepPartThree() -> AttributedString {
+        let mainText = Localizable.Onboarding.SetUpNetworks.Step1.Label.Step1.three.string
+        let highlightedPart = Localizable.Onboarding.SetUpNetworks.Step1.Label.Step1.Three.highlight.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let highlightedRange = (mainText as NSString).range(of: highlightedPart)
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: highlightedRange
+        )
+        return AttributedString(attributedString)
+    }
+
+    static func setUpNetworkStepTwoStepPartTwo() -> AttributedString {
+        let mainText = Localizable.Onboarding.SetUpNetworks.Step2.Label.Step1.two.string
+        let highlightedPart = Localizable.Onboarding.SetUpNetworks.Step2.Label.Step1.Two.highlight.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let highlightedRange = (mainText as NSString).range(of: highlightedPart)
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: highlightedRange
+        )
+        return AttributedString(attributedString)
+    }
+
+    static func setUpNetworkStepTwoStepPartThree() -> AttributedString {
+        let mainText = Localizable.Onboarding.SetUpNetworks.Step2.Label.Step1.three.string
+        let highlightedPart = Localizable.Onboarding.SetUpNetworks.Step2.Label.Step1.Three.highlight.string
+        let attributedString = NSMutableAttributedString(string: mainText)
+        let highlightedRange = (mainText as NSString).range(of: highlightedPart)
+        attributedString.setAttributes(
+            [.foregroundColor: Asset.accentPink300.color],
+            range: highlightedRange
+        )
+        return AttributedString(attributedString)
+    }
 }

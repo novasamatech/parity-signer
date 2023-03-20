@@ -20,7 +20,7 @@ scale-info = "2.3.1"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.39"
+thiserror = "1.0.40"
 
 [dev-dependencies]
 pretty_assertions = "1"

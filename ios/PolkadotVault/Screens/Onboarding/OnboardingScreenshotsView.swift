@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OnboardingScreenshotsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
         GeometryReader { geo in
@@ -76,10 +75,7 @@ struct OnboardingScreenshotsView: View {
                     minHeight: geo.size.height
                 )
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            .onAppear {
-                viewModel.use(navigation: navigation)
-            }
+            .background(Asset.backgroundSystem.swiftUIColor)
         }
     }
 }
@@ -90,25 +86,15 @@ extension OnboardingScreenshotsView {
         @Published var isActionDisabled: Bool = true
 
         private let onNextTap: () -> Void
-        private weak var navigation: NavigationCoordinator!
-        private let onboardingMediator: OnboardingMediator
 
         init(
-            onNextTap: @escaping () -> Void,
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+            onNextTap: @escaping () -> Void
         ) {
             self.onNextTap = onNextTap
-            self.onboardingMediator = onboardingMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onDoneTap() {
             onNextTap()
-            onboardingMediator.onboard()
-            navigation.perform(navigation: .init(action: .start))
         }
 
         func toggleCheckbox() {
