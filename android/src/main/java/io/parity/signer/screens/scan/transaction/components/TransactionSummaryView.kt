@@ -86,7 +86,10 @@ fun TransactionSummaryView(
 						.padding(end = 8.dp)
 				)
 			}
-			SignerDivider(modifier = Modifier.padding(vertical = 8.dp))
+			SignerDivider(
+				modifier = Modifier.padding(vertical = 8.dp),
+				sidePadding = 0.dp
+			)
 		}
 		model.keyModel?.let { keyModel ->
 			Column() {

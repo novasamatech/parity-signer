@@ -160,7 +160,7 @@ fun DerivationCreateSubgraph(
 	}
 }
 
-internal object DerivationCreateSubgraph {
+private object DerivationCreateSubgraph {
 	const val home = "derivation_creation_home"
 	const val path = "derivation_creation_path"
 }
