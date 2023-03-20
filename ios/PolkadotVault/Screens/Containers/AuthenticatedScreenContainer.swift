@@ -31,7 +31,7 @@ struct AuthenticatedScreenContainer: View {
                             .init(
                                 type: [.none, .multiSelect]
                                     .contains(navigation.actionResult.rightButton) ? .empty : .more,
-                                action: { self.navigation.perform(navigation: .init(action: .rightButtonAction)) }
+                                action: { navigation.perform(navigation: .init(action: .rightButtonAction)) }
                             )
                         ]
                     )

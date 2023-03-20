@@ -27,7 +27,7 @@ struct EnterKeySetNameView: View {
                             .constant(!viewModel.isActionAvailable())
                         ),
                         action: {
-                            self.nameFocused = false
+                            nameFocused = false
                             viewModel.onNextTap()
                         }
                     )]

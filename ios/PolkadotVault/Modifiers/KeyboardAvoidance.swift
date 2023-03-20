@@ -15,10 +15,10 @@ struct KeyboardAvoidance: ViewModifier {
         content
             .padding(.bottom, keyboardHeight)
             .onReceive(Publishers.keyboardHeight) {
-                if self.keyboardHeight != 0, $0 != 0 {
+                if keyboardHeight != 0, $0 != 0 {
                     return
                 }
-                self.keyboardHeight = $0
+                keyboardHeight = $0
             }
     }
 }
