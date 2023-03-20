@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.networks.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +17,10 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTypesInfo
 
+
+/**
+ * This menu was removed after network list screen redesign, functionality is not available anymore
+ */
 @Composable
 fun TypesInfo(typesInfo: MTypesInfo, sharedViewModel: SharedViewModel) {
 	var confirm by remember { mutableStateOf(false) }

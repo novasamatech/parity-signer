@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
-import io.parity.signer.components.panels.BottomBarSingleton
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
@@ -49,7 +49,7 @@ fun ScanNavSubgraph(
 		passwordModel.value != null || errorWrongPassword.value
 
 	val navigateToPrevious = {
-		rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+		CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 	}
 
 	val backAction = {
