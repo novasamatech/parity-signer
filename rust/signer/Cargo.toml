@@ -22,7 +22,6 @@ qr_reader_phone = { path = "../qr_reader_phone" }
 transaction_parsing = { path = "../transaction_parsing" }
 parser = { path = "../parser" }
 qrcode_static = { path = "../qrcode_static" }
-transaction_parsing = {path = "../transaction_parsing"}
 
 [target.'cfg(all(not(target_os = "android"), not(target_os = "ios")))'.dependencies]
 env_logger = "0.10"

@@ -26,7 +26,7 @@ mod ffi_types;
 
 use lazy_static::lazy_static;
 use sled::Db;
-
+use transaction_parsing::entry_to_transactions_with_decoding;
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
 use navigator::Error as NavigatorError;
