@@ -42,7 +42,13 @@ fun NetworkKeysExpandableMultiselect(
 	onKeyClick: (isSelected: Boolean, keyAddress: String) -> Unit,
 ) {
 	val collapsed = remember { mutableStateOf(false) }
-	NetworkKeysExpandableMultiselectPrivate(network, keys, selectedKeysAdr, collapsed, onKeyClick)
+	NetworkKeysExpandableMultiselectPrivate(
+		network,
+		keys,
+		selectedKeysAdr,
+		collapsed,
+		onKeyClick
+	)
 }
 
 @Composable
@@ -115,7 +121,7 @@ private fun NetworkKeysExpandableMultiselectPrivate(
 					model = key,
 					networkLogo = network.logo,
 					isSelected = selectedKeysAdr.contains(key.addressKey),
-					onClick = {isSelected, address -> onKeyClick(isSelected, address) })
+					onClick = { isSelected, address -> onKeyClick(isSelected, address) })
 				first = false
 			}
 		}
@@ -158,7 +164,13 @@ private fun PreviewNetworkKeysExpandableMultiselect() {
 		val key = KeyModel.createStub()
 		NetworkKeysExpandableMultiselect(
 			NetworkModel.createStub(),
-			listOf(key, key.copy(path = key.path + "//somemore")),
+			listOf(
+				key,
+				key.copy(
+					path = key.path + "//somemore",
+					addressKey = "f1c25182fb8e20313b2c1eb49219da7a70c"
+				)
+			),
 			setOf(key.addressKey),
 		) { _, _ -> }
 	}

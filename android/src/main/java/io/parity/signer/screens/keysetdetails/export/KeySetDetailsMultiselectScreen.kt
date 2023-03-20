@@ -52,14 +52,14 @@ fun KeySetDetailsMultiselectScreen(
 				.weight(1f)
 				.verticalScroll(rememberScrollState())
 		) {
-			//seed
+			//seed - key set
 			model.root?.let {
 				SeedKeyDetails(model = it, Modifier.padding(horizontal = 24.dp, vertical = 16.dp))
 			}
 
 			val models = model.keysAndNetwork.groupBy { it.network }
 			for (networkAndKeys in models.entries) {
-				NetworkKeysExpandableMultiselect( //todo dmitry
+				NetworkKeysExpandableMultiselect(
 					network = networkAndKeys.key.toNetworkModel(),
 					keys = networkAndKeys.value
 						.map { it.key }
@@ -69,15 +69,6 @@ fun KeySetDetailsMultiselectScreen(
 					if (isSelected) selected.value += keyAdr else selected.value -= keyAdr
 				}
 			}
-//			for (key in model.keysAndNetwork) {
-//				KeyDerivedItemMultiselect(
-//					model = key.key,
-//					networkLogo = key.network.networkLogo,
-//					isSelected = selected.value.contains(key.key.addressKey),
-//				) { isSelected, key ->
-//					if (isSelected) selected.value += key else selected.value -= key
-//				}
-//			}
 		}
 		Row(
 			modifier = Modifier
