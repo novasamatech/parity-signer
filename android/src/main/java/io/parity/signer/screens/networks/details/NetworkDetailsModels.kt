@@ -39,7 +39,7 @@ data class NetworkDetailsModel(
 				"custom",
 				"vwvsWqqBYFK",
 				PreviewData.exampleIdenticonPng,
-				"src3322"
+				"sr25519"
 			),
 			meta = listOf(MetadataModel.createStub(), MetadataModel.createStub())
 		)

@@ -216,42 +216,53 @@ fun NetworkDetailsScreen(
 @Composable
 private fun VerifierContent(verifier: VerifierModel) {
 	when (verifier.ttype) {
-		"general", "none" -> {
+		"none" -> {
 			TCNameValueOppositeElement(
 				name = stringResource(R.string.network_details_field_verifier),
-				value = verifier.ttype
+				value = verifier.ttype.capitalize()
+			)
+		}
+		"general" -> {
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_field_verifier),
+				value = verifier.ttype.capitalize()
+			)
+			SignerDivider(sidePadding = 0.dp)
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_verifier_public_key_for_general),
+				value = verifier.publicKey
+			)
+			SignerDivider(sidePadding = 0.dp)
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_verifier_crypto_field),
+				value = verifier.encryption
 			)
 		}
 		"custom" -> {
-			Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_field_verifier),
+				value = verifier.ttype.capitalize()
+			)
+			SignerDivider(sidePadding = 0.dp)
+			Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(
-					text = stringResource(R.string.network_details_field_verifier),
+					text = stringResource(R.string.network_details_verifier_identicon_field),
 					style = SignerTypeface.BodyL,
 					color = MaterialTheme.colors.textTertiary
 				)
-				Row {
-					IdentIcon(identicon = verifier.identicon)
-					Spacer(modifier = Modifier.padding(start = 8.dp))
-					Text(
-						verifier.ttype,
-						style = SignerTypeface.BodyL,
-						color = MaterialTheme.colors.primary
-					)
-				}
-				Text(
-					verifier.publicKey,
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary
-				)
-				Text(
-					stringResource(
-						R.string.network_details_verifier_encryption_field,
-						verifier.encryption
-					),
-					style = SignerTypeface.BodyL,
-					color = MaterialTheme.colors.primary
-				)
+				Spacer(modifier = Modifier.weight(1f))
+				IdentIcon(identicon = verifier.identicon)
 			}
+			SignerDivider(sidePadding = 0.dp)
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_verifier_public_key_for_custom),
+				value = verifier.publicKey
+			)
+			SignerDivider(sidePadding = 0.dp)
+			TCNameValueOppositeElement(
+				name = stringResource(R.string.network_details_verifier_crypto_field),
+				value = verifier.encryption
+			)
 		}
 		else -> {
 			TCNameValueOppositeElement(
