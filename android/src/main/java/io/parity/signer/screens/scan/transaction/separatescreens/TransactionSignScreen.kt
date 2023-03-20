@@ -71,7 +71,7 @@ fun TransactionSignScreen(
 					style = SignerTypeface.BodyL,
 				)
 				Spacer(modifier = Modifier.padding(top = 12.dp))
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				Spacer(modifier = Modifier.padding(top = 12.dp))
 				Row(Modifier.fillMaxWidth()) {
 					Text(
@@ -115,7 +115,7 @@ fun TransactionSignScreen(
 					)
 				}
 				Spacer(modifier = Modifier.padding(top = 12.dp))
-				SignerDivider()
+				SignerDivider(sidePadding = 0.dp)
 				Spacer(modifier = Modifier.padding(top = 12.dp))
 				Text(
 					text = model.metadataHash,

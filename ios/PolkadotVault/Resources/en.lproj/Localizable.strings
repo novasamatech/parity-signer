@@ -318,6 +318,8 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
+
+// Logs
 "LogsList.Label.Title" = "All Logs";
 "LogsList.More.Action.Add" = "Add Note";
 "LogsList.More.Action.Clear" = "Clear Log";
@@ -331,6 +333,7 @@
 "LogsList.Modal.AddNote.Label.Placeholder" = "Enter note";
 "LogsList.Modal.AddNote.Action.Done" = "Done";
 
+"LogDetails.Label.Title" = "Event Details";
 
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";
@@ -535,6 +538,36 @@
 "Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
 "Onboarding.Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
 "Onboarding.Airgap.Action.Next" = "Next";
+
+"Onboarding.SetUpNetworks.Label.Title" = "Set Up Networks On Which You Will Sign Transactions";
+"Onboarding.SetUpNetworks.Label.Content" = "Polkadot Vault is a fully Decentralised wallet, which means users have to manage networks themselves. Follow the tutorial to learn more.";
+"Onboarding.SetUpNetworks.Action.SetUp" = "Set Up Networks";
+"Onboarding.SetUpNetworks.Action.Later" = "Set Up Later";
+
+"Onboarding.SetUpNetworks.Step1.Label.Step" = "Step 1 / 2";
+"Onboarding.SetUpNetworks.Step1.Label.Title" = "How to Add Networks";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.One" = "Go to Portal where your network is stored";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Three.Highlight" = "metadata.novasama.io";
+"Onboarding.SetUpNetworks.Step1.Label.Step2" = "Choose the Network you need";
+"Onboarding.SetUpNetworks.Step1.Label.Step3" = "Scan \"Chain spec\" QR to add the missing network";
+"Onboarding.SetUpNetworks.Step1.Label.Step3.Action" = "Scan Chain Spec";
+"Onboarding.SetUpNetworks.Step1.Label.Step4" = "Press \"Next\" When You’re Done";
+"Onboarding.SetUpNetworks.Step1.Action.Next" = "Next";
+
+"Onboarding.SetUpNetworks.Step2.Label.Step" = "Step 2 / 2";
+"Onboarding.SetUpNetworks.Step2.Label.Title" = "How to Update Network’s Metadata";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.One" = "Go to the Portal where your network’s metadata is stored";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Three.Highlight" = "metadata.novasama.io";
+"Onboarding.SetUpNetworks.Step2.Label.Step2" = "Choose the Network you need";
+"Onboarding.SetUpNetworks.Step2.Label.Step3" = "Go to \"Update Metadata\" Tab and Scan the Metadata Animated QR Code";
+"Onboarding.SetUpNetworks.Step2.Label.Step3.Action" = "Update Metadata";
+"Onboarding.SetUpNetworks.Step2.Action.Done" = "Done";
 
 "NewSeed.Name.Label.Title" = "Key Set Name";
 "NewSeed.Name.Label.Header" = "Enter a name that will help you identify this key set";

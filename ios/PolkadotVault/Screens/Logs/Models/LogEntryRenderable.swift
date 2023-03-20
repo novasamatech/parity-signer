@@ -22,7 +22,7 @@ struct LogEntryRenderable: Equatable, Hashable, Identifiable {
     let type: EntryType
     let dateHeader: String?
     let timestamp: String
-    let navigationDetails: String
+    let navigationDetails: UInt32
 }
 
 final class LogEntryRenderableBuilder {
@@ -50,7 +50,7 @@ final class LogEntryRenderableBuilder {
                         type: $0.entryType,
                         dateHeader: shouldIncludeDate ? lastDate : nil,
                         timestamp: DateFormatter.hourMinutes(timestamp),
-                        navigationDetails: String(logs.log.reversed().firstIndex(of: historyItem) ?? 0)
+                        navigationDetails: UInt32(logs.log.reversed().firstIndex(of: historyItem) ?? 0)
                     )
                 )
             }

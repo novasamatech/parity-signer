@@ -20,10 +20,8 @@ final class MainScreensFactory {
             )
         case .settings:
             SettingsView(viewModel: .init())
-        case let .log(value):
-            LogsListView(viewModel: .init(logs: value))
-        case let .logDetails(value):
-            EventDetails(content: value)
+        case .log:
+            LogsListView(viewModel: .init())
         case let .seedSelector(value):
             KeySetList(viewModel: .init(), dataModel: .constant(value))
         case let .keyDetails(value):
@@ -59,7 +57,8 @@ final class MainScreensFactory {
              .selectSeedForBackup,
              .scan,
              .transaction,
-             .keyDetailsMulti:
+             .keyDetailsMulti,
+             .logDetails:
             EmptyView()
         }
     }

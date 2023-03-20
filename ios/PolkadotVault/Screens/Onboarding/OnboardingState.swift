@@ -13,10 +13,25 @@ enum OnboardingState: Equatable {
     case terms
     case airgap
     case screenshots
+    case setUpNetworksIntro
+    case setUpNetworksStepOne
+    case setUpNetworksStepTwo
 }
 
 final class OnboardingStateMachine: ObservableObject {
     @Published var currentState: OnboardingState = .overview
+    private let onboardingMediator: OnboardingMediator
+    private weak var navigation: NavigationCoordinator!
+
+    init(
+        onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+    ) {
+        self.onboardingMediator = onboardingMediator
+    }
+
+    func use(navigation: NavigationCoordinator) {
+        self.navigation = navigation
+    }
 
     @ViewBuilder
     func currentView() -> some View {
@@ -28,7 +43,28 @@ final class OnboardingStateMachine: ObservableObject {
         case .airgap:
             OnboardingAirgapView(viewModel: .init(onNextTap: { self.onAirgapNextTap() }))
         case .screenshots:
-            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.resetState() }))
+            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.onScreenshotNextTap() }))
+        case .setUpNetworksIntro:
+            SetUpNetworksIntroView(
+                viewModel: .init(
+                    onNextTap: { self.onSetUpNetworksIntroNext() },
+                    onSkipTap: { self.finishOnboarding() }
+                )
+            )
+        case .setUpNetworksStepOne:
+            SetUpNetworksStepOneView(
+                viewModel: .init(
+                    onNextTap: { self.onSetUpNetworksStepOne() },
+                    onBackTap: { self.onSetUpNetworksStepOneBackTap() }
+                )
+            )
+        case .setUpNetworksStepTwo:
+            SetUpNetworksStepTwoView(
+                viewModel: .init(
+                    onNextTap: { self.finishOnboarding() },
+                    onBackTap: { self.onSetUpNetworksStepTwoBackTap() }
+                )
+            )
         }
     }
 
@@ -44,7 +80,29 @@ final class OnboardingStateMachine: ObservableObject {
         currentState = .screenshots
     }
 
-    func resetState() {
+    func onScreenshotNextTap() {
+        currentState = .setUpNetworksIntro
+    }
+
+    func onSetUpNetworksIntroNext() {
+        currentState = .setUpNetworksStepOne
+    }
+
+    func onSetUpNetworksStepOne() {
+        currentState = .setUpNetworksStepTwo
+    }
+
+    func onSetUpNetworksStepOneBackTap() {
+        currentState = .setUpNetworksIntro
+    }
+
+    func onSetUpNetworksStepTwoBackTap() {
+        currentState = .setUpNetworksStepOne
+    }
+
+    func finishOnboarding() {
         currentState = .overview
+        onboardingMediator.onboard()
+        navigation.perform(navigation: .init(action: .start))
     }
 }

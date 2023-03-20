@@ -24,7 +24,7 @@ struct WrappingHStack<Model, V>: View where Model: Hashable & Identifiable, V: V
     var body: some View {
         VStack {
             GeometryReader { geometry in
-                self.generateContent(in: geometry)
+                generateContent(in: geometry)
             }
         }
         .frame(height: totalHeight) // << variant for ScrollView/List
@@ -36,7 +36,7 @@ struct WrappingHStack<Model, V>: View where Model: Hashable & Identifiable, V: V
         var height = CGFloat.zero
 
         return ZStack(alignment: .topLeading) {
-            ForEach(self.models, id: \.id) { models in
+            ForEach(models, id: \.id) { models in
                 viewGenerator(models)
                     .padding(.horizontal, horizontalSpacing)
                     .padding(.vertical, verticalSpacing)

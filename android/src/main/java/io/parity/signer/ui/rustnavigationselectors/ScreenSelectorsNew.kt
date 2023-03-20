@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
-import io.parity.signer.components.panels.BottomBarSingleton
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.components.panels.toAction
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
@@ -30,6 +30,10 @@ import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
+import io.parity.signer.screens.networks.details.NetworkDetailsSubgraph
+import io.parity.signer.screens.networks.details.toNetworkDetailsModel
+import io.parity.signer.screens.networks.list.NetworksList
+import io.parity.signer.screens.networks.list.toNetworksListModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -102,6 +106,18 @@ fun CombinedScreensSelector(
 					networkState = networkState
 				)
 			}
+		is ScreenData.ManageNetworks ->
+			Box(modifier = Modifier.statusBarsPadding()) {
+				NetworksList(
+					model = screenData.f.toNetworksListModel(),
+					rootNavigator = rootNavigator
+				)
+			}
+		is ScreenData.NNetworkDetails ->
+			NetworkDetailsSubgraph(
+				screenData.f.toNetworkDetailsModel(),
+				rootNavigator
+			)
 		is ScreenData.NewSeed ->
 			Box(
 				modifier = Modifier
@@ -123,7 +139,7 @@ fun CombinedScreensSelector(
 				"Selector",
 				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
 			)
-			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 		is ScreenData.DeriveKey -> {
 			Box(

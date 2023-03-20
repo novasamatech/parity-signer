@@ -80,7 +80,7 @@ struct OnboardingOverviewView: View {
                     RoundedRectangle(cornerRadius: CornerRadius.medium)
                         .frame(height: Heights.oviewviewPageIndicator)
                         .foregroundColor(
-                            index <= self.viewModel.currentSelectedPage ? Asset.accentForegroundText
+                            index <= viewModel.currentSelectedPage ? Asset.accentForegroundText
                                 .swiftUIColor : Asset.fill30.swiftUIColor
                         )
                 }
