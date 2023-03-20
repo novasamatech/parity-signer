@@ -12,7 +12,6 @@ import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
-import io.parity.signer.screens.networks.NetworkDetails
 import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
@@ -51,14 +50,8 @@ fun ScreenSelector(
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
-		is ScreenData.ManageNetworks -> ManageNetworks(
-			screenData.f,
-			button2,
-		)
-		is ScreenData.NNetworkDetails -> NetworkDetails(
-			screenData.f,
-			button2
-		)
+		is ScreenData.ManageNetworks -> {} //migrated to new selector
+		is ScreenData.NNetworkDetails -> {} // migrated to new selector
 		is ScreenData.NewSeed -> {} // new selector
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
@@ -127,20 +120,13 @@ fun ModalSelector(
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
-			is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
-				sharedViewModel = sharedViewModel
-			)
-			is ModalData.ManageMetadata -> {
-				ManageMetadata(modalData.f, sharedViewModel = sharedViewModel)
-			}
+			is ModalData.NetworkDetailsMenu -> {} // migrated to network details screen
+			is ModalData.ManageMetadata -> {} // those actions now right in network details screen
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
 			)
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
-			is ModalData.TypesInfo -> TypesInfo(
-				modalData.f,
-				sharedViewModel = sharedViewModel
-			)
+			is ModalData.TypesInfo -> {} // this functionality removed after redesign
 			is ModalData.NewSeedBackup -> {}//moved to new selector
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {

@@ -318,6 +318,8 @@
 "Transaction.EnterPassword.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
 "Transaction.EnterPassword.Error.Title" = "Did you forget your\npassword?";
 "Transaction.EnterPassword.Error.Message" = "Your password was entered incorrectly more than once. Retrieve it and scan the QR code again.";
+
+// Logs
 "LogsList.Label.Title" = "All Logs";
 "LogsList.More.Action.Add" = "Add Note";
 "LogsList.More.Action.Clear" = "Clear Log";
@@ -331,6 +333,7 @@
 "LogsList.Modal.AddNote.Label.Placeholder" = "Enter note";
 "LogsList.Modal.AddNote.Action.Done" = "Done";
 
+"LogDetails.Label.Title" = "Event Details";
 
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";
