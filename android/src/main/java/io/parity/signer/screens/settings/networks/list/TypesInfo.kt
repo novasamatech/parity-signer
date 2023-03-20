@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks.list
+package io.parity.signer.screens.settings.networks.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

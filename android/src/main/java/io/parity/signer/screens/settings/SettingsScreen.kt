@@ -111,6 +111,8 @@ private object SettingsScreenSubgraph {
 	const val wipeConformation = "setting_whipe_all_conformation"
 	const val terms = "settings_terms_of_service"
 	const val privacyPolicy = "settings_privacy_polcy"
+	const val backup = "settings_backup"
+	const val backupResult = "settings_backup_result"
 }
 
 @Composable
