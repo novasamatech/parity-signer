@@ -38,18 +38,18 @@ import io.parity.signer.ui.theme.textSecondary
 
 
 @Composable
-fun BackupScreen(
+fun SeedBackupScreen(
 	rootNavigator: Navigator,
 	onSelected: (selectedSeed: String) -> Unit,
 ) {
 	val viewModel = viewModel<SeedBackupViewModel>()
 	val seeds = viewModel.getSeeds()
-	BackupScreenPrivate(seeds, rootNavigator, onSelected)
+	SeedBackupScreenPrivate(seeds, rootNavigator, onSelected)
 }
 
 
 @Composable
-private fun BackupScreenPrivate(
+private fun SeedBackupScreenPrivate(
 	seeds: List<String>,
 	rootNavigator: Navigator,
 	onSelected: (selectedSeed: String) -> Unit
@@ -126,7 +126,7 @@ private fun SeedItem(seedName: String, onClick: Callback) {
 @Composable
 private fun PreviewBackupScreen() {
 	SignerNewTheme {
-		BackupScreenPrivate(
+		SeedBackupScreenPrivate(
 			listOf("Seed", "Seed Some", "Another name"),
 			rootNavigator = EmptyNavigator(),
 		) { some ->
