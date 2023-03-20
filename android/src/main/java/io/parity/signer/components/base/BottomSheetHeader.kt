@@ -56,12 +56,15 @@ fun BottomSheetHeader(
 }
 
 @Composable
-fun BottomSheetSubtitle(@StringRes id: Int) {
+fun BottomSheetSubtitle(
+	@StringRes id: Int,
+	modifier: Modifier = Modifier,
+) {
 	Text(
 		text = stringResource(id),
 		color = MaterialTheme.colors.primary,
 		style = SignerTypeface.BodyL,
-		modifier = Modifier.padding(start = 24.dp)
+		modifier = modifier.padding(start = 24.dp)
 	)
 }
 

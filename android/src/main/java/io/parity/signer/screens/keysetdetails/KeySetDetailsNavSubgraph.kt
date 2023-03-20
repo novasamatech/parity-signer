@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.removeSeed
-import io.parity.signer.screens.keysetdetails.backup.SeedBackupFullOverlayBottomSheet
+import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
 
@@ -68,7 +68,7 @@ fun KeySetDetailsNavSubgraph(
 					)
 				}
 				//content
-				SeedBackupFullOverlayBottomSheet(
+				KeySetBackupFullOverlayBottomSheet(
 					model = backupModel,
 					getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
 					onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },

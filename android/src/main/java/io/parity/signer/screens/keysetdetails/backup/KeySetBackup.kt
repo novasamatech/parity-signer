@@ -15,25 +15,25 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.BottomSheetSubtitle
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.screens.keysetdetails.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.screens.keysetdetails.items.SlimKeyItem
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
-fun SeedBackupFullOverlayBottomSheet(
+fun KeySetBackupFullOverlayBottomSheet(
 	model: SeedBackupModel,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
 	BottomSheetWrapperRoot(onClosedAction = onClose) {
-		SeedBackupBottomSheet(model, getSeedPhraseForBackup, onClose)
+		KeySetBackupBottomSheet(model, getSeedPhraseForBackup, onClose)
 	}
 	Row(modifier = Modifier.fillMaxSize()) {
 		SnackBarCircularCountDownTimer(
@@ -46,7 +46,7 @@ fun SeedBackupFullOverlayBottomSheet(
 }
 
 @Composable
-private fun SeedBackupBottomSheet(
+private fun KeySetBackupBottomSheet(
 	model: SeedBackupModel,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
@@ -68,14 +68,16 @@ private fun SeedBackupBottomSheet(
 				.verticalScroll(rememberScrollState()),
 		) {
 			// phrase
-			Spacer(modifier = Modifier.padding(top = 14.dp))
-			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
-			Spacer(modifier = Modifier.padding(top = 14.dp))
+			BottomSheetSubtitle(
+				R.string.subtitle_secret_recovery_phrase,
+				Modifier.padding(top = 14.dp)
+			)
 			BackupPhraseBox(seedPhrase)
 			//derived keys
-			Spacer(modifier = Modifier.padding(top = 22.dp))
-			BottomSheetSubtitle(R.string.subtitle_derived_keys)
-			Spacer(modifier = Modifier.padding(top = 14.dp))
+			BottomSheetSubtitle(
+				R.string.subtitle_derived_keys,
+				Modifier.padding(top = 22.dp, bottom = 14.dp)
+			)
 			for (index in 0..model.derivations.lastIndex) {
 				SlimKeyItem(model = model.derivations[index])
 				if (index != model.derivations.lastIndex) {
@@ -108,7 +110,7 @@ private fun SeedBackupBottomSheet(
 private fun PreviewSeedBackupBottomSheet() {
 	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
-		SeedBackupBottomSheet(model,
+		KeySetBackupBottomSheet(model,
 			{ _ -> " some long words some some" }, {})
 	}
 }
@@ -124,11 +126,11 @@ private fun PreviewSeedBackupBottomSheet() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewSeedBackupFullOverlayScreen() {
+private fun PreviewKeySetBackupFullOverlayScreen() {
 	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			SeedBackupFullOverlayBottomSheet(model,
+			KeySetBackupFullOverlayBottomSheet(model,
 				{ _ -> " some long words some some" }, {})
 		}
 	}
