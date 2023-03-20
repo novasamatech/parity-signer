@@ -24,18 +24,18 @@
 
 mod ffi_types;
 
-use lazy_static::lazy_static;
-use sled::Db;
-use transaction_parsing::entry_to_transactions_with_decoding;
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
+use sled::Db;
 use std::{
     collections::HashMap,
     fmt::Display,
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
 
 lazy_static! {
