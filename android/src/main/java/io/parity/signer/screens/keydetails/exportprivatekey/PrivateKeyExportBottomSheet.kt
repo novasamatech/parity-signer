@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,8 +39,8 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun PrivateKeyExportBottomSheet(
-    model: PrivateKeyExportModel,
-    navigator: Navigator,
+	model: PrivateKeyExportModel,
+	navigator: Navigator,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -53,33 +54,40 @@ fun PrivateKeyExportBottomSheet(
 		//scrollable part if doesn't fit into screen
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(weight = 1f, fill = false)
-				.padding(start = sidePadding, end = sidePadding)
+                .verticalScroll(rememberScrollState())
+                .weight(weight = 1f, fill = false)
+                .padding(start = sidePadding, end = sidePadding)
 		) {
 			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 			val plateShape =
-				RoundedCornerShape(qrRounding, qrRounding, qrRounding, qrRounding)
+				RoundedCornerShape(qrRounding)
 			Column(
 				modifier = Modifier
-					.clip(plateShape)
-					.border(
-						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-						plateShape
-					)
-					.background(MaterialTheme.colors.fill6, plateShape)
+                    .clip(plateShape)
+                    .border(
+                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                        plateShape
+                    )
+                    .background(MaterialTheme.colors.fill6, plateShape)
 			) {
 				Box(
 					modifier = Modifier
-						.fillMaxWidth(1f)
-						.aspectRatio(1.1f)
-						.background(
-							Color.White,
-							RoundedCornerShape(qrRounding)
-						),
+                        .fillMaxWidth(1f)
+                        .aspectRatio(1.1f)
+                        .background(
+                            Color.White,
+                            RoundedCornerShape(qrRounding)
+                        ),
 					contentAlignment = Alignment.Center,
 				) {
-					val qrImage = remember { runBlocking { encodeToQr(model.qrData, true) } }
+					val qrImage =
+						if (LocalInspectionMode.current) {
+							PreviewData.exampleQRImage
+						} else {
+							remember {
+								runBlocking { encodeToQr(model.qrData, true) }
+							}
+						}
 					Image(
 						bitmap = qrImage.intoImageBitmap(),
 						contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
@@ -128,6 +136,7 @@ fun MKeyDetails.toPrivateKeyExportModel(): PrivateKeyExportModel {
 				identIcon = address.identicon.toImageContent(),
 				seedName = address.seedName,
 				hasPassword = address.hasPwd,
+				networkLogo = networkInfo.networkLogo,
 				path = address.path,
 				base58 = base58,
 			)

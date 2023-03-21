@@ -210,7 +210,7 @@ fun MKeyDetails.toKeyDetailsModel() =
 		address = KeyCardModel.fromAddress(
 			address = address,
 			base58 = base58,
-			networkTitle = networkInfo.networkTitle,
+			network = networkInfo.toNetworkInfoModel(),
 		),
 		base58 = base58,
 		secretExposed = address.secretExposed,

@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -17,13 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.components.sharedcomponents.NetworkLabel
 import io.parity.signer.domain.*
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -56,21 +56,14 @@ fun KeyDerivedItem(
 			)
 			Column(Modifier.weight(1f)) {
 				if (model.path.isNotEmpty() || model.hasPwd) {
-					Row(verticalAlignment = Alignment.CenterVertically) {
-						Text(
-							text = model.path,
-							color = MaterialTheme.colors.textTertiary,
-							style = SignerTypeface.CaptionM,
-						)
-						if (model.hasPwd) {
-							Icon(
-								painterResource(id = R.drawable.ic_lock_16),
-								contentDescription = stringResource(R.string.key_lock_item),
-								tint = MaterialTheme.colors.textTertiary,
-								modifier = Modifier.padding(start = 8.dp)
-							)
-						}
-					}
+					KeyPath(
+						path = model.path,
+						hasPassword = model.hasPwd,
+						textStyle = SignerTypeface.CaptionM,
+						iconSize = 16.sp,
+						textColor = MaterialTheme.colors.textTertiary,
+						iconColor = MaterialTheme.colors.textTertiary,
+					)
 					Spacer(modifier = Modifier.padding(top = 4.dp))
 				}
 				Text(
@@ -84,8 +77,8 @@ fun KeyDerivedItem(
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 				modifier = Modifier
-					.padding(end = 16.dp)
-					.size(28.dp)
+                    .padding(end = 16.dp)
+                    .size(28.dp)
 			)
 		}
 	}
@@ -108,28 +101,24 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 				end = 12.dp,
 			)
 		)
-		if (model.key.path.isNotEmpty()) {
-			Text(
-				text = model.key.path,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.LabelM,
-			)
-			if (model.key.hasPwd) {
-				Icon(
-					painterResource(id = R.drawable.ic_lock_16),
-					contentDescription = stringResource(R.string.key_lock_item),
-					tint = MaterialTheme.colors.textTertiary,
-					modifier = Modifier.padding(start = 8.dp)
+		Box(modifier = Modifier.weight(1f)) {
+			if (model.key.path.isNotEmpty()) {
+				KeyPath(
+					path = model.key.path,
+					hasPassword = model.key.hasPwd,
+					textColor = MaterialTheme.colors.primary,
+					iconSize = 16.sp,
+					iconColor = MaterialTheme.colors.textTertiary,
+					textStyle = SignerTypeface.LabelM,
+				)
+			} else {
+				Text(
+					text = stringResource(R.string.derivation_key_empty_path_placeholder),
+					color = MaterialTheme.colors.textTertiary,
+					style = SignerTypeface.LabelM,
 				)
 			}
-		} else {
-			Text(
-				text = stringResource(R.string.derivation_key_empty_path_placeholder),
-				color = MaterialTheme.colors.textTertiary,
-				style = SignerTypeface.LabelM,
-			)
 		}
-		Spacer(modifier = Modifier.weight(1f))
 		NetworkLabel(
 			networkName = model.network.networkTitle,
 			modifier = Modifier.padding(end = 24.dp, start = 8.dp)
@@ -174,6 +163,15 @@ private fun PreviewSlimKeyItem() {
 			SlimKeyItem(model)
 			SignerDivider()
 			SlimKeyItem(model.copy(key = model.key.copy(path = "")))
+			SignerDivider()
+			SlimKeyItem(
+				model.copy(
+					key = model.key.copy(
+						path = "//kusama//some//very_long_path//somesomesome",
+						hasPwd = true,
+					)
+				)
+			)
 		}
 	}
 }
