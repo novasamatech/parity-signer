@@ -32,6 +32,7 @@ fun SeedBackupFullOverlayBottomSheet(
 	BottomSheetWrapperRoot(onClosedAction = onClose) {
 		SeedBackupBottomSheet(seedName, getSeedPhraseForBackup, onClose)
 	}
+	//todo dmitry adjust paddings and make sure it have enough space.
 	Row(modifier = Modifier.fillMaxSize()) {
 		SnackBarCircularCountDownTimer(
 			PrivateKeyExportModel.SHOW_PRIVATE_KEY_TIMEOUT,
