@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +51,7 @@ fun ScreenHeader(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 		//center
 		if (title != null) {
@@ -78,7 +81,7 @@ fun ScreenHeader(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 	}
 }
@@ -144,7 +147,7 @@ fun ScreenHeaderClose(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 	}
 }
