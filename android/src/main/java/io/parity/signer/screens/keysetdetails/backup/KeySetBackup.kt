@@ -1,5 +1,6 @@
 package io.parity.signer.screens.keysetdetails.backup
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
@@ -32,13 +34,18 @@ fun KeySetBackupFullOverlayBottomSheet(
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
+	val timerSize = remember {
+		mutableStateOf(80.dp)
+	}
+
 	BottomSheetWrapperRoot(onClosedAction = onClose) {
-		KeySetBackupBottomSheet(model, getSeedPhraseForBackup, onClose)
+		KeySetBackupBottomSheet(model, timerSize, getSeedPhraseForBackup, onClose)
 	}
 	Row(modifier = Modifier.fillMaxSize()) {
 		SnackBarCircularCountDownTimer(
 			PrivateKeyExportModel.SHOW_PRIVATE_KEY_TIMEOUT,
 			stringResource(R.string.seed_backup_autohide_title),
+			timerSize,
 			Modifier.align(Alignment.Bottom),
 			onClose,
 		)
@@ -48,6 +55,7 @@ fun KeySetBackupFullOverlayBottomSheet(
 @Composable
 private fun KeySetBackupBottomSheet(
 	model: SeedBackupModel,
+	timerSize: State<Dp>,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
@@ -84,7 +92,7 @@ private fun KeySetBackupBottomSheet(
 					SignerDivider(sidePadding = 24.dp)
 				}
 			}
-			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))
+			Spacer(modifier = Modifier.size(height = timerSize.value, width = 1.dp))
 		}
 	}
 
@@ -97,6 +105,7 @@ private fun KeySetBackupBottomSheet(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -111,6 +120,7 @@ private fun PreviewKeySetBackupBottomSheet() {
 	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
 		KeySetBackupBottomSheet(model,
+			mutableStateOf(80.dp),
 			{ _ -> " some long words some some" }, {})
 	}
 }

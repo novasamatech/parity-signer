@@ -16,11 +16,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.domain.conditional
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.theme.*
 import kotlinx.coroutines.delay
@@ -93,8 +97,9 @@ fun CircularCountDownTimer(
 fun SnackBarCircularCountDownTimer(
 	timeoutSeconds: Int,
 	text: String,
+	componentHeighCallback: MutableState<Dp>? = null,
 	modifier: Modifier = Modifier,
-	onTimeOutAction: () -> Unit
+	onTimeOutAction: () -> Unit,
 ) {
 	if (timeoutSeconds <= 0) {
 		onTimeOutAction()
@@ -103,14 +108,22 @@ fun SnackBarCircularCountDownTimer(
 
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	val localDensity = LocalDensity.current
 
 	var timeLeft by remember { mutableStateOf<Int>(timeoutSeconds) }
 	Row(
 		modifier = modifier
+			.conditional(componentHeighCallback != null) {
+				onGloballyPositioned { coordinates ->
+					componentHeighCallback?.value =
+						with(localDensity) { coordinates.size.height.toDp() }
+				}
+			}
 			.fillMaxWidth(1f)
 			.padding(horizontal = 8.dp, vertical = 16.dp)
 			.background(MaterialTheme.colors.snackBarBackground, innerShape)
 			.padding(12.dp),
+
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(

@@ -1,5 +1,6 @@
 package io.parity.signer.screens.settings.backup
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
@@ -29,14 +31,18 @@ fun SeedBackupFullOverlayBottomSheet(
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
-	BottomSheetWrapperRoot(onClosedAction = onClose) {
-		SeedBackupBottomSheet(seedName, getSeedPhraseForBackup, onClose)
+	val timerSize = remember {
+		mutableStateOf(80.dp)
 	}
-	//todo dmitry adjust paddings and make sure it have enough space.
+
+	BottomSheetWrapperRoot(onClosedAction = onClose) {
+		SeedBackupBottomSheet(seedName, timerSize, getSeedPhraseForBackup, onClose)
+	}
 	Row(modifier = Modifier.fillMaxSize()) {
 		SnackBarCircularCountDownTimer(
 			PrivateKeyExportModel.SHOW_PRIVATE_KEY_TIMEOUT,
 			stringResource(R.string.seed_backup_countdown_message),
+			timerSize,
 			Modifier.align(Alignment.Bottom),
 			onClose,
 		)
@@ -46,6 +52,7 @@ fun SeedBackupFullOverlayBottomSheet(
 @Composable
 private fun SeedBackupBottomSheet(
 	seedName: String,
+	timerSize: State<Dp>,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
@@ -70,7 +77,7 @@ private fun SeedBackupBottomSheet(
 				Modifier.padding(top = 14.dp)
 			)
 			BackupPhraseBox(seedPhrase)
-			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))
+			Spacer(modifier = Modifier.size(height = timerSize.value, width = 1.dp))
 		}
 	}
 
@@ -83,6 +90,7 @@ private fun SeedBackupBottomSheet(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -96,6 +104,7 @@ private fun SeedBackupBottomSheet(
 private fun PreviewSeedBackupBottomSheet() {
 	SignerNewTheme {
 		SeedBackupBottomSheet("seed",
+			mutableStateOf(80.dp),
 			{ _ -> " some long words some some" }, {})
 	}
 }
