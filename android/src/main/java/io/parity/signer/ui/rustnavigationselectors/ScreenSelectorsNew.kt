@@ -14,7 +14,6 @@ import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.components.panels.toAction
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
@@ -30,12 +29,12 @@ import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
+import io.parity.signer.screens.scan.ScanNavSubgraph
+import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
 import io.parity.signer.screens.settings.networks.list.NetworksList
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
-import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.*
@@ -97,15 +96,13 @@ fun CombinedScreensSelector(
 				)
 			}
 		is ScreenData.Settings ->
-			Box(modifier = Modifier.statusBarsPadding()) {
-				SettingsScreenSubgraph(
-					rootNavigator = rootNavigator,
-					isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
-					appVersion = sharedViewModel.getAppVersion(),
-					wipeToFactory = sharedViewModel::wipeToFactory,
-					networkState = networkState
-				)
-			}
+			SettingsScreenSubgraph(
+				rootNavigator = rootNavigator,
+				isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
+				appVersion = sharedViewModel.getAppVersion(),
+				wipeToFactory = sharedViewModel::wipeToFactory,
+				networkState = networkState
+			)
 		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
 				NetworksList(
