@@ -92,7 +92,7 @@ fun KeySetDetailsExportResultBottomSheet(
 					KeyCard(
 						KeyCardModel.fromKeyModel(
 							keyModel.key,
-							keyModel.network.networkTitle
+							keyModel.network
 						),
 					)
 					if (i != seedList.lastIndex) {

@@ -1,9 +1,7 @@
 package io.parity.signer.screens.scan.transaction.transactionElements
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,11 +11,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.NetworkLabelWithIcon
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.NetworkSpecs
 
 @Composable
@@ -76,10 +76,18 @@ fun TCAddNetwork(specs: NetworkSpecs) {
 				value = specs.name
 			)
 			SignerDivider(sidePadding = 0.dp)
-			TCNameValueOppositeElement(
-				name = stringResource(R.string.transaction_new_network_logo),
-				value = specs.logo
-			)
+			Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+				Text(
+					text = stringResource(R.string.transaction_new_network_logo),
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.textTertiary
+				)
+				Spacer(modifier = Modifier.weight(1f))
+				NetworkLabelWithIcon(
+					networkName = specs.logo.capitalize(),
+					networkLogo = specs.logo,
+				)
+			}
 			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(
 				name = stringResource(R.string.transaction_new_default_network_path),

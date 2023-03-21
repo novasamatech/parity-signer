@@ -2,10 +2,9 @@ package io.parity.signer.screens.keysets.create
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +36,8 @@ internal fun NewKeySetBackupScreen(
 	Column(
 		Modifier
 			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background),
+			.background(MaterialTheme.colors.background)
+			.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeader(
 			title = stringResource(R.string.new_key_set_backup_title),
@@ -106,5 +106,34 @@ private fun PreviewNewKeySetBackupScreen() {
 	)
 	SignerNewTheme {
 		NewKeySetBackupScreen(model, {}, {})
+	}
+}
+
+
+@Preview
+@Composable
+private fun PreviewNewKeySetBackupScreenNarrow() {
+	val model = NewSeedBackupModel(
+		"seedname",
+		"some words many many words secr fphr phrase"
+	)
+	Box(modifier = Modifier.size(height = 400.dp, width = 150.dp)) {
+		SignerNewTheme {
+			NewKeySetBackupScreen(model, {}, {})
+		}
+	}
+}
+
+@Preview
+@Composable
+private fun PreviewNewKeySetBackupScreenShort() {
+	val model = NewSeedBackupModel(
+		"seedname",
+		"some words many many words secr fphr phrase"
+	)
+	Box(modifier = Modifier.size(height = 400.dp, width = 200.dp)) {
+		SignerNewTheme {
+			NewKeySetBackupScreen(model, {}, {})
+		}
 	}
 }

@@ -202,7 +202,7 @@ data class EnterPasswordModel(
 }
 
 fun MEnterPassword.toEnterPasswordModel(withShowError: Boolean = false) = EnterPasswordModel(
-	keyCard = KeyCardModelBase.fromAddress(authorInfo),
+	keyCard = KeyCardModelBase.fromAddress(authorInfo, networkInfo?.networkLogo),
 	showError = withShowError,
 	attempt = counter.toInt(),
 )

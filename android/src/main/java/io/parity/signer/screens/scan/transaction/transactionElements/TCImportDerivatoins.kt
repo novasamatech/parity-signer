@@ -29,6 +29,7 @@ import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
@@ -107,24 +108,7 @@ private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 		Row() {
 			IdentIcon(key.identicon, 16.dp)
 			Spacer(modifier = Modifier.padding(end = 8.dp))
-			Text(
-				key.derivationPath,
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.CaptionM,
-			)
-			if (key.hadPwd) {
-				Text(
-					" •••• ",
-					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.CaptionM,
-				)
-				Icon(
-					imageVector = Icons.Outlined.Lock,
-					contentDescription = stringResource(R.string.description_locked_icon),
-					tint = MaterialTheme.colors.primary,
-					modifier = Modifier.size(14.dp)
-				)
-			}
+			KeyPath(path = key.derivationPath, hasPassword = key.hadPwd)
 		}
 		Text(
 			text = key.address,
@@ -291,12 +275,12 @@ data class DerivedKeysSetModel(
 					identicon = PreviewData.exampleIdenticonPng,
 					derivationPath = "//kusama",
 					hadPwd = false,
-					address = "address",
+					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Kusama",
 				),
 				DerivedKeyModel(
 					identicon = PreviewData.exampleIdenticonPng,
-					derivationPath = "//westendMain",
+					derivationPath = "//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain/verylongPath2",
 					hadPwd = true,
 					address = "GD5434gFGFD543Dgdf",
 					networkTitle = "Westend",
@@ -305,21 +289,21 @@ data class DerivedKeysSetModel(
 					identicon = PreviewData.exampleIdenticonPng,
 					derivationPath = "//polka",
 					hadPwd = false,
-					address = "address",
+					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Polkadot",
 				),
 				DerivedKeyModel(
 					identicon = PreviewData.exampleIdenticonPng,
 					derivationPath = "//polkadot//parachains",
 					hadPwd = false,
-					address = "address",
+					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = null,
 				),
 				DerivedKeyModel(
 					identicon = PreviewData.exampleIdenticonPng,
 					derivationPath = "//polkadot//staking",
 					hadPwd = false,
-					address = "address",
+					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = null,
 				),
 			),
