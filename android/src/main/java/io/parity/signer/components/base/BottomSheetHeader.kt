@@ -28,6 +28,7 @@ fun BottomSheetHeader(
 	Row(
 		modifier = modifier
 			.padding(start = 24.dp, end = 16.dp)
+			.padding(vertical = 20.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
@@ -47,7 +48,8 @@ fun BottomSheetHeader(
 		}
 		if (onCloseClicked != null) {
 			CloseIcon(
-				onCloseClicked = onCloseClicked
+				onCloseClicked = onCloseClicked,
+				modifier = Modifier.padding(start = 16.dp)
 			)
 		}
 	}
