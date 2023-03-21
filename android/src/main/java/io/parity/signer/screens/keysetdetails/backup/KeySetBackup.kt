@@ -78,13 +78,13 @@ private fun KeySetBackupBottomSheet(
 			// phrase
 			BottomSheetSubtitle(
 				R.string.subtitle_secret_recovery_phrase,
-				Modifier.padding(top = 14.dp)
+				Modifier.padding(top = 14.dp, bottom = 8.dp)
 			)
 			BackupPhraseBox(seedPhrase)
 			//derived keys
 			BottomSheetSubtitle(
 				R.string.subtitle_derived_keys,
-				Modifier.padding(top = 22.dp, bottom = 14.dp)
+				Modifier.padding(top = 8.dp, bottom = 14.dp)
 			)
 			for (index in 0..model.derivations.lastIndex) {
 				SlimKeyItem(model = model.derivations[index])

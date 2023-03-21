@@ -120,10 +120,9 @@ fun SnackBarCircularCountDownTimer(
 				}
 			}
 			.fillMaxWidth(1f)
-			.padding(horizontal = 8.dp, vertical = 16.dp)
+			.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 16.dp)
 			.background(MaterialTheme.colors.snackBarBackground, innerShape)
 			.padding(12.dp),
-
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(

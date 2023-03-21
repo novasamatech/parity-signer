@@ -74,7 +74,7 @@ private fun SeedBackupBottomSheet(
 			// phrase
 			BottomSheetSubtitle(
 				R.string.subtitle_secret_recovery_phrase,
-				Modifier.padding(top = 14.dp)
+				Modifier.padding(top = 14.dp, bottom = 8.dp)
 			)
 			BackupPhraseBox(seedPhrase)
 			Spacer(modifier = Modifier.size(height = timerSize.value, width = 1.dp))
