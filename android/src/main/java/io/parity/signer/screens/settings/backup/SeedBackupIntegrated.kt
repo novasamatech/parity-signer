@@ -22,7 +22,11 @@ fun SeedBackupIntegratedScreen(rootNavigator: Navigator, onBack: Callback) {
 
 	// content
 	Box(modifier = Modifier.statusBarsPadding()) {
-		SeedBackupScreen(seeds, rootNavigator, onBack = onBack) { seed ->
+		SeedBackupScreen(
+			seeds = seeds,
+			rootNavigator = rootNavigator,
+			onBack = onBack
+		) { seed ->
 			selectedSeed = seed
 		}
 	}

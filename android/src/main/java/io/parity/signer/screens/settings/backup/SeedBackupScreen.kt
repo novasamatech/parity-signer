@@ -66,9 +66,7 @@ fun SeedBackupScreen(
 		BottomBar2(
 			rootNavigator, BottomBar2State.SETTINGS,
 			skipRememberCameraParent = true
-		) {
-			rootNavigator.backAction()
-		}
+		)
 	}
 }
 
