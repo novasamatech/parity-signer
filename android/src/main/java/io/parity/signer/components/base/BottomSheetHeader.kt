@@ -31,7 +31,7 @@ fun BottomSheetHeader(
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Column() {
+		Column(modifier = Modifier.weight(1.0f)) {
 			Text(
 				text = title,
 				color = MaterialTheme.colors.primary,
@@ -45,10 +45,8 @@ fun BottomSheetHeader(
 				)
 			}
 		}
-		Spacer(modifier = Modifier.weight(1.0f))
 		if (onCloseClicked != null) {
 			CloseIcon(
-				modifier = Modifier.padding(vertical = 20.dp),
 				onCloseClicked = onCloseClicked
 			)
 		}
@@ -87,6 +85,8 @@ private fun PreviewHeaderWithClose() {
 	SignerNewTheme {
 		Column() {
 			BottomSheetHeader(title = "Title") {}
+			Divider()
+			BottomSheetHeader(title = "Very very very very long title Very very very very long title") {}
 			Divider()
 			BottomSheetHeader(title = "Title", subtitile = "With subtitle") {}
 			Divider()
