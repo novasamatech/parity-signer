@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -17,14 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.abbreviateString
@@ -42,7 +40,8 @@ fun KeyDerivedItemMultiselect(
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = Color.Transparent,
-		modifier = Modifier.padding(vertical = 16.dp)
+		modifier = Modifier
+			.padding(vertical = 16.dp)
 			.clickable { onClick(!isSelected, model.addressKey) }
 	) {
 		Row(
@@ -59,27 +58,20 @@ fun KeyDerivedItemMultiselect(
 			)
 			Column(Modifier.weight(1f)) {
 				if (model.path.isNotEmpty() || model.hasPwd) {
-					Row(verticalAlignment = Alignment.CenterVertically) {
-						Text(
-							text = model.path,
-							color = MaterialTheme.colors.primary,
-							style = SignerTypeface.LabelM,
-						)
-						if (model.hasPwd) {
-							Icon(
-								painterResource(id = R.drawable.ic_lock_16),
-								contentDescription = stringResource(R.string.key_lock_item),
-								tint = MaterialTheme.colors.textTertiary,
-								modifier = Modifier.padding(start = 8.dp)
-							)
-						}
-					}
+					KeyPath(
+						path = model.path,
+						hasPassword = model.hasPwd,
+						textStyle = SignerTypeface.CaptionM,
+						iconSize = 16.sp,
+						textColor = MaterialTheme.colors.textTertiary,
+						iconColor = MaterialTheme.colors.textTertiary,
+					)
 					Spacer(modifier = Modifier.padding(top = 4.dp))
 				}
 				Text(
 					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.primary,
+					style = SignerTypeface.BodyL,
 				)
 			}
 			SignerCheckbox(
@@ -114,7 +106,8 @@ private fun PreviewKeyDerivedItemMultiselect() {
 			SignerDivider()
 			KeyDerivedItemMultiselect(
 				model = KeyModel.createStub().copy(
-					path = "//kusama//some//very_long_path//somesomesome", hasPwd = true,),
+					path = "//kusama//some//very_long_path//somesomesome", hasPwd = true,
+				),
 				networkLogo = "kusama",
 				onClick = { _, _ -> },
 			)
