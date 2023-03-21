@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
 import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
@@ -62,8 +61,8 @@ fun KeyDerivedItemMultiselect(
 					Row(verticalAlignment = Alignment.CenterVertically) {
 						Text(
 							text = model.path,
-							color = MaterialTheme.colors.primary,
-							style = SignerTypeface.LabelM,
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.CaptionM,
 						)
 						if (model.hasPwd) {
 							Icon(
@@ -78,12 +77,13 @@ fun KeyDerivedItemMultiselect(
 				}
 				Text(
 					text = model.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.primary,
+					style = SignerTypeface.BodyL,
 				)
 			}
 			SignerCheckbox(
 				isChecked = isSelected,
+				uncheckedColor = MaterialTheme.colors.primary,
 				modifier = Modifier
 					.padding(end = 8.dp)
 			) {
