@@ -113,7 +113,9 @@ fun SettingsScreenSubgraph(
 			}
 		}
 		composable(SettingsScreenSubgraph.backup) {
-			SeedBackupIntegratedScreen(rootNavigator)
+			SeedBackupIntegratedScreen(rootNavigator) {
+				navController.popBackStack(SettingsScreenSubgraph.home, false)
+			}
 		}
 	}
 }

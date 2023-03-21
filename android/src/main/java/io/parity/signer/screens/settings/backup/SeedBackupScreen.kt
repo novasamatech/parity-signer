@@ -41,10 +41,11 @@ import io.parity.signer.ui.theme.textSecondary
 fun SeedBackupScreen(
 	seeds: List<String>,
 	rootNavigator: Navigator,
+	onBack: Callback,
 	onSelected: (selectedSeed: String) -> Unit,
 ) {
 	Column() {
-		ScreenHeader(title = stringResource(R.string.keys_backup_screen_title))
+		ScreenHeader(title = stringResource(R.string.keys_backup_screen_title), onBack = onBack)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
@@ -119,6 +120,7 @@ private fun PreviewBackupScreen() {
 		SeedBackupScreen(
 			listOf("Seed", "Seed Some", "Another name"),
 			rootNavigator = EmptyNavigator(),
+			{},
 		) { some ->
 		}
 	}
