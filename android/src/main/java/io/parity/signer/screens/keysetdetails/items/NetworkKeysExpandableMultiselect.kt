@@ -35,21 +35,29 @@ import io.parity.signer.ui.theme.textDisabled
 
 
 @Composable
-fun NetworkKeysElementExpandable(
+fun NetworkKeysExpandableMultiselect(
 	network: NetworkModel,
 	keys: List<KeyModel>,
-	onKeyClick: (KeyModel, NetworkModel) -> Unit,
+	selectedKeysAdr: Set<String>,
+	onKeyClick: (isSelected: Boolean, keyAddress: String) -> Unit,
 ) {
-	val collapsed = remember { mutableStateOf(true) }
-	NetworkKeysElementExpandablePrivate(network, keys, collapsed, onKeyClick)
+	val collapsed = remember { mutableStateOf(false) }
+	NetworkKeysExpandableMultiselectPrivate(
+		network,
+		keys,
+		selectedKeysAdr,
+		collapsed,
+		onKeyClick
+	)
 }
 
 @Composable
-private fun NetworkKeysElementExpandablePrivate(
+private fun NetworkKeysExpandableMultiselectPrivate(
 	network: NetworkModel,
 	keys: List<KeyModel>,
+	selectedKeysAdr: Set<String>,
 	collapsed: MutableState<Boolean>,
-	onKeyClick: (KeyModel, NetworkModel) -> Unit,
+	onKeyClick: (isSelected: Boolean, keyAddress: String) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
@@ -109,7 +117,11 @@ private fun NetworkKeysElementExpandablePrivate(
 			var first = true
 			keys.forEach { key ->
 				SignerDivider(modifier = if (first) Modifier else Modifier.padding(start = 48.dp))
-				KeyDerivedItem(model = key, network.logo, onClick = { onKeyClick(key, network) })
+				KeyDerivedItemMultiselect(
+					model = key,
+					networkLogo = network.logo,
+					isSelected = selectedKeysAdr.contains(key.addressKey),
+					onClick = { isSelected, address -> onKeyClick(isSelected, address) })
 				first = false
 			}
 		}
@@ -129,7 +141,7 @@ private fun NetworkKeysElementExpandablePrivate(
 @Composable
 private fun PreviewNetworkKeysElementExpandable() {
 	SignerNewTheme {
-		NetworkKeysElementExpandable(
+		NetworkKeysExpandable(
 			NetworkModel.createStub(),
 			listOf(KeyModel.createStub())
 		) { _, _ -> }
@@ -147,15 +159,19 @@ private fun PreviewNetworkKeysElementExpandable() {
 	backgroundColor = 0xFFFFFFFF
 )
 @Composable
-private fun PreviewNetworkKeysElementExpanded() {
+private fun PreviewNetworkKeysExpandableMultiselect() {
 	SignerNewTheme {
-		val state = remember {
-			mutableStateOf(false)
-		}
-		NetworkKeysElementExpandablePrivate(
+		val key = KeyModel.createStub()
+		NetworkKeysExpandableMultiselect(
 			NetworkModel.createStub(),
-			listOf(KeyModel.createStub(), KeyModel.createStub()),
-			state,
+			listOf(
+				key,
+				key.copy(
+					path = key.path + "//somemore",
+					addressKey = "f1c25182fb8e20313b2c1eb49219da7a70c"
+				)
+			),
+			setOf(key.addressKey),
 		) { _, _ -> }
 	}
 }

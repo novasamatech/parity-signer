@@ -76,6 +76,7 @@ fun KeyDerivedItemMultiselect(
 			}
 			SignerCheckbox(
 				isChecked = isSelected,
+				uncheckedColor = MaterialTheme.colors.primary,
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
 			) {
