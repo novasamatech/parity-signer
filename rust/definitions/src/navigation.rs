@@ -459,6 +459,7 @@ pub struct MSufficientCryptoReady {
     pub author_info: MAddressCard,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
+    pub network_logo: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

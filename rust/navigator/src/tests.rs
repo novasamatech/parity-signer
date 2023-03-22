@@ -4339,6 +4339,7 @@ fn flow_test_1() {
                             .to_string(),
                 },
             },
+            network_logo: Some("westend".to_string()),
         },
     });
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
@@ -4646,6 +4647,7 @@ fn flow_test_1() {
                     name: "westend".to_string(),
                     version: 9150,
                 },
+                network_logo: Some("westend".to_string()),
             },
         }),
         alert_data: None,
@@ -4779,6 +4781,7 @@ fn flow_test_1() {
                     image: types_known().to_vec(),
                 },
             },
+            network_logo: Some("westend".to_string()),
         },
     });
     /*

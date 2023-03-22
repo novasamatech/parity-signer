@@ -663,6 +663,7 @@ dictionary MSufficientCryptoReady {
     MAddressCard author_info;
     sequence<u8> sufficient;
     MSCContent content;
+    string? network_logo;
 };
 
 dictionary MBackup {
