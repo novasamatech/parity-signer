@@ -75,7 +75,7 @@ fun KeyDerivedItem(
 			Image(
 				imageVector = Icons.Filled.ChevronRight,
 				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 				modifier = Modifier
 					.padding(2.dp)// because it's 28 not 32pd
 					.padding(end = 16.dp)
