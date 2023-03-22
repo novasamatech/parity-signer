@@ -43,6 +43,7 @@ struct SignSpecsListView: View {
         HStack(alignment: .center, spacing: Spacing.small) {
             NetworkIdenticon(
                 identicon: rawKey.address.identicon,
+                network: rawKey.networkLogo,
                 background: Asset.backgroundPrimary.swiftUIColor,
                 size: Sizes.signSpecsIdenticonSize
             )
