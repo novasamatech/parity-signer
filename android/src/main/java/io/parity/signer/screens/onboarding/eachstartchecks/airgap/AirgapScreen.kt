@@ -3,6 +3,7 @@ package io.parity.signer.screens.onboarding.eachstartchecks.airgap
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -25,12 +26,13 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
-import io.parity.signer.components.base.CheckboxWithText
+import io.parity.signer.components.base.CheckboxIcon
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
@@ -65,13 +67,13 @@ private fun AirgapScreen(
 	Column() {
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.weight(1f, true)
+                .verticalScroll(rememberScrollState())
+                .weight(1f, true)
 		) {
 			Text(
 				modifier = Modifier
-					.fillMaxWidth(1f)
-					.padding(horizontal = 24.dp, vertical = 12.dp),
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
 				text = stringResource(R.string.airgap_onboarding_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
@@ -79,8 +81,8 @@ private fun AirgapScreen(
 			)
 			Text(
 				modifier = Modifier
-					.fillMaxWidth(1f)
-					.padding(horizontal = 24.dp),
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 24.dp),
 				text = stringResource(R.string.airgap_onboarding_subtitle),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyL,
@@ -122,19 +124,20 @@ private fun AirgapScreen(
 							contentDescription = null,
 							colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 							modifier = Modifier
-								.size(24.dp)
+                                .padding(8.dp)
+                                .size(24.dp)
 						)
 						Text(
 							text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
 							color = MaterialTheme.colors.textTertiary,
 							style = SignerTypeface.TitleS,
 							modifier = Modifier
-								.padding(horizontal = 16.dp, vertical = 14.dp)
-								.weight(1f)
+                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                                .weight(1f)
 						)
 					}
 					SignerDivider()
-					CheckboxWithText(
+					CheckboxWithTextWithGap(
 						checked = state.cablesDisconnected,
 						text = stringResource(R.string.airgap_onboarding_disconnect_cable_checkbox_description),
 						modifier = Modifier.padding(16.dp),
@@ -149,6 +152,35 @@ private fun AirgapScreen(
 			modifier = Modifier.padding(24.dp),
 			isEnabled = state.isReadyToProceed(),
 			onClicked = onCta,
+		)
+	}
+}
+
+@Composable
+private fun CheckboxWithTextWithGap(
+	checked: Boolean,
+	text: String,
+	modifier: Modifier = Modifier,
+	onValueChange: (Boolean) -> Unit,
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = modifier.toggleable(
+			value = checked,
+			role = Role.Checkbox,
+			onValueChange = { onValueChange(it) }
+		)
+	) {
+		Box(Modifier.padding(8.dp)) {
+			CheckboxIcon(
+				checked = checked,
+			)
+		}
+		Spacer(Modifier.width(16.dp))
+		Text(
+			text,
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyL,
 		)
 	}
 }
@@ -191,8 +223,8 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 			color = color,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 14.dp)
-				.weight(1f)
+                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .weight(1f)
 		)
 	}
 }
@@ -209,8 +241,8 @@ private fun IconWithCheckmark(
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
-				.size(40.dp)
-				.background(color, CircleShape)
+                .size(40.dp)
+                .background(color, CircleShape)
 		) {
 			Image(
 				imageVector = icon,
@@ -233,8 +265,8 @@ private fun IconWithCheckmark(
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(backgroundColor),
 				modifier = Modifier
-					.size(18.dp)
-					.offset(x = 2.dp, y = 2.dp)
+                    .size(18.dp)
+                    .offset(x = 2.dp, y = 2.dp)
 			)
 		}
 	}

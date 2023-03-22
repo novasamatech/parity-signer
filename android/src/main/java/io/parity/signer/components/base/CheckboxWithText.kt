@@ -56,7 +56,7 @@ fun CheckboxWithText(
  * Just a checkbox with proper colors
  */
 @Composable
-private fun CheckboxIcon(
+fun CheckboxIcon(
 	checked: Boolean
 ) {
 	Checkbox(
