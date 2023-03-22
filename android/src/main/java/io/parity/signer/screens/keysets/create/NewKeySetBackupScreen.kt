@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,10 +35,11 @@ internal fun NewKeySetBackupScreen(
 ) {
 
 	Column(
-		Modifier
+		modifier = Modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
 			title = stringResource(R.string.new_key_set_backup_title),

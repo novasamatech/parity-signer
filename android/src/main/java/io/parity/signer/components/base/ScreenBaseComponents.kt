@@ -157,6 +157,7 @@ fun ScreenHeaderClose(
 fun ScreenHeaderWithButton(
 	canProceed: Boolean,
 	title: String = "",
+	btnText: String? = null,
 	onClose: Callback,
 	onDone: Callback,
 ) {
@@ -195,7 +196,7 @@ fun ScreenHeaderWithButton(
 			contentAlignment = Alignment.CenterEnd,
 		) {
 			PrimaryButtonGreyDisabled(
-				label = stringResource(R.string.generic_done),
+				label = btnText ?: stringResource(R.string.generic_done),
 				isEnabled = canProceed,
 			) {
 				if (canProceed) {
@@ -253,8 +254,8 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
-			ScreenHeaderWithButton(true, "Derivation", {}, {})
-			ScreenHeaderWithButton(false, "Derivation", {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, {}, {})
+			ScreenHeaderWithButton(false, "Derivation", null, {}, {})
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},
