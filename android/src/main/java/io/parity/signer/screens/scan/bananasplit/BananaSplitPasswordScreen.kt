@@ -147,12 +147,13 @@ private fun BananaSplitPasswordInternal(
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				modifier = Modifier
-					.padding(bottom = 20.dp)
+					.padding(bottom = 14.dp)
 			)
 			Text(
 				text = stringResource(R.string.banana_split_password_name_header),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.BodyL,
+				modifier = Modifier.padding(vertical = 6.dp),
 			)
 
 			OutlinedTextField(
@@ -183,14 +184,14 @@ private fun BananaSplitPasswordInternal(
 					style = SignerTypeface.CaptionM,
 				)
 			}
-			Spacer(modifier = Modifier.padding(bottom = 20.dp))
+			Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
 			//password
 			Text(
 				text = stringResource(R.string.banana_split_password_password_header),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.BodyL,
-				modifier = Modifier
+				modifier = Modifier.padding(vertical = 6.dp),
 			)
 			OutlinedTextField(
 				value = password.value,
