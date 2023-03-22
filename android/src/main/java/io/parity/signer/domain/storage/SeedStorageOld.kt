@@ -47,10 +47,10 @@ fun SharedViewModel.addSeed(
 @Deprecated("Use SeedStorage or better SeedRepository")
 internal fun SharedViewModel.getSeed(
 	seedName: String,
-	backup: Boolean = false
+	showInLogs: Boolean = false
 ): String {
 	return try {
-		seedStorage.getSeed(seedName, backup)
+		seedStorage.getSeed(seedName, showInLogs)
 	} catch (e: java.lang.Exception) {
 		Log.d("get seed failure", e.toString())
 		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()

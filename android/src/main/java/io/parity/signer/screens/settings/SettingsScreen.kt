@@ -2,10 +2,7 @@ package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -34,6 +31,7 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -58,50 +56,66 @@ fun SettingsScreenSubgraph(
 	) {
 
 		composable(SettingsScreenSubgraph.home) {
-			SettingsScreenGeneralView(
-				rootNavigator,
-				onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
-				onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
-				onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
-				isStrongBoxProtected,
-				appVersion,
-				networkState
-			)
-		}
-		composable(SettingsScreenSubgraph.wipeConformation) {
-			SettingsScreenGeneralView(
-				rootNavigator,
-				onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
-				onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
-				onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
-				isStrongBoxProtected,
-				appVersion,
-				networkState
-			)
-
-			BottomSheetWrapperRoot(onClosedAction = {
-				navController.popBackStack(SettingsScreenSubgraph.home, false)
-			}) {
-				SettingsWipeAllConfirmation(
-					onCancel = {
-						navController.popBackStack(
-							SettingsScreenSubgraph.home,
-							false
-						)
-					},
-					onWipe = wipeToFactory
+			Box(modifier = Modifier.statusBarsPadding()) {
+				SettingsScreenGeneralView(
+					rootNavigator,
+					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
+					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
+					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
+					isStrongBoxProtected,
+					appVersion,
+					networkState
 				)
 			}
 		}
-		composable(SettingsScreenSubgraph.terms) {
-			TosScreen(onBack = {
+		composable(SettingsScreenSubgraph.wipeConformation) {
+			Box(modifier = Modifier.statusBarsPadding()) {
+				SettingsScreenGeneralView(
+					rootNavigator,
+					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
+					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
+					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
+					isStrongBoxProtected,
+					appVersion,
+					networkState
+				)
+			}
+			BottomSheetWrapperRoot(onClosedAction = {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
-			})
+			}) {
+				Box(modifier = Modifier.statusBarsPadding()) {
+					SettingsWipeAllConfirmation(
+						onCancel = {
+							navController.popBackStack(
+								SettingsScreenSubgraph.home,
+								false
+							)
+						},
+						onWipe = wipeToFactory
+					)
+				}
+			}
+		}
+		composable(SettingsScreenSubgraph.terms) {
+			Box(modifier = Modifier.statusBarsPadding()) {
+				TosScreen(onBack = {
+					navController.popBackStack(SettingsScreenSubgraph.home, false)
+				})
+			}
 		}
 		composable(SettingsScreenSubgraph.privacyPolicy) {
-			PpScreen(onBack = {
+			Box(modifier = Modifier.statusBarsPadding()) {
+				PpScreen(onBack = {
+					navController.popBackStack(SettingsScreenSubgraph.home, false)
+				})
+			}
+		}
+		composable(SettingsScreenSubgraph.backup) {
+			SeedBackupIntegratedScreen(rootNavigator) {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
-			})
+			}
 		}
 	}
 }
@@ -111,6 +125,7 @@ private object SettingsScreenSubgraph {
 	const val wipeConformation = "setting_whipe_all_conformation"
 	const val terms = "settings_terms_of_service"
 	const val privacyPolicy = "settings_privacy_polcy"
+	const val backup = "settings_backup"
 }
 
 @Composable
@@ -119,6 +134,7 @@ private fun SettingsScreenGeneralView(
 	onWipeData: Callback,
 	onShowTerms: Callback,
 	onShowPrivacyPolicy: Callback,
+	onBackup: Callback,
 	isStrongBoxProtected: Boolean,
 	appVersion: String,
 	networkState: State<NetworkState?>
@@ -133,6 +149,10 @@ private fun SettingsScreenGeneralView(
 				SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
 					rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
 				}
+				SettingsElement(
+					name = stringResource(R.string.settings_backup),
+					onClick = onBackup
+				)
 				SettingsElement(
 					name = stringResource(R.string.documents_privacy_policy),
 					onClick = onShowPrivacyPolicy
@@ -223,6 +243,7 @@ private fun PreviewSettingsScreen() {
 			onWipeData = {},
 			onShowTerms = {},
 			onShowPrivacyPolicy = {},
+			onBackup = {},
 			isStrongBoxProtected = false,
 			appVersion = "0.6.1",
 			networkState = state,

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks.list
+package io.parity.signer.screens.settings.networks.list
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*

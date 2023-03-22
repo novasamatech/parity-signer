@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks.details
+package io.parity.signer.screens.settings.networks.details
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -14,17 +14,17 @@ import androidx.navigation.navArgument
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.networks.details.menu.ConfirmRemoveMetadataBottomSheet
-import io.parity.signer.screens.networks.details.menu.ConfirmRemoveNetworkBottomSheet
-import io.parity.signer.screens.networks.details.menu.NetworkDetailsMenuGeneral
+import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
+import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetworkBottomSheet
+import io.parity.signer.screens.settings.networks.details.menu.NetworkDetailsMenuGeneral
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 
 
 @Composable
 fun NetworkDetailsSubgraph(
-	model: NetworkDetailsModel,
-	rootNavigator: Navigator,
+    model: NetworkDetailsModel,
+    rootNavigator: Navigator,
 ) {
 	val menuController = rememberNavController()
 	val savedMetadataVersionAction = remember {
