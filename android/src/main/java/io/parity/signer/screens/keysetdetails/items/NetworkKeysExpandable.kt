@@ -99,7 +99,9 @@ private fun NetworkKeysExpandablePrivate(
 					} else {
 						Icons.Filled.ExpandLess
 					},
-					modifier = Modifier.size(20.dp),
+					modifier = Modifier
+						.padding(4.dp)
+						.size(24.dp),
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 				)

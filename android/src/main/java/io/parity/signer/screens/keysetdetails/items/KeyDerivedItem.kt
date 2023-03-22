@@ -77,8 +77,9 @@ fun KeyDerivedItem(
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 				modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(28.dp)
+					.padding(2.dp)// because it's 28 not 32pd
+					.padding(end = 16.dp)
+					.size(28.dp)
 			)
 		}
 	}
