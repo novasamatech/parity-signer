@@ -12,6 +12,7 @@ import SwiftUI
 /// Deprecated, used in: SufficientCryptoReady, SignSufficientCrypto
 struct AddressCard: View {
     var card: MAddressCard
+
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28
     var body: some View {
@@ -26,17 +27,10 @@ struct AddressCard: View {
                     HStack {
                         Text(card.address.seedName).foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                             .font(PrimaryFont.labelM.font)
-                        Text(card.address.path)
-                        if card.address.hasPwd {
-                            Localizable.Shared.Label.passwordedPathDelimeter.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                .font(PrimaryFont.captionM.font)
-                            Image(.lock)
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                .font(PrimaryFont.captionM.font)
-                        }
-                    }.foregroundColor(Asset.accentPink300.swiftUIColor)
-                        .font(PrimaryFont.captionM.font)
+                        Text(card.address.displayablePath)
+                    }
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
                     // Here we could have shortened base58 address when buttons are shown, but we don't need to
                     Text(card.base58.truncateMiddle(length: 8)).foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(PrimaryFont.captionM.font)

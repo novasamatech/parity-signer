@@ -17,26 +17,6 @@ struct AuthenticatedScreenContainer: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if !navigation.shouldSkipInjectedViews {
-                NavigationBarView(
-                    viewModel: .init(
-                        title: navigation.actionResult.screenLabel,
-                        leftButtons: [
-                            .init(
-                                type: navigation.actionResult.back ? .arrow : .empty,
-                                action: { navigation.perform(navigation: .init(action: .goBack)) }
-                            )
-                        ],
-                        rightButtons: [
-                            .init(
-                                type: [.none, .multiSelect]
-                                    .contains(navigation.actionResult.rightButton) ? .empty : .more,
-                                action: { navigation.perform(navigation: .init(action: .rightButtonAction)) }
-                            )
-                        ]
-                    )
-                )
-            }
             ZStack {
                 VStack(spacing: 0) {
                     viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)

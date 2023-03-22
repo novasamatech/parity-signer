@@ -65,6 +65,8 @@ enum Heights {
     static let capsuleSelectionView: CGFloat = 28
     static let minimumActionSheetButtonHeight: CGFloat = 48
     static let onboardingAgreementRecord: CGFloat = 52
+
+    static let signSpecsListRowHeight: CGFloat = 96
 }
 
 enum Sizes {
@@ -81,4 +83,5 @@ enum Sizes {
     /// Diameter for connectivity alert button, 56pt
     static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
+    static let signSpecsIdenticonSize: CGFloat = 36
 }

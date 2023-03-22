@@ -80,8 +80,8 @@
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
-// Sign Sufficient Crypto
-"Select key for signing" = "Select key for signing";
+// Sign Specs
+"SignSpecsList.Label.Title" = "Select Key for Signing";
 "Signature for metadata update" = "Signature for metadata update";
 "Signature for network specs" = "Signature for network specs";
 "Signature for types" = "Signature for types";
