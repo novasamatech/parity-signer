@@ -378,6 +378,7 @@ pub struct MRawKey {
     pub address: Address,
     pub address_key: String,
     pub public_key: String,
+    pub network_logo: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

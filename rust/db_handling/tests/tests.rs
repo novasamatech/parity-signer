@@ -153,6 +153,7 @@ fn print_all_ids() {
                 path: "".to_string(),
                 secret_exposed: false,
             },
+            network_logo: "polkadot".to_owned(),
         },
         MRawKey {
             address_key: format!(
@@ -169,6 +170,7 @@ fn print_all_ids() {
                 path: "".to_string(),
                 secret_exposed: false,
             },
+            network_logo: "kusama".to_owned(),
         },
         MRawKey {
             address_key: format!("01{}01{}", public_key, hex::encode(westend_genesis())),
@@ -182,6 +184,7 @@ fn print_all_ids() {
                 path: "".to_string(),
                 secret_exposed: false,
             },
+            network_logo: "westend".to_owned(),
         },
         MRawKey {
             address_key: concat!(
@@ -200,6 +203,7 @@ fn print_all_ids() {
                 path: "//Alice".to_string(),
                 secret_exposed: false,
             },
+            network_logo: "westend".to_owned(),
         },
     ];
 

@@ -487,6 +487,7 @@ dictionary MRawKey {
     Address address;
     string address_key;
     string public_key;
+    string network_logo;
 };
 
 dictionary MSignSufficientCrypto {
