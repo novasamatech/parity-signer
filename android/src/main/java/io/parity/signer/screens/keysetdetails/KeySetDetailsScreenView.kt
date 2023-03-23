@@ -60,6 +60,7 @@ fun KeySetDetailsScreenView(
 			if (model.keysAndNetwork.isNotEmpty()) {
 				Column(
 					modifier = Modifier
+						.padding(horizontal = 8.dp)
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
