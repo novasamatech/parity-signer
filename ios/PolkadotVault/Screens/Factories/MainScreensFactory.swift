@@ -12,6 +12,8 @@ final class MainScreensFactory {
     // swiftlint:disable function_body_length
     func screen(for screenData: ScreenData) -> some View {
         switch screenData {
+        case let .seedSelector(value):
+            KeySetList(viewModel: .init(), dataModel: .constant(value))
         case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
@@ -22,8 +24,6 @@ final class MainScreensFactory {
             SettingsView(viewModel: .init())
         case .log:
             LogsListView(viewModel: .init())
-        case let .seedSelector(value):
-            KeySetList(viewModel: .init(), dataModel: .constant(value))
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(
@@ -49,9 +49,7 @@ final class MainScreensFactory {
         case let .nNetworkDetails(value):
             NetworkSettingsDetails(viewModel: .init(networkDetails: value))
         case let .signSufficientCrypto(value):
-            SignSufficientCrypto(
-                content: value
-            )
+            SignSpecsListView(viewModel: .init(content: value))
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,

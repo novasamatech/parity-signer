@@ -58,13 +58,6 @@ final class NavigationCoordinator: ObservableObject {
 
     @Published var shouldPresentQRScanner = false
 
-    /// Enables to override old logic based on `ActionResult` to not include additional components in main view
-    /// hierarchy
-    /// for screens with updated design approach.
-    ///
-    /// This will enable to slowly move into proper view hierachy in newer screens and then update navigation
-    var shouldSkipInjectedViews: Bool = false
-
     /// Stores currently selected Key Set Details
     ///
     /// This is a temporary fix that should be removed after introduction of Rust API
@@ -113,7 +106,6 @@ extension NavigationCoordinator {
         )
         switch result {
         case let .success(actionResult):
-            updateIntermediateNavigation(actionResult)
             updateIntermediateDataModels(actionResult)
             updateGlobalViews(actionResult)
             self.actionResult = actionResult
@@ -126,33 +118,6 @@ extension NavigationCoordinator {
 }
 
 private extension NavigationCoordinator {
-    func updateIntermediateNavigation(_ actionResult: ActionResult) {
-        var updatedShouldSkipInjectedViews: Bool
-        switch actionResult.screenData {
-        case .keys:
-            disableSwipeToBack = true
-            updatedShouldSkipInjectedViews = true
-        case .seedSelector, // Main `Keys` screen
-             .keyDetails, // `Public Key` screen
-             .transaction,
-             .log,
-             .settings,
-             .vVerifier,
-             .manageNetworks,
-             .nNetworkDetails,
-             .deriveKey,
-             .newSeed,
-             .recoverSeedName,
-             .recoverSeedPhrase:
-            updatedShouldSkipInjectedViews = true
-        default:
-            updatedShouldSkipInjectedViews = false
-        }
-        if updatedShouldSkipInjectedViews != shouldSkipInjectedViews {
-            shouldSkipInjectedViews = updatedShouldSkipInjectedViews
-        }
-    }
-
     func updateIntermediateDataModels(_ actionResult: ActionResult) {
         // Used temporarly in Export Private Key flow. To be removed
         if case let .keyDetails(keyDetails) = actionResult.screenData {

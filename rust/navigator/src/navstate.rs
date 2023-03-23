@@ -1410,12 +1410,21 @@ impl State {
             Modal::SufficientCryptoReady((ref sufficient, ref content)) => {
                 match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, author_info)) = s.key_selected() {
+                        if let Some((_, address, author_info)) = s.key_selected() {
                             let content = content.clone();
+                            let network_logo = match address.network_id {
+                                Some(network_id) => Some(
+                                    db_handling::helpers::get_network_specs(&self.db, &network_id)?
+                                        .specs
+                                        .logo,
+                                ),
+                                None => None,
+                            };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),
                                 content,
+                                network_logo,
                             };
                             Some(ModalData::SufficientCryptoReady { f })
                         } else {

@@ -9,7 +9,7 @@ import UIKit
 
 /// Common UI components heights to be used for Design System views
 enum Heights {
-    static let chevronRightInList: CGFloat = 15
+    static let chevronRightInList: CGFloat = 14
     static let oviewviewPageIndicator: CGFloat = 4
     /// All variants of `ActionButton`, 56 pt
     static let actionButton: CGFloat = 56
@@ -65,6 +65,8 @@ enum Heights {
     static let capsuleSelectionView: CGFloat = 28
     static let minimumActionSheetButtonHeight: CGFloat = 48
     static let onboardingAgreementRecord: CGFloat = 52
+
+    static let signSpecsListRowHeight: CGFloat = 96
 }
 
 enum Sizes {
@@ -81,4 +83,5 @@ enum Sizes {
     /// Diameter for connectivity alert button, 56pt
     static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
+    static let signSpecsIdenticonSize: CGFloat = 36
 }

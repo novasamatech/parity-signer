@@ -196,6 +196,7 @@ pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
                         },
                         address_key: hex::encode(address_key.key()),
                         public_key: hex::encode(public_key),
+                        network_logo: network_specs.specs.logo,
                     })
                 }
                 None => None,

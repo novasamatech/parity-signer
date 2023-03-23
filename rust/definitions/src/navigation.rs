@@ -378,6 +378,7 @@ pub struct MRawKey {
     pub address: Address,
     pub address_key: String,
     pub public_key: String,
+    pub network_logo: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -458,6 +459,7 @@ pub struct MSufficientCryptoReady {
     pub author_info: MAddressCard,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
+    pub network_logo: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
