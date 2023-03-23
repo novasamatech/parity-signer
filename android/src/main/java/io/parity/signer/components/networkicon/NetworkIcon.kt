@@ -98,6 +98,52 @@ private fun getResourceIdForNetwork(networkName: String) =
 		"composable" -> R.drawable.network_composable
 		"mangata-parachain" -> R.drawable.network_mangata_parachain
 		//svgs below
+		  "acala" -> R.drawable.network_acala
+			"acala_testnet" -> R.drawable.network_acala_testnet
+			"ajuna" -> R.drawable.network_ajuna
+			"aleph-node" -> R.drawable.network_aleph_node
+			"alphanet" -> R.drawable.network_alphanet
+			"altair" -> R.drawable.network_altair
+			"amplitude" -> R.drawable.network_amplitude
+			"appchain" -> R.drawable.network_appchain
+			"apron" -> R.drawable.network_apron
+			"ares" -> R.drawable.network_ares
+			"astar" -> R.drawable.network_astar
+			"aventus" -> R.drawable.network_aventus
+			"bajun" -> R.drawable.network_bajun
+			"basilisk" -> R.drawable.network_basilisk
+			"beresheet" -> R.drawable.network_beresheet
+			"bifrost" -> R.drawable.network_bifrost
+			"bifrost_polkadot" -> R.drawable.network_bifrost_polkadot
+			"bitgreen" -> R.drawable.network_bitgreen
+			"calamari" -> R.drawable.network_calamari
+			"centrifuge" -> R.drawable.network_centrifuge
+			"chainx" -> R.drawable.network_chainx
+			"clover-mainnet" -> R.drawable.network_clover_mainnet
+			"clover-solochain" -> R.drawable.network_clover_solochain
+			"coinversation" -> R.drawable.network_coinversation
+			"continuum-runtime" -> R.drawable.network_continuum_runtime
+			"Crab Parachain" -> R.drawable.network_crab_parachain
+			"crust-collator" -> R.drawable.network_crust_collator
+			"Crust" -> R.drawable.network_crust
+			"Darwinia Parachain" -> R.drawable.network_darwinia_parachain
+			"datahighway-parachain" -> R.drawable.network_datahighway_parachain
+			"DICO" -> R.drawable.network_dico
+			"DORA KSM Parachain" -> R.drawable.network_dora_ksm_parachain
+			"edgeware" -> R.drawable.network_edgeware
+			"efinity" -> R.drawable.network_efinity
+			"encointer-parachain" -> R.drawable.network_encointer_parachain
+			"equilibrium" -> R.drawable.network_equilibrium
+			"fusotao" -> R.drawable.network_fusotao
+			"geminis" -> R.drawable.network_geminis
+			"genshiro" -> R.drawable.network_genshiro
+			"governance2_testnet" -> R.drawable.network_governance2_testnet
+			"hashed" -> R.drawable.network_hashed
+			"heiko" -> R.drawable.network_heiko
+			"hydradx" -> R.drawable.network_hydradx
+			"imbue" -> R.drawable.network_imbue
+			"Integritee_Kusama" -> R.drawable.network_integritee_kusama
+			"integritee-parachain" -> R.drawable.network_integritee_parachain
 		"Integritee_Polkadot" -> R.drawable.network_integritee_polkadot
 		"interlay-parachain" -> R.drawable.network_interlay_parachain
 		"ipci" -> R.drawable.network_ipci
