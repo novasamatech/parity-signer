@@ -29,20 +29,18 @@ import io.parity.signer.ui.theme.pink500
 
 
 object ScanConstants{
-	val CLIP_TOP_PADDING = 140.dp
-	val CLIP_SIDE_PADDING = 8.dp
+//	val CLIP_TOP_PADDING = 140.dp
+	val CLIP_SIDE_PADDING = 40.dp
 }
 
 @Composable
-internal fun TransparentClipLayout(
+internal fun TransparentCutoutLayout(
 	modifier: Modifier = Modifier,
 ) {
 
-	val offsetInPx: Float
 	val sidePaddingInPX: Float
 
 	with(LocalDensity.current) {
-		offsetInPx = ScanConstants.CLIP_TOP_PADDING.toPx()
 		sidePaddingInPX = ScanConstants.CLIP_SIDE_PADDING.toPx()
 	}
 
@@ -52,6 +50,7 @@ internal fun TransparentClipLayout(
 
 	Canvas(modifier = modifier.fillMaxSize()) {
 
+		val offsetInPx = (size.height/2) - (size.width/2)
 		val canvasWidth = size.width
 		val smallestSide = minOf(size.height, size.width)
 		val sideInPx = smallestSide - 2 * sidePaddingInPX
@@ -155,6 +154,6 @@ internal fun ScanHeader(
 private fun PreviewTransparentClipLayout() {
 
 	SignerNewTheme {
-		TransparentClipLayout()
+		TransparentCutoutLayout()
 	}
 }
