@@ -31,8 +31,8 @@ struct SignSpecsListView: View {
                     }
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
         }
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
         }
@@ -48,9 +48,11 @@ struct SignSpecsListView: View {
                 size: Sizes.signSpecsIdenticonSize
             )
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                Text(rawKey.address.displayablePath)
-                    .font(PrimaryFont.captionM.font)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                if !rawKey.address.displayablePath.isEmpty {
+                    Text(rawKey.address.displayablePath)
+                        .font(PrimaryFont.captionM.font)
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                }
                 Text(rawKey.publicKey.truncateMiddle())
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -60,6 +62,9 @@ struct SignSpecsListView: View {
             }
             Spacer()
             Asset.chevronRight.swiftUIImage
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(height: Heights.chevronRightInList)
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                 .padding(Spacing.small)
         }

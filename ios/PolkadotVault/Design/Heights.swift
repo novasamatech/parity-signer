@@ -9,7 +9,7 @@ import UIKit
 
 /// Common UI components heights to be used for Design System views
 enum Heights {
-    static let chevronRightInList: CGFloat = 15
+    static let chevronRightInList: CGFloat = 14
     static let oviewviewPageIndicator: CGFloat = 4
     /// All variants of `ActionButton`, 56 pt
     static let actionButton: CGFloat = 56

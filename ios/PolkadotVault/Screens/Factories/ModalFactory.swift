@@ -12,7 +12,7 @@ final class ModalFactory {
     func modal(for modalData: ModalData?) -> some View {
         switch modalData {
         case let .sufficientCryptoReady(value):
-            SufficientCryptoReady(content: value)
+            SignSpecDetails(viewModel: .init(content: value))
         case let .newSeedBackup(value):
             CreateKeySetSeedPhraseView(viewModel: .init(dataModel: value))
         case let .selectSeed(value):
