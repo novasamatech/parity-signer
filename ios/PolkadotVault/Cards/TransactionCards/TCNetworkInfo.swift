@@ -9,10 +9,16 @@ import SwiftUI
 
 struct TCNetworkInfo: View {
     let content: MscNetworkInfo
+
     var body: some View {
         HStack {
-            NetworkCard(title: content.networkTitle, logo: content.networkLogo)
+            NetworkLogoIcon(networkName: content.networkLogo)
+            Text(content.networkTitle)
+                .font(PrimaryFont.labelM.font)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
         }
+        .frame(height: 36)
+        .padding(.horizontal)
     }
 }
 

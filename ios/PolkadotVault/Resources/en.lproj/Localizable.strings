@@ -1,3 +1,6 @@
+// Copy for updated design
+"Shared.Label.PasswordedPathDelimeter" = "///••••";
+
 // History cards (Logs)
 "Comment_alt" = "Comment :";
 "in network" = "in network";
@@ -80,17 +83,16 @@
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
-// Sign Sufficient Crypto
-"Select key for signing" = "Select key for signing";
-"Signature for metadata update" = "Signature for metadata update";
-"Signature for network specs" = "Signature for network specs";
-"Signature for types" = "Signature for types";
-"Your Signature" = "Your Signature";
-"Scan it into your application" = "Scan it into your application";
-"Signature.metadata" = "%@ version %@";
+// Sign Specs
+"SignSpecsList.Label.Title" = "Select Key for Signing";
+"SignSpecsDetails.Label.Title" = "Sign Transaction";
 
-// Copy for updated design
-"Shared.Label.PasswordedPathDelimeter" = "///••••";
+"SignSpecsDetails.Label.NetworkMetadataSignature" = "Signature for metadata update %@ version %@";
+"SignSpecsDetails.Label.TypesSignature" = "Signature for types";
+"SignSpecsDetails.Label.NetworkSpecSignature" = "Signature for network specs update\nFor network: %@\nSpecs key: %@";
+"SignSpecsDetails.Label.ScanQRCode" = "Scan QR code to Sign Transaction";
+"SignSpecsDetails.Label.Sign" = "Sign With";
+"SignSpecsDetails.Action.Done" = "Done";
 
 "TabBar.Keys" = "Keys";
 "TabBar.Logs" = "Logs";

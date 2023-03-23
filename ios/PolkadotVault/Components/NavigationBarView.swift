@@ -42,8 +42,8 @@ struct NavigationBarViewModel {
     init(
         title: String? = nil,
         subtitle: String? = nil,
-        leftButtons: [NavigationButtonModel] = [.init()],
-        rightButtons: [NavigationButtonModel] = [.init()],
+        leftButtons: [NavigationButtonModel] = [],
+        rightButtons: [NavigationButtonModel] = [],
         backgroundColor: Color = Asset.backgroundPrimary.swiftUIColor
     ) {
         self.title = title

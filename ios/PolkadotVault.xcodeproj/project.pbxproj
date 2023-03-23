@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35027609CDE004B27BE /* HistoryCard.swift */; };
 		2D48F3532760A2D8004B27BE /* PrimaryFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3522760A2D8004B27BE /* PrimaryFont.swift */; };
-		2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */; };
-		2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */; };
 		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
 		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -36,8 +34,6 @@
 		2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */; };
 		2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */; };
 		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
-		2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */; };
-		2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
 		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
 		2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829C27885A67002917C0 /* TCMeta.swift */; };
@@ -95,6 +91,8 @@
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0756289B369200B2EE48 /* Assets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0755289B369200B2EE48 /* Assets.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
+		6D4F779929CAECA500374C83 /* SignSpecsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779829CAECA500374C83 /* SignSpecsListView.swift */; };
+		6D4F779B29CAF55200374C83 /* SignSpecDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */; };
 		6D52E3A32946C1B500AD72F0 /* SettingsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52E3A22946C1B500AD72F0 /* SettingsRowView.swift */; };
 		6D52E3A52946C3B400AD72F0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52E3A42946C3B400AD72F0 /* SettingsView.swift */; };
 		6D52E3A72946C45100AD72F0 /* SettingsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52E3A62946C45100AD72F0 /* SettingsItem.swift */; };
@@ -328,8 +326,6 @@
 /* Begin PBXFileReference section */
 		2D48F35027609CDE004B27BE /* HistoryCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
 		2D48F3522760A2D8004B27BE /* PrimaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryFont.swift; sourceTree = "<group>"; };
-		2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSufficientCrypto.swift; sourceTree = "<group>"; };
-		2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkInfo.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -356,8 +352,6 @@
 		2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
 		2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
 		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
-		2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCard.swift; sourceTree = "<group>"; };
-		2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressCard.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
 		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
@@ -420,6 +414,8 @@
 		6D4C0751289AC36100B2EE48 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		6D4C0755289B369200B2EE48 /* Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assets.swift; sourceTree = "<group>"; };
 		6D4C0757289BD95500B2EE48 /* SFSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbols.swift; sourceTree = "<group>"; };
+		6D4F779829CAECA500374C83 /* SignSpecsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecsListView.swift; sourceTree = "<group>"; };
+		6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecDetailsView.swift; sourceTree = "<group>"; };
 		6D52E3A22946C1B500AD72F0 /* SettingsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowView.swift; sourceTree = "<group>"; };
 		6D52E3A42946C3B400AD72F0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6D52E3A62946C45100AD72F0 /* SettingsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsItem.swift; sourceTree = "<group>"; };
@@ -663,9 +659,7 @@
 				2DA5F84627566C3600D8DD29 /* TransactionCards */,
 				2DA5F8402756687200D8DD29 /* TransactionCardView.swift */,
 				2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */,
-				2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */,
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
-				2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */,
 				2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */,
 			);
 			path = Cards;
@@ -689,7 +683,6 @@
 				6DC5643E28B929E0003D540B /* KeyDetails */,
 				6DF7751C28B39F590040012E /* KeySetsList */,
 				6D019966289C936800F4C317 /* Containers */,
-				2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -1029,6 +1022,15 @@
 			path = Subviews;
 			sourceTree = "<group>";
 		};
+		6D4F779729CAEC9B00374C83 /* SignSpecs */ = {
+			isa = PBXGroup;
+			children = (
+				6D4F779829CAECA500374C83 /* SignSpecsListView.swift */,
+				6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */,
+			);
+			path = SignSpecs;
+			sourceTree = "<group>";
+		};
 		6D52E3A12946C19F00AD72F0 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -1043,6 +1045,7 @@
 		6D52E3A82946F57000AD72F0 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				6D4F779729CAEC9B00374C83 /* SignSpecs */,
 				6DE67D03298AA41D0042415A /* Backup */,
 				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
 				6D7129202952B7570048558C /* Networks */,
@@ -1708,7 +1711,6 @@
 			isa = PBXGroup;
 			children = (
 				2DAA8298278738C0002917C0 /* SelectSeed.swift */,
-				2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */,
 			);
 			path = Deprecated;
 			sourceTree = "<group>";
@@ -2039,6 +2041,7 @@
 			files = (
 				6DD860E8299CAD140000D81E /* OnboadingAirgapView+Components.swift in Sources */,
 				6D3423352994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift in Sources */,
+				6D4F779B29CAF55200374C83 /* SignSpecDetailsView.swift in Sources */,
 				6DF07AE229C1140500C01DE8 /* SetUpNetworksStepOneView.swift in Sources */,
 				6DF5E7A42923DD4400F2B5B4 /* Text+Markdown.swift in Sources */,
 				6DDEF13228AE6039004CA2FD /* signer.udl in Sources */,
@@ -2075,7 +2078,6 @@
 				6DC5643B28B8D189003D540B /* KeychainAccessAdapter.swift in Sources */,
 				6D10EACD297114550063FB71 /* DerivationPathComponents.swift in Sources */,
 				6DEFB53228FEE42D00762219 /* ExportMultipleKeysService.swift in Sources */,
-				2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */,
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				6DA08B9029B68AF90027CFCB /* NavigationInitialisationService.swift in Sources */,
 				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
@@ -2151,7 +2153,6 @@
 				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
 				6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */,
 				6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */,
-				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
 				6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				6DDD737A29404E5000F04CE7 /* Event+EntryType.swift in Sources */,
@@ -2213,7 +2214,6 @@
 				6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
-				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
 				6D84441F28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift in Sources */,
@@ -2241,6 +2241,7 @@
 				6DA08B8A29B614C20027CFCB /* RecoverKeySetSeedPhraseView.swift in Sources */,
 				6D932CE6292E0CE6008AD883 /* PrimaryTextField.swift in Sources */,
 				6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */,
+				6D4F779929CAECA500374C83 /* SignSpecsListView.swift in Sources */,
 				6D55F286292CF2F800871896 /* StrokeContainerBackground.swift in Sources */,
 				6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */,
 				6DF07ADE29C1062300C01DE8 /* SetUpNetworksIntroView.swift in Sources */,
@@ -2286,7 +2287,6 @@
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
-				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
