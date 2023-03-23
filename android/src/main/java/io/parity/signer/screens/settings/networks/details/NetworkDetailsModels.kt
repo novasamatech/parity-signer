@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks.details
+package io.parity.signer.screens.settings.networks.details
 
 import io.parity.signer.components.ImageContent
 import io.parity.signer.components.toImageContent
@@ -11,20 +11,20 @@ import io.parity.signer.uniffi.MVerifier
 
 
 data class NetworkDetailsModel(
-	val base58prefix: UShort,
+    val base58prefix: UShort,
 //	val color: String,
-	val decimals: UByte,
+    val decimals: UByte,
 //	val encryptionType: String,
-	val genesisHash: String,
-	val logo: String,
-	val name: String,
+    val genesisHash: String,
+    val logo: String,
+    val name: String,
 //	val order: String,
 //	val pathId: String,
 //	val secondaryColor: String,
-	val title: String,
-	val unit: String,
-	val currentVerifier: VerifierModel,
-	val meta: List<MetadataModel>
+    val title: String,
+    val unit: String,
+    val currentVerifier: VerifierModel,
+    val meta: List<MetadataModel>
 ) {
 	companion object {
 		fun createStub() = NetworkDetailsModel(

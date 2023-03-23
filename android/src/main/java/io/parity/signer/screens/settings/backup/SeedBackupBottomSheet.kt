@@ -1,5 +1,6 @@
-package io.parity.signer.screens.keysetdetails.backup
+package io.parity.signer.screens.settings.backup
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,35 +11,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.BottomSheetSubtitle
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.screens.keysetdetails.items.SlimKeyItem
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
-import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.abbreviateString
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.screens.keysetdetails.backup.BackupPhraseBox
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
 fun SeedBackupFullOverlayBottomSheet(
-	model: SeedBackupModel,
+	seedName: String,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
+	val timerSize = remember {
+		mutableStateOf(80.dp)
+	}
+
 	BottomSheetWrapperRoot(onClosedAction = onClose) {
-		SeedBackupBottomSheet(model, getSeedPhraseForBackup, onClose)
+		SeedBackupBottomSheet(seedName, timerSize, getSeedPhraseForBackup, onClose)
 	}
 	Row(modifier = Modifier.fillMaxSize()) {
 		SnackBarCircularCountDownTimer(
 			PrivateKeyExportModel.SHOW_PRIVATE_KEY_TIMEOUT,
-			stringResource(R.string.seed_backup_autohide_title),
+			stringResource(R.string.seed_backup_countdown_message),
+			timerSize,
 			Modifier.align(Alignment.Bottom),
 			onClose,
 		)
@@ -47,7 +51,8 @@ fun SeedBackupFullOverlayBottomSheet(
 
 @Composable
 private fun SeedBackupBottomSheet(
-	model: SeedBackupModel,
+	seedName: String,
+	timerSize: State<Dp>,
 	getSeedPhraseForBackup: suspend (String) -> String?,
 	onClose: Callback,
 ) {
@@ -58,8 +63,7 @@ private fun SeedBackupBottomSheet(
 	Column() {
 		//header
 		BottomSheetHeader(
-			title = model.seedName,
-			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+			title = seedName,
 			onCloseClicked = onClose,
 		)
 		SignerDivider(sidePadding = 24.dp)
@@ -68,26 +72,17 @@ private fun SeedBackupBottomSheet(
 				.verticalScroll(rememberScrollState()),
 		) {
 			// phrase
-			Spacer(modifier = Modifier.padding(top = 14.dp))
-			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
-			Spacer(modifier = Modifier.padding(top = 14.dp))
+			BottomSheetSubtitle(
+				R.string.subtitle_secret_recovery_phrase,
+				Modifier.padding(top = 14.dp, bottom = 8.dp)
+			)
 			BackupPhraseBox(seedPhrase)
-			//derived keys
-			Spacer(modifier = Modifier.padding(top = 22.dp))
-			BottomSheetSubtitle(R.string.subtitle_derived_keys)
-			Spacer(modifier = Modifier.padding(top = 14.dp))
-			for (index in 0..model.derivations.lastIndex) {
-				SlimKeyItem(model = model.derivations[index])
-				if (index != model.derivations.lastIndex) {
-					SignerDivider(sidePadding = 24.dp)
-				}
-			}
-			Spacer(modifier = Modifier.size(height = 80.dp, width = 1.dp))
+			Spacer(modifier = Modifier.size(height = timerSize.value, width = 1.dp))
 		}
 	}
 
 	LaunchedEffect(Unit) {
-		val phrase = getSeedPhraseForBackup(model.seedName)
+		val phrase = getSeedPhraseForBackup(seedName)
 		if (phrase != null) {
 			seedPhrase = phrase
 		}
@@ -95,6 +90,7 @@ private fun SeedBackupBottomSheet(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -106,9 +102,9 @@ private fun SeedBackupBottomSheet(
 )
 @Composable
 private fun PreviewSeedBackupBottomSheet() {
-	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
 	SignerNewTheme {
-		SeedBackupBottomSheet(model,
+		SeedBackupBottomSheet("seed",
+			mutableStateOf(80.dp),
 			{ _ -> " some long words some some" }, {})
 	}
 }
@@ -124,11 +120,10 @@ private fun PreviewSeedBackupBottomSheet() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewSeedBackupFullOverlayScreen() {
-	val model = KeySetDetailsModel.createStub().toSeedBackupModel()!!
+private fun PreviewKeySetBackupFullOverlayScreen() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			SeedBackupFullOverlayBottomSheet(model,
+			SeedBackupFullOverlayBottomSheet("seed",
 				{ _ -> " some long words some some" }, {})
 		}
 	}

@@ -64,9 +64,9 @@
 	<string name="log_title_network_removed">Network removed</string>
 	<string name="log_title_network_verifier_set">Network verifier set</string>
 	<string name="log_title_reset_danger_record">Warnings acknowledged</string>
-	<string name="log_title_seed_created">Seed created</string>
-	<string name="log_title_seed_removed">Seed removed</string>
-	<string name="log_title_seed_name_was_shown">Seed was shown</string>
+	<string name="log_title_seed_created">Key Set created</string>
+	<string name="log_title_seed_removed">Key Set removed</string>
+	<string name="log_title_seed_name_was_shown">Key set was shown</string>
 	<string name="log_title_network_specs_signed">Network specs signed</string>
 	<string name="log_title_metadata_signed">Meta signed</string>
 	<string name="log_title_types_signed">Types signed</string>
@@ -352,11 +352,15 @@
 	<string name="network_details_metadata_delete_label">Delete this metadata</string>
 	<string name="network_details_remove_metadata_confirm_title">Remove metadata?</string>
 	<string name="network_details_remove_metadata_confirm_description">This metadata will be removed for all networks</string>
-    <string name="network_details_add_network_metadata_label">Add Network Metadata</string>
+	<string name="network_details_add_network_metadata_label">Add Network Metadata</string>
 	<string name="network_details_verifier_public_key_for_general">Key</string>
 	<string name="network_details_verifier_public_key_for_custom">Public Key</string>
 	<string name="network_details_verifier_crypto_field">Crypto</string>
 	<string name="network_details_verifier_identicon_field">Identicon</string>
+	<string name="keys_backup_screen_title">Select Key Set</string>
+	<string name="keys_backup_screen_subtitle">Select a key set you want to Expose a Secret Recovery Phrase for</string>
+	<string name="seed_backup_countdown_message">Secret Recovery Phrase  will be hidden in</string>
+	<string name="settings_backup">Backup Secret Phrase</string>
 
 
 </resources>

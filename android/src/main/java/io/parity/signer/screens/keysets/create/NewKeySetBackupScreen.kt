@@ -49,14 +49,13 @@ internal fun NewKeySetBackupScreen(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
-				.padding(bottom = 16.dp),
+				.padding(bottom = 8.dp),
 		)
 		BackupPhraseBox(seedPhrase = model.seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
-				.padding(top = 8.dp)
 		)
 		Spacer(modifier = Modifier.weight(1f))
 

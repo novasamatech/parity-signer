@@ -1,4 +1,4 @@
-package io.parity.signer.screens.networks.details
+package io.parity.signer.screens.settings.networks.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*
@@ -33,11 +33,11 @@ import io.parity.signer.uniffi.Action
 
 @Composable
 fun NetworkDetailsScreen(
-	model: NetworkDetailsModel,
-	rootNavigator: Navigator,
-	onMenu: Callback,
-	onAddNetwork: Callback,
-	onRemoveMetadataCallback: (version: String) -> Unit,
+    model: NetworkDetailsModel,
+    rootNavigator: Navigator,
+    onMenu: Callback,
+    onAddNetwork: Callback,
+    onRemoveMetadataCallback: (version: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 
