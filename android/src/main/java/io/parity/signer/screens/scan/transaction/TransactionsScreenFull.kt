@@ -129,7 +129,7 @@ private fun getTransactionsTitle(
 		is TransactionPreviewType.AddNetwork -> stringResource(R.string.transactions_title_network)
 		is TransactionPreviewType.Metadata -> stringResource(R.string.transactions_title_metadata)
 		TransactionPreviewType.Transfer, TransactionPreviewType.Unknown -> pluralStringResource(
-			id = R.plurals.transactions_title_other, transactionsCount,
+			id = R.plurals.transactions_title_other, transactionsCount, transactionsCount
 		)
 	}
 }
