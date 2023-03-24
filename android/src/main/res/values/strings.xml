@@ -185,7 +185,7 @@
 	<string name="transaction_unknown_network_tx_version">Tx version</string>
 	<string name="transaction_types_info_hash">Types hash</string>
 	<string name="warning_exl">Warning!</string>
-	<string name="enter_password_title">Enter the password for</string>
+	<string name="enter_password_title">Confirm Password</string>
 	<string name="enter_password_description">Enter the password you used for your derivation path</string>
 	<string name="password_hide_password">Hide password</string>
 	<string name="password_show_password">Show password</string>

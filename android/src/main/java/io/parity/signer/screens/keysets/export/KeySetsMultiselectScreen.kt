@@ -75,7 +75,7 @@ fun KeySetsSelectExportScreenContent(
 		) {
 			ClickableLabel(
 				stringId = R.string.key_set_export_all_label,
-				isEnabled = true,
+				isEnabled = model.keys.isEmpty(),
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 				onClick = onExportAll,
 			)

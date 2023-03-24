@@ -30,7 +30,7 @@ import io.parity.signer.screens.scan.transaction.components.TransactionElementSe
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.backgroundSystem
+import io.parity.signer.ui.theme.backgroundPrimary
 import io.parity.signer.uniffi.MSignatureReady
 import io.parity.signer.uniffi.MTransaction
 import io.parity.signer.uniffi.TransactionType
@@ -86,7 +86,7 @@ internal fun TransactionsScreenFull(
 	BackHandler(onBack = onBack)
 	Column(
 		modifier
-			.background(MaterialTheme.colors.backgroundSystem)
+			.background(MaterialTheme.colors.backgroundPrimary)
 	) {
 		ScreenHeader(
 			title = getTransactionsTitle(

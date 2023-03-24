@@ -52,7 +52,7 @@ fun KeySetDetailsMultiselectScreen(
 				.weight(1f)
 				.padding(horizontal = 8.dp)
 				.verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
 			//seed - key set
 			model.root?.let {

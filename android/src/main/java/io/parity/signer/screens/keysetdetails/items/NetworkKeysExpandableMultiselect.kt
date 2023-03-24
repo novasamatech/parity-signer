@@ -98,7 +98,8 @@ private fun NetworkKeysExpandableMultiselectPrivate(
 						end = 16.dp,
 						start = 12.dp
 					)
-					.background(MaterialTheme.colors.fill6, CircleShape),
+					.background(MaterialTheme.colors.fill6, CircleShape)
+				,
 				contentAlignment = Alignment.Center,
 			) {
 				Image(
@@ -107,7 +108,9 @@ private fun NetworkKeysExpandableMultiselectPrivate(
 					} else {
 						Icons.Filled.ExpandLess
 					},
-					modifier = Modifier.size(20.dp),
+					modifier = Modifier
+						.padding(4.dp)
+						.size(24.dp),
 					contentDescription = null,
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
 				)

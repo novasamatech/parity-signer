@@ -33,7 +33,6 @@ fun NewSeedMenu(
 	Column() {
 		BottomSheetHeader(
 			title = stringResource(R.string.add_key_set_menu_title),
-			modifier = Modifier.padding(vertical = 16.dp),
 			onCloseClicked = null
 		)
 		SignerDivider(sidePadding = 24.dp)

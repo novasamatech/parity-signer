@@ -94,6 +94,7 @@ fun DerivationPathScreen(
 			onClose = onClose,
 			onDone = onDoneLocal,
 		)
+		Spacer(modifier = Modifier.padding(top = 16.dp))
 		OutlinedTextField(
 			value = path.value, //hide password, add hint
 			onValueChange = { newStr -> path.value = newStr },
@@ -124,6 +125,7 @@ fun DerivationPathScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
+		Spacer(modifier = Modifier.padding(top = 8.dp))
 		val errorForPath = when (pathValidity) {
 			DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD -> null
 			DerivationCreateViewModel.DerivationPathValidity.WRONG_PATH -> stringResource(
@@ -224,19 +226,20 @@ fun DerivationPathScreen(
 				.padding(horizontal = 24.dp)
 				.padding(vertical = 8.dp)
 		)
+		Spacer(modifier = Modifier.padding(top = 8.dp))
 
 		if (hasPassword) {
 			Text(
 				text = stringResource(R.string.enter_password_title),
 				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleS,
-				modifier = Modifier.padding(horizontal = 24.dp)
+				style = SignerTypeface.BodyL,
+				modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
 			)
 			OutlinedTextField(
 				value = password.value,
 				onValueChange = { password.value = it },
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
+					.padding(horizontal = 24.dp, vertical = 8.dp)
 					.focusRequester(passwordFocusRequester)
 					.fillMaxWidth(1f),
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),

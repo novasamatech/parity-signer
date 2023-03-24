@@ -78,6 +78,7 @@ fun KeyDerivedItemMultiselect(
 				isChecked = isSelected,
 				uncheckedColor = MaterialTheme.colors.primary,
 				modifier = Modifier
+					.padding(8.dp)
 					.padding(horizontal = 8.dp)
 			) {
 				onClick(!isSelected, model.addressKey)

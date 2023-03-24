@@ -62,7 +62,7 @@ fun KeySetDetailsScreenView(
 					modifier = Modifier
 						.padding(horizontal = 8.dp)
 						.verticalScroll(rememberScrollState()),
-					verticalArrangement = Arrangement.spacedBy(8.dp),
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					//seed
 					model.root?.let {
@@ -121,7 +121,8 @@ fun KeySetDetailsHeader(
 	Row(
 		modifier = Modifier
 			.fillMaxWidth(1f)
-			.defaultMinSize(minHeight = 56.dp)
+			.defaultMinSize(minHeight = 56.dp),
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Image(
 			imageVector = Icons.Filled.ChevronLeft,
