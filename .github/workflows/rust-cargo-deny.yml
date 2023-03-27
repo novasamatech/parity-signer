@@ -19,9 +19,9 @@ jobs:
 
     steps:
       - name:               Checkout Sources
-        uses:               actions/checkout@v3.4.0
+        uses:               actions/checkout@v3.5.0
 
       - name:               Run cargo-deny
-        uses:               EmbarkStudios/cargo-deny-action@8a8607bd8e2b3a514d5a40174cc7c55b229d9ba7 # v1.4.0
+        uses:               EmbarkStudios/cargo-deny-action@8af37f5d0c77859223226de776036f7f691e1469 # v1.5.0
         with:
           command:          --manifest-path=./rust/Cargo.toml check ${{ matrix.checks }}
