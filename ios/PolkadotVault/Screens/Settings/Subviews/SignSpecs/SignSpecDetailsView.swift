@@ -136,10 +136,14 @@ extension SignSpecDetails {
         var content: MSufficientCryptoReady
         private weak var navigation: NavigationCoordinator!
 
+        @Binding var isPresented: Bool
+
         init(
-            content: MSufficientCryptoReady
+            content: MSufficientCryptoReady,
+            isPresented: Binding<Bool>
         ) {
             self.content = content
+            _isPresented = isPresented
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -147,6 +151,7 @@ extension SignSpecDetails {
         }
 
         func onBackTap() {
+            isPresented = false
             navigation.perform(navigation: .init(action: .goBack))
         }
     }

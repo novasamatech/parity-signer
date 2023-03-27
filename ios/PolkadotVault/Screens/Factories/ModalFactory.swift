@@ -11,8 +11,6 @@ final class ModalFactory {
     @ViewBuilder
     func modal(for modalData: ModalData?) -> some View {
         switch modalData {
-        case let .sufficientCryptoReady(value):
-            SignSpecDetails(viewModel: .init(content: value))
         case let .newSeedBackup(value):
             CreateKeySetSeedPhraseView(viewModel: .init(dataModel: value))
         case let .selectSeed(value):
@@ -34,6 +32,7 @@ final class ModalFactory {
             .networkSelector,
             .manageMetadata,
             .networkDetailsMenu,
+            .sufficientCryptoReady,
             nil:
             EmptyView()
         }

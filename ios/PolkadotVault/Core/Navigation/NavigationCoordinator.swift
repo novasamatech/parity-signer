@@ -93,8 +93,9 @@ extension NavigationCoordinator {
         backendActionPerformer.performTransaction(with: payload)
     }
 
-    func perform(navigation: Navigation, skipDebounce: Bool = false) {
-        guard isActionAvailable else { return }
+    @discardableResult
+    func perform(navigation: Navigation, skipDebounce: Bool = false) -> ActionResult {
+        guard isActionAvailable else { return actionResult }
         defer { handleDebounce(skipDebounce) }
 
         isActionAvailable = false
@@ -114,6 +115,7 @@ extension NavigationCoordinator {
             genericError.errorMessage = error.description
             genericError.isPresented = true
         }
+        return actionResult
     }
 }
 
