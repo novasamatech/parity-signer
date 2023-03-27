@@ -66,6 +66,19 @@ struct EnterKeySetNameView: View {
             .onAppear {
                 viewModel.use(navigation: navigation)
             }
+            .fullScreenCover(
+                isPresented: $viewModel.isPresentingDetails,
+                onDismiss: {
+                    viewModel.detailsContent = nil
+                }
+            ) {
+                CreateKeySetSeedPhraseView(
+                    viewModel: .init(
+                        dataModel: viewModel.detailsContent,
+                        isPresented: $viewModel.isPresentingDetails
+                    )
+                )
+            }
         }
     }
 }
@@ -73,6 +86,9 @@ struct EnterKeySetNameView: View {
 extension EnterKeySetNameView {
     final class ViewModel: ObservableObject {
         @Published var seedName: String = ""
+        @Published var isPresentingDetails: Bool = false
+        @Published var detailsContent: MNewSeedBackup!
+
         weak var navigation: NavigationCoordinator!
 
         private let seedsMediator: SeedsMediating
@@ -92,7 +108,10 @@ extension EnterKeySetNameView {
         }
 
         func onNextTap() {
-            navigation.perform(navigation: .init(action: .goForward, details: seedName))
+            guard case let .newSeedBackup(detailsContent) = navigation
+                .performFake(navigation: .init(action: .goForward, details: seedName)).modalData else { return }
+            self.detailsContent = detailsContent
+            isPresentingDetails = true
         }
 
         func isActionAvailable() -> Bool {
