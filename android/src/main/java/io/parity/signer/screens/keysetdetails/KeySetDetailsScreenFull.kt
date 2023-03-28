@@ -19,9 +19,8 @@ fun KeySetDetailsScreenFull(
 	onRemoveKeySet: Callback,
 ) {
 	val bottomSheetState =
-		rememberModalBottomSheetState(
-			ModalBottomSheetValue.Hidden,
-			confirmStateChange = {
+		rememberModalBottomSheetState(ModalBottomSheetValue.Hidden,
+			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
 		)
@@ -54,9 +53,7 @@ fun KeySetDetailsScreenFull(
 				networkState = networkState,
 				onMenu = {
 					scope.launch {
-						bottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						bottomSheetState.show()
 					}
 				}
 			)

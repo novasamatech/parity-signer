@@ -45,17 +45,13 @@ fun KeySetDetailsExportScreenFull(
 				onClose = onClose,
 				onExportSelected = {
 					scope.launch {
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						modalBottomSheetState.show()
 					}
 				},
 				onExportAll = {
 					scope.launch {
 						selected.value = model.keysAndNetwork.map { it.key.addressKey }.toSet()
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						modalBottomSheetState.show()
 					}
 				},
 			)
