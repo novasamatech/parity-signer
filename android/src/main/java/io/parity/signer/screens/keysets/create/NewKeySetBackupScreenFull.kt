@@ -20,9 +20,8 @@ fun NewKeySetBackupScreenFull(
 	onCreateKeySet: (String, String) -> Unit
 ) {
 	val modalBottomSheetState =
-		rememberModalBottomSheetState(
-			ModalBottomSheetValue.Hidden,
-			confirmStateChange = {
+		rememberModalBottomSheetState(ModalBottomSheetValue.Hidden,
+			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
 		)
@@ -43,9 +42,7 @@ fun NewKeySetBackupScreenFull(
 				model = model,
 				onProceed = {
 					scope.launch {
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						modalBottomSheetState.show()
 					}
 				},
 				onBack = onBack,

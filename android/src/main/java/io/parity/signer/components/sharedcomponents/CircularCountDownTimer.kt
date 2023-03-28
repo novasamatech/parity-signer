@@ -28,8 +28,8 @@ import io.parity.signer.domain.conditional
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 @OptIn(ExperimentalTime::class)
 @Composable
