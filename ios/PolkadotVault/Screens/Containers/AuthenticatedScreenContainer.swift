@@ -82,7 +82,7 @@ struct AuthenticatedScreenContainer: View {
         ) {
             ErrorBottomModal(
                 viewModel: .alertError(message: navigation.genericError.errorMessage),
-                dismissAction: navigation.perform(navigation: .init(action: .goBack)),
+                dismissAction: viewModel.onDismissErrorTap(),
                 isShowingBottomAlert: $navigation.genericError.isPresented
             )
             .clearModalBackground()
@@ -105,6 +105,10 @@ extension AuthenticatedScreenContainer {
             self.modalFactory = modalFactory
             self.mainScreenFactory = mainScreenFactory
             navigation.perform(navigation: .init(action: .start))
+        }
+
+        func onDismissErrorTap() {
+            navigation.perform(navigation: .init(action: .goBack))
         }
     }
 }

@@ -80,6 +80,7 @@
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
 		6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */; };
 		6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */; };
+		6D30228329D183BE0074CDDF /* SignSpecEnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30228229D183BE0074CDDF /* SignSpecEnterPasswordModal.swift */; };
 		6D3423352994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */; };
 		6D34233A299615FD00F3BA27 /* MVerifier+Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D342339299615FD00F3BA27 /* MVerifier+Type.swift */; };
 		6D3A538729968D920004DDDD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D3A538629968D920004DDDD /* LaunchScreen.storyboard */; };
@@ -403,6 +404,7 @@
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
 		6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyView.swift; sourceTree = "<group>"; };
 		6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyActionsModal.swift; sourceTree = "<group>"; };
+		6D30228229D183BE0074CDDF /* SignSpecEnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecEnterPasswordModal.swift; sourceTree = "<group>"; };
 		6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorBottomModalViewModel+TransactionErrors.swift"; sourceTree = "<group>"; };
 		6D342339299615FD00F3BA27 /* MVerifier+Type.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVerifier+Type.swift"; sourceTree = "<group>"; };
 		6D3A538629968D920004DDDD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -1027,6 +1029,7 @@
 			children = (
 				6D4F779829CAECA500374C83 /* SignSpecsListView.swift */,
 				6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */,
+				6D30228229D183BE0074CDDF /* SignSpecEnterPasswordModal.swift */,
 			);
 			path = SignSpecs;
 			sourceTree = "<group>";
@@ -2081,6 +2084,7 @@
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				6DA08B9029B68AF90027CFCB /* NavigationInitialisationService.swift in Sources */,
 				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
+				6D30228329D183BE0074CDDF /* SignSpecEnterPasswordModal.swift in Sources */,
 				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
 				6DA2ACAC2939E87600AAEADC /* Event+Value.swift in Sources */,
 				6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */,
