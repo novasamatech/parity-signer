@@ -67,13 +67,14 @@ private fun AirgapScreen(
 	Column() {
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(1f, true)
+				.verticalScroll(rememberScrollState())
+				.weight(1f, true)
 		) {
 			Text(
 				modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
+					.fillMaxWidth(1f)
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 12.dp),
 				text = stringResource(R.string.airgap_onboarding_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
@@ -81,8 +82,9 @@ private fun AirgapScreen(
 			)
 			Text(
 				modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(horizontal = 24.dp),
+					.fillMaxWidth(1f)
+					.padding(horizontal = 24.dp)
+					.padding(bottom = 16.dp),
 				text = stringResource(R.string.airgap_onboarding_subtitle),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyL,
@@ -93,7 +95,7 @@ private fun AirgapScreen(
 				shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 				border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
 				color = MaterialTheme.colors.fill6,
-				modifier = Modifier.padding(16.dp)
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
 			) {
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,7 +112,7 @@ private fun AirgapScreen(
 				shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 				border = BorderStroke(1.dp, color = MaterialTheme.colors.fill12),
 				color = MaterialTheme.colors.fill6,
-				modifier = Modifier.padding(16.dp)
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
 			) {
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,16 +126,16 @@ private fun AirgapScreen(
 							contentDescription = null,
 							colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 							modifier = Modifier
-                                .padding(8.dp)
-                                .size(24.dp)
+								.padding(8.dp)
+								.size(24.dp)
 						)
 						Text(
 							text = stringResource(R.string.airgap_onboarding_disconnect_cable_header),
 							color = MaterialTheme.colors.textTertiary,
 							style = SignerTypeface.TitleS,
 							modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 14.dp)
-                                .weight(1f)
+								.padding(horizontal = 16.dp, vertical = 14.dp)
+								.weight(1f)
 						)
 					}
 					SignerDivider()
@@ -223,8 +225,8 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 			color = color,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 14.dp)
-                .weight(1f)
+				.padding(horizontal = 16.dp, vertical = 14.dp)
+				.weight(1f)
 		)
 	}
 }
@@ -241,8 +243,8 @@ private fun IconWithCheckmark(
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
-                .size(40.dp)
-                .background(color, CircleShape)
+				.size(40.dp)
+				.background(color, CircleShape)
 		) {
 			Image(
 				imageVector = icon,
@@ -265,8 +267,8 @@ private fun IconWithCheckmark(
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(backgroundColor),
 				modifier = Modifier
-                    .size(18.dp)
-                    .offset(x = 2.dp, y = 2.dp)
+					.size(18.dp)
+					.offset(x = 2.dp, y = 2.dp)
 			)
 		}
 	}
