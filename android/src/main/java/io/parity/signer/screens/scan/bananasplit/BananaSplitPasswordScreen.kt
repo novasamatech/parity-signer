@@ -161,7 +161,6 @@ private fun BananaSplitPasswordInternal(
 				onValueChange = { newStr -> onChangeSeedName(newStr) },
 				keyboardOptions = KeyboardOptions(
 					//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
-//					imeAction = if (name.value.isNotEmpty() && !nameCollision.value) ImeAction.Go else ImeAction.None
 					imeAction = ImeAction.Go
 				),
 				keyboardActions = KeyboardActions(onGo = {
@@ -207,7 +206,6 @@ private fun BananaSplitPasswordInternal(
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
 //				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
-//				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(

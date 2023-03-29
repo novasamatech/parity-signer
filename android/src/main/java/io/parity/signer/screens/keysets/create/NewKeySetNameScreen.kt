@@ -79,7 +79,6 @@ fun NewKeySetNameScreen(
 			onValueChange = { newStr -> keySetName = newStr },
 			keyboardOptions = KeyboardOptions(
 //				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
-//				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(
