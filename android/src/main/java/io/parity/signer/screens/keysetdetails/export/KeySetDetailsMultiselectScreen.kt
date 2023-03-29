@@ -59,6 +59,7 @@ fun KeySetDetailsMultiselectScreen(
 				SeedKeyDetails(
 					model = it,
 					Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+						.padding(bottom = 16.dp)
 				)
 			}
 
