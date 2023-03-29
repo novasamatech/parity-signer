@@ -160,10 +160,13 @@ private fun BananaSplitPasswordInternal(
 				value = name.value,
 				onValueChange = { newStr -> onChangeSeedName(newStr) },
 				keyboardOptions = KeyboardOptions(
-					imeAction = if (name.value.isNotEmpty() && !nameCollision.value) ImeAction.Go else ImeAction.None
+					//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Go
 				),
 				keyboardActions = KeyboardActions(onGo = {
-					passwordFocusRequester.requestFocus()
+					if (name.value.isNotEmpty() && !nameCollision.value) {
+						passwordFocusRequester.requestFocus()
+					}
 				}),
 				placeholder = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
 				isError = nameCollision.value,
@@ -202,7 +205,8 @@ private fun BananaSplitPasswordInternal(
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
 					onDone = {

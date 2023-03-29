@@ -91,7 +91,8 @@ fun EnterPassword(
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
 					onDone = {
