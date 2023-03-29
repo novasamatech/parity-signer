@@ -82,7 +82,7 @@ private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 			style = SignerTypeface.TitleS,
 			color = MaterialTheme.colors.primary,
 			modifier = Modifier
-                .padding(start = 24.dp)
+                .padding(start = 12.dp)
                 .weight(1f)
 		)
 		Image(
