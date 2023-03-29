@@ -11,7 +11,8 @@ import io.parity.signer.components.toImageContent
 import io.parity.signer.uniffi.MVerifierDetails
 
 @Composable
-fun VerifierScreen(
+//todo dmitry remove it
+fun VerifierScreenOld(
 	verifierDetails: MVerifierDetails,
 	wipeToJailbreak: () -> Unit
 ) {
