@@ -1036,7 +1036,7 @@ fn decode_type_def_bit_sequence(
                 Some(a) => a,
                 None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
             };
-            let card_prep = match bitstore_type.clone().type_def {
+            let card_prep = match &bitstore_type.type_def {
                 TypeDef::Primitive(a) => {
                     match a {
                         TypeDefPrimitive::U8 => process_bitvec::<u8>(bitorder, into_bv_decode)?,
