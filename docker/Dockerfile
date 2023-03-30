@@ -28,13 +28,15 @@ RUN apt-get -y update && \
     rm android-commandline-tools.zip && ls -la ${ANDROID_SDK_ROOT}/cmdline-tools/latest/ && \
 # We need at least one set of build-tools installed for apksigner
     yes | sdkmanager --licenses && \
-    yes | sdkmanager "build-tools;30.0.3" && \
+    yes | sdkmanager "build-tools;33.0.2" && \
     echo "y" | sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT} && \
 # rust stuff
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
 # install additional rust targets
     rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android && \
     bash /tmp/scripts/init.sh && \
+# install uniffi_bindgen
+    cargo install uniffi_bindgen --version 0.22.0 && \
 # versions
     rustup show && \
     cargo --version && \
