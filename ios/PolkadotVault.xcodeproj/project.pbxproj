@@ -33,9 +33,7 @@
 		2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85727566C3600D8DD29 /* TCWarning.swift */; };
 		2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */; };
 		2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */; };
-		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
-		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
 		2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829C27885A67002917C0 /* TCMeta.swift */; };
 		2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */; };
 		2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */; };
@@ -51,7 +49,6 @@
 		6D03118F2937269100C38F61 /* TransactionErrorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D03118E2937269100C38F61 /* TransactionErrorsView.swift */; };
 		6D042AF22901B3FB00B3F4F7 /* QRCodeImageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */; };
 		6D042AF42901B40400B3F4F7 /* ExportMultipleKeysModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */; };
-		6D0677AA29BB095C00D76D90 /* ModalFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0677A929BB095C00D76D90 /* ModalFactory.swift */; };
 		6D0677AC29BB0C6000D76D90 /* AppLaunchMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */; };
 		6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0677AD29BB0D0000D76D90 /* WarningStateMediator.swift */; };
 		6D07D370292B40D2001A0B79 /* TransactionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */; };
@@ -352,9 +349,7 @@
 		2DA5F85727566C3600D8DD29 /* TCWarning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
 		2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
 		2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
-		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
-		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
 		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
 		2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpecPlain.swift; sourceTree = "<group>"; };
@@ -375,7 +370,6 @@
 		6D03118E2937269100C38F61 /* TransactionErrorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionErrorsView.swift; sourceTree = "<group>"; };
 		6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeImageGenerator.swift; sourceTree = "<group>"; };
 		6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysModal.swift; sourceTree = "<group>"; };
-		6D0677A929BB095C00D76D90 /* ModalFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalFactory.swift; sourceTree = "<group>"; };
 		6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchMediator.swift; sourceTree = "<group>"; };
 		6D0677AD29BB0D0000D76D90 /* WarningStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningStateMediator.swift; sourceTree = "<group>"; };
 		6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryView.swift; sourceTree = "<group>"; };
@@ -660,7 +654,6 @@
 			children = (
 				2DA5F84627566C3600D8DD29 /* TransactionCards */,
 				2DA5F8402756687200D8DD29 /* TransactionCardView.swift */,
-				2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */,
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
 				2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */,
 			);
@@ -694,7 +687,6 @@
 			children = (
 				6D52E3AD2946FF4900AD72F0 /* NetworkSelection */,
 				6DEFB53028FEE17800762219 /* ExportKeys */,
-				6DEFB52628FEA1A500762219 /* Deprecated */,
 				6DBF6E2528E44DBA00CC959F /* Errors */,
 				6DCC572528D8C0410014278A /* Backup */,
 				6DD9FF1428C8B83C00FB6195 /* Alerts */,
@@ -884,7 +876,6 @@
 		6D0677A829BB095400D76D90 /* Factories */ = {
 			isa = PBXGroup;
 			children = (
-				6D0677A929BB095C00D76D90 /* ModalFactory.swift */,
 				6DF91F4429C07014000A6BB2 /* MainScreensFactory.swift */,
 			);
 			path = Factories;
@@ -1710,14 +1701,6 @@
 			path = SeedPhrase;
 			sourceTree = "<group>";
 		};
-		6DEFB52628FEA1A500762219 /* Deprecated */ = {
-			isa = PBXGroup;
-			children = (
-				2DAA8298278738C0002917C0 /* SelectSeed.swift */,
-			);
-			path = Deprecated;
-			sourceTree = "<group>";
-		};
 		6DEFB52B28FEC94000762219 /* QRCode */ = {
 			isa = PBXGroup;
 			children = (
@@ -2197,10 +2180,8 @@
 				6D52E3A32946C1B500AD72F0 /* SettingsRowView.swift in Sources */,
 				6D16687F28F86DE0008C664A /* CameraButton.swift in Sources */,
 				6DBBC1F2298CB09C00368638 /* NetworkIdenticon.swift in Sources */,
-				6D0677AA29BB095C00D76D90 /* ModalFactory.swift in Sources */,
 				6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */,
 				6D8F813C2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift in Sources */,
-				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				6D10EAC7296FA6410063FB71 /* AttributedInfoBoxView.swift in Sources */,
 				6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */,
 				6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */,
@@ -2217,7 +2198,6 @@
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
-				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
 				6D84441F28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift in Sources */,

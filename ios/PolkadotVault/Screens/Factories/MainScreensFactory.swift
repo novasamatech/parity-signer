@@ -13,7 +13,7 @@ final class MainScreensFactory {
     func screen(for screenData: ScreenData) -> some View {
         switch screenData {
         case let .seedSelector(value):
-            KeySetList(viewModel: .init(), dataModel: .constant(value))
+            KeySetList(viewModel: .init(dataModel: value))
         case let .keys(keyName):
             KeyDetailsView(
                 viewModel: .init(
