@@ -33,7 +33,6 @@
 		2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85727566C3600D8DD29 /* TCWarning.swift */; };
 		2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */; };
 		2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */; };
-		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
 		2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829C27885A67002917C0 /* TCMeta.swift */; };
 		2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */; };
@@ -350,7 +349,6 @@
 		2DA5F85727566C3600D8DD29 /* TCWarning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
 		2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
 		2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
-		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
 		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
@@ -656,7 +654,6 @@
 			children = (
 				2DA5F84627566C3600D8DD29 /* TransactionCards */,
 				2DA5F8402756687200D8DD29 /* TransactionCardView.swift */,
-				2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */,
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
 				2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */,
 			);
@@ -2185,7 +2182,6 @@
 				6DBBC1F2298CB09C00368638 /* NetworkIdenticon.swift in Sources */,
 				6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */,
 				6D8F813C2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift in Sources */,
-				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				6D10EAC7296FA6410063FB71 /* AttributedInfoBoxView.swift in Sources */,
 				6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */,
 				6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */,
