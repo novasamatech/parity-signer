@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -31,8 +33,9 @@ fun BottomSheetConfirmDialog(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 32.dp),
+			.fillMaxWidth()
+			.verticalScroll(rememberScrollState())
+			.padding(start = sidePadding, end = sidePadding, top = 32.dp),
 	) {
 
 		Text(
@@ -44,11 +47,11 @@ fun BottomSheetConfirmDialog(
 		)
 		Text(
 			modifier = Modifier
-                .fillMaxWidth(1f)
-                .padding(
-                    top = 16.dp, bottom = 24.dp,
-                    start = 8.dp, end = 8.dp
-                ),
+				.fillMaxWidth(1f)
+				.padding(
+					top = 16.dp, bottom = 24.dp,
+					start = 8.dp, end = 8.dp
+				),
 			text = message,
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.BodyL,

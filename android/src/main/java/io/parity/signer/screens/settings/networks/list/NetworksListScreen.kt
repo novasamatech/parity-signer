@@ -34,7 +34,7 @@ import io.parity.signer.uniffi.MManageNetworks
 
 
 @Composable
-fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
+fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = stringResource(R.string.networks_screen_title),
@@ -122,7 +122,7 @@ private fun PreviewNetworksList() {
 		)
 	)
 	SignerNewTheme {
-		NetworksList(
+		NetworksListScreen(
 			model,
 			rootNavigator = EmptyNavigator(),
 		)
