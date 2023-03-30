@@ -11,7 +11,6 @@ struct KeySetList: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
-    @Binding var dataModel: MSeeds
     @State private var isShowingNewSeedMenu = false
     @State private var isShowingMoreMenu = false
     @State private var isExportKeysSelected = false
@@ -64,8 +63,6 @@ struct KeySetList: View {
                     .hiddenScrollContent()
                 }
             }
-            .onChange(of: dataModel, perform: { viewModel.updateView($0) })
-            .onAppear { viewModel.updateView(dataModel) }
             VStack {
                 // Add Key Set
                 if !isExportKeysSelected {
@@ -200,13 +197,17 @@ extension KeySetList {
         private let modelBuilder: KeySetListViewModelBuilder
         @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
+        private var dataModel: MSeeds
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
-            modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder()
+            modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
+            dataModel: MSeeds
         ) {
             self.keyDetailsService = keyDetailsService
             self.modelBuilder = modelBuilder
+            self.dataModel = dataModel
+            updateView(dataModel)
         }
 
         func updateView(_ dataModel: MSeeds) {
@@ -245,8 +246,7 @@ private struct KeyListEmptyState: View {
     struct KeySetListPreview: PreviewProvider {
         static var previews: some View {
             KeySetList(
-                viewModel: .init(),
-                dataModel: .constant(PreviewData.mseeds)
+                viewModel: .init(dataModel: PreviewData.mseeds)
             )
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)

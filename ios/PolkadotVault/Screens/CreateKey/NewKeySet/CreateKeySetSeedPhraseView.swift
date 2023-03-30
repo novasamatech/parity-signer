@@ -98,15 +98,18 @@ extension CreateKeySetSeedPhraseView {
         private weak var navigation: NavigationCoordinator!
 
         let dataModel: MNewSeedBackup
+        @Binding var isPresented: Bool
         @Published var confirmBackup = false
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
 
         init(
             dataModel: MNewSeedBackup,
+            isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.dataModel = dataModel
+            _isPresented = isPresented
             self.seedsMediator = seedsMediator
         }
 
@@ -115,7 +118,8 @@ extension CreateKeySetSeedPhraseView {
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
+            isPresented = false
         }
 
         func onCreateTap() {
@@ -149,7 +153,8 @@ extension CreateKeySetSeedPhraseView {
                         season give exact gift push bid rich atom system pig put welcome exit
                         """,
                         identicon: .svg(image: PreviewData.exampleIdenticon)
-                    )
+                    ),
+                    isPresented: .constant(true)
                 )
             )
             .environmentObject(NavigationCoordinator())
