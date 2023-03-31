@@ -38,6 +38,7 @@ fun VerifierScreenFull(
 	verifierDetails: VerifierDetailsModels,
 	wipe: Callback,
 ) {
+
 }
 
 

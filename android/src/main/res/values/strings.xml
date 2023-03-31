@@ -362,6 +362,7 @@
 	<string name="seed_backup_countdown_message">Secret Recovery Phrase  will be hidden in</string>
 	<string name="settings_backup">Backup Secret Phrase</string>
 	<string name="verifier_certificate_title">Verifier Certificate</string>
+	<string name="verifier_certificate_remove_cta">Remove Certificate</string>
 
 
 </resources>
