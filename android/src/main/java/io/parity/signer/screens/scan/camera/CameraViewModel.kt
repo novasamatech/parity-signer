@@ -44,7 +44,11 @@ class CameraViewModel() : ViewModel() {
 		barcodeScanner: BarcodeScanner,
 		imageProxy: ImageProxy
 	) {
+		Log.e("size is", "" + imageProxy.width +" * "+ imageProxy.height)
+		Log.e("crop is", "" + imageProxy.cropRect)//todo dmitry remove it
+
 		if (imageProxy.image == null) return
+val croppedImage = imageProxy.image!!.
 		val inputImage = InputImage.fromMediaImage(
 			imageProxy.image!!,
 			imageProxy.imageInfo.rotationDegrees,

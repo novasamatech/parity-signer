@@ -1,6 +1,8 @@
 package io.parity.signer.screens.scan.camera
 
 import android.util.Log
+import android.util.Rational
+import android.view.Surface.ROTATION_0
 import android.view.ViewGroup
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -8,6 +10,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -17,6 +20,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import io.parity.signer.ui.helpers.afterMeasured
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
@@ -27,6 +31,10 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
 	val coroutineScope = rememberCoroutineScope()
+	val configuration = LocalConfiguration.current
+val backgroundExecutor = remember {
+	Executors.newCachedThreadPool()
+}
 
 	AndroidView(
 		factory = { context ->
@@ -41,7 +49,9 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 			// mlkit docs: The default option is not recommended because it tries
 			// to scan all barcode formats, which is slow.
 			val options = BarcodeScannerOptions.Builder()
-				.setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+				.setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+				.setExecutor(backgroundExecutor)
+				.build()
 			val barcodeScanner = BarcodeScanning.getClient(options)
 
 			cameraProviderFuture.addListener({
@@ -59,17 +69,26 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 					.build()
 					.apply {
-						setAnalyzer(executor) { imageProxy ->
+						setAnalyzer(backgroundExecutor) { imageProxy ->
 							viewModel.processFrame(barcodeScanner, imageProxy)
 						}
 					}
+
+				val viewPort =
+					ViewPort.Builder(Rational(configuration.screenWidthDp,
+						configuration.screenHeightDp), ROTATION_0).build()
+
+				val useCaseGroup = UseCaseGroup.Builder()
+					.addUseCase(preview)
+					.addUseCase(imageAnalysis)
+					.setViewPort(viewPort)
+					.build()
 
 				cameraProvider.unbindAll()
 				val camera = cameraProvider.bindToLifecycle(
 					lifecycleOwner,
 					cameraSelector,
-					imageAnalysis,
-					preview
+					useCaseGroup
 				)
 				//torch control
 				if (camera.cameraInfo.hasFlashUnit()) {
