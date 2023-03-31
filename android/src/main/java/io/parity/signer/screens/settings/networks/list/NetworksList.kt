@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
@@ -41,9 +42,9 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 		)
 		Spacer(modifier = Modifier.padding(top = 10.dp))
 		Column(
-			Modifier
-				.weight(1f)
-				.verticalScroll(rememberScrollState())
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
 		) {
 			model.networks.forEach { network ->
 				NetworkListItem(network) {
@@ -53,12 +54,15 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 				}
 			}
 		}
-		BottomBar2(rootNavigator, BottomBar2State.SETTINGS,
-			skipRememberCameraParent = true) {
+		BottomBar2(
+			rootNavigator, BottomBar2State.SETTINGS,
+			skipRememberCameraParent = true
+		) {
 			rootNavigator.backAction()
 		}
-		LaunchedEffect(key1 = Unit,) {
-			CameraParentSingleton.lastPossibleParent = CameraParentScreen.NetworkListScreen
+		LaunchedEffect(key1 = Unit) {
+			CameraParentSingleton.lastPossibleParent =
+				CameraParentScreen.NetworkListScreen
 		}
 	}
 }
@@ -67,9 +71,10 @@ fun NetworksList(model: NetworksListModel, rootNavigator: Navigator) {
 @Composable
 private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 	Row(
-		Modifier
-			.padding(horizontal = 16.dp, vertical = 8.dp)
-			.clickable(onClick = callback)
+        Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = callback),
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		NetworkIcon(networkLogoName = network.logo, size = 36.dp)
 		Text(
@@ -77,7 +82,7 @@ private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 			style = SignerTypeface.TitleS,
 			color = MaterialTheme.colors.primary,
 			modifier = Modifier
-                .padding(start = 24.dp)
+                .padding(start = 12.dp)
                 .weight(1f)
 		)
 		Image(

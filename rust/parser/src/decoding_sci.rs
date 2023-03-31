@@ -299,7 +299,7 @@ enum SpecialType {
 }
 
 fn check_special(current_type: &Type<PortableForm>) -> SpecialType {
-    match current_type.path().ident() {
+    match current_type.path.ident() {
         Some(a) => match a.as_str() {
             "AccountId32" => SpecialType::AccountId,
             "AccountId20" => SpecialType::AccountId20,
@@ -362,7 +362,7 @@ pub(crate) fn decoding_sci_complete(
                     }
                 }
             }
-            match current_type.type_def() {
+            match &current_type.type_def {
                 TypeDef::Composite(x) => decode_type_def_composite(
                     x,
                     possible_ext,
@@ -393,7 +393,7 @@ pub(crate) fn decoding_sci_complete(
                     }
                     let inner_type = meta_v14
                         .types
-                        .resolve(x.type_param().id())
+                        .resolve(x.type_param.id)
                         .ok_or(ParserDecodingError::V14TypeNotResolved)?;
                     decode_type_def_sequence(
                         inner_type,
@@ -441,11 +441,11 @@ pub(crate) fn decoding_sci_complete(
                     }
                     let inner_type = meta_v14
                         .types
-                        .resolve(x.type_param().id())
+                        .resolve(x.type_param.id)
                         .ok_or(ParserDecodingError::V14TypeNotResolved)?;
                     decode_type_def_array(
                         inner_type,
-                        x.len(),
+                        x.len,
                         possible_ext,
                         balance_flag,
                         data,
@@ -460,7 +460,7 @@ pub(crate) fn decoding_sci_complete(
                             ParserDecodingError::UnexpectedCompactInsides,
                         ));
                     }
-                    let id_set = x.fields().iter().map(|a| a.id()).collect();
+                    let id_set = x.fields.iter().map(|a| a.id).collect();
                     decode_type_def_tuple(
                         id_set,
                         possible_ext,
@@ -483,7 +483,7 @@ pub(crate) fn decoding_sci_complete(
                 TypeDef::Compact(x) => {
                     let inner_type = meta_v14
                         .types
-                        .resolve(x.type_param().id())
+                        .resolve(x.type_param.id)
                         .ok_or(ParserDecodingError::V14TypeNotResolved)?;
                     let compact_flag = true;
                     decoding_sci_complete(
@@ -521,7 +521,7 @@ pub(crate) fn decoding_sci_entry_point(
         if x.index == pallet_index {
             found_pallet_name = Some(x.name.to_string());
             if let Some(a) = &x.calls {
-                found_call_type = Some(a.ty.id());
+                found_call_type = Some(a.ty.id);
             }
             break;
         }
@@ -702,20 +702,20 @@ fn is_option_bool(
     let mut got_none = false;
     let mut got_some = false;
     let mut is_bool = false;
-    if found_ty.variants().len() == 2 {
+    if found_ty.variants.len() == 2 {
         got_len = true;
-        for x in found_ty.variants().iter() {
-            if x.name().as_str() == "None" {
+        for x in found_ty.variants.iter() {
+            if x.name.as_str() == "None" {
                 got_none = true;
             }
-            if x.name().as_str() == "Some" {
+            if x.name.as_str() == "Some" {
                 got_some = true;
-                let fields = x.fields();
+                let fields = &x.fields;
                 if fields.len() == 1 {
-                    let option_type_id = fields[0].ty().id();
+                    let option_type_id = fields[0].ty.id;
                     match meta_v14.types.resolve(option_type_id) {
                         Some(a) => {
-                            if let TypeDef::Primitive(TypeDefPrimitive::Bool) = a.type_def() {
+                            if let TypeDef::Primitive(TypeDefPrimitive::Bool) = a.type_def {
                                 is_bool = true
                             } else {
                                 break;
@@ -791,11 +791,11 @@ fn decode_type_def_variant(
                         return Err(Error::Decoding(ParserDecodingError::DataTooShort));
                     }
                     data = data[1..].to_vec();
-                    let found_variant = &found_ty.variants()[1];
+                    let found_variant = &found_ty.variants[1];
                     let compact_flag = false;
                     let balance_flag = false;
                     process_fields(
-                        found_variant.fields(),
+                        &found_variant.fields,
                         possible_ext,
                         &CallExpectation::None,
                         compact_flag,
@@ -813,8 +813,8 @@ fn decode_type_def_variant(
         }
     } else {
         let mut found_variant = None;
-        for x in found_ty.variants().iter() {
-            if x.index() == enum_index {
+        for x in found_ty.variants.iter() {
+            if x.index == enum_index {
                 found_variant = Some(x);
                 break;
             }
@@ -824,7 +824,7 @@ fn decode_type_def_variant(
             None => return Err(Error::Decoding(ParserDecodingError::UnexpectedEnumVariant)),
         };
         let mut variant_docs = String::new();
-        for (i, x) in found_variant.docs().iter().enumerate() {
+        for (i, x) in found_variant.docs.iter().enumerate() {
             if i > 0 {
                 variant_docs.push('\n');
             }
@@ -833,18 +833,18 @@ fn decode_type_def_variant(
         let mut fancy_out = match call_expectation {
             CallExpectation::None => vec![OutputCard {
                 card: ParserCard::EnumVariantName {
-                    name: found_variant.name().to_string(),
+                    name: found_variant.name.to_string(),
                     docs_enum_variant: variant_docs,
                 },
                 indent,
             }],
             CallExpectation::Pallet => vec![OutputCard {
-                card: ParserCard::Pallet(found_variant.name().to_string()),
+                card: ParserCard::Pallet(found_variant.name.to_string()),
                 indent,
             }],
             CallExpectation::Method => vec![OutputCard {
                 card: ParserCard::Method {
-                    method_name: found_variant.name().to_string(),
+                    method_name: found_variant.name.to_string(),
                     docs: variant_docs,
                 },
                 indent,
@@ -855,7 +855,7 @@ fn decode_type_def_variant(
         let compact_flag = false;
         let balance_flag = false;
         let fields_processed = process_fields(
-            found_variant.fields(),
+            &found_variant.fields,
             possible_ext,
             call_expectation,
             compact_flag,
@@ -892,14 +892,14 @@ fn process_fields(
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, x) in fields.iter().enumerate() {
         let mut field_docs = String::new();
-        for (j, y) in x.docs().iter().enumerate() {
+        for (j, y) in x.docs.iter().enumerate() {
             if j > 0 {
                 field_docs.push('\n');
             }
             field_docs.push_str(y);
         }
-        let (inner_type, path_type, docs_type) = type_path_docs(meta_v14, x.ty().id())?;
-        match x.name() {
+        let (inner_type, path_type, docs_type) = type_path_docs(meta_v14, x.ty.id)?;
+        match &x.name {
             Some(field_name) => {
                 fancy_out.push(OutputCard {
                     card: ParserCard::FieldName {
@@ -930,7 +930,7 @@ fn process_fields(
                 }
             }
         }
-        balance_flag = match x.type_name() {
+        balance_flag = match &x.type_name {
             Some(a) => field_type_name_is_balance(a),
             None => balance_flag,
         };
@@ -978,13 +978,13 @@ fn decode_type_def_composite(
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut> {
-    if compact_flag && (composite_ty.fields().len() > 1) {
+    if compact_flag && (composite_ty.fields.len() > 1) {
         return Err(Error::Decoding(
             ParserDecodingError::UnexpectedCompactInsides,
         ));
     }
     process_fields(
-        composite_ty.fields(),
+        &composite_ty.fields,
         possible_ext,
         &CallExpectation::None,
         compact_flag,
@@ -1014,13 +1014,13 @@ fn decode_type_def_bit_sequence(
                 Some(a) => a.to_vec(),
                 None => return Err(Error::Decoding(ParserDecodingError::DataTooShort)),
             };
-            let bitorder_type_id = bit_ty.bit_order_type().id();
+            let bitorder_type_id = bit_ty.bit_order_type.id;
             let bitorder_type = match meta_v14.types.resolve(bitorder_type_id) {
                 Some(a) => a,
                 None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
             };
-            let bitorder = match bitorder_type.type_def() {
-                TypeDef::Composite(_) => match bitorder_type.path().ident() {
+            let bitorder = match bitorder_type.type_def {
+                TypeDef::Composite(_) => match bitorder_type.path.ident() {
                     Some(x) => match x.as_str() {
                         "Lsb0" => FoundBitOrder::Lsb0,
                         "Msb0" => FoundBitOrder::Msb0,
@@ -1031,12 +1031,12 @@ fn decode_type_def_bit_sequence(
                 _ => return Err(Error::Decoding(ParserDecodingError::NotBitOrderType)),
             };
 
-            let bitstore_type_id = bit_ty.bit_store_type().id();
+            let bitstore_type_id = bit_ty.bit_store_type.id;
             let bitstore_type = match meta_v14.types.resolve(bitstore_type_id) {
                 Some(a) => a,
                 None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
             };
-            let card_prep = match bitstore_type.type_def() {
+            let card_prep = match &bitstore_type.type_def {
                 TypeDef::Primitive(a) => {
                     match a {
                         TypeDefPrimitive::U8 => process_bitvec::<u8>(bitorder, into_bv_decode)?,
@@ -1129,14 +1129,14 @@ fn type_path_docs(
         .resolve(type_id)
         .ok_or(ParserDecodingError::V14TypeNotResolved)?;
     let mut docs = String::new();
-    for (i, x) in current_type.docs().iter().enumerate() {
+    for (i, x) in current_type.docs.iter().enumerate() {
         if i > 0 {
             docs.push('\n');
         }
         docs.push_str(x);
     }
     let mut path = String::new();
-    for (i, x) in current_type.path().segments().iter().enumerate() {
+    for (i, x) in current_type.path.segments.iter().enumerate() {
         if i > 0 {
             path.push_str(" >> ");
         }

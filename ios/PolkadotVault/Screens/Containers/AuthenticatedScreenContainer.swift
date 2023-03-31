@@ -17,11 +17,8 @@ struct AuthenticatedScreenContainer: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)
-                }
-                viewModel.modalFactory.modal(for: navigation.actionResult.modalData)
+            VStack(spacing: 0) {
+                viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)
             }
             .gesture(
                 DragGesture().updating($dragOffset, body: { value, _, _ in
@@ -82,7 +79,7 @@ struct AuthenticatedScreenContainer: View {
         ) {
             ErrorBottomModal(
                 viewModel: .alertError(message: navigation.genericError.errorMessage),
-                dismissAction: navigation.perform(navigation: .init(action: .goBack)),
+                dismissAction: viewModel.onDismissErrorTap(),
                 isShowingBottomAlert: $navigation.genericError.isPresented
             )
             .clearModalBackground()
@@ -93,18 +90,19 @@ struct AuthenticatedScreenContainer: View {
 extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
         private let navigation: NavigationCoordinator
-        let modalFactory: ModalFactory
         let mainScreenFactory: MainScreensFactory
 
         init(
             navigation: NavigationCoordinator = NavigationCoordinator(),
-            modalFactory: ModalFactory = ModalFactory(),
             mainScreenFactory: MainScreensFactory = MainScreensFactory()
         ) {
             self.navigation = navigation
-            self.modalFactory = modalFactory
             self.mainScreenFactory = mainScreenFactory
             navigation.perform(navigation: .init(action: .start))
+        }
+
+        func onDismissErrorTap() {
+            navigation.perform(navigation: .init(action: .goBack))
         }
     }
 }

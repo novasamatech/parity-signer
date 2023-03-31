@@ -17,7 +17,7 @@ lazy_static = "1.4.0"
 parity-scale-codec = "3.4.0"
 qrcode_rtx = {path = "../qrcode_rtx"}
 regex = "1.7.3"
-serde_json = "1.0.94"
+serde_json = "1.0.95"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
@@ -28,4 +28,4 @@ tokio = { version = "1", features = ["full"] }
 [dev-dependencies]
 assert_cmd = "2.0"
 defaults = {path = "../defaults", features = ["active"]}
-tempfile = "3.4"
+tempfile = "3.5"

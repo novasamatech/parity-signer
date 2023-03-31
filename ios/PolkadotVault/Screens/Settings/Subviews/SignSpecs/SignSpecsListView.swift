@@ -36,6 +36,57 @@ struct SignSpecsListView: View {
         .onAppear {
             viewModel.use(navigation: navigation)
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingEnterPassword,
+            onDismiss: {
+                viewModel.enterPassword = nil
+                if viewModel.detailsContent != nil {
+                    viewModel.isPresentingDetails = true
+                    return
+                }
+                if viewModel.shouldPresentError {
+                    viewModel.shouldPresentError = false
+                    viewModel.isPresentingError = true
+                } else {
+                    navigation.perform(navigation: .init(action: .goBack))
+                }
+            }
+        ) {
+            SignSpecEnterPasswordModal(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingEnterPassword,
+                    shouldPresentError: $viewModel.shouldPresentError,
+                    dataModel: $viewModel.enterPassword,
+                    detailsContent: $viewModel.detailsContent
+                )
+            )
+            .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingDetails,
+            onDismiss: {
+                viewModel.detailsContent = nil
+            }
+        ) {
+            SignSpecDetails(
+                viewModel: .init(
+                    content: viewModel.detailsContent,
+                    isPresented: $viewModel.isPresentingDetails
+                )
+            )
+        }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingError,
+            onDismiss: {
+                navigation.perform(navigation: .init(action: .navbarSettings))
+            }
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 
     @ViewBuilder
@@ -79,6 +130,14 @@ extension SignSpecsListView {
         private let seedsMediator: SeedsMediating
         private weak var navigation: NavigationCoordinator!
 
+        @Published var detailsContent: MSufficientCryptoReady!
+        @Published var isPresentingDetails: Bool = false
+        @Published var isPresentingEnterPassword: Bool = false
+        @Published var shouldPresentError: Bool = false
+        @Published var isPresentingError: Bool = false
+        @Published var enterPassword: MEnterPassword!
+        @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
+
         init(
             content: MSignSufficientCrypto,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
@@ -98,13 +157,23 @@ extension SignSpecsListView {
         func onRecordTap(_ keyRecord: MRawKey) {
             let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
             guard !seedPhrase.isEmpty else { return }
-            navigation.perform(
+            let actionResult = navigation.performFake(
                 navigation: .init(
                     action: .goForward,
                     details: keyRecord.addressKey,
                     seedPhrase: seedPhrase
                 )
             )
+            switch actionResult.modalData {
+            case let .enterPassword(enterPassword):
+                self.enterPassword = enterPassword
+                isPresentingEnterPassword = true
+            case let .sufficientCryptoReady(detailsContent):
+                self.detailsContent = detailsContent
+                isPresentingDetails = true
+            default:
+                ()
+            }
         }
     }
 }

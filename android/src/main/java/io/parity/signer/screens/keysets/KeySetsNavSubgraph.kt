@@ -58,12 +58,14 @@ fun KeySetsNavSubgraph(
 					networkState = networkState,
 				)
 			}
-			if (model.keys.isEmpty()) {
+			if (model.keys.isNotEmpty()) {
 				BottomSheetWrapperRoot(onClosedAction = {
 					navController.popBackStack(KeySetsNavSubgraph.home, false)
 				}) {
 					KeySetsMenuBottomSheet(navigator = navController)
 				}
+			} else {
+				navController.popBackStack(KeySetsNavSubgraph.home, false)
 			}
 		}
 		composable(KeySetsNavSubgraph.export) {
