@@ -68,19 +68,19 @@ struct KeyDetailsPublicKeyView: View {
                             AnimatedQRCodeView(
                                 viewModel: Binding<AnimatedQRCodeViewModel>.constant(
                                     .init(
-                                        qrCodes: viewModel.viewModel.qrCodes
+                                        qrCodes: viewModel.renderable.qrCodes
                                     )
                                 )
                             )
                             .padding(Spacing.stroke)
                             QRCodeAddressFooterView(
-                                viewModel: viewModel.viewModel.footer,
+                                viewModel: viewModel.renderable.footer,
                                 backgroundColor: Asset.fill6Solid.swiftUIColor
                             )
                         }
                         .strokeContainerBackground()
                         // Exposed key alert
-                        if viewModel.viewModel.isKeyExposed {
+                        if viewModel.renderable.isKeyExposed {
                             HStack {
                                 Localizable.KeyScreen.Label.hotkey.text
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -169,21 +169,19 @@ struct KeyDetailsPublicKeyView: View {
 
 extension KeyDetailsPublicKeyView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
-
-        var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         private let keyDetails: MKeyDetails
         private let forgetKeyActionHandler: ForgetSingleKeyAction
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
 
-        @Published var viewModel: KeyDetailsPublicKeyViewModel
+        private weak var navigation: NavigationCoordinator!
+        @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
+        @Published var renderable: KeyDetailsPublicKeyViewModel
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingExportKeysWarningModal = false
         @Published var isPresentingExportKeysModal = false
         @Published var isPresentingConnectivityAlert = false
-
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
@@ -198,7 +196,7 @@ extension KeyDetailsPublicKeyView {
             self.forgetKeyActionHandler = forgetKeyActionHandler
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
-            _viewModel = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
+            _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
         }
 
         func onAppear() {
@@ -219,7 +217,7 @@ extension KeyDetailsPublicKeyView {
         }
 
         func navigationSubtitle() -> String? {
-            viewModel.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string
+            renderable.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string
         }
 
         func checkForActionsPresentation() {
@@ -251,6 +249,7 @@ extension KeyDetailsPublicKeyView {
         func onExportKeysDismissal() {
             // When user finished Export Private Key interaction, mimic Rust state machine and hide "..." modal menu
             navigation.perform(navigation: .init(action: .rightButtonAction))
+            exportPrivateKeyViewModel = nil
         }
 
         func onConnectivityErrorContinueTap() {
