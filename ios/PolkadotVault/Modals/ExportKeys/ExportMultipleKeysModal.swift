@@ -62,7 +62,7 @@ struct ExportMultipleKeysModal: View {
                     // QR Code container
                     VStack(spacing: 0) {
                         AnimatedQRCodeView(viewModel: $viewModel.qrCode)
-                            .padding(0.5)
+                            .padding(Spacing.stroke)
                             .fixedSize(horizontal: false, vertical: true)
                         InfoBoxView(text: Localizable.KeysExport.KeySets.Label.info.string)
                             .padding(.top, Spacing.extraSmall)
