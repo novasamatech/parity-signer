@@ -9,7 +9,6 @@ import SwiftUI
 
 final class MainScreensFactory {
     @ViewBuilder
-    // swiftlint:disable function_body_length
     func screen(for screenData: ScreenData) -> some View {
         switch screenData {
         case let .seedSelector(value):
@@ -26,11 +25,7 @@ final class MainScreensFactory {
             LogsListView(viewModel: .init())
         case let .keyDetails(value):
             if let value = value {
-                KeyDetailsPublicKeyView(
-                    viewModel: KeyDetailsPublicKeyViewModel(value),
-                    actionModel: KeyDetailsPublicKeyActionModel(value),
-                    exportPrivateKeyService: ExportPrivateKeyService(keyDetails: value)
-                )
+                KeyDetailsPublicKeyView(viewModel: .init(keyDetails: value))
             } else {
                 EmptyView()
             }
