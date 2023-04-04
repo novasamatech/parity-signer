@@ -2,6 +2,7 @@ package io.parity.signer.screens.scan.camera
 
 import android.util.Log
 import android.util.Rational
+import android.util.Size
 import android.view.Surface.ROTATION_0
 import android.view.ViewGroup
 import androidx.camera.core.*
@@ -67,16 +68,20 @@ val backgroundExecutor = remember {
 
 				val imageAnalysis = ImageAnalysis.Builder()
 					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+					.setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)//todo dmitry change crop?
+//					.setTargetResolution(Size(1024,2048))
 					.build()
 					.apply {
-						setAnalyzer(backgroundExecutor) { imageProxy ->
+						setAnalyzer(executor) { imageProxy ->
 							viewModel.processFrame(barcodeScanner, imageProxy)
 						}
 					}
 
+				Log.e("rational is ", "${configuration.screenWidthDp} ${configuration.screenHeightDp}")
 				val viewPort =
 					ViewPort.Builder(Rational(configuration.screenWidthDp,
-						configuration.screenHeightDp), ROTATION_0).build()
+						configuration.screenHeightDp), previewView.display.rotation)
+						.build()
 
 				val useCaseGroup = UseCaseGroup.Builder()
 					.addUseCase(preview)

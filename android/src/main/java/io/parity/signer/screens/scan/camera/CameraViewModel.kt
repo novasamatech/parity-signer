@@ -48,7 +48,6 @@ class CameraViewModel() : ViewModel() {
 		Log.e("crop is", "" + imageProxy.cropRect)//todo dmitry remove it
 
 		if (imageProxy.image == null) return
-val croppedImage = imageProxy.image!!.
 		val inputImage = InputImage.fromMediaImage(
 			imageProxy.image!!,
 			imageProxy.imageInfo.rotationDegrees,
