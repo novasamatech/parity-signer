@@ -1,44 +1,48 @@
 package io.parity.signer.screens.settings.verifiercert
 
-import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import io.parity.signer.R
-import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.networkicon.NetworkIcon
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
-import io.parity.signer.components.panels.CameraParentScreen
-import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.domain.*
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textTertiary
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MManageNetworks
+import androidx.compose.runtime.rememberCoroutineScope
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.VerifierDetailsModels
+import io.parity.signer.ui.BottomSheetWrapperContent
+import kotlinx.coroutines.launch
 
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun VerifierScreenFull(
 	verifierDetails: VerifierDetailsModels,
 	wipe: Callback,
+	navigator: Navigator,
 ) {
+	val bottomSheetState =
+		rememberModalBottomSheetState(
+			ModalBottomSheetValue.Hidden,
+			confirmValueChange = {
+				it != ModalBottomSheetValue.HalfExpanded
+			}
+		)
+	val scope = rememberCoroutineScope()
 
+	BottomSheetWrapperContent(
+		bottomSheetState = bottomSheetState,
+		bottomSheetContent = {
+			ConfirmRemoveCertificateBottomSheet(
+				onCancel = { scope.launch { bottomSheetState.hide() } },
+				onRemoveCertificate = wipe,
+			)
+		},
+		mainContent = {
+			VerifierScreen(
+				verifierDetails = verifierDetails,
+				onBack = navigator::backAction,
+				onRemove = { scope.launch { bottomSheetState.show() } },
+			)
+		},
+	)
 }
 
 

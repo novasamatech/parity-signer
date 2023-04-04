@@ -16,7 +16,7 @@ import io.parity.signer.ui.theme.pink300
 
 
 @Composable
-fun ConfirmRemoveCertificateBottomSheet(
+internal fun ConfirmRemoveCertificateBottomSheet(
 	onCancel: Callback,
 	onRemoveCertificate: Callback,
 ) {

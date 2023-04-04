@@ -21,7 +21,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-fun VerifierScreen(
+internal fun VerifierScreen(
 	verifierDetails: VerifierDetailsModels,
 	onBack: Callback,
 	onRemove: Callback,
@@ -62,6 +62,7 @@ fun VerifierScreen(
 			color = MaterialTheme.colors.red400,
 			modifier = Modifier
 				.clickable(onClick = onRemove)
+				.fillMaxWidth(1f)
 				.padding(vertical = 14.dp, horizontal = 24.dp)
 		)
 	}
