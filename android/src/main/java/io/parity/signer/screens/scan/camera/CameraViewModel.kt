@@ -2,12 +2,10 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
@@ -21,9 +19,11 @@ class CameraViewModel() : ViewModel() {
 	val isTorchEnabled = MutableStateFlow(false)
 
 	private val _bananaSplitPayload = MutableStateFlow<List<String>?>(null)
-	val bananaSplitPayload: StateFlow<List<String>?> = _bananaSplitPayload.asStateFlow()
+	val bananaSplitPayload: StateFlow<List<String>?> =
+		_bananaSplitPayload.asStateFlow()
 
-	private val _pendingTransactionPayloads = MutableStateFlow<Set<String>>(emptySet())
+	private val _pendingTransactionPayloads =
+		MutableStateFlow<Set<String>>(emptySet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
 		_pendingTransactionPayloads.asStateFlow()
 
@@ -60,7 +60,8 @@ class CameraViewModel() : ViewModel() {
 					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
 						if (total.value == null) {
 							try {
-								val proposeTotal = qrparserGetPacketsTotal(payloadString, true).toInt()
+								val proposeTotal =
+									qrparserGetPacketsTotal(payloadString, true).toInt()
 								if (proposeTotal == 1) {
 									decode(listOf(payloadString))
 								} else {

@@ -3,7 +3,6 @@ package io.parity.signer.screens.scan.camera
 import android.util.Log
 import android.util.Rational
 import android.util.Size
-import android.view.Surface.ROTATION_0
 import android.view.ViewGroup
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -33,9 +32,9 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 		remember { ProcessCameraProvider.getInstance(context) }
 	val coroutineScope = rememberCoroutineScope()
 	val configuration = LocalConfiguration.current
-val backgroundExecutor = remember {
-	Executors.newCachedThreadPool()
-}
+	val backgroundExecutor = remember {
+		Executors.newCachedThreadPool()
+	}
 
 	AndroidView(
 		factory = { context ->
@@ -69,7 +68,7 @@ val backgroundExecutor = remember {
 				val imageAnalysis = ImageAnalysis.Builder()
 					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 					.setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
-					.setTargetResolution(Size(1920,1080))
+					.setTargetResolution(Size(1920, 1080))
 					.build()
 					.apply {
 						setAnalyzer(executor) { imageProxy ->
@@ -77,10 +76,13 @@ val backgroundExecutor = remember {
 						}
 					}
 
-				Log.e("rational is ", "${configuration.screenWidthDp} ${configuration.screenHeightDp}")
 				val viewPort =
-					ViewPort.Builder(Rational(configuration.screenWidthDp,
-						configuration.screenHeightDp), previewView.display.rotation)
+					ViewPort.Builder(
+						Rational(
+							configuration.screenWidthDp,
+							configuration.screenHeightDp
+						), previewView.display.rotation
+					)
 						.build()
 
 				val useCaseGroup = UseCaseGroup.Builder()
