@@ -69,7 +69,7 @@ val backgroundExecutor = remember {
 				val imageAnalysis = ImageAnalysis.Builder()
 					.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 					.setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
-					.setTargetResolution(Size(1200,1600))
+					.setTargetResolution(Size(1920,1080))
 					.build()
 					.apply {
 						setAnalyzer(executor) { imageProxy ->
