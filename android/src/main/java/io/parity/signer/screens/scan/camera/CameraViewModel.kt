@@ -2,10 +2,12 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
@@ -46,6 +48,7 @@ class CameraViewModel() : ViewModel() {
 	) {
 		Log.e("size is", "" + imageProxy.width +" * "+ imageProxy.height)
 		Log.e("crop is", "" + imageProxy.cropRect)//todo dmitry remove it
+		Toast.makeText(ServiceLocator.appContext, "Size is" + imageProxy.width +" * "+ imageProxy.height, Toast.LENGTH_SHORT).show()
 
 		if (imageProxy.image == null) return
 		val inputImage = InputImage.fromMediaImage(
