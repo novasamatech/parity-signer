@@ -50,7 +50,7 @@ struct ExportPrivateKeyModal: View {
                                 )
                             )
                         )
-                        .padding(0.5)
+                        .padding(Spacing.stroke)
                         .privacySensitive()
                         QRCodeAddressFooterView(
                             viewModel: viewModel.addressFooter,

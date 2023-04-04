@@ -145,7 +145,6 @@
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
 		6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */; };
-		6D84441F28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84441E28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift */; };
 		6D84442128D3267A0072FBAC /* ForgetSingleKeyAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84442028D3267A0072FBAC /* ForgetSingleKeyAction.swift */; };
 		6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */; };
 		6D850BDE292F7B4D00BA9017 /* EnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */; };
@@ -466,7 +465,6 @@
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
 		6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeRootFooterView.swift; sourceTree = "<group>"; };
-		6D84441E28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyViewModel.swift; sourceTree = "<group>"; };
 		6D84442028D3267A0072FBAC /* ForgetSingleKeyAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgetSingleKeyAction.swift; sourceTree = "<group>"; };
 		6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenScrollContainerModifier.swift; sourceTree = "<group>"; };
 		6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPasswordModal.swift; sourceTree = "<group>"; };
@@ -974,7 +972,6 @@
 			isa = PBXGroup;
 			children = (
 				6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */,
-				6D84441E28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift */,
 			);
 			path = PublicKey;
 			sourceTree = "<group>";
@@ -2200,7 +2197,6 @@
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
-				6D84441F28D317FE0072FBAC /* KeyDetailsPublicKeyViewModel.swift in Sources */,
 				6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
