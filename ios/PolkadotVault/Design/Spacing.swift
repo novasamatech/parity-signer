@@ -11,6 +11,8 @@ import UIKit
 enum Spacing {
     /// No padding: 0 pts
     static let none: CGFloat = 0
+    /// Stroke: 0.5 pts
+    static let stroke: CGFloat = 0.5
     /// Minimal: 2 pts
     static let minimal: CGFloat = 2
     /// Extra Extra Small: 4 pts

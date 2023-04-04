@@ -61,7 +61,7 @@ extension PreviewData {
         isRootKey: Bool = true
     ) -> KeyDetailsPublicKeyViewModel {
         KeyDetailsPublicKeyViewModel(
-            qrCode: qrCodeContainerViewModel,
+            qrCodes: [],
             footer: qrCodeAddressFooterViewModel,
             isKeyExposed: isKeyExposed,
             isRootKey: isRootKey
