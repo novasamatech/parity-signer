@@ -46,9 +46,6 @@ class CameraViewModel() : ViewModel() {
 		barcodeScanner: BarcodeScanner,
 		imageProxy: ImageProxy
 	) {
-		Log.e("size is", "" + imageProxy.width +" * "+ imageProxy.height)
-		Log.e("crop is", "" + imageProxy.cropRect)//todo dmitry remove it
-		Toast.makeText(ServiceLocator.appContext, "Size is" + imageProxy.width +" * "+ imageProxy.height, Toast.LENGTH_SHORT).show()
 
 		if (imageProxy.image == null) return
 		val inputImage = InputImage.fromMediaImage(
