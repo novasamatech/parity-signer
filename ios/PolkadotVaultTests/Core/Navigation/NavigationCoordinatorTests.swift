@@ -90,19 +90,6 @@ final class NavigationCoordinatorTests: XCTestCase {
         XCTAssertEqual(backendActionPerformer.performBackendReceivedSeedPhrase, ["", secondNavigation.seedPhrase])
     }
 
-    func test_performNavigation_whenActionUpdatesFooterButton_updatesSelectedTab() {
-        // Given
-        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
-        backendActionPerformer.performBackendReturnValue = .success(.generate(footerButton: .log))
-        XCTAssertEqual(subject.selectedTab, .keys)
-
-        // When
-        subject.perform(navigation: navigation)
-
-        // Then
-        XCTAssertEqual(subject.selectedTab, .logs)
-    }
-
     func test_performNavigation_whenActionDoesNotChangeFooterButton_doesNotUpdateSelectedTab() {
         // Given
         let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)

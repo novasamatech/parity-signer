@@ -17,7 +17,7 @@ struct LogsListView: View {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.LogsList.Label.title.string,
-                        leftButtons: [.init(type: .empty)],
+                        leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
                     )
@@ -89,17 +89,19 @@ extension LogsListView {
         @Published var isPresentingAddNoteModal = false
         @Published var selectedDetails: MLogDetails!
         @Published var isPresentingDetails = false
-
+        @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
         private let logsService: LogsService
         private let snackBarPresentation: BottomSnackbarPresentation
         private let renderableBuilder: LogEntryRenderableBuilder
 
         init(
+            isPresented: Binding<Bool>,
             logsService: LogsService = LogsService(),
             snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
         ) {
+            _isPresented = isPresented
             self.logsService = logsService
             self.snackBarPresentation = snackBarPresentation
             self.renderableBuilder = renderableBuilder
@@ -121,6 +123,10 @@ extension LogsListView {
                     self.snackBarPresentation.isSnackbarPresented = true
                 }
             }
+        }
+
+        func onBackTap() {
+            isPresented = false
         }
 
         func onMoreMenuTap() {
@@ -176,7 +182,7 @@ extension LogsListView {
 #if DEBUG
     struct LogsListView_Previews: PreviewProvider {
         static var previews: some View {
-            LogsListView(viewModel: .init())
+            LogsListView(viewModel: .init(isPresented: .constant(true)))
                 .environmentObject(NavigationCoordinator())
         }
     }

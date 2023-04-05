@@ -11,7 +11,6 @@ import Foundation
 enum Tab: CaseIterable, Equatable {
     case keys
     case scanner
-    case logs
     case settings
 }
 
@@ -24,15 +23,14 @@ extension Tab {
             return nil
         }
         switch footerButton {
-        case .log:
-            self = .logs
         case .scan:
             self = .scanner
         case .keys:
             self = .keys
         case .settings:
             self = .settings
-        case .back:
+        case .back,
+             .log:
             return nil
         }
     }
@@ -45,8 +43,6 @@ extension Tab {
             return .navbarKeys
         case .scanner:
             return nil
-        case .logs:
-            return .navbarLog
         case .settings:
             return .navbarSettings
         }

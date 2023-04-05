@@ -36,8 +36,6 @@ private extension TabViewModelBuilder {
             return Asset.tabbarKeys.swiftUIImage
         case .scanner:
             return Asset.tabbarScanner.swiftUIImage
-        case .logs:
-            return isSelected ? Asset.tabbarLogsSelected.swiftUIImage : Asset.tabbarLogs.swiftUIImage
         case .settings:
             return isSelected ? Asset.tabbarSettingsSelected.swiftUIImage : Asset.tabbarSettings.swiftUIImage
         }
@@ -49,8 +47,6 @@ private extension TabViewModelBuilder {
             return Localizable.TabBar.keys.text
         case .scanner:
             return Localizable.TabBar.scanner.text
-        case .logs:
-            return Localizable.TabBar.logs.text
         case .settings:
             return Localizable.TabBar.settings.text
         }
