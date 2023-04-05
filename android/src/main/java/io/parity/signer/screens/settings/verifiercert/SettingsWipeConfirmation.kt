@@ -20,10 +20,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.pink300
-import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.ui.theme.*
 
 
 @Composable
@@ -72,7 +69,7 @@ fun SettingsWipeAllConfirmation(
 		)
 		PrimaryButtonWide(
 			label = stringResource(R.string.settings_confirmation_wipe_all_message_yes_label),
-			activeBackground = Color.Red,
+			activeBackground = MaterialTheme.colors.red400,
 			onClicked = onWipe
 		)
 		SecondaryButtonWide(
