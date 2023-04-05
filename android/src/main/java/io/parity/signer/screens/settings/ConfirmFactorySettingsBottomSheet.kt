@@ -13,7 +13,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 @Composable
 internal fun ConfirmFactorySettingsBottomSheet(
 	onCancel: Callback,
-	onRemoveCertificate: Callback,
+	onFactoryReset: Callback,
 ) {
 	BottomSheetConfirmDialog(
 		title = stringResource(R.string.confirm_factory_reset_title),
@@ -21,7 +21,7 @@ internal fun ConfirmFactorySettingsBottomSheet(
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
 		onCancel = onCancel,
 		isCtaDangerous = true,
-		onCta = onRemoveCertificate,
+		onCta = onFactoryReset,
 	)
 }
 

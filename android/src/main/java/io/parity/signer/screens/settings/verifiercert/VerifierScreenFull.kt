@@ -8,6 +8,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.VerifierDetailsModels
+import io.parity.signer.screens.settings.SettingsWipeAllConfirmation
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 
@@ -30,9 +31,9 @@ fun VerifierScreenFull(
 	BottomSheetWrapperContent(
 		bottomSheetState = bottomSheetState,
 		bottomSheetContent = {
-			ConfirmFactorySettingsBottomSheet(
+			SettingsWipeAllConfirmation(
 				onCancel = { scope.launch { bottomSheetState.hide() } },
-				onRemoveCertificate = wipe,
+				onWipe = wipe,
 			)
 		},
 		mainContent = {
