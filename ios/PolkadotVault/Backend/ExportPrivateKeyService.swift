@@ -10,19 +10,16 @@ import Foundation
 final class ExportPrivateKeyService {
     private let databaseMediator: DatabaseMediating
     private let seedsMediator: SeedsMediating
-    private let keyDetails: MKeyDetails
 
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-        keyDetails: MKeyDetails
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
         self.databaseMediator = databaseMediator
         self.seedsMediator = seedsMediator
-        self.keyDetails = keyDetails
     }
 
-    func exportPrivateKey() -> ExportPrivateKeyViewModel? {
+    func exportPrivateKey(_ keyDetails: MKeyDetails) -> ExportPrivateKeyViewModel? {
         guard let qrCode = try? generateSecretKeyQr(
             publicKey: keyDetails.pubkey,
             expectedSeedName: keyDetails.address.seedName,
