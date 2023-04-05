@@ -31,18 +31,6 @@ final class TabTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    func test_init_whenLog_returnsLogs() {
-        // Given
-        let expectedResult: Tab = .logs
-        let footerButoon: FooterButton? = .log
-
-        // When
-        let result = Tab(footerButoon)
-
-        // Then
-        XCTAssertEqual(result, expectedResult)
-    }
-
     func test_init_whenScan_returnsScanner() {
         // Given
         let expectedResult: Tab = .scanner

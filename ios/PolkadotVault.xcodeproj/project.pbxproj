@@ -1025,10 +1025,10 @@
 		6D52E3A12946C19F00AD72F0 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				6D52E3A82946F57000AD72F0 /* Subviews */,
 				6D52E3A22946C1B500AD72F0 /* SettingsRowView.swift */,
 				6D52E3A42946C3B400AD72F0 /* SettingsView.swift */,
 				6D52E3A62946C45100AD72F0 /* SettingsItem.swift */,
+				6D52E3A82946F57000AD72F0 /* Subviews */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1036,9 +1036,9 @@
 		6D52E3A82946F57000AD72F0 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				6D702D2F29DC85550039EB9F /* VerifierCertificate */,
 				6D4F779729CAEC9B00374C83 /* SignSpecs */,
 				6DE67D03298AA41D0042415A /* Backup */,
-				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
 				6D7129202952B7570048558C /* Networks */,
 			);
 			path = Subviews;
@@ -1239,6 +1239,14 @@
 				6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */,
 			);
 			path = Rows;
+			sourceTree = "<group>";
+		};
+		6D702D2F29DC85550039EB9F /* VerifierCertificate */ = {
+			isa = PBXGroup;
+			children = (
+				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
+			);
+			path = VerifierCertificate;
 			sourceTree = "<group>";
 		};
 		6D7129202952B7570048558C /* Networks */ = {

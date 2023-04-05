@@ -10,6 +10,8 @@ import SwiftUI
 struct VerfierCertificateView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -18,47 +20,52 @@ struct VerfierCertificateView: View {
                     title: Localizable.VerifierCertificate.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: {
+                            viewModel.onBackTap()
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     )],
                     rightButtons: [.init(type: .empty)]
                 )
             )
-            VStack {
-                VStack(spacing: Spacing.small) {
-                    VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                        Localizable.Transaction.Verifier.Label.key.text
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        Text(viewModel.content.publicKey)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    }
-                    Divider()
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Localizable.Transaction.Verifier.Label.crypto.text
+            if let content = viewModel.content {
+                VStack {
+                    VStack(spacing: Spacing.small) {
+                        VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                            Localizable.Transaction.Verifier.Label.key.text
                                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                            Spacer()
-                            Text(viewModel.content.encryption)
+                            Text(content.publicKey)
                                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         }
+                        Divider()
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Localizable.Transaction.Verifier.Label.crypto.text
+                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                Spacer()
+                                Text(content.encryption)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            }
+                        }
                     }
+                    .padding(Spacing.medium)
                 }
-                .padding(Spacing.medium)
+                .containerBackground()
+                .padding(.bottom, Spacing.extraSmall)
+                .padding(.horizontal, Spacing.extraSmall)
+                HStack {
+                    Text(Localizable.VerifierCertificate.Action.remove.string)
+                        .font(PrimaryFont.titleS.font)
+                        .foregroundColor(Asset.accentRed400.swiftUIColor)
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    viewModel.onRemoveTap()
+                }
+                .frame(height: Heights.verifierCertificateActionHeight)
+                .padding(.horizontal, Spacing.large)
             }
-            .containerBackground()
-            .padding(.bottom, Spacing.extraSmall)
-            .padding(.horizontal, Spacing.extraSmall)
-            HStack {
-                Text(Localizable.VerifierCertificate.Action.remove.string)
-                    .font(PrimaryFont.titleS.font)
-                    .foregroundColor(Asset.accentRed400.swiftUIColor)
-                Spacer()
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                viewModel.onRemoveTap()
-            }
-            .frame(height: Heights.verifierCertificateActionHeight)
-            .padding(.horizontal, Spacing.large)
             Spacer()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
@@ -70,24 +77,25 @@ struct VerfierCertificateView: View {
             )
             .clearModalBackground()
         }
+        .onAppear {
+            viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
+        }
     }
 }
 
 extension VerfierCertificateView {
     final class ViewModel: ObservableObject {
-        @Published var renderable: SettingsViewRenderable = .init()
         @Published var isPresentingRemoveConfirmation = false
+        @Published var content: MVerifierDetails?
 
-        let content: MVerifierDetails
         private let onboardingMediator: OnboardingMediator
-
+        private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
 
         init(
-            content: MVerifierDetails,
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
         ) {
-            self.content = content
             self.onboardingMediator = onboardingMediator
         }
 
@@ -95,8 +103,13 @@ extension VerfierCertificateView {
             self.navigation = navigation
         }
 
-        func loadData() {
-            renderable = SettingsViewRenderable()
+        func use(appState: AppState) {
+            self.appState = appState
+            content = appState.userData.verifierDetails
+        }
+
+        func onBackTap() {
+            appState.userData.verifierDetails = nil
         }
 
         func onRemoveTap() {
@@ -113,11 +126,7 @@ extension VerfierCertificateView {
 #if DEBUG
     struct VerfierCertificateView_Previews: PreviewProvider {
         static var previews: some View {
-            VerfierCertificateView(viewModel: .init(content: .init(
-                publicKey: "public key",
-                identicon: .svg(image: PreviewData.exampleIdenticon),
-                encryption: "fdsfds"
-            )))
+            VerfierCertificateView(viewModel: .init())
         }
     }
 #endif

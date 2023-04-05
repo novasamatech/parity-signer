@@ -7,7 +7,8 @@
 
 import Foundation
 
-enum SettingsItem: Equatable, CaseIterable {
+enum SettingsItem: Equatable, Hashable, CaseIterable {
+    case logs
     case networks
     case verifier
     case backup
@@ -19,6 +20,8 @@ enum SettingsItem: Equatable, CaseIterable {
 extension SettingsItem {
     var title: String {
         switch self {
+        case .logs:
+            return Localizable.Settings.Label.logs.string
         case .networks:
             return Localizable.Settings.Label.networks.string
         case .verifier:
@@ -40,5 +43,9 @@ extension SettingsItem {
 
     var hasDetails: Bool {
         ![.wipe].contains(self)
+    }
+
+    var nativeNavigation: Bool {
+        ![.wipe, .networks, .verifier].contains(self)
     }
 }
