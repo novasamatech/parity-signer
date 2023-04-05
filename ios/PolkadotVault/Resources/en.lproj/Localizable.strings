@@ -94,8 +94,7 @@
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
 
-"TabBar.Keys" = "Keys";
-"TabBar.Logs" = "Logs";
+"TabBar.Keys" = "Key Sets";
 "TabBar.Scanner" = "Scanner";
 "TabBar.Settings" = "Settings";
 
@@ -339,6 +338,7 @@
 
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";
+"Settings.Label.Logs" = "Logs";
 "Settings.Label.Verifier" = "Verifier Certificate";
 "Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";

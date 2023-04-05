@@ -26,9 +26,13 @@ struct TabBarView: View {
     var body: some View {
         HStack {
             ForEach(Tab.allCases, id: \.self) { tab in
-                TabBarButton(
-                    viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab)
-                )
+                if tab == .scanner {
+                    CentralTabBarButton(viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab))
+                } else {
+                    TabBarButton(
+                        viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab)
+                    )
+                }
             }
         }
         .frame(height: Heights.tabbarHeight)
@@ -71,7 +75,7 @@ private struct TabBarButton: View {
                 }
                 .foregroundColor(
                     viewModel.isActive ?
-                        Asset.accentPink500.swiftUIColor :
+                        Asset.textAndIconsPrimary.swiftUIColor :
                         Asset.textAndIconsTertiary.swiftUIColor
                 )
             }
@@ -80,12 +84,49 @@ private struct TabBarButton: View {
     }
 }
 
+/// View mimicing single `.tabItem()` within `TabView` equivalent view (here: TabBarView)
+private struct CentralTabBarButton: View {
+    @EnvironmentObject private var navigation: NavigationCoordinator
+
+    private let viewModel: TabViewModel
+
+    init(
+        viewModel: TabViewModel
+    ) {
+        self.viewModel = viewModel
+    }
+
+    var body: some View {
+        Button(
+            action: {
+                if let action = viewModel.action {
+                    navigation.perform(navigation: .init(action: action))
+                } else {
+                    navigation.shouldPresentQRScanner.toggle()
+                }
+            },
+            label: {
+                viewModel.icon
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            }
+        )
+        .frame(height: Heights.tabbarScannerHeight, alignment: .center)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: CornerRadius.extraLarge)
+                .stroke(Asset.fill12.swiftUIColor, lineWidth: 2)
+                .cornerRadius(CornerRadius.extraLarge)
+        )
+        .padding(.horizontal, Spacing.medium)
+    }
+}
+
 /// To test preview with different `Tab` selected, just substitute `selectedTab` with
 /// `Binding<Tab>.constant(<any enum Tab value here>)`
 struct TabBarView_Previews: PreviewProvider {
     static var previews: some View {
         TabBarView(
-            selectedTab: Binding<Tab>.constant(.logs)
+            selectedTab: Binding<Tab>.constant(.keys)
         )
         .previewLayout(.sizeThatFits)
         .environmentObject(NavigationCoordinator())

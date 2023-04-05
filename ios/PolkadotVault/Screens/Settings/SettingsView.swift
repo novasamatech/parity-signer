@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -39,12 +40,16 @@ struct SettingsView: View {
                             .padding(.bottom, Spacing.extraSmall)
                     }
                 }
+                TabBarView(
+                    selectedTab: $navigation.selectedTab
+                )
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
             ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
             viewModel.loadData()
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingWipeConfirmation) {
@@ -60,6 +65,12 @@ struct SettingsView: View {
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingPrivacyPolicy) {
             PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
+        }
+        .fullScreenCover(isPresented: $viewModel.isPresentingLogs) {
+            LogsListView(viewModel: .init(isPresented: $viewModel.isPresentingLogs))
+        }
+        .fullScreenCover(isPresented: $viewModel.isPresentingVerifier) {
+            VerfierCertificateView(viewModel: .init(isPresented: $viewModel.isPresentingVerifier))
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingBackup) {
             BackupSelectKeyView(
@@ -78,7 +89,10 @@ extension SettingsView {
         @Published var isPresentingTermsOfService = false
         @Published var isPresentingPrivacyPolicy = false
         @Published var isPresentingBackup = false
+        @Published var isPresentingLogs = false
+        @Published var isPresentingVerifier = false
 
+        private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
         private let onboardingMediator: OnboardingMediator
 
@@ -92,12 +106,18 @@ extension SettingsView {
             self.navigation = navigation
         }
 
+        func use(appState: AppState) {
+            self.appState = appState
+        }
+
         func loadData() {
             renderable = SettingsViewRenderable()
         }
 
         func onTapAction(_ item: SettingsItem) {
             switch item {
+            case .logs:
+                onTapLogs()
             case .wipe:
                 onTapWipe()
             case .termsAndConditions:
@@ -107,10 +127,18 @@ extension SettingsView {
             case .networks:
                 navigation.perform(navigation: .init(action: .manageNetworks))
             case .verifier:
-                navigation.perform(navigation: .init(action: .viewGeneralVerifier))
+                guard case let .vVerifier(value) = navigation
+                    .performFake(navigation: .init(action: .viewGeneralVerifier)).screenData else { return }
+                navigation.performFake(navigation: .init(action: .goBack))
+                appState.userData.verifierDetails = value
+                isPresentingVerifier = true
             case .backup:
                 onBackupTap()
             }
+        }
+
+        private func onTapLogs() {
+            isPresentingLogs = true
         }
 
         private func onTapWipe() {

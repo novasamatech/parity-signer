@@ -22,7 +22,7 @@ final class MainScreensFactory {
         case .settings:
             SettingsView(viewModel: .init())
         case .log:
-            LogsListView(viewModel: .init())
+            LogsListView(viewModel: .init(isPresented: .constant(true)))
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(viewModel: .init(keyDetails: value))
@@ -37,8 +37,6 @@ final class MainScreensFactory {
             RecoverKeySetSeedPhraseView(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
-        case let .vVerifier(value):
-            VerfierCertificateView(viewModel: .init(content: value))
         case let .manageNetworks(value):
             NetworkSelectionSettings(viewModel: .init(networks: value.networks))
         case let .nNetworkDetails(value):
@@ -49,6 +47,7 @@ final class MainScreensFactory {
         case .documents,
              .selectSeedForBackup,
              .scan,
+             .vVerifier,
              .transaction,
              .keyDetailsMulti,
              .logDetails:

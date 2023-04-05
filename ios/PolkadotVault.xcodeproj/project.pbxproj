@@ -1025,10 +1025,10 @@
 		6D52E3A12946C19F00AD72F0 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				6D52E3A82946F57000AD72F0 /* Subviews */,
 				6D52E3A22946C1B500AD72F0 /* SettingsRowView.swift */,
 				6D52E3A42946C3B400AD72F0 /* SettingsView.swift */,
 				6D52E3A62946C45100AD72F0 /* SettingsItem.swift */,
+				6D52E3A82946F57000AD72F0 /* Subviews */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -1036,9 +1036,9 @@
 		6D52E3A82946F57000AD72F0 /* Subviews */ = {
 			isa = PBXGroup;
 			children = (
+				6D702D2F29DC85550039EB9F /* VerifierCertificate */,
 				6D4F779729CAEC9B00374C83 /* SignSpecs */,
 				6DE67D03298AA41D0042415A /* Backup */,
-				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
 				6D7129202952B7570048558C /* Networks */,
 			);
 			path = Subviews;
@@ -1239,6 +1239,14 @@
 				6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */,
 			);
 			path = Rows;
+			sourceTree = "<group>";
+		};
+		6D702D2F29DC85550039EB9F /* VerifierCertificate */ = {
+			isa = PBXGroup;
+			children = (
+				6D52E3A92946F58200AD72F0 /* VerfierCertificateView.swift */,
+			);
+			path = VerifierCertificate;
 			sourceTree = "<group>";
 		};
 		6D7129202952B7570048558C /* Networks */ = {
@@ -2366,7 +2374,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2422,7 +2430,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -2449,7 +2457,7 @@
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2458,7 +2466,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.0.2;
+				MARKETING_VERSION = 6.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2484,7 +2492,7 @@
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2493,7 +2501,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.0.2;
+				MARKETING_VERSION = 6.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2514,7 +2522,7 @@
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = PolkadotVaultTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2539,7 +2547,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				INFOPLIST_FILE = PolkadotVaultTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
