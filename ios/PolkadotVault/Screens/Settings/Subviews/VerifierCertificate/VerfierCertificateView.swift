@@ -11,7 +11,6 @@ struct VerfierCertificateView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
-    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -20,10 +19,7 @@ struct VerfierCertificateView: View {
                     title: Localizable.VerifierCertificate.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: {
-                            viewModel.onBackTap()
-                            presentationMode.wrappedValue.dismiss()
-                        }
+                        action: viewModel.onBackTap
                     )],
                     rightButtons: [.init(type: .empty)]
                 )
@@ -88,14 +84,17 @@ extension VerfierCertificateView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingRemoveConfirmation = false
         @Published var content: MVerifierDetails?
+        @Binding var isPresented: Bool
 
         private let onboardingMediator: OnboardingMediator
         private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
 
         init(
+            isPresented: Binding<Bool>,
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
         ) {
+            _isPresented = isPresented
             self.onboardingMediator = onboardingMediator
         }
 
@@ -109,6 +108,7 @@ extension VerfierCertificateView {
         }
 
         func onBackTap() {
+            isPresented = false
             appState.userData.verifierDetails = nil
         }
 
@@ -126,7 +126,7 @@ extension VerfierCertificateView {
 #if DEBUG
     struct VerfierCertificateView_Previews: PreviewProvider {
         static var previews: some View {
-            VerfierCertificateView(viewModel: .init())
+            VerfierCertificateView(viewModel: .init(isPresented: .constant(true)))
         }
     }
 #endif
