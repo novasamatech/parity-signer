@@ -32,7 +32,6 @@ import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
-import io.parity.signer.screens.settings.verifiercert.ConfirmFactorySettingsBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -86,17 +85,15 @@ fun SettingsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}) {
-				Box(modifier = Modifier.statusBarsPadding()) {
-					ConfirmFactorySettingsBottomSheet(
-						onCancel = {
-							navController.popBackStack(
-								SettingsScreenSubgraph.home,
-								false
-							)
-						},
-						onFactoryReset = wipeToFactory
-					)
-				}
+				ConfirmFactorySettingsBottomSheet(
+					onCancel = {
+						navController.popBackStack(
+							SettingsScreenSubgraph.home,
+							false
+						)
+					},
+					onFactoryReset = wipeToFactory
+				)
 			}
 		}
 		composable(SettingsScreenSubgraph.terms) {

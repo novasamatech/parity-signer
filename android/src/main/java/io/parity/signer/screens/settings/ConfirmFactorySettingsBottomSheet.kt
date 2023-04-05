@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings.verifiercert
+package io.parity.signer.screens.settings
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
