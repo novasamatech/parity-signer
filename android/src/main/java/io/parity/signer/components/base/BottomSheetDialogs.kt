@@ -27,15 +27,15 @@ fun BottomSheetConfirmDialog(
 	title: String,
 	message: String,
 	ctaLabel: String,
+	isCtaDangerous: Boolean = false,
 	onCancel: Callback,
 	onCta: Callback,
 ) {
-	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState())
-			.padding(start = sidePadding, end = sidePadding, top = 32.dp),
+			.padding(start = 24.dp, end = 24.dp, top = 32.dp),
 	) {
 
 		Text(
@@ -61,6 +61,7 @@ fun BottomSheetConfirmDialog(
 			labelCancel = stringResource(R.string.generic_cancel),
 			labelCta = ctaLabel,
 			onClickedCancel = onCancel,
+			isCtaDangerous = isCtaDangerous,
 			onClickedCta = onCta,
 		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
@@ -82,7 +83,7 @@ private fun PreviewBottomSheetConfirmDialog() {
 	SignerNewTheme {
 		BottomSheetConfirmDialog(
 			"Title", "Message long description message",
-			"Cta lable",
+			"Cta lable", false,
 			{}, {},
 		)
 	}

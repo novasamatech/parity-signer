@@ -363,7 +363,8 @@
 	<string name="settings_backup">Backup Secret Phrase</string>
 	<string name="verifier_certificate_title">Verifier Certificate</string>
 	<string name="verifier_certificate_remove_cta">Remove Certificate</string>
-
+	<string name="confirm_factory_reset_title">Wipe All Data</string>
+	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
 
 </resources>
 

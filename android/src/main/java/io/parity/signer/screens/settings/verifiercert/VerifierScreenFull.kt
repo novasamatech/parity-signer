@@ -30,7 +30,7 @@ fun VerifierScreenFull(
 	BottomSheetWrapperContent(
 		bottomSheetState = bottomSheetState,
 		bottomSheetContent = {
-			ConfirmRemoveCertificateBottomSheet(
+			ConfirmFactorySettingsBottomSheet(
 				onCancel = { scope.launch { bottomSheetState.hide() } },
 				onRemoveCertificate = wipe,
 			)
