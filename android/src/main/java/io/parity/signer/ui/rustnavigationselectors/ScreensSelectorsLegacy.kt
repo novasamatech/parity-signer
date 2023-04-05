@@ -12,7 +12,6 @@ import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.screens.logs.logdetails.LogDetails
-import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -75,10 +74,7 @@ fun ScreenSelector(
 			screenData.f,
 			sharedViewModel::signSufficientCrypto
 		)
-		is ScreenData.VVerifier -> VerifierScreen(
-			screenData.f,
-			sharedViewModel::wipeToJailbreak
-		)
+		is ScreenData.VVerifier -> {} //new selector
 	}
 }
 

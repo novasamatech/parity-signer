@@ -85,17 +85,15 @@ fun SettingsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}) {
-				Box(modifier = Modifier.statusBarsPadding()) {
-					SettingsWipeAllConfirmation(
-						onCancel = {
-							navController.popBackStack(
-								SettingsScreenSubgraph.home,
-								false
-							)
-						},
-						onWipe = wipeToFactory
-					)
-				}
+				ConfirmFactorySettingsBottomSheet(
+					onCancel = {
+						navController.popBackStack(
+							SettingsScreenSubgraph.home,
+							false
+						)
+					},
+					onFactoryReset = wipeToFactory
+				)
 			}
 		}
 		composable(SettingsScreenSubgraph.terms) {

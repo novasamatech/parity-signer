@@ -33,8 +33,9 @@ import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
-import io.parity.signer.screens.settings.networks.list.NetworksList
+import io.parity.signer.screens.settings.networks.list.NetworksListScreen
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
+import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.*
@@ -105,7 +106,7 @@ fun CombinedScreensSelector(
 			)
 		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				NetworksList(
+				NetworksListScreen(
 					model = screenData.f.toNetworksListModel(),
 					rootNavigator = rootNavigator
 				)
@@ -148,6 +149,11 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+		is ScreenData.VVerifier -> VerifierScreenFull(
+			screenData.f.toVerifierDetailsModels(),
+			sharedViewModel::wipeToJailbreak,
+			rootNavigator,
+		)
 		else -> {} //old Selector showing them
 	}
 }
