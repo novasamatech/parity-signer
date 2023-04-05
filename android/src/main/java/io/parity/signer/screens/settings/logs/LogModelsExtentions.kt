@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs
+package io.parity.signer.screens.settings.logs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -7,7 +7,7 @@ import io.parity.signer.domain.DateUtils
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.toLogDateString
 import io.parity.signer.domain.toLogTimeString
-import io.parity.signer.screens.logs.items.LogsListEntryModel
+import io.parity.signer.screens.settings.logs.items.LogsListEntryModel
 import io.parity.signer.uniffi.*
 
 

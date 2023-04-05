@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs.logdetails
+package io.parity.signer.screens.settings.logs.logdetails
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

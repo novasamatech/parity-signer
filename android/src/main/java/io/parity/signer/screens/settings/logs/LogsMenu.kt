@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs
+package io.parity.signer.screens.settings.logs
 
 import android.content.res.Configuration
 import android.util.Log

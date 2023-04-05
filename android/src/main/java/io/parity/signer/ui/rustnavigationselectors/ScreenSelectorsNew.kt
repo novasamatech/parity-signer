@@ -26,9 +26,9 @@ import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
-import io.parity.signer.screens.logs.LogsMenu
-import io.parity.signer.screens.logs.LogsScreen
-import io.parity.signer.screens.logs.toLogsScreenModel
+import io.parity.signer.screens.settings.logs.LogsMenu
+import io.parity.signer.screens.settings.logs.LogsScreen
+import io.parity.signer.screens.settings.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
@@ -88,13 +88,7 @@ fun CombinedScreensSelector(
 						rootNavigator.backAction()
 					}
 			}
-		is ScreenData.Log ->
-			Box(Modifier.statusBarsPadding()) {
-				LogsScreen(
-					model = screenData.f.toLogsScreenModel(),
-					navigator = rootNavigator,
-				)
-			}
+		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.Settings ->
 			SettingsScreenSubgraph(
 				rootNavigator = rootNavigator,
@@ -203,14 +197,7 @@ fun BottomSheetSelector(
 						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
-				is ModalData.LogRight ->
-					BottomSheetWrapperRoot(onClosedAction = {
-						navigator.backAction()
-					}) {
-						LogsMenu(
-							navigator = sharedViewModel.navigator,
-						)
-					}
+				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
 				is ModalData.EnterPassword ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()

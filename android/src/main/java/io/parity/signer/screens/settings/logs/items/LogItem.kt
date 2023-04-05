@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs.items
+package io.parity.signer.screens.settings.logs.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -23,8 +23,8 @@ import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun LogItem(
-	model: LogsListEntryModel.LogEntryModel,
-	onClick: Callback,
+    model: LogsListEntryModel.LogEntryModel,
+    onClick: Callback,
 ) {
 	Row(
 		modifier = Modifier
