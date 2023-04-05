@@ -54,44 +54,6 @@ final class TabViewModelBuilderTests: XCTestCase {
         XCTAssertEqual(result, expectedResult)
     }
 
-    func test_build_logs_selected_returnsExpectedModel() {
-        // Given
-        let tab: Tab = .logs
-        let isSelected = false
-        let expectedResult = TabViewModel(
-            action: .navbarLog,
-            isActive: isSelected,
-            icon: Asset.tabbarLogs.swiftUIImage,
-            label: Localizable.TabBar.logs.text,
-            tab: tab
-        )
-
-        // When
-        let result = subject.build(for: tab, isSelected: isSelected)
-
-        // Then
-        XCTAssertEqual(result, expectedResult)
-    }
-
-    func test_build_logs_notSelected_returnsExpectedModel() {
-        // Given
-        let tab: Tab = .logs
-        let isSelected = true
-        let expectedResult = TabViewModel(
-            action: .navbarLog,
-            isActive: isSelected,
-            icon: Asset.tabbarLogsSelected.swiftUIImage,
-            label: Localizable.TabBar.logs.text,
-            tab: tab
-        )
-
-        // When
-        let result = subject.build(for: tab, isSelected: isSelected)
-
-        // Then
-        XCTAssertEqual(result, expectedResult)
-    }
-
     func test_build_settings_selected_returnsExpectedModel() {
         // Given
         let tab: Tab = .settings
