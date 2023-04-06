@@ -22,7 +22,6 @@ import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.domain.*
 import io.parity.signer.ui.theme.*
 
@@ -79,11 +78,6 @@ fun KeySetDetailsExportResultBottomSheet(
 					)
 				}
 				NotificationFrameText(messageRes = R.string.key_set_export_description_content)
-				KeySeedCard(
-					seedTitle = model.root.seedName,
-					base58 = model.root.base58,
-				)
-				SignerDivider()
 				val seedList = selectedKeys.toList()
 				for (i in 0..seedList.lastIndex) {
 					val seed = seedList[i]

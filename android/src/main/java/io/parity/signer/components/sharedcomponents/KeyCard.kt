@@ -99,21 +99,6 @@ fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 	)
 }
 
-@Composable
-fun KeySeedCard(seedTitle: String, base58: String) {
-	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-	) {
-		Text(
-			seedTitle,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.LabelS,
-		)
-		ShowBase58Collapsible(base58)
-	}
-}
 
 
 @Composable
@@ -323,27 +308,13 @@ private fun PreviewKeyCard() {
 					)
 				)
 			)
+			SignerDivider()
+			KeyCard(
+				model = model.copy(
+					cardBase = model.cardBase.copy(path = "",)
+				)
+			)
 		}
-	}
-}
-
-@Preview(
-	name = "day",
-	uiMode = Configuration.UI_MODE_NIGHT_NO,
-	showBackground = true,
-)
-@Preview(
-	name = "dark theme",
-	uiMode = Configuration.UI_MODE_NIGHT_YES,
-	backgroundColor = 0xFFFFFFFF
-)
-@Composable
-private fun PreviewKeySeedCard() {
-	SignerNewTheme {
-		KeySeedCard(
-			seedTitle = "Seed title",
-			base58 = KeyCardModel.createStub().cardBase.base58,
-		)
 	}
 }
 
