@@ -1,13 +1,16 @@
 package io.parity.signer.screens.keysetdetails.export
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
@@ -23,10 +26,13 @@ import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeySeedCard
-import io.parity.signer.domain.*
-import io.parity.signer.ui.theme.*
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.backgroundTertiary
+import io.parity.signer.ui.theme.fill6
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetDetailsExportResultBottomSheet(
 	model: KeySetDetailsModel,
@@ -101,32 +107,6 @@ fun KeySetDetailsExportResultBottomSheet(
 				}
 			}
 		}
-	}
-}
-
-@Composable
-@OptIn(ExperimentalComposeUiApi::class)
-private fun KeySetItemInExport(seed: KeySetModel) {
-	Row(Modifier.padding(16.dp, top = 12.dp, bottom = 12.dp)) {
-		Text(
-			text = seed.seedName,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyM,
-		)
-		Text(
-			text = " · ",
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
-		Text(
-			text = pluralStringResource(
-				id = R.plurals.key_sets_item_derived_subtitle,
-				count = seed.derivedKeysCount.toInt(),
-				seed.derivedKeysCount.toInt(),
-			),
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
 	}
 }
 

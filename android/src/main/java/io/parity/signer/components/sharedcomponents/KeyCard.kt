@@ -50,14 +50,16 @@ import java.util.*
 fun KeyCard(model: KeyCardModel) {
 
 	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
-				KeyPath(model.cardBase.path, model.cardBase.hasPassword)
-				Spacer(Modifier.padding(top = 4.dp))
+				if (model.cardBase.path.isNotEmpty()) {
+					KeyPath(model.cardBase.path, model.cardBase.hasPassword)
+					Spacer(Modifier.padding(top = 4.dp))
+				}
 				Text(
 					model.cardBase.seedName,
 					color = MaterialTheme.colors.primary,
@@ -76,8 +78,8 @@ fun KeyCard(model: KeyCardModel) {
 			ShowBase58Collapsible(
 				base58 = model.cardBase.base58,
 				modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 24.dp)
+					.weight(1f)
+					.padding(end = 24.dp)
 			)
 			NetworkLabel(model.network)
 		}
@@ -91,20 +93,20 @@ fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 		color = MaterialTheme.colors.textTertiary,
 		style = SignerTypeface.CaptionM,
 		modifier = modifier
-            .background(
-                MaterialTheme.colors.fill12,
-                RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-            )
-            .padding(horizontal = 8.dp, vertical = 2.dp)
+			.background(
+				MaterialTheme.colors.fill12,
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+			)
+			.padding(horizontal = 8.dp, vertical = 2.dp)
 	)
 }
 
 @Composable
 fun KeySeedCard(seedTitle: String, base58: String) {
 	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 		Text(
 			seedTitle,
@@ -114,7 +116,6 @@ fun KeySeedCard(seedTitle: String, base58: String) {
 		ShowBase58Collapsible(base58)
 	}
 }
-
 
 @Composable
 fun KeyPath(
@@ -162,8 +163,8 @@ fun ShowBase58Collapsible(base58: String, modifier: Modifier = Modifier) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = modifier
-            .clickable { expanded.value = !expanded.value }
-            .animateContentSize()
+			.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
@@ -323,7 +324,30 @@ private fun PreviewKeyCard() {
 					)
 				)
 			)
+			SignerDivider()
+			KeyCard(
+				model = model.copy(
+					cardBase = model.cardBase.copy(path = "")
+				)
+			)
 		}
+	}
+}
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewNetworkLabel() {
+	SignerNewTheme {
+		NetworkLabel("Polkadot")
 	}
 }
 
@@ -347,19 +371,3 @@ private fun PreviewKeySeedCard() {
 	}
 }
 
-@Preview(
-	name = "day",
-	uiMode = Configuration.UI_MODE_NIGHT_NO,
-	showBackground = true,
-)
-@Preview(
-	name = "dark theme",
-	uiMode = Configuration.UI_MODE_NIGHT_YES,
-	backgroundColor = 0xFFFFFFFF
-)
-@Composable
-private fun PreviewNetworkLabel() {
-	SignerNewTheme {
-		NetworkLabel("Polkadot")
-	}
-}
