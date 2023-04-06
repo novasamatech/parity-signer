@@ -50,9 +50,9 @@ import java.util.*
 fun KeyCard(model: KeyCardModel) {
 
 	Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
@@ -76,8 +76,8 @@ fun KeyCard(model: KeyCardModel) {
 			ShowBase58Collapsible(
 				base58 = model.cardBase.base58,
 				modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 24.dp)
+					.weight(1f)
+					.padding(end = 24.dp)
 			)
 			NetworkLabel(model.network)
 		}
@@ -91,15 +91,29 @@ fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 		color = MaterialTheme.colors.textTertiary,
 		style = SignerTypeface.CaptionM,
 		modifier = modifier
-            .background(
-                MaterialTheme.colors.fill12,
-                RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
-            )
-            .padding(horizontal = 8.dp, vertical = 2.dp)
+			.background(
+				MaterialTheme.colors.fill12,
+				RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+			)
+			.padding(horizontal = 8.dp, vertical = 2.dp)
 	)
 }
 
-
+@Composable
+fun KeySeedCard(seedTitle: String, base58: String) {
+	Column(
+		Modifier
+			.fillMaxWidth()
+			.padding(16.dp)
+	) {
+		Text(
+			seedTitle,
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.LabelS,
+		)
+		ShowBase58Collapsible(base58)
+	}
+}
 
 @Composable
 fun KeyPath(
@@ -147,8 +161,8 @@ fun ShowBase58Collapsible(base58: String, modifier: Modifier = Modifier) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = modifier
-            .clickable { expanded.value = !expanded.value }
-            .animateContentSize()
+			.clickable { expanded.value = !expanded.value }
+			.animateContentSize()
 	) {
 		if (expanded.value) {
 			Text(
@@ -311,7 +325,7 @@ private fun PreviewKeyCard() {
 			SignerDivider()
 			KeyCard(
 				model = model.copy(
-					cardBase = model.cardBase.copy(path = "",)
+					cardBase = model.cardBase.copy(path = "")
 				)
 			)
 		}
@@ -334,3 +348,24 @@ private fun PreviewNetworkLabel() {
 		NetworkLabel("Polkadot")
 	}
 }
+
+@Preview(
+	name = "day",
+	uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true,
+)
+@Preview(
+	name = "dark theme",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun PreviewKeySeedCard() {
+	SignerNewTheme {
+		KeySeedCard(
+			seedTitle = "Seed title",
+			base58 = KeyCardModel.createStub().cardBase.base58,
+		)
+	}
+}
+
