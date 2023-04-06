@@ -56,8 +56,10 @@ fun KeyCard(model: KeyCardModel) {
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Column(Modifier.weight(1f)) {
-				KeyPath(model.cardBase.path, model.cardBase.hasPassword)
-				Spacer(Modifier.padding(top = 4.dp))
+				if (model.cardBase.path.isNotEmpty()) {
+					KeyPath(model.cardBase.path, model.cardBase.hasPassword)
+					Spacer(Modifier.padding(top = 4.dp))
+				}
 				Text(
 					model.cardBase.seedName,
 					color = MaterialTheme.colors.primary,
