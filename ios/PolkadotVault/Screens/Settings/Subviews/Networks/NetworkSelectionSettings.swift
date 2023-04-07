@@ -10,6 +10,8 @@ import SwiftUI
 struct NetworkSelectionSettings: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,7 +20,10 @@ struct NetworkSelectionSettings: View {
                     title: Localizable.Settings.Networks.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: {
+                            viewModel.onBackTap()
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     )],
                     rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
@@ -48,10 +53,18 @@ struct NetworkSelectionSettings: View {
                     }
                 }
             }
+            NavigationLink(
+                destination: NetworkSettingsDetails(
+                    viewModel: .init(networkDetails: viewModel.selectedDetails)
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+            viewModel.use(appState: appState)
         }
     }
 
@@ -79,31 +92,39 @@ struct NetworkSelectionSettings: View {
 
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
+        private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
-        let networks: [MmNetwork]
+        @Published var networks: [MmNetwork] = []
+        @Published var selectedDetails: MNetworkDetails!
+        @Published var isPresentingDetails = false
 
-        init(
-            networks: [MmNetwork]
-        ) {
-            self.networks = networks
-        }
+        init() {}
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
 
+        func use(appState: AppState) {
+            self.appState = appState
+            networks = appState.userData.manageNetworks.networks
+        }
+
         func onTap(_ network: MmNetwork) {
-            navigation.perform(navigation: .init(action: .goForward, details: network.key))
+            guard case let .nNetworkDetails(value) = navigation
+                .performFake(navigation: .init(action: .goForward, details: network.key)).screenData else { return }
+            selectedDetails = value
+            isPresentingDetails = true
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            appState.userData.manageNetworks = nil
+            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         func onAddTap() {
             navigation.shouldPresentQRScanner = true
-            navigation.performFake(navigation: .init(action: .goBack))
-            navigation.performFake(navigation: .init(action: .navbarScan))
+//            navigation.performFake(navigation: .init(action: .goBack))
+//            navigation.performFake(navigation: .init(action: .navbarScan))
         }
     }
 }
@@ -111,7 +132,7 @@ extension NetworkSelectionSettings {
 struct NetworkSelectionSettings_Previews: PreviewProvider {
     static var previews: some View {
         NetworkSelectionSettings(
-            viewModel: .init(networks: [])
+            viewModel: .init()
         )
         .environmentObject(NavigationCoordinator())
     }

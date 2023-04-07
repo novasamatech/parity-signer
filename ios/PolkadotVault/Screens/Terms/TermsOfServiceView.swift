@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TermsOfServiceView: View {
     @StateObject var viewModel: ViewModel
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,7 +18,7 @@ struct TermsOfServiceView: View {
                     title: Localizable.Settings.TermsOfService.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: viewModel.onBackTap
+                        action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
                     backgroundColor: Asset.backgroundSystem.swiftUIColor
@@ -37,14 +38,10 @@ struct TermsOfServiceView: View {
 
 extension TermsOfServiceView {
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
+        let onBackTap: (() -> Void)?
 
-        init(isPresented: Binding<Bool>) {
-            _isPresented = isPresented
-        }
-
-        func onBackTap() {
-            isPresented = false
+        init(onBackTap: (() -> Void)? = nil) {
+            self.onBackTap = onBackTap
         }
     }
 }
@@ -52,7 +49,7 @@ extension TermsOfServiceView {
 #if DEBUG
     struct TermsOfServiceView_Previews: PreviewProvider {
         static var previews: some View {
-            TermsOfServiceView(viewModel: .init(isPresented: .constant(true)))
+            TermsOfServiceView(viewModel: .init())
         }
     }
 #endif

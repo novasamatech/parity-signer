@@ -98,6 +98,7 @@ struct NavigationBarView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: Heights.navigationBarHeight)
+            .background(viewModel.backgroundColor)
         }
     }
 

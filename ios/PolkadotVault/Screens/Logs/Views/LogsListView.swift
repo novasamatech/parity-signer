@@ -10,14 +10,21 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            NavigationLink(
+                destination:
+                LogDetailsView(viewModel: .init(viewModel.selectedDetails))
+                    .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
             VStack(spacing: 0) {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.LogsList.Label.title.string,
-                        leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                        leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                         backgroundColor: Asset.backgroundSystem.swiftUIColor
                     )
@@ -66,15 +73,6 @@ struct LogsListView: View {
             LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
                 .clearModalBackground()
         }
-        .fullScreenCover(
-            isPresented: $viewModel.isPresentingDetails,
-            onDismiss: { viewModel.onEventDetailsDismiss() }
-        ) {
-            LogDetailsView(viewModel: .init(
-                isPresented: $viewModel.isPresentingDetails,
-                details: viewModel.selectedDetails
-            ))
-        }
     }
 }
 
@@ -89,19 +87,16 @@ extension LogsListView {
         @Published var isPresentingAddNoteModal = false
         @Published var selectedDetails: MLogDetails!
         @Published var isPresentingDetails = false
-        @Binding var isPresented: Bool
         private weak var navigation: NavigationCoordinator!
         private let logsService: LogsService
         private let snackBarPresentation: BottomSnackbarPresentation
         private let renderableBuilder: LogEntryRenderableBuilder
 
         init(
-            isPresented: Binding<Bool>,
             logsService: LogsService = LogsService(),
             snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
         ) {
-            _isPresented = isPresented
             self.logsService = logsService
             self.snackBarPresentation = snackBarPresentation
             self.renderableBuilder = renderableBuilder
@@ -123,10 +118,6 @@ extension LogsListView {
                     self.snackBarPresentation.isSnackbarPresented = true
                 }
             }
-        }
-
-        func onBackTap() {
-            isPresented = false
         }
 
         func onMoreMenuTap() {
@@ -182,7 +173,7 @@ extension LogsListView {
 #if DEBUG
     struct LogsListView_Previews: PreviewProvider {
         static var previews: some View {
-            LogsListView(viewModel: .init(isPresented: .constant(true)))
+            LogsListView(viewModel: .init())
                 .environmentObject(NavigationCoordinator())
         }
     }

@@ -10,6 +10,8 @@ import SwiftUI
 struct NetworkSettingsDetails: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,10 +19,13 @@ struct NetworkSettingsDetails: View {
                 viewModel: NavigationBarViewModel(
                     leftButtons: [.init(
                         type: .arrow,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: {
+                            viewModel.onBackTap()
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     )],
                     rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView(showsIndicators: false) {
@@ -78,6 +83,7 @@ struct NetworkSettingsDetails: View {
                     .frame(height: Heights.networkSelectionSettings)
                     .onTapGesture {
                         viewModel.onAddTap()
+                        rootPresentationMode.wrappedValue.dismiss()
                     }
                     Spacer()
                         .frame(height: Spacing.large)
@@ -116,6 +122,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
+            .navigationBarHidden(true)
         }
     }
 }
@@ -320,14 +327,14 @@ extension NetworkSettingsDetails {
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         func onAddTap() {
             navigation.shouldPresentQRScanner = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.navigation.performFake(navigation: .init(action: .goBack))
-                self.navigation.perform(navigation: .init(action: .goBack))
+                self.navigation.performFake(navigation: .init(action: .goBack))
                 self.navigation.performFake(navigation: .init(action: .navbarScan))
             }
         }
@@ -388,7 +395,7 @@ extension NetworkSettingsDetails {
 struct NetworkSettingsDetails_Previews: PreviewProvider {
     static var previews: some View {
         NetworkSelectionSettings(
-            viewModel: .init(networks: [])
+            viewModel: .init()
         )
         .environmentObject(NavigationCoordinator())
     }
