@@ -33,7 +33,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # Links
 
-- [Official Website](https://parity.io/signer)
+- [Official Website](https://www.parity.io/technologies/signer/)
 - [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
 - [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
 - [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
