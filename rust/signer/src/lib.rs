@@ -26,6 +26,8 @@ mod ffi_types;
 
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use definitions::keyring::AddressKey;
+use ffi_support::ErrorCode;
 use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
 use sled::Db;
@@ -440,6 +442,131 @@ fn clear_log_history() -> anyhow::Result<(), ErrorDisplayed> {
 fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplayed> {
     db_handling::manage_history::history_entry_user(&get_db()?, string_from_user)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+pub struct TransactionSigningResult {}
+
+fn get_seeds(names_phone_knows: &[String]) -> anyhow::Result<MSeeds, ErrorDisplayed> {
+    let seed_name_cards = db_handling::interface_signer::get_all_seed_names_with_identicons(
+        &get_db()?,
+        names_phone_knows,
+    )
+    .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    Ok(MSeeds { seed_name_cards })
+}
+
+fn get_key_set_public_key(
+    address: &str,
+    network_specs_key: &str,
+) -> anyhow::Result<MKeyDetails, ErrorDisplayed> {
+    let address_key =
+        AddressKey::from_hex(address).map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let address_details = db_handling::helpers::get_address_details(&get_db()?, &address_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    db_handling::interface_signer::export_key(
+        &get_db()?,
+        address_key.multi_signer(),
+        &address_details.seed_name,
+        &network_specs_key,
+    )
+    .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn remove_derived_key(
+    address_key: &str,
+    path: &str,
+    network_specs_key: &str,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    todo!()
+}
+
+fn remove_key_set(address_key: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    todo!()
+}
+
+fn get_verifier_details() -> anyhow::Result<MVerifierDetails, ErrorDisplayed> {
+    todo!()
+}
+
+fn get_managed_networks() -> anyhow::Result<MManageNetworks, ErrorDisplayed> {
+    todo!()
+}
+
+fn get_managed_network_details(
+    network_key: &str,
+) -> anyhow::Result<MNetworkDetails, ErrorDisplayed> {
+    todo!()
+}
+
+fn remove_metadata_on_managed_network(
+    network_key: &str,
+    metadata_specs_version: &str,
+) -> anyhow::Result<MNetworkDetails, ErrorDisplayed> {
+    todo!()
+}
+
+fn get_keys_for_signing(
+    network_key: &str,
+    metadata_specs_version: &str,
+) -> anyhow::Result<MSignSufficientCrypto, ErrorDisplayed> {
+    todo!()
+}
+
+fn sign_metadata_with_key(
+    network_key: &str,
+    metadata_specs_version: &str,
+    signing_address_key: &str,
+    seed_phrase: &str,
+) -> anyhow::Result<MSufficientCryptoReady, ErrorDisplayed> {
+    todo!()
+}
+
+fn sign_network_spec_with_key(
+    network_key: &str,
+    signing_address_key: &str,
+    seed_phrase: &str,
+) -> anyhow::Result<MSufficientCryptoReady, ErrorDisplayed> {
+    todo!()
+}
+
+fn get_transactions(qr_payload: &str) -> anyhow::Result<Vec<MTransaction>, ErrorDisplayed> {
+    todo!()
+}
+
+fn sign_transaction(
+    transaction_id: &str,
+    seed_phrase_payload: &str,
+) -> anyhow::Result<TransactionSigningResult, ErrorDisplayed> {
+    todo!()
+}
+
+fn sign_with_password(
+    transaction_id: &str,
+    password: &str,
+) -> anyhow::Result<TransactionSigningResult, ErrorDisplayed> {
+    todo!()
+}
+
+fn approve(transaction_id: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    todo!()
+}
+
+fn reject(transaction_id: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    todo!()
+}
+
+fn seed_phrase_guess_words(user_input: &str) -> Result<Vec<String>, ErrorDisplayed> {
+    todo!()
+}
+
+fn recover_seed_phrase(seed_name: &str, seed_phrase: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    todo!()
 }
 
 /// Must be called once to initialize logging from Rust in development mode.
