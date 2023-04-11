@@ -135,7 +135,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name:           Assemble GPlay unsigned apk
+      - name:           Assemble unsigned debug apk
         run:            |
           ./gradlew clean assembleDebug --stacktrace
 
