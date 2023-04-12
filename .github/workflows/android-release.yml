@@ -125,27 +125,37 @@ jobs:
         with:
           workspaces:   rust -> rust/target
 
-# build and publish
-      #TODO DMITRY CHECK
 
-   - name: Sign app APK
+      # build and publish
+
+      - name: Assemble release unsigned apk
+          run: |
+            ./gradlew clean assembleRelease --stacktrace
+
+      - name: Sign app APK
       uses: r0adkll/sign-android-release@v1
       # ID used to access action output
       id: sign_app
       with:
-        releaseDirectory: app/build/outputs/apk/release
+        releaseDirectory: android/build/outputs/apk/release
         signingKeyBase64: ${{ secrets.SIGNING_KEY }}
         alias: ${{ secrets.ALIAS }}
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
 
+      - name: Upload Gplay release APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: signer-release-signed
+          path: |
+            android/build/outputs/apk/release/*.apk
 
-  - name: Publish to Google Play Store
-    uses: r0adkll/upload-google-play@v1.1.0
-    with:
-      service_account_json: ${{ secrets.GOOGLE_PLAY_API_JSON }}
-      bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
-      track: 'internal'
+      - name: Publish to Google Play Store
+        uses: r0adkll/upload-google-play@v1.1.0
+        with:
+          service_account_json: ${{ secrets.GOOGLE_PLAY_API_JSON }}
+          bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: 'internal'
 
 
 
