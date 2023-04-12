@@ -73,7 +73,7 @@ jobs:
           ./gradlew :android:testDebugUnitTest
 
   release:
-    name: Build unsigned APKs
+    name: Build signed APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
     steps:
@@ -126,7 +126,7 @@ jobs:
           workspaces:   rust -> rust/target
 
 
-      # build and publish
+      # Build and publish
 
       - name:           Assemble release unsigned apk
         run:            |
