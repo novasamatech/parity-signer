@@ -129,18 +129,18 @@ jobs:
       # build and publish
 
       - name: Assemble release unsigned apk
-          run: ./gradlew clean assembleRelease --stacktrace
+        run: ./gradlew clean assembleRelease --stacktrace
 
       - name: Sign app APK
-      uses: r0adkll/sign-android-release@v1
-      # ID used to access action output
-      id: sign_app
-      with:
-        releaseDirectory: android/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_BASE64 }}
-        alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
-        keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
-        keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+        uses: r0adkll/sign-android-release@v1
+        # ID used to access action output
+        id: sign_app
+        with:
+          releaseDirectory: android/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
 
       - name: Upload Gplay release APKs
         uses: actions/upload-artifact@v3
