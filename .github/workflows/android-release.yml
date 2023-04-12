@@ -138,24 +138,24 @@ jobs:
       id: sign_app
       with:
         releaseDirectory: android/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: ${{ secrets.ALIAS }}
-        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
+        signingKeyBase64: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_BASE64 }}
+        alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
+        keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+        keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
 
       - name: Upload Gplay release APKs
         uses: actions/upload-artifact@v3
         with:
           name: signer-release-signed
           path: |
-            android/build/outputs/apk/release/*.apk
+            ${{steps.sign_app.outputs.signedReleaseFile}}
 
-      - name: Publish to Google Play Store
-        uses: r0adkll/upload-google-play@v1.1.0
-        with:
-          service_account_json: ${{ secrets.GOOGLE_PLAY_API_JSON }}
-          bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: 'internal'
+#      - name: Publish to Google Play Store
+#        uses: r0adkll/upload-google-play@v1.1.0
+#        with:
+#          service_account_json: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+#          bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
+#          track: 'internal'
 
 
 
