@@ -2,10 +2,11 @@ name: Release android app
 
 on:
   push:
-    branches:
-      - master
-    tags:
-      - 'v*'
+#    branches:
+#      - master
+#    todo dmitry release
+#    tags:
+#      - 'v*'
 jobs:
   build:
     name: Build
@@ -150,6 +151,7 @@ jobs:
           path: |
             ${{steps.sign_app.outputs.signedReleaseFile}}
 
+# todo dmitry fix before release
 #      - name: Publish to Google Play Store
 #        uses: r0adkll/upload-google-play@v1.1.0
 #        with:
