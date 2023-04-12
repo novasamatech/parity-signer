@@ -164,7 +164,7 @@ jobs:
       - name: Publish to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.1
         with:
-          service_account_json: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+          serviceAccountJson: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
           status: inProgress
           track: internal
