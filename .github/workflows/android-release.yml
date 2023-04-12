@@ -167,6 +167,7 @@ jobs:
           serviceAccountJson: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
           status: inProgress
+          packageName: io.parity.signer
           track: internal
 
 
