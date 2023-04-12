@@ -8,7 +8,7 @@ on:
       - stable
 jobs:
   build:
-    name: Build
+    name: Build android unit tests
     runs-on:            ubuntu-22.04
     steps:
       - name:           Cancel Previous Runs
