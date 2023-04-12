@@ -128,8 +128,9 @@ jobs:
 
       # build and publish
 
-      - name: Assemble release unsigned apk
-        run: ./gradlew clean assembleRelease --stacktrace
+      - name:           Assemble release unsigned apk
+        run:            |
+          ./gradlew clean assembleRelease --stacktrace
 
       - name: Sign app APK
         uses: r0adkll/sign-android-release@v1
