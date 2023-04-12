@@ -152,13 +152,12 @@ jobs:
           path: |
             ${{steps.sign_app.outputs.signedReleaseFile}}
 
-# todo dmitry fix before release
-#      - name: Publish to Google Play Store
-#        uses: r0adkll/upload-google-play@v1.1.0
-#        with:
-#          service_account_json: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
-#          bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
-#          track: 'internal'
+      - name: Publish to Google Play Store
+        uses: r0adkll/upload-google-play@v1.1.0
+        with:
+          service_account_json: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+          bundle_file: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: 'internal'
 
 
 
