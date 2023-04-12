@@ -2,13 +2,14 @@ name: Release android app
 
 on:
   push
+#  push:
 #    branches:
 #      - master
 #    todo dmitry release
 #    tags:
 #      - 'v*'
 jobs:
-  build:
+  tests:
     name: Build android unit test
     runs-on:            ubuntu-22.04
     steps:
@@ -73,7 +74,7 @@ jobs:
         run:            |
           ./gradlew :android:testDebugUnitTest
 
-  release:
+  build:
     name: Build signed APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
