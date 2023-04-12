@@ -1,7 +1,7 @@
 name: Release android app
 
 on:
-  push:
+  push
 #    branches:
 #      - master
 #    todo dmitry release
