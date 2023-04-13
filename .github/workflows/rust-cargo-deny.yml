@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name:               Checkout Sources
-        uses:               actions/checkout@v3.5.0
+        uses:               actions/checkout@v3.5.1
 
       - name:               Run cargo-deny
         uses:               EmbarkStudios/cargo-deny-action@3d26fd4e2adf837aee64b12f86d4dabb799fcfa2 # v1.5.1
