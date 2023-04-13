@@ -41,7 +41,7 @@ fun LogsScreen(
 				}
 			}
 		}
-//		BottomBar2(navigator = navigator, state = BottomBar2State.LOGS) todo dmitry
+//		BottomBar(navigator = navigator, state = BottomBar2State.LOGS) todo dmitry
 	}
 }
 

@@ -32,6 +32,7 @@ import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
+import io.parity.signer.screens.settings.logs.LogsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -115,6 +116,11 @@ fun SettingsScreenSubgraph(
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}
 		}
+		composable(SettingsScreenSubgraph.logs) {
+			Box(modifier = Modifier.statusBarsPadding()) {
+//				LogsScreen(model = , navigator = ) todo dmitry implement
+			}
+		}
 	}
 }
 
@@ -124,6 +130,7 @@ private object SettingsScreenSubgraph {
 	const val terms = "settings_terms_of_service"
 	const val privacyPolicy = "settings_privacy_polcy"
 	const val backup = "settings_backup"
+	const val logs = "settings_logs"
 }
 
 @Composable
