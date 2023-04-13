@@ -145,7 +145,6 @@ data class KeySetModel(
 }
 
 
-
 fun SeedNameCard.toSeedModel() =
 	KeySetModel(
 		seedName,
@@ -289,6 +288,25 @@ fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 )
 
 
+data class VerifierDetailsModels(
+	val publicKey: String,
+	val identicon: ImageContent,
+	val encryption: String,
+) {
+	companion object {
+		fun createStub() = VerifierDetailsModels(
+			publicKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+			identicon = PreviewData.exampleIdenticonPng,
+			encryption = "sr25519",
+		)
+	}
+}
+
+fun MVerifierDetails.toVerifierDetailsModels() = VerifierDetailsModels(
+	publicKey = publicKey,
+	identicon = identicon.toImageContent(),
+	encryption = encryption,
+)
 
 
 

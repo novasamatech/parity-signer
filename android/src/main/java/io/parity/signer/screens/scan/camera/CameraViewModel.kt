@@ -19,9 +19,11 @@ class CameraViewModel() : ViewModel() {
 	val isTorchEnabled = MutableStateFlow(false)
 
 	private val _bananaSplitPayload = MutableStateFlow<List<String>?>(null)
-	val bananaSplitPayload: StateFlow<List<String>?> = _bananaSplitPayload.asStateFlow()
+	val bananaSplitPayload: StateFlow<List<String>?> =
+		_bananaSplitPayload.asStateFlow()
 
-	private val _pendingTransactionPayloads = MutableStateFlow<Set<String>>(emptySet())
+	private val _pendingTransactionPayloads =
+		MutableStateFlow<Set<String>>(emptySet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
 		_pendingTransactionPayloads.asStateFlow()
 
@@ -44,6 +46,7 @@ class CameraViewModel() : ViewModel() {
 		barcodeScanner: BarcodeScanner,
 		imageProxy: ImageProxy
 	) {
+
 		if (imageProxy.image == null) return
 		val inputImage = InputImage.fromMediaImage(
 			imageProxy.image!!,
@@ -57,7 +60,8 @@ class CameraViewModel() : ViewModel() {
 					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
 						if (total.value == null) {
 							try {
-								val proposeTotal = qrparserGetPacketsTotal(payloadString, true).toInt()
+								val proposeTotal =
+									qrparserGetPacketsTotal(payloadString, true).toInt()
 								if (proposeTotal == 1) {
 									decode(listOf(payloadString))
 								} else {

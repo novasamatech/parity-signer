@@ -30,7 +30,7 @@ fun NetworkIcon(
 	modifier: Modifier = Modifier,
 	size: Dp = 32.dp,
 ) {
-	val icon = getIconForNetwork(networkLogoName)
+	val icon = getIconForNetwork(networkLogoName.lowercase())
 	if (icon != null) {
 		Image(
 			painter = icon,
@@ -41,7 +41,7 @@ fun NetworkIcon(
 		)
 	} else {
 		val networkColors = ServiceLocator.unknownNetworkColorsGenerator
-			.getBackground(networkLogoName)
+			.getBackground(networkLogoName.lowercase())
 			.toUnknownNetworkColorsDrawable()
 		val chars = networkLogoName.take(1).uppercase()
 		UnknownNetworkIcon(networkColors, chars, size, modifier)
