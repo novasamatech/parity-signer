@@ -171,7 +171,7 @@ Enable "Show package details" checkmark to select specific version.
 # Release Android
 
 - Create PR with new app version updated and tag v* (example "v6.1.3")
-- After merging to master release-android.yml flow should be triggered. It will build and sign apk and upload it to internal track in play store
+- After merging to master - run release-android.yml flow. It will build and sign apk and upload it to internal track in play store
 - Create github release with apk from release flow
 - Go to play store, promote internal track to production and update changes in play store
 
