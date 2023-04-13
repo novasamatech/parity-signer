@@ -26,9 +26,6 @@ import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
-import io.parity.signer.screens.settings.logs.LogsMenu
-import io.parity.signer.screens.settings.logs.LogsScreen
-import io.parity.signer.screens.settings.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph

@@ -52,7 +52,7 @@ fun BottomBar(
 			horizontalArrangement = Arrangement.SpaceEvenly,
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
-			BottomBarButton2(
+			BottomBarButton(
 				navigator = navigator,
 				iconId = R.drawable.ic_key_outlined_24,
 				action = Action.NAVBAR_KEYS,
@@ -60,7 +60,8 @@ fun BottomBar(
 				isEnabled = state == BottomBar2State.KEYS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
-			BottomBarButton2(
+			//todo dmitry new design https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?node-id=11930-77855&t=khcNTdojUGw29HQu-4
+			BottomBarButton(
 				navigator = navigator,
 				iconId = R.drawable.ic_qe_code_24,
 				action = Action.NAVBAR_SCAN,
@@ -68,7 +69,7 @@ fun BottomBar(
 				isEnabled = state == BottomBar2State.SCANNER,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
-			BottomBarButton2(
+			BottomBarButton(
 				navigator = navigator,
 				iconId = R.drawable.ic_settings_outlined_24,
 				enabledIconId = R.drawable.ic_settings_filled_24,
@@ -87,7 +88,7 @@ enum class BottomBar2State { KEYS, SCANNER, SETTINGS }
  * Unified bottom bar button view for [BottomBar]
  */
 @Composable
-fun BottomBarButton2(
+fun BottomBarButton(
 	navigator: Navigator,
 	@DrawableRes iconId: Int,
 	@DrawableRes enabledIconId: Int? = null,

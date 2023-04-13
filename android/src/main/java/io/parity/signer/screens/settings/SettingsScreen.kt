@@ -118,6 +118,7 @@ fun SettingsScreenSubgraph(
 		}
 		composable(SettingsScreenSubgraph.logs) {
 			Box(modifier = Modifier.statusBarsPadding()) {
+
 //				LogsScreen(model = , navigator = ) todo dmitry implement
 			}
 		}
