@@ -9,7 +9,7 @@ on:
 jobs:
   #this it tests jobs, called build as it's required name for PR
   build:
-    name: Build android unit tests
+    name: Build
     runs-on:            ubuntu-22.04
     steps:
       - name:           Cancel Previous Runs
