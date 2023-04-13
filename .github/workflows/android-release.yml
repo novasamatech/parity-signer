@@ -164,8 +164,8 @@ jobs:
       - name: Publish to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.1
         with:
-          serviceAccountJson: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
-          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+          releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
           packageName: io.parity.signer
           track: internal
 
