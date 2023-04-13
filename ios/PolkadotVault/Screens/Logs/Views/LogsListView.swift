@@ -26,7 +26,7 @@ struct LogsListView: View {
                         title: Localizable.LogsList.Label.title.string,
                         leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
-                        backgroundColor: Asset.backgroundSystem.swiftUIColor
+                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
                 )
                 ScrollView {

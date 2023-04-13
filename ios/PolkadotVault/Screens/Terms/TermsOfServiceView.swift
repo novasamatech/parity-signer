@@ -21,7 +21,7 @@ struct TermsOfServiceView: View {
                         action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView {

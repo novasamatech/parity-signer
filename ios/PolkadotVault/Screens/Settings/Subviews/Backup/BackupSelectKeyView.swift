@@ -23,7 +23,7 @@ struct BackupSelectKeyView: View {
                         action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView {

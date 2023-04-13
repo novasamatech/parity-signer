@@ -21,7 +21,7 @@ struct SettingsView: View {
                             title: Localizable.Settings.Label.title.string,
                             leftButtons: [.init(type: .empty)],
                             rightButtons: [.init(type: .empty)],
-                            backgroundColor: Asset.backgroundSystem.swiftUIColor
+                            backgroundColor: Asset.backgroundPrimary.swiftUIColor
                         )
                     )
                     ScrollView {
@@ -97,6 +97,7 @@ struct SettingsView: View {
 
 extension SettingsView {
     final class ViewModel: ObservableObject {
+        private let cancelBag = CancelBag()
         @Published var renderable: SettingsViewRenderable = .init()
         @Published var isPresentingWipeConfirmation = false
         @Published var isDetailsPresented = false
@@ -113,6 +114,7 @@ extension SettingsView {
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+            listenToUpdates()
         }
 
         func use(appState: AppState) {
@@ -121,6 +123,14 @@ extension SettingsView {
 
         func loadData() {
             renderable = SettingsViewRenderable()
+        }
+
+        private func listenToUpdates() {
+            $isDetailsPresented.sink { [weak self] isPresented in
+                guard let self = self, !isPresented else { return }
+                self.navigation.performFake(navigation: .init(action: .start))
+                self.navigation.performFake(navigation: .init(action: .navbarSettings))
+            }.store(in: cancelBag)
         }
 
         func onTapAction(_ item: SettingsItem) {

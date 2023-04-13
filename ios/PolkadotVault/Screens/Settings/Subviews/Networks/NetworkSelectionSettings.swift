@@ -10,7 +10,6 @@ import SwiftUI
 struct NetworkSelectionSettings: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var appState: AppState
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -20,13 +19,10 @@ struct NetworkSelectionSettings: View {
                     title: Localizable.Settings.Networks.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: {
-                            viewModel.onBackTap()
-                            presentationMode.wrappedValue.dismiss()
-                        }
+                        action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView(showsIndicators: false) {
@@ -55,7 +51,7 @@ struct NetworkSelectionSettings: View {
             }
             NavigationLink(
                 destination: NetworkSettingsDetails(
-                    viewModel: .init(networkDetails: viewModel.selectedDetails)
+                    viewModel: .init(networkKey: viewModel.selectedDetails)
                 )
                 .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDetails
@@ -64,7 +60,6 @@ struct NetworkSelectionSettings: View {
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
-            viewModel.use(appState: appState)
         }
     }
 
@@ -92,40 +87,49 @@ struct NetworkSelectionSettings: View {
 
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
-        private weak var appState: AppState!
+        private let cancelBag = CancelBag()
         private weak var navigation: NavigationCoordinator!
+        private let service: ManageNetworksService
         @Published var networks: [MmNetwork] = []
-        @Published var selectedDetails: MNetworkDetails!
+        @Published var selectedDetails: String!
         @Published var isPresentingDetails = false
 
-        init() {}
+        init(
+            service: ManageNetworksService = ManageNetworksService()
+        ) {
+            self.service = service
+            updateNetworks()
+            onDetailsDismiss()
+        }
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
 
-        func use(appState: AppState) {
-            self.appState = appState
-            networks = appState.userData.manageNetworks.networks
-        }
-
         func onTap(_ network: MmNetwork) {
-            guard case let .nNetworkDetails(value) = navigation
-                .performFake(navigation: .init(action: .goForward, details: network.key)).screenData else { return }
-            selectedDetails = value
+            selectedDetails = network.key
             isPresentingDetails = true
         }
 
-        func onBackTap() {
-            appState.userData.manageNetworks = nil
-            navigation.performFake(navigation: .init(action: .goBack))
-        }
-
         func onAddTap() {
+            navigation.qrScannerDismissUpdate = { [weak self] in
+                self?.updateNetworks()
+            }
             navigation.shouldPresentQRScanner = true
-//            navigation.performFake(navigation: .init(action: .goBack))
-//            navigation.performFake(navigation: .init(action: .navbarScan))
         }
+    }
+}
+
+private extension NetworkSelectionSettings.ViewModel {
+    func onDetailsDismiss() {
+        $isPresentingDetails.sink { [weak self] isPresented in
+            guard let self = self, !isPresented else { return }
+            self.updateNetworks()
+        }.store(in: cancelBag)
+    }
+
+    func updateNetworks() {
+        networks = service.manageNetworks()
     }
 }
 

@@ -22,7 +22,7 @@ struct CreateDerivedKeyView: View {
                         action: { navigation.perform(navigation: .init(action: .goBack)) }
                     )],
                     rightButtons: [.init(type: .questionmark, action: viewModel.onRightNavigationButtonTap)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             VStack(alignment: .leading, spacing: 0) {

@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 20/12/2022.
 //
 
+import Combine
 import SwiftUI
 
 struct NetworkSettingsDetails: View {
@@ -83,15 +84,22 @@ struct NetworkSettingsDetails: View {
                     .frame(height: Heights.networkSelectionSettings)
                     .onTapGesture {
                         viewModel.onAddTap()
-                        rootPresentationMode.wrappedValue.dismiss()
                     }
                     Spacer()
                         .frame(height: Spacing.large)
                 }
+                NavigationLink(
+                    destination: SignSpecsListView(viewModel: .init(content: viewModel.signSpecList))
+                        .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingSignSpecList
+                ) { EmptyView() }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
             .onAppear {
                 viewModel.use(navigation: navigation)
+            }
+            .onReceive(viewModel.dismissViewRequest) { _ in
+                presentationMode.wrappedValue.dismiss()
             }
             .fullScreenCover(isPresented: $viewModel.isPresentingRemoveMetadataConfirmation) {
                 HorizontalActionsBottomModal(
@@ -290,7 +298,13 @@ extension NetworkSettingsDetails {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
         private let snackbarPresentation: BottomSnackbarPresentation
+        private let networkDetailsService: ManageNetworkDetailsService
+        private let networkKey: String
+
         private var metadataToDelete: MMetadataRecord?
+
+        var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         @Published var isPresentingRemoveMetadataConfirmation = false
         @Published var networkDetails: MNetworkDetails
@@ -299,27 +313,33 @@ extension NetworkSettingsDetails {
         @Published var shouldPresentRemoveNetworkConfirmation = false
         @Published var isPresentingRemoveNetworkConfirmation = false
 
+        @Published var signSpecList: MSignSufficientCrypto!
+        @Published var isPresentingSignSpecList: Bool = false
+
         init(
-            networkDetails: MNetworkDetails,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+            networkKey: String,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
-            _networkDetails = .init(wrappedValue: networkDetails)
+            self.networkKey = networkKey
             self.snackbarPresentation = snackbarPresentation
+            self.networkDetailsService = networkDetailsService
+            _networkDetails = .init(initialValue: networkDetailsService.networkDetails(networkKey))
         }
 
         func removeMetadata() {
             isPresentingRemoveMetadataConfirmation = false
-            if case let .nNetworkDetails(updatedDetails) = navigation
-                .performFake(navigation: .init(action: .removeMetadata)).screenData {
-                networkDetails = updatedDetails
-                snackbarPresentation.viewModel = .init(
-                    title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
-                        .confirmation(metadataToDelete?.specsVersion ?? ""),
-                    style: .warning
-                )
-                snackbarPresentation.isSnackbarPresented = true
-                metadataToDelete = nil
-            }
+            networkDetails = networkDetailsService.deleteNetworkMetadata(
+                networkKey,
+                metadataToDelete?.specsVersion ?? ""
+            )
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
+                    .confirmation(metadataToDelete?.specsVersion ?? ""),
+                style: .warning
+            )
+            snackbarPresentation.isSnackbarPresented = true
+            metadataToDelete = nil
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -331,23 +351,20 @@ extension NetworkSettingsDetails {
         }
 
         func onAddTap() {
-            navigation.shouldPresentQRScanner = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.navigation.performFake(navigation: .init(action: .goBack))
-                self.navigation.performFake(navigation: .init(action: .goBack))
-                self.navigation.performFake(navigation: .init(action: .navbarScan))
+            navigation.qrScannerDismissUpdate = { [weak self] in
+                self?.updateView()
             }
+            navigation.shouldPresentQRScanner = true
         }
 
         func didTapDelete(_ metadata: MMetadataRecord) {
             metadataToDelete = metadata
-            navigation.performFake(navigation: .init(action: .manageMetadata, details: metadata.specsVersion))
             isPresentingRemoveMetadataConfirmation = true
         }
 
         func didTapSign(_ metadata: MMetadataRecord) {
-            navigation.performFake(navigation: .init(action: .manageMetadata, details: metadata.specsVersion))
-            navigation.perform(navigation: .init(action: .signMetadata))
+            signSpecList = networkDetailsService.signMetadataSpecList(networkKey, metadata.specsVersion)
+            isPresentingSignSpecList = true
         }
 
         func cancelMetadataRemoval() {
@@ -357,21 +374,17 @@ extension NetworkSettingsDetails {
         }
 
         func onMoreMenuTap() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
             isShowingActionSheet = true
         }
 
         func onMoreActionSheetDismissal() {
-            // Due to iOS 15 handling of following .fullscreen presentation after dismissal, we need to enforce sync on
-            // main queue
-            DispatchQueue.main.async {
-                if self.shouldSignSpecs {
-                    self.navigation.perform(navigation: .init(action: .signNetworkSpecs))
-                }
-                if self.shouldPresentRemoveNetworkConfirmation {
-                    self.shouldPresentRemoveNetworkConfirmation = false
-                    self.isPresentingRemoveNetworkConfirmation = true
-                }
+            if shouldSignSpecs {
+                signSpecList = networkDetailsService.signSpecList(networkKey)
+                isPresentingSignSpecList = true
+            }
+            if shouldPresentRemoveNetworkConfirmation {
+                shouldPresentRemoveNetworkConfirmation = false
+                isPresentingRemoveNetworkConfirmation = true
             }
         }
 
@@ -382,12 +395,17 @@ extension NetworkSettingsDetails {
                 style: .warning
             )
             snackbarPresentation.isSnackbarPresented = true
-            navigation.perform(navigation: .init(action: .removeNetwork))
+            networkDetailsService.deleteNetwork(networkKey)
+            dismissRequest.send()
         }
 
         func cancelNetworkRemoval() {
             isPresentingRemoveNetworkConfirmation = false
             navigation.performFake(navigation: .init(action: .goBack))
+        }
+
+        private func updateView() {
+            networkDetails = networkDetailsService.networkDetails(networkKey)
         }
     }
 }

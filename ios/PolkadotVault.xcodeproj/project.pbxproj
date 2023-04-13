@@ -195,6 +195,8 @@
 		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
 		6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */; };
 		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
+		6DA9DAE729E57BE7009CC12C /* ManageNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */; };
+		6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */; };
 		6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */; };
 		6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */; };
 		6DB99035295C1080001101DC /* ConnectivityAlertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */; };
@@ -514,6 +516,8 @@
 		6DA501D6290BECBE0096DA4E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyAndNetworkCard+PathAndNetwork.swift"; sourceTree = "<group>"; };
 		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
+		6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworksService.swift; sourceTree = "<group>"; };
+		6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageNetworkDetailsService.swift; sourceTree = "<group>"; };
 		6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedStateMediator.swift; sourceTree = "<group>"; };
 		6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediator.swift; sourceTree = "<group>"; };
 		6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityAlertButton.swift; sourceTree = "<group>"; };
@@ -967,6 +971,8 @@
 				6DFE588E297A9F78002BFDBF /* ServiceError.swift */,
 				6DA08B8F29B68AF90027CFCB /* NavigationInitialisationService.swift */,
 				6DC909F529C87C8C00AE6BAD /* LogsService.swift */,
+				6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */,
+				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -2182,6 +2188,7 @@
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */,
 				6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */,
+				6DA9DAE729E57BE7009CC12C /* ManageNetworksService.swift in Sources */,
 				6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */,
 				6D2E66FD29DFFC1E000CE788 /* RootPresentationMode.swift in Sources */,
 				6D14F978293480A900F8EF44 /* InfoBoxView.swift in Sources */,
@@ -2229,6 +2236,7 @@
 				6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */,
+				6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */,
 				6DF5E7A22923A08A00F2B5B4 /* AttributedString+Markdown.swift in Sources */,
 				6DA08B8A29B614C20027CFCB /* RecoverKeySetSeedPhraseView.swift in Sources */,
 				6D932CE6292E0CE6008AD883 /* PrimaryTextField.swift in Sources */,

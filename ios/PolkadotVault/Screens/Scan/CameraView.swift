@@ -225,7 +225,7 @@ struct CameraView: View {
             Spacer()
             CapsuleButton(
                 action: {
-                    viewModel.onMultipleTransactionSign(model.multipleTransactions, model: model)
+                    viewModel.onMultipleTransactionSign(model.multipleTransactions)
                 },
                 icon: Asset.arrowForward.swiftUIImage,
                 title: Localizable.Scanner.Action.sign.string
@@ -398,7 +398,7 @@ extension CameraView.ViewModel {
 // MARK: - Mutliple Transactions mode
 
 extension CameraView.ViewModel {
-    func onMultipleTransactionSign(_ payloads: [String], model _: CameraService) {
+    func onMultipleTransactionSign(_ payloads: [String]) {
         var transactions: [MTransaction] = []
         for payload in payloads {
             let actionResult = navigation.performFake(

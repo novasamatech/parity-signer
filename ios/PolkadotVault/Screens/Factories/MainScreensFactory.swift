@@ -21,8 +21,6 @@ final class MainScreensFactory {
             )
         case .settings:
             SettingsView(viewModel: .init())
-        case .log:
-            LogsListView(viewModel: .init())
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(viewModel: .init(keyDetails: value))
@@ -37,8 +35,6 @@ final class MainScreensFactory {
             RecoverKeySetSeedPhraseView(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
-        case let .signSufficientCrypto(value):
-            SignSpecsListView(viewModel: .init(content: value))
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,
@@ -48,7 +44,9 @@ final class MainScreensFactory {
              .keyDetailsMulti,
              .manageNetworks,
              .nNetworkDetails,
-             .logDetails:
+             .logDetails,
+             .signSufficientCrypto,
+             .log:
             EmptyView()
         }
     }
