@@ -1,13 +1,11 @@
 name: Release android app
 
 on:
-  push
-#  push:
-#    branches:
-#      - master
-#    todo dmitry release
-#    tags:
-#      - 'v*'
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
 jobs:
   tests:
     name: Build android unit test
