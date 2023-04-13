@@ -7,7 +7,8 @@ on:
       - master
       - stable
 jobs:
-  tests:
+  #this it tests jobs, called build as it's required name for PR
+  build:
     name: Build android unit tests
     runs-on:            ubuntu-22.04
     steps:
@@ -72,7 +73,7 @@ jobs:
         run:            |
           ./gradlew :android:testDebugUnitTest
 
-  build:
+  makeapk:
     name: Build unsigned APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
