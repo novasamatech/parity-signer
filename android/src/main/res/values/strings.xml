@@ -35,7 +35,6 @@
 	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>
 	<string name="bottom_bar_label_scanner">Scanner</string>
-	<string name="bottom_bar_label_logs">Logs</string>
 	<string name="bottom_bar_label_settings">Settings</string>
 	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
 	<string name="key_set_details_multiselect_title_none_selected">Select Keys</string>

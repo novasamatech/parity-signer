@@ -9,8 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.settings.logs.items.LogItem
 import io.parity.signer.screens.settings.logs.items.LogItemDate
@@ -43,7 +41,7 @@ fun LogsScreen(
 				}
 			}
 		}
-		BottomBar2(navigator = navigator, state = BottomBar2State.LOGS)
+//		BottomBar2(navigator = navigator, state = BottomBar2State.LOGS) todo dmitry
 	}
 }
 

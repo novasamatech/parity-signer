@@ -22,7 +22,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar2
+import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
@@ -87,7 +87,7 @@ fun KeySetsScreen(
 				}
 			}
 		}
-		BottomBar2(rootNavigator, BottomBar2State.KEYS)
+		BottomBar(rootNavigator, BottomBar2State.KEYS)
 	}
 }
 

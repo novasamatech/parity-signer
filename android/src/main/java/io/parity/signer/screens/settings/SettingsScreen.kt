@@ -25,7 +25,7 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar2
+import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBar2State
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
@@ -188,7 +188,7 @@ private fun SettingsScreenGeneralView(
 					.padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
-		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
+		BottomBar(rootNavigator, BottomBar2State.SETTINGS)
 	}
 }
 

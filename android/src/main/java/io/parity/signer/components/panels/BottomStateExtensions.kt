@@ -8,7 +8,6 @@ fun BottomBar2State.toAction() =
 	when (this) {
 		BottomBar2State.KEYS -> Action.NAVBAR_KEYS
 		BottomBar2State.SCANNER -> Action.NAVBAR_SCAN
-		BottomBar2State.LOGS -> Action.NAVBAR_LOG
 		BottomBar2State.SETTINGS -> Action.NAVBAR_SETTINGS
 	}
 
