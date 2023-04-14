@@ -16,6 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -61,8 +62,10 @@ fun NetworkLabelWithIcon(networkName: String,
 @Composable
 private fun PreviewNetworkLabelWithIcon() {
 	SignerNewTheme {
-		Column() {
+		Column {
 			NetworkLabelWithIcon("kusama", "kusama", 24.dp, SignerTypeface.BodyM)
+			SignerDivider()
+			NetworkLabelWithIcon("kusama", "", 24.dp, SignerTypeface.BodyM)
 		}
 	}
 }
