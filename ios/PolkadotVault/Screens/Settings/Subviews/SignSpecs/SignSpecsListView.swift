@@ -5,18 +5,26 @@
 //  Created by Krzysztof Rodak on 22/03/2023.
 //
 
+import Combine
 import SwiftUI
 
 struct SignSpecsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.SignSpecsList.Label.title.string,
-                    leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: {
+                            viewModel.onBackTap()
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    )],
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
@@ -31,6 +39,11 @@ struct SignSpecsListView: View {
                     }
                 }
             }
+            NavigationLink(
+                destination: SignSpecDetails(viewModel: .init(content: viewModel.detailsContent))
+                    .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
@@ -38,19 +51,7 @@ struct SignSpecsListView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingEnterPassword,
-            onDismiss: {
-                viewModel.enterPassword = nil
-                if viewModel.detailsContent != nil {
-                    viewModel.isPresentingDetails = true
-                    return
-                }
-                if viewModel.shouldPresentError {
-                    viewModel.shouldPresentError = false
-                    viewModel.isPresentingError = true
-                } else {
-                    navigation.perform(navigation: .init(action: .goBack))
-                }
-            }
+            onDismiss: { viewModel.onPasswordModalDismiss() }
         ) {
             SignSpecEnterPasswordModal(
                 viewModel: .init(
@@ -61,19 +62,6 @@ struct SignSpecsListView: View {
                 )
             )
             .clearModalBackground()
-        }
-        .fullScreenCover(
-            isPresented: $viewModel.isPresentingDetails,
-            onDismiss: {
-                viewModel.detailsContent = nil
-            }
-        ) {
-            SignSpecDetails(
-                viewModel: .init(
-                    content: viewModel.detailsContent,
-                    isPresented: $viewModel.isPresentingDetails
-                )
-            )
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingError,
@@ -150,8 +138,20 @@ extension SignSpecsListView {
             self.navigation = navigation
         }
 
-        func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+        func onBackTap() {}
+
+        func onPasswordModalDismiss() {
+            enterPassword = nil
+            if detailsContent != nil {
+                isPresentingDetails = true
+                return
+            }
+            if shouldPresentError {
+                shouldPresentError = false
+                isPresentingError = true
+            } else {
+                navigation.perform(navigation: .init(action: .goBack))
+            }
         }
 
         func onRecordTap(_ keyRecord: MRawKey) {

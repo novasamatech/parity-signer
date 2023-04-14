@@ -25,6 +25,7 @@ protocol BackendNavigationPerforming: AnyObject {
     ///   - details: Additional data to be send along with `action`
     ///   - seedPhrase: Seed phrase required to be sent along with some `action`s
     /// - Returns: `ActionResult` if action was valid, `nil` otherwise
+    @discardableResult
     func performBackend(action: Action, details: String, seedPhrase: String) -> Result<ActionResult, NavigationError>
     func performTransaction(with payload: String) -> Result<ActionResult, TransactionError>
 }
@@ -32,6 +33,7 @@ protocol BackendNavigationPerforming: AnyObject {
 /// We don't want to use module-wide public functions as there is no way of mocking them in unit  / UI tests
 /// This adapters acts as a wrapper for public function for navigation
 final class BackendNavigationAdapter: BackendNavigationPerforming {
+    @discardableResult
     func performBackend(action: Action, details: String, seedPhrase: String) -> Result<ActionResult, NavigationError> {
         do {
             let actionResult = try backendAction(
