@@ -61,11 +61,13 @@ private fun UnknownNetworkIcon(
 			.background(networkColors.background, CircleShape),
 		contentAlignment = Alignment.Center
 	) {
-		AutoSizeText(
-			text = chars,
-			fontWeight = FontWeight.Bold,
-			color = networkColors.text,
-		)
+		if (chars.isNotEmpty()) {
+			AutoSizeText(
+				text = chars,
+				fontWeight = FontWeight.Bold,
+				color = networkColors.text,
+			)
+		}
 	}
 }
 
@@ -220,6 +222,26 @@ private fun getResourceIdForNetwork(networkName: String) =
 	}
 
 
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewEmptyIcon() {
+	SignerNewTheme {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+		) {
+			NetworkIcon("")
+		}
+	}
+}
+
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -268,3 +290,6 @@ private fun PreviewNetworkIconUnknownIcons() {
 		}
 	}
 }
+
+
+

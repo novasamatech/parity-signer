@@ -328,7 +328,7 @@ private fun MTransaction.shouldShowAsSummaryTransaction(): Boolean {
 @Composable
 private fun PreviewTransactionsScreenFull() {
 	SignerNewTheme {
-		val transaction = UnifiiStubs.makeTransactionAddNetworksNovasamaStub()
+		val transaction = UnifiiStubs.makeTransactionStubList()
 		TransactionsScreenFull(transaction, null, Modifier, {}, {}, {})
 	}
 }
