@@ -84,7 +84,7 @@ fun TCAddNetwork(specs: NetworkSpecs) {
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				NetworkLabelWithIcon(
-					networkName = specs.logo.capitalize(),
+					networkName = specs.name.capitalize(),
 					networkLogo = specs.logo,
 				)
 			}

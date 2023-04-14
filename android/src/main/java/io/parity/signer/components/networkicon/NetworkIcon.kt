@@ -229,6 +229,25 @@ private fun getResourceIdForNetwork(networkName: String) =
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
+private fun PreviewEmptyIcon() {
+	SignerNewTheme {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+		) {
+			NetworkIcon("")
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
 		Column(
@@ -268,3 +287,6 @@ private fun PreviewNetworkIconUnknownIcons() {
 		}
 	}
 }
+
+
+
