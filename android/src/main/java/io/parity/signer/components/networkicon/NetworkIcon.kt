@@ -61,13 +61,11 @@ private fun UnknownNetworkIcon(
 			.background(networkColors.background, CircleShape),
 		contentAlignment = Alignment.Center
 	) {
-		if (chars.isNotEmpty()) {
-			AutoSizeText(
-				text = chars,
-				fontWeight = FontWeight.Bold,
-				color = networkColors.text,
-			)
-		}
+		AutoSizeText(
+			text = chars,
+			fontWeight = FontWeight.Bold,
+			color = networkColors.text,
+		)
 	}
 }
 
@@ -220,7 +218,6 @@ private fun getResourceIdForNetwork(networkName: String) =
 		"zeitgeist" -> R.drawable.network_zeitgeist
 		else -> -1
 	}
-
 
 
 @Preview(
