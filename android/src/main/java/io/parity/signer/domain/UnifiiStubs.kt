@@ -1,5 +1,6 @@
 package io.parity.signer.domain
 
+import io.parity.signer.components.ImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 
@@ -77,7 +78,7 @@ object UnifiiStubs {
 							0.toUInt(), 0.toUInt(), Card.VerifierCard(
 								f = MVerifierDetails(
 									publicKey = "b04b58ffedd058a81a625819d437d7a35485c63cfac9fc9f0907c16b3e3e9d6c",
-									identicon = SignerImage.Png((PreviewData.exampleIdenticonPng as SignerImage.Png).image),
+									identicon = SignerImage.Png((PreviewData.exampleIdenticonPng as ImageContent.Png).image),
 									encryption = Encryption.SR25519.toString(),
 								)
 							)
