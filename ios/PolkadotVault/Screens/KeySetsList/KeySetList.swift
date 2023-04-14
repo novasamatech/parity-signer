@@ -12,8 +12,10 @@ struct KeySetList: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
+    @State private var isShowingCreateKeySet = false
     @State private var isShowingMoreMenu = false
     @State private var isExportKeysSelected = false
+    @State private var shouldShowCreateKeySet = false
 
     @State var selectedItems: [KeySetViewModel] = []
 
@@ -92,11 +94,29 @@ struct KeySetList: View {
                 exportKeysOverlay
             }
         }
-        .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
+        .fullScreenCover(
+            isPresented: $isShowingNewSeedMenu,
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async {
+                    if shouldShowCreateKeySet {
+                        shouldShowCreateKeySet = false
+                        isShowingCreateKeySet = true
+                    }
+                }
+            }
+        ) {
             AddKeySetModal(
-                isShowingNewSeedMenu: $isShowingNewSeedMenu
+                isShowingNewSeedMenu: $isShowingNewSeedMenu,
+                shouldShowCreateKeySet: $shouldShowCreateKeySet
             )
             .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $isShowingCreateKeySet,
+            onDismiss: viewModel.updateData
+        ) {
+            EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
         }
         .fullScreenCover(isPresented: $isShowingMoreMenu) {
             KeyListMoreMenuModal(
@@ -194,6 +214,7 @@ struct KeySetList: View {
 
 extension KeySetList {
     final class ViewModel: ObservableObject {
+        private let keyListService: KeyListService
         let keyDetailsService: KeyDetailsService
         private let modelBuilder: KeySetListViewModelBuilder
         @Published var isShowingKeysExportModal = false
@@ -202,10 +223,12 @@ extension KeySetList {
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
+            keyListService: KeyListService = KeyListService(),
             modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
             dataModel: MSeeds
         ) {
             self.keyDetailsService = keyDetailsService
+            self.keyListService = keyListService
             self.modelBuilder = modelBuilder
             self.dataModel = dataModel
             updateView(dataModel)
@@ -213,6 +236,11 @@ extension KeySetList {
 
         func updateView(_ dataModel: MSeeds) {
             listViewModel = modelBuilder.build(for: dataModel)
+        }
+
+        func updateData() {
+            dataModel = keyListService.getKeyList()
+            updateView(dataModel)
         }
 
         func loadKeysInformation(

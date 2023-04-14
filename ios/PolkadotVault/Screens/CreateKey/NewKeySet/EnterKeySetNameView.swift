@@ -13,73 +13,80 @@ struct EnterKeySetNameView: View {
     @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            NavigationBarView(
-                viewModel: .init(
-                    title: nil,
-                    leftButtons: [.init(
-                        type: .xmark,
-                        action: viewModel.onBackTap
-                    )],
-                    rightButtons: [.init(
-                        type: .activeAction(
-                            Localizable.NewSeed.Name.Action.next.key,
-                            .constant(!viewModel.isActionAvailable())
-                        ),
-                        action: {
-                            nameFocused = false
-                            viewModel.onNextTap()
-                        }
-                    )]
-                )
-            )
+        NavigationView {
             VStack(alignment: .leading, spacing: 0) {
-                Localizable.NewSeed.Name.Label.title.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.titleL.font)
-                    .padding(.top, Spacing.extraSmall)
-                Localizable.NewSeed.Name.Label.header.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.bodyL.font)
-                    .padding(.vertical, Spacing.extraSmall)
-                TextField("", text: $viewModel.seedName)
-                    .submitLabel(.done)
-                    .primaryTextFieldStyle(
-                        Localizable.NewSeed.Name.Label.placeholder.string,
-                        text: $viewModel.seedName
+                NavigationBarView(
+                    viewModel: .init(
+                        title: nil,
+                        leftButtons: [.init(
+                            type: .xmark,
+                            action: viewModel.onBackTap
+                        )],
+                        rightButtons: [.init(
+                            type: .activeAction(
+                                Localizable.NewSeed.Name.Action.next.key,
+                                .constant(!viewModel.isActionAvailable())
+                            ),
+                            action: {
+                                nameFocused = false
+                                viewModel.onNextTap()
+                            }
+                        )]
                     )
-                    .focused($nameFocused)
-                    .onSubmit {
-                        nameFocused = false
-                        viewModel.onSubmitTap()
-                    }
-                    .onAppear {
-                        nameFocused = true
-                    }
-                    .padding(.vertical, Spacing.medium)
-                Localizable.NewSeed.Name.Label.footer.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
-                Spacer()
+                )
+                mainContent()
+                NavigationLink(
+                    destination:
+                    CreateKeySetSeedPhraseView(
+                        viewModel: .init(
+                            dataModel: viewModel.detailsContent,
+                            isPresented: $viewModel.isPresented
+                        )
+                    )
+                    .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingDetails
+                ) { EmptyView() }
             }
-            .padding(.horizontal, Spacing.large)
             .onAppear {
                 viewModel.use(navigation: navigation)
             }
-            .fullScreenCover(
-                isPresented: $viewModel.isPresentingDetails,
-                onDismiss: {
-                    viewModel.detailsContent = nil
-                }
-            ) {
-                CreateKeySetSeedPhraseView(
-                    viewModel: .init(
-                        dataModel: viewModel.detailsContent,
-                        isPresented: $viewModel.isPresentingDetails
-                    )
-                )
-            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationBarHidden(true)
         }
+    }
+
+    @ViewBuilder
+    func mainContent() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Localizable.NewSeed.Name.Label.title.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.titleL.font)
+                .padding(.top, Spacing.extraSmall)
+            Localizable.NewSeed.Name.Label.header.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyL.font)
+                .padding(.vertical, Spacing.extraSmall)
+            TextField("", text: $viewModel.seedName)
+                .submitLabel(.done)
+                .primaryTextFieldStyle(
+                    Localizable.NewSeed.Name.Label.placeholder.string,
+                    text: $viewModel.seedName
+                )
+                .focused($nameFocused)
+                .onSubmit {
+                    nameFocused = false
+                    viewModel.onSubmitTap()
+                }
+                .onAppear {
+                    nameFocused = true
+                }
+                .padding(.vertical, Spacing.medium)
+            Localizable.NewSeed.Name.Label.footer.text
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .font(PrimaryFont.captionM.font)
+            Spacer()
+        }
+        .padding(.horizontal, Spacing.large)
     }
 }
 
@@ -88,15 +95,20 @@ extension EnterKeySetNameView {
         @Published var seedName: String = ""
         @Published var isPresentingDetails: Bool = false
         @Published var detailsContent: MNewSeedBackup!
-
+        @Binding var isPresented: Bool
         weak var navigation: NavigationCoordinator!
 
         private let seedsMediator: SeedsMediating
+        private let service: CreateKeySetService
 
         init(
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            service: CreateKeySetService = CreateKeySetService(),
+            isPresented: Binding<Bool>
         ) {
             self.seedsMediator = seedsMediator
+            self.service = service
+            _isPresented = isPresented
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -104,13 +116,11 @@ extension EnterKeySetNameView {
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            isPresented = false
         }
 
         func onNextTap() {
-            guard case let .newSeedBackup(detailsContent) = navigation
-                .performFake(navigation: .init(action: .goForward, details: seedName)).modalData else { return }
-            self.detailsContent = detailsContent
+            detailsContent = service.createKeySet(seedsMediator.seedNames.isEmpty, seedName: seedName)
             isPresentingDetails = true
         }
 
@@ -129,7 +139,7 @@ extension EnterKeySetNameView {
     struct EnterKeySetNameView_Previews: PreviewProvider {
         static var previews: some View {
             EnterKeySetNameView(
-                viewModel: .init()
+                viewModel: .init(isPresented: .constant(true))
             )
             .environmentObject(NavigationCoordinator())
             .previewLayout(.sizeThatFits)
