@@ -205,7 +205,9 @@ extension EnterBananaSplitPasswordModal {
                 seedPhrase: seedPhrase
             ))
             navigation.performFake(navigation: .init(action: .goBack))
-            navigation.overrideQRScannerDismissalNavigation = .init(action: .selectSeed, details: seedName)
+            navigation.qrScannerDismissUpdate = {
+                self.navigation.perform(navigation: .init(action: .selectSeed, details: self.seedName))
+            }
             isKeyRecovered = true
             isPresented = false
         }

@@ -1,5 +1,5 @@
 //
-//  VerfierCertificateView.swift
+//  VerifierCertificateView.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 12/12/2022.
@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-struct VerfierCertificateView: View {
+struct VerifierCertificateView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -19,7 +20,10 @@ struct VerfierCertificateView: View {
                     title: Localizable.VerifierCertificate.Label.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: viewModel.onBackTap
+                        action: {
+                            viewModel.onBackTap()
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     )],
                     rightButtons: [.init(type: .empty)]
                 )
@@ -80,21 +84,18 @@ struct VerfierCertificateView: View {
     }
 }
 
-extension VerfierCertificateView {
+extension VerifierCertificateView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingRemoveConfirmation = false
         @Published var content: MVerifierDetails?
-        @Binding var isPresented: Bool
 
         private let onboardingMediator: OnboardingMediator
         private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
 
         init(
-            isPresented: Binding<Bool>,
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
         ) {
-            _isPresented = isPresented
             self.onboardingMediator = onboardingMediator
         }
 
@@ -108,7 +109,6 @@ extension VerfierCertificateView {
         }
 
         func onBackTap() {
-            isPresented = false
             appState.userData.verifierDetails = nil
         }
 
@@ -126,7 +126,7 @@ extension VerfierCertificateView {
 #if DEBUG
     struct VerfierCertificateView_Previews: PreviewProvider {
         static var previews: some View {
-            VerfierCertificateView(viewModel: .init(isPresented: .constant(true)))
+            VerifierCertificateView(viewModel: .init())
         }
     }
 #endif

@@ -5,6 +5,7 @@
 //  Created by Alexander Slesarev on 9.8.2021.
 //
 
+import Combine
 import SwiftUI
 
 struct TransactionWrapper: Identifiable {
@@ -18,6 +19,7 @@ struct TransactionPreview: View {
     @State private var isLogNoteVisible: Bool = false
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack {
@@ -53,6 +55,9 @@ struct TransactionPreview: View {
             ),
             isPresented: $viewModel.isDetailsPresented
         )
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 
     @ViewBuilder
@@ -235,6 +240,8 @@ extension TransactionPreview {
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
+        var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         let signature: MSignatureReady?
 
@@ -296,22 +303,21 @@ extension TransactionPreview {
 
         func onBackButtonTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
+            dismissRequest.send()
         }
 
         func onDoneTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
+            dismissRequest.send()
         }
 
         func onCancelTap() {
             navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
+            dismissRequest.send()
         }
 
         func onApproveTap() {
-            navigation.perform(navigation: .init(action: .goForward))
-            isPresented = false
+            navigation.performFake(navigation: .init(action: .goForward))
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
                 snackbarPresentation.viewModel = .init(
@@ -328,6 +334,7 @@ extension TransactionPreview {
             default:
                 ()
             }
+            dismissRequest.send()
         }
 
         func onImportKeysTap() {

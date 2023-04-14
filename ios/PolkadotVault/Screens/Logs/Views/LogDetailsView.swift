@@ -9,18 +9,14 @@ import SwiftUI
 
 struct LogDetailsView: View {
     @StateObject var viewModel: ViewModel
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
                     title: Localizable.LogDetails.Label.title.string,
-                    leftButtons: [
-                        .init(
-                            type: .arrow,
-                            action: viewModel.onBackTap
-                        )
-                    ],
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: []
                 )
             )
@@ -41,19 +37,10 @@ struct LogDetailsView: View {
 
 extension LogDetailsView {
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
         let details: MLogDetails
 
-        init(
-            isPresented: Binding<Bool>,
-            details: MLogDetails
-        ) {
-            _isPresented = isPresented
+        init(_ details: MLogDetails) {
             self.details = details
-        }
-
-        func onBackTap() {
-            isPresented = false
         }
     }
 }

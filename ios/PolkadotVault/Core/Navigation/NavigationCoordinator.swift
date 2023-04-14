@@ -50,7 +50,7 @@ final class NavigationCoordinator: ObservableObject {
     /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
     ///
     /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other time
-    @Published var overrideQRScannerDismissalNavigation: Navigation?
+    @Published var qrScannerDismissUpdate: (() -> Void)?
 
     /// Responsible for presentation of generic error bottom sheet alert component
     /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
