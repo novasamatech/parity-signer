@@ -1,15 +1,11 @@
-name: Build android app
+name: Release android app
 
 on:
-  pull_request:
-  push:
-    branches:
-      - master
-      - stable
+  workflow_dispatch:
 jobs:
-  #this it tests jobs, called build as it's required name for PR
+  #it's tests but build job is required in our branch policies
   build:
-    name: Build
+    name: Build android unit test
     runs-on:            ubuntu-22.04
     steps:
       - name:           Cancel Previous Runs
@@ -73,8 +69,8 @@ jobs:
         run:            |
           ./gradlew :android:testDebugUnitTest
 
-  makeapk:
-    name: Build unsigned APKs
+  make:
+    name: Build signed APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
     steps:
@@ -90,7 +86,6 @@ jobs:
           submodules:   'recursive'
 
       - name:           Install System Dependencies (Linux)
-        if: runner.os == 'Linux'
         run:            |
           sudo apt-get update
           sudo apt-get install -y clang libclang-dev libopencv-dev
@@ -136,13 +131,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name:           Assemble unsigned debug apk
-        run:            |
-          ./gradlew clean assembleDebug --stacktrace
+      # Build and publish
 
-      - name:           Upload Gplay unsigned APKs
-        uses:           actions/upload-artifact@v3
+      - name:           Assemble release unsigned apk
+        run:            |
+          ./gradlew clean assembleRelease --stacktrace
+
+      - name: Sign app APK
+        uses: r0adkll/sign-android-release@v1
+        # ID used to access action output
+        id: sign_app
         with:
-          name:         signer-debug-unsigned
-          path:         |
-            android/build/outputs/apk/debug/*.apk
+          releaseDirectory: android/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+
+      - name: Upload Gplay release APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: signer-release-signed
+          path: |
+            ${{steps.sign_app.outputs.signedReleaseFile}}
+
+      - name: Publish to Google Play Store
+        uses: r0adkll/upload-google-play@v1.1.1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+          releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          packageName: io.parity.signer
+          track: internal
+
+
+

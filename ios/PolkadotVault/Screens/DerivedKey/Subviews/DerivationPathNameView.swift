@@ -32,7 +32,7 @@ struct DerivationPathNameView: View {
                         ),
                         action: viewModel.onRightNavigationButtonTap
                     )],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView(showsIndicators: false) {

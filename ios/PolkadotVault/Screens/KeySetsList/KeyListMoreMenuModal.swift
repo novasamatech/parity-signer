@@ -17,7 +17,7 @@ struct KeyListMoreMenuModal: View {
         FullScreenRoundedModal(
             backgroundTapAction: {
                 animateDismissal {
-                    navigation.perform(navigation: .init(action: .rightButtonAction))
+                    navigation.performFake(navigation: .init(action: .rightButtonAction))
                 }
             },
             animateBackground: $animateBackground,
