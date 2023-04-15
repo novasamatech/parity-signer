@@ -19,9 +19,6 @@ struct KeySetList: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Background color
-            Asset.backgroundSystem.swiftUIColor
-                .ignoresSafeArea()
             // Main screen
             VStack(spacing: 0) {
                 // Navigation Bar
@@ -63,6 +60,10 @@ struct KeySetList: View {
                     .hiddenScrollContent()
                 }
             }
+            .background(
+                Asset.backgroundSystem.swiftUIColor
+                    .ignoresSafeArea()
+            )
             VStack {
                 // Add Key Set
                 if !isExportKeysSelected {
@@ -73,7 +74,7 @@ struct KeySetList: View {
                                 // We need to call this conditionally, as if there are no seeds,
                                 // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
                                 if !viewModel.listViewModel.list.isEmpty {
-                                    navigation.perform(navigation: .init(action: .rightButtonAction))
+                                    navigation.performFake(navigation: .init(action: .rightButtonAction))
                                 }
                                 isShowingNewSeedMenu.toggle()
                             },

@@ -11,6 +11,7 @@ struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 0) {
@@ -19,10 +20,10 @@ struct BackupSelectKeyView: View {
                     title: Localizable.Settings.SelectKey.title.string,
                     leftButtons: [.init(
                         type: .arrow,
-                        action: viewModel.onBackTap
+                        action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView {
@@ -88,7 +89,6 @@ struct BackupSelectKeyView: View {
 
 extension BackupSelectKeyView {
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
         @Published var isPresentingBackupModal = false
         @Published var isPresentingConnectivityAlert = false
         @Published var seedPhraseToPresent: SettingsBackupViewModel = .init(
@@ -102,11 +102,9 @@ extension BackupSelectKeyView {
         private let warningStateMediator: WarningStateMediator
 
         init(
-            isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
-            _isPresented = isPresented
             self.seedsMediator = seedsMediator
             self.warningStateMediator = warningStateMediator
         }
@@ -122,10 +120,6 @@ extension BackupSelectKeyView {
             } else {
                 presentBackupModal(seedName)
             }
-        }
-
-        func onBackTap() {
-            isPresented = false
         }
 
         func onConnectivityWarningTap() {
@@ -155,7 +149,7 @@ extension BackupSelectKeyView {
     struct BackupSelectKeyView_Previews: PreviewProvider {
         static var previews: some View {
             BackupSelectKeyView(
-                viewModel: .init(isPresented: .constant(true))
+                viewModel: .init()
             )
         }
     }

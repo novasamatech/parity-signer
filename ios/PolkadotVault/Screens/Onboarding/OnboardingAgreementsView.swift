@@ -81,10 +81,10 @@ struct OnboardingAgreementsView: View {
         }
         .background(Asset.backgroundSystem.swiftUIColor)
         .fullScreenCover(isPresented: $viewModel.isPresentingTermsOfService) {
-            TermsOfServiceView(viewModel: .init(isPresented: $viewModel.isPresentingTermsOfService))
+            TermsOfServiceView(viewModel: .init(onBackTap: { viewModel.isPresentingTermsOfService = false }))
         }
         .fullScreenCover(isPresented: $viewModel.isPresentingPrivacyPolicy) {
-            PrivacyPolicyView(viewModel: .init(isPresented: $viewModel.isPresentingPrivacyPolicy))
+            PrivacyPolicyView(viewModel: .init(onBackTap: { viewModel.isPresentingPrivacyPolicy = false }))
         }
     }
 }

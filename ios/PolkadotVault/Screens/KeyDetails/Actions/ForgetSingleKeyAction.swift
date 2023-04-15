@@ -23,7 +23,7 @@ final class ForgetSingleKeyAction {
 
     func forgetSingleKey(_: String) {
         // This triggers key deletion and moves user to Logs tab
-        navigation.perform(navigation: .init(action: .removeKey), skipDebounce: true)
+        navigation.performFake(navigation: .init(action: .removeKey))
         // We need this call to Rust state machine to move user manually from Logs to Keys tab as per new design
         navigation.perform(navigation: .init(action: .navbarKeys))
         // After moving user to Keys, present snackbar from bottom as action confirmation

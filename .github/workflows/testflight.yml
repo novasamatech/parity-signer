@@ -16,7 +16,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout repository
-        uses:                 actions/checkout@v3.5.0
+        uses:                 actions/checkout@v3.5.2
 
       - name:                 Setup Ruby
         uses:                 ruby/setup-ruby@v1

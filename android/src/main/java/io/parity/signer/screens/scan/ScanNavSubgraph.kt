@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.components.panels.toAction
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen

@@ -7,6 +7,7 @@ on:
       - master
       - stable
 jobs:
+  #this it tests jobs, called build as it's required name for PR
   build:
     name: Build
     runs-on:            ubuntu-22.04
@@ -17,7 +18,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.5.0
+        uses:           actions/checkout@v3.5.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -72,7 +73,7 @@ jobs:
         run:            |
           ./gradlew :android:testDebugUnitTest
 
-  debug:
+  makeapk:
     name: Build unsigned APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
@@ -83,7 +84,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.5.0
+        uses:           actions/checkout@v3.5.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -135,7 +136,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name:           Assemble GPlay unsigned apk
+      - name:           Assemble unsigned debug apk
         run:            |
           ./gradlew clean assembleDebug --stacktrace
 

@@ -168,6 +168,13 @@ Enable "Show package details" checkmark to select specific version.
 
 **10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
 
+# Release Android
+
+- Create PR with new app version updated and tag v* (example "v6.1.3")
+- After merging to master - run release-android.yml flow. It will build and sign apk and upload it to internal track in play store
+- Create github release with apk from release flow
+- Go to play store, promote internal track to production and update changes in play store
+
 # Tests
 
 Core Rust code is fully covered by tests, and they run in CI on each commit. To run tests on your machine:

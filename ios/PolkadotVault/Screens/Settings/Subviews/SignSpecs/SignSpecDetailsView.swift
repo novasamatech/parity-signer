@@ -5,19 +5,24 @@
 //  Created by Krzysztof Rodak on 22/03/2023.
 //
 
+import Combine
 import SwiftUI
 
 struct SignSpecDetails: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject var navigation: NavigationCoordinator
     @State var isShowingFullAddress: Bool = false
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.SignSpecsDetails.Label.title.string,
-                    leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: viewModel.onBackTap
+                    )],
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
@@ -53,6 +58,9 @@ struct SignSpecDetails: View {
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
+        }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
     }
 
@@ -135,15 +143,16 @@ extension SignSpecDetails {
     final class ViewModel: ObservableObject {
         var content: MSufficientCryptoReady
         private weak var navigation: NavigationCoordinator!
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
 
-        @Binding var isPresented: Bool
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            content: MSufficientCryptoReady,
-            isPresented: Binding<Bool>
+            content: MSufficientCryptoReady
         ) {
             self.content = content
-            _isPresented = isPresented
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -151,8 +160,8 @@ extension SignSpecDetails {
         }
 
         func onBackTap() {
-            isPresented = false
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
+            dismissRequest.send()
         }
     }
 }
