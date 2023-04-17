@@ -13,7 +13,11 @@ import io.parity.signer.uniffi.ValidCurrentVerifier
 import io.parity.signer.uniffi.VerifierValue
 
 
-data class LogsScreenModel(val logs: List<LogsListEntryModel>)
+data class LogsScreenModel(val logs: List<LogsListEntryModel>) {
+	companion object {
+		val EMPTY = LogsScreenModel(emptyList())
+	}
+}
 
 fun MLog.toLogsScreenModel(context: Context): LogsScreenModel {
 	val result = mutableListOf<LogsListEntryModel>()

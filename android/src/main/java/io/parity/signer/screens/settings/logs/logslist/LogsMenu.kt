@@ -106,8 +106,26 @@ fun LogeMenuDeleteConfirm(
 @Composable
 private fun PreviewLogsMenu() {
 	SignerNewTheme {
-		io.parity.signer.screens.settings.logs.logslist.LogsMenu(
-			EmptyNavigator(),
+		LogsMenuGeneral(
+			{},{},{},
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewLogsMenuConfirm() {
+	SignerNewTheme {
+		LogeMenuDeleteConfirm(
+			{},{},
 		)
 	}
 }

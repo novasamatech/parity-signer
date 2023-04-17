@@ -32,6 +32,7 @@ import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
+import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -115,12 +116,7 @@ fun SettingsScreenSubgraph(
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}
 		}
-		composable(SettingsScreenSubgraph.logs) {
-			Box(modifier = Modifier.statusBarsPadding()) {
-
-//				LogsScreen(model = , navigator = ) todo dmitry implement
-			}
-		}
+		logsNavigationSubgraph(SettingsScreenSubgraph.logs)
 	}
 }
 

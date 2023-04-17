@@ -51,8 +51,11 @@ fun LogsScreen(
 			}
 		}
 //		todo dmitry check workarounds in networks screen or how this works
-		BottomBar(navigator = rootNavigator, state = BottomBarState.SETTINGS,
-			skipRememberCameraParent = true)
+		BottomBar(
+			navigator = rootNavigator,
+			state = BottomBarState.SETTINGS,
+			skipRememberCameraParent = true
+		)
 	}
 }
 
