@@ -32,7 +32,6 @@ import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
-import io.parity.signer.screens.settings.logs.LogsScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action

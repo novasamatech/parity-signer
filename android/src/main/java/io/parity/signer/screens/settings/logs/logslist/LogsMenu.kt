@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings.logs
+package io.parity.signer.screens.settings.logs.logslist
 
 import android.content.res.Configuration
 import android.util.Log
@@ -28,7 +28,7 @@ import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.launch
 
-const val TAG = "LogsMenu"
+private const val TAG = "LogsMenu"
 
 @Composable
 fun LogsMenu(
@@ -44,7 +44,7 @@ fun LogsMenu(
 			onDeleteClicked = { state.value = LogsState.DELETE_CONFIRM },
 		)
 		LogsState.DELETE_CONFIRM ->
-			LogeMenuDeleteConfirm(
+			io.parity.signer.screens.settings.logs.logslist.LogeMenuDeleteConfirm(
 				onCancel = { state.value = LogsState.GENERAL },
 				onRemoveKey = {
 					coroutineScope.launch {
@@ -130,7 +130,7 @@ private enum class LogsState {
 @Composable
 private fun PreviewLogsMenu() {
 	SignerNewTheme {
-		LogsMenu(
+		io.parity.signer.screens.settings.logs.logslist.LogsMenu(
 			EmptyNavigator(),
 		)
 	}
