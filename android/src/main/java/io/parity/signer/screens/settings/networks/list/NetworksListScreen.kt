@@ -22,7 +22,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.components.panels.CameraParentScreen
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.*
@@ -55,7 +55,7 @@ fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
 			}
 		}
 		BottomBar(
-			rootNavigator, BottomBar2State.SETTINGS,
+			rootNavigator, BottomBarState.SETTINGS,
 			skipRememberCameraParent = true
 		) {
 			rootNavigator.backAction()

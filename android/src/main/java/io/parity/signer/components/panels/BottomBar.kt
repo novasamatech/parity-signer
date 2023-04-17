@@ -33,7 +33,7 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun BottomBar(
 	navigator: Navigator,
-	state: BottomBar2State,
+	state: BottomBarState,
 	skipRememberCameraParent: Boolean = false,
 	onBeforeActionWhenClicked: Callback? = null,
 ) {
@@ -57,7 +57,7 @@ fun BottomBar(
 				iconId = R.drawable.ic_key_outlined_24,
 				action = Action.NAVBAR_KEYS,
 				labelResId = R.string.bottom_bar_label_key_sets,
-				isEnabled = state == BottomBar2State.KEYS,
+				isEnabled = state == BottomBarState.KEYS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 			//todo dmitry new design https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?node-id=11930-77855&t=khcNTdojUGw29HQu-4
@@ -66,7 +66,7 @@ fun BottomBar(
 				iconId = R.drawable.ic_qe_code_24,
 				action = Action.NAVBAR_SCAN,
 				labelResId = R.string.bottom_bar_label_scanner,
-				isEnabled = state == BottomBar2State.SCANNER,
+				isEnabled = state == BottomBarState.SCANNER,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 			BottomBarButton(
@@ -75,14 +75,14 @@ fun BottomBar(
 				enabledIconId = R.drawable.ic_settings_filled_24,
 				action = Action.NAVBAR_SETTINGS,
 				labelResId = R.string.bottom_bar_label_settings,
-				isEnabled = state == BottomBar2State.SETTINGS,
+				isEnabled = state == BottomBarState.SETTINGS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 		}
 	}
 }
 
-enum class BottomBar2State { KEYS, SCANNER, SETTINGS }
+enum class BottomBarState { KEYS, SCANNER, SETTINGS }
 
 /**
  * Unified bottom bar button view for [BottomBar]
@@ -141,7 +141,7 @@ fun BottomBarButton(
 private fun PreviewBottomBar2() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			BottomBar(EmptyNavigator(), BottomBar2State.KEYS)
+			BottomBar(EmptyNavigator(), BottomBarState.KEYS)
 		}
 	}
 }

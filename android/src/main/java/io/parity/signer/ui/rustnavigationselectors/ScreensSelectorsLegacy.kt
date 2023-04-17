@@ -11,7 +11,6 @@ import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
-import io.parity.signer.screens.settings.logs.logdetails.LogDetails
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
