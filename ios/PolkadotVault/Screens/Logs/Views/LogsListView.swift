@@ -49,7 +49,10 @@ struct LogsListView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
-            onDismiss: { viewModel.onMoreActionSheetDismissal() }
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.onMoreActionSheetDismissal() }
+            }
         ) {
             LogsMoreActionsModal(
                 isShowingActionSheet: $viewModel.isShowingActionSheet,

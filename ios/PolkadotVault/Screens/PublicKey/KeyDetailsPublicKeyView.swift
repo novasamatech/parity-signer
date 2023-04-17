@@ -111,7 +111,10 @@ struct KeyDetailsPublicKeyView: View {
         // Action sheet
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
-            onDismiss: viewModel.checkForActionsPresentation
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.checkForActionsPresentation() }
+            }
         ) {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $viewModel.shouldPresentExportKeysWarningModal,
@@ -123,7 +126,10 @@ struct KeyDetailsPublicKeyView: View {
         // Export private key warning
         .fullScreenCover(
             isPresented: $viewModel.isPresentingExportKeysWarningModal,
-            onDismiss: viewModel.onWarningDismissal
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.onWarningDismissal() }
+            }
         ) {
             ExportPrivateKeyWarningModal(
                 isPresentingExportKeysWarningModal: $viewModel.isPresentingExportKeysWarningModal,
@@ -154,7 +160,10 @@ struct KeyDetailsPublicKeyView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: viewModel.checkForActionsPresentation
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.checkForActionsPresentation() }
+            }
         ) {
             ErrorBottomModal(
                 viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(

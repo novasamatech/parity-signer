@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddKeySetModal: View {
     @Binding var isShowingNewSeedMenu: Bool
+    @Binding var shouldShowCreateKeySet: Bool
     @State private var animateBackground: Bool = false
     @EnvironmentObject private var navigation: NavigationCoordinator
 
@@ -30,7 +31,7 @@ struct AddKeySetModal: View {
                     ActionSheetButton(
                         action: {
                             animateDismissal {
-                                navigation.perform(navigation: .init(action: .newSeed))
+                                shouldShowCreateKeySet = true
                             }
                         },
                         icon: Asset.add.swiftUIImage,
