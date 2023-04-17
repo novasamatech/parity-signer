@@ -1,6 +1,7 @@
 package io.parity.signer.screens.settings.logs.logslist
 
 import android.content.res.Configuration
+import android.telecom.Call
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +33,7 @@ private const val TAG = "LogsMenu"
 
 @Composable
 fun LogsMenu(
-	navigator: Navigator,
+
 ) {
 	val state = remember { mutableStateOf(LogsState.GENERAL) }
 	val coroutineScope = rememberCoroutineScope()
@@ -67,8 +68,9 @@ fun LogsMenu(
 
 @Composable
 private fun LogsMenuGeneral(
-	navigator: Navigator,
+	onCreateComment: Callback,
 	onDeleteClicked: Callback,
+	onCancel: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -92,9 +94,8 @@ private fun LogsMenuGeneral(
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
-		) {
-			navigator.backAction()
-		}
+			onClicked = onCancel,
+		)
 		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 	}
 }

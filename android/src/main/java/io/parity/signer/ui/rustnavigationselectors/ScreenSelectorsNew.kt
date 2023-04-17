@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
@@ -216,9 +215,9 @@ fun BottomSheetSelector(
 							onClose = { navigator.backAction() },
 						)
 					}
-				is ModalData.SignatureReady -> {}//part of camera flow now
+				is ModalData.SignatureReady -> {} //part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(sharedViewModel = sharedViewModel)
+				is ModalData.LogComment -> {} //moved to logs subgraph, part of settigns now
 				else -> {}
 			}
 		}
