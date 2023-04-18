@@ -1,6 +1,8 @@
 package io.parity.signer.screens.settings.logs
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
+import io.parity.signer.backend.CompletableResult
 import io.parity.signer.backend.OperationResult
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -8,26 +10,37 @@ import io.parity.signer.domain.DispatchersRustSingle
 import io.parity.signer.domain.getDetailedDescriptionString
 import io.parity.signer.uniffi.MLog
 import io.parity.signer.uniffi.MLogDetails
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 
 /**
  * Entity that syncs Rust backend with current UI requests
  */
-class LogsViewModel() {
+class LogsViewModel(): ViewModel() {
 	val uniffiInteractor = ServiceLocator.uniffiInteractor
 
-	suspend fun getLogsData(): OperationResult<MLog, String> {
-		return when (val result = withContext(DispatchersRustSingle) { uniffiInteractor.getLogs() }) {
+	private val _logsState: MutableStateFlow<CompletableResult<MLog, String>> =
+		MutableStateFlow(CompletableResult.InProgress)
+	val logsState: StateFlow<CompletableResult<MLog, String>> = _logsState.asStateFlow()
+
+	private suspend fun updateLogsData() {
+		when (val result = withContext(DispatchersRustSingle) { uniffiInteractor.getLogs() }) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDetailedDescriptionString()
 				Log.e(TAG, "Unexpected error getLogs, $error")
-				OperationResult.Err(error)
+				_logsState.value = CompletableResult.Err(error)
 			}
 			is UniffiResult.Success -> {
-				OperationResult.Ok(result.result)
+				_logsState.value  = CompletableResult.Ok(result.result)
 			}
 		}
+	}
+
+	fun resetValues() {
+		_logsState.value = CompletableResult.InProgress
 	}
 
 	suspend fun getLogDetails(logIndex: UInt): OperationResult<MLogDetails, String> {
