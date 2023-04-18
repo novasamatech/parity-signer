@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings
+package io.parity.signer.screens.settings.logs
 
 import android.util.Log
 import io.parity.signer.backend.OperationResult

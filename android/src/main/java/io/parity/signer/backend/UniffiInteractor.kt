@@ -217,6 +217,12 @@ sealed class OperationResult<out T, out E> {
 	data class Err<out E>(val error: E) : OperationResult<Nothing, E>()
 }
 
+sealed class Completable<out T> {
+	data class Result<out T>(val result: T): Completable<T>()
+	object InProgress: Completable<Nothing>()
+	object Failed: Completable<Nothing>()
+}
+
 fun <T> UniffiResult<T>.mapError(): T? {
 	return when (this) {
 		is UniffiResult.Error -> {

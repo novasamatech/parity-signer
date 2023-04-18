@@ -116,7 +116,11 @@ fun SettingsScreenSubgraph(
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}
 		}
-		logsNavigationSubgraph(SettingsScreenSubgraph.logs)
+		logsNavigationSubgraph(
+			SettingsScreenSubgraph.logs,
+			rootNavigator,
+			navController
+		)
 	}
 }
 
