@@ -130,6 +130,7 @@
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
+	<string name="settings_logs">Logs</string>
 	<string name="settings_networks">Networks</string>
 	<string name="settings_verifier_certificate">Verifier certificate</string>
 	<string name="settings_backup_keys">Backup keys</string>

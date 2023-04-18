@@ -23,8 +23,9 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
+//todo dmitry remove
 @Composable
-fun LogComment(sharedViewModel: SharedViewModel) {
+fun LogCommentOld(sharedViewModel: SharedViewModel) {
 	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }

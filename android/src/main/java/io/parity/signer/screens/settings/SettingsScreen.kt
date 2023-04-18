@@ -61,6 +61,7 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
@@ -75,6 +76,7 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
@@ -137,6 +139,7 @@ private object SettingsScreenSubgraph {
 private fun SettingsScreenGeneralView(
 	rootNavigator: Navigator,
 	onWipeData: Callback,
+	onOpenLogs: Callback,
 	onShowTerms: Callback,
 	onShowPrivacyPolicy: Callback,
 	onBackup: Callback,
@@ -148,6 +151,10 @@ private fun SettingsScreenGeneralView(
 		ScreenHeader(title = stringResource(R.string.settings_title))
 		Box(modifier = Modifier.weight(1f)) {
 			Column(Modifier.verticalScroll(rememberScrollState())) {
+				SettingsElement(
+					name = stringResource(R.string.settings_logs),
+					onClick = onOpenLogs
+				)
 				SettingsElement(name = stringResource(R.string.settings_networks)) {
 					rootNavigator.navigate(Action.MANAGE_NETWORKS)
 				}
@@ -246,6 +253,7 @@ private fun PreviewSettingsScreen() {
 		SettingsScreenGeneralView(
 			rootNavigator = EmptyNavigator(),
 			onWipeData = {},
+			onOpenLogs = {},
 			onShowTerms = {},
 			onShowPrivacyPolicy = {},
 			onBackup = {},

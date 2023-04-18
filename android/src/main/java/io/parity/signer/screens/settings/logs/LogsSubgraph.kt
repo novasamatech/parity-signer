@@ -35,11 +35,8 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 ) {
 	navigation(
 		route = routePath,
-		startDestination = LogsSubgraph.waiting,
+		startDestination = LogsSubgraph.home,
 	) {
-		composable(route = LogsSubgraph.waiting) {
-
-		}
 		composable(route = LogsSubgraph.home) {
 			LogsScreenFull(rootNavigator, navController)
 
@@ -67,7 +64,6 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 }
 
 internal object LogsSubgraph {
-	const val waiting = "logs_waiting"
 	const val home = "logs_home"
 
 	const val logs_details = "logs_details"

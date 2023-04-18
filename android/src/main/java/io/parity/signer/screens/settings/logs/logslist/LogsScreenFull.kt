@@ -15,12 +15,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.backend.CompletableResult
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.onboarding.WaitingScreen
-import io.parity.signer.screens.settings.logs.LogsScreenModel
 import io.parity.signer.screens.settings.logs.LogsSubgraph
 import io.parity.signer.screens.settings.logs.LogsViewModel
 import io.parity.signer.screens.settings.logs.toLogsScreenModel
+import io.parity.signer.ui.BottomSheetWrapperRoot
 
 
 @Composable
@@ -28,8 +29,8 @@ fun LogsScreenFull(
 	rootNavigator: Navigator,
 	navController: NavController,
 ) {
-	val subNavController = rememberNavController()
-	val viewModel : LogsViewModel = viewModel<LogsViewModel>()
+	val menuNavController = rememberNavController()
+	val viewModel: LogsViewModel = viewModel<LogsViewModel>()
 	val context = LocalContext.current
 
 	val logsState = viewModel.logsState.collectAsState()
@@ -39,7 +40,8 @@ fun LogsScreenFull(
 		when (logsCurrentValue) {
 			is CompletableResult.Err -> {
 				Log.e(TAG, "error in getting logs ${logsCurrentValue.error}")
-				Toast.makeText(context, logsCurrentValue.error, Toast.LENGTH_LONG).show()
+				Toast.makeText(context, logsCurrentValue.error, Toast.LENGTH_LONG)
+					.show()
 				viewModel.resetValues()
 				navController.popBackStack()
 			}
@@ -50,7 +52,7 @@ fun LogsScreenFull(
 				LogsScreen(
 					model = logsCurrentValue.result.toLogsScreenModel(context),
 					rootNavigator = rootNavigator,
-					onMenu = { subNavController.navigate(LogsMenuSubgraph.logs_menu) },
+					onMenu = { menuNavController.navigate(LogsMenuSubgraph.logs_menu) },
 					onLogClicked = { logId -> navController.navigate(LogsSubgraph.logs_details + "/" + logId) },
 				)
 			}
@@ -61,25 +63,38 @@ fun LogsScreenFull(
 	}
 	//bottom sheets
 	NavHost(
-		navController = subNavController,
+		navController = menuNavController,
 		startDestination = LogsMenuSubgraph.logs_empty,
 	) {
-		composable(LogsMenuSubgraph.logs_empty) {}
+		val closeAction: Callback = {
+			menuNavController.popBackStack()
+		}
+		composable(LogsMenuSubgraph.logs_empty) {}//no menu
 		composable(LogsMenuSubgraph.logs_menu) {
-//					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-//						NetworkSelectionBottomSheet(
-//							networks = deriveViewModel.allNetworks,
-//							currentlySelectedNetwork = selectedNetwork.value,
-//							onClose = closeAction,
-//							onSelect = { newNetwork ->
-//								deriveViewModel.updateSelectedNetwork(newNetwork)
-//								closeAction()
-//							},
-//						)
-//					}
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				LogsMenuGeneral(
+					onCreateComment = {
+						navController.navigate(LogsSubgraph.logs_add_comment)
+					},
+					onDeleteClicked = {
+						menuNavController.navigate(LogsMenuSubgraph.logs_menu_delete_confirm) {
+							popUpTo(LogsMenuSubgraph.logs_empty)
+						}
+					},
+					onCancel = closeAction,
+				)
+			}
 		}
 		composable(LogsMenuSubgraph.logs_menu_delete_confirm) {
-
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				LogeMenuDeleteConfirm(
+					onCancel = closeAction,
+						doRemoveKeyAndNavigateOut = {
+//							viewModel.
+							//todo dmitry implement
+						}
+				)
+			}
 		}
 	}
 }
