@@ -29,7 +29,6 @@ fun LogsScreen(
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = stringResource(R.string.logs_title),
-//			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) }) todo dmitry
 			onMenu = onMenu,
 			onBack = onBack,
 		)
@@ -39,11 +38,6 @@ fun LogsScreen(
 					is LogsListEntryModel.LogEntryModel -> {
 						LogItem(item) {
 							onLogClicked(item.logGroupId)
-//							todo dmitry remove
-//							navigator.navigate(
-//								Action.SHOW_LOG_DETAILS,
-//								item.logGroupId.toString()
-//							)
 						}
 					}
 					is LogsListEntryModel.TimeSeparatorModel -> {
@@ -52,7 +46,6 @@ fun LogsScreen(
 				}
 			}
 		}
-//		todo dmitry check workarounds in networks screen or how this works
 		BottomBar(
 			navigator = rootNavigator,
 			state = BottomBarState.SETTINGS,

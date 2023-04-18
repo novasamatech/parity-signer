@@ -3,31 +3,9 @@ package io.parity.signer.screens.settings.logs
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.parity.signer.domain.Navigator
+import io.parity.signer.screens.settings.logs.comment.AddLogCommentScreen
 import io.parity.signer.screens.settings.logs.logdetails.LogDetailsScreen
 import io.parity.signer.screens.settings.logs.logslist.LogsScreenFull
-
-
-//is ScreenData.Log
-//Box(Modifier.statusBarsPadding()) {
-//	LogsScreen(
-//		model = screenData.f.toLogsScreenModel(),
-//		navigator = rootNavigator,
-//	)
-//}
-
-
-//				is ModalData.LogRight ->
-//					BottomSheetWrapperRoot(onClosedAction = {
-//						navigator.backAction()
-//					}) {
-//						LogsMenu(
-//							navigator = sharedViewModel.navigator,
-//						)
-//					}
-
-
-//		is ScreenData.LogDetails -> LogDetails(screenData.f)
-
 
 fun NavGraphBuilder.logsNavigationSubgraph(
 	routePath: String,
@@ -58,7 +36,9 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 			}
 		}
 		composable(route = LogsSubgraph.logs_add_comment) {
-//todo dmitry implement
+			AddLogCommentScreen(
+				onBack = {navController.popBackStack()}
+			)
 		}
 	}
 }

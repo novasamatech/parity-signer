@@ -164,7 +164,6 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-//	todo dmitry as LogsService in iOS
 	suspend fun getLogs(): UniffiResult<MLog> =
 	withContext(Dispatchers.IO) {
 		try {
