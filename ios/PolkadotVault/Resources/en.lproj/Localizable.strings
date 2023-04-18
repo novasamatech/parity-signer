@@ -549,8 +549,8 @@
 "Onboarding.SetUpNetworks.Step1.Label.Step" = "Step 1 / 2";
 "Onboarding.SetUpNetworks.Step1.Label.Title" = "How to Add Networks";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.One" = "Go to Portal where your network is stored";
-"Onboarding.SetUpNetworks.Step1.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
-"Onboarding.SetUpNetworks.Step1.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two" = "metadata.parity.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two.Highlight" = "metadata.parity.io";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.Three.Highlight" = "metadata.novasama.io";
 "Onboarding.SetUpNetworks.Step1.Label.Step2" = "Choose the Network you need";
@@ -562,8 +562,8 @@
 "Onboarding.SetUpNetworks.Step2.Label.Step" = "Step 2 / 2";
 "Onboarding.SetUpNetworks.Step2.Label.Title" = "How to Update Network’s Metadata";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.One" = "Go to the Portal where your network’s metadata is stored";
-"Onboarding.SetUpNetworks.Step2.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
-"Onboarding.SetUpNetworks.Step2.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two" = "metadata.parity.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two.Highlight" = "metadata.parity.io";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.Three.Highlight" = "metadata.novasama.io";
 "Onboarding.SetUpNetworks.Step2.Label.Step2" = "Choose the Network you need";
