@@ -78,6 +78,7 @@
 	<string name="log_title_warning">Warning!</string>
 	<string name="log_title_wrong_password">Wrong password entered</string>
 	<string name="log_message_wrong_passowrd">operation declined</string>
+	<string name="logs_details_title">Event Details</string>
 	<string name="logs_title">All Logs</string>
 	<string name="log_message_metadata">%1$s version %2$s</string>
 	<string name="log_message_network_verifier">%1$s for network with genesis hash %2$s</string>

@@ -3,6 +3,7 @@ package io.parity.signer.screens.settings.logs
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.parity.signer.domain.Navigator
+import io.parity.signer.screens.settings.logs.logdetails.LogDetailsScreen
 import io.parity.signer.screens.settings.logs.logslist.LogsScreenFull
 
 
@@ -53,9 +54,8 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 			if (logElement == null) {
 				navController.popBackStack()
 			} else {
-
+				LogDetailsScreen(navController, logElement)
 			}
-
 		}
 		composable(route = LogsSubgraph.logs_add_comment) {
 //todo dmitry implement

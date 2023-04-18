@@ -1,36 +1,35 @@
-package io.parity.signer.screens.settings.logs
+package io.parity.signer.screens.settings.logs.logdetails
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.CompletableResult
-import io.parity.signer.backend.OperationResult
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.DispatchersRustSingle
 import io.parity.signer.domain.getDetailedDescriptionString
-import io.parity.signer.uniffi.MLog
 import io.parity.signer.uniffi.MLogDetails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
-
 /**
  * Entity that syncs Rust backend with current UI requests
  */
-class LogsViewModel(): ViewModel() {
+class LogsDetailsViewModel(): ViewModel() {
 	val uniffiInteractor = ServiceLocator.uniffiInteractor
 
-	private val _logsState: MutableStateFlow<CompletableResult<MLog, String>> =
-		MutableStateFlow(CompletableResult.InProgress)
-	val logsState: StateFlow<CompletableResult<MLog, String>> = _logsState.asStateFlow()
+	private val _logsState: MutableStateFlow<CompletableResult<MLogDetails, String>> =
+        MutableStateFlow(CompletableResult.InProgress)
+	val logsState: StateFlow<CompletableResult<MLogDetails, String>> = _logsState.asStateFlow()
 
-	suspend fun updateLogsData() {
-		when (val result = withContext(DispatchersRustSingle) { uniffiInteractor.getLogs() }) {
+	suspend fun updateLogDetails(index: UInt) {
+		when (val result = withContext(DispatchersRustSingle) {
+			uniffiInteractor.getLogDetails(index)
+		}) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDetailedDescriptionString()
-				Log.e(TAG, "Unexpected error getLogs, $error")
+                Log.e(TAG, "Unexpected error getLogs, $error")
 				_logsState.value = CompletableResult.Err(error)
 			}
 			is UniffiResult.Success -> {
@@ -43,5 +42,4 @@ class LogsViewModel(): ViewModel() {
 		_logsState.value = CompletableResult.InProgress
 	}
 }
-
-private const val TAG = "LogsViewModel"
+private const val TAG = "LogsDetailsViewModel"

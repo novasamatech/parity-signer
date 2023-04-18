@@ -23,6 +23,7 @@ fun LogsScreen(
 	model: LogsScreenModel,
 	rootNavigator: Navigator,
 	onMenu: Callback,
+	onBack: Callback,
 	onLogClicked: (UInt) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
@@ -30,6 +31,7 @@ fun LogsScreen(
 			title = stringResource(R.string.logs_title),
 //			onMenu = { navigator.navigate(Action.RIGHT_BUTTON_ACTION) }) todo dmitry
 			onMenu = onMenu,
+			onBack = onBack,
 		)
 		LazyColumn(Modifier.weight(1f)) {
 			items(model.logs.size) { index ->

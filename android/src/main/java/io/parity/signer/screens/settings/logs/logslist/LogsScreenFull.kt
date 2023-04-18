@@ -53,6 +53,7 @@ fun LogsScreenFull(
 					model = logsCurrentValue.result.toLogsScreenModel(context),
 					rootNavigator = rootNavigator,
 					onMenu = { menuNavController.navigate(LogsMenuSubgraph.logs_menu) },
+					onBack = { navController.popBackStack() },
 					onLogClicked = { logId -> navController.navigate(LogsSubgraph.logs_details + "/" + logId) },
 				)
 			}
@@ -89,10 +90,10 @@ fun LogsScreenFull(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				LogeMenuDeleteConfirm(
 					onCancel = closeAction,
-						doRemoveKeyAndNavigateOut = {
+					doRemoveKeyAndNavigateOut = {
 //							viewModel.
-							//todo dmitry implement
-						}
+						//todo dmitry implement
+					}
 				)
 			}
 		}
