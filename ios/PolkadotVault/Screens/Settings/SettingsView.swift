@@ -13,8 +13,8 @@ struct SettingsView: View {
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            NavigationView {
+        NavigationView {
+            ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     NavigationBarView(
                         viewModel: NavigationBarViewModel(
@@ -46,16 +46,17 @@ struct SettingsView: View {
                                 .padding(.bottom, Spacing.extraSmall)
                         }
                     }
+                    Spacer()
                     TabBarView(
                         selectedTab: $navigation.selectedTab
                     )
                 }
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .navigationViewStyle(StackNavigationViewStyle())
+                .navigationBarHidden(true)
+                ConnectivityAlertOverlay(viewModel: .init())
             }
-            ConnectivityAlertOverlay(viewModel: .init())
         }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .navigationBarHidden(true)
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)

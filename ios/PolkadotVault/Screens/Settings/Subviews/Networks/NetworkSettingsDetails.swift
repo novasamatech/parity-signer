@@ -121,7 +121,11 @@ struct NetworkSettingsDetails: View {
             }
             .fullScreenCover(
                 isPresented: $viewModel.isShowingActionSheet,
-                onDismiss: { viewModel.onMoreActionSheetDismissal() }
+                onDismiss: {
+                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                    // async
+                    DispatchQueue.main.async { viewModel.onMoreActionSheetDismissal() }
+                }
             ) {
                 NetworkSettingsDetailsActionModal(
                     isShowingActionSheet: $viewModel.isShowingActionSheet,
@@ -380,6 +384,7 @@ extension NetworkSettingsDetails {
         func onMoreActionSheetDismissal() {
             if shouldSignSpecs {
                 signSpecList = networkDetailsService.signSpecList(networkKey)
+                shouldSignSpecs = false
                 isPresentingSignSpecList = true
             }
             if shouldPresentRemoveNetworkConfirmation {

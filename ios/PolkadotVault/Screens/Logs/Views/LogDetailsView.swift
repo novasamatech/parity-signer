@@ -16,8 +16,7 @@ struct LogDetailsView: View {
             NavigationBarView(
                 viewModel: .init(
                     title: Localizable.LogDetails.Label.title.string,
-                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
-                    rightButtons: []
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })]
                 )
             )
             Text(viewModel.details.timestamp)

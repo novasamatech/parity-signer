@@ -75,7 +75,10 @@ struct KeyDetailsView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
-            onDismiss: viewModel.onActionSheetDismissal
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.onActionSheetDismissal() }
+            }
         ) {
             KeyDetailsActionsModal(
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
@@ -113,7 +116,10 @@ struct KeyDetailsView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: viewModel.onActionSheetDismissal
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.onActionSheetDismissal() }
+            }
         ) {
             ErrorBottomModal(
                 viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
