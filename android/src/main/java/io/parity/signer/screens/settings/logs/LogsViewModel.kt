@@ -26,7 +26,7 @@ class LogsViewModel(): ViewModel() {
 		MutableStateFlow(CompletableResult.InProgress)
 	val logsState: StateFlow<CompletableResult<MLog, String>> = _logsState.asStateFlow()
 
-	private suspend fun updateLogsData() {
+	suspend fun updateLogsData() {
 		when (val result = withContext(DispatchersRustSingle) { uniffiInteractor.getLogs() }) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDetailedDescriptionString()

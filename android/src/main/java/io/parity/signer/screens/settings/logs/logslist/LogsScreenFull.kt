@@ -1,8 +1,11 @@
 package io.parity.signer.screens.settings.logs.logslist
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +38,10 @@ fun LogsScreenFull(
 	Box(Modifier.statusBarsPadding()) {
 		when (logsCurrentValue) {
 			is CompletableResult.Err -> {
-				//todo dmitry add feedback
+				Log.e(TAG, "error in getting logs ${logsCurrentValue.error}")
+				Toast.makeText(context, logsCurrentValue.error, Toast.LENGTH_LONG).show()
+				viewModel.resetValues()
+				navController.popBackStack()
 			}
 			CompletableResult.InProgress -> {
 				WaitingScreen()
@@ -48,6 +54,9 @@ fun LogsScreenFull(
 					onLogClicked = { logId -> navController.navigate(LogsSubgraph.logs_details + "/" + logId) },
 				)
 			}
+		}
+		LaunchedEffect(Unit) {
+			viewModel.updateLogsData()
 		}
 	}
 	//bottom sheets
@@ -74,6 +83,8 @@ fun LogsScreenFull(
 		}
 	}
 }
+
+private const val TAG = "logs_full"
 
 private object LogsMenuSubgraph {
 	const val logs_empty = "logs_menu_empty"
