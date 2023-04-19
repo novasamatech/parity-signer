@@ -16,28 +16,25 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.red400
-import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun LogItem(
-    model: LogsListEntryModel.LogEntryModel,
-    onClick: Callback,
+	model: LogsListEntryModel.LogEntryModel,
+	onClick: Callback,
 ) {
 	Row(
 		modifier = Modifier
             .fillMaxWidth(1f)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp, horizontal = 24.dp),
-		verticalAlignment = Alignment.Bottom,
+		verticalAlignment = Alignment.Top,
 	) {
 		Column(modifier = Modifier.weight(1f)) {
 			Text(
 				text = model.title,
 				color = if (model.isDanger) {
-					MaterialTheme.colors.red400
+					MaterialTheme.colors.accentRed
 				} else {
 					MaterialTheme.colors.primary
 				},
@@ -54,16 +51,18 @@ fun LogItem(
 			}
 		}
 		Spacer(modifier = Modifier.padding(start = 8.dp))
-		Text(
-			text = model.timeStr,
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-		)
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			Text(
+				text = model.timeStr,
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyM,
+			)
+			Image(
+				imageVector = Icons.Filled.ChevronRight,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+			)
+		}
 	}
 }
 
