@@ -3,8 +3,10 @@ package io.parity.signer.components.panels
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -50,7 +52,8 @@ fun BottomBar(
 	) {
 		Row(
 			horizontalArrangement = Arrangement.SpaceEvenly,
-			modifier = Modifier.fillMaxWidth(1f)
+			modifier = Modifier.fillMaxWidth(1f),
+			verticalAlignment = Alignment.CenterVertically
 		) {
 			BottomBarButton(
 				navigator = navigator,
@@ -61,7 +64,7 @@ fun BottomBar(
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 			//todo dmitry new design https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?node-id=11930-77855&t=khcNTdojUGw29HQu-4
-			BottomBarButton(
+			BottomBarMiddleButton(
 				navigator = navigator,
 				iconId = R.drawable.ic_qe_code_24,
 				action = Action.NAVBAR_SCAN,
@@ -98,7 +101,7 @@ fun BottomBarButton(
 	onBeforeActionWhenClicked: Callback?
 ) {
 	val color = if (isEnabled) {
-		MaterialTheme.colors.pink500
+		MaterialTheme.colors.primary
 	} else {
 		MaterialTheme.colors.textTertiary
 	}
@@ -127,6 +130,40 @@ fun BottomBarButton(
 	}
 }
 
+
+@Composable
+fun BottomBarMiddleButton(
+	navigator: Navigator,
+	@DrawableRes iconId: Int,
+	@DrawableRes enabledIconId: Int? = null,
+	@StringRes labelResId: Int,
+	action: Action,
+	isEnabled: Boolean,
+	onBeforeActionWhenClicked: Callback?
+) {
+	Box(contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.padding(vertical = 4.dp)
+			.border(2.dp, MaterialTheme.colors.fill12, RoundedCornerShape(32.dp))
+			.clickable {
+				onBeforeActionWhenClicked?.invoke()
+				navigator.navigate(action)
+			}
+			.width(80.dp)
+			.fillMaxHeight(1f)
+	) {
+		Icon(
+			painter = painterResource(
+				id = if (isEnabled) enabledIconId ?: iconId else iconId
+			),
+			contentDescription = stringResource(id = labelResId),
+			tint = MaterialTheme.colors.primary,
+			modifier = Modifier
+				.size(28.dp)
+				.padding(bottom = 2.dp)
+		)
+	}
+}
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,

@@ -37,7 +37,7 @@ internal fun AddLogCommentScreen(onBack: Callback) {
 
 	AddLogCommentInternal(
 		onBack = onBack,
-		onDone = { note -> }//todo dmitry do it
+		onDone = { note -> } //todo dmitry do it
 	)
 }
 
@@ -85,7 +85,6 @@ private fun AddLogCommentInternal(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
-//				.defaultMinSize(minHeight = 120.dp)
 				.padding(horizontal = 24.dp, vertical = 24.dp)
 		)
 	}
