@@ -210,7 +210,7 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onAppear() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+//            navigation.performFake(navigation: .init(action: .rightButtonAction))
         }
 
         func use(navigation: NavigationCoordinator) {
