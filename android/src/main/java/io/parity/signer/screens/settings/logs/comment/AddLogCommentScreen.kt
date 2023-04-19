@@ -1,6 +1,8 @@
 package io.parity.signer.screens.settings.logs.comment
 
 import android.content.res.Configuration
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,13 +23,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
+import io.parity.signer.backend.OperationResult
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.settings.logs.LogsViewModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -37,7 +42,27 @@ internal fun AddLogCommentScreen(onBack: Callback) {
 
 	AddLogCommentInternal(
 		onBack = onBack,
-		onDone = { note -> } //todo dmitry do it
+		onDone = { note ->
+			viewModel.viewModelScope.launch {
+				when (val postResult = viewModel.addLogNote(note)) {
+					is OperationResult.Err -> {
+						Log.e(TAG, "log note not added, error ${postResult.error}")
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.logs_add_error_message,
+								postResult.error
+							),
+							Toast.LENGTH_LONG
+						).show()
+						onBack()
+					}
+					is OperationResult.Ok -> {
+						onBack()
+					}
+				}
+			}
+		}
 	)
 }
 
@@ -47,7 +72,8 @@ private fun AddLogCommentInternal(
 	onDone: (note: String) -> Unit,
 ) {
 	val note = remember { mutableStateOf("") }
-	val canProceed = note.value.isNotBlank()
+	val posted = remember { mutableStateOf(false) }
+	val canProceed = note.value.isNotBlank() && !posted.value
 
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -59,8 +85,11 @@ private fun AddLogCommentInternal(
 	) {
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
-			title = stringResource(R.string.add_log_comment_title),
-			onDone = { onDone(note.value) },
+			title = stringResource(R.string.logs_add_comment_title),
+			onDone = {
+				posted.value = true
+				onDone(note.value)
+			},
 			onClose = onBack,
 		)
 		OutlinedTextField(
@@ -94,6 +123,7 @@ private fun AddLogCommentInternal(
 	}
 }
 
+private const val TAG = "log_add"
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,

@@ -76,6 +76,7 @@ fun LogsScreenFull(
 				LogsMenuGeneral(
 					onCreateComment = {
 						navController.navigate(LogsSubgraph.logs_add_comment)
+						menuNavController.popBackStack()
 					},
 					onDeleteClicked = {
 						menuNavController.navigate(LogsMenuSubgraph.logs_menu_delete_confirm) {

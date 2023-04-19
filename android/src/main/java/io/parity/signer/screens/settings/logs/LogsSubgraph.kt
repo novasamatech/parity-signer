@@ -18,7 +18,6 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 	) {
 		composable(route = LogsSubgraph.home) {
 			LogsScreenFull(rootNavigator, navController)
-
 		}
 		composable(
 			route = LogsSubgraph.logs_details + "/{${LogsSubgraph.PARAM_LOG_DETAILS}}",
@@ -45,7 +44,6 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 
 internal object LogsSubgraph {
 	const val home = "logs_home"
-
 	const val logs_details = "logs_details"
 	const val logs_add_comment = "logs_add_comment"
 	const val PARAM_LOG_DETAILS = "logID"
