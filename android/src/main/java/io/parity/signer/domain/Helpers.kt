@@ -19,5 +19,3 @@ fun ErrorDisplayed.getDetailedDescriptionString(): String {
 	return this.javaClass.name + "Message: " + message
 }
 
-
-val DispatchersRustSingle = Dispatchers.IO.limitedParallelism(1)

@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.backend.CompletableResult
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.DispatchersRustSingle
 import io.parity.signer.domain.getDetailedDescriptionString
 import io.parity.signer.uniffi.MLogDetails
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +24,7 @@ class LogsDetailsViewModel(): ViewModel() {
 	val logsState: StateFlow<CompletableResult<MLogDetails, String>> = _logsState.asStateFlow()
 
 	suspend fun updateLogDetails(index: UInt) {
-		when (val result = withContext(DispatchersRustSingle) {
+		when (val result = withContext(Dispatchers.IO) {
 			uniffiInteractor.getLogDetails(index)
 		}) {
 			is UniffiResult.Error -> {

@@ -367,6 +367,7 @@
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
 	<string name="add_log_comment_title">Add Note</string>
+    <string name="add_log_note_placeholder">Enter log note</string>
 
 </resources>
 
