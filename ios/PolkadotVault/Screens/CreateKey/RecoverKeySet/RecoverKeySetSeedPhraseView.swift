@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RecoverKeySetSeedPhraseView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @FocusState private var focus: Bool
 
     var body: some View {
@@ -17,12 +17,7 @@ struct RecoverKeySetSeedPhraseView: View {
             NavigationBarView(
                 viewModel: .init(
                     title: Localizable.RecoverSeedPhrase.Label.title.string,
-                    leftButtons: [
-                        .init(
-                            type: .arrow,
-                            action: viewModel.onBackTap
-                        )
-                    ],
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: [.init(
                         type: .activeAction(
                             Localizable.RecoverSeedPhrase.Action.done.key,
@@ -73,7 +68,6 @@ struct RecoverKeySetSeedPhraseView: View {
                 }
             }
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focus = true
             }
             .fullScreenCover(
@@ -175,8 +169,9 @@ extension RecoverKeySetSeedPhraseView {
         private let seedsMediator: SeedsMediating
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
-        private weak var navigation: NavigationCoordinator!
-
+        private let navigation: NavigationCoordinator
+        private let service: RecoverKeySetService
+        @Binding var isPresented: Bool
         @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = " "
         @Published var previousUserInput: String = " "
@@ -193,19 +188,17 @@ extension RecoverKeySetSeedPhraseView {
 
         init(
             content: MRecoverSeedPhrase,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            isPresented: Binding<Bool>,
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            navigation: NavigationCoordinator = NavigationCoordinator(),
+            service: RecoverKeySetService = RecoverKeySetService()
         ) {
             self.content = content
             self.seedsMediator = seedsMediator
-            regenerateGrid()
-        }
-
-        func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
-        }
-
-        func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            self.service = service
+            _isPresented = isPresented
+            regenerateGrid()
         }
 
         func onGuessTap(_ guess: String) {
@@ -244,11 +237,8 @@ extension RecoverKeySetSeedPhraseView {
                 seedPhrase: seedPhrase,
                 shouldCheckForCollision: false
             )
-            navigation.perform(navigation: .init(
-                action: .goForward,
-                details: BackendConstants.true,
-                seedPhrase: seedPhrase
-            ))
+            service.finishKeySetRecover(seedPhrase)
+            isPresented = false
         }
 
         private func regenerateGrid() {
