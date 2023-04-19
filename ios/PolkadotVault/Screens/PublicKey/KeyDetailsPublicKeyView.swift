@@ -46,6 +46,7 @@ struct KeyDetailsPublicKeyView: View {
 
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         GeometryReader { geo in
@@ -55,10 +56,10 @@ struct KeyDetailsPublicKeyView: View {
                     viewModel: .init(
                         title: Localizable.PublicKeyDetails.Label.title.string,
                         subtitle: viewModel.navigationSubtitle(),
-                        leftButtons: [.init(
-                            type: .xmark,
-                            action: viewModel.onBackTap
-                        )],
+                        leftButtons: [.init(type: .arrow, action: {
+                            viewModel.onBackTap()
+                            mode.wrappedValue.dismiss()
+                        })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreButtonTap)]
                     )
                 )
@@ -218,7 +219,7 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         func onMoreButtonTap() {

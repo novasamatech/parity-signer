@@ -11,7 +11,7 @@ struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,7 +19,10 @@ struct KeyDetailsView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                        leftButtons: [.init(type: .arrow, action: {
+                            viewModel.onBackTap()
+                            mode.wrappedValue.dismiss()
+                        })],
                         rightButtons: [
                             .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
                             .init(type: .more, action: { viewModel.isShowingActionSheet.toggle() })
@@ -70,8 +73,6 @@ struct KeyDetailsView: View {
         }
         .onAppear {
             viewModel.use(navigation: navigation)
-            viewModel.use(appState: appState)
-            viewModel.refreshData()
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
@@ -192,6 +193,12 @@ struct KeyDetailsView: View {
                 .onTapGesture {
                     viewModel.onDerivedKeyTap(deriveKey)
                 }
+                NavigationLink(
+                    destination:
+                    KeyDetailsPublicKeyView(viewModel: .init(keyDetails: viewModel.presentedKeyDetails))
+                        .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingKeyDetails
+                ) { EmptyView() }
             }
             Spacer()
                 .frame(height: Heights.actionButton + Spacing.large)

@@ -18,79 +18,74 @@ struct KeySetList: View {
     @State private var shouldShowCreateKeySet = false
     @State private var shouldShowRecoverKeySet = false
     @State private var isShowingRecoverKeySet = false
+    @State private var isShowingDetails = false
 
     @State var selectedItems: [KeySetViewModel] = []
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Main screen
-            VStack(spacing: 0) {
-                // Navigation Bar
-                NavigationBarView(
-                    viewModel: NavigationBarViewModel(
-                        title: Localizable.KeySets.title.string,
-                        leftButtons: [.init(
-                            type: isExportKeysSelected ? .xmark : .empty,
-                            action: {
-                                isExportKeysSelected.toggle()
-                                selectedItems.removeAll()
-                            }
-                        )],
-                        rightButtons: [.init(
-                            type: isExportKeysSelected ? .empty : .more,
-                            action: {
-                                isShowingMoreMenu.toggle()
-                            }
-                        )],
-                        backgroundColor: Asset.backgroundSystem.swiftUIColor
-                    )
-                )
-                // Empty state
-                if viewModel.listViewModel.list.isEmpty {
-                    KeyListEmptyState()
-                } else {
-                    // List of Key Sets
-                    List {
-                        ForEach(
-                            viewModel.listViewModel.list.sorted(by: { $0.keyName < $1.keyName }),
-                            id: \.keyName
-                        ) { keyItem($0) }
-                        Spacer()
-                            .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-                            .listRowSeparator(.hidden)
-                            .frame(height: Heights.actionButton + Spacing.large + Heights.tabbarHeight)
-                    }
-                    .listStyle(.plain)
-                    .hiddenScrollContent()
-                }
-            }
-            .background(
-                Asset.backgroundSystem.swiftUIColor
-                    .ignoresSafeArea()
-            )
-            VStack {
-                // Add Key Set
-                if !isExportKeysSelected {
-                    VStack(spacing: 0) {
-                        ConnectivityAlertOverlay(viewModel: .init())
-                        PrimaryButton(
-                            action: {
-                                isShowingNewSeedMenu.toggle()
-                            },
-                            text: Localizable.KeySets.Action.add.key
+        NavigationView {
+            ZStack(alignment: .bottom) {
+                // Main screen
+                VStack(spacing: 0) {
+                    // Navigation Bar
+                    NavigationBarView(
+                        viewModel: NavigationBarViewModel(
+                            title: Localizable.KeySets.title.string,
+                            leftButtons: [.init(
+                                type: isExportKeysSelected ? .xmark : .empty,
+                                action: {
+                                    isExportKeysSelected.toggle()
+                                    selectedItems.removeAll()
+                                }
+                            )],
+                            rightButtons: [.init(
+                                type: isExportKeysSelected ? .empty : .more,
+                                action: {
+                                    isShowingMoreMenu.toggle()
+                                }
+                            )],
+                            backgroundColor: Asset.backgroundSystem.swiftUIColor
                         )
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.large)
+                    )
+                    // Empty state
+                    if viewModel.listViewModel.list.isEmpty {
+                        KeyListEmptyState()
+                    } else {
+                        // List of Key Sets
+                        keyList()
                     }
                 }
-                TabBarView(
-                    selectedTab: $navigation.selectedTab
+                .background(
+                    Asset.backgroundSystem.swiftUIColor
+                        .ignoresSafeArea()
                 )
-            }
-            if isExportKeysSelected {
-                exportKeysOverlay
+                .navigationViewStyle(StackNavigationViewStyle())
+                .navigationBarHidden(true)
+                VStack {
+                    // Add Key Set
+                    if !isExportKeysSelected {
+                        VStack(spacing: 0) {
+                            ConnectivityAlertOverlay(viewModel: .init())
+                            PrimaryButton(
+                                action: {
+                                    isShowingNewSeedMenu.toggle()
+                                },
+                                text: Localizable.KeySets.Action.add.key
+                            )
+                            .padding(.horizontal, Spacing.large)
+                            .padding(.bottom, Spacing.large)
+                        }
+                    }
+                    TabBarView(
+                        selectedTab: $navigation.selectedTab
+                    )
+                }
+                if isExportKeysSelected {
+                    exportKeysOverlay
+                }
             }
         }
+
         .fullScreenCover(
             isPresented: $isShowingNewSeedMenu,
             onDismiss: {
@@ -157,6 +152,33 @@ struct KeySetList: View {
         }
     }
 
+    func keyList() -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(
+                    viewModel.listViewModel.list.sorted(by: { $0.keyName < $1.keyName }),
+                    id: \.keyName
+                ) {
+                    keyItem($0)
+                    NavigationLink(
+                        destination:
+                        KeyDetailsView(
+                            viewModel: .init(
+                                keyName: $0.keyName
+                            )
+                        )
+                        .navigationBarHidden(true),
+                        isActive: $isShowingDetails
+                    ) { EmptyView() }
+                }
+                Spacer()
+                    .listRowBackground(Asset.backgroundSystem.swiftUIColor)
+                    .listRowSeparator(.hidden)
+                    .frame(height: Heights.actionButton + Spacing.large + Heights.tabbarHeight)
+            }
+        }
+    }
+
     func keyItem(_ viewModel: KeySetViewModel) -> some View {
         KeySetRow(
             viewModel: viewModel,
@@ -175,21 +197,15 @@ struct KeySetList: View {
                     switch result {
                     case let .success(keysData):
                         appState.userData.keysData = keysData
-                        navigation.perform(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+                        navigation.performFake(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+                        isShowingDetails = true
                     case .failure:
                         ()
                     }
                 }
             }
         }
-        .listRowBackground(Asset.backgroundSystem.swiftUIColor)
-        .listRowSeparator(.hidden)
-        .listRowInsets(.init(
-            top: Spacing.extraExtraSmall,
-            leading: Spacing.extraSmall,
-            bottom: Spacing.extraExtraSmall,
-            trailing: Spacing.extraSmall
-        ))
+        .padding([.horizontal, .bottom], Spacing.extraSmall)
     }
 
     var exportKeysOverlay: some View {

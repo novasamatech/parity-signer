@@ -25,7 +25,7 @@ extension KeyDetailsView {
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
         var keysData: MKeysNew?
-        private weak var appState: AppState!
+        private var appState: AppState
         private weak var navigation: NavigationCoordinator!
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
@@ -36,6 +36,9 @@ extension KeyDetailsView {
         @Published var isPresentingConnectivityAlert = false
         @Published var isPresentingSelectionOverlay = false
         @Published var isPresentingRootDetails = false
+        @Published var isPresentingKeyDetails = false
+        @Published var presentedKeyDetails: MKeyDetails!
+
         @Published var isShowingKeysExportModal = false
         // Network selection
         @Published var isPresentingNetworkSelection = false
@@ -59,7 +62,8 @@ extension KeyDetailsView {
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetAllNetworksService = GetAllNetworksService(),
             forgetKeyActionHandler: ForgetKeySetAction = ForgetKeySetAction(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            appState: AppState = ServiceLocator.appState
         ) {
             self.keyName = keyName
             self.exportPrivateKeyService = exportPrivateKeyService
@@ -67,12 +71,13 @@ extension KeyDetailsView {
             self.networksService = networksService
             self.forgetKeyActionHandler = forgetKeyActionHandler
             self.warningStateMediator = warningStateMediator
+            self.appState = appState
+            use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
         }
 
         func use(appState: AppState) {
-            self.appState = appState
             keysData = appState.userData.keysData
             $isPresentingNetworkSelection.sink { newValue in
                 guard !newValue else { return }
@@ -128,7 +133,7 @@ extension KeyDetailsView {
 
         func onBackTap() {
             appState.userData.keysData = nil
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         func onRemoveKeySetConfirmationTap() {
@@ -171,7 +176,11 @@ extension KeyDetailsView.ViewModel {
                 selectedKeys.append(deriveKey)
             }
         } else {
-            navigation.perform(navigation: deriveKey.actionModel.tapAction)
+            guard case let .keyDetails(keyDetails) = navigation
+                .performFake(navigation: .init(action: .selectKey, details: deriveKey.publicKeyDetails)).screenData,
+                let keyDetails = keyDetails else { return }
+            presentedKeyDetails = keyDetails
+            isPresentingKeyDetails = true
         }
     }
 
@@ -257,9 +266,7 @@ private extension KeyDetailsView.ViewModel {
                 return DerivedKeyRowModel(
                     keyData: $0,
                     viewModel: DerivedKeyRowViewModel($0),
-                    actionModel: DerivedKeyActionModel(
-                        tapAction: .init(action: .selectKey, details: details)
-                    )
+                    publicKeyDetails: details
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list

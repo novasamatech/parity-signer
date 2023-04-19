@@ -13,20 +13,8 @@ final class MainScreensFactory {
         switch screenData {
         case let .seedSelector(value):
             KeySetList(viewModel: .init(dataModel: value))
-        case let .keys(keyName):
-            KeyDetailsView(
-                viewModel: .init(
-                    keyName: keyName
-                )
-            )
         case .settings:
             SettingsView(viewModel: .init())
-        case let .keyDetails(value):
-            if let value = value {
-                KeyDetailsPublicKeyView(viewModel: .init(keyDetails: value))
-            } else {
-                EmptyView()
-            }
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
         // Screens handled outside of Rust navigation
@@ -43,6 +31,8 @@ final class MainScreensFactory {
              .nNetworkDetails,
              .logDetails,
              .signSufficientCrypto,
+             .keys,
+             .keyDetails,
              .log:
             EmptyView()
         }
