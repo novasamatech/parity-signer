@@ -52,8 +52,11 @@ private fun AddLogCommentInternal(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
-	Column(Modifier.statusBarsPadding()
-		.fillMaxSize(1f)) {
+	Column(
+		Modifier
+			.statusBarsPadding()
+			.fillMaxSize(1f)
+	) {
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
 			title = stringResource(R.string.add_log_comment_title),
@@ -65,7 +68,6 @@ private fun AddLogCommentInternal(
 			onValueChange = { note.value = it },
 			placeholder = { Text(text = stringResource(R.string.add_log_note_placeholder)) },
 			keyboardOptions = KeyboardOptions(
-//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(onDone = {
@@ -73,7 +75,8 @@ private fun AddLogCommentInternal(
 					onDone(note.value)
 				}
 			}),
-			singleLine = true,
+			singleLine = false,
+			minLines = 3,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(
 				textColor = MaterialTheme.colors.primary,
@@ -82,7 +85,7 @@ private fun AddLogCommentInternal(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
-				.height(120.dp)
+//				.defaultMinSize(minHeight = 120.dp)
 				.padding(horizontal = 24.dp, vertical = 24.dp)
 		)
 	}
