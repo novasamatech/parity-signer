@@ -16,6 +16,8 @@ struct KeySetList: View {
     @State private var isShowingMoreMenu = false
     @State private var isExportKeysSelected = false
     @State private var shouldShowCreateKeySet = false
+    @State private var shouldShowRecoverKeySet = false
+    @State private var isShowingRecoverKeySet = false
 
     @State var selectedItems: [KeySetViewModel] = []
 
@@ -73,11 +75,6 @@ struct KeySetList: View {
                         ConnectivityAlertOverlay(viewModel: .init())
                         PrimaryButton(
                             action: {
-                                // We need to call this conditionally, as if there are no seeds,
-                                // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-                                if !viewModel.listViewModel.list.isEmpty {
-                                    navigation.performFake(navigation: .init(action: .rightButtonAction))
-                                }
                                 isShowingNewSeedMenu.toggle()
                             },
                             text: Localizable.KeySets.Action.add.key
@@ -103,12 +100,21 @@ struct KeySetList: View {
                         shouldShowCreateKeySet = false
                         isShowingCreateKeySet = true
                     }
+                    if shouldShowRecoverKeySet {
+                        shouldShowRecoverKeySet = false
+                        isShowingRecoverKeySet = true
+                    }
+                    if shouldShowRecoverKeySet {
+                        shouldShowRecoverKeySet = false
+                        isShowingRecoverKeySet = true
+                    }
                 }
             }
         ) {
             AddKeySetModal(
                 isShowingNewSeedMenu: $isShowingNewSeedMenu,
-                shouldShowCreateKeySet: $shouldShowCreateKeySet
+                shouldShowCreateKeySet: $shouldShowCreateKeySet,
+                shouldShowRecoverKeySet: $shouldShowRecoverKeySet
             )
             .clearModalBackground()
         }
@@ -117,6 +123,12 @@ struct KeySetList: View {
             onDismiss: viewModel.updateData
         ) {
             EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
+        }
+        .fullScreenCover(
+            isPresented: $isShowingRecoverKeySet,
+            onDismiss: viewModel.updateData
+        ) {
+            RecoverKeySetNameView(viewModel: .init(isPresented: $isShowingRecoverKeySet))
         }
         .fullScreenCover(isPresented: $isShowingMoreMenu) {
             KeyListMoreMenuModal(

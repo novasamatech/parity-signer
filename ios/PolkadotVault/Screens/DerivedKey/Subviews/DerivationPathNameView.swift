@@ -308,11 +308,11 @@ extension DerivationPathNameView {
                 .map { validators -> Bool in
                     let (isPassworded, isPasswordValid, derivationPathError) = validators
                     if isPassworded {
-                        return (
+                        return
                             !isPasswordValid ||
-                                !self.isPasswordConfirmationValid() ||
-                                self.derivationPathError != nil
-                        )
+                            !self.isPasswordConfirmationValid() ||
+                            self.derivationPathError != nil
+
                     } else {
                         return derivationPathError != nil || self.isInitialEntry()
                     }

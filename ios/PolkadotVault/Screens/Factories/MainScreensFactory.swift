@@ -27,16 +27,14 @@ final class MainScreensFactory {
             } else {
                 EmptyView()
             }
-        case let .recoverSeedName(value):
-            RecoverKeySetNameView(viewModel: .init(content: value))
-        case let .recoverSeedPhrase(value):
-            RecoverKeySetSeedPhraseView(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,
              .newSeed,
+             .recoverSeedName,
+             .recoverSeedPhrase,
              .vVerifier,
              .scan,
              .transaction,
