@@ -28,12 +28,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.*
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.CloseIcon
-import io.parity.signer.components.base.PrimaryButtonGreyDisabled
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.createderivation.DerivationCreateViewModel

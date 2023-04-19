@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs.logdetails
+package io.parity.signer.screens.settings.logs.logdetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs
+package io.parity.signer.screens.settings.logs.logslist
 
 import android.content.res.Configuration
 import android.util.Log
@@ -25,50 +25,15 @@ import io.parity.signer.domain.*
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
-import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.launch
 
-const val TAG = "LogsMenu"
+private const val TAG = "LogsMenu"
 
 @Composable
-fun LogsMenu(
-	navigator: Navigator,
-) {
-	val state = remember { mutableStateOf(LogsState.GENERAL) }
-	val coroutineScope = rememberCoroutineScope()
-	val context = LocalContext.current
-
-	when (state.value) {
-		LogsState.GENERAL -> LogsMenuGeneral(
-			navigator = navigator,
-			onDeleteClicked = { state.value = LogsState.DELETE_CONFIRM },
-		)
-		LogsState.DELETE_CONFIRM ->
-			LogeMenuDeleteConfirm(
-				onCancel = { state.value = LogsState.GENERAL },
-				onRemoveKey = {
-					coroutineScope.launch {
-						val authenticator = ServiceLocator.authentication
-						when (authenticator.authenticate(context.findActivity() as FragmentActivity)) {
-							AuthResult.AuthSuccess -> {
-								navigator.navigate(Action.CLEAR_LOG)
-							}
-							AuthResult.AuthError,
-							AuthResult.AuthFailed,
-							AuthResult.AuthUnavailable -> {
-								Log.d(TAG, "Can't remove logs without authentication")
-							}
-						}
-					}
-				}
-			)
-	}
-}
-
-@Composable
-private fun LogsMenuGeneral(
-	navigator: Navigator,
+fun LogsMenuGeneral(
+	onCreateComment: Callback,
 	onDeleteClicked: Callback,
+	onCancel: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -80,7 +45,7 @@ private fun LogsMenuGeneral(
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_add_28,
 			label = stringResource(R.string.menu_option_add_note),
-			onclick = { navigator.navigate(Action.CREATE_LOG_COMMENT) }
+			onclick = onCreateComment,
 		)
 
 		MenuItemForBottomSheet(
@@ -92,9 +57,8 @@ private fun LogsMenuGeneral(
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 		SecondaryButtonWide(
 			label = stringResource(R.string.generic_cancel),
-		) {
-			navigator.backAction()
-		}
+			onClicked = onCancel,
+		)
 		Spacer(modifier = Modifier.padding(bottom = 16.dp))
 	}
 }
@@ -102,19 +66,19 @@ private fun LogsMenuGeneral(
 @Composable
 fun LogeMenuDeleteConfirm(
 	onCancel: Callback,
-	onRemoveKey: Callback,
+	doRemoveKeyAndNavigateOut: Callback,
 ) {
+	val coroutineScope = rememberCoroutineScope()
+	val context = LocalContext.current
 	BottomSheetConfirmDialog(
 		title = stringResource(R.string.remove_key_confirm_title),
 		message = stringResource(R.string.remove_key_confirm_text),
 		ctaLabel = stringResource(R.string.remove_key_confirm_cta),
 		onCancel = onCancel,
-		onCta = onRemoveKey,
+		onCta = {
+			doRemoveKeyAndNavigateOut()
+		}
 	)
-}
-
-private enum class LogsState {
-	GENERAL, DELETE_CONFIRM,
 }
 
 
@@ -130,8 +94,26 @@ private enum class LogsState {
 @Composable
 private fun PreviewLogsMenu() {
 	SignerNewTheme {
-		LogsMenu(
-			EmptyNavigator(),
+		LogsMenuGeneral(
+			{},{},{},
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewLogsMenuConfirm() {
+	SignerNewTheme {
+		LogeMenuDeleteConfirm(
+			{},{},
 		)
 	}
 }
