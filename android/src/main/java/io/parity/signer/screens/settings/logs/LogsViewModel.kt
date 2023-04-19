@@ -1,17 +1,23 @@
 package io.parity.signer.screens.settings.logs
 
+import android.content.Context
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.CompletableResult
 import io.parity.signer.backend.OperationResult
 import io.parity.signer.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.AuthResult
+import io.parity.signer.domain.findActivity
 import io.parity.signer.domain.getDetailedDescriptionString
 import io.parity.signer.uniffi.MLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -46,6 +52,36 @@ class LogsViewModel() : ViewModel() {
 			is UniffiResult.Error -> {
 				val error = result.error.getDetailedDescriptionString()
 				Log.e(TAG, "Unexpected error addNote, $error")
+				OperationResult.Err(error)
+			}
+			is UniffiResult.Success -> {
+				OperationResult.Ok(result.result)
+			}
+		}
+	}
+
+	fun actionClearLogsHistory(context: Context) {
+		viewModelScope.launch {
+			val authenticator = ServiceLocator.authentication
+			when (authenticator.authenticate(context.findActivity() as FragmentActivity)) {
+				AuthResult.AuthSuccess -> {
+					clearLogHistory()
+					updateLogsData()
+				}
+				AuthResult.AuthError,
+				AuthResult.AuthFailed,
+				AuthResult.AuthUnavailable -> {
+					Log.d("Vault", "Can't remove logs without authentication")
+				}
+			}
+		}
+	}
+	private suspend fun clearLogHistory(): OperationResult<Unit, String> {
+		return when (val result =
+			withContext(Dispatchers.IO) { uniffiInteractor.clearLogHistory() }) {
+			is UniffiResult.Error -> {
+				val error = result.error.getDetailedDescriptionString()
+				Log.e(TAG, "Unexpected error clear logs, $error")
 				OperationResult.Err(error)
 			}
 			is UniffiResult.Success -> {

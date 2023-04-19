@@ -63,7 +63,6 @@ fun BottomBar(
 				isEnabled = state == BottomBarState.KEYS,
 				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
-			//todo dmitry new design https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?node-id=11930-77855&t=khcNTdojUGw29HQu-4
 			BottomBarMiddleButton(
 				navigator = navigator,
 				iconId = R.drawable.ic_qe_code_24,

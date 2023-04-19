@@ -88,12 +88,13 @@ fun LogsScreenFull(
 			}
 		}
 		composable(LogsMenuSubgraph.logs_menu_delete_confirm) {
+			val context = LocalContext.current
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				LogeMenuDeleteConfirm(
 					onCancel = closeAction,
 					doRemoveKeyAndNavigateOut = {
-//							viewModel.
-						//todo dmitry implement
+						viewModel.actionClearLogsHistory(context)
+						closeAction()
 					}
 				)
 			}

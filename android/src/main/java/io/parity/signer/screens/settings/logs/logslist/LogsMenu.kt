@@ -76,19 +76,7 @@ fun LogeMenuDeleteConfirm(
 		ctaLabel = stringResource(R.string.remove_key_confirm_cta),
 		onCancel = onCancel,
 		onCta = {
-			coroutineScope.launch {
-				val authenticator = ServiceLocator.authentication
-				when (authenticator.authenticate(context.findActivity() as FragmentActivity)) {
-					AuthResult.AuthSuccess -> {
-						doRemoveKeyAndNavigateOut()
-					}
-					AuthResult.AuthError,
-					AuthResult.AuthFailed,
-					AuthResult.AuthUnavailable -> {
-						Log.d(TAG, "Can't remove logs without authentication")
-					}
-				}
-			}
+			doRemoveKeyAndNavigateOut()
 		}
 	)
 }
