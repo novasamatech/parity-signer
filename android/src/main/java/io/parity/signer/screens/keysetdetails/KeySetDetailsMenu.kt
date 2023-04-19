@@ -28,50 +28,18 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.uniffi.Action
 
-@Composable
-fun KeySetDetailsMenu(
-	navigator: Navigator,
-	networkState: State<NetworkState?>,
-	removeSeed: Callback,
-	onSelectKeysClicked: Callback,
-	onBackupClicked: Callback,
-	onCancel: Callback,
-) {
-	val state = remember {
-		mutableStateOf(KeySetDetailsMenuState.GENERAL)
-	}
-	when (state.value) {
-		KeySetDetailsMenuState.GENERAL ->
-			KeyDetailsMenuGeneral(
-				navigator = navigator,
-				networkState = networkState,
-				onDeleteClicked = {
-					state.value = KeySetDetailsMenuState.DELETE_CONFIRM
-				},
-				onSelectKeysClicked = onSelectKeysClicked,
-				onBackupClicked = onBackupClicked,
-				onCancel = onCancel,
-			)
-		KeySetDetailsMenuState.DELETE_CONFIRM ->
-			KeySetDeleteConfirmBottomSheet(
-				onCancel = { state.value = KeySetDetailsMenuState.GENERAL },
-				onRemoveKey = removeSeed,
-			)
-	}
-}
 
-//todo dmitry switch state back to general if sheet is closed
 @Composable
 fun KeySetDeleteConfirmBottomSheet(
 	onCancel: Callback,
-	onRemoveKey: Callback,
+	onRemoveKeySet: Callback,
 ) {
 	BottomSheetConfirmDialog(
 		title = stringResource(R.string.remove_key_set_confirm_title),
 		message = stringResource(R.string.remove_key_set_confirm_text),
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
 		onCancel = onCancel,
-		onCta = onRemoveKey,
+		onCta = onRemoveKeySet,
 	)
 }
 
@@ -124,10 +92,6 @@ fun KeyDetailsMenuGeneral(
 }
 
 
-private enum class KeySetDetailsMenuState {
-	GENERAL, DELETE_CONFIRM,
-}
-
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -142,8 +106,26 @@ private enum class KeySetDetailsMenuState {
 private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.None) }
-		KeySetDetailsMenu(
+		KeyDetailsMenuGeneral(
 			EmptyNavigator(), state, {}, {}, {}, {},
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeyDetailsMenuConfirm() {
+	SignerNewTheme {
+		KeySetDeleteConfirmBottomSheet(
+			{}, {},
 		)
 	}
 }
