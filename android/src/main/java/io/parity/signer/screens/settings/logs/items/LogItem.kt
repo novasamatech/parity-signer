@@ -1,4 +1,4 @@
-package io.parity.signer.screens.logs.items
+package io.parity.signer.screens.settings.logs.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -16,54 +16,52 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.red400
-import io.parity.signer.ui.theme.textTertiary
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun LogItem(
 	model: LogsListEntryModel.LogEntryModel,
 	onClick: Callback,
 ) {
-	Row(
+	Column(
 		modifier = Modifier
             .fillMaxWidth(1f)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp, horizontal = 24.dp),
-		verticalAlignment = Alignment.Bottom,
 	) {
-		Column(modifier = Modifier.weight(1f)) {
+		Row(verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				text = model.title,
 				color = if (model.isDanger) {
-					MaterialTheme.colors.red400
+					MaterialTheme.colors.accentRed
 				} else {
 					MaterialTheme.colors.primary
 				},
 				style = SignerTypeface.TitleS,
+				modifier = Modifier.weight(1f)
 			)
-			if (model.message.isNotBlank()) {
-				Spacer(modifier = Modifier.padding(top = 4.dp))
-
-				Text(
-					text = model.message,
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.BodyM,
-				)
-			}
+			Spacer(modifier = Modifier.padding(start = 8.dp))
+			Text(
+				text = model.timeStr,
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyM,
+			)
+			Image(
+				imageVector = Icons.Filled.ChevronRight,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+			)
 		}
-		Spacer(modifier = Modifier.padding(start = 8.dp))
-		Text(
-			text = model.timeStr,
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyM,
-		)
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-		)
+
+		if (model.message.isNotBlank()) {
+			Spacer(modifier = Modifier.padding(top = 4.dp))
+
+			Text(
+				text = model.message,
+				color = MaterialTheme.colors.textSecondary,
+				style = SignerTypeface.BodyM,
+			)
+		}
 	}
 }
 
@@ -111,7 +109,7 @@ private fun PreviewLogItem() {
 			LogItem(
 				LogsListEntryModel.LogEntryModel(
 					title = "Database initiated",
-					message = "Message of database init happened very long 2 lines",
+					message = "Message of database init happened very long 2 lines and even bigger",
 					timeStr = "10:42",
 					isDanger = false,
 					logGroupId = 23.toUInt(),

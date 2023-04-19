@@ -35,7 +35,6 @@
 	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>
 	<string name="bottom_bar_label_scanner">Scanner</string>
-	<string name="bottom_bar_label_logs">Logs</string>
 	<string name="bottom_bar_label_settings">Settings</string>
 	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
 	<string name="key_set_details_multiselect_title_none_selected">Select Keys</string>
@@ -79,6 +78,8 @@
 	<string name="log_title_warning">Warning!</string>
 	<string name="log_title_wrong_password">Wrong password entered</string>
 	<string name="log_message_wrong_passowrd">operation declined</string>
+	<string name="logs_details_title">Event Details</string>
+	<string name="logs_add_error_message">Note not added, %1$s</string>
 	<string name="logs_title">All Logs</string>
 	<string name="log_message_metadata">%1$s version %2$s</string>
 	<string name="log_message_network_verifier">%1$s for network with genesis hash %2$s</string>
@@ -131,6 +132,7 @@
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
+	<string name="settings_logs">Logs</string>
 	<string name="settings_networks">Networks</string>
 	<string name="settings_verifier_certificate">Verifier certificate</string>
 	<string name="settings_backup_keys">Backup keys</string>
@@ -365,6 +367,8 @@
 	<string name="verifier_certificate_remove_cta">Remove Certificate</string>
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
+	<string name="logs_add_comment_title">Add Note</string>
+    <string name="add_log_note_placeholder">Enter log note</string>
 
 </resources>
 
