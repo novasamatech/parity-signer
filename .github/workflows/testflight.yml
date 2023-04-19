@@ -16,7 +16,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout repository
-        uses:                 actions/checkout@v3.3.0
+        uses:                 actions/checkout@v3.5.2
 
       - name:                 Setup Ruby
         uses:                 ruby/setup-ruby@v1
@@ -25,7 +25,7 @@ jobs:
           bundler-cache:      true
 
       - name:                 Setup - Xcode
-        run:                  sudo xcode-select -switch '/Applications/Xcode_14.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
+        run:                  sudo xcode-select -switch '/Applications/Xcode_14.2.app/Contents/Developer' && /usr/bin/xcodebuild -version
 
       - name:                 Install dependencies
         run:                  |
@@ -67,7 +67,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
+        uses:                 Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
         with:
           workspaces:         rust -> rust/target
 

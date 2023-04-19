@@ -623,7 +623,6 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
     let name = "a very long key name a very long key name".to_owned();
 
     let derived_keys: Vec<AddrInfo> = (0..keys_num)
-        .into_iter()
         .map(|num| AddrInfo {
             address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
             derivation_path: Some(format!("//this//is//a//path//{num}")),
@@ -734,7 +733,7 @@ pub fn specs_agnostic(
 /// Update [`NetworkSpecs`] already existing in the database with
 /// **exactly same** encryption.
 ///
-/// Could be used to overwrite token (if possible for the network) or the Signer
+/// Could be used to overwrite token (if possible for the network) or the Vault
 /// display title. If no title override is used, the title remains as it was.
 ///
 /// Output flag indicates if the value has changed, and the database entry

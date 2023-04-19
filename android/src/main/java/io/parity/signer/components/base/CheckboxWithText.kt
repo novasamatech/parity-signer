@@ -1,6 +1,5 @@
 package io.parity.signer.components.base
 
-import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.pink500
+import io.parity.signer.ui.theme.textTertiary
 
 /**
  * Active checkbox field that responds to click anywhere within it
@@ -54,7 +56,7 @@ fun CheckboxWithText(
  * Just a checkbox with proper colors
  */
 @Composable
-private fun CheckboxIcon(
+fun CheckboxIcon(
 	checked: Boolean
 ) {
 	Checkbox(
@@ -66,6 +68,33 @@ private fun CheckboxIcon(
 			checkmarkColor = Color.White
 		)
 	)
+}
+
+@Composable
+fun CheckboxWithTextSecondary(
+	checked: Boolean,
+	text: String,
+	modifier: Modifier = Modifier,
+	onValueChange: (Boolean) -> Unit,
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = modifier.toggleable(
+			value = checked,
+			role = Role.Checkbox,
+			onValueChange = { onValueChange(it) }
+		)
+	) {
+		CheckboxIcon(
+			checked = checked,
+		)
+		Spacer(Modifier.width(16.dp))
+		Text(
+			text,
+			color = MaterialTheme.colors.secondary,
+			style = SignerTypeface.BodyM,
+		)
+	}
 }
 
 @Preview(
@@ -91,6 +120,19 @@ private fun PreviewCheckboxWithText() {
 				checked = false,
 				onValueChange = {},
 				text = "Description of this checkbox very long two lines",
+			)
+			SignerDivider()
+			SignerDivider()
+			CheckboxWithTextSecondary(
+				checked = true,
+				onValueChange = {},
+				text = "Description of this checkbox secondary",
+			)
+			SignerDivider()
+			CheckboxWithTextSecondary(
+				checked = false,
+				onValueChange = {},
+				text = "Description of this checkbox secondary",
 			)
 		}
 	}

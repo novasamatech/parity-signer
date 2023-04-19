@@ -1,5 +1,6 @@
 package io.parity.signer.screens.scan.transaction
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
@@ -23,17 +25,17 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.UnifiiStubs
 import io.parity.signer.domain.getData
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.screens.scan.elements.TransactionErrors
+import io.parity.signer.screens.scan.errors.TransactionErrorEmbedded
 import io.parity.signer.screens.scan.transaction.components.TransactionElementSelector
 import io.parity.signer.screens.scan.transaction.components.TransactionSummaryView
 import io.parity.signer.screens.scan.transaction.components.toSigningTransactionModels
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.backgroundSystem
-import io.parity.signer.uniffi.MSignatureReady
-import io.parity.signer.uniffi.MTransaction
-import io.parity.signer.uniffi.TransactionType
+import io.parity.signer.ui.theme.backgroundPrimary
+import io.parity.signer.uniffi.*
 
 
 /**
@@ -86,7 +88,7 @@ internal fun TransactionsScreenFull(
 	BackHandler(onBack = onBack)
 	Column(
 		modifier
-			.background(MaterialTheme.colors.backgroundSystem)
+			.background(MaterialTheme.colors.backgroundPrimary)
 	) {
 		ScreenHeader(
 			title = getTransactionsTitle(
@@ -129,7 +131,9 @@ private fun getTransactionsTitle(
 		is TransactionPreviewType.AddNetwork -> stringResource(R.string.transactions_title_network)
 		is TransactionPreviewType.Metadata -> stringResource(R.string.transactions_title_metadata)
 		TransactionPreviewType.Transfer, TransactionPreviewType.Unknown -> pluralStringResource(
-			id = R.plurals.transactions_title_other, transactionsCount,
+			id = R.plurals.transactions_title_other,
+			transactionsCount,
+			transactionsCount
 		)
 	}
 }
@@ -180,8 +184,8 @@ private fun QrSignatureData(signature: MSignatureReady) {
 		input = signature.signatures.map { it.getData() },
 		provider = EmptyQrCodeProvider(),
 		modifier = Modifier
-            .fillMaxWidth(1f)
-            .padding(horizontal = 24.dp)
+			.fillMaxWidth(1f)
+			.padding(horizontal = 24.dp)
 	)
 }
 
@@ -215,15 +219,15 @@ private fun ActionButtons(
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_approve),
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 32.dp, bottom = 8.dp),
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 8.dp),
 				onClicked = { onApprove() },
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 32.dp),
+					.padding(horizontal = 24.dp)
+					.padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}
@@ -240,15 +244,15 @@ private fun ActionButtons(
 			PrimaryButtonWide(
 				label = stringResource(R.string.transaction_action_import_keys),
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 32.dp, bottom = 8.dp),
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 8.dp),
 				onClicked = onImportKeys,
 			)
 			SecondaryButtonWide(
 				label = stringResource(R.string.transaction_action_decline),
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 32.dp),
+					.padding(horizontal = 24.dp)
+					.padding(bottom = 32.dp),
 				onClicked = onBack,
 			)
 		}
@@ -286,7 +290,7 @@ private fun AddLogElement() {
 internal fun TransactionIssues(transaction: MTransaction) {
 	transaction.transactionIssues().let {
 		if (it.isNotEmpty()) {
-			TransactionErrors(
+			TransactionErrorEmbedded(
 				errors = it,
 				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 			)
@@ -308,5 +312,23 @@ private fun MTransaction.shouldShowAsSummaryTransaction(): Boolean {
 		TransactionType.IMPORT_DERIVATIONS -> {
 			return false
 		}
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xB0FFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewTransactionsScreenFull() {
+	SignerNewTheme {
+		val transaction = UnifiiStubs.makeTransactionStubList()
+		TransactionsScreenFull(transaction, null, Modifier, {}, {}, {})
 	}
 }

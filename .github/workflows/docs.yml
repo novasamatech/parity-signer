@@ -18,7 +18,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.3.0
+        uses:                 actions/checkout@v3.5.2
         with:
           fetch-depth:        1
           submodules:         recursive
@@ -30,12 +30,12 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
+        uses:                 Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
         with:
           workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@48c92f3d491efa23daace9891498a14c5aaa1afd # v2.0.0
         with:
           crate:              cargo-spellcheck
 
@@ -66,12 +66,12 @@ jobs:
           mdbook-version:     latest
 
       - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@48c92f3d491efa23daace9891498a14c5aaa1afd # v2.0.0
         with:
           crate:              mdbook-linkcheck
 
       - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@bf6758885262d0e6f61089a9d8c8790d3ac3368f # v1.3.0
+        uses:                 baptiste0928/cargo-install@48c92f3d491efa23daace9891498a14c5aaa1afd # v2.0.0
         with:
           crate:              mdbook-mermaid
 
@@ -86,7 +86,7 @@ jobs:
 
       # deploy
       - name:                 Deploy rustdocs and user-docs
-        uses:                 peaceiris/actions-gh-pages@bd8c6b06eba6b3d25d72b7a1767993c0aeee42e7 # v3.9.2
+        uses:                 peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
         # published only from master AND if the triggerer is not dependabot
         # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
         if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}

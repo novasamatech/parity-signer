@@ -29,10 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.backgroundSystem
-import io.parity.signer.ui.theme.red500
+import io.parity.signer.ui.theme.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -129,7 +126,7 @@ private fun BananaSplitPasswordInternal(
 
 	Column(
 		modifier
-			.background(MaterialTheme.colors.backgroundSystem)
+			.background(MaterialTheme.colors.backgroundPrimary)
 			.fillMaxSize(1f)
 	) {
 		ScreenHeaderWithButton(
@@ -150,22 +147,26 @@ private fun BananaSplitPasswordInternal(
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				modifier = Modifier
-					.padding(bottom = 20.dp)
+					.padding(bottom = 14.dp)
 			)
 			Text(
 				text = stringResource(R.string.banana_split_password_name_header),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.BodyL,
+				modifier = Modifier.padding(vertical = 6.dp),
 			)
 
 			OutlinedTextField(
 				value = name.value,
 				onValueChange = { newStr -> onChangeSeedName(newStr) },
 				keyboardOptions = KeyboardOptions(
-					imeAction = if (name.value.isNotEmpty() && !nameCollision.value) ImeAction.Go else ImeAction.None
+					//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Go
 				),
 				keyboardActions = KeyboardActions(onGo = {
-					passwordFocusRequester.requestFocus()
+					if (name.value.isNotEmpty() && !nameCollision.value) {
+						passwordFocusRequester.requestFocus()
+					}
 				}),
 				placeholder = { Text(text = stringResource(R.string.banana_split_password_name_label)) },
 				isError = nameCollision.value,
@@ -186,14 +187,14 @@ private fun BananaSplitPasswordInternal(
 					style = SignerTypeface.CaptionM,
 				)
 			}
-			Spacer(modifier = Modifier.padding(bottom = 20.dp))
+			Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
 			//password
 			Text(
 				text = stringResource(R.string.banana_split_password_password_header),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.BodyL,
-				modifier = Modifier
+				modifier = Modifier.padding(vertical = 6.dp),
 			)
 			OutlinedTextField(
 				value = password.value,
@@ -204,7 +205,8 @@ private fun BananaSplitPasswordInternal(
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
 					onDone = {

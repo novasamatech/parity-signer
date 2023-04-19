@@ -10,11 +10,11 @@ edition = "2018"
 hex = "0.4.3"
 raptorq = "1.7.0"
 nom = "7.1.3"
-thiserror = "1.0.38"
+thiserror = "1.0.40"
 
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
 
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false}
 
 [lib]
 name = "qr_reader_phone"

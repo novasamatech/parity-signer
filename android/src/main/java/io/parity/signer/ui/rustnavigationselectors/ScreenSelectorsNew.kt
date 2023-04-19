@@ -13,8 +13,7 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
-import io.parity.signer.components.panels.BottomBarSingleton
-import io.parity.signer.components.panels.toAction
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
@@ -31,24 +30,26 @@ import io.parity.signer.screens.logs.LogsMenu
 import io.parity.signer.screens.logs.LogsScreen
 import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreen
+import io.parity.signer.screens.settings.SettingsScreenSubgraph
+import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
+import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
+import io.parity.signer.screens.settings.networks.list.NetworksListScreen
+import io.parity.signer.screens.settings.networks.list.toNetworksListModel
+import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.keysBySeedName
+import io.parity.signer.uniffi.*
 
 @Composable
 fun CombinedScreensSelector(
-    screenData: ScreenData,
-    localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    signerMainViewModel: SignerMainViewModel
+	screenData: ScreenData,
+	localNavAction: LocalNavAction?,
+	networkState: State<NetworkState?>,
+	sharedViewModel: SharedViewModel
 ) {
-	val rootNavigator = signerMainViewModel.navigator
+	val rootNavigator = sharedViewModel.navigator
 	val seedNames =
-		signerMainViewModel.seedStorage.lastKnownSeedNames.collectAsState()
+		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
@@ -59,13 +60,21 @@ fun CombinedScreensSelector(
 			)
 		}
 		is ScreenData.Keys -> {
-			val keys = keysBySeedName(screenData.f)
-			KeySetDetailsNavSubgraph(
-				model = keys.toKeySetDetailsModel(),
-				rootNavigator = rootNavigator,
-				networkState = networkState,
-				singleton = signerMainViewModel,
-			)
+			val keys = try {
+				keysBySeedName(screenData.f)
+			} catch (e: ErrorDisplayed) {
+				rootNavigator.backAction()
+				submitErrorState("unexpected error in keysBySeedName $e")
+				null
+			}
+			keys?.let {
+				KeySetDetailsNavSubgraph(
+					model = keys.toKeySetDetailsModel(),
+					rootNavigator = rootNavigator,
+					networkState = networkState,
+					singleton = sharedViewModel,
+				)
+			}
 		}
 		is ScreenData.KeyDetails ->
 			Box(modifier = Modifier.statusBarsPadding()) {
@@ -88,15 +97,25 @@ fun CombinedScreensSelector(
 				)
 			}
 		is ScreenData.Settings ->
+			SettingsScreenSubgraph(
+				rootNavigator = rootNavigator,
+				isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
+				appVersion = sharedViewModel.getAppVersion(),
+				wipeToFactory = sharedViewModel::wipeToFactory,
+				networkState = networkState
+			)
+		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				SettingsScreen(
-					rootNavigator = rootNavigator,
-					isStrongBoxProtected = signerMainViewModel.seedStorage.isStrongBoxProtected,
-					appVersion = signerMainViewModel.getAppVersion(),
-					wipeToFactory = signerMainViewModel::wipeToFactory,
-					networkState = networkState
+				NetworksListScreen(
+					model = screenData.f.toNetworksListModel(),
+					rootNavigator = rootNavigator
 				)
 			}
+		is ScreenData.NNetworkDetails ->
+			NetworkDetailsSubgraph(
+				screenData.f.toNetworkDetailsModel(),
+				rootNavigator
+			)
 		is ScreenData.NewSeed ->
 			Box(
 				modifier = Modifier
@@ -118,7 +137,7 @@ fun CombinedScreensSelector(
 				"Selector",
 				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
 			)
-			rootNavigator.navigate(BottomBarSingleton.lastUsedTab.toAction())
+			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 		is ScreenData.DeriveKey -> {
 			Box(
@@ -130,17 +149,22 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+		is ScreenData.VVerifier -> VerifierScreenFull(
+			screenData.f.toVerifierDetailsModels(),
+			sharedViewModel::wipeToJailbreak,
+			rootNavigator,
+		)
 		else -> {} //old Selector showing them
 	}
 }
 
 @Composable
 fun BottomSheetSelector(
-    modalData: ModalData?,
-    localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    signerMainViewModel: SignerMainViewModel,
-    navigator: Navigator,
+	modalData: ModalData?,
+	localNavAction: LocalNavAction?,
+	networkState: State<NetworkState?>,
+	sharedViewModel: SharedViewModel,
+	navigator: Navigator,
 ) {
 	SignerNewTheme {
 
@@ -165,7 +189,7 @@ fun BottomSheetSelector(
 					}) {
 						KeyDetailsMenuAction(
 							navigator = navigator,
-							keyDetails = signerMainViewModel.lastOpenedKeyDetails
+							keyDetails = sharedViewModel.lastOpenedKeyDetails
 						)
 					}
 				is ModalData.NewSeedMenu ->
@@ -175,14 +199,14 @@ fun BottomSheetSelector(
 					}) {
 						NewSeedMenu(
 							networkState = networkState,
-							navigator = signerMainViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.NewSeedBackup -> {
 					NewKeySetBackupScreenFull(
 						model = modalData.f.toNewSeedBackupModel(),
 						onBack = { navigator.backAction() },
-						onCreateKeySet = signerMainViewModel::addSeed
+						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
 				is ModalData.LogRight ->
@@ -190,7 +214,7 @@ fun BottomSheetSelector(
 						navigator.backAction()
 					}) {
 						LogsMenu(
-							navigator = signerMainViewModel.navigator,
+							navigator = sharedViewModel.navigator,
 						)
 					}
 				is ModalData.EnterPassword ->
@@ -210,7 +234,7 @@ fun BottomSheetSelector(
 					}
 				is ModalData.SignatureReady -> {}//part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(signerMainViewModel = signerMainViewModel)
+				is ModalData.LogComment -> LogComment(sharedViewModel = sharedViewModel)
 				else -> {}
 			}
 		}

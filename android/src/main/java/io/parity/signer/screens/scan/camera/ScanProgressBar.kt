@@ -43,7 +43,7 @@ fun ScanProgressBar(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth(1f)
-			.padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
+			.padding(start = 8.dp, end = 8.dp, bottom = 24.dp, top = 8.dp)
 			.background(SNACKBAR_BACKGROUND, innerShape)
 			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 20.dp),
 	) {

@@ -2,13 +2,13 @@ package io.parity.signer.screens.keysets.create
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,9 +35,11 @@ internal fun NewKeySetBackupScreen(
 ) {
 
 	Column(
-		Modifier
+		modifier = Modifier
 			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background),
+			.background(MaterialTheme.colors.background)
+			.verticalScroll(rememberScrollState()),
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
 			title = stringResource(R.string.new_key_set_backup_title),
@@ -49,14 +51,13 @@ internal fun NewKeySetBackupScreen(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
-				.padding(bottom = 16.dp),
+				.padding(bottom = 8.dp),
 		)
 		BackupPhraseBox(seedPhrase = model.seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
-				.padding(top = 8.dp)
 		)
 		Spacer(modifier = Modifier.weight(1f))
 
@@ -106,5 +107,34 @@ private fun PreviewNewKeySetBackupScreen() {
 	)
 	SignerNewTheme {
 		NewKeySetBackupScreen(model, {}, {})
+	}
+}
+
+
+@Preview
+@Composable
+private fun PreviewNewKeySetBackupScreenNarrow() {
+	val model = NewSeedBackupModel(
+		"seedname",
+		"some words many many words secr fphr phrase"
+	)
+	Box(modifier = Modifier.size(height = 400.dp, width = 150.dp)) {
+		SignerNewTheme {
+			NewKeySetBackupScreen(model, {}, {})
+		}
+	}
+}
+
+@Preview
+@Composable
+private fun PreviewNewKeySetBackupScreenShort() {
+	val model = NewSeedBackupModel(
+		"seedname",
+		"some words many many words secr fphr phrase"
+	)
+	Box(modifier = Modifier.size(height = 400.dp, width = 200.dp)) {
+		SignerNewTheme {
+			NewKeySetBackupScreen(model, {}, {})
+		}
 	}
 }

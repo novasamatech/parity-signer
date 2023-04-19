@@ -6,45 +6,45 @@
 
 ## About
 
-### What is Signer?
+### What is Vault?
 
-Signer is an app for an air-gapped device, it turns an offline device — usually a smartphone — into a secure hardware wallet. Signer offers you a way to securely generate, store, manage and use your blockchain credentials.
+Vault is an app for an air-gapped device, it turns an offline device — usually a smartphone — into a secure hardware wallet. Vault offers you a way to securely generate, store, manage and use your blockchain credentials.
 
-### Should I use Signer?
+### Should I use Vault?
 
-Signer is optimized for the highest security requirements. If you already manage many accounts on multiple networks, Signer is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Signer as intuitive as possible; get in touch via [signer@parity.io](mailto:signer@parity.io) or [GitHub Issues](https://github.com/paritytech/parity-signer/issues) if you can help us get there!
+Vault is optimized for the highest security requirements. If you already manage many accounts on multiple networks, Vault is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Vault as intuitive as possible; get in touch via [signer@parity.io](mailto:signer@parity.io) or [GitHub Issues](https://github.com/paritytech/parity-signer/issues) if you can help us get there!
 
 ### How does an offline device communicate with the outside world?
 
-Communication happens through scanning and generating QR codes. Scanned with Signer input-QRs interact with keys stored in Signer to, generate response-QRs on behalf of those keys. Usually, input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
+Communication happens through scanning and generating QR codes. Scanned with Vault input-QRs interact with keys stored in Vault to, generate response-QRs on behalf of those keys. Usually, input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
 
 ### How do I keep my keys secure?
 
-Signer is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend backing up your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
+Vault is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend backing up your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
 
 ### How do I know I am not interacting with malicious apps or actors?
 
-The Signer does not interact with a network. The app itself does not have a way to check if an app or an account you're interacting with is malicious. 
-If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps, or Signer Component Browser Extension they will rely on a community-driven curated list of potentially less-than-honest operators: [<https://polkadot.js.org/phishing/#>](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on the use of Signer with other tools.
+The Vault does not interact with a network. The app itself does not have a way to check if an app or an account you're interacting with is malicious. 
+If you use Vault with PolkadotJS Browser Extension, PolkadotJS Apps, or Signer Component Browser Extension they will rely on a community-driven curated list of potentially less-than-honest operators: [<https://polkadot.js.org/phishing/#>](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on the use of Vault with other tools.
 
-### I want to play with Signer to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
+### I want to play with Vault to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
 
-Yes. In Signer, you should add a key for an address on Westend network and request test tokens for that address, see the step-by-step guide on [Polkadot Network Wiki](https://wiki.polkadot.network/docs/learn-DOT#getting-westies). 
+Yes. In Vault, you should add a key for an address on Westend network and request test tokens for that address, see the step-by-step guide on [Polkadot Network Wiki](https://wiki.polkadot.network/docs/learn-DOT#getting-westies). 
 
 You can use test tokens in the same way you would use value-bearing tokens.
 
-For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create a transaction on behalf of your account, generate a signature with Signer and submit it to the network. All of this without keys ever leaving your offline device.
+For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create a transaction on behalf of your account, generate a signature with Vault and submit it to the network. All of this without keys ever leaving your offline device.
 
 ## Networks
 
-### What networks does Signer support?
+### What networks does Vault support?
 
-From-the-shelf Party Signer supports Polkadot, Kusama, and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand the capability of Parity Signer.
+From-the-shelf Polkadot Vault supports Polkadot, Kusama, and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand the capability of Polkadot Vault.
 
 ### How can I update metadata version for a network?
 
-Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR-"movies" same way you scan transaction QR:\
-in Signer open scanner, scan the QR for the respective network and accept new metadata.
+Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Vault you can scan one of the multipart QR-"movies" same way you scan transaction QR:\
+in Vault open scanner, scan the QR for the respective network and accept new metadata.
 
 Currently, [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama, and Westend network metadata updates. Parity is open to collaboration with participants of other networks and is currently exploring safe and more decentralized ways of publishing verified metadata.
 
@@ -52,11 +52,11 @@ If you want to update networks that you've added manually, please follow the [Ad
 
 ### Why do I need to update network metadata versions at all?
 
-It's a safety feature. Substrate-based blockchain networks can be updated and otherwise changed; without recent metadata version of a network Signer won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Signer is an app for an air-gapped device, you have to update the network version by using camera.
+It's a safety feature. Substrate-based blockchain networks can be updated and otherwise changed; without recent metadata version of a network Vault won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Vault is an app for an air-gapped device, you have to update the network version by using camera.
 
-### How can I add a new network to Signer?
+### How can I add a new network to Vault?
 
-Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Signer open scanner, scan the QR and accept new network spec. Then scan the multipart QR-"movie" containing recent metadata for this network.
+Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Chain Specs", scan the network specs QR same way you scan transaction QR: in Vault open scanner, scan the QR and accept new network spec. Then scan the multipart QR-"movie" containing recent metadata for this network.
 
 ### Can I add a network that does not have network specs and metadata QR published anywhere?
 
@@ -66,17 +66,17 @@ Currently, the process requires you to have [rust](https://www.rust-lang.org/too
 
 ## Seeds and keys
 	
-### Can I import my keys from `polkadot{.js}` apps or extension to Parity Signer?
+### Can I import my keys from `polkadot{.js}` apps or extension to Polkadot Vault?
 
-Yes. Keys are compatible between `polkadot{.js}` and Parity Signer, except for the keys generated with Ledger (`BIP39`). To import seed keys into Parity Signer, you need to know:
+Yes. Keys are compatible between `polkadot{.js}` and Polkadot Vault, except for the keys generated with Ledger (`BIP39`). To import seed keys into Polkadot Vault, you need to know:
 1. Seed phrase\
 _It should always be backed up in paper!_
-2. Network you are adding address to and whether Parity Signer installed on your device has metadata for the respective network.\
+2. Network you are adding address to and whether Polkadot Vault installed on your device has metadata for the respective network.\
 _If (2) is not one of the default built-in networks, you will need to add network yourself or find a distribution center for adding networks._
 3. Derivation path\
 _Only if you are importing a derived key, usually keys generated with `polkadot{.js}` are seed keys._
 
-In Parity Signer go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
+In Polkadot Vault go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
 If you are importing a derived key select the seed from which your key is derived, select account's network, press "Plus" icon next to "Derived keys", enter your derivation path.
 
 ### What is the difference between seed key and derived key? Why should I use derived keys?

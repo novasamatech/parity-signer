@@ -1,7 +1,7 @@
-//! Constants used throughout in [Signer](https://github.com/paritytech/parity-signer)
-//! and Signer-supporting ecosystem.  
+//! Constants used throughout in [Vault](https://github.com/paritytech/parity-signer)
+//! and Vault-supporting ecosystem.
 //!
-//! Signer uses **cold** database.
+//! Vault uses **cold** database.
 //!
 //! The database used on a non air-gapper device for updates generation is
 //! called **hot** database.
@@ -16,7 +16,7 @@
 //! sign updates for a given network
 //! - [`METATREE`], with network metadata
 //! - [`ADDRTREE`], with user addresses public information
-//! - [`SETTREE`], containing general verifier, types information, and Signer
+//! - [`SETTREE`], containing general verifier, types information, and Vault
 //! danger status
 //! - [`TRANSACTION`], used to store temporarily transaction data while the
 //! user accepts or declines it
@@ -35,18 +35,18 @@
 //! - tree names in cold database alone or shared between cold and hot databases
 //! - key names in [`SPECSTREE`] tree of cold database alone or shared between
 //! cold and hot databases
-//! - recurring throughout the Signer seed phrase for Alice
+//! - recurring throughout the Vault seed phrase for Alice
 //! - QR graphic settings, used for both static and animated PNG QR codes
 //!
 //! # Features
-//! Feature `"signer"` corresponds to everything related exclusively to Signer
+//! Feature `"signer"` corresponds to everything related exclusively to Vault
 //! air-gapped device. It includes:
 //!
 //! - keys for [`TRANSACTION`] tree, used for temporary storage for various
 //! kinds of transactions while they are shown to user for approval
 //! - display settings for history log and word guesser
 //!
-//! Feature `"active"` corresponds to all Signer-related things happening
+//! Feature `"active"` corresponds to all Vault-related things happening
 //! exclusively **without** air-gap. It includes:
 //!
 //! - default database addresses for hot database and cold release database
@@ -62,11 +62,9 @@
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
-#[cfg(feature = "test")]
 pub mod test_values;
 
-/// Default folder for cold database generated during the Signer build
-#[cfg(feature = "active")]
+/// Default folder for cold database generated during the Vault build
 pub const COLD_DB_NAME_RELEASE: &str = "../database/database_cold_release";
 
 /// Tree name for the tree storing the network specs in cold database
@@ -87,7 +85,7 @@ pub const ADDRTREE: &[u8] = b"addresses";
 /// Tree name for the tree storing database settings
 ///
 /// In cold database, the settings tree contains general verifier, types
-/// information, Signer danger status.
+/// information, Vault danger status.
 ///
 /// In hot database, the settings tree contains types information.
 pub const SETTREE: &[u8] = b"settings";
@@ -95,7 +93,7 @@ pub const SETTREE: &[u8] = b"settings";
 /// Tree name for the tree temporarily storing transaction entries
 pub const TRANSACTION: &[u8] = b"transaction";
 
-/// Tree name for the tree storing Signer history
+/// Tree name for the tree storing Vault history
 pub const HISTORY: &[u8] = b"history";
 
 /// Key in settings tree [`SETTREE`] for encoded types information
@@ -104,64 +102,51 @@ pub const TYPES: &[u8] = b"types";
 /// Key in settings tree [`SETTREE`] for general verifier information
 pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 
-/// Key in settings tree [`SETTREE`] for Signer danger status
+/// Key in settings tree [`SETTREE`] for Vault danger status
 pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key in transactions tree [`TRANSACTION`] for updates data
-#[cfg(feature = "signer")]
 pub const STUB: &[u8] = b"stub";
 
 /// Key in transactions tree [`TRANSACTION`] for signable transactions
-#[cfg(feature = "signer")]
 pub const SIGN: &[u8] = b"sign";
 
 /// Key in transactions tree [`TRANSACTION`] for derivations import data
-#[cfg(feature = "signer")]
 pub const DRV: &[u8] = b"derivations";
 
 /// Maximum number of words displayed to user based on user input in seed
 /// recovery process
-#[cfg(feature = "signer")]
 pub const MAX_WORDS_DISPLAY: usize = 8;
 
 /// Number of entries on log history page
-#[cfg(feature = "signer")]
 pub const HISTORY_PAGE_SIZE: usize = 20;
 
 /// Default folder for hot database
-#[cfg(feature = "active")]
 pub const HOT_DB_NAME: &str = "../database/database_hot";
 
 /// Tree name for the tree storing the network specs in hot database
-#[cfg(feature = "active")]
 pub const SPECSTREEPREP: &[u8] = b"chainspecs_prep";
 
 /// Tree name for the tree storing the network block hash at the time of
 /// metadata fetch, in hot database
-#[cfg(feature = "active")]
 pub const META_HISTORY: &[u8] = b"metadata_history";
 
 /// Tree name for the tree storing the address book in hot database, with data
 /// necessary for RPC calls
-#[cfg(feature = "active")]
 pub const ADDRESS_BOOK: &[u8] = b"address_book";
 
 /// Default `color` to be used in generating network specs with no color
 /// information provided
-#[cfg(feature = "active")]
 pub const COLOR: &str = "#660D35";
 
 /// Default `secondary_color` to be used in generating network specs with no
 /// color information provided
-#[cfg(feature = "active")]
 pub const SECONDARY_COLOR: &str = "#262626";
 
 /// Folder to save payloads ready for signing, for `generate_message` crate
-#[cfg(feature = "active")]
 pub const FOLDER: &str = "../files/in_progress";
 
 /// Folder to save completed update messages, for `generate_message` crate
-#[cfg(feature = "active")]
 pub const EXPORT_FOLDER: &str = "../files/completed";
 
 /// Alice seed phrase
@@ -169,14 +154,12 @@ pub const ALICE_SEED_PHRASE: &str =
     "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
 /// Data chunk size for fountain QR code generation
-#[cfg(feature = "active")]
 pub const CHUNK_SIZE: u16 = 1072;
 
 /// Main color for QR codes (both static and animated ones)
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
-/// Main color for **dangerous** QR codes (static only, in Signer)
-#[cfg(feature = "signer")]
+/// Main color for **dangerous** QR codes (static only, in Vault)
 pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
 
 /// Background color for QR codes (both static and animated ones)
@@ -187,8 +170,7 @@ pub fn qr_palette() -> Vec<u8> {
     [MAIN_COLOR.to_vec(), BACK_COLOR.to_vec()].concat()
 }
 
-/// Color palette for **dangerous** QR codes (static only, in Signer)
-#[cfg(feature = "signer")]
+/// Color palette for **dangerous** QR codes (static only, in Vault)
 pub fn qr_palette_danger() -> Vec<u8> {
     [MAIN_COLOR_DANGER.to_vec(), BACK_COLOR.to_vec()].concat()
 }

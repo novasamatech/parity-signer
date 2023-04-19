@@ -1,6 +1,6 @@
-//! Types used in Signer history log
+//! Types used in Vault history log
 //!
-//! Signer keeps log of all events in `HISTORY` tree of the cold database.
+//! Vault keeps log of all events in `HISTORY` tree of the cold database.
 //!
 //! Every log [`Entry`] consists of timestamp and a set of simultaneously
 //! occurred events `Vec<Event>`. [`Entry`] is stored SCALE-encoded under key
@@ -20,10 +20,7 @@
 use parity_scale_codec::{Decode, Encode};
 use sp_core::{blake2_256, H256};
 use sp_runtime::MultiSigner;
-#[cfg(feature = "signer")]
 use std::convert::TryInto;
-#[cfg(feature = "test")]
-use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -392,7 +389,6 @@ impl SignMessageDisplay {
 
 /// Events that could be recorded in the history log
 #[derive(PartialEq, Eq, Debug, Decode, Encode, Clone)]
-#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {
@@ -405,7 +401,7 @@ pub enum Event {
     },
 
     /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
-    /// with one of Signer addresses for `load_metadata` update
+    /// with one of Vault addresses for `load_metadata` update
     MetadataSigned {
         meta_values_export: MetaValuesExport,
     },
@@ -421,7 +417,7 @@ pub enum Event {
     },
 
     /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
-    /// with one of Signer addresses for `add_specs` update
+    /// with one of Vault addresses for `add_specs` update
     NetworkSpecsSigned {
         network_specs_export: NetworkSpecsExport,
     },
@@ -441,7 +437,7 @@ pub enum Event {
     TypesRemoved { types_display: TypesDisplay },
 
     /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
-    /// with one of Signer addresses for `load_types` update
+    /// with one of Vault addresses for `load_types` update
     TypesSigned { types_export: TypesExport },
 
     /// User has generated signature for a transaction
@@ -471,10 +467,10 @@ pub enum Event {
     /// All identities were wiped
     IdentitiesWiped,
 
-    /// Signer was online, i.e. the air-gap was broken
+    /// Vault was online, i.e. the air-gap was broken
     DeviceWasOnline,
 
-    /// User has acknowledged the dangers detected and has reset the Signer
+    /// User has acknowledged the dangers detected and has reset the Vault
     /// danger status
     ResetDangerRecord,
 
@@ -526,7 +522,6 @@ pub struct Entry {
 ///
 /// Uses mock values and is needed to test [`Event`] format in displaying all events
 /// in user interface.  
-#[cfg(feature = "signer")]
 pub fn all_events_preview() -> Vec<Event> {
     let meta_values = MetaValues {
         name: String::from("westend"),

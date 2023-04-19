@@ -3,9 +3,10 @@ package io.parity.signer.components.exposesecurity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.components.AlertComponent
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
 fun ShieldAlert(
@@ -16,16 +17,20 @@ fun ShieldAlert(
 ) {
 	when (networkState.value) {
 		NetworkState.Active -> {
-			BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
-				ExposedNowBottomSheet(close = navigateBack)
+			SignerNewTheme() {
+				BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
+					ExposedNowBottomSheet(close = navigateBack)
+				}
 			}
 		}
 		NetworkState.Past -> {
-			BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
-				ExposedPastBottomSheet(
-					close = navigateBack,
-					acknowledgeWarning = acknowledgeWarning
-				)
+			SignerNewTheme() {
+				BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
+					ExposedPastBottomSheet(
+						close = navigateBack,
+						acknowledgeWarning = acknowledgeWarning
+					)
+				}
 			}
 		}
 		NetworkState.None -> AlertComponent(

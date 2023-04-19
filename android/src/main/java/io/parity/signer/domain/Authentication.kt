@@ -1,6 +1,6 @@
 package io.parity.signer.domain
 
-import android.util.Log
+import android.content.Context
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -13,6 +13,34 @@ import kotlin.coroutines.suspendCoroutine
 
 
 class Authentication {
+
+
+	companion object {
+		fun canAuthenticate(context: Context): Boolean {
+			val biometricManager = BiometricManager.from(context)
+
+			return when (biometricManager.canAuthenticate(
+				BiometricManager.Authenticators.DEVICE_CREDENTIAL
+					or BiometricManager.Authenticators.BIOMETRIC_WEAK
+			)) {
+				BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
+				BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED,
+				BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+				BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED,
+				BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED,
+				BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
+					false
+				}
+				BiometricManager.BIOMETRIC_SUCCESS -> {
+					true
+				}
+				else -> {
+					submitErrorState("unexpected biometric response value, this should be impossible")
+					true
+				}
+			}
+		}
+	}
 
 	private lateinit var biometricPrompt: BiometricPrompt
 

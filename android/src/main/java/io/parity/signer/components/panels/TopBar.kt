@@ -15,7 +15,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.NavbarShield
-import io.parity.signer.domain.SignerMainViewModel
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.navigate
 import io.parity.signer.ui.theme.Action400
@@ -28,7 +28,7 @@ import io.parity.signer.uniffi.ScreenNameType
 
 @Composable
 fun TopBar(
-    signerMainViewModel: SignerMainViewModel,
+    sharedViewModel: SharedViewModel,
     actionResult: ActionResult,
     networkState: State<NetworkState?>
 ) {
@@ -49,7 +49,7 @@ fun TopBar(
 						backgroundColor = MaterialTheme.colors.Bg100
 					),
 					onClick = {
-						signerMainViewModel.navigate(Action.GO_BACK)
+						sharedViewModel.navigate(Action.GO_BACK)
 					}
 				) {
 					if (actionResult.rightButton == RightButton.MULTI_SELECT) {
@@ -73,7 +73,7 @@ fun TopBar(
 			modifier = Modifier.weight(0.6f, fill = true)
 		) {
 			Text(
-				actionResult.screenLabel ?: "",
+				getScreenLabel(actionResult.screenLabel),
 				style = if (actionResult.screenNameType == ScreenNameType.H1) {
 					MaterialTheme.typography.h2
 				} else {
@@ -87,7 +87,7 @@ fun TopBar(
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			IconButton(onClick = { signerMainViewModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
+			IconButton(onClick = { sharedViewModel.navigate(Action.RIGHT_BUTTON_ACTION) }) {
 				when (actionResult.rightButton) {
 					RightButton.NEW_SEED -> {
 						Icon(
@@ -122,9 +122,16 @@ fun TopBar(
 					}
 				}
 			}
-			IconButton(onClick = { signerMainViewModel.navigate(Action.SHIELD) }) {
+			IconButton(onClick = { sharedViewModel.navigate(Action.SHIELD) }) {
 				NavbarShield(networkState = networkState)
 			}
 		}
+	}
+}
+
+private fun getScreenLabel(screenLabel: String): String {
+	return when (screenLabel) {
+		"Recover Seed" -> "Recover Key Set"
+		else -> screenLabel
 	}
 }

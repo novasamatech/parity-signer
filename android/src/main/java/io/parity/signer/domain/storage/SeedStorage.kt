@@ -35,6 +35,8 @@ class SeedStorage {
 	private lateinit var sharedPreferences: SharedPreferences
 	private val KEYSTORE_NAME = "AndroidKeyStore"
 
+	fun isInitialized(): Boolean = this::sharedPreferences.isInitialized
+
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
@@ -55,12 +57,12 @@ class SeedStorage {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
 				.setRequestStrongBoxBacked(true)
-				.setUserAuthenticationRequired(true)
+				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
 				.build()
 		} else {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setUserAuthenticationRequired(true)
+				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
 				.build()
 		}
 

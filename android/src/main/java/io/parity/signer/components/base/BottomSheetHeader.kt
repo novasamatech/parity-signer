@@ -28,10 +28,11 @@ fun BottomSheetHeader(
 	Row(
 		modifier = modifier
 			.padding(start = 24.dp, end = 16.dp)
+			.padding(vertical = 20.dp)
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Column() {
+		Column(modifier = Modifier.weight(1.0f)) {
 			Text(
 				text = title,
 				color = MaterialTheme.colors.primary,
@@ -45,23 +46,25 @@ fun BottomSheetHeader(
 				)
 			}
 		}
-		Spacer(modifier = Modifier.weight(1.0f))
 		if (onCloseClicked != null) {
 			CloseIcon(
-				modifier = Modifier.padding(vertical = 20.dp),
-				onCloseClicked = onCloseClicked
+				onCloseClicked = onCloseClicked,
+				modifier = Modifier.padding(start = 16.dp)
 			)
 		}
 	}
 }
 
 @Composable
-fun BottomSheetSubtitle(@StringRes id: Int) {
+fun BottomSheetSubtitle(
+	@StringRes id: Int,
+	modifier: Modifier = Modifier,
+) {
 	Text(
 		text = stringResource(id),
 		color = MaterialTheme.colors.primary,
 		style = SignerTypeface.BodyL,
-		modifier = Modifier.padding(start = 24.dp)
+		modifier = modifier.padding(start = 24.dp)
 	)
 }
 
@@ -84,6 +87,8 @@ private fun PreviewHeaderWithClose() {
 	SignerNewTheme {
 		Column() {
 			BottomSheetHeader(title = "Title") {}
+			Divider()
+			BottomSheetHeader(title = "Very very very very long title Very very very very long title") {}
 			Divider()
 			BottomSheetHeader(title = "Title", subtitile = "With subtitle") {}
 			Divider()

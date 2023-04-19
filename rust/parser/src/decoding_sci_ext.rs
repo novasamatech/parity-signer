@@ -22,7 +22,7 @@ pub(crate) fn decode_ext_attempt(
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for x in meta_v14.extrinsic.signed_extensions.iter() {
         ext.identifier = x.identifier.to_string();
-        let current_type = match meta_v14.types.resolve(x.ty.id()) {
+        let current_type = match meta_v14.types.resolve(x.ty.id) {
             Some(a) => a,
             None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
@@ -42,7 +42,7 @@ pub(crate) fn decode_ext_attempt(
     }
     for x in meta_v14.extrinsic.signed_extensions.iter() {
         ext.identifier = x.identifier.to_string();
-        let current_type = match meta_v14.types.resolve(x.additional_signed.id()) {
+        let current_type = match meta_v14.types.resolve(x.additional_signed.id) {
             Some(a) => a,
             None => return Err(Error::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
@@ -81,7 +81,7 @@ impl Ext {
         }
     }
     pub(crate) fn check_special(&mut self, current_type: &Type<PortableForm>) {
-        self.specialty = match current_type.path().ident() {
+        self.specialty = match current_type.path.ident() {
             Some(a) => match a.as_str() {
                 "Era" => SpecialExt::Era,
                 "CheckNonce" => SpecialExt::Nonce,

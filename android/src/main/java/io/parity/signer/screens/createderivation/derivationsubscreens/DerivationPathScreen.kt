@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.CloseIcon
 import io.parity.signer.components.base.PrimaryButtonGreyDisabled
+import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.createderivation.DerivationCreateViewModel
 import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
@@ -87,16 +88,19 @@ fun DerivationPathScreen(
 	}
 
 	Column(modifier = modifier) {
-		DerivationPathHeader(
+		ScreenHeaderWithButton(
+			title = stringResource(R.string.derivation_path_screen_title),
 			canProceed = canProceed,
 			onClose = onClose,
 			onDone = onDoneLocal,
 		)
+		Spacer(modifier = Modifier.padding(top = 16.dp))
 		OutlinedTextField(
 			value = path.value, //hide password, add hint
 			onValueChange = { newStr -> path.value = newStr },
 			keyboardOptions = KeyboardOptions(
-				imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+				imeAction = ImeAction.Done
 			),
 			visualTransformation = DerivationPathVisualTransformation(
 				context = LocalContext.current,
@@ -122,6 +126,7 @@ fun DerivationPathScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
+		Spacer(modifier = Modifier.padding(top = 8.dp))
 		val errorForPath = when (pathValidity) {
 			DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD -> null
 			DerivationCreateViewModel.DerivationPathValidity.WRONG_PATH -> stringResource(
@@ -222,19 +227,20 @@ fun DerivationPathScreen(
 				.padding(horizontal = 24.dp)
 				.padding(vertical = 8.dp)
 		)
+		Spacer(modifier = Modifier.padding(top = 8.dp))
 
 		if (hasPassword) {
 			Text(
 				text = stringResource(R.string.enter_password_title),
 				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleS,
-				modifier = Modifier.padding(horizontal = 24.dp)
+				style = SignerTypeface.BodyL,
+				modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
 			)
 			OutlinedTextField(
 				value = password.value,
 				onValueChange = { password.value = it },
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
+					.padding(horizontal = 24.dp, vertical = 8.dp)
 					.focusRequester(passwordFocusRequester)
 					.fillMaxWidth(1f),
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -341,61 +347,6 @@ private fun DerivationAlarm(modifier: Modifier = Modifier) {
 				.align(Alignment.CenterVertically)
 				.padding(start = 18.dp, end = 18.dp)
 		)
-	}
-}
-
-/**
- * io/parity/signer/screens/keysets/create/NewKeySetNameScreen.kt:107
- */
-@Composable
-private fun DerivationPathHeader(
-	canProceed: Boolean,
-	onClose: Callback,
-	onDone: Callback,
-) {
-	Box(
-		modifier = Modifier.padding(
-			start = 24.dp,
-			end = 8.dp,
-			top = 8.dp,
-			bottom = 8.dp
-		),
-		contentAlignment = Alignment.Center,
-	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.CenterStart,
-		) {
-			CloseIcon(
-				noBackground = true,
-				onCloseClicked = onClose,
-			)
-		}
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.Center,
-		) {
-			Text(
-				text = stringResource(R.string.derivation_path_screen_title),
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.TitleS,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth(1f)
-			)
-		}
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.CenterEnd,
-		) {
-			PrimaryButtonGreyDisabled(
-				label = stringResource(R.string.generic_done),
-				isEnabled = canProceed,
-			) {
-				if (canProceed) {
-					onDone()
-				}
-			}
-		}
 	}
 }
 

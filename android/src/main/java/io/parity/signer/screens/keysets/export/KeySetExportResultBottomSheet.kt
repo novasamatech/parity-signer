@@ -153,15 +153,11 @@ private fun KeySetItemInExport(seed: KeySetModel) {
 @Composable
 private fun PreviewKeySetExportResultBottomSheet() {
 	val keys = mutableSetOf(
-		KeySetModel(
-			"first seed name",
-			PreviewData.exampleIdenticonPng,
-			1.toUInt()
+		KeySetModel.createStub(
+			"first seed name", 1
 		),
-		KeySetModel(
-			"second seed name",
-			PreviewData.exampleIdenticonPng,
-			3.toUInt()
+		KeySetModel.createStub(
+			"second seed name", 3
 		),
 	)
 	SignerNewTheme {

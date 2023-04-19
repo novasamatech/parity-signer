@@ -9,17 +9,19 @@ anyhow = "1.0"
 ffi-support = "0.4"
 hex = "0.4.3"
 uniffi = { version = "0.22.0" }
+lazy_static = "1.4.0"
+sled = "0.34"
 
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
-db_handling = { path = "../db_handling", default-features = false, features = ["signer"] }
-definitions = { path = "../definitions", default-features = false, features = ["signer"] }
+db_handling = { path = "../db_handling", default-features = false }
+definitions = { path = "../definitions", default-features = false }
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
+transaction_parsing = { path = "../transaction_parsing" }
+parser = { path = "../parser" }
 qrcode_static = { path = "../qrcode_static" }
-lazy_static = "1.4.0"
-sled = "0.34"
 
 [target.'cfg(all(not(target_os = "android"), not(target_os = "ios")))'.dependencies]
 env_logger = "0.10"
@@ -28,7 +30,7 @@ env_logger = "0.10"
 oslog = "0.2"
 
 [target.'cfg(target_os = "android")'.dependencies]
-android_logger = "0.12"
+android_logger = "0.13"
 log = "0.4.17"
 
 [build-dependencies]

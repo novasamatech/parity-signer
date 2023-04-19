@@ -323,7 +323,7 @@ fn bulk_signing_test_unpassworded() {
         &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
     )
     .unwrap();
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
 
     tx_state.update_seeds(&seeds);
 
@@ -440,7 +440,7 @@ fn bulk_signing_test_passworded() {
 
     let payload = [&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat();
 
-    let mut tx_state = TransactionState::new(&db, &hex::encode(payload));
+    let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
     tx_state.update_seeds(&format!(
         "{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}\n{ALICE_SEED_PHRASE}"
     ));
@@ -3045,7 +3045,7 @@ fn flow_test_1() {
         concat!(
             "GoForward on RecoverSeedPhrase screen with ",
             "seed phrase (seed phrase vaidity was already checked ",
-            "elsewhere - currently in crate Signer). Expected updated ",
+            "elsewhere - currently in crate Vault). Expected updated ",
             "Keys screen with no modals, with known stable content since ",
             "this is Alice"
         )
@@ -4177,6 +4177,7 @@ fn flow_test_1() {
                             path: "//westend".to_string(),
                             secret_exposed: false,
                         },
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address_key:
@@ -4194,6 +4195,7 @@ fn flow_test_1() {
                             path: "".to_string(),
                             secret_exposed: false,
                         },
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4211,6 +4213,7 @@ fn flow_test_1() {
                         public_key:
                             "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address_key:
@@ -4228,6 +4231,7 @@ fn flow_test_1() {
                             path: "//Alice/secret//secret".to_string(),
                             secret_exposed: false,
                         },
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address_key:
@@ -4245,6 +4249,7 @@ fn flow_test_1() {
                             path: "//Alice".to_string(),
                             secret_exposed: false,
                         },
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4262,6 +4267,7 @@ fn flow_test_1() {
                         public_key:
                             "e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4279,6 +4285,7 @@ fn flow_test_1() {
                         public_key:
                             "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                 ],
             },
@@ -4332,6 +4339,7 @@ fn flow_test_1() {
                             .to_string(),
                 },
             },
+            network_logo: Some("westend".to_string()),
         },
     });
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
@@ -4502,6 +4510,7 @@ fn flow_test_1() {
                         public_key:
                             "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4519,6 +4528,7 @@ fn flow_test_1() {
                         public_key:
                             "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4536,6 +4546,7 @@ fn flow_test_1() {
                         public_key:
                             "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4553,6 +4564,7 @@ fn flow_test_1() {
                         public_key:
                             "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4570,6 +4582,7 @@ fn flow_test_1() {
                         public_key:
                             "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4587,6 +4600,7 @@ fn flow_test_1() {
                         public_key:
                             "e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                     MRawKey {
                         address: Address {
@@ -4604,6 +4618,7 @@ fn flow_test_1() {
                         public_key:
                             "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                                 .to_string(),
+                        network_logo: "westend".to_string(),
                     },
                 ],
             },
@@ -4632,6 +4647,7 @@ fn flow_test_1() {
                     name: "westend".to_string(),
                     version: 9150,
                 },
+                network_logo: Some("westend".to_string()),
             },
         }),
         alert_data: None,
@@ -4765,6 +4781,7 @@ fn flow_test_1() {
                     image: types_known().to_vec(),
                 },
             },
+            network_logo: Some("westend".to_string()),
         },
     });
     /*
@@ -6203,7 +6220,7 @@ fn flow_test_1() {
         concat!(
             "Switched to Settings from Log with non-initiated database. ",
             "Expected Settings screen with error on screen, and no alerts ",
-            "(we should still allow to reset Signer)"
+            "(we should still allow to reset Vault)"
         )
     );
 

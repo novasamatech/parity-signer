@@ -1,15 +1,15 @@
 //! Network metadata and related types
 //!
-//! The main purpose of the Signer is to generate signatures for transactions.
-//! Signer reads the transactions as QR codes with SCALE-encoded
+//! The main purpose of the Vault is to generate signatures for transactions.
+//! Vault reads the transactions as QR codes with SCALE-encoded
 //! information.
 //! Any transaction before user is able to sign it must be decoded.
 //!
-//! Transaction decoding uses network metadata, and Signer needs latest
+//! Transaction decoding uses network metadata, and Vault needs latest
 //! available network metadata to parse freshly generated transactions.  
 //!
-//! New network metadata could be added to Signer through scanning `load_metadata`
-//! QR code for the network metadata. Signer allows loading new metadata only if
+//! New network metadata could be added to Vault through scanning `load_metadata`
+//! QR code for the network metadata. Vault allows loading new metadata only if
 //! the network has network specs in the database and the incoming `load_metadata`
 //! payload is signed by the verifier already associated with the network.  
 //!
@@ -130,7 +130,7 @@ impl MetaValues {
     /// Gets [`MetaValues`] from raw metadata in `Vec<u8>` format
     ///
     /// Produces [`MetadataError`] if the metadata is somehow not suitable for
-    /// use in Signer.
+    /// use in Vault.
     pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self> {
         let meta_info = info_from_metadata(&runtime_metadata_from_slice(meta_slice)?)?;
         Ok(Self {
@@ -191,10 +191,10 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 /// Searches `System` pallet within the metadata, gets from it `Version` and
 /// optionally `SS58Prefix` constants.
 ///
-/// Produces [`MetaInfo`] if the metadata is suitable for the Signer, and
+/// Produces [`MetaInfo`] if the metadata is suitable for the Vault, and
 /// [`MetadataError`] if not.
 ///
-/// `RuntimeMetadata` suitable for use in Signer:  
+/// `RuntimeMetadata` suitable for use in Vault:
 ///
 /// - must be of runtime version `V12` or above
 /// - must have 'System' pallet  
@@ -309,7 +309,7 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
 /// Get [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// from slice of raw `Vec<u8>` metadata
 ///
-/// Raw `Vec<u8>` metadata suitable for use in Signer:  
+/// Raw `Vec<u8>` metadata suitable for use in Vault:
 ///
 /// - must begin with b"meta"  
 /// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version `V12` or above
@@ -329,10 +329,10 @@ pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata> {
 /// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
 /// and era are among signed extensions. Otherwise, a `ParserMetadataError` would occur on decoding.
 /// However, we can not simply forbid the loading of the metadata without required set of
-/// signed extensions into Signer.
+/// signed extensions into Vault.
 ///
 /// This function should be used for warnings only on `generate_message` side and during metadata
-/// loading into Signer.
+/// loading into Vault.
 fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
     let mut signed_extensions = HashMap::new();
     for x in metadata_v14.extrinsic.signed_extensions.iter() {
@@ -348,7 +348,6 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
 
 /// Metadata as checked [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// with network info extracted from it, for transaction decoding
-#[cfg(feature = "signer")]
 pub struct MetaSetElement {
     /// Network name, from metadata `Version` constant
     name: String,
@@ -369,15 +368,14 @@ pub struct MetaSetElement {
     runtime_metadata: RuntimeMetadata,
 }
 
-#[cfg(feature = "signer")]
 impl MetaSetElement {
-    /// Generates `MetaSetElement` from Signer database tree `METATREE` (key, value)
+    /// Generates `MetaSetElement` from Vault database tree `METATREE` (key, value)
     /// entry  
     ///
     /// Checks that name and version from [`MetaKey`] match the ones in metadata
     /// `Version` constant.  
     ///
-    /// Also checks that the metadata is suitable for use in Signer. Since the
+    /// Also checks that the metadata is suitable for use in Vault. Since the
     /// metadata already was accepted in the database at some point, errors here
     /// are very unlikely to happen and would indicate the database corruption
     pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self> {
@@ -536,7 +534,6 @@ impl MetaHistoryEntry {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
 mod tests {
     use super::*;
     use std::fs::read_to_string;

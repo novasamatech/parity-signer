@@ -715,14 +715,14 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_transaction_fetched(&self, details_str: &str) -> (Navstate, String) {
+    fn handle_transaction_fetched(&self, details_str: &str) -> Result<(Navstate, String)> {
         let errorline = String::new();
 
         let new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
-            TransactionState::new(&self.db, details_str),
+            TransactionState::new(&self.db, details_str)?,
         )));
 
-        (new_navstate, errorline)
+        Ok((new_navstate, errorline))
     }
 
     fn handle_remove_network(&self) -> (Navstate, String) {
@@ -1406,12 +1406,21 @@ impl State {
             Modal::SufficientCryptoReady((ref sufficient, ref content)) => {
                 match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, author_info)) = s.key_selected() {
+                        if let Some((_, address, author_info)) = s.key_selected() {
                             let content = content.clone();
+                            let network_logo = match address.network_id {
+                                Some(network_id) => Some(
+                                    db_handling::helpers::get_network_specs(&self.db, &network_id)?
+                                        .specs
+                                        .logo,
+                                ),
+                                None => None,
+                            };
                             let f = MSufficientCryptoReady {
                                 author_info,
                                 sufficient: sufficient.clone(),
                                 content,
+                                network_logo,
                             };
                             Some(ModalData::SufficientCryptoReady { f })
                         } else {
@@ -1480,7 +1489,7 @@ impl State {
             Action::BackupSeed => self.handle_backup_seed(details_str),
             Action::NetworkSelector => self.handle_network_selector(),
             Action::CheckPassword => self.handle_change_password(details_str),
-            Action::TransactionFetched => self.handle_transaction_fetched(details_str),
+            Action::TransactionFetched => self.handle_transaction_fetched(details_str)?,
             Action::RemoveNetwork => self.handle_remove_network(),
             Action::RemoveMetadata => self.handle_remove_metadata(),
             Action::RemoveTypes => self.handle_remove_types(),

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -30,8 +30,8 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun ScreenHeader(
 	title: String?,
-	onBack: (() -> Unit)? = null,
-	onMenu: (() -> Unit)? = null,
+	onBack: Callback? = null,
+	onMenu: Callback? = null,
 ) {
 	Row(
 		modifier = Modifier
@@ -40,7 +40,7 @@ fun ScreenHeader(
 	) {
 		if (onBack != null) {
 			Image(
-				imageVector = Icons.Filled.ChevronLeft,
+				imageVector = Icons.Filled.ArrowBackIos,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
@@ -51,7 +51,7 @@ fun ScreenHeader(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 		//center
 		if (title != null) {
@@ -81,7 +81,7 @@ fun ScreenHeader(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 	}
 }
@@ -90,8 +90,8 @@ fun ScreenHeader(
 fun ScreenHeaderClose(
 	title: String,
 	subtitle: String? = null,
-	onClose: () -> Unit,
-	onMenu: (() -> Unit)? = null,
+	onClose: Callback,
+	onMenu: Callback? = null,
 	differentMenuIcon: ImageVector? = null,
 ) {
 	Row(
@@ -147,17 +147,17 @@ fun ScreenHeaderClose(
 					.align(Alignment.CenterVertically)
 			)
 		} else {
-			Spacer(modifier = Modifier.padding(start = 44.dp))
+			Spacer(modifier = Modifier.padding(start = 56.dp))
 		}
 	}
 }
 
 
-//todo dmitry DerivationPathScreen.kt:350 migrate to this view when merged
 @Composable
 fun ScreenHeaderWithButton(
 	canProceed: Boolean,
 	title: String = "",
+	btnText: String? = null,
 	onClose: Callback,
 	onDone: Callback,
 ) {
@@ -196,7 +196,7 @@ fun ScreenHeaderWithButton(
 			contentAlignment = Alignment.CenterEnd,
 		) {
 			PrimaryButtonGreyDisabled(
-				label = stringResource(R.string.generic_done),
+				label = btnText ?: stringResource(R.string.generic_done),
 				isEnabled = canProceed,
 			) {
 				if (canProceed) {
@@ -254,8 +254,8 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
-			ScreenHeaderWithButton(true, "Derivation", {}, {})
-			ScreenHeaderWithButton(false, "Derivation", {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, {}, {})
+			ScreenHeaderWithButton(false, "Derivation", null, {}, {})
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},

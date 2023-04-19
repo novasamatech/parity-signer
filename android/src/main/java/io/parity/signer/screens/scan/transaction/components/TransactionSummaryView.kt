@@ -86,7 +86,10 @@ fun TransactionSummaryView(
 						.padding(end = 8.dp)
 				)
 			}
-			SignerDivider(modifier = Modifier.padding(vertical = 8.dp))
+			SignerDivider(
+				modifier = Modifier.padding(vertical = 8.dp),
+				sidePadding = 0.dp
+			)
 		}
 		model.keyModel?.let { keyModel ->
 			Column() {
@@ -96,7 +99,7 @@ fun TransactionSummaryView(
 					style = SignerTypeface.CaptionM,
 					modifier = Modifier.padding(bottom = 8.dp)
 				)
-				KeyCardSignature(model = keyModel)
+				KeyCardSignature(model = keyModel,)
 			}
 		}
 	}

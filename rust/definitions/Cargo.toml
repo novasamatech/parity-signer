@@ -8,11 +8,11 @@ edition = "2021"
 [dependencies]
 eth-blockies = "1.0.0"
 constants = { path = "../constants" }
-frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
+frame-metadata = {version = "15.1.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
-parity-scale-codec = {version = "3.3.0", features = ["derive"]}
-plot_icon = {version = "0.2.0", optional = true}
+parity-scale-codec = {version = "3.4.0", features = ["derive"]}
+plot_icon = "0.3.0"
 sc-executor-common = {git = "https://github.com/paritytech/substrate"}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
@@ -21,23 +21,14 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
-thiserror = "1.0.38"
-variant_count = {version = "1.1.0", optional = true}
+thiserror = "1.0.40"
 
 [features]
-default = ["test"]
+default = []
 active = [
 	"sc-executor-wasmi",
 	"sp-io",
 	"sp-wasm-interface",
-]
-signer = [
-	"plot_icon",
-]
-test = [
-	"active",
-	"signer",
-	"variant_count",
 ]
 
 [lib]

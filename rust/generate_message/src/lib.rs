@@ -1,26 +1,26 @@
 //! This crate is intended to support the
-//! [Signer](https://github.com/paritytech/parity-signer) from the active
+//! [Vault](https://github.com/paritytech/parity-signer) from the active
 //! (non air-gapped) side.
 //!
 //! This crate is mainly used to:
 //!
 //! - fetch network data through RPC calls
-//! - prepare Signer update and derivation import payloads
-//! - generate Signer update QR codes, either signed or unsigned, and
-//! derivations import QR codes, to be scanned into Signer
+//! - prepare Vault update and derivation import payloads
+//! - generate Vault update QR codes, either signed or unsigned, and
+//! derivations import QR codes, to be scanned into Vault
 //! - maintain the `hot` database on the network-connected device, to store and
 //! manage the data that went into update QR codes
-//! - maintain Signer default network metadata set in `defaults` crate and
-//! prepare the `cold` database for the Signer release
+//! - maintain Vault default network metadata set in `defaults` crate and
+//! prepare the `cold` database for the Vault release
 //!
-//! # Supported Signer updates
+//! # Supported Vault updates
 //!
-//! Crate `generate_message` can generate and the Signer can accept following
+//! Crate `generate_message` can generate and the Vault can accept following
 //! updates:
 //!
-//! - `add-specs`, to add a new network (i.e. the network specs) into the Signer
-//! - `load-metadata`, to load into the Signer the network metadata, for
-//! networks that already have corresponding network specs entry in the Signer
+//! - `add-specs`, to add a new network (i.e. the network specs) into the Vault
+//! - `load-metadata`, to load into the Vault the network metadata, for
+//! networks that already have corresponding network specs entry in the Vault
 //! database
 //! - `load-types`, to load types information (it is used to support the
 //! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
@@ -99,7 +99,7 @@
 //!
 //! Note that the update payloads are build in such a way that the length of
 //! the payload always could be easily found, thus allowing to separate update
-//! payload, signature and reserved tail in Signer when accepting the update.
+//! payload, signature and reserved tail in Vault when accepting the update.
 //! The tail is reserved to future-proof the updates if the multi-signing is
 //! ever implemented for them. Currently the tail is empty.
 //!
@@ -110,21 +110,21 @@
 //! 1. make update payload
 //! 2. (optional) make signature for update payload
 //! 3. make update QR code (optionally signed), that could be scanned into
-//! Signer
+//! Vault
 //!
 //! Steps (1) and (3) are done in `generate_message`, the signature is produced
 //! in other tools, except the test "signed" updates with Alice as a verifier,
 //! when the signature is produced while making QR code during step (3).
 //!
-//! Signature could be produced with Subkey or with Signer. For update signing
+//! Signature could be produced with Subkey or with Vault. For update signing
 //! it is recommended to use a dedicated key, not used for transactions. This
 //! way, if the signed data was not really the update data, but something else
 //! posing as the update data, the signature produced could not do any damage.
 //!
-//! If the Signer is used to produce the signature, it should be a dedicated
-//! Signer with no verifier or weak key verifier for the network: before the
+//! If the Vault is used to produce the signature, it should be a dedicated
+//! Vault with no verifier or weak key verifier for the network: before the
 //! signature is produced, an unsigned or easily signed update must be loaded
-//! into Signer.
+//! into Vault.
 //!
 //! # Available commands
 //!
@@ -156,7 +156,7 @@
 //! - network encryption
 //! - additional marker that the network is a default one, i.e. entry has not
 //! changed since the database generation
-//! - network title as it will be displayed in Signer, from
+//! - network title as it will be displayed in Vault, from
 //! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //!
 //! ## Show network specs for a network, as recorded in the hot database
@@ -284,7 +284,7 @@
 //! and `UNIT` unit set up.
 //!
 //! Title override could be used when processing an individual network, to set
-//! the title under which the network will be displayed in Signer, should the
+//! the title under which the network will be displayed in Vault, should the
 //! `add-specs` payload be accepted. Non-default networks, if the title override
 //! is not specified, have title `<network_name>-<network_encryption>`.
 //!
@@ -636,7 +636,7 @@
 //!
 //! Raw `[u8]` update payloads, as prepared by `add_specs`, `load_metadata` or
 //! `load_types` commands get transformed into update QR codes (to be scanned
-//! into the Signer) or textfiles with hexadecimal data (for tests).
+//! into the Vault) or textfiles with hexadecimal data (for tests).
 //!
 //! There are two commands for generating updates: `make` and `sign`.
 //!
@@ -654,7 +654,7 @@
 //!
 //! Command `sign` is used to generate signed updates with a valid
 //! [`SufficientCrypto`](definitions::crypto::SufficientCrypto) produced by
-//! Signer. Signer exports `SufficientCrypto` produced for one of its keys
+//! Vault. Vault exports `SufficientCrypto` produced for one of its keys
 //! as a static QR code, this QR code content goes into command line.
 //!
 //! Update QR and/or hexadecimal string file are produced in
@@ -748,11 +748,11 @@
 //!    - default, i.e. if goal is not provided, both QR code and text file are generated.
 //!
 //! - Key `-sufficient` followed by:
-//!    - `-hex` followed by hexadecimal string with contents of Signer-produced
+//!    - `-hex` followed by hexadecimal string with contents of Vault-produced
 //! `SufficientCrypto` QR code
 //!    - `-file` followed by file path in dedicated
 //! [`FOLDER`](constants::FOLDER) for raw bytes file with contents of
-//! Signer-produced `SufficientCrypto` QR code
+//! Vault-produced `SufficientCrypto` QR code
 //!
 //! - Key `-msg` followed by message type:
 //!    - `load-types`
@@ -766,15 +766,15 @@
 //! - Optional key `-name` followed by path override for export file in
 //! dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
 //!
-//! Generating `SufficientCrypto` in Signer is suggested mainly for update
+//! Generating `SufficientCrypto` in Vault is suggested mainly for update
 //! distribution purposes. A dedicated (i.e. used only for updates signing),
-//! kept physically safe Signer is strongly suggested, with a dedicated key
-//! for updates signing. As the Signer can accept only payloads with
+//! kept physically safe Vault is strongly suggested, with a dedicated key
+//! for updates signing. As the Vault can accept only payloads with
 //! verifier not weaker than the one used before, and the whole purpose of
 //! the process is to generate a signature for payload, it is expected that
-//! this isolated Signer will receive unsigned or weakly signed updates,
+//! this isolated Vault will receive unsigned or weakly signed updates,
 //! thoroughly check them and export `SufficientCrypto`, so that a signed
-//! update could be made for other, routinely used Signer devices.
+//! update could be made for other, routinely used Vault devices.
 //!
 //! ### Examples: generate `load_metadata` QR code for westend metadata version 9200.
 //!
@@ -802,7 +802,7 @@
 //!
 //! #### `make` for test verifier Alice
 //!
-//! Payloads signed by Alice are used for testing in Signer. The signature
+//! Payloads signed by Alice are used for testing in Vault. The signature
 //! in this case is generated automatically and is not supplied in command
 //! line.
 //!
@@ -834,7 +834,7 @@
 //!
 //! Here `<hex_sufficient>` is hex-encoded data from
 //! [`SufficientCrypto`](definitions::crypto::SufficientCrypto) QR code produced
-//! by the Signer.
+//! by the Vault.
 //!
 //! `$ cargo run sign --goal qr --sufficient-hex <hex_sufficient> --msg
 //! load-metadata --payload sign_me_load_metadata_westendV9200`
@@ -915,8 +915,8 @@
 //! [`SETTREE`](constants::SETTREE)
 //!
 //! Note that the general verifier is not specified and history is not
-//! started. This will be done only in Signer itself. Before initialization,
-//! the cold release database could not be used by Signer.
+//! started. This will be done only in Vault itself. Before initialization,
+//! the cold release database could not be used by Vault.
 //!
 //! ## Transfer metadata from hot database to cold release database
 //!

@@ -7,6 +7,7 @@ on:
       - master
       - stable
 jobs:
+  #this it tests jobs, called build as it's required name for PR
   build:
     name: Build
     runs-on:            ubuntu-22.04
@@ -17,7 +18,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.3.0
+        uses:           actions/checkout@v3.5.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -54,7 +55,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
+        uses:           Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
         with:
           workspaces:   rust -> rust/target
 
@@ -72,7 +73,7 @@ jobs:
         run:            |
           ./gradlew :android:testDebugUnitTest
 
-  debug:
+  makeapk:
     name: Build unsigned APKs
     runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
@@ -83,7 +84,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.3.0
+        uses:           actions/checkout@v3.5.2
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -121,7 +122,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0
+        uses:           Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
         with:
           workspaces:   rust -> rust/target
 
@@ -135,7 +136,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name:           Assemble GPlay unsigned apk
+      - name:           Assemble unsigned debug apk
         run:            |
           ./gradlew clean assembleDebug --stacktrace
 

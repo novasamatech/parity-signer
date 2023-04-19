@@ -3,6 +3,12 @@ interface ErrorDisplayed {
     Str(string s);
     MutexPoisoned();
     DbNotInitialized();
+    LoadMetaUnknownNetwork(string name);
+    SpecsKnown(string name, Encryption encryption);
+    MetadataKnown(string name, u32 version);
+    MetadataOutdated(string name, u32 have, u32 want);
+    UnknownNetwork(H256 genesis_hash, Encryption encryption);
+    NoMetadata(string name);
 };
 
 [Error]
@@ -481,6 +487,7 @@ dictionary MRawKey {
     Address address;
     string address_key;
     string public_key;
+    string network_logo;
 };
 
 dictionary MSignSufficientCrypto {
@@ -610,6 +617,18 @@ namespace signer {
     sequence<MMNetwork> get_all_networks();
 
     void init_logging(string tag);
+
+    [Throws=ErrorDisplayed]
+    MLog get_logs();
+
+    [Throws=ErrorDisplayed]
+    MLogDetails get_log_details(u32 order);
+
+    [Throws=ErrorDisplayed]
+    void clear_log_history();
+
+    [Throws=ErrorDisplayed]
+    void handle_log_comment([ByRef] string user_input);
 };
 
 dictionary MKeysNew {
@@ -644,6 +663,7 @@ dictionary MSufficientCryptoReady {
     MAddressCard author_info;
     sequence<u8> sufficient;
     MSCContent content;
+    string? network_logo;
 };
 
 dictionary MBackup {

@@ -97,12 +97,11 @@ private fun CameraBottomText() {
 			.fillMaxSize(1f)
 			.padding(horizontal = 48.dp),
 	) {
-		val paddingTop = ScanConstants.CLIP_TOP_PADDING +
-			//square clip height
-			LocalConfiguration.current.screenWidthDp.dp - ScanConstants.CLIP_SIDE_PADDING.times(
-			2
-		)
-		Spacer(modifier = Modifier.padding(top = paddingTop))
+		val paddingTillEndOfCutout =
+			(LocalConfiguration.current.screenHeightDp.dp / 2).plus(
+				(LocalConfiguration.current.screenWidthDp.dp / 2) - ScanConstants.CLIP_SIDE_PADDING * 2
+			)
+		Spacer(modifier = Modifier.padding(top = paddingTillEndOfCutout))
 		Spacer(modifier = Modifier.weight(0.5f))
 		Text(
 			text = stringResource(R.string.camera_screen_header_single),
@@ -138,7 +137,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 
 		//camera content itself!
 		CameraViewInternal(viewModel)
-		TransparentClipLayout()
+		TransparentCutoutLayout()
 
 	} else if (cameraPermissionState.status.shouldShowRationale
 		&& !rationalShown.value
@@ -210,6 +209,9 @@ private fun PreviewScanScreen() {
 @Composable
 private fun PreviewBottomText() {
 	SignerNewTheme {
-		CameraBottomText()
+		Box() {
+			TransparentCutoutLayout()
+			CameraBottomText()
+		}
 	}
 }

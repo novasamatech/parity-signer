@@ -1,6 +1,6 @@
 # QR reader crate for PC
 
-QR reader crate for PC is a utility to capture (via webcam) QR codes from Signer mobile app
+QR reader crate for PC is a utility to capture (via webcam) QR codes from Vault mobile app
 and extracting data from it.  
 It prints a string with decoded QR message in HEX format on display (and to file "decoded_output.txt").
 

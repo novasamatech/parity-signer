@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.sharedcomponents.KeyCard
-import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
@@ -95,14 +94,7 @@ fun KeyDetailsPublicKeyScreen(
 							modifier = Modifier.size(264.dp)
 						)
 					}
-					if (model.isRootKey) {
-						KeySeedCard(
-							seedTitle = model.address.cardBase.seedName,
-							base58 = model.address.cardBase.base58
-						)
-					} else {
-						KeyCard(model.address)
-					}
+					KeyCard(model.address)
 				}
 				if (model.secretExposed) {
 					ExposedKeyAlarm()

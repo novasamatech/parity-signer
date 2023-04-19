@@ -26,11 +26,15 @@ fun PrimaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
+	activeBackground: Color = MaterialTheme.colors.pink500,
 	onClicked: Callback,
 ) {
 	PrimaryButton(
-		label, modifier.fillMaxWidth(1f),
-		isEnabled, onClicked
+		label = label,
+		modifier = modifier.fillMaxWidth(1f),
+		isEnabled = isEnabled,
+		activeBackground = activeBackground,
+		onClicked = onClicked
 	)
 }
 
@@ -39,6 +43,7 @@ fun PrimaryButton(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
+	activeBackground: Color = MaterialTheme.colors.pink500,
 	onClicked: Callback
 ) {
 	Box(
@@ -51,7 +56,7 @@ fun PrimaryButton(
 				}
 			}
 			.background(
-				if (isEnabled) MaterialTheme.colors.pink500 else MaterialTheme.colors.primaryButtonDisabledBackground,
+				if (isEnabled) activeBackground else MaterialTheme.colors.primaryButtonDisabledBackground,
 				RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius))
 			),
 		contentAlignment = Alignment.Center,
@@ -117,10 +122,15 @@ fun SecondaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	withBackground: Boolean = false,
+	textColor: Color = MaterialTheme.colors.textSecondary,
 	onClicked: Callback,
 ) {
 	SecondaryButton(
-		label, modifier.fillMaxWidth(), withBackground, onClicked,
+		label = label,
+		modifier = modifier.fillMaxWidth(),
+		withBackground = withBackground,
+		textColor = textColor,
+		onClicked = onClicked,
 	)
 }
 
@@ -129,6 +139,7 @@ private fun SecondaryButton(
 	label: String,
 	modifier: Modifier = Modifier,
 	withBackground: Boolean = false,
+	textColor: Color = MaterialTheme.colors.textSecondary,
 	onClicked: Callback,
 ) {
 	Column(
@@ -149,7 +160,7 @@ private fun SecondaryButton(
 	) {
 		Text(
 			text = label,
-			color = MaterialTheme.colors.textSecondary,
+			color = textColor,
 			style = SignerTypeface.TitleS,
 			maxLines = 1,
 		)
@@ -163,6 +174,7 @@ fun RowButtonsBottomSheet(
 	modifier: Modifier = Modifier,
 	onClickedCancel: Callback,
 	onClickedCta: Callback,
+	isCtaDangerous: Boolean = false,
 	isCtaEnabled: Boolean = true,
 ) {
 	Row(modifier = modifier) {
@@ -175,6 +187,8 @@ fun RowButtonsBottomSheet(
 		Spacer(modifier = Modifier.padding(end = 8.dp))
 		PrimaryButton(
 			label = labelCta, modifier = Modifier.weight(1f),
+			activeBackground = if (isCtaDangerous) MaterialTheme.colors.red400
+			else MaterialTheme.colors.pink500,
 			onClicked = onClickedCta, isEnabled = isCtaEnabled
 		)
 	}

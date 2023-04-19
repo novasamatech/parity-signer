@@ -91,7 +91,8 @@ fun EnterPassword(
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 				keyboardOptions = KeyboardOptions(
 					keyboardType = KeyboardType.Password,
-					imeAction = if (canProceed) ImeAction.Done else ImeAction.None
+//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
 					onDone = {
@@ -202,7 +203,7 @@ data class EnterPasswordModel(
 }
 
 fun MEnterPassword.toEnterPasswordModel(withShowError: Boolean = false) = EnterPasswordModel(
-	keyCard = KeyCardModelBase.fromAddress(authorInfo),
+	keyCard = KeyCardModelBase.fromAddress(authorInfo, networkInfo?.networkLogo),
 	showError = withShowError,
 	attempt = counter.toInt(),
 )

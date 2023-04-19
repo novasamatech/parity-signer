@@ -6,28 +6,28 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
-definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+db_handling = {path = "../db_handling", default-features = false }
+definitions = {path = "../definitions", default-features = false }
 hex = "0.4.3"
 lazy_static = "1.4.0"
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.38"
+thiserror = "1.0.40"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
-zeroize = { version = "1.5.7", features = ["std"] }
+zeroize = { version = "1.6.0", features = ["std"] }
 qrcode_rtx = { path = "../qrcode_rtx" }
-parity-scale-codec = "3.3.0"
+parity-scale-codec = "3.4.0"
 sled = "0.34"
 log = "0.4"
 
 [dev-dependencies]
 pretty_assertions = "1"
-tempfile = "3.3"
-regex = { version = "1.7.1" }
+tempfile = "3.5"
+regex = { version = "1.7.3" }
 
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
-constants = { path = "../constants", features = ["test"] }
+constants = { path = "../constants" }
 parser = { path = "../parser", default-features = false }
 db_handling = {path = "../db_handling"}
 

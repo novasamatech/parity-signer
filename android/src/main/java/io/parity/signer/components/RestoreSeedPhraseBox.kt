@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
@@ -98,4 +99,5 @@ fun RestoreSeedPhraseBox(
 		}
 		onDispose { focusManager.clearFocus() }
 	}
+	DisableScreenshots()
 }

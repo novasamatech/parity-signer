@@ -378,6 +378,7 @@ pub struct MRawKey {
     pub address: Address,
     pub address_key: String,
     pub public_key: String,
+    pub network_logo: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -458,6 +459,7 @@ pub struct MSufficientCryptoReady {
     pub author_info: MAddressCard,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
+    pub network_logo: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -677,7 +679,7 @@ pub struct MSCNetworkInfo {
 impl From<OrderedNetworkSpecs> for MSCNetworkInfo {
     fn from(o: OrderedNetworkSpecs) -> Self {
         MSCNetworkInfo {
-            network_title: o.specs.title,
+            network_title: o.specs.name,
             network_logo: o.specs.logo,
             network_specs_key: hex::encode(
                 NetworkSpecsKey::from_parts(&o.specs.genesis_hash, &o.specs.encryption).key(),

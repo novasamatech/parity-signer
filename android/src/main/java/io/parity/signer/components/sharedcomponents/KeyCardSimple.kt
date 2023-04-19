@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.abbreviateString
@@ -44,28 +45,7 @@ fun KeyCardPassword(
 
 		//left
 		Column(Modifier.weight(1f)) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					model.path,
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.CaptionM,
-				)
-				if (model.hasPassword) {
-					Text(
-						" •••• ",
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.CaptionM,
-					)
-					Icon(
-						Icons.Outlined.Lock,
-						contentDescription = stringResource(R.string.description_locked_icon),
-						tint = MaterialTheme.colors.textSecondary,
-						modifier = Modifier.size(14.dp)
-					)
-				}
-			}
+			KeyPath(path = model.path, hasPassword = model.hasPassword)
 
 			Spacer(Modifier.padding(top = 4.dp))
 
@@ -88,7 +68,11 @@ fun KeyCardPassword(
 		}
 
 		//right()
-		IdentIcon(model.identIcon, 36.dp)
+		if (model.networkLogo != null) {
+			IdentIconWithNetwork(model.identIcon, networkLogoName = model.networkLogo, 36.dp)
+		} else {
+			IdentIcon(model.identIcon, 36.dp)
+		}
 	}
 }
 
@@ -106,28 +90,7 @@ fun KeyCardSignature(
 
 		//left
 		Column(Modifier.weight(1f)) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Text(
-					model.path,
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.CaptionM,
-				)
-				if (model.hasPassword) {
-					Text(
-						" •••• ",
-						color = MaterialTheme.colors.textSecondary,
-						style = SignerTypeface.CaptionM,
-					)
-					Icon(
-						Icons.Outlined.Lock,
-						contentDescription = stringResource(R.string.description_locked_icon),
-						tint = MaterialTheme.colors.textSecondary,
-						modifier = Modifier.size(14.dp)
-					)
-				}
-			}
+			KeyPath(path = model.path, hasPassword = model.hasPassword)
 
 			Spacer(Modifier.padding(top = 4.dp))
 
@@ -143,7 +106,11 @@ fun KeyCardSignature(
 		}
 
 		//right()
-		IdentIcon(model.identIcon, 36.dp)
+		if (model.networkLogo != null) {
+			IdentIconWithNetwork(model.identIcon, networkLogoName = model.networkLogo, 36.dp)
+		} else {
+			IdentIcon(model.identIcon, 36.dp)
+		}
 	}
 }
 
@@ -165,6 +132,12 @@ private fun PreviewKeyCardPassword() {
 			KeyCardPassword(model = KeyCardModelBase.createStub())
 			SignerDivider()
 			KeyCardSignature(model = KeyCardModelBase.createStub())
+			KeyCardPassword(model = KeyCardModelBase.createStub().copy(
+				path = "//kusama//some//very_long_path//somesomesome//somemoremore-path", hasPassword = true,))
+			SignerDivider()
+			KeyCardSignature(model = KeyCardModelBase.createStub().copy(
+				path = "//kusama//some//very_long_path//somesomesome//somemoremore-path", hasPassword = true,
+			))
 		}
 	}
 }

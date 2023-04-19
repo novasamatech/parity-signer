@@ -17,7 +17,7 @@
 
 # Introduction
 
-Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
+Polkadot Vault is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
 You can create accounts in Substrate-based networks, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
 
@@ -25,7 +25,7 @@ You must turn off or even physically remove the smartphone's Wifi, Mobile Networ
 
 ☝️ **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](https://paritytech.github.io/parity-signer/about/Security-And-Privacy.html) for more details.**
 
-Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
+Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
 **Available for both iOS and Android.**
 
@@ -33,7 +33,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # Links
 
-- [Official Website](https://parity.io/signer)
+- [Official Website](https://signer.parity.io/)
 - [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
 - [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
 - [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
@@ -53,7 +53,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # How to use
 
-Please read our documentation before using Signer for the first time or before upgrading. It covers the main use-cases such as installing on a new phone, creating keys, upgrading and adding new networks:
+Please read our documentation before using Vault for the first time or before upgrading. It covers the main use-cases such as installing on a new phone, creating keys, upgrading and adding new networks:
 
 👉 https://paritytech.github.io/parity-signer/index.html
 
@@ -61,7 +61,7 @@ To contribute into the documentation use [docs](docs) folder
 
 # Project Structure
 
-Signer is a native app for iOS and Android. Native UI's are written on Swift and Kotlin and built on top of a universal Rust core library, which implements all the logic. Here's a rough folder structure of the project.
+Vault is a native app for iOS and Android. Native UI's are written on Swift and Kotlin and built on top of a universal Rust core library, which implements all the logic. Here's a rough folder structure of the project.
 
 - `android` - Android project. Builds by Android Studio automatically
 - `docker` - files for CI on gitlab
@@ -72,25 +72,25 @@ Signer is a native app for iOS and Android. Native UI's are written on Swift and
 
 Since most of the application logic is concentrated in the `rust` folder, it makes sense to review it separately.
 
-There are 3 actual endpoints in `rust` folder: `signer`, which is source of library used for Signer itself; `generate_message`, which is used to update Signer repo with new built-in network information and to generate over-the-airgap updates; and `qr_reader_pc` which is a minimalistic app to parse qr codes that we had to write since there was no reasonably working alternative.
+There are 3 actual endpoints in `rust` folder: `signer`, which is source of library used for Vault itself; `generate_message`, which is used to update Vault repo with new built-in network information and to generate over-the-airgap updates; and `qr_reader_pc` which is a minimalistic app to parse qr codes that we had to write since there was no reasonably working alternative.
 
 Sub-folders of the `rust` folder:
 
 - `constants` — constant values defined for the whole workspace.
-- 🔥 `db_handling` — all database-related operations for Signer and `generate_message` tool. Most of the business logic is contained here.
+- 🔥 `db_handling` — all database-related operations for Vault and `generate_message` tool. Most of the business logic is contained here.
 - `defaults` — built-in and test data for database
 - `definitions` — objects used across the workspace are defined here
 - `files` — contains test files and is used for build and update generation processes. Most contents are gitignored.
 - `generate_message` — tool to generate over-the-airgap updates and maintain network info database on hot side
-- 🔥 `navigator` — navigation for Signer app; it is realized in rust to unify app behavior across the platforms
+- 🔥 `navigator` — navigation for Vault app; it is realized in rust to unify app behavior across the platforms
 - `parser` - parses signable transactions. This is internal logic for `transaction_parsing` that is used when signable transaction is identified, but it could be used as a standalone lib for the same purpose.
 - `printing_balance` — small lib to render tokens with proper units
-- `qr_reader_pc` — small standalone PC app to parse QR codes in Signer ecosystem. Also is capable of parsing multiframe payloads (theoretically, in practice it is not feasible due to PC webcam low performance)
-- `qr_reader_phone` — logic to parse QR payloads in Signer
+- `qr_reader_pc` — small standalone PC app to parse QR codes in Vault ecosystem. Also is capable of parsing multiframe payloads (theoretically, in practice it is not feasible due to PC webcam low performance)
+- `qr_reader_phone` — logic to parse QR payloads in Vault
 - `qrcode_rtx` — multiframe erasure-encoded payload generator for signer update QR animation.
 - `qrcode_static` — generation of static qr codes used all over the workspace
 - 🔥 `signer` — FFI interface crate to generate bindings that bridge native code and rust backend
-- `transaction_parsing` — high-level parser for all QR payloads sent into Signer
+- `transaction_parsing` — high-level parser for all QR payloads sent into Vault
 - `transaction_signing` — all operations that could be performed when user accepts payload parsed with transaction_parsing
 
 > 🔥 — this emoji means an important folder for the application logic
@@ -132,12 +132,12 @@ sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
 sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
 ```
 
-**6.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
-- `NativeSigner` - used for deployments and running production-ready app on your devices
-- `NativeSigner-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
+**6.** Open the `PolkadotVault.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
+- `PolkadotVault` - used for deployments and running production-ready app on your devices
+- `PolkadotVault-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
 To run project, select one of the schemes and click `Run` (Cmd+R)
 
-**Note:** If you are using `NativeSigner` scheme, the first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac, hence use of `NativeSigner-Dev` is recommended for both simulator and device development.
+**Note:** If you are using `PolkadotVault` scheme, the first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac, hence use of `PolkadotVault-Dev` is recommended for both simulator and device development.
 
 However, we strongly recommend that you use a real device for development, as some important parts (e.g. camera) may not work in the simulator.
 
@@ -167,6 +167,13 @@ Enable "Show package details" checkmark to select specific version.
 `rust.pythonCommand=python3`
 
 **10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
+
+# Release Android
+
+- Create PR with new app version updated and tag v* (example "v6.1.3")
+- After merging to master - run release-android.yml flow. It will build and sign apk and upload it to internal track in play store
+- Create github release with apk from release flow
+- Go to play store, promote internal track to production and update changes in play store
 
 # Tests
 
@@ -198,4 +205,4 @@ Our contribution guidelines are still in development. Until then, you're welcome
 
 # License
 
-Parity-Signer is [GPL 3.0 licensed](LICENSE).
+Polkadot-Vault is [GPL 3.0 licensed](LICENSE).

@@ -45,17 +45,13 @@ fun KeySetsExportScreenFull(
 				onClose = onClose,
 				onExportSelected = {
 					scope.launch {
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						modalBottomSheetState.show()
 					}
 				},
 				onExportAll = {
 					scope.launch {
 						selected.value = model.keys.toSet()
-						modalBottomSheetState.animateTo(
-							ModalBottomSheetValue.Expanded
-						)
+						modalBottomSheetState.show()
 					}
 				},
 			)

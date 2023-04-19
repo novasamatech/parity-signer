@@ -41,7 +41,8 @@ data class SigningTransactionModel(
 					seedName = "Parity Keys",
 					base58 = "1219xC79CXV31543DDXoQMjuA",
 					identIcon = PreviewData.exampleIdenticonPng,
-					hasPassword = true
+					hasPassword = true,
+					networkLogo = "kusama"
 				)
 			)
 	}
@@ -100,9 +101,10 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 		),
 		keyModel = value.authorInfo?.let { author ->
 			KeyCardModelBase(
-				path = author.address.toDisplayablePathString(),
+				path = author.address.path,
 				seedName = author.address.seedName,
 				base58 = author.base58,
+				networkLogo = value.networkInfo?.networkLogo,
 				identIcon = author.address.identicon.toImageContent(),//.svgPayload, on iOS
 				hasPassword = author.address.hasPwd
 			)
@@ -110,9 +112,6 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 	)
 }
 
-fun Address.toDisplayablePathString(): String {
-	return if (hasPwd) "$path •••• " else path
-}
 
 data class TransactionSummaryModel(
 	val pallet: String,

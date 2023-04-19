@@ -5,24 +5,20 @@
 //! Each tree gets updated with its own [`Batch`], updates occur within a single
 //! transaction.
 //!
-//! For transactions scanned into Signer, currently a temporary database entry
+//! For transactions scanned into Vault, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
 
 // TODO this is a temporary solution, the data eventually could be stored in
 // `navigator` state.
-#[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
 use sled::{transaction::TransactionResult, Batch, Transactional};
-#[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use constants::{ADDRESS_BOOK, META_HISTORY, SPECSTREEPREP};
 use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
-#[cfg(feature = "signer")]
 use constants::{GENERALVERIFIER, SIGN, STUB, TYPES};
 
-#[cfg(feature = "signer")]
 use definitions::{
     history::{
         Event, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay,
@@ -38,10 +34,8 @@ use definitions::{
 };
 
 use crate::helpers::open_tree;
-#[cfg(feature = "signer")]
 use crate::Error;
 use crate::Result;
-#[cfg(feature = "signer")]
 use crate::{
     helpers::{make_batch_clear_tree, verify_checksum},
     manage_history::events_to_batch,
@@ -51,11 +45,11 @@ use crate::{
 /// applied to each [`Tree`](sled::Tree).
 ///
 /// Cold database tree names and content information could be found in
-/// [`constants`] crate. All trees are routinely updated as Signer is used.
+/// [`constants`] crate. All trees are routinely updated as Vault is used.
 ///
 /// [`TrDbCold`] is applied to the cold database in an atomic transaction.
 ///
-/// [`TrDbCold`] is used both by the Signer side (for all database-related
+/// [`TrDbCold`] is used both by the Vault side (for all database-related
 /// actions) and the active side (to generate and populate the cold database).
 ///
 /// Note that all the checking is done as the [`TrDbCold`] is generated,
@@ -350,7 +344,6 @@ impl Default for TrDbHot {
 /// When applying [`BatchStub`], i.e. transforming it into [`Batch`], the
 /// removals are always applied before additions, to avoid accidental replacing
 /// of just added value.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 struct BatchStub {
     /// Vector of keys to be removed from the database.
@@ -360,7 +353,6 @@ struct BatchStub {
     additions: Vec<(Vec<u8>, Vec<u8>)>,
 }
 
-#[cfg(feature = "signer")]
 impl BatchStub {
     /// Generate empty [`BatchStub`].
     fn empty() -> Self {
@@ -401,7 +393,7 @@ impl BatchStub {
     }
 }
 
-/// Draft for cold database atomic transaction, constructed for Signer update
+/// Draft for cold database atomic transaction, constructed for Vault update
 /// transaction (`add_specs`, `load_metadata`, `load_types`).
 ///
 /// [`TrDbColdStub`] is stored SCALE-encoded in [`TRANSACTION`] tree
@@ -424,7 +416,6 @@ impl BatchStub {
 /// Note that all the checking is done before the [`TrDbColdStub`] is written
 /// into [`TRANSACTION`] tree, `apply` method will check only that the checksum
 /// known to the user is the same as the one database has currently.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdStub {
     /// `BatchStub` to be transformed into `Batch` for [`ADDRTREE`] tree.
@@ -448,7 +439,6 @@ pub struct TrDbColdStub {
     verifiers_stub: BatchStub,
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdStub {
     /// Construct new empty [`TrDbColdStub`].
     pub fn new() -> Self {
@@ -544,7 +534,7 @@ impl TrDbColdStub {
     /// - Transform received in `add_specs` payload [`NetworkSpecs`]
     /// into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
     /// in the end of the network list, with order set to the total number of
-    /// network specs entries currently in Signer. When a network is removed,
+    /// network specs entries currently in Vault. When a network is removed,
     /// the order of the remaining networks gets rearranged, see details in
     /// function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
@@ -611,7 +601,7 @@ impl TrDbColdStub {
     /// Verifiers remain unchanged during the hold processing.
     ///
     /// The addresses are not removed and will be again visible from the user
-    /// interface when the properly verified network specs are loaded in Signer.
+    /// interface when the properly verified network specs are loaded in Vault.
     pub fn remove_network_specs(
         mut self,
         network_specs: &OrderedNetworkSpecs,
@@ -733,7 +723,6 @@ impl TrDbColdStub {
     }
 }
 
-#[cfg(feature = "signer")]
 impl Default for TrDbColdStub {
     /// Default value for [`TrDbColdStub`]. Empty.
     fn default() -> Self {
@@ -743,12 +732,12 @@ impl Default for TrDbColdStub {
 
 /// Temporary storage for signable transaction and associated data.
 ///
-/// Signable transaction received by the Signer must always be parsed prior to
+/// Signable transaction received by the Vault must always be parsed prior to
 /// signing, and when it is, [`TrDbColdSign`] is generated and the transaction
 /// details are shown to user.
 ///
 /// If the user signs the transaction or tries to sign and enters wrong
-/// password, the transaction data will be recorded in Signer history log.
+/// password, the transaction data will be recorded in Vault history log.
 ///
 /// While the user considers the transaction, [`TrDbColdSign`] is stored
 /// SCALE-encoded in [`TRANSACTION`] tree of the cold database under the key
@@ -762,14 +751,12 @@ impl Default for TrDbColdStub {
 /// corresponding [`MultiSigner`] value
 /// - relevant history [`Event`] set: warnings that were shown during the
 /// parsing
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
     /// Bulk of transactions to sign.
     pub signing_bulk: Vec<TrDbColdSignOne>,
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdSign {
     /// Recover [`TrDbColdSign`] from storage in the cold database.
     ///
@@ -820,7 +807,7 @@ impl TrDbColdSign {
     /// interface
     /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
     /// the cases when the user has entered the wrong password and no signature
-    /// was generated. Signer current policy is to log all wrong password entry
+    /// was generated. Vault current policy is to log all wrong password entry
     /// attempts.
     ///
     /// Required input:
@@ -888,7 +875,6 @@ impl TrDbColdSign {
     }
 }
 
-#[cfg(feature = "signer")]
 impl From<TrDbColdSignOne> for TrDbColdSign {
     fn from(t: TrDbColdSignOne) -> Self {
         Self {
@@ -897,7 +883,6 @@ impl From<TrDbColdSignOne> for TrDbColdSign {
     }
 }
 
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSignOne {
     /// data to sign
@@ -922,7 +907,7 @@ pub struct TrDbColdSignOne {
 
 /// Signable transaction content
 ///
-/// Signer can sign:
+/// Vault can sign:
 /// - transactions
 /// - messages
 ///
@@ -931,7 +916,6 @@ pub struct TrDbColdSignOne {
 /// extensions.
 ///
 /// Messages contain SCALE-encoded text messages.
-#[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode, Clone)]
 pub enum SignContent {
     /// `53xx00` or `53xx02` transaction
@@ -947,7 +931,6 @@ pub enum SignContent {
     Message(String),
 }
 
-#[cfg(feature = "signer")]
 impl TrDbColdSignOne {
     /// Construct [`TrDbColdSign`] from components.
     ///
