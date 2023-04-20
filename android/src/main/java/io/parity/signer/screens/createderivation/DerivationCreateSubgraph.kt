@@ -62,7 +62,8 @@ fun DerivationCreateSubgraph(
 				},
 				onPathClicked = { navController.navigate(DerivationCreateSubgraph.path) },
 				onCreateClicked = {
-					subNavController.navigate(HomeDerivationSheetsSubGraph.confirmation)
+					//todo dmitry
+					navController.navigate(DerivationCreateSubgraph.path)
 				},
 				modifier = Modifier.statusBarsPadding()
 			)
@@ -103,23 +104,6 @@ fun DerivationCreateSubgraph(
 						)
 					}
 				}
-				composable(HomeDerivationSheetsSubGraph.confirmation) {
-					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						DerivationCreateConfirmBottomSheet(
-							path = path.value,
-							onCancel = closeAction,
-							onDone = {
-								deriveViewModel.viewModelScope.launch {
-									deriveViewModel.proceedCreateKey(
-										context
-									)
-									closeAction()
-									rootNavigator.backAction()
-								}
-							},
-						)
-					}
-				}
 			}
 		}
 
@@ -155,6 +139,22 @@ fun DerivationCreateSubgraph(
 						)
 					}
 				}
+				composable(PathDerivationSheetsSubGraph.confirmation) {
+					BottomSheetWrapperRoot(onClosedAction = closeAction) {
+						DerivationCreateConfirmBottomSheet(
+							path = path.value,
+							onDone = {
+								deriveViewModel.viewModelScope.launch {
+									deriveViewModel.proceedCreateKey(
+										context
+									)
+									closeAction()
+									rootNavigator.backAction()
+								}
+							},
+						)
+					}
+				}
 			}
 		}
 	}
@@ -172,10 +172,10 @@ private object HomeDerivationSheetsSubGraph {
 		"derivation_creation_basic_sheets_derivationMenuHelp"
 	const val derivationPathHelp =
 		"derivation_creation_basic_sheets_derivationPathHelp"
-	const val confirmation = "derivation_creation_confirmation"
 }
 
 private object PathDerivationSheetsSubGraph {
 	const val empty = "derivation_creation_path_sheets_empty"
 	const val help = "derivation_creation_path_sheets_help"
+	const val confirmation = "derivation_creation_confirmation"
 }

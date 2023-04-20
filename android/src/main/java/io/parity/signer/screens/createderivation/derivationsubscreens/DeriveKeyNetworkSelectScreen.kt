@@ -30,9 +30,8 @@ import io.parity.signer.screens.createderivation.DerivationPathAnalyzer
 import io.parity.signer.screens.createderivation.INITIAL_DERIVATION_PATH
 import io.parity.signer.ui.theme.*
 
-//TODO DMITRY REMOVE THIS SCREEN
 @Composable
-fun DeriveKeyBaseScreen(
+fun DeriveKeyNetworkSelectScreen(
 	selectedNetwork: NetworkModel,
 	path: String,
 	isPathValid: Boolean,
@@ -47,10 +46,8 @@ fun DeriveKeyBaseScreen(
 
 	Column(modifier = modifier) {
 		ScreenHeaderClose(
-			title = stringResource(R.string.derivation_screen_title),
+			title = stringResource(R.string.derivation_network_select_title),
 			onClose = onClose,
-			onMenu = onDerivationMenuHelpClicked,
-			differentMenuIcon = Icons.Filled.HelpOutline
 		)
 
 		Text(
@@ -163,7 +160,7 @@ private fun ChevronRight() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewDeriveKeyBaseScreen() {
+private fun PreviewDeriveKeyNetworkSelectScreen() {
 	SignerNewTheme {
 		DeriveKeyBaseScreen(
 			selectedNetwork = NetworkModel.createStub(),

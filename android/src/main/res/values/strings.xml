@@ -365,6 +365,7 @@
 	<string name="verifier_certificate_remove_cta">Remove Certificate</string>
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
+	<string name="derivation_network_select_title">Select Network</string>
 
 </resources>
 

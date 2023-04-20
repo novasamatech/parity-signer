@@ -4,7 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -16,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.CheckboxWithText
-import io.parity.signer.components.base.RowButtonsBottomSheet
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
@@ -24,7 +27,6 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun DerivationCreateConfirmBottomSheet(
 	path: String,
-	onCancel: Callback,
 	onDone: Callback,
 ) {
 	var checkboxConfirmed by remember { mutableStateOf(false) }
@@ -76,12 +78,10 @@ fun DerivationCreateConfirmBottomSheet(
 		) { newValue ->
 			checkboxConfirmed = newValue
 		}
-		RowButtonsBottomSheet(
-			labelCancel = stringResource(id = R.string.generic_back),
-			labelCta = stringResource(id = R.string.generic_done),
-			onClickedCancel = onCancel,
-			onClickedCta = onDone,
-			isCtaEnabled = checkboxConfirmed,
+		PrimaryButtonWide(
+			label = stringResource(id = R.string.generic_done),
+			isEnabled = checkboxConfirmed,
+			onClicked = onDone,
 		)
 	}
 }
