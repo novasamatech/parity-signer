@@ -140,6 +140,11 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 }
 
+sealed class SelectedNetwork {
+	class Network(val networkModel: NetworkModel): SelectedNetwork()
+	object AllNetworks: SelectedNetwork()
+}
+
 internal const val INITIAL_DERIVATION_PATH = "//"
 private const val TAG = "DerivationCreateViewModel"
 

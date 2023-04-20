@@ -98,6 +98,6 @@ fun DerivationCreateConfirmBottomSheet(
 @Composable
 private fun PreviewDerivationCreateConfirmBottomSheet() {
 	SignerNewTheme {
-		DerivationCreateConfirmBottomSheet("//polkadot//1///pass", {}, {})
+		DerivationCreateConfirmBottomSheet("//polkadot//1///pass", {})
 	}
 }
