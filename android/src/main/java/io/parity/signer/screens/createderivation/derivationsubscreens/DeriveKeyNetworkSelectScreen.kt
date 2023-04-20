@@ -5,18 +5,22 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -94,6 +98,7 @@ private fun NetworkItem(
 				.padding(end = 16.dp)
 				.size(28.dp)
 		)
+		NetworkAlarm(Modifier)//todo dmitry clickable and ask if we remove helper
 	}
 }
 
@@ -124,14 +129,53 @@ private fun AllNetworksItem(
 }
 
 @Composable
-private fun ChevronRight() {
-	Image(
-		imageVector = Icons.Filled.ChevronRight,
-		contentDescription = null,
-		colorFilter = ColorFilter.tint(MaterialTheme.colors.textDisabled),
-		modifier = Modifier.size(28.dp)
-	)
+private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change content
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	Row(
+		modifier = modifier
+			.padding(vertical = 8.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
+
+	) {
+
+		val derivationAlarmText = buildAnnotatedString {
+			val str =
+				stringResource(R.string.derivation_path_screen_help_tile_message)
+			val boldStr =
+				stringResource(R.string.derivation_path_screen_help_tile_message_highlited_part)
+			val startIndex = str.indexOf(boldStr)
+			val endIndex = startIndex + boldStr.length
+			append(str)
+			addStyle(
+				style = SpanStyle(color = MaterialTheme.colors.pink300),
+				start = startIndex,
+				end = endIndex
+			)
+		}
+		Text(
+			text = derivationAlarmText,
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+			modifier = Modifier
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+		)
+		Icon(
+			imageVector = Icons.Outlined.HelpOutline,
+			contentDescription = null,
+			tint = MaterialTheme.colors.pink300,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
+		)
+	}
 }
+
+
 
 
 @Preview(
