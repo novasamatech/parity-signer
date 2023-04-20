@@ -119,6 +119,7 @@ fun KeyDetailsPublicKeyScreen(
 						)
 					}
 				}
+				//todo dmitry fininsh
 				Column(
 					modifier = Modifier
 						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
@@ -130,7 +131,7 @@ fun KeyDetailsPublicKeyScreen(
 						modifier = Modifier.padding(vertical = 8.dp)
 					) {
 						Text(
-							text = "Network",//todo dmitry fiinsh and export
+							text = stringResource(R.string.key_details_public_label_network),
 							style = SignerTypeface.BodyL,
 							color = MaterialTheme.colors.textTertiary
 						)
@@ -141,87 +142,39 @@ fun KeyDetailsPublicKeyScreen(
 						)
 					}
 					SignerDivider(sidePadding = 0.dp)
-					TCNameValueOppositeElement(
-						name = "Derivation Path",
-						value = model.address.cardBase.path,
-						valueInSameLine = true,
-					)
-					SignerDivider(sidePadding = 0.dp)
-					TCNameValueOppositeElement(
-						name = "Key Set Name",
-						value = model.address.cardBase.seedName,
-						valueInSameLine = true,
-					)
-				}
-				if (model.secretExposed) {
-					ExposedKeyAlarm()
-				}
-			}
-		}
-	}
-}
-
-@Composable
-fun KeyDetailsPublicKeyScreenold(
-	//todo dmitry remove old
-	model: KeyDetailsModel,
-	rootNavigator: Navigator,
-) {
-	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeaderClose(
-			stringResource(id = R.string.key_details_public_export_title),
-			if (model.isRootKey) {
-				null
-			} else {
-				stringResource(id = R.string.key_details_public_export_derived_subtitle)
-			},
-			onClose = { rootNavigator.backAction() },
-			onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
-		)
-		Box(modifier = Modifier.weight(1f)) {
-			Column(
-				modifier = Modifier.verticalScroll(rememberScrollState())
-			) {
-				val plateShape =
-					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-				Column(
-					modifier = Modifier
-						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp)
-						.clip(plateShape)
-						.border(
-							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-							plateShape
-						)
-						.background(MaterialTheme.colors.fill6, plateShape)
-				) {
-					Box(
-						modifier = Modifier
-							.fillMaxWidth(1f)
-							.aspectRatio(1.1f)
-							.background(
-								Color.White,
-								plateShape
-							),
-						contentAlignment = Alignment.Center,
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						modifier = Modifier.padding(vertical = 8.dp)
 					) {
-
-						val isPreview = LocalInspectionMode.current
-						val qrImage = remember {
-							if (isPreview) {
-								PreviewData.exampleQRImage
-							} else {
-								runBlocking { encodeToQr(model.qrData, false) }
-							}
-						}
-
-						Image(
-							bitmap = qrImage.intoImageBitmap(),
-							contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-							contentScale = ContentScale.Fit,
-							modifier = Modifier.size(264.dp)
+						Text(
+							text = stringResource(R.string.key_details_public_label_path),
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.textTertiary
+						)
+						Spacer(modifier = Modifier.weight(1f))
+						Text(
+							text = model.address.cardBase.path,
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.primary
 						)
 					}
-					KeyCard(model.address)
+					SignerDivider(sidePadding = 0.dp)
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						modifier = Modifier.padding(vertical = 8.dp)
+					) {
+						Text(
+							text = stringResource(R.string.key_details_public_label_keyset),
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.textTertiary
+						)
+						Spacer(modifier = Modifier.weight(1f))
+						Text(
+							text = model.address.cardBase.seedName,
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.primary
+						)
+					}
 				}
 				if (model.secretExposed) {
 					ExposedKeyAlarm()
@@ -230,6 +183,7 @@ fun KeyDetailsPublicKeyScreenold(
 		}
 	}
 }
+
 
 @Composable
 private fun ExposedKeyAlarm() {
