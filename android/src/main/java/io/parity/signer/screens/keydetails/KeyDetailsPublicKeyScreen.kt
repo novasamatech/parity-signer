@@ -119,36 +119,40 @@ fun KeyDetailsPublicKeyScreen(
 						)
 					}
 				}
-					Spacer(modifier = Modifier.padding(top = 16.dp))
-					Column(//todo dmitry see above add paddings
-						Modifier.background(MaterialTheme.colors.fill6, plateShape)
+				Column(
+					modifier = Modifier
+						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+						.background(MaterialTheme.colors.fill6, plateShape)
+						.padding(horizontal = 16.dp)
+				) {
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						modifier = Modifier.padding(vertical = 8.dp)
 					) {
-						Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-							Text(
-								text = "Network",//todo dmitry fiinsh and export
-								style = SignerTypeface.BodyL,
-								color = MaterialTheme.colors.textTertiary
-							)
-							Spacer(modifier = Modifier.weight(1f))
-							NetworkLabelWithIcon(
-								model.networkInfo.networkTitle,
-								model.networkInfo.networkLogo,
-							)
-						}
-						SignerDivider(sidePadding = 0.dp)
-						TCNameValueOppositeElement(
-							name = "Derivation Path",
-							value = model.address.cardBase.path,
-							valueInSameLine = true,
+						Text(
+							text = "Network",//todo dmitry fiinsh and export
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.textTertiary
 						)
-						SignerDivider(sidePadding = 0.dp)
-						TCNameValueOppositeElement(
-							name = "Key Set Name",
-							value = model.address.cardBase.seedName,
-							valueInSameLine = true,
+						Spacer(modifier = Modifier.weight(1f))
+						NetworkLabelWithIcon(
+							model.networkInfo.networkTitle,
+							model.networkInfo.networkLogo,
 						)
 					}
-
+					SignerDivider(sidePadding = 0.dp)
+					TCNameValueOppositeElement(
+						name = "Derivation Path",
+						value = model.address.cardBase.path,
+						valueInSameLine = true,
+					)
+					SignerDivider(sidePadding = 0.dp)
+					TCNameValueOppositeElement(
+						name = "Key Set Name",
+						value = model.address.cardBase.seedName,
+						valueInSameLine = true,
+					)
+				}
 				if (model.secretExposed) {
 					ExposedKeyAlarm()
 				}
