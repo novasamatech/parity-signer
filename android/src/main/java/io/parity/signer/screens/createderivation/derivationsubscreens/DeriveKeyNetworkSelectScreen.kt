@@ -3,15 +3,12 @@ package io.parity.signer.screens.createderivation.derivationsubscreens
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,6 +57,8 @@ fun DeriveKeyNetworkSelectScreen(
 			}
 			AllNetworksItem() {}//todo dmitry
 		}
+		NetworkAlarm()  //todo dmitry pass clicker
+		Spacer(modifier = Modifier.weight(1f))
 	}
 }
 
@@ -98,7 +97,6 @@ private fun NetworkItem(
 				.padding(end = 16.dp)
 				.size(28.dp)
 		)
-		NetworkAlarm(Modifier)//todo dmitry clickable and ask if we remove helper
 	}
 }
 
@@ -107,15 +105,19 @@ private fun AllNetworksItem(
 	onClick: (SelectedNetwork) -> Unit,//todo dmitry
 ) {
 	Row(
-		modifier = Modifier.clickable { onClick(SelectedNetwork.AllNetworks) },
+		modifier = Modifier
+			.height(70.dp)
+			.clickable { onClick(SelectedNetwork.AllNetworks) },
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			text = "Allow use on any network", //todo dmitry
+			text = stringResource(R.string.derive_key_network_all),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
+			modifier = Modifier
+				.padding(horizontal = 16.dp)
+				.weight(1f)
 		)
-		Spacer(modifier = Modifier.weight(1f))
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
 			contentDescription = null,
@@ -174,8 +176,6 @@ private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change co
 		)
 	}
 }
-
-
 
 
 @Preview(
