@@ -26,13 +26,11 @@ import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.NetworkLabelWithIcon
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.sharedcomponents.KeyCard
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.KeyDetailsModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.intoImageBitmap
-import io.parity.signer.screens.scan.transaction.transactionElements.TCNameValueOppositeElement
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -119,7 +117,6 @@ fun KeyDetailsPublicKeyScreen(
 						)
 					}
 				}
-				//todo dmitry fininsh
 				Column(
 					modifier = Modifier
 						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
@@ -127,8 +124,10 @@ fun KeyDetailsPublicKeyScreen(
 						.padding(horizontal = 16.dp)
 				) {
 					Row(
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
-						modifier = Modifier.padding(vertical = 8.dp)
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.defaultMinSize(minHeight = 48.dp)
+							.padding(vertical = 8.dp)
 					) {
 						Text(
 							text = stringResource(R.string.key_details_public_label_network),
@@ -141,10 +140,12 @@ fun KeyDetailsPublicKeyScreen(
 							model.networkInfo.networkLogo,
 						)
 					}
-					SignerDivider(sidePadding = 0.dp)
+					SignerDivider()
 					Row(
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
-						modifier = Modifier.padding(vertical = 8.dp)
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.defaultMinSize(minHeight = 48.dp)
+							.padding(vertical = 8.dp)
 					) {
 						Text(
 							text = stringResource(R.string.key_details_public_label_path),
@@ -158,10 +159,12 @@ fun KeyDetailsPublicKeyScreen(
 							color = MaterialTheme.colors.primary
 						)
 					}
-					SignerDivider(sidePadding = 0.dp)
+					SignerDivider()
 					Row(
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
-						modifier = Modifier.padding(vertical = 8.dp)
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.defaultMinSize(minHeight = 48.dp)
+							.padding(vertical = 8.dp)
 					) {
 						Text(
 							text = stringResource(R.string.key_details_public_label_keyset),
