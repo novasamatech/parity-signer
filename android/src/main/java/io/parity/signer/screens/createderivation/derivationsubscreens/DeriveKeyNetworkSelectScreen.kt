@@ -33,7 +33,7 @@ import io.parity.signer.ui.theme.*
 fun DeriveKeyNetworkSelectScreen(
 	networks: List<NetworkModel>,
 	onClose: Callback,
-	onNetworkSelectClicked: (SelectedNetwork) -> Unit,
+	onNetworkSelect: (SelectedNetwork) -> Unit,
 	onDerivationPathHelpClicked: Callback,
 	onDerivationMenuHelpClicked: Callback,
 	modifier: Modifier = Modifier
@@ -52,10 +52,14 @@ fun DeriveKeyNetworkSelectScreen(
 				)
 		) {
 			networks.forEach { network ->
-				NetworkItem(network) {}//todo dmitry callback
+				NetworkItem(network) { network ->
+					onNetworkSelect(SelectedNetwork.Network(network))
+				}
 				SignerDivider()
 			}
-			AllNetworksItem() {}//todo dmitry
+			AllNetworksItem() {
+				onNetworkSelect(SelectedNetwork.AllNetworks)
+			}
 		}
 		NetworkAlarm()  //todo dmitry pass clicker
 		Spacer(modifier = Modifier.weight(1f))
@@ -74,13 +78,13 @@ private fun NetworkItem(
 		NetworkIcon(
 			networkLogoName = network.logo,
 			modifier = Modifier
-				.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
-				.size(36.dp),
+                .padding(
+                    top = 16.dp,
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 12.dp
+                )
+                .size(36.dp),
 		)
 		Text(
 			text = network.title,
@@ -93,21 +97,21 @@ private fun NetworkItem(
 			contentDescription = null,
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 			modifier = Modifier
-				.padding(2.dp)// because it's 28 not 32pd
-				.padding(end = 16.dp)
-				.size(28.dp)
+                .padding(2.dp)// because it's 28 not 32pd
+                .padding(end = 16.dp)
+                .size(28.dp)
 		)
 	}
 }
 
 @Composable
 private fun AllNetworksItem(
-	onClick: (SelectedNetwork) -> Unit,//todo dmitry
+	onClick: (SelectedNetwork) -> Unit,
 ) {
 	Row(
 		modifier = Modifier
-			.height(70.dp)
-			.clickable { onClick(SelectedNetwork.AllNetworks) },
+            .height(70.dp)
+            .clickable { onClick(SelectedNetwork.AllNetworks) },
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
@@ -115,17 +119,17 @@ private fun AllNetworksItem(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-				.padding(horizontal = 16.dp)
-				.weight(1f)
+                .padding(horizontal = 16.dp)
+                .weight(1f)
 		)
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
 			contentDescription = null,
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 			modifier = Modifier
-				.padding(2.dp)// because it's 28 not 32pd
-				.padding(end = 16.dp)
-				.size(28.dp)
+                .padding(2.dp)// because it's 28 not 32pd
+                .padding(end = 16.dp)
+                .size(28.dp)
 		)
 	}
 }
@@ -136,11 +140,11 @@ private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change co
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = modifier
-			.padding(vertical = 8.dp)
-			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-				innerShape
-			)
+            .padding(vertical = 8.dp)
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+                innerShape
+            )
 
 	) {
 
@@ -163,16 +167,16 @@ private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change co
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
-				.weight(1f)
-				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                .weight(1f)
+                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.HelpOutline,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-				.align(Alignment.CenterVertically)
-				.padding(start = 18.dp, end = 18.dp)
+                .align(Alignment.CenterVertically)
+                .padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
@@ -210,7 +214,7 @@ private fun PreviewDeriveKeyNetworkSelectScreen() {
 		DeriveKeyNetworkSelectScreen(
 			networks = networks,
 			onClose = {},
-			onNetworkSelectClicked = {},
+			onNetworkSelect = {},
 			onDerivationPathHelpClicked = {},
 			onDerivationMenuHelpClicked = {},
 		)

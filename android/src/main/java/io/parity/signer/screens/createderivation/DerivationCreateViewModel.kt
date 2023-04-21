@@ -37,9 +37,9 @@ class DerivationCreateViewModel : ViewModel() {
 		MutableStateFlow(INITIAL_DERIVATION_PATH)
 	val path: StateFlow<String> = _path.asStateFlow()
 
-	private val _selectedNetwork: MutableStateFlow<NetworkModel> =
-		MutableStateFlow(allNetworks.first())
-	val selectedNetwork: StateFlow<NetworkModel> = _selectedNetwork.asStateFlow()
+	private val _selectedNetwork: MutableStateFlow<SelectedNetwork> =
+		MutableStateFlow(SelectedNetwork.Network(allNetworks.first()))
+	val selectedNetwork: StateFlow<SelectedNetwork> = _selectedNetwork.asStateFlow()
 
 	fun updatePath(newPath: String) {
 		_path.value = newPath
@@ -63,7 +63,7 @@ class DerivationCreateViewModel : ViewModel() {
 		return uniffiInteractor.getAllNetworks().mapError()
 	}
 
-	fun updateSelectedNetwork(newNetwork: NetworkModel) {
+	fun updateSelectedNetwork(newNetwork: SelectedNetwork) {
 		_selectedNetwork.value = newNetwork
 	}
 

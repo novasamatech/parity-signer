@@ -13,10 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
-import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationPathScreen
-import io.parity.signer.screens.createderivation.derivationsubscreens.DeriveKeyBaseScreen
-import io.parity.signer.screens.createderivation.derivationsubscreens.NetworkSelectionBottomSheet
+import io.parity.signer.screens.createderivation.derivationsubscreens.*
 import io.parity.signer.screens.createderivation.help.DerivationKeysHelpBottomSheet
 import io.parity.signer.screens.createderivation.help.DerivationMethodsHelpBottomSheet
 import io.parity.signer.screens.createderivation.help.DerivationPathHelpBottomSheet
@@ -43,27 +40,21 @@ fun DerivationCreateSubgraph(
 	) {
 		composable(DerivationCreateSubgraph.home) {
 			val subNavController = rememberNavController()
-			DeriveKeyBaseScreen(
-				path = path.value,
-				isPathValid = deriveViewModel.checkPath(path.value) == DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD,
-				selectedNetwork = selectedNetwork.value,
+			DeriveKeyNetworkSelectScreen(
+				networks = deriveViewModel.allNetworks,
 				onClose = {
 					deriveViewModel.resetState()
 					rootNavigator.backAction()
 				},
-				onNetworkSelectClicked = {
-					subNavController.navigate(HomeDerivationSheetsSubGraph.networks)
+				onNetworkSelect = { newNetwork ->
+					deriveViewModel.updateSelectedNetwork(newNetwork)
+					navController.navigate(DerivationCreateSubgraph.path)
 				},
 				onDerivationMenuHelpClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationMenuHelp)
 				},
 				onDerivationPathHelpClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationPathHelp)
-				},
-				onPathClicked = { navController.navigate(DerivationCreateSubgraph.path) },
-				onCreateClicked = {
-					//todo dmitry
-					navController.navigate(DerivationCreateSubgraph.path)
 				},
 				modifier = Modifier.statusBarsPadding()
 			)
@@ -77,19 +68,6 @@ fun DerivationCreateSubgraph(
 					subNavController.popBackStack()
 				}
 				composable(HomeDerivationSheetsSubGraph.empty) {}
-				composable(HomeDerivationSheetsSubGraph.networks) {
-					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						NetworkSelectionBottomSheet(
-							networks = deriveViewModel.allNetworks,
-							currentlySelectedNetwork = selectedNetwork.value,
-							onClose = closeAction,
-							onSelect = { newNetwork ->
-								deriveViewModel.updateSelectedNetwork(newNetwork)
-								closeAction()
-							},
-						)
-					}
-				}
 				composable(HomeDerivationSheetsSubGraph.derivationMenuHelp) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
 						DerivationKeysHelpBottomSheet(
@@ -167,7 +145,6 @@ private object DerivationCreateSubgraph {
 
 private object HomeDerivationSheetsSubGraph {
 	const val empty = "derivation_creation_basic_sheets_empty"
-	const val networks = "derivation_creation_basic_sheets_networks"
 	const val derivationMenuHelp =
 		"derivation_creation_basic_sheets_derivationMenuHelp"
 	const val derivationPathHelp =

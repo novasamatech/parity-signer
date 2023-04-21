@@ -26,7 +26,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink300
 
-//todo dmitry remote it and strings
+//todo dmitry remove it and strings
 @Composable
 fun NetworkSelectionBottomSheet(
 	networks: List<NetworkModel>,
