@@ -31,7 +31,6 @@ fun DerivationCreateSubgraph(
 	deriveViewModel.setInitValues(seedName, rootNavigator)
 	val context = LocalContext.current
 	val path = deriveViewModel.path.collectAsState()
-	val selectedNetwork = deriveViewModel.selectedNetwork.collectAsState()
 
 	val navController = rememberNavController()
 	NavHost(
@@ -86,17 +85,17 @@ fun DerivationCreateSubgraph(
 		}
 
 		composable(DerivationCreateSubgraph.path) {
-			val subNavController = rememberNavController()
+			val menuNavController = rememberNavController()
 
 			DerivationPathScreen(
 				initialPath = path.value,
 				onDerivationHelp = {
-					subNavController.navigate(PathDerivationSheetsSubGraph.help)
+					menuNavController.navigate(PathDerivationSheetsSubGraph.help)
 				},
 				onClose = { navController.popBackStack() },
 				onDone = { newPath ->
 					deriveViewModel.updatePath(newPath)
-					navController.popBackStack()
+					menuNavController.navigate(PathDerivationSheetsSubGraph.confirmation)
 				},
 				validator = deriveViewModel::checkPath,
 				modifier = Modifier
@@ -105,10 +104,10 @@ fun DerivationCreateSubgraph(
 			)
 			//bottom sheets
 			NavHost(
-				navController = subNavController,
+				navController = menuNavController,
 				startDestination = PathDerivationSheetsSubGraph.empty,
 			) {
-				val closeAction: Callback = { subNavController.popBackStack() }
+				val closeAction: Callback = { menuNavController.popBackStack() }
 				composable(PathDerivationSheetsSubGraph.empty) {}
 				composable(PathDerivationSheetsSubGraph.help) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
