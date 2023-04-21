@@ -60,6 +60,11 @@ fun KeyDetailsPublicKeyScreen(
 			Column(
 				modifier = Modifier.verticalScroll(rememberScrollState())
 			) {
+
+				if (model.secretExposed) {
+					ExposedKeyAlarm()
+				}
+
 				val plateShape =
 					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 				Column(
@@ -117,9 +122,6 @@ fun KeyDetailsPublicKeyScreen(
 					}
 				}
 				BottomKeyPlate(plateShape, model)
-				if (model.secretExposed) {
-					ExposedKeyAlarm()
-				}
 			}
 		}
 	}
@@ -203,10 +205,10 @@ private fun ExposedKeyAlarm() {
 		modifier = Modifier
 			.padding(vertical = 8.dp, horizontal = 24.dp)
 			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				BorderStroke(1.dp, MaterialTheme.colors.fill12),
 				innerShape
 			)
-			.background(MaterialTheme.colors.fill6, innerShape)
+			.background(MaterialTheme.colors.red500fill12, innerShape)
 
 	) {
 		Text(
