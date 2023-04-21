@@ -64,7 +64,7 @@ fun KeyDetailsPublicKeyScreen(
 					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 				Column(
 					modifier = Modifier
-						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp)
+						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -107,82 +107,89 @@ fun KeyDetailsPublicKeyScreen(
 							base58 = model.address.cardBase.base58,
 							modifier = Modifier
 								.weight(1f)
-								.padding(end = 24.dp)
 						)
 						IdentIconWithNetwork(
 							identicon = model.address.cardBase.identIcon,
 							networkLogoName = model.address.network,
 							size = 36.dp,
-							modifier = Modifier.padding(start = 24.dp)
+							modifier = Modifier.padding(start = 8.dp)
 						)
 					}
 				}
-				Column(
-					modifier = Modifier
-						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
-						.background(MaterialTheme.colors.fill6, plateShape)
-						.padding(horizontal = 16.dp)
-				) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.defaultMinSize(minHeight = 48.dp)
-							.padding(vertical = 8.dp)
-					) {
-						Text(
-							text = stringResource(R.string.key_details_public_label_network),
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.textTertiary
-						)
-						Spacer(modifier = Modifier.weight(1f))
-						NetworkLabelWithIcon(
-							model.networkInfo.networkTitle,
-							model.networkInfo.networkLogo,
-						)
-					}
-					SignerDivider()
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.defaultMinSize(minHeight = 48.dp)
-							.padding(vertical = 8.dp)
-					) {
-						Text(
-							text = stringResource(R.string.key_details_public_label_path),
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.textTertiary
-						)
-						Spacer(modifier = Modifier.weight(1f))
-						Text(
-							text = model.address.cardBase.path,
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.primary
-						)
-					}
-					SignerDivider()
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.defaultMinSize(minHeight = 48.dp)
-							.padding(vertical = 8.dp)
-					) {
-						Text(
-							text = stringResource(R.string.key_details_public_label_keyset),
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.textTertiary
-						)
-						Spacer(modifier = Modifier.weight(1f))
-						Text(
-							text = model.address.cardBase.seedName,
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.primary
-						)
-					}
-				}
+				BottomKeyPlate(plateShape, model)
 				if (model.secretExposed) {
 					ExposedKeyAlarm()
 				}
 			}
+		}
+	}
+}
+
+@Composable
+private fun BottomKeyPlate(
+	plateShape: RoundedCornerShape,
+	model: KeyDetailsModel
+) {
+	Column(
+		modifier = Modifier
+			.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+			.background(MaterialTheme.colors.fill6, plateShape)
+			.padding(horizontal = 16.dp)
+	) {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_network),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			NetworkLabelWithIcon(
+				model.networkInfo.networkTitle,
+				model.networkInfo.networkLogo,
+			)
+		}
+		SignerDivider(sidePadding = 0.dp)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_path),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			Text(
+				text = model.address.cardBase.path,
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.primary
+			)
+		}
+		SignerDivider(sidePadding = 0.dp)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_keyset),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			Text(
+				text = model.address.cardBase.seedName,
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.primary
+			)
 		}
 	}
 }
