@@ -12,32 +12,49 @@ struct KeyDetailsPublicKeyViewModel: Equatable {
     let footer: QRCodeAddressFooterViewModel
     let isKeyExposed: Bool
     let isRootKey: Bool
+    let networkTitle: String
+    let networkLogo: String
+    let keySetName: String
+    let path: String
+    let hasPassword: Bool
 
     init(_ keyDetails: MKeyDetails) {
         qrCodes = [keyDetails.qr.payload]
         footer = .init(
             identicon: keyDetails.address.identicon,
-            rootKeyName: keyDetails.address.seedName,
-            path: keyDetails.address.path,
-            hasPassword: keyDetails.address.hasPwd,
-            network: keyDetails.networkInfo.networkTitle,
+
             networkLogo: keyDetails.networkInfo.networkLogo,
             base58: keyDetails.base58
         )
         isKeyExposed = keyDetails.address.secretExposed
         isRootKey = keyDetails.isRootKey
+        networkTitle = keyDetails.networkInfo.networkTitle
+        networkLogo = keyDetails.networkInfo.networkLogo
+        keySetName = keyDetails.address.seedName
+        path = keyDetails.address.path
+        hasPassword = keyDetails.address.hasPwd
     }
 
     init(
         qrCodes: [[UInt8]],
         footer: QRCodeAddressFooterViewModel,
         isKeyExposed: Bool,
-        isRootKey: Bool
+        isRootKey: Bool,
+        networkTitle: String,
+        networkLogo: String,
+        keySetName: String,
+        path: String,
+        hasPassword: Bool
     ) {
         self.qrCodes = qrCodes
         self.footer = footer
         self.isKeyExposed = isKeyExposed
         self.isRootKey = isRootKey
+        self.networkTitle = networkTitle
+        self.networkLogo = networkLogo
+        self.keySetName = keySetName
+        self.path = path
+        self.hasPassword = hasPassword
     }
 }
 
@@ -63,7 +80,22 @@ struct KeyDetailsPublicKeyView: View {
                     )
                 )
                 ScrollView {
-                    VStack {
+                    VStack(spacing: Spacing.medium) {
+                        // Exposed key alert
+                        if viewModel.renderable.isKeyExposed {
+                            HStack(alignment: .center, spacing: 0) {
+                                Localizable.KeyScreen.Label.hotkey.text
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .font(PrimaryFont.labelXS.font)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                Spacer().frame(maxWidth: Spacing.small)
+                                Asset.exclamationRed.swiftUIImage
+                                    .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            }
+                            .padding(Spacing.medium)
+                            .strokeContainerBackground(CornerRadius.small, state: .error)
+                        }
+                        // QR Code container
                         VStack(spacing: 0) {
                             AnimatedQRCodeView(
                                 viewModel: Binding<AnimatedQRCodeViewModel>.constant(
@@ -79,23 +111,12 @@ struct KeyDetailsPublicKeyView: View {
                             )
                         }
                         .strokeContainerBackground()
-                        // Exposed key alert
-                        if viewModel.renderable.isKeyExposed {
-                            HStack {
-                                Localizable.KeyScreen.Label.hotkey.text
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Spacer().frame(maxWidth: Spacing.medium)
-                                Asset.exclamationRed.swiftUIImage
-                            }
-                            .padding()
-                            .foregroundColor(Asset.accentRed300.swiftUIColor)
-                            .font(PrimaryFont.bodyM.font)
-                            .strokeContainerBackground(CornerRadius.small, state: .error)
-                        }
+                        // Key data
+                        keyDetails()
+                            .padding(.bottom, Spacing.extraExtraLarge)
                     }
                     .padding([.leading, .trailing], Spacing.large)
-                    .padding([.top, .bottom], Spacing.flexibleComponentSpacer)
-                    Spacer()
+                    .padding(.top, Spacing.extraSmall)
                 }
             }
             .frame(
@@ -173,6 +194,69 @@ struct KeyDetailsPublicKeyView: View {
             )
             .clearModalBackground()
         }
+    }
+}
+
+private extension KeyDetailsPublicKeyView {
+    @ViewBuilder
+    func keyDetails() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                Localizable.PublicKeyDetails.Label.network.text
+                    .frame(height: Spacing.large, alignment: .center)
+                    .padding(.vertical, Spacing.small)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Spacer()
+                NetworkIconCapsuleView(
+                    networkLogo: viewModel.renderable.networkLogo,
+                    networkTitle: viewModel.renderable.networkTitle
+                )
+            }
+            Divider()
+            rowWrapper(
+                Localizable.PublicKeyDetails.Label.derivation.string,
+                fullPath
+            )
+            rowWrapper(
+                Localizable.PublicKeyDetails.Label.keySetName.string,
+                Text(viewModel.renderable.keySetName),
+                isLast: true
+            )
+        }
+        .font(PrimaryFont.bodyL.font)
+        .padding(.horizontal, Spacing.medium)
+        .containerBackground()
+    }
+
+    @ViewBuilder
+    func rowWrapper(
+        _ key: String,
+        _ value: some View,
+        isLast: Bool = false
+    ) -> some View {
+        HStack(spacing: Spacing.medium) {
+            Text(key)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .frame(height: Spacing.large, alignment: .center)
+            Spacer()
+            value
+                .frame(idealWidth: .infinity, alignment: .trailing)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+        }
+        .padding(.vertical, Spacing.small)
+        if !isLast {
+            Divider()
+        }
+    }
+
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
+    /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    var fullPath: Text {
+        viewModel.renderable.hasPassword ?
+            Text(
+                "\(viewModel.renderable.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
+            ) :
+            Text(viewModel.renderable.path)
     }
 }
 
@@ -277,20 +361,20 @@ extension KeyDetailsPublicKeyView {
             navigation.performFake(navigation: .init(action: .rightButtonAction))
         }
     }
+}
 
-    struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-        static var previews: some View {
-            Group {
-                KeyDetailsPublicKeyView(
-                    viewModel: .init(
-                        keyDetails: PreviewData.mkeyDetails
-                    )
+struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            KeyDetailsPublicKeyView(
+                viewModel: .init(
+                    keyDetails: PreviewData.mkeyDetails
                 )
-            }
-            .previewLayout(.sizeThatFits)
-            .preferredColorScheme(.dark)
-            .environmentObject(NavigationCoordinator())
-            .environmentObject(ConnectivityMediator())
+            )
         }
+        .previewLayout(.sizeThatFits)
+        .preferredColorScheme(.dark)
+        .environmentObject(NavigationCoordinator())
+        .environmentObject(ConnectivityMediator())
     }
 }
