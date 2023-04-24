@@ -15,8 +15,6 @@ final class MainScreensFactory {
             KeySetList(viewModel: .init(dataModel: value))
         case .settings:
             SettingsView(viewModel: .init())
-        case .deriveKey:
-            CreateDerivedKeyView(viewModel: .init())
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,
@@ -33,6 +31,7 @@ final class MainScreensFactory {
              .signSufficientCrypto,
              .keys,
              .keyDetails,
+             .deriveKey,
              .log:
             EmptyView()
         }

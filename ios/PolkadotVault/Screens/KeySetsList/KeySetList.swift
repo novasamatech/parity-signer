@@ -185,6 +185,7 @@ struct KeySetList: View {
             selectedItems: $selectedItems,
             isExportKeysSelected: $isExportKeysSelected
         )
+        .padding([.horizontal, .bottom], Spacing.extraSmall)
         .onTapGesture {
             if isExportKeysSelected {
                 if selectedItems.contains(viewModel) {
@@ -205,7 +206,6 @@ struct KeySetList: View {
                 }
             }
         }
-        .padding([.horizontal, .bottom], Spacing.extraSmall)
     }
 
     var exportKeysOverlay: some View {

@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CreateDerivedKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -19,7 +19,7 @@ struct CreateDerivedKeyView: View {
                     title: Localizable.CreateDerivedKey.Label.title.string,
                     leftButtons: [.init(
                         type: .xmark,
-                        action: { navigation.perform(navigation: .init(action: .goBack)) }
+                        action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .questionmark, action: viewModel.onRightNavigationButtonTap)],
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
@@ -65,10 +65,21 @@ struct CreateDerivedKeyView: View {
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.large)
             .padding(.top, Spacing.medium)
+            // Navigation Links
+            NavigationLink(
+                destination: DerivationPathNameView(
+                    viewModel: .init(
+                        seedName: viewModel.seedName,
+                        derivationPath: $viewModel.derivationPath,
+                        networkSelection: $viewModel.networkSelection
+                    )
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDerivationPath
+            ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
         }
         .fullScreenCover(
@@ -90,18 +101,6 @@ struct CreateDerivedKeyView: View {
                 )
             )
             .clearModalBackground()
-        }
-        .fullScreenCover(
-            isPresented: $viewModel.isPresentingDerivationPath
-        ) {
-            DerivationPathNameView(
-                viewModel: .init(
-                    seedName: viewModel.seedName,
-                    derivationPath: $viewModel.derivationPath,
-                    isPresented: $viewModel.isPresentingDerivationPath,
-                    networkSelection: $viewModel.networkSelection
-                )
-            )
         }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingConfirmation
@@ -194,7 +193,6 @@ struct CreateDerivedKeyView: View {
 
 extension CreateDerivedKeyView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private weak var appState: AppState!
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
@@ -219,10 +217,6 @@ extension CreateDerivedKeyView {
             self.networkService = networkService
             self.createKeyService = createKeyService
             subscribeToChanges()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func use(appState: AppState) {

@@ -175,6 +175,15 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isPresentingDeriveNewKey
+        ) {
+            NavigationView {
+                CreateDerivedKeyView(viewModel: .init())
+                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationBarHidden(true)
+            }
+        }
     }
 
     var mainList: some View {

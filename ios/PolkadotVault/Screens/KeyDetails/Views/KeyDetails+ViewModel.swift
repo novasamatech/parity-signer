@@ -20,6 +20,7 @@ extension KeyDetailsView {
         private let cancelBag = CancelBag()
         private let forgetKeyActionHandler: ForgetKeySetAction
         private let exportPrivateKeyService: PrivateKeyQRCodeService
+        private let deriveKeyService: NewDerivedKeyService
 
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -53,6 +54,9 @@ extension KeyDetailsView {
         @Published var viewState: ViewState = .list
         @Published var backupModal: BackupModalViewModel?
 
+        // Derive New Key
+        @Published var isPresentingDeriveNewKey: Bool = false
+
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
@@ -62,6 +66,7 @@ extension KeyDetailsView {
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetAllNetworksService = GetAllNetworksService(),
             forgetKeyActionHandler: ForgetKeySetAction = ForgetKeySetAction(),
+            deriveKeyService: NewDerivedKeyService = NewDerivedKeyService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState
         ) {
@@ -69,6 +74,7 @@ extension KeyDetailsView {
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
+            self.deriveKeyService = deriveKeyService
             self.forgetKeyActionHandler = forgetKeyActionHandler
             self.warningStateMediator = warningStateMediator
             self.appState = appState
@@ -146,11 +152,12 @@ extension KeyDetailsView {
 
 extension KeyDetailsView.ViewModel {
     func onCreateDerivedKeyTap() {
-        if !appState.userData.allNetworks.isEmpty {
-            navigation.perform(navigation: .init(action: .newKey))
-        } else {
+        if appState.userData.allNetworks.isEmpty {
             presentableError = .noNetworksAvailable()
             isPresentingError = true
+        } else {
+            deriveKeyService.startDeriveNewKey(keyName)
+            isPresentingDeriveNewKey = true
         }
     }
 
