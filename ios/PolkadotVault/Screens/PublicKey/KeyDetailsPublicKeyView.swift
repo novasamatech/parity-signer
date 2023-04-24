@@ -215,7 +215,8 @@ private extension KeyDetailsPublicKeyView {
             Divider()
             rowWrapper(
                 Localizable.PublicKeyDetails.Label.derivation.string,
-                fullPath
+                viewModel.renderable.path.isEmpty && !viewModel.renderable.hasPassword ? Localizable.PublicKeyDetails
+                    .Label.emptyPath.text : fullPath
             )
             rowWrapper(
                 Localizable.PublicKeyDetails.Label.keySetName.string,
@@ -241,6 +242,7 @@ private extension KeyDetailsPublicKeyView {
             Spacer()
             value
                 .frame(idealWidth: .infinity, alignment: .trailing)
+                .multilineTextAlignment(.trailing)
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
         }
         .padding(.vertical, Spacing.small)
