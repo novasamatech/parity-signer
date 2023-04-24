@@ -58,6 +58,7 @@ fun BottomSheetWrapperRoot(
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
+			skipHalfExpanded = true,
 			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
