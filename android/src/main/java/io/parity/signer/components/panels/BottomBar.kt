@@ -1,110 +1,183 @@
 package io.parity.signer.components.panels
 
+import android.content.res.Configuration
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarViewDay
-import androidx.compose.material.icons.filled.CropFree
-import androidx.compose.material.icons.filled.Pattern
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.domain.SharedViewModel
-import io.parity.signer.domain.navigate
-import io.parity.signer.ui.theme.Bg000
-import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Text400
-import io.parity.signer.ui.theme.Text600
+import io.parity.signer.R
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.Navigator
+import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.actionGetName
 
 /**
  * Bar to be shown on the bottom of screen;
+ * Redesigned version
+ * @param onBeforeActionWhenClicked is when some actiond need to be done before
+ * we can navigate to tapped state. Workaround for state machine
  */
 @Composable
-@Deprecated("not used")
 fun BottomBar(
-	sharedViewModel: SharedViewModel,
+	navigator: Navigator,
+	state: BottomBarState,
+	skipRememberCameraParent: Boolean = false,
+	onBeforeActionWhenClicked: Callback? = null,
 ) {
+	if (!skipRememberCameraParent) {
+		LaunchedEffect(key1 = Unit) {
+			CameraParentSingleton.lastPossibleParent =
+				CameraParentScreen.BottomBarScreen(state)
+		}
+	}
 	BottomAppBar(
-		backgroundColor = MaterialTheme.colors.Bg000,
-		elevation = 0.dp,
-		modifier = Modifier.height(56.dp)
+		backgroundColor = MaterialTheme.colors.backgroundSecondary,
+		elevation = 8.dp,
+		modifier = Modifier.height(50.dp)
 	) {
 		Row(
 			horizontalArrangement = Arrangement.SpaceEvenly,
-			modifier = Modifier.fillMaxWidth(1f)
+			modifier = Modifier.fillMaxWidth(1f),
+			verticalAlignment = Alignment.CenterVertically
 		) {
 			BottomBarButton(
-				sharedViewModel = sharedViewModel,
-				image = Icons.Default.Pattern,
-				action = Action.NAVBAR_KEYS
+				navigator = navigator,
+				iconId = R.drawable.ic_key_outlined_24,
+				action = Action.NAVBAR_KEYS,
+				labelResId = R.string.bottom_bar_label_key_sets,
+				isEnabled = state == BottomBarState.KEYS,
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+			)
+			BottomBarMiddleButton(
+				navigator = navigator,
+				iconId = R.drawable.ic_qe_code_24,
+				action = Action.NAVBAR_SCAN,
+				labelResId = R.string.bottom_bar_label_scanner,
+				isEnabled = state == BottomBarState.SCANNER,
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 			BottomBarButton(
-				sharedViewModel = sharedViewModel,
-				image = Icons.Default.CropFree,
-				action = Action.NAVBAR_SCAN
-			)
-			BottomBarButton(
-				sharedViewModel = sharedViewModel,
-				image = Icons.Default.CalendarViewDay,
-				action = Action.NAVBAR_LOG
-			)
-			BottomBarButton(
-				sharedViewModel = sharedViewModel,
-				image = Icons.Default.Settings,
-				action = Action.NAVBAR_SETTINGS
+				navigator = navigator,
+				iconId = R.drawable.ic_settings_outlined_24,
+				enabledIconId = R.drawable.ic_settings_filled_24,
+				action = Action.NAVBAR_SETTINGS,
+				labelResId = R.string.bottom_bar_label_settings,
+				isEnabled = state == BottomBarState.SETTINGS,
+				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
 			)
 		}
 	}
 }
 
-
+enum class BottomBarState { KEYS, SCANNER, SETTINGS }
 
 /**
- * Unified bottom bar button view
+ * Unified bottom bar button view for [BottomBar]
  */
 @Composable
 fun BottomBarButton(
-	sharedViewModel: SharedViewModel,
-	image: ImageVector,
+	navigator: Navigator,
+	@DrawableRes iconId: Int,
+	@DrawableRes enabledIconId: Int? = null,
 	action: Action,
+	@StringRes labelResId: Int,
+	isEnabled: Boolean,
+	onBeforeActionWhenClicked: Callback?
 ) {
-	val selected =
-		sharedViewModel.actionResult.collectAsState().value?.footerButton == actionGetName(action)
-	val tint = if (selected) {
-		MaterialTheme.colors.Text600
+	val color = if (isEnabled) {
+		MaterialTheme.colors.primary
 	} else {
-		MaterialTheme.colors.Text300
+		MaterialTheme.colors.textTertiary
 	}
-	val color = if (selected) {
-		MaterialTheme.colors.Text600
-	} else {
-		MaterialTheme.colors.Text400
-	}
-	Column(
-		horizontalAlignment = Alignment.CenterHorizontally,
+	Column(horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-			.clickable(onClick = {
-				sharedViewModel.navigate(action)
-			})
-			.width(66.dp)
-	) {
-		Icon(image, contentDescription = actionGetName(action).toString(), tint = tint)
+			.clickable {
+				onBeforeActionWhenClicked?.invoke()
+				navigator.navigate(action)
+			}
+			.width(66.dp)) {
+		Icon(
+			painter = painterResource(
+				id = if (isEnabled) enabledIconId ?: iconId else iconId
+			),
+			contentDescription = stringResource(id = labelResId),
+			tint = color,
+			modifier = Modifier
+				.size(28.dp)
+				.padding(bottom = 2.dp)
+		)
 		Text(
-			actionGetName(action).toString(),
+			text = stringResource(id = labelResId),
 			color = color,
-			style = MaterialTheme.typography.subtitle2
+			style = SignerTypeface.CaptionS,
 		)
 	}
 }
 
 
+@Composable
+fun BottomBarMiddleButton(
+	navigator: Navigator,
+	@DrawableRes iconId: Int,
+	@DrawableRes enabledIconId: Int? = null,
+	@StringRes labelResId: Int,
+	action: Action,
+	isEnabled: Boolean,
+	onBeforeActionWhenClicked: Callback?
+) {
+	Box(contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.padding(vertical = 4.dp)
+			.border(2.dp, MaterialTheme.colors.fill12, RoundedCornerShape(32.dp))
+			.clickable {
+				onBeforeActionWhenClicked?.invoke()
+				navigator.navigate(action)
+			}
+			.width(80.dp)
+			.fillMaxHeight(1f)
+	) {
+		Icon(
+			painter = painterResource(
+				id = if (isEnabled) enabledIconId ?: iconId else iconId
+			),
+			contentDescription = stringResource(id = labelResId),
+			tint = MaterialTheme.colors.primary,
+			modifier = Modifier
+				.size(28.dp)
+				.padding(bottom = 2.dp)
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewBottomBar2() {
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			BottomBar(EmptyNavigator(), BottomBarState.KEYS)
+		}
+	}
+}

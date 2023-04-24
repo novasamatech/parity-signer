@@ -14,7 +14,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
@@ -87,16 +86,6 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 							actionResult = actionResult,
 							networkState = shieldAlert,
 						)
-					}
-				},
-				bottomBar = {
-					if (NavigationMigrations.shouldShowBar(
-							localNavAction = localNavAction.value,
-							globalNavAction = actionResult,
-						)
-						&& actionResult.footer
-					) {
-						BottomBar(sharedViewModel = sharedViewModel)
 					}
 				},
 			) { innerPadding ->

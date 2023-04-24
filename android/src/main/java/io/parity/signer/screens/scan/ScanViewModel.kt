@@ -32,9 +32,7 @@ class ScanViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val importKeysService: ImportDerivedKeysRepository by lazy {
-		ImportDerivedKeysRepository(
-			seedRepository
-		)
+		ImportDerivedKeysRepository(seedRepository)
 	}
 
 	data class TransactionsState(val transactions: List<MTransaction>)

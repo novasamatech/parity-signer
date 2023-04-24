@@ -1,15 +1,20 @@
 package io.parity.signer.screens.keysetdetails
 
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import io.parity.signer.domain.*
-import io.parity.signer.ui.BottomSheetWrapperContent
-import kotlinx.coroutines.launch
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.ui.BottomSheetWrapperRoot
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun KeySetDetailsScreenFull(
 	model: KeySetDetailsModel,
@@ -18,45 +23,66 @@ fun KeySetDetailsScreenFull(
 	networkState: State<NetworkState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
-	val bottomSheetState =
-		rememberModalBottomSheetState(ModalBottomSheetValue.Hidden,
-			confirmValueChange = {
-				it != ModalBottomSheetValue.HalfExpanded
+	val menuNavController = rememberNavController()
+
+	Box(Modifier.statusBarsPadding()) {
+		KeySetDetailsScreenView(
+			model = model,
+			navigator = navigator,
+			networkState = networkState,
+			onMenu = {
+				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 			}
 		)
-	val scope = rememberCoroutineScope()
+	}
 
-	BottomSheetWrapperContent(
-		bottomSheetState = bottomSheetState,
-		bottomSheetContent = {
-			KeySetDetailsMenu(
-				navigator = navigator,
-				networkState = networkState,
-				removeSeed = onRemoveKeySet,
-				onSelectKeysClicked = {
-					scope.launch { bottomSheetState.hide() }
-					navController.navigate(KeySetDetailsNavSubgraph.multiselect)
-				},
-				onBackupClicked = {
-					scope.launch { bottomSheetState.hide() }
-					navController.navigate(KeySetDetailsNavSubgraph.backup)
-				},
-				onCancel =  {
-					scope.launch { bottomSheetState.hide() }
-				}
-			)
-		},
-		mainContent = {
-			KeySetDetailsScreenView(
-				model = model,
-				navigator = navigator,
-				networkState = networkState,
-				onMenu = {
-					scope.launch {
-						bottomSheetState.show()
+	NavHost(
+		navController = menuNavController,
+		startDestination = KeySetDetailsMenuSubgraph.empty,
+	) {
+		val closeAction: Callback = {
+			menuNavController.popBackStack()
+		}
+		composable(KeySetDetailsMenuSubgraph.empty) {}//no menu
+		composable(KeySetDetailsMenuSubgraph.keys_menu) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeyDetailsMenuGeneral(
+					navigator = navigator,
+					networkState = networkState,
+					onSelectKeysClicked = {
+						menuNavController.popBackStack()
+						navController.navigate(KeySetDetailsNavSubgraph.multiselect)
+					},
+					onBackupClicked = {
+						menuNavController.popBackStack()
+						navController.navigate(KeySetDetailsNavSubgraph.backup)
+					},
+					onCancel = {
+						menuNavController.popBackStack()
+					},
+					onDeleteClicked = {
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
+						}
 					}
-				}
-			)
-		},
-	)
+				)
+			}
+		}
+		composable(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeySetDeleteConfirmBottomSheet(
+					onCancel = closeAction,
+					onRemoveKeySet = onRemoveKeySet,
+				)
+			}
+		}
+	}
 }
+
+
+private object KeySetDetailsMenuSubgraph {
+	const val empty = "keys_menu_empty"
+	const val keys_menu = "keys_menu"
+	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
+}
+
