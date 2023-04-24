@@ -118,7 +118,6 @@ fun PrivateKeyExportBottomSheet(
 			) { navigator.backAction() }
 		}
 	}
-//todo dmitry fix half shown at beginning
 	DisableScreenshots()
 }
 

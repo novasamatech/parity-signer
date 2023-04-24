@@ -214,7 +214,7 @@ private fun ExposedKeyAlarm() {
 		Text(
 			text = stringResource(R.string.key_details_exposed_notification_label),
 			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyM,
+			style = SignerTypeface.LabelS,
 			modifier = Modifier
 				.weight(1f)
 				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
