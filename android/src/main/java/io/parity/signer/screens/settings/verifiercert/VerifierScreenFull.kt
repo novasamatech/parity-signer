@@ -21,6 +21,7 @@ fun VerifierScreenFull(
 	val bottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
+			skipHalfExpanded = true,
 			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}
