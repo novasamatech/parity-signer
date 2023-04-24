@@ -143,8 +143,11 @@
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
+"PublicKeyDetails.Label.KeySetName" = "Key Set Name";
+"PublicKeyDetails.Label.Network" = "Network";
+"PublicKeyDetails.Label.Derivation" = "Derivation Path";
 
-"KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
+"KeyScreen.Label.Hotkey" = "This key is marked HOT because its root private key has been exported.";
 "KeyScreen.Action.Export" = "Export Private Key";
 
 "KeyExportWarning.Label.Header" = "Export Private Key";
