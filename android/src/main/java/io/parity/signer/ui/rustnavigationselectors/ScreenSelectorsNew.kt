@@ -162,7 +162,9 @@ fun BottomSheetSelector(
 
 			when (localNavAction) {
 				is LocalNavAction.ShowExportPrivateKey -> {
-					BottomSheetWrapperRoot {
+					BottomSheetWrapperRoot(onClosedAction = {
+						navigator.backAction()
+					}) {
 						PrivateKeyExportBottomSheet(
 							model = localNavAction.model,
 							navigator = localNavAction.navigator
