@@ -160,7 +160,7 @@ pub const CHUNK_SIZE: u16 = 1072;
 pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
 /// Main color for **dangerous** QR codes (static only, in Vault)
-pub const MAIN_COLOR_DANGER: [u8; 3] = [0xfd, 0x49, 0x35];
+pub const MAIN_COLOR_DANGER: [u8; 3] = [0xf2, 0x72, 0xb6];
 
 /// Background color for QR codes (both static and animated ones)
 pub const BACK_COLOR: [u8; 3] = [0xff, 0xff, 0xff];
