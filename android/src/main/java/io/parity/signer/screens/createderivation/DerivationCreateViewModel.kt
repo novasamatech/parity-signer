@@ -92,7 +92,6 @@ class DerivationCreateViewModel : ViewModel() {
 		return when (val selectedNetwork = selectedNetwork.value) {
 			SelectedNetwork.AllNetworks -> runBlocking {
 				allNetworks
-
 					.map { network ->
 						async(Dispatchers.IO) {
 							uniffiInteractor.validateDerivationPath(
