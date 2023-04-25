@@ -162,6 +162,7 @@ fun ScreenHeaderWithButton(
 	onClose: Callback,
 	onDone: Callback,
 ) {
+//todo dmitry remove paddings and change usages
 	Row(
 		modifier = Modifier.padding(
 			start = 24.dp,
