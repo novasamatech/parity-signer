@@ -21,6 +21,7 @@ import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.backgroundTertiary
 import io.parity.signer.ui.theme.textSecondary
 
+//not used after redesign for now
 @Composable
 fun DerivationKeysHelpBottomSheet(
 	onClose: Callback,

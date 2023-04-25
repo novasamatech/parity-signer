@@ -38,7 +38,6 @@ fun DerivationCreateSubgraph(
 		startDestination = DerivationCreateSubgraph.home,
 	) {
 		composable(DerivationCreateSubgraph.home) {
-			val subNavController = rememberNavController()
 			DeriveKeyNetworkSelectScreen(
 				networks = deriveViewModel.allNetworks,
 				onClose = {
@@ -49,40 +48,9 @@ fun DerivationCreateSubgraph(
 					deriveViewModel.updateSelectedNetwork(newNetwork)
 					navController.navigate(DerivationCreateSubgraph.path)
 				},
-				onDerivationMenuHelpClicked = {//todo dmitry remove
-					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationMenuHelp)
-				},
-				onDerivationPathHelpClicked = {
-					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationPathHelp)
-				},
 				onNetworkHelp = {},//todo dmitry implement.
 				modifier = Modifier.statusBarsPadding()
 			)
-
-			//bottom sheets
-			NavHost(
-				navController = subNavController,
-				startDestination = HomeDerivationSheetsSubGraph.empty,
-			) {
-				val closeAction: Callback = {
-					subNavController.popBackStack()
-				}
-				composable(HomeDerivationSheetsSubGraph.empty) {}
-				composable(HomeDerivationSheetsSubGraph.derivationMenuHelp) {
-					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						DerivationKeysHelpBottomSheet(
-							onClose = closeAction,
-						)
-					}
-				}
-				composable(HomeDerivationSheetsSubGraph.derivationPathHelp) {
-					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						DerivationPathHelpBottomSheet(
-							onClose = closeAction,
-						)
-					}
-				}
-			}
 		}
 
 		composable(DerivationCreateSubgraph.path) {
@@ -141,14 +109,6 @@ fun DerivationCreateSubgraph(
 private object DerivationCreateSubgraph {
 	const val home = "derivation_creation_home"
 	const val path = "derivation_creation_path"
-}
-
-private object HomeDerivationSheetsSubGraph {
-	const val empty = "derivation_creation_basic_sheets_empty"
-	const val derivationMenuHelp =
-		"derivation_creation_basic_sheets_derivationMenuHelp"
-	const val derivationPathHelp =
-		"derivation_creation_basic_sheets_derivationPathHelp"
 }
 
 private object PathDerivationSheetsSubGraph {

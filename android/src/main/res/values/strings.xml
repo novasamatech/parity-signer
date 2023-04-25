@@ -223,13 +223,6 @@
 	<string name="banana_split_password_password_error_wrong">The password you entered is incorrect</string>
 	<string name="banana_split_password_error_seed_phrase_exists">This seed phrase already exists</string>
 	<string name="banana_split_password_error_cannot_save_seed">Given combination of seed phrase and seed name couldn\'t be saved.</string>
-	<string name="derivation_screen_title">Create Derived Key</string>
-	<string name="derivation_screen_network_header">Choose Network</string>
-	<string name="derivation_screen_network_label">Network</string>
-	<string name="derivation_screen_derivation_header">Derivation Path</string>
-	<string name="derivation_screen_dirivation_help_content_description">Derivation help button</string>
-	<string name="derivation_screen_path_placeholder">// Add Path Name</string>
-	<string name="derivation_screen_derivation_note_description">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="derivation_help_path_title">Derivation Paths</string>
 	<string name="derivation_help_methods_title">Derivation Methods</string>
 	<string name="derivation_help_keys_title">Derived Keys</string>

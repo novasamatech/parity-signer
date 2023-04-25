@@ -34,8 +34,6 @@ fun DeriveKeyNetworkSelectScreen(
 	networks: List<NetworkModel>,
 	onClose: Callback,
 	onNetworkSelect: (SelectedNetwork) -> Unit,
-	onDerivationPathHelpClicked: Callback,
-	onDerivationMenuHelpClicked: Callback,
 	onNetworkHelp: Callback,
 	modifier: Modifier = Modifier
 ) {
@@ -205,8 +203,6 @@ private fun PreviewDeriveKeyNetworkSelectScreen() {
 			onClose = {},
 			onNetworkSelect = {},
 			onNetworkHelp = {},
-			onDerivationPathHelpClicked = {},
-			onDerivationMenuHelpClicked = {},
 		)
 	}
 }
