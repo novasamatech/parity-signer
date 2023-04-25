@@ -167,9 +167,12 @@ private fun BottomKeyPlate(
 				style = SignerTypeface.BodyL,
 				color = MaterialTheme.colors.textTertiary
 			)
-			Spacer(modifier = Modifier.weight(1f))
+			Spacer(modifier = Modifier.padding(start = 16.dp).weight(1f))
+			val path = model.address.cardBase.path
 			Text(
-				text = model.address.cardBase.path,
+				text = path.ifEmpty {
+					stringResource(R.string.derivation_key_empty_path_placeholder)
+				},
 				style = SignerTypeface.BodyL,
 				color = MaterialTheme.colors.primary
 			)
