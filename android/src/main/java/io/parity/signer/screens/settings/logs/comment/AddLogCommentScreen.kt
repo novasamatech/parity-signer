@@ -91,6 +91,7 @@ private fun AddLogCommentInternal(
 				onDone(note.value)
 			},
 			onClose = onBack,
+			backNotClose = true,
 		)
 		OutlinedTextField(
 			value = note.value, //hide password, add hint

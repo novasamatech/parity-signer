@@ -13,10 +13,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.createderivation.derivationsubscreens.*
-import io.parity.signer.screens.createderivation.help.DerivationKeysHelpBottomSheet
+import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
+import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationPathScreen
+import io.parity.signer.screens.createderivation.derivationsubscreens.DeriveKeyNetworkSelectScreen
 import io.parity.signer.screens.createderivation.help.DerivationMethodsHelpBottomSheet
-import io.parity.signer.screens.createderivation.help.DerivationPathHelpBottomSheet
+import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import kotlinx.coroutines.launch
 
@@ -35,9 +36,9 @@ fun DerivationCreateSubgraph(
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = DerivationCreateSubgraph.home,
+		startDestination = DerivationCreateSubgraph.select_network,
 	) {
-		composable(DerivationCreateSubgraph.home) {
+		composable(DerivationCreateSubgraph.select_network) {
 			DeriveKeyNetworkSelectScreen(
 				networks = deriveViewModel.allNetworks,
 				onClose = {
@@ -48,11 +49,10 @@ fun DerivationCreateSubgraph(
 					deriveViewModel.updateSelectedNetwork(newNetwork)
 					navController.navigate(DerivationCreateSubgraph.path)
 				},
-				onNetworkHelp = {},//todo dmitry implement.
+				onNetworkHelp = { navController.navigate(DerivationCreateSubgraph.network_help) },
 				modifier = Modifier.statusBarsPadding()
 			)
 		}
-
 		composable(DerivationCreateSubgraph.path) {
 			val menuNavController = rememberNavController()
 
@@ -103,12 +103,18 @@ fun DerivationCreateSubgraph(
 				}
 			}
 		}
+		networkHelpersSubgraph(
+			routePath = DerivationCreateSubgraph.network_help,
+			onScanClicked = {}, ////			todo dmitry finish
+			navController = navController,
+		)
 	}
 }
 
 private object DerivationCreateSubgraph {
-	const val home = "derivation_creation_home"
+	const val select_network = "derivation_creation_select_network"
 	const val path = "derivation_creation_path"
+	const val network_help = "network_help_screens"
 }
 
 private object PathDerivationSheetsSubGraph {

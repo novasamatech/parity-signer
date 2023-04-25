@@ -158,29 +158,45 @@ fun ScreenHeaderWithButton(
 	canProceed: Boolean,
 	title: String = "",
 	btnText: String? = null,
+	backNotClose: Boolean = false,
 	onClose: Callback,
 	onDone: Callback,
 ) {
-	Box(
+	Row(
 		modifier = Modifier.padding(
 			start = 24.dp,
 			end = 8.dp,
 			top = 8.dp,
 			bottom = 8.dp
 		),
-		contentAlignment = Alignment.Center,
+		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(1f),
-			contentAlignment = Alignment.CenterStart,
-		) {
-			CloseIcon(
-				noBackground = true,
-				onCloseClicked = onClose,
+		if (backNotClose) {
+			Image(
+				imageVector = Icons.Filled.ArrowBackIos,
+				contentDescription = stringResource(R.string.description_back_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(end = 8.dp)
+					.clickable(onClick = onClose)
+					.padding(8.dp)
+					.size(24.dp)
+			)
+		}else {
+			Image(
+				imageVector = Icons.Filled.Close,
+				contentDescription = stringResource(R.string.description_back_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(end = 8.dp)
+					.clickable(onClick = onClose)
+					.padding(8.dp)
+					.size(24.dp)
+					.align(Alignment.CenterVertically)
 			)
 		}
 		Box(
-			modifier = Modifier.fillMaxWidth(1f),
+			modifier = Modifier.weight(1f),
 			contentAlignment = Alignment.Center,
 		) {
 			Text(
@@ -192,7 +208,6 @@ fun ScreenHeaderWithButton(
 			)
 		}
 		Box(
-			modifier = Modifier.fillMaxWidth(1f),
 			contentAlignment = Alignment.CenterEnd,
 		) {
 			PrimaryButtonGreyDisabled(
@@ -254,8 +269,9 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
-			ScreenHeaderWithButton(true, "Derivation", null, {}, {})
-			ScreenHeaderWithButton(false, "Derivation", null, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, true, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, false, {}, {})
+			ScreenHeaderWithButton(false, "Derivation", null, false, {}, {})
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},

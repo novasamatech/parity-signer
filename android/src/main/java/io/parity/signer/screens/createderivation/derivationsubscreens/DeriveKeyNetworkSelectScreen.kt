@@ -38,7 +38,7 @@ fun DeriveKeyNetworkSelectScreen(
 	modifier: Modifier = Modifier
 ) {
 
-	Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+	Column(modifier) {
 		ScreenHeaderClose(
 			title = stringResource(R.string.derivation_network_select_title),
 			onClose = onClose,

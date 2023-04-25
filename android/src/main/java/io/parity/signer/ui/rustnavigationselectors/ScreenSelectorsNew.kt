@@ -104,7 +104,7 @@ fun CombinedScreensSelector(
 		is ScreenData.NNetworkDetails ->
 			NetworkDetailsSubgraph(
 				screenData.f.toNetworkDetailsModel(),
-				rootNavigator
+				rootNavigator,
 			)
 		is ScreenData.NewSeed ->
 			Box(
