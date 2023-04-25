@@ -45,6 +45,7 @@ fun DeriveKeyNetworkSelectScreen(
 		)
 		Column(
 			modifier = Modifier
+				.verticalScroll(rememberScrollState())
 				.padding(horizontal = 8.dp)
 				.background(
 					MaterialTheme.colors.fill6,
@@ -61,8 +62,10 @@ fun DeriveKeyNetworkSelectScreen(
 				onNetworkSelect(SelectedNetwork.AllNetworks)
 			}
 		}
-		NetworkAlarm(Modifier.padding(horizontal = 8.dp)
-			.clickable(onClick = onNetworkHelp))
+		NetworkAlarm(
+			Modifier
+				.padding(horizontal = 8.dp)
+				.clickable(onClick = onNetworkHelp))
 		Spacer(modifier = Modifier.weight(1f))
 	}
 }
@@ -79,13 +82,13 @@ private fun NetworkItem(
 		NetworkIcon(
 			networkLogoName = network.logo,
 			modifier = Modifier
-                .padding(
-                    top = 16.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 12.dp
-                )
-                .size(36.dp),
+				.padding(
+					top = 16.dp,
+					bottom = 16.dp,
+					start = 16.dp,
+					end = 12.dp
+				)
+				.size(36.dp),
 		)
 		Text(
 			text = network.title,
