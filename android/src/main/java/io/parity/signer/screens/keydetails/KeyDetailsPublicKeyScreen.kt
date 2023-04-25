@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -174,7 +175,8 @@ private fun BottomKeyPlate(
 					stringResource(R.string.derivation_key_empty_path_placeholder)
 				},
 				style = SignerTypeface.BodyL,
-				color = MaterialTheme.colors.primary
+				color = MaterialTheme.colors.primary,
+				textAlign = TextAlign.End
 			)
 		}
 		SignerDivider(sidePadding = 0.dp)
