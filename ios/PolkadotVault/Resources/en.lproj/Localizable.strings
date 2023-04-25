@@ -146,6 +146,7 @@
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
 "PublicKeyDetails.Label.Network" = "Network";
 "PublicKeyDetails.Label.Derivation" = "Derivation Path";
+"PublicKeyDetails.Label.EmptyPath" = "Derivation Path Name Is Empty";
 
 "KeyScreen.Label.Hotkey" = "This key is marked HOT because its root private key has been exported.";
 "KeyScreen.Action.Export" = "Export Private Key";
@@ -412,7 +413,7 @@
 "ImportKeys.Label.Title.Single" = "Import Key";
 "ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
 "ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
-"ImportKeys.Label.EmptyPath" = "Derivation path name is empty";
+"ImportKeys.Label.EmptyPath" = "Derivation Path Name Is Empty";
 "ImportKeys.Action.Import" = "Import Keys";
 "ImportKeys.Error.Label.KeySetMissing" = "Some keys cannot be imported until their key sets are recovered. Please recover the missing key sets.";
 "ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
@@ -455,7 +456,7 @@
 "CreateDerivedKey.Label.Header.Network" = "Choose Network";
 "CreateDerivedKey.Label.Header.Path" = "Derivation Path";
 "CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
-"CreateDerivedKey.Label.EmpyyPath" = "Derivation path name is empty";
+"CreateDerivedKey.Label.EmpyyPath" = "Derivation Path Name Is Empty";
 "CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Action.Add" = "Create Derived Key";
 "CreateDerivedKey.Label.Network.Single" = "Network";
@@ -472,7 +473,7 @@
 "CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
-"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation path name is empty";
+"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation Path Name Is Empty";
 "CreateDerivedKey.Modal.Path.Error.Password" = "Passwords don’t match";
 "CreateDerivedKey.Modal.Path.Error.AlreadyExists" = "Key with this Derivation path name already exists";
 "CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";
