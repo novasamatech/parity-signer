@@ -36,6 +36,7 @@ fun DeriveKeyNetworkSelectScreen(
 	onNetworkSelect: (SelectedNetwork) -> Unit,
 	onDerivationPathHelpClicked: Callback,
 	onDerivationMenuHelpClicked: Callback,
+	onNetworkHelp: Callback,
 	modifier: Modifier = Modifier
 ) {
 
@@ -46,6 +47,7 @@ fun DeriveKeyNetworkSelectScreen(
 		)
 		Column(
 			modifier = Modifier
+				.padding(horizontal = 8.dp)
 				.background(
 					MaterialTheme.colors.fill6,
 					RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
@@ -61,7 +63,8 @@ fun DeriveKeyNetworkSelectScreen(
 				onNetworkSelect(SelectedNetwork.AllNetworks)
 			}
 		}
-		NetworkAlarm()  //todo dmitry pass clicker
+		NetworkAlarm(Modifier.padding(horizontal = 8.dp)
+			.clickable(onClick = onNetworkHelp))
 		Spacer(modifier = Modifier.weight(1f))
 	}
 }
@@ -135,7 +138,7 @@ private fun AllNetworksItem(
 }
 
 @Composable
-private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change content
+private fun NetworkAlarm(modifier: Modifier = Modifier) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
@@ -148,22 +151,8 @@ private fun NetworkAlarm(modifier: Modifier = Modifier) {//todo dmitry change co
 
 	) {
 
-		val derivationAlarmText = buildAnnotatedString {
-			val str =
-				stringResource(R.string.derivation_path_screen_help_tile_message)
-			val boldStr =
-				stringResource(R.string.derivation_path_screen_help_tile_message_highlited_part)
-			val startIndex = str.indexOf(boldStr)
-			val endIndex = startIndex + boldStr.length
-			append(str)
-			addStyle(
-				style = SpanStyle(color = MaterialTheme.colors.pink300),
-				start = startIndex,
-				end = endIndex
-			)
-		}
 		Text(
-			text = derivationAlarmText,
+			text = stringResource(R.string.derivation_create_help_network_setup_label),
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
@@ -215,6 +204,7 @@ private fun PreviewDeriveKeyNetworkSelectScreen() {
 			networks = networks,
 			onClose = {},
 			onNetworkSelect = {},
+			onNetworkHelp = {},
 			onDerivationPathHelpClicked = {},
 			onDerivationMenuHelpClicked = {},
 		)

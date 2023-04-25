@@ -49,12 +49,13 @@ fun DerivationCreateSubgraph(
 					deriveViewModel.updateSelectedNetwork(newNetwork)
 					navController.navigate(DerivationCreateSubgraph.path)
 				},
-				onDerivationMenuHelpClicked = {
+				onDerivationMenuHelpClicked = {//todo dmitry remove
 					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationMenuHelp)
 				},
 				onDerivationPathHelpClicked = {
 					subNavController.navigate(HomeDerivationSheetsSubGraph.derivationPathHelp)
 				},
+				onNetworkHelp = {},//todo dmitry implement.
 				modifier = Modifier.statusBarsPadding()
 			)
 

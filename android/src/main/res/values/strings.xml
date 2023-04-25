@@ -374,6 +374,7 @@
 	<string name="key_details_public_label_keyset">Key Set Name</string>
 	<string name="derivation_network_select_title">Select Network</string>
   <string name="derive_key_network_all">Allow use on any network</string>
+	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
 
 </resources>
 
