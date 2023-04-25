@@ -48,7 +48,6 @@ import java.util.*
 
 @Composable
 fun KeyCard(model: KeyCardModel) {
-
 	Column(
 		Modifier
 			.fillMaxWidth()

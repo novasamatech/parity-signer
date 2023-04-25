@@ -19,12 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.base.BottomSheetHeader
-import io.parity.signer.components.sharedcomponents.CircularCountDownTimer
-import io.parity.signer.components.sharedcomponents.KeyCard
-import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.components.sharedcomponents.KeyCardModelBase
+import io.parity.signer.components.sharedcomponents.*
 import io.parity.signer.components.toImageContent
 import io.parity.signer.components.toNetworkCardModel
 import io.parity.signer.domain.*
@@ -95,7 +93,22 @@ fun PrivateKeyExportBottomSheet(
 						modifier = Modifier.size(264.dp)
 					)
 				}
-				KeyCard(model.keyCard)
+				Row(
+					Modifier.padding(16.dp),
+					verticalAlignment = Alignment.CenterVertically,
+				) {
+					ShowBase58Collapsible(
+						base58 = model.keyCard.cardBase.base58,
+						modifier = Modifier
+							.weight(1f)
+					)
+					IdentIconWithNetwork(
+						identicon = model.keyCard.cardBase.identIcon,
+						networkLogoName = model.keyCard.network,
+						size = 36.dp,
+						modifier = Modifier.padding(start = 8.dp)
+					)
+				}
 			}
 			//autohide component
 			val timerText = stringResource(R.string.export_private_key_timer_label)
@@ -105,7 +118,6 @@ fun PrivateKeyExportBottomSheet(
 			) { navigator.backAction() }
 		}
 	}
-
 	DisableScreenshots()
 }
 
