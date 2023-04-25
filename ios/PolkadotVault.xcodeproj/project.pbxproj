@@ -52,6 +52,7 @@
 		6D0677AC29BB0C6000D76D90 /* AppLaunchMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */; };
 		6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0677AD29BB0D0000D76D90 /* WarningStateMediator.swift */; };
 		6D07D370292B40D2001A0B79 /* TransactionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */; };
+		6D0BF95229F2BBF500F5B569 /* NetworkIconCapsuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0BF95129F2BBF500F5B569 /* NetworkIconCapsuleView.swift */; };
 		6D0E188B291B82D000B59875 /* ProgressSnackbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0E188A291B82D000B59875 /* ProgressSnackbar.swift */; };
 		6D0FA73B2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */; };
 		6D10EAC5296F16EE0063FB71 /* DerivationPathNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D10EAC4296F16EE0063FB71 /* DerivationPathNameView.swift */; };
@@ -378,6 +379,7 @@
 		6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchMediator.swift; sourceTree = "<group>"; };
 		6D0677AD29BB0D0000D76D90 /* WarningStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningStateMediator.swift; sourceTree = "<group>"; };
 		6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryView.swift; sourceTree = "<group>"; };
+		6D0BF95129F2BBF500F5B569 /* NetworkIconCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkIconCapsuleView.swift; sourceTree = "<group>"; };
 		6D0E188A291B82D000B59875 /* ProgressSnackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSnackbar.swift; sourceTree = "<group>"; };
 		6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExportMultipleKeysModal+ViewModel.swift"; sourceTree = "<group>"; };
 		6D10EAC4296F16EE0063FB71 /* DerivationPathNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivationPathNameView.swift; sourceTree = "<group>"; };
@@ -900,6 +902,7 @@
 				6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */,
 				6D10EAC6296FA6410063FB71 /* AttributedInfoBoxView.swift */,
 				6DF3CFEF29937E48002DF203 /* AttributedTintInfoBox.swift */,
+				6D0BF95129F2BBF500F5B569 /* NetworkIconCapsuleView.swift */,
 			);
 			path = Text;
 			sourceTree = "<group>";
@@ -2274,6 +2277,7 @@
 				6D10EAC9296FA8910063FB71 /* Localizable+Formatted.swift in Sources */,
 				6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */,
 				6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */,
+				6D0BF95229F2BBF500F5B569 /* NetworkIconCapsuleView.swift in Sources */,
 				6D4C0756289B369200B2EE48 /* Assets.swift in Sources */,
 				6D6430F128CB32CC00342E37 /* Snackbar.swift in Sources */,
 				6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */,

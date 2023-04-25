@@ -17,10 +17,6 @@ extension QRCodeRootFooterViewModel {
 extension QRCodeAddressFooterViewModel {
     init(_ derivedKey: DerivedKeyExportModel) {
         identicon = derivedKey.viewModel.identicon
-        rootKeyName = derivedKey.viewModel.rootKeyName
-        path = derivedKey.viewModel.path
-        hasPassword = derivedKey.viewModel.hasPassword
-        network = derivedKey.keyData.network.networkTitle
         networkLogo = derivedKey.keyData.network.networkLogo
         base58 = derivedKey.viewModel.base58
     }

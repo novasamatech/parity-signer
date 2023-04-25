@@ -16,30 +16,18 @@ extension PreviewData {
 
     static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
         identicon: .svg(image: PreviewData.exampleIdenticon),
-        rootKeyName: "Dotsama parachains",
-        path: "//polkadot//path",
-        hasPassword: true,
-        network: "Polkadot",
         networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
     static let qrCodeAddressFooterViewModelNoPath = QRCodeAddressFooterViewModel(
         identicon: .svg(image: PreviewData.exampleIdenticon),
-        rootKeyName: "Dotsama parachains",
-        path: "",
-        hasPassword: false,
-        network: "Polkadot",
         networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 
     static let qrCodeAddressFooterViewModelVeryLongPath = QRCodeAddressFooterViewModel(
         identicon: .svg(image: PreviewData.exampleIdenticon),
-        rootKeyName: "Dotsama Crowdloans and Parity is a not just a very long name but the longest name",
-        path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
-        hasPassword: false,
-        network: "Polkadot",
         networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
@@ -60,11 +48,16 @@ extension PreviewData {
         isKeyExposed: Bool = true,
         isRootKey: Bool = true
     ) -> KeyDetailsPublicKeyViewModel {
-        KeyDetailsPublicKeyViewModel(
+        .init(
             qrCodes: [],
-            footer: qrCodeAddressFooterViewModel,
+            footer: PreviewData.qrCodeAddressFooterViewModel,
             isKeyExposed: isKeyExposed,
-            isRootKey: isRootKey
+            isRootKey: isRootKey,
+            networkTitle: "Polkadot",
+            networkLogo: "polkadot",
+            keySetName: "My Key Set",
+            path: "//polkadot",
+            hasPassword: true
         )
     }
 }
