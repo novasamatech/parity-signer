@@ -27,5 +27,5 @@
 /android/src/main/java/io/parity/signer/components @tetekinandrey @Dmitry-Borodin
 /android/src/main/java/io/parity/signer/components2 @tetekinandrey @Dmitry-Borodin
 /android/src/main/java/io/parity/signer/bottmsheets @tetekinandrey @Dmitry-Borodin
-/rust @montekki @prybalko
+/rust @prybalko
 /rust/signer/src/signer.udl @Dmitry-Borodin @krodak
