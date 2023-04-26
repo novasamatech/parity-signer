@@ -198,8 +198,14 @@ struct KeyDetailsView: View {
                 }
                 NavigationLink(
                     destination:
-                    KeyDetailsPublicKeyView(viewModel: .init(keyDetails: viewModel.presentedKeyDetails))
-                        .navigationBarHidden(true),
+                    KeyDetailsPublicKeyView(
+                        viewModel: .init(
+                            keyDetails: viewModel.presentedKeyDetails,
+                            publicKeyDetails: viewModel.presentedPublicKeyDetails,
+                            onCompletion: viewModel.refreshData
+                        )
+                    )
+                    .navigationBarHidden(true),
                     isActive: $viewModel.isPresentingKeyDetails
                 ) { EmptyView() }
             }

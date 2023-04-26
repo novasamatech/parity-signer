@@ -17,26 +17,20 @@ final class KeyDetailsActionService {
     }
 
     func startDeriveNewKey(_ keyName: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+        resetNavigationStateToKeyDetails(keyName)
         navigation.performFake(navigation: .init(action: .newKey))
         navigation.performFake(navigation: .init(action: .goBack))
     }
 
     func performBackupSeed(_ keyName: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+        resetNavigationStateToKeyDetails(keyName)
         navigation.performFake(navigation: .init(action: .rightButtonAction))
         navigation.performFake(navigation: .init(action: .backupSeed))
         navigation.performFake(navigation: .init(action: .rightButtonAction))
     }
 
     func navigateToPublicKey(_ keyName: String, _ publicKeyDetails: String) -> MKeyDetails? {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+        resetNavigationStateToKeyDetails(keyName)
         guard case let .keyDetails(keyDetails) = navigation
             .performFake(navigation: .init(action: .selectKey, details: publicKeyDetails)).screenData,
             let keyDetails = keyDetails else { return nil }
@@ -44,13 +38,18 @@ final class KeyDetailsActionService {
     }
 
     func forgetKeySetAction(_ keyName: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+        resetNavigationStateToKeyDetails(keyName)
         navigation.performFake(navigation: .init(action: .rightButtonAction))
         // Now update UI state -> this moves user to Logs
         navigation.performFake(navigation: .init(action: .removeSeed))
         // We need this call to Rust state machine to move user manually from Logs to Keys tab as per new design
         navigation.performFake(navigation: .init(action: .navbarKeys))
+        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+    }
+
+    func resetNavigationStateToKeyDetails(_ keyName: String) {
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarKeys))
+        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
     }
 }

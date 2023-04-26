@@ -41,6 +41,7 @@ extension KeyDetailsView {
         @Published var isPresentingRootDetails = false
         @Published var isPresentingKeyDetails = false
         @Published var presentedKeyDetails: MKeyDetails!
+        @Published var presentedPublicKeyDetails: String!
 
         @Published var isShowingKeysExportModal = false
         // Network selection
@@ -191,7 +192,7 @@ extension KeyDetailsView.ViewModel {
         } else {
             guard let keyDetails = keyDetailsActionsService.navigateToPublicKey(keyName, deriveKey.publicKeyDetails)
             else { return }
-
+            presentedPublicKeyDetails = deriveKey.publicKeyDetails
             presentedKeyDetails = keyDetails
             isPresentingKeyDetails = true
         }
@@ -276,11 +277,10 @@ private extension KeyDetailsView.ViewModel {
         }
         derivedKeys = filteredKeys
             .map {
-                let details = "\($0.key.addressKey)\n\($0.network.networkSpecsKey)"
-                return DerivedKeyRowModel(
+                DerivedKeyRowModel(
                     keyData: $0,
                     viewModel: DerivedKeyRowViewModel($0),
-                    publicKeyDetails: details
+                    publicKeyDetails: $0.publicKeyDetails
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list
