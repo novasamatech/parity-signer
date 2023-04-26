@@ -11,6 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.components.panels.CameraParentScreen
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.createderivation.derivationsubscreens.DerivationCreateConfirmBottomSheet
@@ -19,6 +21,7 @@ import io.parity.signer.screens.createderivation.derivationsubscreens.DeriveKeyN
 import io.parity.signer.screens.createderivation.help.DerivationMethodsHelpBottomSheet
 import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.launch
 
 
@@ -105,7 +108,12 @@ fun DerivationCreateSubgraph(
 		}
 		networkHelpersSubgraph(
 			routePath = DerivationCreateSubgraph.network_help,
-			onScanClicked = {}, ////			todo dmitry finish
+			onScanClicked = {
+				CameraParentSingleton.lastPossibleParent =
+					CameraParentScreen.CreateDerivationScreen(seedName)
+				rootNavigator.backAction()
+				rootNavigator.navigate(Action.NAVBAR_SCAN)
+			},
 			navController = navController,
 		)
 	}

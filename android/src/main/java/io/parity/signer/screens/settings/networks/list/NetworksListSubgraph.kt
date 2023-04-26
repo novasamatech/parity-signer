@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
+import io.parity.signer.uniffi.Action
 
 
 @Composable
@@ -20,12 +21,18 @@ fun NetworksListSubgraph(model: NetworksListModel, rootNavigator: Navigator) {
 				model = model,
 				rootNavigator = rootNavigator,
 				onNetworkHelp = { navController.navigate(NetworkListSubgraph.network_help) },
-				onAddNetwork = {}, //todo dmitry finish same as below
+				onAddNetwork = {
+					rootNavigator.backAction()
+					rootNavigator.navigate(Action.NAVBAR_SCAN)
+				},
 			)
 		}
 		networkHelpersSubgraph(
 			routePath = NetworkListSubgraph.network_help,
-			onScanClicked = {}, ////			todo dmitry finish
+			onScanClicked = {
+				rootNavigator.backAction()
+				rootNavigator.navigate(Action.NAVBAR_SCAN)
+			},
 			navController = navController,
 		)
 	}

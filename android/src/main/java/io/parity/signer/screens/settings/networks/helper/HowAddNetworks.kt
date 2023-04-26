@@ -26,7 +26,7 @@ import io.parity.signer.screens.scan.errors.COMPOSE_URL_TAG_ANNOTATION
 import io.parity.signer.ui.theme.*
 
 
-//todo text export
+//todo dmitry text export
 @Composable
 internal fun HowAddNetworks(
 	onClose: Callback,
@@ -36,7 +36,7 @@ internal fun HowAddNetworks(
 	Column() {
 		ScreenHeaderWithButton(
 			canProceed = true,
-			btnText = "Next",
+			btnText = stringResource(id = R.string.button_next),
 			onClose = onClose,
 			onDone = onNext,
 		)
@@ -55,7 +55,8 @@ internal fun HowAddNetworks(
 				text = "How to Add Networks",
 				style = SignerTypeface.TitleL,
 				color = MaterialTheme.colors.primary,
-				modifier = Modifier.padding(bottom = 16.dp)
+				modifier = Modifier
+					.padding(bottom = 16.dp)
 					.padding(horizontal = 8.dp)
 			)
 			Row(
@@ -86,7 +87,7 @@ internal fun HowAddNetworks(
 				}
 				Column() {
 					Text(
-						text = "Go to Portal where \u2028your network is stored",
+						text = "Go to Portal where your network is stored",
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 						modifier = Modifier.padding(end = 12.dp)

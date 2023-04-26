@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -21,7 +22,7 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
-
+//todo dmitry text export
 @Composable
 internal fun HowUpdateMetadata(
 	onClose: Callback,
@@ -31,7 +32,7 @@ internal fun HowUpdateMetadata(
 	Column() {
 		ScreenHeaderWithButton(
 			canProceed = true,
-			btnText = "Done",
+			btnText = stringResource(id = R.string.generic_done),
 			onClose = onClose,
 			onDone = onDone,
 			backNotClose = true,
