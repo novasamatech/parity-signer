@@ -26,7 +26,6 @@ import io.parity.signer.screens.scan.errors.COMPOSE_URL_TAG_ANNOTATION
 import io.parity.signer.ui.theme.*
 
 
-//todo dmitry text export
 @Composable
 internal fun HowAddNetworks(
 	onClose: Callback,
@@ -46,13 +45,13 @@ internal fun HowAddNetworks(
 				.padding(16.dp)
 		) {
 			Text(
-				text = "Step 1/2",
+				text = stringResource(R.string.networks_help_screen_1),
 				style = SignerTypeface.CaptionM,
 				color = MaterialTheme.colors.textSecondary,
 				modifier = Modifier.padding(horizontal = 8.dp),
 			)
 			Text(
-				text = "How to Add Networks",
+				text = stringResource(R.string.networks_help_title_add_networks),
 				style = SignerTypeface.TitleL,
 				color = MaterialTheme.colors.primary,
 				modifier = Modifier
@@ -80,14 +79,14 @@ internal fun HowAddNetworks(
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
-						text = "1",
+						text = stringResource(R.string.step_number_1),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 					)
 				}
 				Column() {
 					Text(
-						text = "Go to Portal where your network is stored",
+						text = stringResource(R.string.network_help_networks_go_portal),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 						modifier = Modifier.padding(end = 12.dp)
@@ -124,14 +123,14 @@ internal fun HowAddNetworks(
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
-						text = "2",
+						text = stringResource(R.string.step_number_2),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 					)
 				}
 				Column() {
 					Text(
-						text = "Choose the Network you need ",
+						text = stringResource(R.string.network_help_networks_choose_network),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 						modifier = Modifier.padding(end = 12.dp)
@@ -148,7 +147,8 @@ internal fun HowAddNetworks(
 						MaterialTheme.colors.fill12,
 						RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 					)
-					.padding(16.dp)) {
+					.padding(16.dp)
+			) {
 				Row() {
 					Box(
 						modifier = Modifier
@@ -162,22 +162,20 @@ internal fun HowAddNetworks(
 						contentAlignment = Alignment.Center,
 					) {
 						Text(
-							text = "3",
+							text = stringResource(R.string.step_number_3),
 							style = SignerTypeface.BodyL,
 							color = MaterialTheme.colors.primary,
 						)
 					}
-					Column() {
-						Text(
-							text = "Scan \"Chain spec\" QR to add the missing network",
-							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.primary,
-							modifier = Modifier.padding(end = 12.dp)
-						)
-					}
+					Text(
+						text = stringResource(R.string.network_help_networks_go_scan),
+						modifier = Modifier.padding(end = 12.dp),
+						color = MaterialTheme.colors.primary,
+						style = SignerTypeface.BodyL
+					)
 				}
 				SecondaryButtonWide(
-					label = "Scan Chain Spec",
+					label = stringResource(R.string.network_help_networks_scan_cta),
 					onClicked = onScanClicked,
 					withBackground = true,
 					modifier = Modifier.padding(top = 16.dp)
@@ -207,14 +205,14 @@ internal fun HowAddNetworks(
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
-						text = "4",
+						text = stringResource(R.string.step_number_4),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 					)
 				}
 				Column() {
 					Text(
-						text = "Press “Next” When You’re Done",
+						text = stringResource(R.string.network_help_networks_press_next),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 						modifier = Modifier.padding(end = 12.dp)

@@ -367,6 +367,23 @@
   <string name="derive_key_network_all">Allow use on any network</string>
 	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
 	<string name="networks_screen_add_net_network">Add new network</string>
+	<string name="networks_help_screen_1">Step 1/2</string>
+	<string name="networks_help_screen_2">Step 2/2</string>
+	<string name="networks_help_title_add_networks">How to Add Networks</string>
+	<string name="networks_help_title_add_metadata">How to Update Network’s Metadata</string>
+	<string name="step_number_1">1</string>
+	<string name="step_number_2">2</string>
+	<string name="step_number_3">3</string>
+	<string name="step_number_4">4</string>
+	<string name="network_help_networks_go_portal">Go to Portal where your network is stored</string>
+	<string name="network_help_networks_choose_network">Choose the Network you need</string>
+	<string name="network_help_networks_press_next">Press “Next” When You’re Done</string>
+	<string name="network_help_networks_go_scan">Scan "Chain spec" QR to add the missing network</string>
+	<string name="network_help_networks_scan_cta">Scan Chain Spec</string>
+	<string name="network_help_metadata_go_portal">Go to the Portal where your network’s metadata is stored</string>
+	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
+	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
+	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
 
 </resources>
 

@@ -22,7 +22,6 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
-//todo dmitry text export
 @Composable
 internal fun HowUpdateMetadata(
 	onClose: Callback,
@@ -43,13 +42,13 @@ internal fun HowUpdateMetadata(
 				.padding(16.dp)
 		) {
 			Text(
-				text = "Step 2/2",
+				text = stringResource(R.string.networks_help_screen_2),
 				style = SignerTypeface.CaptionM,
 				color = MaterialTheme.colors.textSecondary,
 				modifier = Modifier.padding(horizontal = 8.dp),
 			)
 			Text(
-				text = "How to Update Network’s Metadata",
+				text = stringResource(R.string.networks_help_title_add_metadata),
 				style = SignerTypeface.TitleL,
 				color = MaterialTheme.colors.primary,
 				modifier = Modifier
@@ -77,14 +76,14 @@ internal fun HowUpdateMetadata(
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
-						text = "1",
+						text = stringResource(R.string.step_number_1),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 					)
 				}
 				Column() {
 					Text(
-						text = "Go to the Portal where your network’s metadata is stored",
+						text = stringResource(R.string.network_help_metadata_go_portal),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 						modifier = Modifier.padding(end = 12.dp)
@@ -121,19 +120,17 @@ internal fun HowUpdateMetadata(
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
-						text = "2",
+						text = stringResource(R.string.step_number_2),
 						style = SignerTypeface.BodyL,
 						color = MaterialTheme.colors.primary,
 					)
 				}
-				Column() {
-					Text(
-						text = "Choose the Network you need",
-						style = SignerTypeface.BodyL,
-						color = MaterialTheme.colors.primary,
-						modifier = Modifier.padding(end = 12.dp)
-					)
-				}
+				Text(
+					text = stringResource(R.string.network_help_metadata_choose_networks),
+					style = SignerTypeface.BodyL,
+					color = MaterialTheme.colors.primary,
+					modifier = Modifier.padding(end = 12.dp)
+				)
 			}
 
 			Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -160,14 +157,14 @@ internal fun HowUpdateMetadata(
 						contentAlignment = Alignment.Center,
 					) {
 						Text(
-							text = "3",
+							text = stringResource(R.string.step_number_3),
 							style = SignerTypeface.BodyL,
 							color = MaterialTheme.colors.primary,
 						)
 					}
 					Column() {
 						Text(
-							text = "Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code",
+							text = stringResource(R.string.network_help_metadata_go_scan),
 							style = SignerTypeface.BodyL,
 							color = MaterialTheme.colors.primary,
 							modifier = Modifier.padding(end = 12.dp)
@@ -175,7 +172,7 @@ internal fun HowUpdateMetadata(
 					}
 				}
 				SecondaryButtonWide(
-					label = "Scan Metadata",
+					label = stringResource(R.string.network_help_metadata_scan_cta),
 					onClicked = onScanClicked,
 					withBackground = true,
 					modifier = Modifier.padding(top = 16.dp)
