@@ -54,6 +54,7 @@ fun NewKeySetNameScreen(
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
 			btnText = stringResource(R.string.button_next),
+			modifier = Modifier.padding(start = 8.dp),
 			onClose = { rootNavigator.backAction() }
 		) {
 			if (canProceed) {

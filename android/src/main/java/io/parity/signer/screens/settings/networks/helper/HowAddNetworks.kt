@@ -49,12 +49,14 @@ internal fun HowAddNetworks(
 				text = "Step 1/2",
 				style = SignerTypeface.CaptionM,
 				color = MaterialTheme.colors.textSecondary,
+				modifier = Modifier.padding(horizontal = 8.dp),
 			)
 			Text(
 				text = "How to Add Networks",
 				style = SignerTypeface.TitleL,
 				color = MaterialTheme.colors.primary,
 				modifier = Modifier.padding(bottom = 16.dp)
+					.padding(horizontal = 8.dp)
 			)
 			Row(
 				modifier = Modifier

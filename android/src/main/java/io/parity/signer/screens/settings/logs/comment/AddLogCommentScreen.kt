@@ -115,7 +115,7 @@ private fun AddLogCommentInternal(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp, vertical = 24.dp)
+				.padding(horizontal = 16.dp, vertical = 24.dp)
 		)
 	}
 	DisposableEffect(Unit) {

@@ -159,13 +159,14 @@ fun ScreenHeaderWithButton(
 	title: String = "",
 	btnText: String? = null,
 	backNotClose: Boolean = false,
+	modifier: Modifier = Modifier,
 	onClose: Callback,
 	onDone: Callback,
 ) {
 //todo dmitry remove paddings and change usages
 	Row(
-		modifier = Modifier.padding(
-			start = 24.dp,
+		modifier = modifier.padding(
+			start = 8.dp,
 			end = 8.dp,
 			top = 8.dp,
 			bottom = 8.dp
@@ -183,7 +184,7 @@ fun ScreenHeaderWithButton(
 					.padding(8.dp)
 					.size(24.dp)
 			)
-		}else {
+		} else {
 			Image(
 				imageVector = Icons.Filled.Close,
 				contentDescription = stringResource(R.string.description_back_button),
@@ -270,9 +271,9 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
-			ScreenHeaderWithButton(true, "Derivation", null, true, {}, {})
-			ScreenHeaderWithButton(true, "Derivation", null, false, {}, {})
-			ScreenHeaderWithButton(false, "Derivation", null, false, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, true, Modifier, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, false, Modifier, {}, {})
+			ScreenHeaderWithButton(false, "Derivation", null, false, Modifier, {}, {})
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},

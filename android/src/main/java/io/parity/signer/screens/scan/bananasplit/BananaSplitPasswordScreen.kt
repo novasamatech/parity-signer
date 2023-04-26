@@ -132,6 +132,7 @@ private fun BananaSplitPasswordInternal(
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
 			title = "",
+			modifier = Modifier.padding(start = 8.dp),
 			onClose = onClose,
 			onDone = onDoneTap,
 		)
@@ -141,7 +142,6 @@ private fun BananaSplitPasswordInternal(
 				.padding(horizontal = 24.dp)
 				.verticalScroll(rememberScrollState())
 		) {
-
 			Text(
 				text = stringResource(R.string.banana_split_password_title),
 				color = MaterialTheme.colors.primary,
