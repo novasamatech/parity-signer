@@ -20,6 +20,7 @@ fun NetworksListSubgraph(model: NetworksListModel, rootNavigator: Navigator) {
 				model = model,
 				rootNavigator = rootNavigator,
 				onNetworkHelp = { navController.navigate(NetworkListSubgraph.network_help) },
+				onAddNetwork = {}, //todo dmitry finish same as below
 			)
 		}
 		networkHelpersSubgraph(

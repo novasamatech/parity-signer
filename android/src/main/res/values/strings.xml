@@ -368,6 +368,7 @@
 	<string name="derivation_network_select_title">Select Network</string>
   <string name="derive_key_network_all">Allow use on any network</string>
 	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
+	<string name="networks_screen_add_net_network">Add new network</string>
 
 </resources>
 
