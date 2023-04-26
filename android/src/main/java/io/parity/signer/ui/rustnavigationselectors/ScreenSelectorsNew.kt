@@ -29,7 +29,7 @@ import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
-import io.parity.signer.screens.settings.networks.list.NetworksListScreen
+import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
 import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -96,7 +96,7 @@ fun CombinedScreensSelector(
 			)
 		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				NetworksListScreen(
+				NetworksListSubgraph(
 					model = screenData.f.toNetworksListModel(),
 					rootNavigator = rootNavigator
 				)

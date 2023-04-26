@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
@@ -62,7 +60,7 @@ fun DeriveKeyNetworkSelectScreen(
 				onNetworkSelect(SelectedNetwork.AllNetworks)
 			}
 		}
-		NetworkAlarm(
+		NetworkHelpAlarm(
 			Modifier
 				.padding(horizontal = 8.dp)
 				.clickable(onClick = onNetworkHelp))
@@ -139,7 +137,7 @@ private fun AllNetworksItem(
 }
 
 @Composable
-private fun NetworkAlarm(modifier: Modifier = Modifier) {
+fun NetworkHelpAlarm(modifier: Modifier = Modifier) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
@@ -149,7 +147,6 @@ private fun NetworkAlarm(modifier: Modifier = Modifier) {
                 BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
                 innerShape
             )
-
 	) {
 
 		Text(

@@ -26,6 +26,7 @@ import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.components.panels.CameraParentScreen
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.*
+import io.parity.signer.screens.createderivation.derivationsubscreens.NetworkHelpAlarm
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textTertiary
@@ -34,7 +35,11 @@ import io.parity.signer.uniffi.MManageNetworks
 
 
 @Composable
-fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
+fun NetworksListScreen(
+	model: NetworksListModel,
+	rootNavigator: Navigator,
+	onNetworkHelp: Callback,
+) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = stringResource(R.string.networks_screen_title),
@@ -42,9 +47,9 @@ fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
 		)
 		Spacer(modifier = Modifier.padding(top = 10.dp))
 		Column(
-            Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+			Modifier
+				.weight(1f)
+				.verticalScroll(rememberScrollState())
 		) {
 			model.networks.forEach { network ->
 				NetworkListItem(network) {
@@ -53,6 +58,11 @@ fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
 						CameraParentScreen.NetworkDetailsScreen(network.key)
 				}
 			}
+				//todo dmitry add network
+			NetworkHelpAlarm(
+				Modifier
+					.padding(horizontal = 8.dp, vertical = 16.dp)
+					.clickable(onClick = onNetworkHelp))
 		}
 		BottomBar(
 			rootNavigator, BottomBarState.SETTINGS,
@@ -71,9 +81,9 @@ fun NetworksListScreen(model: NetworksListModel, rootNavigator: Navigator) {
 @Composable
 private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 	Row(
-        Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable(onClick = callback),
+		Modifier
+			.padding(horizontal = 16.dp, vertical = 8.dp)
+			.clickable(onClick = callback),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		NetworkIcon(networkLogoName = network.logo, size = 36.dp)
@@ -82,8 +92,8 @@ private fun NetworkListItem(network: NetworkModel, callback: Callback) {
 			style = SignerTypeface.TitleS,
 			color = MaterialTheme.colors.primary,
 			modifier = Modifier
-                .padding(start = 12.dp)
-                .weight(1f)
+				.padding(start = 12.dp)
+				.weight(1f)
 		)
 		Image(
 			imageVector = Icons.Filled.ChevronRight,
@@ -125,6 +135,7 @@ private fun PreviewNetworksList() {
 		NetworksListScreen(
 			model,
 			rootNavigator = EmptyNavigator(),
+			{},
 		)
 	}
 }
