@@ -12,16 +12,17 @@ struct KeySetList: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
+    @State private var isShowingCreateKeySet = false
     @State private var isShowingMoreMenu = false
     @State private var isExportKeysSelected = false
+    @State private var shouldShowCreateKeySet = false
+    @State private var shouldShowRecoverKeySet = false
+    @State private var isShowingRecoverKeySet = false
 
     @State var selectedItems: [KeySetViewModel] = []
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Background color
-            Asset.backgroundSystem.swiftUIColor
-                .ignoresSafeArea()
             // Main screen
             VStack(spacing: 0) {
                 // Navigation Bar
@@ -63,6 +64,10 @@ struct KeySetList: View {
                     .hiddenScrollContent()
                 }
             }
+            .background(
+                Asset.backgroundSystem.swiftUIColor
+                    .ignoresSafeArea()
+            )
             VStack {
                 // Add Key Set
                 if !isExportKeysSelected {
@@ -70,11 +75,6 @@ struct KeySetList: View {
                         ConnectivityAlertOverlay(viewModel: .init())
                         PrimaryButton(
                             action: {
-                                // We need to call this conditionally, as if there are no seeds,
-                                // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-                                if !viewModel.listViewModel.list.isEmpty {
-                                    navigation.perform(navigation: .init(action: .rightButtonAction))
-                                }
                                 isShowingNewSeedMenu.toggle()
                             },
                             text: Localizable.KeySets.Action.add.key
@@ -91,11 +91,44 @@ struct KeySetList: View {
                 exportKeysOverlay
             }
         }
-        .fullScreenCover(isPresented: $isShowingNewSeedMenu) {
+        .fullScreenCover(
+            isPresented: $isShowingNewSeedMenu,
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async {
+                    if shouldShowCreateKeySet {
+                        shouldShowCreateKeySet = false
+                        isShowingCreateKeySet = true
+                    }
+                    if shouldShowRecoverKeySet {
+                        shouldShowRecoverKeySet = false
+                        isShowingRecoverKeySet = true
+                    }
+                    if shouldShowRecoverKeySet {
+                        shouldShowRecoverKeySet = false
+                        isShowingRecoverKeySet = true
+                    }
+                }
+            }
+        ) {
             AddKeySetModal(
-                isShowingNewSeedMenu: $isShowingNewSeedMenu
+                isShowingNewSeedMenu: $isShowingNewSeedMenu,
+                shouldShowCreateKeySet: $shouldShowCreateKeySet,
+                shouldShowRecoverKeySet: $shouldShowRecoverKeySet
             )
             .clearModalBackground()
+        }
+        .fullScreenCover(
+            isPresented: $isShowingCreateKeySet,
+            onDismiss: viewModel.updateData
+        ) {
+            EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
+        }
+        .fullScreenCover(
+            isPresented: $isShowingRecoverKeySet,
+            onDismiss: viewModel.updateData
+        ) {
+            RecoverKeySetNameView(viewModel: .init(isPresented: $isShowingRecoverKeySet))
         }
         .fullScreenCover(isPresented: $isShowingMoreMenu) {
             KeyListMoreMenuModal(
@@ -193,6 +226,7 @@ struct KeySetList: View {
 
 extension KeySetList {
     final class ViewModel: ObservableObject {
+        private let keyListService: KeyListService
         let keyDetailsService: KeyDetailsService
         private let modelBuilder: KeySetListViewModelBuilder
         @Published var isShowingKeysExportModal = false
@@ -201,10 +235,12 @@ extension KeySetList {
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
+            keyListService: KeyListService = KeyListService(),
             modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
             dataModel: MSeeds
         ) {
             self.keyDetailsService = keyDetailsService
+            self.keyListService = keyListService
             self.modelBuilder = modelBuilder
             self.dataModel = dataModel
             updateView(dataModel)
@@ -212,6 +248,11 @@ extension KeySetList {
 
         func updateView(_ dataModel: MSeeds) {
             listViewModel = modelBuilder.build(for: dataModel)
+        }
+
+        func updateData() {
+            dataModel = keyListService.getKeyList()
+            updateView(dataModel)
         }
 
         func loadKeysInformation(

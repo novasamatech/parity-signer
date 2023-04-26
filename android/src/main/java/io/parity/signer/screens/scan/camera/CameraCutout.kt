@@ -29,7 +29,7 @@ import io.parity.signer.ui.theme.pink500
 
 
 object ScanConstants{
-	val CLIP_SIDE_PADDING = 8.dp
+	val CLIP_SIDE_PADDING = 40.dp
 }
 
 @Composable

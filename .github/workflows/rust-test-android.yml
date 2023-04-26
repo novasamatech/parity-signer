@@ -18,7 +18,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.5.0
+        uses:                 actions/checkout@v3.5.2
         with:
           fetch-depth:        50
           submodules:         'recursive'
@@ -36,7 +36,7 @@ jobs:
           override:           true
 
       - name:                 Install cargo-nextest
-        uses:                 baptiste0928/cargo-install@2cfb0024938d23011106cbf127b393bc83fddba1 # v1.3.1
+        uses:                 baptiste0928/cargo-install@48c92f3d491efa23daace9891498a14c5aaa1afd # v2.0.0
         with:
           crate:              cargo-nextest
           version:            0.9

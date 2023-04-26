@@ -21,9 +21,10 @@ fun KeySetDetailsExportScreenFull(
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
-			confirmStateChange = {
+			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
-			}
+			},
+			skipHalfExpanded = false
 		)
 	val scope = rememberCoroutineScope()
 

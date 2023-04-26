@@ -21,37 +21,29 @@ final class MainScreensFactory {
             )
         case .settings:
             SettingsView(viewModel: .init())
-        case .log:
-            LogsListView(viewModel: .init())
         case let .keyDetails(value):
             if let value = value {
                 KeyDetailsPublicKeyView(viewModel: .init(keyDetails: value))
             } else {
                 EmptyView()
             }
-        case .newSeed:
-            EnterKeySetNameView(viewModel: .init())
-        case let .recoverSeedName(value):
-            RecoverKeySetNameView(viewModel: .init(content: value))
-        case let .recoverSeedPhrase(value):
-            RecoverKeySetSeedPhraseView(viewModel: .init(content: value))
         case .deriveKey:
             CreateDerivedKeyView(viewModel: .init())
-        case let .vVerifier(value):
-            VerfierCertificateView(viewModel: .init(content: value))
-        case let .manageNetworks(value):
-            NetworkSelectionSettings(viewModel: .init(networks: value.networks))
-        case let .nNetworkDetails(value):
-            NetworkSettingsDetails(viewModel: .init(networkDetails: value))
-        case let .signSufficientCrypto(value):
-            SignSpecsListView(viewModel: .init(content: value))
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,
+             .newSeed,
+             .recoverSeedName,
+             .recoverSeedPhrase,
+             .vVerifier,
              .scan,
              .transaction,
              .keyDetailsMulti,
-             .logDetails:
+             .manageNetworks,
+             .nNetworkDetails,
+             .logDetails,
+             .signSufficientCrypto,
+             .log:
             EmptyView()
         }
     }

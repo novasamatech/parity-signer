@@ -10,16 +10,23 @@ import SwiftUI
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            NavigationLink(
+                destination:
+                LogDetailsView(viewModel: .init(viewModel.selectedDetails))
+                    .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
             VStack(spacing: 0) {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
                         title: Localizable.LogsList.Label.title.string,
-                        leftButtons: [.init(type: .empty)],
+                        leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
-                        backgroundColor: Asset.backgroundSystem.swiftUIColor
+                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
                 )
                 ScrollView {
@@ -42,7 +49,10 @@ struct LogsListView: View {
         }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
-            onDismiss: { viewModel.onMoreActionSheetDismissal() }
+            onDismiss: {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+                DispatchQueue.main.async { viewModel.onMoreActionSheetDismissal() }
+            }
         ) {
             LogsMoreActionsModal(
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
@@ -66,15 +76,6 @@ struct LogsListView: View {
             LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
                 .clearModalBackground()
         }
-        .fullScreenCover(
-            isPresented: $viewModel.isPresentingDetails,
-            onDismiss: { viewModel.onEventDetailsDismiss() }
-        ) {
-            LogDetailsView(viewModel: .init(
-                isPresented: $viewModel.isPresentingDetails,
-                details: viewModel.selectedDetails
-            ))
-        }
     }
 }
 
@@ -89,7 +90,6 @@ extension LogsListView {
         @Published var isPresentingAddNoteModal = false
         @Published var selectedDetails: MLogDetails!
         @Published var isPresentingDetails = false
-
         private weak var navigation: NavigationCoordinator!
         private let logsService: LogsService
         private let snackBarPresentation: BottomSnackbarPresentation

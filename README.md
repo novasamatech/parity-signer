@@ -33,7 +33,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # Links
 
-- [Official Website](https://parity.io/signer)
+- [Official Website](https://signer.parity.io/)
 - [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
 - [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
 - [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
@@ -167,6 +167,13 @@ Enable "Show package details" checkmark to select specific version.
 `rust.pythonCommand=python3`
 
 **10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
+
+# Release Android
+
+- Create PR with new app version updated and tag v* (example "v6.1.3")
+- After merging to master - run release-android.yml flow. It will build and sign apk and upload it to internal track in play store
+- Create github release with apk from release flow
+- Go to play store, promote internal track to production and update changes in play store
 
 # Tests
 

@@ -184,7 +184,7 @@ class SeedRepository(
 }
 
 
-const val TAG = "Seed_Repository"
+private const val TAG = "Seed_Repository"
 
 sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()

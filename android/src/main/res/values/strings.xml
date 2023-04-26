@@ -35,7 +35,6 @@
 	<string name="key_sets_details_screem_create_derived_button">Create Derived Key</string>
 	<string name="bottom_bar_label_key_sets">Key Sets</string>
 	<string name="bottom_bar_label_scanner">Scanner</string>
-	<string name="bottom_bar_label_logs">Logs</string>
 	<string name="bottom_bar_label_settings">Settings</string>
 	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
 	<string name="key_set_details_multiselect_title_none_selected">Select Keys</string>
@@ -79,6 +78,8 @@
 	<string name="log_title_warning">Warning!</string>
 	<string name="log_title_wrong_password">Wrong password entered</string>
 	<string name="log_message_wrong_passowrd">operation declined</string>
+	<string name="logs_details_title">Event Details</string>
+	<string name="logs_add_error_message">Note not added, %1$s</string>
 	<string name="logs_title">All Logs</string>
 	<string name="log_message_metadata">%1$s version %2$s</string>
 	<string name="log_message_network_verifier">%1$s for network with genesis hash %2$s</string>
@@ -131,6 +132,7 @@
 	<string name="exposed_before_cancel_button">Go Back</string>
 	<string name="exposed_before_proceed_button">Acknowledge and Proceed</string>
 	<string name="settings_title">Settings</string>
+	<string name="settings_logs">Logs</string>
 	<string name="settings_networks">Networks</string>
 	<string name="settings_verifier_certificate">Verifier certificate</string>
 	<string name="settings_backup_keys">Backup keys</string>
@@ -332,7 +334,7 @@
 	<string name="transaction_error_outdated_metadata_subtitle">Unique network\'s 3220 metadata is different to the 3219 data you\'re using in the app. Please update it to sign the transaction.</string>
 	<string name="transaction_error_unknown_network_title">Please add the Network you want to Transact in</string>
 	<string name="transaction_error_unknown_network_subtitle">You\'re trying to sign a transaction in a network which has not been added</string>
-    <string name="networks_screen_title">Networks</string>
+	<string name="networks_screen_title">Networks</string>
 	<string name="network_details_remove_confirm_title">Remove Network?</string>
 	<string name="network_details_remove_confirm_description">This network will be removed for the whole device</string>
 	<string name="network_details_menu_sign_specs">Sign Network Specs</string>
@@ -361,7 +363,15 @@
 	<string name="keys_backup_screen_subtitle">Select a key set you want to Expose a Secret Recovery Phrase for</string>
 	<string name="seed_backup_countdown_message">Secret Recovery Phrase  will be hidden in</string>
 	<string name="settings_backup">Backup Secret Phrase</string>
-
+	<string name="verifier_certificate_title">Verifier Certificate</string>
+	<string name="verifier_certificate_remove_cta">Remove Certificate</string>
+	<string name="confirm_factory_reset_title">Wipe All Data</string>
+	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
+	<string name="logs_add_comment_title">Add Note</string>
+	<string name="add_log_note_placeholder">Enter log note</string>
+  <string name="key_details_public_label_network">Network</string>
+	<string name="key_details_public_label_path">Derivation Path</string>
+	<string name="key_details_public_label_keyset">Key Set Name</string>
 
 </resources>
 

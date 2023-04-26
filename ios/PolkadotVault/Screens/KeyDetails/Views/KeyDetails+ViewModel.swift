@@ -186,24 +186,22 @@ extension KeyDetailsView.ViewModel {
 extension KeyDetailsView.ViewModel {
     func onActionSheetDismissal() {
         let isAlertVisible = warningStateMediator.alert
-        DispatchQueue.main.async {
-            if self.shouldPresentRemoveConfirmationModal {
-                self.shouldPresentRemoveConfirmationModal.toggle()
-                self.isShowingRemoveConfirmation.toggle()
+        if shouldPresentRemoveConfirmationModal {
+            shouldPresentRemoveConfirmationModal.toggle()
+            isShowingRemoveConfirmation.toggle()
+        }
+        if shouldPresentBackupModal {
+            shouldPresentBackupModal.toggle()
+            if isAlertVisible {
+                isPresentingConnectivityAlert.toggle()
+            } else {
+                updateBackupModel()
+                isShowingBackupModal = true
             }
-            if self.shouldPresentBackupModal {
-                self.shouldPresentBackupModal.toggle()
-                if isAlertVisible {
-                    self.isPresentingConnectivityAlert.toggle()
-                } else {
-                    self.updateBackupModel()
-                    self.isShowingBackupModal = true
-                }
-            }
-            if self.shouldPresentSelectionOverlay {
-                self.shouldPresentSelectionOverlay.toggle()
-                self.isPresentingSelectionOverlay.toggle()
-            }
+        }
+        if shouldPresentSelectionOverlay {
+            shouldPresentSelectionOverlay.toggle()
+            isPresentingSelectionOverlay.toggle()
         }
     }
 

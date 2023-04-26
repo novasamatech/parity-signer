@@ -22,7 +22,7 @@ struct CreateDerivedKeyView: View {
                         action: { navigation.perform(navigation: .init(action: .goBack)) }
                     )],
                     rightButtons: [.init(type: .questionmark, action: viewModel.onRightNavigationButtonTap)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             VStack(alignment: .leading, spacing: 0) {
@@ -127,17 +127,7 @@ struct CreateDerivedKeyView: View {
                     .font(PrimaryFont.bodyL.font)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 Spacer()
-                HStack(spacing: 0) {
-                    NetworkLogoIcon(networkName: network.logo, size: Heights.networkLogoInCapsule)
-                        .padding(.trailing, Spacing.extraSmall)
-                    Text(network.title.capitalized)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
-                        .padding(.trailing, Spacing.extraSmall)
-                }
-                .padding(Spacing.minimal)
-                .background(Asset.fill12.swiftUIColor)
-                .clipShape(Capsule())
+                NetworkIconCapsuleView(networkLogo: network.logo, networkTitle: network.title)
             case .allowedOnAnyNetwork:
                 Localizable.CreateDerivedKey.Label.Network.onAny.text
                     .font(PrimaryFont.bodyL.font)

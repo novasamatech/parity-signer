@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import io.parity.signer.bottomsheets.LogComment
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
@@ -26,15 +25,13 @@ import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
-import io.parity.signer.screens.logs.LogsMenu
-import io.parity.signer.screens.logs.LogsScreen
-import io.parity.signer.screens.logs.toLogsScreenModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
-import io.parity.signer.screens.settings.networks.list.NetworksList
+import io.parity.signer.screens.settings.networks.list.NetworksListScreen
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
+import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.*
@@ -88,13 +85,7 @@ fun CombinedScreensSelector(
 						rootNavigator.backAction()
 					}
 			}
-		is ScreenData.Log ->
-			Box(Modifier.statusBarsPadding()) {
-				LogsScreen(
-					model = screenData.f.toLogsScreenModel(),
-					navigator = rootNavigator,
-				)
-			}
+		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.Settings ->
 			SettingsScreenSubgraph(
 				rootNavigator = rootNavigator,
@@ -105,7 +96,7 @@ fun CombinedScreensSelector(
 			)
 		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
-				NetworksList(
+				NetworksListScreen(
 					model = screenData.f.toNetworksListModel(),
 					rootNavigator = rootNavigator
 				)
@@ -148,6 +139,11 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+		is ScreenData.VVerifier -> VerifierScreenFull(
+			screenData.f.toVerifierDetailsModels(),
+			sharedViewModel::wipeToJailbreak,
+			rootNavigator,
+		)
 		else -> {} //old Selector showing them
 	}
 }
@@ -166,7 +162,10 @@ fun BottomSheetSelector(
 
 			when (localNavAction) {
 				is LocalNavAction.ShowExportPrivateKey -> {
-					BottomSheetWrapperRoot {
+					BottomSheetWrapperRoot(onClosedAction = {
+//						don't do action here because timer's finally will do back navigation
+//						navigator.backAction()
+					}) {
 						PrivateKeyExportBottomSheet(
 							model = localNavAction.model,
 							navigator = localNavAction.navigator
@@ -203,14 +202,7 @@ fun BottomSheetSelector(
 						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
-				is ModalData.LogRight ->
-					BottomSheetWrapperRoot(onClosedAction = {
-						navigator.backAction()
-					}) {
-						LogsMenu(
-							navigator = sharedViewModel.navigator,
-						)
-					}
+				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
 				is ModalData.EnterPassword ->
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
@@ -226,9 +218,9 @@ fun BottomSheetSelector(
 							onClose = { navigator.backAction() },
 						)
 					}
-				is ModalData.SignatureReady -> {}//part of camera flow now
+				is ModalData.SignatureReady -> {} //part of camera flow now
 				//old design
-				is ModalData.LogComment -> LogComment(sharedViewModel = sharedViewModel)
+				is ModalData.LogComment -> {} //moved to logs subgraph, part of settigns now
 				else -> {}
 			}
 		}

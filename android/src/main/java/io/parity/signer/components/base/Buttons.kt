@@ -174,6 +174,7 @@ fun RowButtonsBottomSheet(
 	modifier: Modifier = Modifier,
 	onClickedCancel: Callback,
 	onClickedCta: Callback,
+	isCtaDangerous: Boolean = false,
 	isCtaEnabled: Boolean = true,
 ) {
 	Row(modifier = modifier) {
@@ -186,6 +187,8 @@ fun RowButtonsBottomSheet(
 		Spacer(modifier = Modifier.padding(end = 8.dp))
 		PrimaryButton(
 			label = labelCta, modifier = Modifier.weight(1f),
+			activeBackground = if (isCtaDangerous) MaterialTheme.colors.red400
+			else MaterialTheme.colors.pink500,
 			onClicked = onClickedCta, isEnabled = isCtaEnabled
 		)
 	}

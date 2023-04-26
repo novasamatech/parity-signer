@@ -21,6 +21,7 @@ fun NewKeySetBackupScreenFull(
 ) {
 	val modalBottomSheetState =
 		rememberModalBottomSheetState(ModalBottomSheetValue.Hidden,
+			skipHalfExpanded = true,
 			confirmValueChange = {
 				it != ModalBottomSheetValue.HalfExpanded
 			}

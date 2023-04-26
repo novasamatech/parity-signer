@@ -11,8 +11,6 @@ import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
-import io.parity.signer.screens.logs.logdetails.LogDetails
-import io.parity.signer.screens.settings.VerifierScreen
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -49,7 +47,7 @@ fun ScreenSelector(
 		}
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
-		is ScreenData.LogDetails -> LogDetails(screenData.f)
+		is ScreenData.LogDetails -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.ManageNetworks -> {} //migrated to new selector
 		is ScreenData.NNetworkDetails -> {} // migrated to new selector
 		is ScreenData.NewSeed -> {} // new selector
@@ -75,10 +73,7 @@ fun ScreenSelector(
 			screenData.f,
 			sharedViewModel::signSufficientCrypto
 		)
-		is ScreenData.VVerifier -> VerifierScreen(
-			screenData.f,
-			sharedViewModel::wipeToJailbreak
-		)
+		is ScreenData.VVerifier -> {} //new selector
 	}
 }
 

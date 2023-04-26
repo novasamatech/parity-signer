@@ -144,9 +144,12 @@ struct CameraView: View {
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
                 model.start()
+
                 // User entered invalid password too many times, present error
                 if viewModel.shouldPresentError {
-                    viewModel.isPresentingError = true
+                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                    // async
+                    DispatchQueue.main.async { viewModel.isPresentingError = true }
                     return
                 }
                 viewModel.clearTransactionState()
@@ -176,12 +179,16 @@ struct CameraView: View {
                 // User forgot password
                 if viewModel.shouldPresentError {
                     viewModel.presentableError = .signingForgotPassword()
-                    viewModel.isPresentingError = true
+                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                    // async
+                    DispatchQueue.main.async { viewModel.isPresentingError = true }
                     return
                 }
                 // User entered valid password, signature is ready
                 if viewModel.signature != nil {
-                    viewModel.continueWithSignature()
+                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                    // async
+                    DispatchQueue.main.async { viewModel.continueWithSignature() }
                     return
                 }
                 // Dismissed by user
@@ -225,7 +232,7 @@ struct CameraView: View {
             Spacer()
             CapsuleButton(
                 action: {
-                    viewModel.onMultipleTransactionSign(model.multipleTransactions, model: model)
+                    viewModel.onMultipleTransactionSign(model.multipleTransactions)
                 },
                 icon: Asset.arrowForward.swiftUIImage,
                 title: Localizable.Scanner.Action.sign.string
@@ -398,7 +405,7 @@ extension CameraView.ViewModel {
 // MARK: - Mutliple Transactions mode
 
 extension CameraView.ViewModel {
-    func onMultipleTransactionSign(_ payloads: [String], model _: CameraService) {
+    func onMultipleTransactionSign(_ payloads: [String]) {
         var transactions: [MTransaction] = []
         for payload in payloads {
             let actionResult = navigation.performFake(

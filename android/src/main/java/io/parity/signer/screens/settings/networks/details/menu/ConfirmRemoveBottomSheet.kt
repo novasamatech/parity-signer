@@ -19,6 +19,7 @@ fun ConfirmRemoveNetworkBottomSheet(
 		title = stringResource(R.string.network_details_remove_confirm_title),
 		message = stringResource(R.string.network_details_remove_confirm_description),
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
+		isCtaDangerous = true,
 		onCancel = onCancel,
 		onCta = onRemoveNetwork,
 	)
@@ -35,6 +36,7 @@ fun ConfirmRemoveMetadataBottomSheet(
 		message = stringResource(R.string.network_details_remove_metadata_confirm_description),
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
 		onCancel = onCancel,
+		isCtaDangerous = true,
 		onCta = onRemoveMetadata,
 	)
 }

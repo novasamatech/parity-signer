@@ -9,18 +9,14 @@ import SwiftUI
 
 struct CreateKeySetSeedPhraseView: View {
     @StateObject var viewModel: ViewModel
-
-    @EnvironmentObject var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
                     title: nil,
-                    leftButtons: [.init(
-                        type: .arrow,
-                        action: viewModel.onBackTap
-                    )]
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })]
                 )
             )
             ScrollView(showsIndicators: false) {
@@ -77,9 +73,6 @@ struct CreateKeySetSeedPhraseView: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingInfo
         ) {
@@ -95,31 +88,24 @@ struct CreateKeySetSeedPhraseView: View {
 extension CreateKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
         private let seedsMediator: SeedsMediating
-        private weak var navigation: NavigationCoordinator!
 
         let dataModel: MNewSeedBackup
         @Binding var isPresented: Bool
         @Published var confirmBackup = false
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
+        private let service: CreateKeySetService
 
         init(
             dataModel: MNewSeedBackup,
             isPresented: Binding<Bool>,
+            service: CreateKeySetService = CreateKeySetService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.dataModel = dataModel
-            _isPresented = isPresented
+            self.service = service
             self.seedsMediator = seedsMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
-        func onBackTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
+            _isPresented = isPresented
         }
 
         func onCreateTap() {
@@ -128,11 +114,8 @@ extension CreateKeySetSeedPhraseView {
                 seedPhrase: dataModel.seedPhrase,
                 shouldCheckForCollision: true
             )
-            navigation.perform(navigation: .init(
-                action: .goForward,
-                details: BackendConstants.true,
-                seedPhrase: dataModel.seedPhrase
-            ))
+            service.confirmKeySetCreation(dataModel.seedPhrase)
+            isPresented = false
         }
 
         func onInfoBoxTap() {
@@ -157,7 +140,6 @@ extension CreateKeySetSeedPhraseView {
                     isPresented: .constant(true)
                 )
             )
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

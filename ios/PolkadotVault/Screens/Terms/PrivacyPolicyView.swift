@@ -9,15 +9,19 @@ import SwiftUI
 
 struct PrivacyPolicyView: View {
     @StateObject var viewModel: ViewModel
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     title: Localizable.Settings.PrivacyPolicy.Label.title.string,
-                    leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                    leftButtons: [.init(
+                        type: .arrow,
+                        action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }
+                    )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundSystem.swiftUIColor
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
             ScrollView {
@@ -34,14 +38,10 @@ struct PrivacyPolicyView: View {
 
 extension PrivacyPolicyView {
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
+        let onBackTap: (() -> Void)?
 
-        init(isPresented: Binding<Bool>) {
-            _isPresented = isPresented
-        }
-
-        func onBackTap() {
-            isPresented = false
+        init(onBackTap: (() -> Void)? = nil) {
+            self.onBackTap = onBackTap
         }
     }
 }
@@ -49,7 +49,7 @@ extension PrivacyPolicyView {
 #if DEBUG
     struct PrivacyPolicyView_Previews: PreviewProvider {
         static var previews: some View {
-            PrivacyPolicyView(viewModel: .init(isPresented: .constant(true)))
+            PrivacyPolicyView(viewModel: .init())
         }
     }
 #endif

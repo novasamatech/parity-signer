@@ -94,8 +94,7 @@
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
 
-"TabBar.Keys" = "Keys";
-"TabBar.Logs" = "Logs";
+"TabBar.Keys" = "Key Sets";
 "TabBar.Scanner" = "Scanner";
 "TabBar.Settings" = "Settings";
 
@@ -144,8 +143,12 @@
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
+"PublicKeyDetails.Label.KeySetName" = "Key Set Name";
+"PublicKeyDetails.Label.Network" = "Network";
+"PublicKeyDetails.Label.Derivation" = "Derivation Path";
+"PublicKeyDetails.Label.EmptyPath" = "Derivation Path Name Is Empty";
 
-"KeyScreen.Label.Hotkey" = "This key is marked hot because its root private key has been exported";
+"KeyScreen.Label.Hotkey" = "This key is marked HOT because its root private key has been exported.";
 "KeyScreen.Action.Export" = "Export Private Key";
 
 "KeyExportWarning.Label.Header" = "Export Private Key";
@@ -339,6 +342,7 @@
 
 "Settings.Label.Title" = "Settings";
 "Settings.Label.Networks" = "Networks";
+"Settings.Label.Logs" = "Logs";
 "Settings.Label.Verifier" = "Verifier Certificate";
 "Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
@@ -409,7 +413,7 @@
 "ImportKeys.Label.Title.Single" = "Import Key";
 "ImportKeys.Label.Title.Multiple" = "Import %@ Keys";
 "ImportKeys.Label.Title.Derived" = "%@ Derived Keys Can Be Imported";
-"ImportKeys.Label.EmptyPath" = "Derivation path name is empty";
+"ImportKeys.Label.EmptyPath" = "Derivation Path Name Is Empty";
 "ImportKeys.Action.Import" = "Import Keys";
 "ImportKeys.Error.Label.KeySetMissing" = "Some keys cannot be imported until their key sets are recovered. Please recover the missing key sets.";
 "ImportKeys.Error.Action.KeySetMissing" = "Recover Key Set";
@@ -452,7 +456,7 @@
 "CreateDerivedKey.Label.Header.Network" = "Choose Network";
 "CreateDerivedKey.Label.Header.Path" = "Derivation Path";
 "CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
-"CreateDerivedKey.Label.EmpyyPath" = "Derivation path name is empty";
+"CreateDerivedKey.Label.EmpyyPath" = "Derivation Path Name Is Empty";
 "CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
 "CreateDerivedKey.Action.Add" = "Create Derived Key";
 "CreateDerivedKey.Label.Network.Single" = "Network";
@@ -469,7 +473,7 @@
 "CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
-"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation path name is empty";
+"CreateDerivedKey.Modal.Path.Placeholder.Path" = "Derivation Path Name Is Empty";
 "CreateDerivedKey.Modal.Path.Error.Password" = "Passwords don’t match";
 "CreateDerivedKey.Modal.Path.Error.AlreadyExists" = "Key with this Derivation path name already exists";
 "CreateDerivedKey.Modal.Path.Error.PathInvalid" = "Given derivation path is invalid";
@@ -549,8 +553,8 @@
 "Onboarding.SetUpNetworks.Step1.Label.Step" = "Step 1 / 2";
 "Onboarding.SetUpNetworks.Step1.Label.Title" = "How to Add Networks";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.One" = "Go to Portal where your network is stored";
-"Onboarding.SetUpNetworks.Step1.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
-"Onboarding.SetUpNetworks.Step1.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two" = "metadata.parity.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step1.Label.Step1.Two.Highlight" = "metadata.parity.io";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
 "Onboarding.SetUpNetworks.Step1.Label.Step1.Three.Highlight" = "metadata.novasama.io";
 "Onboarding.SetUpNetworks.Step1.Label.Step2" = "Choose the Network you need";
@@ -562,8 +566,8 @@
 "Onboarding.SetUpNetworks.Step2.Label.Step" = "Step 2 / 2";
 "Onboarding.SetUpNetworks.Step2.Label.Title" = "How to Update Network’s Metadata";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.One" = "Go to the Portal where your network’s metadata is stored";
-"Onboarding.SetUpNetworks.Step2.Label.Step1.Two" = "parity.metadata.io for Polkadot, Kusama, and Westend";
-"Onboarding.SetUpNetworks.Step2.Label.Step1.Two.Highlight" = "parity.metadata.io";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two" = "metadata.parity.io for Polkadot, Kusama, and Westend";
+"Onboarding.SetUpNetworks.Step2.Label.Step1.Two.Highlight" = "metadata.parity.io";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.Three" = "metadata.novasama.io for Parachains and Solochains";
 "Onboarding.SetUpNetworks.Step2.Label.Step1.Three.Highlight" = "metadata.novasama.io";
 "Onboarding.SetUpNetworks.Step2.Label.Step2" = "Choose the Network you need";

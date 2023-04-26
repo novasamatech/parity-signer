@@ -25,13 +25,14 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.BottomBar
+import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
+import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -60,6 +61,7 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
@@ -74,6 +76,7 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
+					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
@@ -85,17 +88,15 @@ fun SettingsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}) {
-				Box(modifier = Modifier.statusBarsPadding()) {
-					SettingsWipeAllConfirmation(
-						onCancel = {
-							navController.popBackStack(
-								SettingsScreenSubgraph.home,
-								false
-							)
-						},
-						onWipe = wipeToFactory
-					)
-				}
+				ConfirmFactorySettingsBottomSheet(
+					onCancel = {
+						navController.popBackStack(
+							SettingsScreenSubgraph.home,
+							false
+						)
+					},
+					onFactoryReset = wipeToFactory
+				)
 			}
 		}
 		composable(SettingsScreenSubgraph.terms) {
@@ -117,6 +118,11 @@ fun SettingsScreenSubgraph(
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}
 		}
+		logsNavigationSubgraph(
+			SettingsScreenSubgraph.logs,
+			rootNavigator,
+			navController
+		)
 	}
 }
 
@@ -126,12 +132,14 @@ private object SettingsScreenSubgraph {
 	const val terms = "settings_terms_of_service"
 	const val privacyPolicy = "settings_privacy_polcy"
 	const val backup = "settings_backup"
+	const val logs = "settings_logs"
 }
 
 @Composable
 private fun SettingsScreenGeneralView(
 	rootNavigator: Navigator,
 	onWipeData: Callback,
+	onOpenLogs: Callback,
 	onShowTerms: Callback,
 	onShowPrivacyPolicy: Callback,
 	onBackup: Callback,
@@ -143,6 +151,10 @@ private fun SettingsScreenGeneralView(
 		ScreenHeader(title = stringResource(R.string.settings_title))
 		Box(modifier = Modifier.weight(1f)) {
 			Column(Modifier.verticalScroll(rememberScrollState())) {
+				SettingsElement(
+					name = stringResource(R.string.settings_logs),
+					onClick = onOpenLogs
+				)
 				SettingsElement(name = stringResource(R.string.settings_networks)) {
 					rootNavigator.navigate(Action.MANAGE_NETWORKS)
 				}
@@ -190,7 +202,7 @@ private fun SettingsScreenGeneralView(
 					.padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
-		BottomBar2(rootNavigator, BottomBar2State.SETTINGS)
+		BottomBar(rootNavigator, BottomBarState.SETTINGS)
 	}
 }
 
@@ -241,6 +253,7 @@ private fun PreviewSettingsScreen() {
 		SettingsScreenGeneralView(
 			rootNavigator = EmptyNavigator(),
 			onWipeData = {},
+			onOpenLogs = {},
 			onShowTerms = {},
 			onShowPrivacyPolicy = {},
 			onBackup = {},
