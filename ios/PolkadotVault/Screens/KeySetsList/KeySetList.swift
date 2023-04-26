@@ -18,6 +18,7 @@ struct KeySetList: View {
     @State private var shouldShowCreateKeySet = false
     @State private var shouldShowRecoverKeySet = false
     @State private var isShowingRecoverKeySet = false
+    @State private var detailsToPresent: MKeysNew?
     @State private var isShowingDetails = false
 
     @State var selectedItems: [KeySetViewModel] = []
@@ -85,7 +86,13 @@ struct KeySetList: View {
                 }
             }
         }
-
+        .onAppear {
+            viewModel.updateData()
+        }
+        .onChange(of: isShowingDetails, perform: { _ in
+            guard !isShowingDetails else { return }
+            viewModel.updateData()
+        })
         .fullScreenCover(
             isPresented: $isShowingNewSeedMenu,
             onDismiss: {
@@ -164,7 +171,8 @@ struct KeySetList: View {
                         destination:
                         KeyDetailsView(
                             viewModel: .init(
-                                keyName: $0.keyName
+                                keyName: $0.keyName,
+                                keysData: detailsToPresent
                             )
                         )
                         .navigationBarHidden(true),
@@ -197,8 +205,7 @@ struct KeySetList: View {
                 self.viewModel.loadKeysInformation(for: viewModel.keyName) { result in
                     switch result {
                     case let .success(keysData):
-                        appState.userData.keysData = keysData
-                        navigation.performFake(navigation: .init(action: .selectSeed, details: viewModel.keyName))
+                        detailsToPresent = keysData
                         isShowingDetails = true
                     case .failure:
                         ()

@@ -132,7 +132,7 @@
 		6D67F94329825D280017C278 /* JailbreakDetectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94229825D280017C278 /* JailbreakDetectedView.swift */; };
 		6D67F94529837BB00017C278 /* UnlockDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94429837BB00017C278 /* UnlockDeviceView.swift */; };
 		6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */; };
-		6D6DF33229F5756400FC06AD /* NewDerivedKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF33129F5756400FC06AD /* NewDerivedKeyService.swift */; };
+		6D6DF33429F65A0B00FC06AD /* KeyDetailsActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */; };
 		6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */; };
 		6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */; };
 		6D7129222952B7800048558C /* NetworkSettingsDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129212952B7800048558C /* NetworkSettingsDetails.swift */; };
@@ -460,7 +460,7 @@
 		6D67F94229825D280017C278 /* JailbreakDetectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectedView.swift; sourceTree = "<group>"; };
 		6D67F94429837BB00017C278 /* UnlockDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockDeviceView.swift; sourceTree = "<group>"; };
 		6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandler.swift; sourceTree = "<group>"; };
-		6D6DF33129F5756400FC06AD /* NewDerivedKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewDerivedKeyService.swift; sourceTree = "<group>"; };
+		6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionService.swift; sourceTree = "<group>"; };
 		6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyOverviewRow.swift; sourceTree = "<group>"; };
 		6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6D7129212952B7800048558C /* NetworkSettingsDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetails.swift; sourceTree = "<group>"; };
@@ -987,7 +987,7 @@
 				6DD4A6A329E9404200FA6746 /* CreateKeySetService.swift */,
 				6DD4A6A529E9480700FA6746 /* KeyListService.swift */,
 				6DF5543529E952270078B8DC /* RecoverKeySetService.swift */,
-				6D6DF33129F5756400FC06AD /* NewDerivedKeyService.swift */,
+				6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -2194,6 +2194,7 @@
 				6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */,
 				6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */,
 				6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */,
+				6D6DF33429F65A0B00FC06AD /* KeyDetailsActionService.swift in Sources */,
 				6DA08B8629AC88D50027CFCB /* WrappingHStack.swift in Sources */,
 				6D6430F728CB662500342E37 /* ExportPrivateKeyWarningModal.swift in Sources */,
 				6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */,
@@ -2230,7 +2231,6 @@
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
-				6D6DF33229F5756400FC06AD /* NewDerivedKeyService.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
 				6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */,

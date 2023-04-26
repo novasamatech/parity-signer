@@ -9,9 +9,8 @@ import SwiftUI
 
 struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,10 +18,7 @@ struct KeyDetailsView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        leftButtons: [.init(type: .arrow, action: {
-                            viewModel.onBackTap()
-                            mode.wrappedValue.dismiss()
-                        })],
+                        leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [
                             .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
                             .init(type: .more, action: { viewModel.isShowingActionSheet.toggle() })
@@ -71,9 +67,6 @@ struct KeyDetailsView: View {
                 }
             }
         }
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .fullScreenCover(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
@@ -93,10 +86,7 @@ struct KeyDetailsView: View {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
                 mainAction: viewModel.onRemoveKeySetConfirmationTap(),
-                // We need to fake right button action here or Rust machine will break
-                // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
-                // so we need to inform Rust we actually hid it
-                dismissAction: { _ = navigation.performFake(navigation: .init(action: .rightButtonAction)) }(),
+                dismissAction: viewModel.onRemoveKeySetModalDismiss(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
@@ -149,6 +139,9 @@ struct KeyDetailsView: View {
                 EmptyView()
             }
         }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
+        }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingNetworkSelection
         ) {
@@ -176,10 +169,11 @@ struct KeyDetailsView: View {
             .clearModalBackground()
         }
         .fullScreenCover(
-            isPresented: $viewModel.isPresentingDeriveNewKey
+            isPresented: $viewModel.isPresentingDeriveNewKey,
+            onDismiss: viewModel.refreshData
         ) {
             NavigationView {
-                CreateDerivedKeyView(viewModel: .init())
+                CreateDerivedKeyView(viewModel: .init(seedName: viewModel.keysData?.root?.address.seedName ?? ""))
                     .navigationViewStyle(StackNavigationViewStyle())
                     .navigationBarHidden(true)
             }

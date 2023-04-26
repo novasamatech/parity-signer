@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 10/01/2023.
 //
 
+import Combine
 import SwiftUI
 
 struct CreateDerivedKeyView: View {
@@ -107,11 +108,14 @@ struct CreateDerivedKeyView: View {
         ) {
             CreateDerivedKeyConfirmationView(
                 viewModel: .init(
-                    isPresented: $viewModel.isPresentingConfirmation,
-                    derivationPath: viewModel.unwrappedDerivationPath()
+                    derivationPath: viewModel.unwrappedDerivationPath(),
+                    onCompletion: viewModel.onConfirmationCompletion
                 )
             )
             .clearModalBackground()
+        }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
     }
 
@@ -199,19 +203,24 @@ extension CreateDerivedKeyView {
         @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
         @Published var derivationPath: String?
         private let cancelBag = CancelBag()
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
+            seedName: String,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
+            _seedName = .init(initialValue: seedName)
             self.networkService = networkService
             self.createKeyService = createKeyService
             subscribeToChanges()
         }
 
         func use(appState: AppState) {
-            self.appState = appState
-            seedName = appState.userData.keysData?.root?.address.seedName ?? ""
             networkService.getNetworks {
                 if case let .success(networks) = $0 {
                     appState.userData.allNetworks = networks
@@ -238,6 +247,11 @@ extension CreateDerivedKeyView {
 
         func onDerivationPathTap() {
             isPresentingDerivationPath = true
+        }
+
+        func onConfirmationCompletion() {
+            isPresentingConfirmation = false
+            dismissRequest.send()
         }
 
         func onCreateDerivedKeyTap() {
@@ -274,7 +288,7 @@ extension CreateDerivedKeyView {
     struct CreateDerivedKeyView_Previews: PreviewProvider {
         static var previews: some View {
             CreateDerivedKeyView(
-                viewModel: .init()
+                viewModel: .init(seedName: "seedName")
             )
             .environmentObject(NavigationCoordinator())
         }

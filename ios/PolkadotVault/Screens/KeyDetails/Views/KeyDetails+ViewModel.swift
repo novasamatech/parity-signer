@@ -5,7 +5,9 @@
 //  Created by Krzysztof Rodak on 27/10/2022.
 //
 
+import Combine
 import Foundation
+import SwiftUI
 
 extension KeyDetailsView {
     enum ViewState {
@@ -20,7 +22,7 @@ extension KeyDetailsView {
         private let cancelBag = CancelBag()
         private let forgetKeyActionHandler: ForgetKeySetAction
         private let exportPrivateKeyService: PrivateKeyQRCodeService
-        private let deriveKeyService: NewDerivedKeyService
+        private let keyDetailsActionsService: KeyDetailsActionService
 
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -57,44 +59,48 @@ extension KeyDetailsView {
         // Derive New Key
         @Published var isPresentingDeriveNewKey: Bool = false
 
+        // Back Navigation
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
+
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
         init(
             keyName: String,
+            keysData: MKeysNew?,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetAllNetworksService = GetAllNetworksService(),
             forgetKeyActionHandler: ForgetKeySetAction = ForgetKeySetAction(),
-            deriveKeyService: NewDerivedKeyService = NewDerivedKeyService(),
+            keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState
         ) {
             self.keyName = keyName
+            self.keysData = keysData
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
-            self.deriveKeyService = deriveKeyService
+            self.keyDetailsActionsService = keyDetailsActionsService
             self.forgetKeyActionHandler = forgetKeyActionHandler
             self.warningStateMediator = warningStateMediator
             self.appState = appState
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
+            refreshData()
         }
 
-        func use(appState: AppState) {
-            keysData = appState.userData.keysData
+        func use(appState _: AppState) {
             $isPresentingNetworkSelection.sink { newValue in
                 guard !newValue else { return }
                 self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
             }
             .store(in: cancelBag)
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-            forgetKeyActionHandler.use(navigation: navigation)
         }
 
         func subscribeToNetworkChanges() {
@@ -115,7 +121,6 @@ extension KeyDetailsView {
             keyDetailsService.getKeys(for: keyName) { result in
                 switch result {
                 case let .success(keysData):
-                    self.appState.userData.keysData = keysData
                     self.keysData = keysData
                     self.updateRenderables()
                 case let .failure(error):
@@ -137,13 +142,14 @@ extension KeyDetailsView {
             }
         }
 
-        func onBackTap() {
-            appState.userData.keysData = nil
-            navigation.performFake(navigation: .init(action: .goBack))
+        func onRemoveKeySetConfirmationTap() {
+            keyDetailsActionsService.forgetKeySetAction(keyName)
+            forgetKeyActionHandler.forgetKeySet(removeSeed)
+            dismissRequest.send()
         }
 
-        func onRemoveKeySetConfirmationTap() {
-            forgetKeyActionHandler.forgetKeySet(removeSeed)
+        func onRemoveKeySetModalDismiss() {
+            navigation.performFake(navigation: .init(action: .rightButtonAction))
         }
     }
 }
@@ -156,7 +162,7 @@ extension KeyDetailsView.ViewModel {
             presentableError = .noNetworksAvailable()
             isPresentingError = true
         } else {
-            deriveKeyService.startDeriveNewKey(keyName)
+            keyDetailsActionsService.startDeriveNewKey(keyName)
             isPresentingDeriveNewKey = true
         }
     }
@@ -183,9 +189,9 @@ extension KeyDetailsView.ViewModel {
                 selectedKeys.append(deriveKey)
             }
         } else {
-            guard case let .keyDetails(keyDetails) = navigation
-                .performFake(navigation: .init(action: .selectKey, details: deriveKey.publicKeyDetails)).screenData,
-                let keyDetails = keyDetails else { return }
+            guard let keyDetails = keyDetailsActionsService.navigateToPublicKey(keyName, deriveKey.publicKeyDetails)
+            else { return }
+
             presentedKeyDetails = keyDetails
             isPresentingKeyDetails = true
         }
@@ -211,6 +217,7 @@ extension KeyDetailsView.ViewModel {
             if isAlertVisible {
                 isPresentingConnectivityAlert.toggle()
             } else {
+                keyDetailsActionsService.performBackupSeed(keyName)
                 updateBackupModel()
                 isShowingBackupModal = true
             }

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CreateDerivedKeyConfirmationView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
@@ -71,9 +70,6 @@ struct CreateDerivedKeyConfirmationView: View {
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.large)
                 .padding(.top, Spacing.small)
-                .onAppear {
-                    viewModel.use(navigation: navigation)
-                }
             }
         )
     }
@@ -81,27 +77,22 @@ struct CreateDerivedKeyConfirmationView: View {
 
 extension CreateDerivedKeyConfirmationView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private let snackbarPresentation: BottomSnackbarPresentation
-
+        private let onCompletion: () -> Void
         @Published var animateBackground: Bool = false
-        @Binding var isPresented: Bool
-        let derivationPath: String
         @Published var isActionDisabled: Bool = true
         @Published var isCheckboxSelected: Bool = false
 
+        let derivationPath: String
+
         init(
-            isPresented: Binding<Bool>,
             derivationPath: String,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            onCompletion: @escaping () -> Void
         ) {
-            _isPresented = isPresented
             self.derivationPath = derivationPath
             self.snackbarPresentation = snackbarPresentation
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.onCompletion = onCompletion
         }
 
         func onDoneTap() {
@@ -113,21 +104,17 @@ extension CreateDerivedKeyConfirmationView {
         }
 
         func confirmAction() {
-            navigation.perform(navigation: .init(action: .goBack))
             snackbarPresentation.viewModel = .init(
                 title: Localizable.CreateDerivedKey.Snackbar.created.string,
                 style: .info
             )
             snackbarPresentation.isSnackbarPresented = true
+            onCompletion()
         }
 
         func toggleCheckbox() {
             isCheckboxSelected.toggle()
             isActionDisabled = !isCheckboxSelected
-        }
-
-        private func hide() {
-            isPresented = false
         }
     }
 }
@@ -137,8 +124,8 @@ extension CreateDerivedKeyConfirmationView {
         static var previews: some View {
             CreateDerivedKeyConfirmationView(
                 viewModel: .init(
-                    isPresented: .constant(true),
-                    derivationPath: "//polkadot//1///•••••••"
+                    derivationPath: "//polkadot//1///•••••••",
+                    onCompletion: { }
                 )
             )
             .environmentObject(NavigationCoordinator())
