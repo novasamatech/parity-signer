@@ -89,8 +89,12 @@ struct NetworkSettingsDetails: View {
                         .frame(height: Spacing.large)
                 }
                 NavigationLink(
-                    destination: SignSpecsListView(viewModel: .init(content: viewModel.signSpecList))
-                        .navigationBarHidden(true),
+                    destination: SignSpecsListView(
+                        viewModel: .init(
+                            content: viewModel.signSpecList
+                        )
+                    )
+                    .navigationBarHidden(true),
                     isActive: $viewModel.isPresentingSignSpecList
                 ) { EmptyView() }
             }

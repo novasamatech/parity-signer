@@ -34,6 +34,11 @@ object CameraParentSingleton {
 				navigator.navigate(Action.NAVBAR_SETTINGS)
 				navigator.navigate(Action.MANAGE_NETWORKS)
 			}
+			is CameraParentScreen.CreateDerivationScreen -> {
+				navigator.navigate(Action.NAVBAR_KEYS)
+				navigator.navigate(Action.SELECT_SEED, parent.seedName)
+				navigator.navigate(Action.NEW_KEY)
+			}
 		}
 	}
 }
@@ -41,5 +46,6 @@ object CameraParentSingleton {
 sealed class CameraParentScreen() {
 	data class BottomBarScreen(val screen: BottomBarState) : CameraParentScreen()
 	object NetworkListScreen : CameraParentScreen()
+	data class CreateDerivationScreen(val seedName: String) : CameraParentScreen()
 	data class NetworkDetailsScreen(val networkKey: String) : CameraParentScreen()
 }
