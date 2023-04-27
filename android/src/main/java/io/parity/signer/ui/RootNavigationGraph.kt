@@ -14,10 +14,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.parity.signer.domain.findActivity
-import io.parity.signer.screens.onboarding.eachstartchecks.enableEachStartAppFlow
-import io.parity.signer.screens.onboarding.initialUnlockAppScreenFlow
-import io.parity.signer.screens.onboarding.splash.splashScreen
-import io.parity.signer.screens.onboarding.termsconsent.termsConsentAppFlow
+import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
+import io.parity.signer.screens.initial.initialUnlockAppScreenFlow
+import io.parity.signer.screens.initial.splash.splashScreen
+import io.parity.signer.screens.initial.termsconsent.termsConsentAppFlow
 import kotlinx.coroutines.delay
 
 
@@ -62,7 +62,7 @@ const val NAVIGATION_TAG = "navigation"
 
 object MainGraphRoutes {
 	const val splashRoute = "navigation_point_splash"
-	const val onboardingRoute = "navigation_point_terms_consent"
+	const val termsRoute = "navigation_point_terms_consent"
 	const val enableAirgapRoute = "navigation_point_enable_airgap"
 	const val initialUnlockRoute = "navigation_point_initial_unlock"
 	const val mainScreenRoute = "navigation_main_screen"

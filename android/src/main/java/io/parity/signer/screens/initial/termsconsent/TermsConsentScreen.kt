@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.termsconsent
+package io.parity.signer.screens.initial.termsconsent
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -21,7 +21,7 @@ import io.parity.signer.ui.NAVIGATION_TAG
 
 
 fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.onboardingRoute) {
+	composable(route = MainGraphRoutes.termsRoute) {
 //		val viewModel: OnBoardingViewModel = viewModel()
 
 		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {

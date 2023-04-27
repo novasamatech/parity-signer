@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks.airgap
+package io.parity.signer.screens.initial.eachstartchecks.airgap
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
