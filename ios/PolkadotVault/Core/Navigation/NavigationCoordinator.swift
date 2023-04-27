@@ -58,10 +58,6 @@ final class NavigationCoordinator: ObservableObject {
 
     @Published var shouldPresentQRScanner = false
 
-    /// Stores currently selected Key Set Details
-    ///
-    /// This is a temporary fix that should be removed after introduction of Rust API
-    @Published var currentKeyDetails: MKeyDetails!
     @Published var disableSwipeToBack: Bool = false
 
     init(
@@ -120,12 +116,7 @@ extension NavigationCoordinator {
 }
 
 private extension NavigationCoordinator {
-    func updateIntermediateDataModels(_ actionResult: ActionResult) {
-        // Used temporarly in Export Private Key flow. To be removed
-        if case let .keyDetails(keyDetails) = actionResult.screenData {
-            currentKeyDetails = keyDetails
-        }
-    }
+    func updateIntermediateDataModels(_: ActionResult) {}
 
     func updateGlobalViews(_ actionResult: ActionResult) {
         if case let .errorData(message) = actionResult.alertData {

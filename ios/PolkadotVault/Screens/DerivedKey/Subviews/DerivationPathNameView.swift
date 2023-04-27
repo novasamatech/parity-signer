@@ -15,6 +15,7 @@ struct DerivationPathNameView: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @State var isUpdatingText = false
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -22,8 +23,8 @@ struct DerivationPathNameView: View {
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Modal.Path.title.string,
                     leftButtons: [.init(
-                        type: .xmark,
-                        action: viewModel.onDismissTap
+                        type: .arrow,
+                        action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(
                         type: .activeAction(
@@ -116,6 +117,9 @@ struct DerivationPathNameView: View {
             viewModel.onAppear()
             focusedPath = true
         }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
+        }
         .fullScreenCover(
             isPresented: $viewModel.isPresentingInfoModal
         ) {
@@ -184,7 +188,6 @@ extension DerivationPathNameView {
         @Published var derivationPathError: String?
         @Binding var derivationPath: String?
         @Binding var networkSelection: NetworkSelection
-        @Binding var isPresented: Bool
         private var skipValidation = false
         private let cancelBag = CancelBag()
 
@@ -196,16 +199,20 @@ extension DerivationPathNameView {
         @Published var isPresentingInfoModal: Bool = false
         @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivationPathsInfo()
 
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
+
         init(
             seedName: String,
             derivationPath: Binding<String?>,
-            isPresented: Binding<Bool>,
             networkSelection: Binding<NetworkSelection>,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
             self.seedName = seedName
             _derivationPath = derivationPath
-            _isPresented = isPresented
             _networkSelection = networkSelection
             self.createKeyService = createKeyService
             subscribeToChanges()
@@ -225,17 +232,9 @@ extension DerivationPathNameView {
             }
         }
 
-        func onDismissTap() {
-            isPresented = false
-        }
-
         func onRightNavigationButtonTap() {
             derivationPath = inputText
-            isPresented = false
-        }
-
-        func onDerivationPathQuestionTap() {
-            isPresented = false
+            dismissRequest.send()
         }
 
         func onInfoBoxTap() {
@@ -343,7 +342,6 @@ extension DerivationPathNameView {
                 viewModel: .init(
                     seedName: "Keys",
                     derivationPath: .constant("path"),
-                    isPresented: .constant(true),
                     networkSelection: .constant(.allowedOnAnyNetwork([]))
                 )
             )

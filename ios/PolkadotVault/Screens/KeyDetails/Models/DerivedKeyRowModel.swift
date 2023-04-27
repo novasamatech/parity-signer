@@ -10,7 +10,7 @@ import UIKit
 struct DerivedKeyRowModel: Equatable {
     let keyData: MKeyAndNetworkCard
     let viewModel: DerivedKeyRowViewModel
-    let actionModel: DerivedKeyActionModel
+    let publicKeyDetails: String
 }
 
 /// Model of available actions for `Derived Key` cell

@@ -51,12 +51,13 @@ struct SettingsView: View {
                         selectedTab: $navigation.selectedTab
                     )
                 }
+                .background(Asset.backgroundPrimary.swiftUIColor)
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)
                 ConnectivityAlertOverlay(viewModel: .init())
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
             viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
