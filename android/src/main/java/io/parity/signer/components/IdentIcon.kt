@@ -50,7 +50,7 @@ fun SignerImage.toImageContent(): ImageContent {
 fun ImageContent.toBytes(): List<UByte> {
 	val image = when (this) {
 		is ImageContent.Png -> this.image
-		is ImageContent.Svg -> listOf() //todo implementSvg
+		is ImageContent.Svg -> listOf() //todo #1457 implementSvg
 	}
 	return image
 }
