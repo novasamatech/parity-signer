@@ -51,7 +51,7 @@ fun KeySetDetailsScreenView(
 	Column {
 		KeySetDetailsHeader(
 			onAddKey = {
-				navigator.navigate(Action.NEW_KEY, "") //new derived key
+				navigator.navigate(Action.NEW_KEY) //new derived key
 			},
 			onBack = { navigator.backAction() },
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation

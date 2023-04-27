@@ -51,9 +51,12 @@ fun NewKeySetNameScreen(
 			.background(MaterialTheme.colors.background),
 	) {
 
-		ScreenHeaderWithButton(canProceed = canProceed,
+		ScreenHeaderWithButton(
+			canProceed = canProceed,
 			btnText = stringResource(R.string.button_next),
-			onClose = { rootNavigator.backAction() }) {
+			modifier = Modifier.padding(start = 8.dp),
+			onClose = { rootNavigator.backAction() }
+		) {
 			if (canProceed) {
 				rootNavigator.navigate(Action.GO_FORWARD, keySetName)
 				focusManager.clearFocus(true)
