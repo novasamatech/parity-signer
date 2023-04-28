@@ -44,7 +44,7 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 	) {
 		PageIndicatorLine(
 			totalDots = 4,
-			selectedIndex = 1,
+			selectedIndex = 2,
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 		)
 		Row(
@@ -75,7 +75,7 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Generate and Store Multiple Private Keys",
+			text = stringResource(R.string.onboarding_header_2),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)

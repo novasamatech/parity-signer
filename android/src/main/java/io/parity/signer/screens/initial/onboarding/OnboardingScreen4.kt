@@ -44,7 +44,7 @@ internal fun OnboardingScreen4(onSkip: Callback) {
 	) {
 		PageIndicatorLine(
 			totalDots = 4,
-			selectedIndex = 1,
+			selectedIndex = 4,
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 		)
 		Row(
@@ -75,7 +75,7 @@ internal fun OnboardingScreen4(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Add New Networks and Update Them Without Breaking the Air Gap",
+			text = stringResource(R.string.onboarding_header_4),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)

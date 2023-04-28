@@ -75,7 +75,7 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Turn Your Smartphone Into a Hardware Wallet",
+			text = stringResource(R.string.onboarding_header_1),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)

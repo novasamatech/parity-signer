@@ -42,7 +42,7 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 	) {
 		PageIndicatorLine(
 			totalDots = 4,
-			selectedIndex = 1,
+			selectedIndex = 3,
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 		)
 		Row(
@@ -73,7 +73,7 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Sign Transactions While Keeping Your Private Keys Offline",
+			text = stringResource(R.string.onboarding_header_3),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
