@@ -384,6 +384,8 @@
 	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
 	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
 	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
+    <string name="onboarding_skip">Skip</string>
+	<string name="onboarding_welcome">Welcome to Polkadot Vault</string>
 
 </resources>
 

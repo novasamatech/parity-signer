@@ -1,28 +1,33 @@
 package io.parity.signer.screens.initial.onboarding
 
 import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PageIndicatorLine
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
 
 @Composable
-internal fun OnboardingScreen1() {
+internal fun OnboardingScreen1(onSkip: Callback) {
+	ForceDarkTheme()
 	Column(
 		Modifier
 			.fillMaxSize(1f)
@@ -32,7 +37,7 @@ internal fun OnboardingScreen1() {
 					end = Offset(0.0f, Float.POSITIVE_INFINITY),
 					colors = listOf(
 						MaterialTheme.colors.pink500,
-						Color(0xFF1E1E23)
+						MaterialTheme.colors.backgroundSecondary,
 					),
 				)
 			)
@@ -54,18 +59,19 @@ internal fun OnboardingScreen1() {
 					.padding(vertical = 6.dp, horizontal = 16.dp),
 			) {
 				Text(
-					"Welcome to Polkadot Vault",
+					stringResource(R.string.onboarding_welcome),
 					color = MaterialTheme.colors.textSecondary,
 					style = SignerTypeface.LabelS,
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
-				"Skip",
+				stringResource(R.string.onboarding_skip),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.LabelS,
 				modifier = Modifier
 					.padding(horizontal = 6.dp)
+					.clickable(onClick = onSkip)
 			)
 		}
 		Text(
@@ -91,11 +97,18 @@ internal fun OnboardingScreen1() {
 	}
 }
 
+@Composable
+fun ForceDarkTheme() {
+	DisposableEffect(key1 = Unit) {
+		val original = AppCompatDelegate.getDefaultNightMode()
+		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+		onDispose {
+			AppCompatDelegate.setDefaultNightMode(original)
+		}
+	}
+}
 
-@Preview(
-	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
-	showBackground = true, backgroundColor = 0xFFFFFFFF,
-)
+
 @Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
@@ -110,10 +123,6 @@ private fun PreviewOnboarding1Small() {
 }
 
 @Preview(
-	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
-	showBackground = true, backgroundColor = 0xFFFFFFFF,
-)
-@Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
@@ -121,7 +130,7 @@ private fun PreviewOnboarding1Small() {
 private fun PreviewOnboarding1Big() {
 	SignerNewTheme {
 		Box(modifier = Modifier.fillMaxSize(1f)) {
-			OnboardingScreen1()
+			OnboardingScreen1({})
 		}
 	}
 }
