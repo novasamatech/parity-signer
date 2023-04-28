@@ -91,6 +91,7 @@ struct NetworkSettingsDetails: View {
                 NavigationLink(
                     destination: SignSpecsListView(
                         viewModel: .init(
+                            networkKey: viewModel.networkKey,
                             content: viewModel.signSpecList
                         )
                     )
@@ -305,10 +306,10 @@ private extension NetworkSettingsDetails {
 extension NetworkSettingsDetails {
     final class ViewModel: ObservableObject {
         private weak var navigation: NavigationCoordinator!
+        private let cancelBag = CancelBag()
         private let snackbarPresentation: BottomSnackbarPresentation
         private let networkDetailsService: ManageNetworkDetailsService
-        private let networkKey: String
-
+        let networkKey: String
         private var metadataToDelete: MMetadataRecord?
 
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
@@ -333,6 +334,7 @@ extension NetworkSettingsDetails {
             self.snackbarPresentation = snackbarPresentation
             self.networkDetailsService = networkDetailsService
             _networkDetails = .init(initialValue: networkDetailsService.networkDetails(networkKey))
+            listenToNavigationUpdates()
         }
 
         func removeMetadata() {
@@ -415,6 +417,14 @@ extension NetworkSettingsDetails {
 
         private func updateView() {
             networkDetails = networkDetailsService.networkDetails(networkKey)
+        }
+
+        private func listenToNavigationUpdates() {
+            $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
+                guard let self = self, !isPresentingSignSpecList else { return }
+                self.signSpecList = nil
+                self.networkDetailsService.restartNavigationState(self.networkKey)
+            }.store(in: cancelBag)
         }
     }
 }
