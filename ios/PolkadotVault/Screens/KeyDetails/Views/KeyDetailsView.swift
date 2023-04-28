@@ -173,9 +173,12 @@ struct KeyDetailsView: View {
             onDismiss: viewModel.refreshData
         ) {
             NavigationView {
-                CreateDerivedKeyView(viewModel: .init(seedName: viewModel.keysData?.root?.address.seedName ?? ""))
-                    .navigationViewStyle(StackNavigationViewStyle())
-                    .navigationBarHidden(true)
+                CreateKeyNetworkSelectionView(viewModel: .init(
+                    seedName: viewModel.keysData?.root?.address
+                        .seedName ?? ""
+                ))
+                .navigationViewStyle(StackNavigationViewStyle())
+                .navigationBarHidden(true)
             }
         }
     }
@@ -217,10 +220,24 @@ struct KeyDetailsView: View {
     @ViewBuilder
     func rootKeyHeader() -> some View {
         if let keySummary = viewModel.keySummary {
-            KeySummaryView(
-                viewModel: keySummary,
-                isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
-            )
+            VStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+                Text(keySummary.keyName)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.titleXL.font)
+                    .padding(.top, Spacing.medium)
+                    .padding(.bottom, Spacing.extraSmall)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.center)
+                HStack {
+                    Text(keySummary.base58.truncateMiddle())
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.bodyL.font)
+                        .lineLimit(1)
+                    Asset.chevronDown.swiftUIImage
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                }
+            }
+            .padding(.horizontal, Spacing.large)
             .contentShape(Rectangle())
             .onTapGesture { viewModel.onRootKeyTap() }
         } else {
@@ -245,31 +262,5 @@ struct KeyDetailsView: View {
         }
         .containerBackground(CornerRadius.large, state: .actionableInfo)
         .padding(.horizontal, Spacing.medium)
-    }
-}
-
-private struct KeySummaryView: View {
-    let viewModel: KeySummaryViewModel
-    @Binding var isPresentingSelectionOverlay: Bool
-
-    var body: some View {
-        VStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-            Text(viewModel.keyName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(PrimaryFont.titleXL.font)
-                .padding(.top, Spacing.medium)
-                .padding(.bottom, Spacing.extraSmall)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.center)
-            HStack {
-                Text(viewModel.base58.truncateMiddle())
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.bodyL.font)
-                    .lineLimit(1)
-                Asset.chevronDown.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-            }
-        }
-        .padding(.horizontal, Spacing.large)
     }
 }
