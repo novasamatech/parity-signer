@@ -82,7 +82,7 @@ extension AuthenticatedScreenContainer {
         }
 
         func onDismissErrorTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            navigation.performFake(navigation: .init(action: .goBack))
         }
     }
 }

@@ -25,6 +25,7 @@ final class ManageNetworkDetailsService {
         return value
     }
 
+    @discardableResult
     func signSpecList(_ networkKey: String) -> MSignSufficientCrypto! {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarSettings))
@@ -65,5 +66,12 @@ final class ManageNetworkDetailsService {
         guard case let .nNetworkDetails(value) = navigation
             .performFake(navigation: .init(action: .removeMetadata)).screenData else { return nil }
         return value
+    }
+
+    func restartNavigationState(_ networkKey: String) {
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarSettings))
+        navigation.performFake(navigation: .init(action: .manageNetworks))
+        navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
     }
 }

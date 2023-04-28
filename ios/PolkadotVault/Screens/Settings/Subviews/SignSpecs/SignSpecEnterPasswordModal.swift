@@ -153,6 +153,7 @@ extension SignSpecEnterPasswordModal {
         }
 
         func onCancelTap() {
+            navigation.performFake(navigation: .init(action: .goBack))
             isPresented = false
         }
 
@@ -171,6 +172,7 @@ extension SignSpecEnterPasswordModal {
                 isPresented = false
                 shouldPresentError = false
             default:
+                navigation.performFake(navigation: .init(action: .goBack))
                 proceedtoErrorState()
             }
         }
