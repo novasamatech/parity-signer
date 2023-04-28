@@ -152,9 +152,6 @@ extension SettingsView {
                 detailScreen = .backup
                 isDetailsPresented = true
             case .networks:
-                guard case let .manageNetworks(value) = navigation
-                    .performFake(navigation: .init(action: .manageNetworks)).screenData else { return }
-                appState.userData.manageNetworks = value
                 detailScreen = .networks
                 isDetailsPresented = true
             case .verifier:

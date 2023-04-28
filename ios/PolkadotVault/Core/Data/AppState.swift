@@ -20,18 +20,15 @@ extension AppState {
         var allNetworks: [MmNetwork] = []
         var selectedNetworks: [MmNetwork] = []
         var verifierDetails: MVerifierDetails!
-        var manageNetworks: MManageNetworks!
 
         init(
             allNetworks: [MmNetwork] = [],
             selectedNetworks: [MmNetwork] = [],
-            verifierDetails: MVerifierDetails! = nil,
-            manageNetworks: MManageNetworks! = nil
+            verifierDetails: MVerifierDetails! = nil
         ) {
             self.allNetworks = allNetworks
             self.selectedNetworks = selectedNetworks
             self.verifierDetails = verifierDetails
-            self.manageNetworks = manageNetworks
         }
     }
 }

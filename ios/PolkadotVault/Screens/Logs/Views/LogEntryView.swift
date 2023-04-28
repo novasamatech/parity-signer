@@ -33,7 +33,7 @@ struct LogEntryView: View {
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         HStack(spacing: 0) {
-                            Text(DateFormatter.hourMinutes(viewModel.renderable.timestamp))
+                            Text(viewModel.renderable.timestamp)
                                 .padding(.leading, Spacing.extraSmall)
                             if viewModel.renderable.type != .basic {
                                 Asset.chevronRight.swiftUIImage
