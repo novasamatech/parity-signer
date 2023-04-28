@@ -26,7 +26,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-internal fun OnboardingScreen1(onSkip: Callback) {
+internal fun OnboardingScreen2(onSkip: Callback) {
 	ForceDarkTheme()
 	Column(
 		Modifier
@@ -75,7 +75,7 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Turn Your Smartphone Into a Hardware Wallet",
+			text = "Generate and Store Multiple Private Keys",
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -86,7 +86,7 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 				.weight(0.2f)
 		)
 		Image(
-			painter = painterResource(id = R.drawable.onboarding_2),
+			painter = painterResource(id = R.drawable.onboarding_3),
 			contentDescription = null,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
@@ -97,27 +97,15 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 	}
 }
 
-@Composable
-fun ForceDarkTheme() {
-	DisposableEffect(key1 = Unit) {
-		val original = AppCompatDelegate.getDefaultNightMode()
-		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-		onDispose {
-			AppCompatDelegate.setDefaultNightMode(original)
-		}
-	}
-}
-
-
-@Preview(
+ @Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding1Small() {
+private fun PreviewOnboarding2Small() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(320.dp, 568.dp)) {
-			OnboardingScreen1({})
+			OnboardingScreen2({})
 		}
 	}
 }
@@ -127,10 +115,10 @@ private fun PreviewOnboarding1Small() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding1Big() {
+private fun PreviewOnboarding2Big() {
 	SignerNewTheme {
 		Box(modifier = Modifier.fillMaxSize(1f)) {
-			OnboardingScreen1({})
+			OnboardingScreen2({})
 		}
 	}
 }

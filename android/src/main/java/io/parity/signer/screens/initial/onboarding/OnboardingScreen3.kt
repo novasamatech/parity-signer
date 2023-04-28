@@ -1,7 +1,6 @@
 package io.parity.signer.screens.initial.onboarding
 
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,7 +24,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-internal fun OnboardingScreen1(onSkip: Callback) {
+internal fun OnboardingScreen3(onSkip: Callback) {
 	ForceDarkTheme()
 	Column(
 		Modifier
@@ -75,7 +73,7 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = "Turn Your Smartphone Into a Hardware Wallet",
+			text = "Sign Transactions While Keeping Your Private Keys Offline",
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -86,7 +84,7 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 				.weight(0.2f)
 		)
 		Image(
-			painter = painterResource(id = R.drawable.onboarding_2),
+			painter = painterResource(id = R.drawable.onboarding_4),
 			contentDescription = null,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
@@ -97,27 +95,16 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 	}
 }
 
-@Composable
-fun ForceDarkTheme() {
-	DisposableEffect(key1 = Unit) {
-		val original = AppCompatDelegate.getDefaultNightMode()
-		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-		onDispose {
-			AppCompatDelegate.setDefaultNightMode(original)
-		}
-	}
-}
-
 
 @Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding1Small() {
+private fun PreviewOnboarding3Small() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(320.dp, 568.dp)) {
-			OnboardingScreen1({})
+			OnboardingScreen3({})
 		}
 	}
 }
@@ -127,10 +114,10 @@ private fun PreviewOnboarding1Small() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding1Big() {
+private fun PreviewOnboarding3Big() {
 	SignerNewTheme {
 		Box(modifier = Modifier.fillMaxSize(1f)) {
-			OnboardingScreen1({})
+			OnboardingScreen3({})
 		}
 	}
 }
