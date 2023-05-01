@@ -16,37 +16,29 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
 
 
-fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.termsRoute) {
-//		val viewModel: OnBoardingViewModel = viewModel()
 
-		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
-			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
-				popUpTo(0)
-			}
-		}
+@Composable
+fun TermsConsentScreenFull(navigateNextScreen: Callback) {
+	if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
+		navigateNextScreen()
+	}
 
-		TermsConsentScreen(
-			onBoard = {
-				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
-					popUpTo(0)
-				}
-			},
-			modifier = Modifier
-                .navigationBarsPadding()
-                .captionBarPadding()
-                .statusBarsPadding()
-		)
-		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "terms screen opened")
-		}
+	TermsConsentScreen(
+		onBoard = navigateNextScreen,
+		modifier = Modifier
+			.navigationBarsPadding()
+			.captionBarPadding()
+			.statusBarsPadding()
+	)
+	LaunchedEffect(Unit) {
+		Log.d(NAVIGATION_TAG, "terms screen opened")
 	}
 }
-
 
 /**
  * First screen with legal consent request

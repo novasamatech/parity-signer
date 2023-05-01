@@ -11,13 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
 import io.parity.signer.screens.initial.initialUnlockAppScreenFlow
 import io.parity.signer.screens.initial.splash.splashScreen
-import io.parity.signer.screens.initial.termsconsent.termsConsentAppFlow
+import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import kotlinx.coroutines.delay
 
 
@@ -50,7 +54,15 @@ fun RootNavigationGraph(
 			startDestination = startDestination
 		) {
 			splashScreen(navController)
-			termsConsentAppFlow(navController)
+			firstTimeOnlyOnboarding(
+				routePath = MainGraphRoutes.firstTimeOnboarding,
+				globalNavController = navController,
+				onNextStepsNavigate = {
+					navController.navigate(MainGraphRoutes.enableAirgapRoute) {
+						popUpTo(0)
+					}
+				},
+			)
 			enableEachStartAppFlow(navController)
 			initialUnlockAppScreenFlow(navController)
 			mainSignerAppFlow(navController)
@@ -62,8 +74,35 @@ const val NAVIGATION_TAG = "navigation"
 
 object MainGraphRoutes {
 	const val splashRoute = "navigation_point_splash"
-	const val termsRoute = "navigation_point_terms_consent"
+	const val firstTimeOnboarding =
+		"navigation_point_once_onboarding"
 	const val enableAirgapRoute = "navigation_point_enable_airgap"
 	const val initialUnlockRoute = "navigation_point_initial_unlock"
 	const val mainScreenRoute = "navigation_main_screen"
 }
+
+
+fun NavGraphBuilder.firstTimeOnlyOnboarding(
+	routePath: String,
+	globalNavController: NavHostController,
+	onNextStepsNavigate: Callback,
+) {
+	navigation(
+		route = routePath,
+		startDestination = FirstTimeOnboarding.onboardingExplanationRoute,
+	) {
+		composable(route = FirstTimeOnboarding.onboardingExplanationRoute) {
+
+		}
+		composable(route = FirstTimeOnboarding.termsConsentRoute) {
+			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
+		}
+	}
+}
+
+private object FirstTimeOnboarding {
+	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
+	const val termsConsentRoute = "navigation_point_terms_consent"
+}
+
+
