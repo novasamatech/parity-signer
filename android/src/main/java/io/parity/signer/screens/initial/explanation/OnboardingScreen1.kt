@@ -1,4 +1,4 @@
-package io.parity.signer.screens.initial.onboarding
+package io.parity.signer.screens.initial.explanation
 
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
@@ -26,7 +26,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-internal fun OnboardingScreen2(onSkip: Callback) {
+internal fun OnboardingScreen1(onSkip: Callback) {
 	ForceDarkTheme()
 	Column(
 		Modifier
@@ -44,7 +44,7 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 	) {
 		PageIndicatorLine(
 			totalDots = 4,
-			selectedIndex = 2,
+			selectedIndex = 1,
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 		)
 		Row(
@@ -75,7 +75,7 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = stringResource(R.string.onboarding_header_2),
+			text = stringResource(R.string.onboarding_header_1),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -86,7 +86,7 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 				.weight(0.2f)
 		)
 		Image(
-			painter = painterResource(id = R.drawable.onboarding_3),
+			painter = painterResource(id = R.drawable.onboarding_2),
 			contentDescription = null,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
@@ -97,15 +97,27 @@ internal fun OnboardingScreen2(onSkip: Callback) {
 	}
 }
 
- @Preview(
+@Composable
+fun ForceDarkTheme() {
+	DisposableEffect(key1 = Unit) {
+		val original = AppCompatDelegate.getDefaultNightMode()
+		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+		onDispose {
+			AppCompatDelegate.setDefaultNightMode(original)
+		}
+	}
+}
+
+
+@Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding2Small() {
+private fun PreviewOnboarding1Small() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(320.dp, 568.dp)) {
-			OnboardingScreen2({})
+			OnboardingScreen1({})
 		}
 	}
 }
@@ -115,10 +127,10 @@ private fun PreviewOnboarding2Small() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding2Big() {
+private fun PreviewOnboarding1Big() {
 	SignerNewTheme {
 		Box(modifier = Modifier.fillMaxSize(1f)) {
-			OnboardingScreen2({})
+			OnboardingScreen1({})
 		}
 	}
 }

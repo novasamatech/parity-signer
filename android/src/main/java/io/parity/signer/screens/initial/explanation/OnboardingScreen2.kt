@@ -1,4 +1,4 @@
-package io.parity.signer.screens.initial.onboarding
+package io.parity.signer.screens.initial.explanation
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -24,7 +24,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-internal fun OnboardingScreen3(onSkip: Callback) {
+internal fun OnboardingScreen2(onSkip: Callback) {
 	ForceDarkTheme()
 	Column(
 		Modifier
@@ -42,7 +42,7 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 	) {
 		PageIndicatorLine(
 			totalDots = 4,
-			selectedIndex = 3,
+			selectedIndex = 2,
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 		)
 		Row(
@@ -73,7 +73,7 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 			)
 		}
 		Text(
-			text = stringResource(R.string.onboarding_header_3),
+			text = stringResource(R.string.onboarding_header_2),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -84,7 +84,7 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 				.weight(0.2f)
 		)
 		Image(
-			painter = painterResource(id = R.drawable.onboarding_4),
+			painter = painterResource(id = R.drawable.onboarding_3),
 			contentDescription = null,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
@@ -95,16 +95,15 @@ internal fun OnboardingScreen3(onSkip: Callback) {
 	}
 }
 
-
-@Preview(
+ @Preview(
 	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding3Small() {
+private fun PreviewOnboarding2Small() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(320.dp, 568.dp)) {
-			OnboardingScreen3({})
+			OnboardingScreen2({})
 		}
 	}
 }
@@ -114,10 +113,10 @@ private fun PreviewOnboarding3Small() {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewOnboarding3Big() {
+private fun PreviewOnboarding2Big() {
 	SignerNewTheme {
 		Box(modifier = Modifier.fillMaxSize(1f)) {
-			OnboardingScreen3({})
+			OnboardingScreen2({})
 		}
 	}
 }

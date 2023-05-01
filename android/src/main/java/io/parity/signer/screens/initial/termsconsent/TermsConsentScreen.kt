@@ -35,9 +35,6 @@ fun TermsConsentScreenFull(navigateNextScreen: Callback) {
 			.captionBarPadding()
 			.statusBarsPadding()
 	)
-	LaunchedEffect(Unit) {
-		Log.d(NAVIGATION_TAG, "terms screen opened")
-	}
 }
 
 /**

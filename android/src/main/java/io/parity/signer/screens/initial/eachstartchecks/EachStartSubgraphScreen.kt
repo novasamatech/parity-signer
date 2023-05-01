@@ -28,7 +28,7 @@ import io.parity.signer.ui.MainGraphRoutes
 
 
 fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.enableAirgapRoute) {
+	composable(route = MainGraphRoutes.eachTimeOnboardingRoute) {
 		val viewModel: EachStartViewModel = viewModel()
 		val context: Context = LocalContext.current
 

@@ -30,11 +30,11 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		LaunchedEffect(Unit) {
 			Log.d(NAVIGATION_TAG, "Splash screen opened")
 			if (viewModel.shouldShowOnboarding(context)) {
-				globalNavController.navigate(MainGraphRoutes.termsRoute) {
+				globalNavController.navigate(MainGraphRoutes.firstTimeOnboarding) {
 					popUpTo(0)
 				}
 			} else if (viewModel.isShouldShowAirgap()) {
-				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+				globalNavController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
 					popUpTo(0)
 				}
 			} else {
