@@ -27,11 +27,7 @@ struct SettingsView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(viewModel.renderable.items, id: \.id) { renderable in
-                                NavigationLink(
-                                    destination: detailView(viewModel.detailScreen)
-                                        .navigationBarHidden(true),
-                                    isActive: $viewModel.isDetailsPresented
-                                ) { EmptyView() }
+
                                 SettingsRowView(renderable: renderable)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
@@ -48,13 +44,19 @@ struct SettingsView: View {
                     }
                     Spacer()
                     TabBarView(
-                        selectedTab: $navigation.selectedTab
+                        selectedTab: .settings,
+                        onQRCodeTap: viewModel.onQRCodeTap
                     )
                 }
                 .background(Asset.backgroundPrimary.swiftUIColor)
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)
                 ConnectivityAlertOverlay(viewModel: .init())
+                NavigationLink(
+                    destination: detailView(viewModel.detailScreen)
+                        .navigationBarHidden(true),
+                    isActive: $viewModel.isDetailsPresented
+                ) { EmptyView() }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
@@ -107,11 +109,14 @@ extension SettingsView {
         private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
         private let onboardingMediator: OnboardingMediator
+        let onQRCodeTap: () -> Void
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
+            onQRCodeTap: @escaping () -> Void
         ) {
             self.onboardingMediator = onboardingMediator
+            self.onQRCodeTap = onQRCodeTap
         }
 
         func use(navigation: NavigationCoordinator) {
@@ -155,6 +160,8 @@ extension SettingsView {
                 detailScreen = .networks
                 isDetailsPresented = true
             case .verifier:
+                navigation.performFake(navigation: .init(action: .start))
+                navigation.performFake(navigation: .init(action: .navbarSettings))
                 guard case let .vVerifier(value) = navigation
                     .performFake(navigation: .init(action: .viewGeneralVerifier)).screenData else { return }
                 navigation.performFake(navigation: .init(action: .goBack))
@@ -187,7 +194,7 @@ struct SettingsViewRenderable: Equatable {
 #if DEBUG
     struct SettingsView_Previews: PreviewProvider {
         static var previews: some View {
-            SettingsView(viewModel: .init())
+            SettingsView(viewModel: .init(onQRCodeTap: {}))
                 .environmentObject(NavigationCoordinator())
         }
     }
