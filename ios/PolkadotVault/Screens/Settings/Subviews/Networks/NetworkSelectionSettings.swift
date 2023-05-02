@@ -61,6 +61,16 @@ struct NetworkSelectionSettings: View {
         .onAppear {
             viewModel.use(navigation: navigation)
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isShowingQRScanner,
+            onDismiss: viewModel.onQRScannerDismiss
+        ) {
+            CameraView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingQRScanner
+                )
+            )
+        }
     }
 
     @ViewBuilder
@@ -93,6 +103,7 @@ extension NetworkSelectionSettings {
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetails: String!
         @Published var isPresentingDetails = false
+        @Published var isShowingQRScanner: Bool = false
 
         init(
             service: ManageNetworksService = ManageNetworksService()
@@ -112,10 +123,11 @@ extension NetworkSelectionSettings {
         }
 
         func onAddTap() {
-            navigation.qrScannerDismissUpdate = { [weak self] in
-                self?.updateNetworks()
-            }
-            navigation.shouldPresentQRScanner = true
+            isShowingQRScanner = true
+        }
+
+        func onQRScannerDismiss() {
+            updateNetworks()
         }
     }
 }
