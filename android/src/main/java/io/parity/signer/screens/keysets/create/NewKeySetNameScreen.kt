@@ -92,6 +92,7 @@ fun NewKeySetNameScreen(
 					}
 				}
 			),
+			placeholder = { Text(text = stringResource(R.string.new_key_set_name_placeholder)) },
 			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),

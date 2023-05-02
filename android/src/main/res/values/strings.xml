@@ -384,6 +384,9 @@
 	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
 	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
 	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
+    <string name="recovert_key_set_title">Recover Key set</string>
+	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
+	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
 
 </resources>
 
