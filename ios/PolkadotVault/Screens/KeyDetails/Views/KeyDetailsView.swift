@@ -175,7 +175,8 @@ struct KeyDetailsView: View {
             NavigationView {
                 CreateKeyNetworkSelectionView(viewModel: .init(
                     seedName: viewModel.keysData?.root?.address
-                        .seedName ?? ""
+                        .seedName ?? "",
+                    keyName: viewModel.keyName
                 ))
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)

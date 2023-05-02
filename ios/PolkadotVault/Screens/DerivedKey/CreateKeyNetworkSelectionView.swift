@@ -55,11 +55,24 @@ struct CreateKeyNetworkSelectionView: View {
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
+        .fullScreenCover(
+            isPresented: $viewModel.isNetworkTutorialPresented,
+            onDismiss: viewModel.updateNetworks
+        ) {
+            NavigationView {
+                AddKeySetUpNetworksStepOneView(viewModel: .init())
+                    .navigationBarBackButtonHidden(true)
+                    .navigationViewStyle(.stack)
+            }
+        }
     }
 
     @ViewBuilder
     func footer() -> some View {
         AttributedInfoBoxView(text: AttributedString(Localizable.CreateDerivedKey.Label.Footer.network.string))
+            .onTapGesture {
+                viewModel.onInfoBoxTap()
+            }
     }
 
     @ViewBuilder
@@ -123,10 +136,16 @@ extension CreateKeyNetworkSelectionView {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
-        @Published var seedName: String = ""
+        private let keyName: String
+        private let createKeyService: CreateDerivedKeyService
+        let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
         @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
+
+        // Tutorial
+        @Published var isNetworkTutorialPresented: Bool = false
+
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -135,11 +154,16 @@ extension CreateKeyNetworkSelectionView {
 
         init(
             seedName: String,
-            networkService: GetAllNetworksService = GetAllNetworksService()
+            keyName: String,
+            networkService: GetAllNetworksService = GetAllNetworksService(),
+            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
         ) {
-            _seedName = .init(initialValue: seedName)
+            self.seedName = seedName
+            self.keyName = keyName
             self.networkService = networkService
+            self.createKeyService = createKeyService
             updateNetworks()
+            listenToChanges()
         }
 
         func selectNetwork(_ network: MmNetwork) {
@@ -155,6 +179,10 @@ extension CreateKeyNetworkSelectionView {
         func onKeyCreationComplete() {
             dismissRequest.send()
         }
+
+        func onInfoBoxTap() {
+            isNetworkTutorialPresented = true
+        }
     }
 }
 
@@ -166,13 +194,25 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
             }
         }
     }
+
+    func listenToChanges() {
+        $isNetworkTutorialPresented.sink { [weak self] isPresented in
+            guard let self = self, !isPresented else { return }
+            self.createKeyService.resetNavigationState(self.keyName)
+            self.updateNetworks()
+        }
+        .store(in: cancelBag)
+    }
 }
 
 #if DEBUG
     struct CreateDerivedKeyView_Previews: PreviewProvider {
         static var previews: some View {
             CreateKeyNetworkSelectionView(
-                viewModel: .init(seedName: "seedName")
+                viewModel: .init(
+                    seedName: "seedName",
+                    keyName: "keyName"
+                )
             )
             .environmentObject(NavigationCoordinator())
         }
