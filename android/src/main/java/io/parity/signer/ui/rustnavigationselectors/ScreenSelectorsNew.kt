@@ -25,6 +25,7 @@ import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
+import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
@@ -117,6 +118,18 @@ fun CombinedScreensSelector(
 					seedNames = seedNames.value,
 				)
 			}
+		is ScreenData.RecoverSeedName -> {
+			Box(
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			) {
+				KeysetRecoverNameScreen(
+					rootNavigator = rootNavigator,
+					seedNames = seedNames.value
+				)
+			}
+		}
 		is ScreenData.Scan -> {
 			ScanNavSubgraph(
 				rootNavigator = rootNavigator

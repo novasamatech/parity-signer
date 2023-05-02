@@ -5,8 +5,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
-import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
+import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
@@ -51,11 +51,7 @@ fun ScreenSelector(
 		is ScreenData.ManageNetworks -> {} //migrated to new selector
 		is ScreenData.NNetworkDetails -> {} // migrated to new selector
 		is ScreenData.NewSeed -> {} // new selector
-		is ScreenData.RecoverSeedName -> RecoverSeedName(
-			screenData.f,
-			sharedViewModel::navigate,
-			seedNames.value
-		)
+		is ScreenData.RecoverSeedName -> {}//new selector
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
 			recoverSeedPhrase = screenData.f,
 			button = sharedViewModel::navigate,
