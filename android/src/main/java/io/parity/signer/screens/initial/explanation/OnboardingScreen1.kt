@@ -27,7 +27,6 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun OnboardingScreen1(onSkip: Callback) {
-	ForceDarkTheme()
 	Column(
 		Modifier
 			.fillMaxSize(1f)
@@ -94,17 +93,6 @@ internal fun OnboardingScreen1(onSkip: Callback) {
 				.weight(0.7f)
 		)
 		Spacer(modifier = Modifier.padding(top = 16.dp))
-	}
-}
-
-@Composable
-fun ForceDarkTheme() {
-	DisposableEffect(key1 = Unit) {
-		val original = AppCompatDelegate.getDefaultNightMode()
-		AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-		onDispose {
-			AppCompatDelegate.setDefaultNightMode(original)
-		}
 	}
 }
 

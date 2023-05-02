@@ -26,7 +26,6 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun OnboardingScreen4(onContinue: Callback) {
-	ForceDarkTheme()
 	Column(
 		Modifier
 			.fillMaxSize(1f)
