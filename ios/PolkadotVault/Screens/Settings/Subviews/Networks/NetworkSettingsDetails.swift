@@ -12,7 +12,6 @@ struct NetworkSettingsDetails: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
     var body: some View {
         VStack(spacing: 0) {
