@@ -452,17 +452,10 @@
 "EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
 "EnterBananaSplitPasswordModal.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
 
-"CreateDerivedKey.Label.Title" = "Create Derived Key";
-"CreateDerivedKey.Label.Header.Network" = "Choose Network";
-"CreateDerivedKey.Label.Header.Path" = "Derivation Path";
-"CreateDerivedKey.Label.Placeholder.Path" = "// Add Path Name";
-"CreateDerivedKey.Label.EmpyyPath" = "Derivation Path Name Is Empty";
-"CreateDerivedKey.Label.Footer.Path" = "Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.";
-"CreateDerivedKey.Action.Add" = "Create Derived Key";
-"CreateDerivedKey.Label.Network.Single" = "Network";
+"CreateDerivedKey.Label.Title" = "Select Network";
+"CreateDerivedKey.Label.Footer.Network" = "Learn more about How to Set up networks";
+"CreateDerivedKey.Label.Network.Title" = "Choose Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
-"CreateDerivedKey.Modal.Network.Title" = "Choose Network";
-"CreateDerivedKey.Modal.Network.OnAny" = "Allow use on any network";
 
 "CreateDerivedKey.Modal.Path.Title" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
@@ -488,12 +481,6 @@
 "CreateDerivedKey.Modal.Confirmation.Action" = "Done";
 "CreateDerivedKey.Modal.Confirmation.EmptyPath" = "Derivation Path Name Is Empty";
 
-"CreateDerivedKey.InfoModal.DerivedKeys.Title" = "Derived Keys";
-"CreateDerivedKey.InfoModal.DerivedKeys.Content" = "If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys.\n\nWe can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.\n\nThe main reason to use derived keys is to easily back up (and restore from a back up) a derivation path compared to seed phrase.";
-"CreateDerivedKey.InfoModal.DerivedKeys.Action" = "Got It";
-"CreateDerivedKey.InfoModal.DerivationPaths.Title" = "Derivation Paths";
-"CreateDerivedKey.InfoModal.DerivationPaths.Content" = "If you would like to create and manage several accounts on the network using the same seed, you can use derivation paths. We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase. Many Polkadot key generation tools support hard and soft derivation. For instance, if you intend to create an account to be used on the Polkadot chain, you can derive a hard key child account using // after the mnemonic phrase.";
-"CreateDerivedKey.InfoModal.DerivationPaths.Action" = "Got It";
 "CreateDerivedKey.InfoModal.DerivationMethods.Title" = "Derivation Methods";
 "CreateDerivedKey.InfoModal.DerivationMethods.Soft.Title" = "/ Soft derivation";
 "CreateDerivedKey.InfoModal.DerivationMethods.Soft.Content" = "A soft derivation allows someone to potentially \"go backwards\" to figure out the initial account's private key if they know the derived account's private key. It is also possible to determine that different accounts generated from the same seed are linked to that seed.";

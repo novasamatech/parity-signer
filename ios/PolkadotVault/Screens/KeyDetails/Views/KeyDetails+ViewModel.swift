@@ -163,7 +163,6 @@ extension KeyDetailsView.ViewModel {
             presentableError = .noNetworksAvailable()
             isPresentingError = true
         } else {
-            keyDetailsActionsService.startDeriveNewKey(keyName)
             isPresentingDeriveNewKey = true
         }
     }

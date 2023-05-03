@@ -78,7 +78,8 @@ struct KeySetList: View {
                         }
                     }
                     TabBarView(
-                        selectedTab: $navigation.selectedTab
+                        selectedTab: .keys,
+                        onQRCodeTap: viewModel.onQRCodeTap
                     )
                 }
                 if isExportKeysSelected {
@@ -87,6 +88,7 @@ struct KeySetList: View {
             }
         }
         .onAppear {
+            viewModel.use(appState: appState)
             viewModel.updateData()
         }
         .onChange(of: isShowingDetails, perform: { _ in
@@ -250,23 +252,37 @@ struct KeySetList: View {
 extension KeySetList {
     final class ViewModel: ObservableObject {
         private let keyListService: KeyListService
-        let keyDetailsService: KeyDetailsService
+        private let cancelBag = CancelBag()
         private let modelBuilder: KeySetListViewModelBuilder
+        private var dataModel: MSeeds
+        private weak var appState: AppState!
         @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
-        private var dataModel: MSeeds
+
+        let onQRCodeTap: () -> Void
+        let keyDetailsService: KeyDetailsService
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             keyListService: KeyListService = KeyListService(),
             modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
-            dataModel: MSeeds
+            dataModel: MSeeds,
+            onQRCodeTap: @escaping () -> Void
         ) {
             self.keyDetailsService = keyDetailsService
             self.keyListService = keyListService
             self.modelBuilder = modelBuilder
             self.dataModel = dataModel
+            self.onQRCodeTap = onQRCodeTap
             updateView(dataModel)
+        }
+
+        func use(appState: AppState) {
+            self.appState = appState
+            appState.userData.$keyListRequiresUpdate.sink { [weak self] requiresUpdate in
+                guard requiresUpdate else { return }
+                self?.updateData()
+            }.store(in: cancelBag)
         }
 
         func updateView(_ dataModel: MSeeds) {
@@ -310,7 +326,7 @@ private struct KeyListEmptyState: View {
     struct KeySetListPreview: PreviewProvider {
         static var previews: some View {
             KeySetList(
-                viewModel: .init(dataModel: PreviewData.mseeds)
+                viewModel: .init(dataModel: PreviewData.mseeds, onQRCodeTap: {})
             )
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)

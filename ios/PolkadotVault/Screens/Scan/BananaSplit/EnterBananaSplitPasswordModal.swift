@@ -110,6 +110,7 @@ extension EnterBananaSplitPasswordModal {
         @Binding var isErrorPresented: Bool
         @Binding var presentableError: ErrorBottomModalViewModel
         @Binding var qrCodeData: [String]
+        @Binding var onComplete: () -> Void
         @Published var seedName: String = ""
         @Published var password: String = ""
         @Published var isNameValid: Bool = true
@@ -118,21 +119,26 @@ extension EnterBananaSplitPasswordModal {
         @Published var invalidPasswordAttempts: Int = 0
         private var cancelBag = CancelBag()
         private let seedsMediator: SeedsMediating
+        private let service: BananaSplitRecoveryService
 
         init(
+            service: BananaSplitRecoveryService = BananaSplitRecoveryService(),
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             isKeyRecovered: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
             presentableError: Binding<ErrorBottomModalViewModel>,
             qrCodeData: Binding<[String]>,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            onComplete: Binding<() -> Void>
         ) {
+            self.service = service
+            self.seedsMediator = seedsMediator
             _isPresented = isPresented
             _isKeyRecovered = isKeyRecovered
             _isErrorPresented = isErrorPresented
             _presentableError = presentableError
             _qrCodeData = qrCodeData
-            self.seedsMediator = seedsMediator
+            _onComplete = onComplete
             subscribeToUpdates()
         }
 
@@ -175,17 +181,7 @@ extension EnterBananaSplitPasswordModal {
                 dismissWithError(.seedPhraseAlreadyExists())
                 return
             }
-            navigation.performFake(navigation: .init(action: .navbarKeys))
-            // Key Set List state has different "modalData" state depending on whether user has at least one key
-            // or not
-            // So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
-            // calling
-            // .rightButtonAction
-            if !seedsMediator.seedNames.isEmpty {
-                navigation.performFake(navigation: .init(action: .rightButtonAction))
-            }
-            navigation.performFake(navigation: .init(action: .recoverSeed))
-            navigation.performFake(navigation: .init(action: .goForward, details: seedName))
+            service.startBananaSplitRecover(seedName, isFirstSeed: seedsMediator.seedNames.isEmpty)
             // We should do additional check on whether seed can be successfully saved and not call navigation
             // further if there are any issues (i.e. somehow seedname is still empty, etc)
             guard seedsMediator.createSeed(
@@ -199,15 +195,7 @@ extension EnterBananaSplitPasswordModal {
                 ))
                 return
             }
-            navigation.performFake(navigation: .init(
-                action: .goForward,
-                details: BackendConstants.true,
-                seedPhrase: seedPhrase
-            ))
-            navigation.performFake(navigation: .init(action: .goBack))
-            navigation.qrScannerDismissUpdate = {
-                self.navigation.perform(navigation: .init(action: .selectSeed, details: self.seedName))
-            }
+            service.completeBananaSplitRecovery(seedPhrase)
             isKeyRecovered = true
             isPresented = false
         }
@@ -245,7 +233,8 @@ extension EnterBananaSplitPasswordModal {
                     isKeyRecovered: .constant(false),
                     isErrorPresented: .constant(false),
                     presentableError: .constant(.signingForgotPassword()),
-                    qrCodeData: .constant([])
+                    qrCodeData: .constant([]),
+                    onComplete: .constant {}
                 )
             )
             .environmentObject(NavigationCoordinator())

@@ -9,12 +9,12 @@ import SwiftUI
 
 final class MainScreensFactory {
     @ViewBuilder
-    func screen(for screenData: ScreenData) -> some View {
+    func screen(for screenData: ScreenData, onQRCodeTap: @escaping () -> Void) -> some View {
         switch screenData {
         case let .seedSelector(value):
-            KeySetList(viewModel: .init(dataModel: value))
+            KeySetList(viewModel: .init(dataModel: value, onQRCodeTap: onQRCodeTap))
         case .settings:
-            SettingsView(viewModel: .init())
+            SettingsView(viewModel: .init(onQRCodeTap: onQRCodeTap))
         // Screens handled outside of Rust navigation
         case .documents,
              .selectSeedForBackup,
@@ -37,3 +37,5 @@ final class MainScreensFactory {
         }
     }
 }
+
+// appease-cause-congenial-delusion

@@ -38,25 +38,9 @@ final class NavigationCoordinator: ObservableObject {
         alertData: .none
     )
 
-    /// Stores view model of currently selected tab
-    ///
-    /// This should preceed information from `ActionResult.footerButton` as `FooterButton` enum contains also `back`
-    /// value which is irrelevant to bottom navigation system that mimics system `TabView`
-    /// This should be removed once navigation is moved to native system.
-    @Published var selectedTab: Tab = .keys
-
-    /// Informs main view dispatcher whether we should get back to previous tab when dismissing camera view
-    /// or navigate to explicit screen
-    /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
-    ///
-    /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other time
-    @Published var qrScannerDismissUpdate: (() -> Void)?
-
     /// Responsible for presentation of generic error bottom sheet alert component
     /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
     @Published var genericError = GenericErrorViewModel()
-
-    @Published var shouldPresentQRScanner = false
 
     @Published var disableSwipeToBack: Bool = false
 
@@ -106,7 +90,6 @@ extension NavigationCoordinator {
             updateIntermediateDataModels(actionResult)
             updateGlobalViews(actionResult)
             self.actionResult = actionResult
-            updateTabBar()
         case let .failure(error):
             genericError.errorMessage = error.description
             genericError.isPresented = true
@@ -123,11 +106,6 @@ private extension NavigationCoordinator {
             genericError.errorMessage = message
             genericError.isPresented = true
         }
-    }
-
-    func updateTabBar() {
-        guard let tab = Tab(actionResult.footerButton), tab != selectedTab else { return }
-        selectedTab = tab
     }
 
     func handleDebounce(_ skipDebounce: Bool) {

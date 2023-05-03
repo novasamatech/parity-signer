@@ -90,45 +90,6 @@ final class NavigationCoordinatorTests: XCTestCase {
         XCTAssertEqual(backendActionPerformer.performBackendReceivedSeedPhrase, ["", secondNavigation.seedPhrase])
     }
 
-    func test_performNavigation_whenActionDoesNotChangeFooterButton_doesNotUpdateSelectedTab() {
-        // Given
-        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
-        backendActionPerformer.performBackendReturnValue = .success(.generate(footerButton: .keys))
-        XCTAssertEqual(subject.selectedTab, .keys)
-
-        // When
-        subject.perform(navigation: navigation)
-
-        // Then
-        XCTAssertEqual(subject.selectedTab, .keys)
-    }
-
-    func test_performNavigation_whenActionHasNilFooterButton_doesNotUpdateSelectedTab() {
-        // Given
-        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
-        backendActionPerformer.performBackendReturnValue = .success(.generate(footerButton: nil))
-        XCTAssertEqual(subject.selectedTab, .keys)
-
-        // When
-        subject.perform(navigation: navigation)
-
-        // Then
-        XCTAssertEqual(subject.selectedTab, .keys)
-    }
-
-    func test_performNavigation_whenActionHasInvalidFooterButton_doesNotUpdateSelectedTab() {
-        // Given
-        let navigation = Navigation(action: .navbarLog, details: "details", seedPhrase: nil)
-        backendActionPerformer.performBackendReturnValue = .success(.generate(footerButton: .back))
-        XCTAssertEqual(subject.selectedTab, .keys)
-
-        // When
-        subject.perform(navigation: navigation)
-
-        // Then
-        XCTAssertEqual(subject.selectedTab, .keys)
-    }
-
     func test_performNavigation_whenActionPerformerReturnsError_showsGenericErrorWithThatMessage() {
         // Given
         let message = "Error message"
