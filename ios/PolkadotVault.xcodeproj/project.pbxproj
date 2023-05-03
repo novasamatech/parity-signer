@@ -253,7 +253,6 @@
 		6DDD737C2940629D00F04CE7 /* LogsMoreActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD737B2940629D00F04CE7 /* LogsMoreActionsModal.swift */; };
 		6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF10F28AD105F004CA2FD /* TabBarView.swift */; };
 		6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11328AD12FA004CA2FD /* Tab.swift */; };
-		6DDEF11828AD4215004CA2FD /* TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11728AD4215004CA2FD /* TabTests.swift */; };
 		6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */; };
 		6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */; };
 		6DDEF13228AE6039004CA2FD /* signer.udl in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12E28AE5EDA004CA2FD /* signer.udl */; };
@@ -583,7 +582,6 @@
 		6DDD737B2940629D00F04CE7 /* LogsMoreActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsMoreActionsModal.swift; sourceTree = "<group>"; };
 		6DDEF10F28AD105F004CA2FD /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		6DDEF11328AD12FA004CA2FD /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
-		6DDEF11728AD4215004CA2FD /* TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTests.swift; sourceTree = "<group>"; };
 		6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilder.swift; sourceTree = "<group>"; };
 		6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilderTests.swift; sourceTree = "<group>"; };
 		6DDEF12E28AE5EDA004CA2FD /* signer.udl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = signer.udl; path = ../../../rust/signer/src/signer.udl; sourceTree = "<group>"; };
@@ -1643,7 +1641,6 @@
 		6DDEF11628AD4209004CA2FD /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				6DDEF11728AD4215004CA2FD /* TabTests.swift */,
 				6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */,
 			);
 			path = TabBar;
@@ -2341,7 +2338,6 @@
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6D5801DE28992375006C41D8 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
-				6DDEF11828AD4215004CA2FD /* TabTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
