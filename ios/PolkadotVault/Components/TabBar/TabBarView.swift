@@ -19,21 +19,30 @@ struct TabBarView: View {
     ///
     /// For now this value is based on `FooterButton` from `ActionResult`, but when navigation is moved
     /// to native system this should be `private let` and not derived from external view models
-    @Binding var selectedTab: Tab
-
+    let selectedTab: Tab
+    let onQRCodeTap: () -> Void
     private let viewModelBuilder = TabViewModelBuilder()
+
+    init(
+        selectedTab: Tab,
+        onQRCodeTap: @escaping () -> Void
+    ) {
+        self.selectedTab = selectedTab
+        self.onQRCodeTap = onQRCodeTap
+    }
 
     var body: some View {
         HStack {
-            ForEach(Tab.allCases, id: \.self) { tab in
-                if tab == .scanner {
-                    CentralTabBarButton(viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab))
-                } else {
-                    TabBarButton(
-                        viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab)
-                    )
-                }
-            }
+            TabBarButton(
+                viewModel: viewModelBuilder.build(for: .keys, isSelected: selectedTab == .keys)
+            )
+            CentralTabBarButton(
+                viewModel: viewModelBuilder.build(for: .scanner, isSelected: false),
+                onQRCodeTap: onQRCodeTap
+            )
+            TabBarButton(
+                viewModel: viewModelBuilder.build(for: .settings, isSelected: selectedTab == .settings)
+            )
         }
         .frame(height: Heights.tabbarHeight)
         .background(Asset.backgroundSecondary.swiftUIColor)
@@ -61,8 +70,6 @@ private struct TabBarButton: View {
             action: {
                 if let action = viewModel.action {
                     navigation.perform(navigation: .init(action: action))
-                } else {
-                    navigation.shouldPresentQRScanner.toggle()
                 }
             },
             label: {
@@ -89,22 +96,19 @@ private struct CentralTabBarButton: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
 
     private let viewModel: TabViewModel
+    let onQRCodeTap: () -> Void
 
     init(
-        viewModel: TabViewModel
+        viewModel: TabViewModel,
+        onQRCodeTap: @escaping () -> Void
     ) {
         self.viewModel = viewModel
+        self.onQRCodeTap = onQRCodeTap
     }
 
     var body: some View {
         Button(
-            action: {
-                if let action = viewModel.action {
-                    navigation.perform(navigation: .init(action: action))
-                } else {
-                    navigation.shouldPresentQRScanner.toggle()
-                }
-            },
+            action: onQRCodeTap,
             label: {
                 viewModel.icon
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -126,7 +130,8 @@ private struct CentralTabBarButton: View {
 struct TabBarView_Previews: PreviewProvider {
     static var previews: some View {
         TabBarView(
-            selectedTab: Binding<Tab>.constant(.keys)
+            selectedTab: .keys,
+            onQRCodeTap: {}
         )
         .previewLayout(.sizeThatFits)
         .environmentObject(NavigationCoordinator())

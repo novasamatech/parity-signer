@@ -16,12 +16,6 @@ final class KeyDetailsActionService {
         self.navigation = navigation
     }
 
-    func startDeriveNewKey(_ keyName: String) {
-        resetNavigationStateToKeyDetails(keyName)
-        navigation.performFake(navigation: .init(action: .newKey))
-        navigation.performFake(navigation: .init(action: .goBack))
-    }
-
     func performBackupSeed(_ keyName: String) {
         resetNavigationStateToKeyDetails(keyName)
         navigation.performFake(navigation: .init(action: .rightButtonAction))

@@ -52,14 +52,6 @@ struct CameraView: View {
                                 icon: Asset.xmarkButton.swiftUIImage
                             )
                             Spacer()
-                            // Disabled multi-batch mode
-//                            CameraButton(
-//                                action: {
-//                                    viewModel.onScanMultipleTap(model: model)
-//                                },
-//                                icon: Asset.scanMultiple.swiftUIImage,
-//                                isPressed: $viewModel.isScanningMultiple
-//                            )
                             CameraButton(
                                 action: { model.toggleTorch() },
                                 icon: Asset.torchOff.swiftUIImage,
@@ -119,6 +111,7 @@ struct CameraView: View {
         .onAppear {
             model.configure()
             viewModel.use(navigation: navigation)
+            viewModel.onAppear()
         }
         .onDisappear {
             model.shutdown()
@@ -157,6 +150,7 @@ struct CameraView: View {
                 // User proceeded successfully with key recovery, dismiss camera
                 if viewModel.wasBananaSplitKeyRecovered {
                     viewModel.dismissView()
+                    viewModel.onBananaSplitComplete()
                 }
             }
         ) {
@@ -166,7 +160,8 @@ struct CameraView: View {
                     isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
                     isErrorPresented: $viewModel.shouldPresentError,
                     presentableError: $viewModel.presentableError,
-                    qrCodeData: $model.bucket
+                    qrCodeData: $model.bucket,
+                    onComplete: $viewModel.onBananaSplitComplete
                 )
             )
         }
@@ -273,6 +268,7 @@ extension CameraView {
         // Banana split flow
         @Published var isPresentingEnterBananaSplitPassword: Bool = false
         @Published var wasBananaSplitKeyRecovered: Bool = false
+        @Published var onBananaSplitComplete: () -> Void = {}
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -281,19 +277,27 @@ extension CameraView {
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
 
         @Binding var isPresented: Bool
+        @Binding var onComplete: () -> Void
         private weak var navigation: NavigationCoordinator!
         private let seedsMediator: SeedsMediating
 
         init(
             isPresented: Binding<Bool>,
+            onComplete: Binding<() -> Void> = .constant {},
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             _isPresented = isPresented
+            _onComplete = onComplete
             self.seedsMediator = seedsMediator
         }
 
         func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+        }
+
+        func onAppear() {
+            navigation.performFake(navigation: .init(action: .start))
+            navigation.performFake(navigation: .init(action: .navbarScan))
         }
 
         func checkForTransactionNavigation(_ payload: String?) {

@@ -318,6 +318,7 @@ extension TransactionPreview {
 
         func onApproveTap() {
             navigation.performFake(navigation: .init(action: .goForward))
+            navigation.performFake(navigation: .init(action: .start))
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
                 snackbarPresentation.viewModel = .init(
