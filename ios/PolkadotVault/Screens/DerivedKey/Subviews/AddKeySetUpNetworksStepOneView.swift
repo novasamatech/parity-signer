@@ -71,7 +71,7 @@ struct AddKeySetUpNetworksStepOneView: View {
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isShowingQRScanner,
                 onDismiss: viewModel.onQRScannerDismiss
             ) {

@@ -60,7 +60,7 @@ struct AddKeySetUpNetworksStepTwoView: View {
                 minHeight: geo.size.height
             )
             .background(Asset.backgroundSystem.swiftUIColor)
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isShowingQRScanner,
                 onDismiss: viewModel.onQRScannerDismiss
             ) {

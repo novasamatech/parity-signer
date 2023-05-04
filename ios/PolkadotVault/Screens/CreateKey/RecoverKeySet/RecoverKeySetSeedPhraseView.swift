@@ -70,7 +70,7 @@ struct RecoverKeySetSeedPhraseView: View {
             .onAppear {
                 focus = true
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
                 ErrorBottomModal(

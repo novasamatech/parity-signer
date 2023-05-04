@@ -65,7 +65,7 @@ struct SettingsView: View {
             viewModel.use(appState: appState)
             viewModel.loadData()
         }
-        .fullScreenCover(isPresented: $viewModel.isPresentingWipeConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isPresentingWipeConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .wipeAll,
                 mainAction: viewModel.wipe(),

@@ -117,7 +117,7 @@ struct DerivationPathNameView: View {
             viewModel.onAppear()
             focusedPath = true
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingInfoModal
         ) {
             DerivationMethodsInfoView(
@@ -127,7 +127,7 @@ struct DerivationPathNameView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConfirmation
         ) {
             CreateDerivedKeyConfirmationView(

@@ -67,7 +67,7 @@ struct KeyDetailsView: View {
                 }
             }
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -82,7 +82,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
                 mainAction: viewModel.onRemoveKeySetConfirmationTap(),
@@ -91,7 +91,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingBackupModal,
             onDismiss: viewModel.clearBackupModalState
         ) {
@@ -105,7 +105,7 @@ struct KeyDetailsView: View {
                 EmptyView()
             }
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -120,7 +120,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
             if let keyExportModel = viewModel.keyExportModel() {
@@ -142,7 +142,7 @@ struct KeyDetailsView: View {
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingNetworkSelection
         ) {
             NetworkSelectionModal(
@@ -150,7 +150,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingRootDetails
         ) {
             RootKeyDetailsModal(
@@ -159,7 +159,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(
@@ -168,7 +168,7 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingDeriveNewKey,
             onDismiss: viewModel.refreshData
         ) {
