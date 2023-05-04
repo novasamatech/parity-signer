@@ -12,8 +12,6 @@ struct AuthenticatedScreenContainer: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @StateObject var viewModel: ViewModel
-    @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
-    @GestureState private var dragOffset = CGSize.zero
     @State private var isShowingQRScanner: Bool = false
 
     var body: some View {
@@ -21,7 +19,7 @@ struct AuthenticatedScreenContainer: View {
             for: navigation.actionResult.screenData,
             onQRCodeTap: viewModel.onQRCodeTap
         )
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
         ) {
@@ -32,9 +30,7 @@ struct AuthenticatedScreenContainer: View {
                 )
             )
         }
-        .environmentObject(snackBarPresentation)
-        .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $navigation.genericError.isPresented
         ) {
             ErrorBottomModal(

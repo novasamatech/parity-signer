@@ -69,7 +69,7 @@ struct VerifierCertificateView: View {
             Spacer()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(isPresented: $viewModel.isPresentingRemoveConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isPresentingRemoveConfirmation) {
             VerticalActionsBottomModal(
                 viewModel: .removeGeneralVerifier,
                 mainAction: viewModel.onRemoveConfirmationTap(),

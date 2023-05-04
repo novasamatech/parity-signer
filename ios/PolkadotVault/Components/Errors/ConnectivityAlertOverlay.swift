@@ -25,7 +25,7 @@ struct ConnectivityAlertOverlay: View {
                 EmptyView()
             }
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert
         ) {
             ErrorBottomModal(

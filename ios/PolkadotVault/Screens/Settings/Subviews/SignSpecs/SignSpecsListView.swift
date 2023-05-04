@@ -50,7 +50,7 @@ struct SignSpecsListView: View {
             presentationMode.wrappedValue.dismiss()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: viewModel.onPasswordModalDismiss
         ) {
@@ -64,7 +64,7 @@ struct SignSpecsListView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(

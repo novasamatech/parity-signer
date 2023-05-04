@@ -42,7 +42,7 @@ struct BackupSelectKeyView: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingBackupModal,
             onDismiss: { viewModel.seedPhraseToPresent = .init(keyName: "", seedPhrase: .init(seedPhrase: "")) }
         ) {
@@ -52,7 +52,7 @@ struct BackupSelectKeyView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert
         ) {
             ErrorBottomModal(

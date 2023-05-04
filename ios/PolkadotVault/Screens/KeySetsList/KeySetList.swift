@@ -95,7 +95,7 @@ struct KeySetList: View {
             guard !isShowingDetails else { return }
             viewModel.updateData()
         })
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingNewSeedMenu,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -122,26 +122,26 @@ struct KeySetList: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingCreateKeySet,
             onDismiss: viewModel.updateData
         ) {
             EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingRecoverKeySet,
             onDismiss: viewModel.updateData
         ) {
             RecoverKeySetNameView(viewModel: .init(isPresented: $isShowingRecoverKeySet))
         }
-        .fullScreenCover(isPresented: $isShowingMoreMenu) {
+        .fullScreenModal(isPresented: $isShowingMoreMenu) {
             KeyListMoreMenuModal(
                 isPresented: $isShowingMoreMenu,
                 isExportKeysSelected: $isExportKeysSelected
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
             ExportMultipleKeysModal(
