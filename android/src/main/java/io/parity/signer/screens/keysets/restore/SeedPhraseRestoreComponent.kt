@@ -54,6 +54,9 @@ fun SeedPhraseRestoreComponent(phrase: String) {
 			SeedPhraseRestoreWord(index = index + 1, word = words[index])
 		}
 		BasicTextField(
+			modifier = Modifier
+				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp)
+				.padding(vertical = 8.dp, horizontal = 12.dp),
 			value = editedWord,
 			onValueChange = {},//todo dmitry
 		)
