@@ -12,7 +12,6 @@ struct NetworkSettingsDetails: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
     var body: some View {
         VStack(spacing: 0) {
@@ -106,7 +105,7 @@ struct NetworkSettingsDetails: View {
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
-            .fullScreenCover(isPresented: $viewModel.isPresentingRemoveMetadataConfirmation) {
+            .fullScreenModal(isPresented: $viewModel.isPresentingRemoveMetadataConfirmation) {
                 HorizontalActionsBottomModal(
                     viewModel: .removeMetadata,
                     mainAction: viewModel.removeMetadata(),
@@ -115,7 +114,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
-            .fullScreenCover(isPresented: $viewModel.isPresentingRemoveNetworkConfirmation) {
+            .fullScreenModal(isPresented: $viewModel.isPresentingRemoveNetworkConfirmation) {
                 HorizontalActionsBottomModal(
                     viewModel: .removeNetwork,
                     mainAction: viewModel.removeNetwork(),
@@ -124,7 +123,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isShowingActionSheet,
                 onDismiss: {
                     // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
@@ -138,6 +137,16 @@ struct NetworkSettingsDetails: View {
                     shouldSignSpecs: $viewModel.shouldSignSpecs
                 )
                 .clearModalBackground()
+            }
+            .fullScreenModal(
+                isPresented: $viewModel.isShowingQRScanner,
+                onDismiss: viewModel.onQRScannerDismiss
+            ) {
+                CameraView(
+                    viewModel: .init(
+                        isPresented: $viewModel.isShowingQRScanner
+                    )
+                )
             }
             .navigationBarHidden(true)
         }
@@ -324,6 +333,7 @@ extension NetworkSettingsDetails {
 
         @Published var signSpecList: MSignSufficientCrypto!
         @Published var isPresentingSignSpecList: Bool = false
+        @Published var isShowingQRScanner: Bool = false
 
         init(
             networkKey: String,
@@ -333,7 +343,7 @@ extension NetworkSettingsDetails {
             self.networkKey = networkKey
             self.snackbarPresentation = snackbarPresentation
             self.networkDetailsService = networkDetailsService
-            _networkDetails = .init(initialValue: networkDetailsService.networkDetails(networkKey))
+            _networkDetails = .init(initialValue: networkDetailsService.refreshCurrentNavigationState(networkKey))
             listenToNavigationUpdates()
         }
 
@@ -361,10 +371,11 @@ extension NetworkSettingsDetails {
         }
 
         func onAddTap() {
-            navigation.qrScannerDismissUpdate = { [weak self] in
-                self?.updateView()
-            }
-            navigation.shouldPresentQRScanner = true
+            isShowingQRScanner = true
+        }
+
+        func onQRScannerDismiss() {
+            updateView()
         }
 
         func didTapDelete(_ metadata: MMetadataRecord) {
@@ -416,14 +427,14 @@ extension NetworkSettingsDetails {
         }
 
         private func updateView() {
-            networkDetails = networkDetailsService.networkDetails(networkKey)
+            networkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
         }
 
         private func listenToNavigationUpdates() {
             $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
                 guard let self = self, !isPresentingSignSpecList else { return }
                 self.signSpecList = nil
-                self.networkDetailsService.restartNavigationState(self.networkKey)
+                self.updateView()
             }.store(in: cancelBag)
         }
     }

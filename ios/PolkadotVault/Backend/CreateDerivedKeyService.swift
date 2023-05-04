@@ -12,17 +12,20 @@ final class CreateDerivedKeyService {
     private let callQueue: Dispatching
     private let callbackQueue: Dispatching
     private let seedsMediator: SeedsMediating
+    private let navigation: NavigationCoordinator
 
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
         callQueue: Dispatching = DispatchQueue(label: "CreateDerivedKeyService", qos: .userInitiated),
-        callbackQueue: Dispatching = DispatchQueue.main
+        callbackQueue: Dispatching = DispatchQueue.main,
+        navigation: NavigationCoordinator = NavigationCoordinator()
     ) {
         self.databaseMediator = databaseMediator
         self.seedsMediator = seedsMediator
         self.callQueue = callQueue
         self.callbackQueue = callbackQueue
+        self.navigation = navigation
     }
 
     func createDerivedKey(
@@ -89,5 +92,13 @@ final class CreateDerivedKeyService {
         } catch {
             return .failure(.init(message: error.localizedDescription))
         }
+    }
+
+    func resetNavigationState(_ keyName: String) {
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarKeys))
+        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
+        navigation.performFake(navigation: .init(action: .newKey))
+        navigation.performFake(navigation: .init(action: .goBack))
     }
 }

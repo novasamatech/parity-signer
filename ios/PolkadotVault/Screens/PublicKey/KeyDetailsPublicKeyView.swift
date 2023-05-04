@@ -77,7 +77,7 @@ struct KeyDetailsPublicKeyView: View {
             presentationMode.wrappedValue.dismiss()
         }
         // Action sheet
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -93,7 +93,7 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Export private key warning
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysWarningModal,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -107,7 +107,7 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Export private key modal
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysModal,
             onDismiss: viewModel.onExportKeysDismissal
         ) {
@@ -118,7 +118,7 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Remove key modal
-        .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetSingleKey,
                 mainAction: viewModel.onRemoveKeyTap(),
@@ -126,7 +126,7 @@ struct KeyDetailsPublicKeyView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async

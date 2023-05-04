@@ -52,6 +52,7 @@ struct EnterKeySetNameView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarHidden(true)
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
     }
 

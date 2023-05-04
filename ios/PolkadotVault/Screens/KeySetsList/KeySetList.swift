@@ -78,7 +78,8 @@ struct KeySetList: View {
                         }
                     }
                     TabBarView(
-                        selectedTab: $navigation.selectedTab
+                        selectedTab: .keys,
+                        onQRCodeTap: viewModel.onQRCodeTap
                     )
                 }
                 if isExportKeysSelected {
@@ -87,13 +88,14 @@ struct KeySetList: View {
             }
         }
         .onAppear {
+            viewModel.use(appState: appState)
             viewModel.updateData()
         }
         .onChange(of: isShowingDetails, perform: { _ in
             guard !isShowingDetails else { return }
             viewModel.updateData()
         })
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingNewSeedMenu,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -120,26 +122,26 @@ struct KeySetList: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingCreateKeySet,
             onDismiss: viewModel.updateData
         ) {
             EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $isShowingRecoverKeySet,
             onDismiss: viewModel.updateData
         ) {
             RecoverKeySetNameView(viewModel: .init(isPresented: $isShowingRecoverKeySet))
         }
-        .fullScreenCover(isPresented: $isShowingMoreMenu) {
+        .fullScreenModal(isPresented: $isShowingMoreMenu) {
             KeyListMoreMenuModal(
                 isPresented: $isShowingMoreMenu,
                 isExportKeysSelected: $isExportKeysSelected
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
             ExportMultipleKeysModal(
@@ -250,23 +252,37 @@ struct KeySetList: View {
 extension KeySetList {
     final class ViewModel: ObservableObject {
         private let keyListService: KeyListService
-        let keyDetailsService: KeyDetailsService
+        private let cancelBag = CancelBag()
         private let modelBuilder: KeySetListViewModelBuilder
+        private var dataModel: MSeeds
+        private weak var appState: AppState!
         @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
-        private var dataModel: MSeeds
+
+        let onQRCodeTap: () -> Void
+        let keyDetailsService: KeyDetailsService
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             keyListService: KeyListService = KeyListService(),
             modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
-            dataModel: MSeeds
+            dataModel: MSeeds,
+            onQRCodeTap: @escaping () -> Void
         ) {
             self.keyDetailsService = keyDetailsService
             self.keyListService = keyListService
             self.modelBuilder = modelBuilder
             self.dataModel = dataModel
+            self.onQRCodeTap = onQRCodeTap
             updateView(dataModel)
+        }
+
+        func use(appState: AppState) {
+            self.appState = appState
+            appState.userData.$keyListRequiresUpdate.sink { [weak self] requiresUpdate in
+                guard requiresUpdate else { return }
+                self?.updateData()
+            }.store(in: cancelBag)
         }
 
         func updateView(_ dataModel: MSeeds) {
@@ -310,7 +326,7 @@ private struct KeyListEmptyState: View {
     struct KeySetListPreview: PreviewProvider {
         static var previews: some View {
             KeySetList(
-                viewModel: .init(dataModel: PreviewData.mseeds)
+                viewModel: .init(dataModel: PreviewData.mseeds, onQRCodeTap: {})
             )
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)

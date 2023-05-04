@@ -16,7 +16,7 @@ final class ManageNetworkDetailsService {
         self.navigation = navigation
     }
 
-    func networkDetails(_ networkKey: String) -> MNetworkDetails! {
+    func refreshCurrentNavigationState(_ networkKey: String) -> MNetworkDetails! {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarSettings))
         navigation.performFake(navigation: .init(action: .manageNetworks))
@@ -66,12 +66,5 @@ final class ManageNetworkDetailsService {
         guard case let .nNetworkDetails(value) = navigation
             .performFake(navigation: .init(action: .removeMetadata)).screenData else { return nil }
         return value
-    }
-
-    func restartNavigationState(_ networkKey: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarSettings))
-        navigation.performFake(navigation: .init(action: .manageNetworks))
-        navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
     }
 }
