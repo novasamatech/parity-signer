@@ -25,73 +25,13 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun OnboardingScreen2(onSkip: Callback) {
-	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.background(
-				brush = Brush.linearGradient(
-					start = Offset(Float.POSITIVE_INFINITY, 0.0f),
-					end = Offset(0.0f, Float.POSITIVE_INFINITY),
-					colors = listOf(
-						MaterialTheme.colors.pink500,
-						MaterialTheme.colors.backgroundSecondary,
-					),
-				)
-			)
-	) {
-		PageIndicatorLine(
-			totalDots = 4,
-			selectedIndex = 2,
-			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-		)
-		Row(
-			modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Box(
-				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill12, RoundedCornerShape(40.dp)
-					)
-					.padding(vertical = 6.dp, horizontal = 16.dp),
-			) {
-				Text(
-					stringResource(R.string.onboarding_welcome),
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.LabelS,
-				)
-			}
-			Spacer(modifier = Modifier.weight(1f))
-			Text(
-				stringResource(R.string.onboarding_skip),
-				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.LabelS,
-				modifier = Modifier
-					.padding(horizontal = 6.dp)
-					.clickable(onClick = onSkip)
-			)
-		}
-		Text(
-			text = stringResource(R.string.onboarding_header_2),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
-			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-		)
-		Spacer(
-			modifier = Modifier
-				.padding(top = 30.dp)
-				.weight(0.2f)
-		)
-		Image(
-			painter = painterResource(id = R.drawable.onboarding_3),
-			contentDescription = null,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.fillMaxWidth(1f)
-				.weight(0.7f)
-		)
-		Spacer(modifier = Modifier.padding(top = 16.dp))
-	}
+	OnboardingScreenGeneric(
+		page = 2,
+		showSkip = true,
+		title = stringResource(R.string.onboarding_header_2),
+		image = painterResource(id = R.drawable.onboarding_2),
+		onSkip = onSkip,
+	)
 }
 
  @Preview(

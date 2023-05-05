@@ -26,71 +26,19 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun OnboardingScreen4(onContinue: Callback) {
-	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.background(
-				brush = Brush.linearGradient(
-					start = Offset(Float.POSITIVE_INFINITY, 0.0f),
-					end = Offset(0.0f, Float.POSITIVE_INFINITY),
-					colors = listOf(
-						MaterialTheme.colors.pink500,
-						MaterialTheme.colors.backgroundSecondary,
-					),
-				)
-			)
-	) {
-		PageIndicatorLine(
-			totalDots = 4,
-			selectedIndex = 4,
-			modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-		)
-		Row(
-			modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Box(
-				modifier = Modifier
-					.background(
-						MaterialTheme.colors.fill12, RoundedCornerShape(40.dp)
-					)
-					.padding(vertical = 6.dp, horizontal = 16.dp),
-			) {
-				Text(
-					stringResource(R.string.onboarding_welcome),
-					color = MaterialTheme.colors.textSecondary,
-					style = SignerTypeface.LabelS,
-				)
-			}
-			Spacer(modifier = Modifier.weight(1f))
-		}
-		Text(
-			text = stringResource(R.string.onboarding_header_4),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
-			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-		)
-		Spacer(
-			modifier = Modifier
-				.padding(top = 30.dp)
-				.weight(0.2f)
-		)
-		Image(
-			painter = painterResource(id = R.drawable.onboarding_5),
-			contentDescription = null,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.fillMaxWidth(1f)
-				.weight(0.7f)
-		)
-		Spacer(modifier = Modifier.padding(top = 16.dp))
-	}
+	OnboardingScreenGeneric(
+		page = 4,
+		showSkip = false,
+		title = stringResource(R.string.onboarding_header_4),
+		image = painterResource(id = R.drawable.onboarding_4),
+		onSkip = onContinue,
+	)
 	Box(
 		modifier = Modifier.fillMaxSize(1f),
 		contentAlignment = Alignment.BottomCenter,
 	) {
 		PrimaryButtonWide(
-			label = "continue",
+			label = stringResource(R.string.onboarding_cta_continue),
 			activeBackground = Color.White,
 			activeText = MaterialTheme.colors.pink500,
 			modifier = Modifier.padding(24.dp),
