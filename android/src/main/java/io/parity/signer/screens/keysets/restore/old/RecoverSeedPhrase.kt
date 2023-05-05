@@ -15,6 +15,7 @@ import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
+//todo dmitry remove
 @Composable
 fun RecoverSeedPhrase(
 	recoverSeedPhrase: MRecoverSeedPhrase,
