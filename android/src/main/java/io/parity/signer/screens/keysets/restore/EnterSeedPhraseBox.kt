@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,7 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
@@ -31,7 +33,12 @@ import io.parity.signer.ui.theme.textSecondary
 
 
 @Composable
-fun EnterSeedPhraseBox(phrase: String) {
+fun EnterSeedPhraseBox(
+	enteredWords: List<String>,
+	progressWord: String,
+	onEnteredChange: (progressWord: String) -> Unit,
+	onTryProceed: Callback,
+) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
@@ -46,19 +53,16 @@ fun EnterSeedPhraseBox(phrase: String) {
 			.padding(16.dp),
 	) {
 
-		val editedWord = phrase.substringAfterLast(' ', "")
-		val words =
-			phrase.split(' ').filter() { it.isNotEmpty() }//todo fix last word?
-
-		for (index in 0..words.lastIndex) {
-			EnterSeedPhraseWord(index = index + 1, word = words[index])
+		enteredWords.onEachIndexed { index, word ->
+			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
 		BasicTextField(
 			modifier = Modifier
-				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp)
-				.padding(vertical = 8.dp, horizontal = 12.dp),
-			value = editedWord,
-			onValueChange = {},//todo dmitry
+				.padding(vertical = 8.dp, horizontal = 12.dp)
+				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
+			textStyle = TextStyle(color = MaterialTheme.colors.primary),
+			value = progressWord,
+			onValueChange = onEnteredChange,//todo dmitry
 		)
 	}
 
@@ -101,8 +105,12 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 )
 @Composable
 private fun PreviewSeedPhraseRestoreComponentFinished() {
+	val entered = listOf(
+		"some", "workds", "used", "secret", "veryverylong", "special",
+		"long", "text", "here", "how", "printed"
+	)
 	SignerNewTheme {
-		EnterSeedPhraseBox("some workds used for secret veryverylong special long text here to see how printed ")
+		EnterSeedPhraseBox(entered, "", {}, {})
 	}
 }
 
@@ -117,8 +125,12 @@ private fun PreviewSeedPhraseRestoreComponentFinished() {
 )
 @Composable
 private fun PreviewSeedPhraseRestoreComponentInProgress() {
+	val entered = listOf(
+		"some", "workds", "used", "secret", "veryverylong", "special",
+		"long", "text", "here", "how"
+	)
 	SignerNewTheme {
-		EnterSeedPhraseBox("some workds used for secret veryverylong special long text here to see how printed")
+		EnterSeedPhraseBox(entered, "printed", {}, {})
 	}
 }
 
