@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks.airgap
+package io.parity.signer.screens.initial.eachstartchecks.airgap
 
 import android.content.res.Configuration
 import androidx.compose.foundation.*

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks.rootcheck
+package io.parity.signer.screens.initial.eachstartchecks.rootcheck
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks
+package io.parity.signer.screens.initial.eachstartchecks
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
@@ -21,14 +21,14 @@ import androidx.navigation.compose.composable
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.isDbCreatedAndOnboardingPassed
-import io.parity.signer.screens.onboarding.eachstartchecks.airgap.AirgapScreen
-import io.parity.signer.screens.onboarding.eachstartchecks.rootcheck.RootExposedScreen
-import io.parity.signer.screens.onboarding.eachstartchecks.screenlock.SetScreenLockScreen
+import io.parity.signer.screens.initial.eachstartchecks.airgap.AirgapScreen
+import io.parity.signer.screens.initial.eachstartchecks.rootcheck.RootExposedScreen
+import io.parity.signer.screens.initial.eachstartchecks.screenlock.SetScreenLockScreen
 import io.parity.signer.ui.MainGraphRoutes
 
 
 fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.enableAirgapRoute) {
+	composable(route = MainGraphRoutes.eachTimeOnboardingRoute) {
 		val viewModel: EachStartViewModel = viewModel()
 		val context: Context = LocalContext.current
 

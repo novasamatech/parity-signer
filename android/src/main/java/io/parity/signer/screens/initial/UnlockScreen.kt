@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding
+package io.parity.signer.screens.initial
 
 import android.content.res.Configuration
 import android.util.Log
@@ -21,7 +21,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.R
-import io.parity.signer.components.BigButton
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.MainGraphRoutes

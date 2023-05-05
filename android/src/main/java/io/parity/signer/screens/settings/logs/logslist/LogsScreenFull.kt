@@ -17,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.backend.CompletableResult
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.onboarding.WaitingScreen
+import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.screens.settings.logs.LogsSubgraph
 import io.parity.signer.screens.settings.logs.LogsViewModel
 import io.parity.signer.screens.settings.logs.toLogsScreenModel

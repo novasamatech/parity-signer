@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.splash
+package io.parity.signer.screens.initial.splash
 
 import android.content.res.Configuration
 import android.util.Log
@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import io.parity.signer.screens.onboarding.WaitingScreen
+import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
 
@@ -30,11 +30,11 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		LaunchedEffect(Unit) {
 			Log.d(NAVIGATION_TAG, "Splash screen opened")
 			if (viewModel.shouldShowOnboarding(context)) {
-				globalNavController.navigate(MainGraphRoutes.onboardingRoute) {
+				globalNavController.navigate(MainGraphRoutes.firstTimeOnboarding) {
 					popUpTo(0)
 				}
 			} else if (viewModel.isShouldShowAirgap()) {
-				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
+				globalNavController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
 					popUpTo(0)
 				}
 			} else {

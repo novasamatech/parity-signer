@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.termsconsent
+package io.parity.signer.screens.initial.termsconsent
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -16,37 +16,26 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.MainGraphRoutes
 import io.parity.signer.ui.NAVIGATION_TAG
 
 
-fun NavGraphBuilder.termsConsentAppFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.onboardingRoute) {
-//		val viewModel: OnBoardingViewModel = viewModel()
 
-		if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
-			globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
-				popUpTo(0)
-			}
-		}
-
-		TermsConsentScreen(
-			onBoard = {
-				globalNavController.navigate(MainGraphRoutes.enableAirgapRoute) {
-					popUpTo(0)
-				}
-			},
-			modifier = Modifier
-                .navigationBarsPadding()
-                .captionBarPadding()
-                .statusBarsPadding()
-		)
-		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "terms screen opened")
-		}
+@Composable
+fun TermsConsentScreenFull(navigateNextScreen: Callback) {
+	if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
+		navigateNextScreen()
 	}
-}
 
+	TermsConsentScreen(
+		onBoard = navigateNextScreen,
+		modifier = Modifier
+			.navigationBarsPadding()
+			.captionBarPadding()
+			.statusBarsPadding()
+	)
+}
 
 /**
  * First screen with legal consent request
