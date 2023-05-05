@@ -12,7 +12,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -29,6 +34,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 
 @Composable
@@ -115,6 +121,21 @@ fun KeysetRecoverNameScreen(
 	}
 }
 
+data class KeysetRecoverModel(
+	val seedName: String,
+	val userInput: String,
+	val guessSet: List<String>,
+	val draft: List<String>,
+	val readySeed: String?
+)
+
+fun MRecoverSeedPhrase.toKeysetRecoverModel() = KeysetRecoverModel(
+	seedName = seedName,
+	userInput = userInput,
+	guessSet = guessSet,
+	draft = draft,
+	readySeed = readySeed,
+)
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
