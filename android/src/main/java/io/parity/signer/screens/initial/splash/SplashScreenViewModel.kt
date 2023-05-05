@@ -1,10 +1,10 @@
-package io.parity.signer.screens.onboarding.splash
+package io.parity.signer.screens.initial.splash
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NetworkState
-import io.parity.signer.screens.onboarding.termsconsent.OnBoardingViewModel
+import io.parity.signer.screens.initial.termsconsent.OnBoardingViewModel
 
 
 class SplashScreenViewModel : ViewModel() {

@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.eachstartchecks.screenlock
+package io.parity.signer.screens.initial.eachstartchecks.screenlock
 
 import android.content.Intent
 import android.content.res.Configuration

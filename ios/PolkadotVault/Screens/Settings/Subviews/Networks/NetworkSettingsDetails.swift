@@ -105,7 +105,7 @@ struct NetworkSettingsDetails: View {
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
-            .fullScreenCover(isPresented: $viewModel.isPresentingRemoveMetadataConfirmation) {
+            .fullScreenModal(isPresented: $viewModel.isPresentingRemoveMetadataConfirmation) {
                 HorizontalActionsBottomModal(
                     viewModel: .removeMetadata,
                     mainAction: viewModel.removeMetadata(),
@@ -114,7 +114,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
-            .fullScreenCover(isPresented: $viewModel.isPresentingRemoveNetworkConfirmation) {
+            .fullScreenModal(isPresented: $viewModel.isPresentingRemoveNetworkConfirmation) {
                 HorizontalActionsBottomModal(
                     viewModel: .removeNetwork,
                     mainAction: viewModel.removeNetwork(),
@@ -123,7 +123,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isShowingActionSheet,
                 onDismiss: {
                     // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
@@ -138,7 +138,7 @@ struct NetworkSettingsDetails: View {
                 )
                 .clearModalBackground()
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isShowingQRScanner,
                 onDismiss: viewModel.onQRScannerDismiss
             ) {

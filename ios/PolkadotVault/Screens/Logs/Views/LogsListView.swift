@@ -47,7 +47,7 @@ struct LogsListView: View {
             viewModel.use(navigation: navigation)
             viewModel.loadData()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -61,7 +61,7 @@ struct LogsListView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(isPresented: $viewModel.isPresentingClearConfirmationModal) {
+        .fullScreenModal(isPresented: $viewModel.isPresentingClearConfirmationModal) {
             HorizontalActionsBottomModal(
                 viewModel: .clearLog,
                 mainAction: viewModel.clearLogsAction(),
@@ -69,7 +69,7 @@ struct LogsListView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingAddNoteModal,
             onDismiss: { viewModel.loadData() }
         ) {

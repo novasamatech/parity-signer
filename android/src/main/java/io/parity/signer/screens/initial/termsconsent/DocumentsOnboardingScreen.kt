@@ -1,4 +1,4 @@
-package io.parity.signer.screens.onboarding.termsconsent
+package io.parity.signer.screens.initial.termsconsent
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image

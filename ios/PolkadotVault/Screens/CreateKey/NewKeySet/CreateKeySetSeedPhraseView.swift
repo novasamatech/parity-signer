@@ -73,7 +73,7 @@ struct CreateKeySetSeedPhraseView: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingInfo
         ) {
             ErrorBottomModal(

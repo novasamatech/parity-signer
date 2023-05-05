@@ -61,7 +61,7 @@ struct NetworkSelectionSettings: View {
         .onAppear {
             viewModel.use(navigation: navigation)
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
         ) {

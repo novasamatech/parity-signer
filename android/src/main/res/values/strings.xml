@@ -384,6 +384,13 @@
 	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
 	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
 	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
+	<string name="onboarding_skip">Skip</string>
+	<string name="onboarding_welcome">Welcome to Polkadot Vault</string>
+	<string name="onboarding_header_1">Turn Your Smartphone Into a Hardware Wallet</string>
+	<string name="onboarding_header_2">Generate and Store Multiple Private Keys</string>
+	<string name="onboarding_header_3">Sign Transactions While Keeping Your Private Keys Offline</string>
+	<string name="onboarding_header_4">Add New Networks and Update Them Without Breaking the Air Gap</string>
+	<string name="onboarding_cta_continue">Continue</string>
 	<string name="recovert_key_set_title">Recover Key set</string>
 	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
 	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>

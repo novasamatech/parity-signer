@@ -117,7 +117,7 @@ struct CameraView: View {
             model.shutdown()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingTransactionPreview,
             onDismiss: {
                 model.multipleTransactions = []
@@ -133,7 +133,7 @@ struct CameraView: View {
                 )
             )
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
                 model.start()
@@ -165,7 +165,7 @@ struct CameraView: View {
                 )
             )
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
                 // Clear password modal state no matter what
@@ -202,7 +202,7 @@ struct CameraView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingError,
             onDismiss: {
                 model.payload = nil

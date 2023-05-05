@@ -20,7 +20,7 @@ import io.parity.signer.R
 import io.parity.signer.backend.CompletableResult
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.onboarding.WaitingScreen
+import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.uniffi.MLogDetails
 
 @Composable
