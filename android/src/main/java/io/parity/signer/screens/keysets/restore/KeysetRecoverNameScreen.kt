@@ -39,6 +39,7 @@ import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 @Composable
 fun KeysetRecoverNameScreen(
+	model: KeysetRecoverModel,
 	rootNavigator: Navigator,
 	seedNames: Array<String>,
 ) {
@@ -124,15 +125,27 @@ fun KeysetRecoverNameScreen(
 data class KeysetRecoverModel(
 	val seedName: String,
 	val userInput: String,
-	val guessSet: List<String>,
+	val suggestedWords: List<String>,
 	val draft: List<String>,
 	val readySeed: String?
-)
+) {
+	companion object {
+		fun stub(): KeysetRecoverModel {
+			return KeysetRecoverModel(
+				seedName = "some "
+					userInput =
+					suggestedWords =
+					draft =
+					readySeed =
+				)
+		}
+	}
+}
 
 fun MRecoverSeedPhrase.toKeysetRecoverModel() = KeysetRecoverModel(
 	seedName = seedName,
 	userInput = userInput,
-	guessSet = guessSet,
+	suggestedWords = guessSet,
 	draft = draft,
 	readySeed = readySeed,
 )
