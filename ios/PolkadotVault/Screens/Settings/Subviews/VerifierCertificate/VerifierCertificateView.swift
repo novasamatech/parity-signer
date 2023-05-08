@@ -5,11 +5,11 @@
 //  Created by Krzysztof Rodak on 12/12/2022.
 //
 
+import Combine
 import SwiftUI
 
 struct VerifierCertificateView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @Environment(\.presentationMode) var presentationMode
 
@@ -67,6 +67,8 @@ struct VerifierCertificateView: View {
                 .padding(.horizontal, Spacing.large)
             }
             Spacer()
+        }.onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(isPresented: $viewModel.isPresentingRemoveConfirmation) {
@@ -78,7 +80,6 @@ struct VerifierCertificateView: View {
             .clearModalBackground()
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
         }
     }
@@ -92,6 +93,11 @@ extension VerifierCertificateView {
         private let onboardingMediator: OnboardingMediator
         private weak var appState: AppState!
         private weak var navigation: NavigationCoordinator!
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
@@ -118,7 +124,8 @@ extension VerifierCertificateView {
 
         func onRemoveConfirmationTap() {
             onboardingMediator.onboard(verifierRemoved: true)
-            navigation.perform(navigation: .init(action: .start))
+            isPresentingRemoveConfirmation = false
+            dismissRequest.send()
         }
     }
 }

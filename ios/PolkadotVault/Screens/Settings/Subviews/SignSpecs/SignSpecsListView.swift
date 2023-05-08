@@ -173,7 +173,7 @@ extension SignSpecsListView {
                     seedPhrase: seedPhrase
                 )
             )
-            switch actionResult.modalData {
+            switch actionResult?.modalData {
             case let .enterPassword(enterPassword):
                 self.enterPassword = enterPassword
                 isPresentingEnterPassword = true

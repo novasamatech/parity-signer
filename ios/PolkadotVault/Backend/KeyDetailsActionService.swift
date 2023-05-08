@@ -26,7 +26,7 @@ final class KeyDetailsActionService {
     func navigateToPublicKey(_ keyName: String, _ publicKeyDetails: String) -> MKeyDetails? {
         resetNavigationStateToKeyDetails(keyName)
         guard case let .keyDetails(keyDetails) = navigation
-            .performFake(navigation: .init(action: .selectKey, details: publicKeyDetails)).screenData,
+            .performFake(navigation: .init(action: .selectKey, details: publicKeyDetails))?.screenData,
             let keyDetails = keyDetails else { return nil }
         return keyDetails
     }

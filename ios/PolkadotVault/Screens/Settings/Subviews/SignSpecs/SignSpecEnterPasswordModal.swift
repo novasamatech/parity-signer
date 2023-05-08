@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SignSpecEnterPasswordModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @State var animateBackground: Bool = false
@@ -76,7 +75,6 @@ struct SignSpecEnterPasswordModal: View {
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focusedField = .secure
             }
         }
@@ -124,7 +122,7 @@ struct SignSpecEnterPasswordModal: View {
 
 extension SignSpecEnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         @Binding var isPresented: Bool
         @Binding var shouldPresentError: Bool
         @Binding var dataModel: MEnterPassword
@@ -139,17 +137,15 @@ extension SignSpecEnterPasswordModal {
             isPresented: Binding<Bool>,
             shouldPresentError: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
-            detailsContent: Binding<MSufficientCryptoReady?>
+            detailsContent: Binding<MSufficientCryptoReady?>,
+            navigation: NavigationCoordinator = NavigationCoordinator()
         ) {
             _isPresented = isPresented
             _shouldPresentError = shouldPresentError
             _dataModel = dataModel
             _detailsContent = detailsContent
-            subscribeToUpdates()
-        }
-
-        func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
+            subscribeToUpdates()
         }
 
         func onCancelTap() {
@@ -163,7 +159,7 @@ extension SignSpecEnterPasswordModal {
 
         func onDoneTap() {
             let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
-            switch actionResult.modalData {
+            switch actionResult?.modalData {
             case let .enterPassword(value):
                 dataModel = value
                 isValid = false
@@ -221,6 +217,5 @@ struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
                 detailsContent: .constant(nil)
             )
         )
-        .environmentObject(NavigationCoordinator())
     }
 }

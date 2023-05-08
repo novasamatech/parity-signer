@@ -13,7 +13,6 @@ struct KeyDetailsActionsModal: View {
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
     @Binding var shouldPresentSelectionOverlay: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(

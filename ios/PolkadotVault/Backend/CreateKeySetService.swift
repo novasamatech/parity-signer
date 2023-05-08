@@ -26,7 +26,7 @@ final class CreateKeySetService {
         }
         navigation.performFake(navigation: .init(action: .newSeed))
         guard case let .newSeedBackup(value) = navigation
-            .performFake(navigation: .init(action: .goForward, details: seedName)).modalData else { return nil }
+            .performFake(navigation: .init(action: .goForward, details: seedName))?.modalData else { return nil }
         return value
     }
 
