@@ -35,6 +35,7 @@ struct TabBarView: View {
             Divider().background(deviceColorScheme == .dark ? Asset.fill30LightOnly.swiftUIColor : Color.clear),
             alignment: .top
         )
+        .onChange(of: viewModel.selectedTab, perform: viewModel.onTabChange(_:))
     }
 }
 
@@ -43,23 +44,27 @@ extension TabBarView {
         let onQRCodeTap: () -> Void
         let onKeysTap: () -> Void
         let onSettingsTap: () -> Void
-        let selectedTab: Tab
+        @Binding var selectedTab: Tab
         @Published var keysTab: TabViewModel!
         @Published var scannerTab: TabViewModel = TabViewModelBuilder().build(for: .scanner, isSelected: false)
         @Published var settingsTab: TabViewModel!
 
         init(
-            selectedTab: Tab,
+            selectedTab: Binding<Tab>,
             onQRCodeTap: @escaping () -> Void,
             onKeysTap: @escaping () -> Void,
             onSettingsTap: @escaping () -> Void
         ) {
-            self.selectedTab = selectedTab
+            _selectedTab = selectedTab
             self.onQRCodeTap = onQRCodeTap
             self.onKeysTap = onKeysTap
             self.onSettingsTap = onSettingsTap
-            keysTab = TabViewModelBuilder().build(for: .keys, isSelected: selectedTab == .keys)
-            settingsTab = TabViewModelBuilder().build(for: .settings, isSelected: selectedTab == .settings)
+            onTabChange(selectedTab.wrappedValue)
+        }
+
+        func onTabChange(_ tab: Tab) {
+            keysTab = TabViewModelBuilder().build(for: .keys, isSelected: tab == .keys)
+            settingsTab = TabViewModelBuilder().build(for: .settings, isSelected: tab == .settings)
         }
     }
 }
@@ -137,13 +142,12 @@ struct TabBarView_Previews: PreviewProvider {
     static var previews: some View {
         TabBarView(viewModel: .mock)
             .previewLayout(.sizeThatFits)
-            .environmentObject(NavigationCoordinator())
     }
 }
 
 extension TabBarView.ViewModel {
     static let mock = TabBarView.ViewModel(
-        selectedTab: .keys,
+        selectedTab: .constant(.keys),
         onQRCodeTap: {},
         onKeysTap: {},
         onSettingsTap: {}
