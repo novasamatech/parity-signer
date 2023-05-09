@@ -214,7 +214,6 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
                     keyName: "keyName"
                 )
             )
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

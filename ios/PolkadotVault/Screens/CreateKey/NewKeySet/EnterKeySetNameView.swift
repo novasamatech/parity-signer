@@ -142,7 +142,6 @@ extension EnterKeySetNameView {
             EnterKeySetNameView(
                 viewModel: .init(isPresented: .constant(true))
             )
-            .environmentObject(NavigationCoordinator())
             .previewLayout(.sizeThatFits)
         }
     }

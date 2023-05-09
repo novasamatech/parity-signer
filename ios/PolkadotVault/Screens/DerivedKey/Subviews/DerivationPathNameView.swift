@@ -12,7 +12,6 @@ struct DerivationPathNameView: View {
     @FocusState var focusedPath: Bool
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @State var isUpdatingText = false
     @Environment(\.presentationMode) var presentationMode
@@ -113,7 +112,6 @@ struct DerivationPathNameView: View {
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.onAppear()
             focusedPath = true
         }
@@ -183,7 +181,7 @@ extension View {
 
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         private let createKeyService: CreateDerivedKeyService
         private let seedName: String
         private let onComplete: () -> Void
@@ -213,17 +211,15 @@ extension DerivationPathNameView {
             seedName: String,
             networkSelection: Binding<NetworkSelection>,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            navigation: NavigationCoordinator = NavigationCoordinator(),
             onComplete: @escaping () -> Void
         ) {
             self.seedName = seedName
             _networkSelection = networkSelection
             self.createKeyService = createKeyService
+            self.navigation = navigation
             self.onComplete = onComplete
             subscribeToChanges()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onAppear() {
@@ -372,7 +368,6 @@ extension DerivationPathNameView {
                     onComplete: {}
                 )
             )
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

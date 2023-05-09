@@ -103,6 +103,5 @@ final class OnboardingStateMachine: ObservableObject {
     func finishOnboarding() {
         currentState = .overview
         onboardingMediator.onboard()
-        navigation.perform(navigation: .init(action: .start))
     }
 }

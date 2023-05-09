@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LogEntryView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -139,7 +138,6 @@ extension LogEntryView {
                     )
                 )
             }
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

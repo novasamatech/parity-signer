@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EnterBananaSplitPasswordModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @FocusState var focusSeedName: Bool
@@ -95,7 +94,6 @@ struct EnterBananaSplitPasswordModal: View {
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focusSeedName = true
             }
         }
@@ -104,7 +102,7 @@ struct EnterBananaSplitPasswordModal: View {
 
 extension EnterBananaSplitPasswordModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         @Binding var isPresented: Bool
         @Binding var isKeyRecovered: Bool
         @Binding var isErrorPresented: Bool
@@ -124,6 +122,7 @@ extension EnterBananaSplitPasswordModal {
         init(
             service: BananaSplitRecoveryService = BananaSplitRecoveryService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            navigation: NavigationCoordinator = NavigationCoordinator(),
             isPresented: Binding<Bool>,
             isKeyRecovered: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
@@ -133,6 +132,7 @@ extension EnterBananaSplitPasswordModal {
         ) {
             self.service = service
             self.seedsMediator = seedsMediator
+            self.navigation = navigation
             _isPresented = isPresented
             _isKeyRecovered = isKeyRecovered
             _isErrorPresented = isErrorPresented
@@ -140,10 +140,6 @@ extension EnterBananaSplitPasswordModal {
             _qrCodeData = qrCodeData
             _onComplete = onComplete
             subscribeToUpdates()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onCancelTap() {
@@ -237,7 +233,6 @@ extension EnterBananaSplitPasswordModal {
                     onComplete: .constant {}
                 )
             )
-            .environmentObject(NavigationCoordinator())
             .preferredColorScheme(.dark)
         }
     }

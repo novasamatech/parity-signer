@@ -1,13 +1,13 @@
 //
-//  AppInitialisationService.swift
+//  SettingsTabService.swift
 //  PolkadotVault
 //
-//  Created by Krzysztof Rodak on 05/05/2023.
+//  Created by Krzysztof Rodak on 08/05/2023.
 //
 
 import Foundation
 
-final class AppInitialisationService {
+final class SettingsTabService {
     private let navigation: NavigationCoordinator
 
     init(
@@ -16,11 +16,8 @@ final class AppInitialisationService {
         self.navigation = navigation
     }
 
-    func initialiseAppSession() {
+    func onSettingsTabDisplay() {
         navigation.performFake(navigation: .init(action: .start))
-    }
-
-    func resetNavigationState() {
-        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarSettings))
     }
 }

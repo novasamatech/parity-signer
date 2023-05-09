@@ -9,7 +9,6 @@ import SwiftUI
 
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 

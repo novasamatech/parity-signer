@@ -9,7 +9,6 @@ import SwiftUI
 
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var appState: AppState
     @State private var isShowingNewSeedMenu = false
     @State private var isShowingCreateKeySet = false
@@ -78,8 +77,7 @@ struct KeySetList: View {
                         }
                     }
                     TabBarView(
-                        selectedTab: .keys,
-                        onQRCodeTap: viewModel.onQRCodeTap
+                        viewModel: viewModel.tabBarViewModel
                     )
                 }
                 if isExportKeysSelected {
@@ -254,27 +252,24 @@ extension KeySetList {
         private let keyListService: KeyListService
         private let cancelBag = CancelBag()
         private let modelBuilder: KeySetListViewModelBuilder
-        private var dataModel: MSeeds
         private weak var appState: AppState!
+        @Published var dataModel: MSeeds = .init(seedNameCards: [])
         @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
-
-        let onQRCodeTap: () -> Void
+        let tabBarViewModel: TabBarView.ViewModel
         let keyDetailsService: KeyDetailsService
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             keyListService: KeyListService = KeyListService(),
             modelBuilder: KeySetListViewModelBuilder = KeySetListViewModelBuilder(),
-            dataModel: MSeeds,
-            onQRCodeTap: @escaping () -> Void
+            tabBarViewModel: TabBarView.ViewModel
         ) {
             self.keyDetailsService = keyDetailsService
             self.keyListService = keyListService
             self.modelBuilder = modelBuilder
-            self.dataModel = dataModel
-            self.onQRCodeTap = onQRCodeTap
-            updateView(dataModel)
+            self.tabBarViewModel = tabBarViewModel
+            updateData()
         }
 
         func use(appState: AppState) {
@@ -326,11 +321,10 @@ private struct KeyListEmptyState: View {
     struct KeySetListPreview: PreviewProvider {
         static var previews: some View {
             KeySetList(
-                viewModel: .init(dataModel: PreviewData.mseeds, onQRCodeTap: {})
+                viewModel: .init(tabBarViewModel: .mock)
             )
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
-            .environmentObject(NavigationCoordinator())
             .environmentObject(AppState.preview)
         }
     }

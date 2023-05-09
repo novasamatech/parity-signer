@@ -11,14 +11,11 @@ struct KeyListMoreMenuModal: View {
     @Binding var isPresented: Bool
     @Binding var isExportKeysSelected: Bool
     @State private var animateBackground: Bool = false
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
             backgroundTapAction: {
-                animateDismissal {
-                    navigation.performFake(navigation: .init(action: .rightButtonAction))
-                }
+                animateDismissal()
             },
             animateBackground: $animateBackground,
             content: {

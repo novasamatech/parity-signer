@@ -24,15 +24,27 @@ final class RecoverKeySetService {
         if !isFirstKeySet {
             navigation.performFake(navigation: .init(action: .rightButtonAction))
         }
-        guard case let .recoverSeedName(value) = navigation.performFake(navigation: .init(action: .recoverSeed))
+        guard case let .recoverSeedName(value) = navigation.performFake(navigation: .init(action: .recoverSeed))?
             .screenData else { return nil }
         return value
     }
 
     func continueKeySetRecovery(_ seedName: String) -> MRecoverSeedPhrase! {
         guard case let .recoverSeedPhrase(value) = navigation
-            .performFake(navigation: .init(action: .goForward, details: seedName)).screenData else { return nil }
+            .performFake(navigation: .init(action: .goForward, details: seedName))?.screenData else { return nil }
         return value
+    }
+
+    func updateGuess(_ guess: String) -> MRecoverSeedPhrase? {
+        let result = navigation.performFake(navigation: .init(action: .pushWord, details: guess))
+        guard case let .recoverSeedPhrase(updatedContent) = result?.screenData else { return nil }
+        return updatedContent
+    }
+
+    func onUserEntry(_ wordToSend: String) -> MRecoverSeedPhrase? {
+        let result = navigation.performFake(navigation: .init(action: .textEntry, details: wordToSend))
+        guard case let .recoverSeedPhrase(updatedContent) = result?.screenData else { return nil }
+        return updatedContent
     }
 
     func finishKeySetRecover(_ seedPhrase: String) {

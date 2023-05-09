@@ -203,7 +203,7 @@ extension RecoverKeySetSeedPhraseView {
 
         func onGuessTap(_ guess: String) {
             let result = navigation.performFake(navigation: .init(action: .pushWord, details: guess))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard case let .recoverSeedPhrase(updatedContent) = result?.screenData else { return }
             content = updatedContent
             userInput = " "
         }
@@ -213,7 +213,7 @@ extension RecoverKeySetSeedPhraseView {
             shouldSkipUpdate = true
             let wordToSend = word.isEmpty && !previousUserInput.isEmpty ? " " : word
             let result = navigation.performFake(navigation: .init(action: .textEntry, details: wordToSend))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard case let .recoverSeedPhrase(updatedContent) = result?.screenData else { return }
             content = updatedContent
             if content.userInput != userInput {
                 userInput = content.userInput

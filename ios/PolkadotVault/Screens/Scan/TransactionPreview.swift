@@ -18,7 +18,6 @@ struct TransactionPreview: View {
     @FocusState private var focus: Bool
     @State private var isLogNoteVisible: Bool = false
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -41,7 +40,6 @@ struct TransactionPreview: View {
             }
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.onAppear()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
@@ -236,7 +234,7 @@ extension TransactionPreview {
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
@@ -251,7 +249,8 @@ extension TransactionPreview {
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService()
+            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService(),
+            navigation: NavigationCoordinator = NavigationCoordinator()
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
@@ -259,9 +258,6 @@ extension TransactionPreview {
             self.seedsMediator = seedsMediator
             self.snackbarPresentation = snackbarPresentation
             self.importKeysService = importKeysService
-        }
-
-        func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
 
@@ -383,7 +379,6 @@ extension TransactionPreview {
                 content: [PreviewData.signTransaction],
                 signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
             ))
-            .environmentObject(NavigationCoordinator())
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
@@ -391,7 +386,6 @@ extension TransactionPreview {
                 content: [PreviewData.signTransaction, PreviewData.signTransaction],
                 signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
             ))
-            .environmentObject(NavigationCoordinator())
 //        .preferredColorScheme(.dark)
         }
     }

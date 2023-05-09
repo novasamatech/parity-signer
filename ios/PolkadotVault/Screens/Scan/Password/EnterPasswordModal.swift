@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EnterPasswordModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @State var animateBackground: Bool = false
@@ -76,7 +75,6 @@ struct EnterPasswordModal: View {
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focusedField = .secure
             }
         }
@@ -124,7 +122,7 @@ struct EnterPasswordModal: View {
 
 extension EnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         @Binding var isPresented: Bool
         @Binding var isErrorPresented: Bool
         @Binding var dataModel: MEnterPassword
@@ -136,20 +134,18 @@ extension EnterPasswordModal {
         private var cancelBag = CancelBag()
 
         init(
+            navigation: NavigationCoordinator = NavigationCoordinator(),
             isPresented: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
             signature: Binding<MSignatureReady?>
         ) {
+            self.navigation = navigation
             _isPresented = isPresented
             _isErrorPresented = isErrorPresented
             _dataModel = dataModel
             _signature = signature
             subscribeToUpdates()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onCancelTap() {
@@ -167,7 +163,7 @@ extension EnterPasswordModal {
         func onDoneTap() {
             let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
             // If navigation returned `enterPassword`, it means password is invalid
-            if case let .enterPassword(value) = actionResult.modalData {
+            if case let .enterPassword(value) = actionResult?.modalData {
                 if value.counter > 3 {
                     proceedtoErrorState()
                     return
@@ -177,7 +173,7 @@ extension EnterPasswordModal {
             }
             // If we got signature from navigation, we should return to camera view and there check for further
             // navigation to Transaction Details
-            if case let .signatureReady(value) = actionResult.modalData {
+            if case let .signatureReady(value) = actionResult?.modalData {
                 navigation.performFake(navigation: .init(action: .goBack))
                 isPresented = false
                 isErrorPresented = false
@@ -186,7 +182,7 @@ extension EnterPasswordModal {
                 return
             }
             // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
-            if case .log = actionResult.screenData {
+            if case .log = actionResult?.screenData {
                 proceedtoErrorState()
             }
         }
@@ -239,7 +235,5 @@ struct EnterPasswordModal_Previews: PreviewProvider {
                 signature: Binding<MSignatureReady?>.constant(nil)
             )
         )
-        .environmentObject(NavigationCoordinator())
-//        .preferredColorScheme(.dark)
     }
 }

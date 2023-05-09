@@ -20,10 +20,11 @@ extension KeyDetailsView {
         private let networksService: GetAllNetworksService
         private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
-        private let forgetKeyActionHandler: ForgetKeySetAction
+
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
-
+        private let snackbarPresentation: BottomSnackbarPresentation
+        private let seedsMediator: SeedsMediating
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
@@ -76,10 +77,11 @@ extension KeyDetailsView {
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetAllNetworksService = GetAllNetworksService(),
-            forgetKeyActionHandler: ForgetKeySetAction = ForgetKeySetAction(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            appState: AppState = ServiceLocator.appState
+            appState: AppState = ServiceLocator.appState,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            seedsMediator: SeedsMediating = SeedsMediator()
         ) {
             self.keyName = keyName
             self.keysData = keysData
@@ -87,9 +89,10 @@ extension KeyDetailsView {
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
             self.keyDetailsActionsService = keyDetailsActionsService
-            self.forgetKeyActionHandler = forgetKeyActionHandler
             self.warningStateMediator = warningStateMediator
             self.appState = appState
+            self.snackbarPresentation = snackbarPresentation
+            self.seedsMediator = seedsMediator
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
@@ -144,8 +147,16 @@ extension KeyDetailsView {
         }
 
         func onRemoveKeySetConfirmationTap() {
+            let isRemoved = seedsMediator.removeSeed(seedName: removeSeed)
+            guard isRemoved else { return }
+
             keyDetailsActionsService.forgetKeySetAction(keyName)
-            forgetKeyActionHandler.forgetKeySet(removeSeed)
+            // Present snackbar from bottom as action confirmation
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.KeySetsModal.Confirmation.snackbar.string,
+                style: .warning
+            )
+            snackbarPresentation.isSnackbarPresented = true
             dismissRequest.send()
         }
 

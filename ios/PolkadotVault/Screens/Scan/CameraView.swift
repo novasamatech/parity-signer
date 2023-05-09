@@ -12,7 +12,6 @@ struct CameraView: View {
     @StateObject var model = CameraService()
     @StateObject var viewModel: ViewModel
     @StateObject var progressViewModel: ProgressSnackbarViewModel = ProgressSnackbarViewModel()
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
@@ -110,7 +109,6 @@ struct CameraView: View {
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
             model.configure()
-            viewModel.use(navigation: navigation)
             viewModel.onAppear()
         }
         .onDisappear {
@@ -278,20 +276,18 @@ extension CameraView {
 
         @Binding var isPresented: Bool
         @Binding var onComplete: () -> Void
-        private weak var navigation: NavigationCoordinator!
+        private let navigation: NavigationCoordinator
         private let seedsMediator: SeedsMediating
 
         init(
             isPresented: Binding<Bool>,
             onComplete: Binding<() -> Void> = .constant {},
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            navigation: NavigationCoordinator = NavigationCoordinator()
         ) {
             _isPresented = isPresented
             _onComplete = onComplete
             self.seedsMediator = seedsMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
             self.navigation = navigation
         }
 
@@ -366,12 +362,12 @@ extension CameraView.ViewModel {
         let actionResult = sign(transactions: transactions)
         self.transactions = transactions
         // Password protected key, continue to modal
-        if case let .enterPassword(value) = actionResult.modalData {
+        if case let .enterPassword(value) = actionResult?.modalData {
             enterPassword = value
             isPresentingEnterPassword = true
         }
         // Transaction ready to sign
-        if case let .signatureReady(value) = actionResult.modalData {
+        if case let .signatureReady(value) = actionResult?.modalData {
             signature = value
             continueWithSignature()
         }
@@ -418,7 +414,7 @@ extension CameraView.ViewModel {
                     details: payload
                 )
             )
-            if case let .transaction(value) = actionResult.screenData {
+            if case let .transaction(value) = actionResult?.screenData {
                 transactions += value
             }
         }
@@ -443,7 +439,7 @@ private extension CameraView.ViewModel {
         }
     }
 
-    func sign(transactions: [MTransaction]) -> ActionResult {
+    func sign(transactions: [MTransaction]) -> ActionResult? {
         let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
         let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
         return navigation.performFake(

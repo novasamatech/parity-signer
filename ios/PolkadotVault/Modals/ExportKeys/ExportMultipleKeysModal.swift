@@ -34,7 +34,6 @@ struct ExportMultipleKeysModalViewModel: Equatable {
 
 struct ExportMultipleKeysModal: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
@@ -223,7 +222,6 @@ private extension ExportMultipleKeysModal {
                 .background(.gray)
                 .preferredColorScheme(.dark)
             }
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif
