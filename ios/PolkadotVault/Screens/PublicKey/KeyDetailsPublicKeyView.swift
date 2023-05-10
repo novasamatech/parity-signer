@@ -10,8 +10,6 @@ import SwiftUI
 
 struct KeyDetailsPublicKeyView: View {
     @StateObject var viewModel: ViewModel
-
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
@@ -323,7 +321,6 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         }
         .previewLayout(.sizeThatFits)
         .preferredColorScheme(.dark)
-        .environmentObject(NavigationCoordinator())
         .environmentObject(ConnectivityMediator())
     }
 }

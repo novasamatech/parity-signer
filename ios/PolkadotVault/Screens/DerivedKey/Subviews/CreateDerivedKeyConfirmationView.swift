@@ -128,7 +128,6 @@ extension CreateDerivedKeyConfirmationView {
                     onCompletion: { }
                 )
             )
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

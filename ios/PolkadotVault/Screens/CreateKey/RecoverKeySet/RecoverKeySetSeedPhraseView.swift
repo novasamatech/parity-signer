@@ -169,7 +169,6 @@ extension RecoverKeySetSeedPhraseView {
         private let seedsMediator: SeedsMediating
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
-        private let navigation: NavigationCoordinator
         private let service: RecoverKeySetService
         @Binding var isPresented: Bool
         @Published var seedPhraseGrid: [GridElement] = []
@@ -190,20 +189,17 @@ extension RecoverKeySetSeedPhraseView {
             content: MRecoverSeedPhrase,
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            navigation: NavigationCoordinator = NavigationCoordinator(),
             service: RecoverKeySetService = RecoverKeySetService()
         ) {
             self.content = content
             self.seedsMediator = seedsMediator
-            self.navigation = navigation
             self.service = service
             _isPresented = isPresented
             regenerateGrid()
         }
 
         func onGuessTap(_ guess: String) {
-            let result = navigation.performFake(navigation: .init(action: .pushWord, details: guess))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard let updatedContent = service.updateGuess(guess) else { return }
             content = updatedContent
             userInput = " "
         }
@@ -212,8 +208,7 @@ extension RecoverKeySetSeedPhraseView {
             guard !shouldSkipUpdate else { return }
             shouldSkipUpdate = true
             let wordToSend = word.isEmpty && !previousUserInput.isEmpty ? " " : word
-            let result = navigation.performFake(navigation: .init(action: .textEntry, details: wordToSend))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard let updatedContent = service.onUserEntry(wordToSend) else { return }
             content = updatedContent
             if content.userInput != userInput {
                 userInput = content.userInput

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
@@ -97,7 +96,6 @@ extension BackupSelectKeyView {
         )
         private var awaitingSeedName: String?
         private weak var connectivityMediator: ConnectivityMediator!
-        private weak var navigation: NavigationCoordinator!
         let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
 

@@ -21,7 +21,7 @@ final class ManageNetworkDetailsService {
         navigation.performFake(navigation: .init(action: .navbarSettings))
         navigation.performFake(navigation: .init(action: .manageNetworks))
         guard case let .nNetworkDetails(value) = navigation
-            .performFake(navigation: .init(action: .goForward, details: networkKey)).screenData else { return nil }
+            .performFake(navigation: .init(action: .goForward, details: networkKey))?.screenData else { return nil }
         return value
     }
 
@@ -33,7 +33,7 @@ final class ManageNetworkDetailsService {
         navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
         navigation.performFake(navigation: .init(action: .rightButtonAction))
         guard case let .signSufficientCrypto(value) = navigation
-            .performFake(navigation: .init(action: .signNetworkSpecs)).screenData else { return nil }
+            .performFake(navigation: .init(action: .signNetworkSpecs))?.screenData else { return nil }
         return value
     }
 
@@ -44,7 +44,7 @@ final class ManageNetworkDetailsService {
         navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
         navigation.performFake(navigation: .init(action: .manageMetadata, details: specsVersion))
         guard case let .signSufficientCrypto(value) = navigation
-            .performFake(navigation: .init(action: .signMetadata)).screenData else { return nil }
+            .performFake(navigation: .init(action: .signMetadata))?.screenData else { return nil }
         return value
     }
 
@@ -64,7 +64,7 @@ final class ManageNetworkDetailsService {
         navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
         navigation.performFake(navigation: .init(action: .manageMetadata, details: specsVersion))
         guard case let .nNetworkDetails(value) = navigation
-            .performFake(navigation: .init(action: .removeMetadata)).screenData else { return nil }
+            .performFake(navigation: .init(action: .removeMetadata))?.screenData else { return nil }
         return value
     }
 }

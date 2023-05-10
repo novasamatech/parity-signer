@@ -1,13 +1,13 @@
 //
-//  ManageNetworksService.swift
+//  SettingsTabService.swift
 //  PolkadotVault
 //
-//  Created by Krzysztof Rodak on 11/04/2023.
+//  Created by Krzysztof Rodak on 08/05/2023.
 //
 
 import Foundation
 
-final class ManageNetworksService {
+final class SettingsTabService {
     private let navigation: NavigationCoordinator
 
     init(
@@ -16,11 +16,8 @@ final class ManageNetworksService {
         self.navigation = navigation
     }
 
-    func manageNetworks() -> [MmNetwork] {
+    func onSettingsTabDisplay() {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarSettings))
-        guard case let .manageNetworks(value) = navigation
-            .performFake(navigation: .init(action: .manageNetworks))?.screenData else { return [] }
-        return value.networks
     }
 }

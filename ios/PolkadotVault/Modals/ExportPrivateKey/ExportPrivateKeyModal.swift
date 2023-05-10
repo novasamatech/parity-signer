@@ -140,6 +140,5 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             .background(.gray)
             .preferredColorScheme(.dark)
         }
-        .environmentObject(NavigationCoordinator())
     }
 }

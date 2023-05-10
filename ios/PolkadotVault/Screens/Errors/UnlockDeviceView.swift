@@ -9,7 +9,6 @@ import SwiftUI
 
 struct UnlockDeviceView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,9 +33,6 @@ struct UnlockDeviceView: View {
             .padding(.horizontal, Spacing.large)
             Spacer()
         }
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .multilineTextAlignment(.center)
         .background(Asset.backgroundPrimary.swiftUIColor)
     }
@@ -44,32 +40,30 @@ struct UnlockDeviceView: View {
 
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
+        private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
 
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         ) {
             self.seedsMediator = seedsMediator
             self.warningStateMediator = warningStateMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
         }
 
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
-            navigation.perform(navigation: .init(action: .start))
             warningStateMediator.updateWarnings()
+            passwordProtectionStatePublisher.isProtected = true
         }
     }
 }
 
 struct UnlockDeviceView_Previews: PreviewProvider {
     static var previews: some View {
-        UnlockDeviceView(viewModel: .init())
+        UnlockDeviceView(viewModel: .init(passwordProtectionStatePublisher: PasswordProtectionStatePublisher()))
     }
 }

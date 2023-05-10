@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TransactionDetailsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,9 +32,6 @@ struct TransactionDetailsView: View {
                 .padding(.horizontal, Spacing.large)
             }
         }
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .background(Asset.backgroundPrimary.swiftUIColor)
     }
 }
@@ -43,7 +39,6 @@ struct TransactionDetailsView: View {
 extension TransactionDetailsView {
     final class ViewModel: ObservableObject {
         @Binding var isPresented: Bool
-        private weak var navigation: NavigationCoordinator!
 
         let transaction: MTransaction
 
@@ -53,10 +48,6 @@ extension TransactionDetailsView {
         ) {
             _isPresented = isPresented
             self.transaction = transaction
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onBackButtonTap() {
