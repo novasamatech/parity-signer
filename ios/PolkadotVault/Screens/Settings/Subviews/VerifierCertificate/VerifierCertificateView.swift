@@ -21,7 +21,6 @@ struct VerifierCertificateView: View {
                     leftButtons: [.init(
                         type: .arrow,
                         action: {
-                            viewModel.onBackTap()
                             presentationMode.wrappedValue.dismiss()
                         }
                     )],
@@ -79,9 +78,6 @@ struct VerifierCertificateView: View {
             )
             .clearModalBackground()
         }
-        .onAppear {
-            viewModel.use(appState: appState)
-        }
     }
 }
 
@@ -91,8 +87,7 @@ extension VerifierCertificateView {
         @Published var content: MVerifierDetails?
 
         private let onboardingMediator: OnboardingMediator
-        private weak var appState: AppState!
-        private weak var navigation: NavigationCoordinator!
+        private let service: GeneralVerifierService
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -100,22 +95,12 @@ extension VerifierCertificateView {
         private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
+            service: GeneralVerifierService = GeneralVerifierService()
         ) {
             self.onboardingMediator = onboardingMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
-        func use(appState: AppState) {
-            self.appState = appState
-            content = appState.userData.verifierDetails
-        }
-
-        func onBackTap() {
-            appState.userData.verifierDetails = nil
+            self.service = service
+            loadData()
         }
 
         func onRemoveTap() {
@@ -126,6 +111,10 @@ extension VerifierCertificateView {
             onboardingMediator.onboard(verifierRemoved: true)
             isPresentingRemoveConfirmation = false
             dismissRequest.send()
+        }
+
+        func loadData() {
+            content = service.getGeneralVerifier()
         }
     }
 }

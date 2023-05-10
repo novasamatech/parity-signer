@@ -46,7 +46,6 @@ struct AuthenticatedScreenContainer: View {
             .clearModalBackground()
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
             viewModel.onAppear()
         }
@@ -64,7 +63,6 @@ struct AuthenticatedScreenContainer: View {
 
 extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private weak var appState: AppState!
         private let initialisationService: AppInitialisationService
 
@@ -80,15 +78,9 @@ extension AuthenticatedScreenContainer {
         @Published var onQRScannerDismissalComplete: () -> Void = {}
 
         init(
-            navigation: NavigationCoordinator = NavigationCoordinator(),
             initialisationService: AppInitialisationService = AppInitialisationService()
         ) {
-            self.navigation = navigation
             self.initialisationService = initialisationService
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func use(appState: AppState) {
@@ -112,7 +104,7 @@ extension AuthenticatedScreenContainer {
         }
 
         func onDismissErrorTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            initialisationService.resetNavigationState()
         }
 
         func onQRScannerDismiss() {

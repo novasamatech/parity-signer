@@ -161,6 +161,10 @@
 		6D88CFF228C60AED001FB0A1 /* FullScreenRoundedModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */; };
 		6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */; };
 		6D88CFFA28C6365A001FB0A1 /* ActionSheetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF928C6365A001FB0A1 /* ActionSheetButton.swift */; };
+		6D8973A52A08E18C0046A2F3 /* ScanTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */; };
+		6D8973A72A08E6550046A2F3 /* GeneralVerifierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */; };
+		6D8973A92A08E6A90046A2F3 /* SettingsTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */; };
+		6D8973AB2A08EE1E0046A2F3 /* SignSpecService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */; };
 		6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */; };
 		6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */; };
 		6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */; };
@@ -491,6 +495,10 @@
 		6D88CFF128C60AED001FB0A1 /* FullScreenRoundedModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenRoundedModal.swift; sourceTree = "<group>"; };
 		6D88CFF728C634CA001FB0A1 /* KeyDetailsActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionsModal.swift; sourceTree = "<group>"; };
 		6D88CFF928C6365A001FB0A1 /* ActionSheetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetButton.swift; sourceTree = "<group>"; };
+		6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTabService.swift; sourceTree = "<group>"; };
+		6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralVerifierService.swift; sourceTree = "<group>"; };
+		6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabService.swift; sourceTree = "<group>"; };
+		6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecService.swift; sourceTree = "<group>"; };
 		6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssemblerTests.swift; sourceTree = "<group>"; };
 		6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvidingMock.swift; sourceTree = "<group>"; };
 		6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainQueryProviderTests.swift; sourceTree = "<group>"; };
@@ -986,6 +994,10 @@
 				6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */,
 				6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */,
 				6D25E6C32A04D36F00376AB9 /* AppInitialisationService.swift */,
+				6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */,
+				6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */,
+				6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */,
+				6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -2087,6 +2099,7 @@
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				6DA08B9029B68AF90027CFCB /* NavigationInitialisationService.swift in Sources */,
 				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
+				6D8973A72A08E6550046A2F3 /* GeneralVerifierService.swift in Sources */,
 				6D30228329D183BE0074CDDF /* SignSpecEnterPasswordModal.swift in Sources */,
 				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
 				6DA2ACAC2939E87600AAEADC /* Event+Value.swift in Sources */,
@@ -2100,6 +2113,7 @@
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				6D971AC32941CDF600121A36 /* Identicon.swift in Sources */,
 				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
+				6D8973AB2A08EE1E0046A2F3 /* SignSpecService.swift in Sources */,
 				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,
 				6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */,
 				6DE67D05298AA4270042415A /* BackupSelectKeyView.swift in Sources */,
@@ -2183,6 +2197,7 @@
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */,
 				6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */,
+				6D8973A92A08E6A90046A2F3 /* SettingsTabService.swift in Sources */,
 				6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */,
 				6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */,
 				6D6DF33429F65A0B00FC06AD /* KeyDetailsActionService.swift in Sources */,
@@ -2220,6 +2235,7 @@
 				6D971AC02941B45A00121A36 /* SignerImage+Helpers.swift in Sources */,
 				6DA501CC290A48190096DA4E /* KeyDetails+ViewModel.swift in Sources */,
 				6DA2ACAE2939EAC300AAEADC /* Event+isImportant.swift in Sources */,
+				6D8973A52A08E18C0046A2F3 /* ScanTabService.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,

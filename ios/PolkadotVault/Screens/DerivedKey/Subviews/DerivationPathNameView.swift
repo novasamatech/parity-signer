@@ -181,7 +181,6 @@ extension View {
 
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
-        private let navigation: NavigationCoordinator
         private let createKeyService: CreateDerivedKeyService
         private let seedName: String
         private let onComplete: () -> Void
@@ -211,13 +210,11 @@ extension DerivationPathNameView {
             seedName: String,
             networkSelection: Binding<NetworkSelection>,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
-            navigation: NavigationCoordinator = NavigationCoordinator(),
             onComplete: @escaping () -> Void
         ) {
             self.seedName = seedName
             _networkSelection = networkSelection
             self.createKeyService = createKeyService
-            self.navigation = navigation
             self.onComplete = onComplete
             subscribeToChanges()
         }

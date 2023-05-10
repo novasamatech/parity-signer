@@ -234,7 +234,7 @@ extension TransactionPreview {
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
-        private let navigation: NavigationCoordinator
+        private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
@@ -250,7 +250,7 @@ extension TransactionPreview {
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             importKeysService: ImportDerivedKeysService = ImportDerivedKeysService(),
-            navigation: NavigationCoordinator = NavigationCoordinator()
+            scanService: ScanTabService = ScanTabService()
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
@@ -258,7 +258,7 @@ extension TransactionPreview {
             self.seedsMediator = seedsMediator
             self.snackbarPresentation = snackbarPresentation
             self.importKeysService = importKeysService
-            self.navigation = navigation
+            self.scanService = scanService
         }
 
         func onAppear() {
@@ -298,23 +298,22 @@ extension TransactionPreview {
         }
 
         func onBackButtonTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onDoneTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onCancelTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onApproveTap() {
-            navigation.performFake(navigation: .init(action: .goForward))
-            navigation.performFake(navigation: .init(action: .start))
+            scanService.onTransactionApprove()
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
                 snackbarPresentation.viewModel = .init(

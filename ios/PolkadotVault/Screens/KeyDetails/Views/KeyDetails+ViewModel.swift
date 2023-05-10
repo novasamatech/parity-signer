@@ -30,7 +30,6 @@ extension KeyDetailsView {
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
         var keysData: MKeysNew?
         private var appState: AppState
-        private weak var navigation: NavigationCoordinator!
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
         @Published var shouldPresentSelectionOverlay = false
@@ -161,7 +160,7 @@ extension KeyDetailsView {
         }
 
         func onRemoveKeySetModalDismiss() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+            keyDetailsActionsService.resetNavigationStateToKeyDetails(keyName)
         }
     }
 }

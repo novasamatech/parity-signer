@@ -276,30 +276,29 @@ extension CameraView {
 
         @Binding var isPresented: Bool
         @Binding var onComplete: () -> Void
-        private let navigation: NavigationCoordinator
+        private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
 
         init(
             isPresented: Binding<Bool>,
             onComplete: Binding<() -> Void> = .constant {},
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            navigation: NavigationCoordinator = NavigationCoordinator()
+            scanService: ScanTabService = ScanTabService()
         ) {
             _isPresented = isPresented
             _onComplete = onComplete
             self.seedsMediator = seedsMediator
-            self.navigation = navigation
+            self.scanService = scanService
         }
 
         func onAppear() {
-            navigation.performFake(navigation: .init(action: .start))
-            navigation.performFake(navigation: .init(action: .navbarScan))
+            scanService.startQRScan()
         }
 
         func checkForTransactionNavigation(_ payload: String?) {
             guard let payload = payload, !isInTransactionProgress else { return }
             isInTransactionProgress = true
-            switch navigation.performTransaction(with: payload) {
+            switch scanService.performTransaction(with: payload) {
             case let .success(actionResult):
                 // Handle transactions with just error payload
                 guard case let .transaction(transactions) = actionResult.screenData else { return }
@@ -308,8 +307,8 @@ extension CameraView {
                         message: transactions
                             .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
                     )
-                    navigation.performFake(navigation: .init(action: .goBack))
                     isPresentingError = true
+                    scanService.resetNavigationState()
                     return
                 }
                 // Handle rest of transactions with optional error payload
@@ -378,10 +377,7 @@ extension CameraView.ViewModel {
 
 extension CameraView.ViewModel {
     func continueImportDerivedKeys(_ transactions: [MTransaction]) {
-        // We always need to `.goBack` as even if camera is dismissed without import,
-        // navigation "forward" already happened
-
-        navigation.performFake(navigation: .init(action: .goBack))
+        scanService.resetNavigationState()
         if let importError = transactions.dominantImportError {
             switch importError {
             case .networkMissing:
@@ -408,14 +404,10 @@ extension CameraView.ViewModel {
     func onMultipleTransactionSign(_ payloads: [String]) {
         var transactions: [MTransaction] = []
         for payload in payloads {
-            let actionResult = navigation.performFake(
-                navigation: .init(
-                    action: .transactionFetched,
-                    details: payload
-                )
-            )
-            if case let .transaction(value) = actionResult?.screenData {
-                transactions += value
+            if case let .success(actionResult) = scanService.performTransaction(with: payload) {
+                if case let .transaction(value) = actionResult.screenData {
+                    transactions += value
+                }
             }
         }
         self.transactions = transactions
@@ -442,17 +434,6 @@ private extension CameraView.ViewModel {
     func sign(transactions: [MTransaction]) -> ActionResult? {
         let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
         let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
-        return navigation.performFake(
-            navigation:
-            .init(
-                action: .goForward,
-                details: "",
-                seedPhrase: formattedPhrase(seedNames: seedNames, with: seedPhrasesDictionary)
-            )
-        )
-    }
-
-    func formattedPhrase(seedNames: [String], with dictionary: [String: String]) -> String {
-        seedNames.reduce(into: "") { $0 += "\(dictionary[$1] ?? "")\n" }
+        return scanService.continueTransactionSigning(seedNames, seedPhrasesDictionary)
     }
 }

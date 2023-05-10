@@ -96,7 +96,6 @@ extension BackupSelectKeyView {
         )
         private var awaitingSeedName: String?
         private weak var connectivityMediator: ConnectivityMediator!
-        private weak var navigation: NavigationCoordinator!
         let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
 

@@ -67,7 +67,6 @@ struct KeyDetailsActionsModal: View {
 //    static var previews: some View {
 //        KeyDetailsActionsModal(
 //            isShowingActionSheet: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator(),
 //            removeSeed: {}
 //        )
 //        .preferredColorScheme(.dark)
@@ -75,7 +74,6 @@ struct KeyDetailsActionsModal: View {
 //        VStack {
 //            KeyDetailsActionsModal(
 //                isShowingActionSheet: Binding<Bool>.constant(true),
-//                navigation: NavigationCoordinator(),
 //                removeSeed: {}
 //            )
 //            .preferredColorScheme(.light)

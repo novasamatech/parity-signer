@@ -45,10 +45,6 @@ extension NavigationCoordinator {
             return nil
         }
     }
-
-    func performTransaction(with payload: String) -> Result<ActionResult, TransactionError> {
-        backendActionPerformer.performTransaction(with: payload)
-    }
 }
 
 private extension NavigationCoordinator {

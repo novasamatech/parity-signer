@@ -115,8 +115,7 @@ extension SignSpecsListView {
         private let networkKey: String
         let content: MSignSufficientCrypto
         private let seedsMediator: SeedsMediating
-        private let navigation: NavigationCoordinator
-        private let manageDetailsService: ManageNetworkDetailsService
+        private let service: SignSpecService
         @Published var detailsContent: MSufficientCryptoReady!
         @Published var isPresentingDetails: Bool = false
         @Published var isPresentingEnterPassword: Bool = false
@@ -134,18 +133,16 @@ extension SignSpecsListView {
             networkKey: String,
             content: MSignSufficientCrypto,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            manageDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService(),
-            navigation: NavigationCoordinator = NavigationCoordinator()
+            service: SignSpecService = SignSpecService()
         ) {
             self.networkKey = networkKey
             self.content = content
             self.seedsMediator = seedsMediator
-            self.manageDetailsService = manageDetailsService
-            self.navigation = navigation
+            self.service = service
         }
 
         func onDetailsCompletion() {
-            manageDetailsService.signSpecList(networkKey)
+            service.signSpecList(networkKey)
         }
 
         func onPasswordModalDismiss() {
@@ -154,26 +151,20 @@ extension SignSpecsListView {
                 isPresentingDetails = true
                 return
             } else {
-                manageDetailsService.signSpecList(networkKey)
+                service.signSpecList(networkKey)
             }
             if shouldPresentError {
                 shouldPresentError = false
                 isPresentingError = true
-                manageDetailsService.signSpecList(networkKey)
+                service.signSpecList(networkKey)
             }
         }
 
         func onRecordTap(_ keyRecord: MRawKey) {
             let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
-            guard !seedPhrase.isEmpty else { return }
-            let actionResult = navigation.performFake(
-                navigation: .init(
-                    action: .goForward,
-                    details: keyRecord.addressKey,
-                    seedPhrase: seedPhrase
-                )
-            )
-            switch actionResult?.modalData {
+            guard !seedPhrase.isEmpty,
+                  let actionResult = service.attemptSigning(keyRecord, seedPhrase) else { return }
+            switch actionResult.modalData {
             case let .enterPassword(enterPassword):
                 self.enterPassword = enterPassword
                 isPresentingEnterPassword = true

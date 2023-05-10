@@ -102,7 +102,6 @@ struct EnterBananaSplitPasswordModal: View {
 
 extension EnterBananaSplitPasswordModal {
     final class ViewModel: ObservableObject {
-        private let navigation: NavigationCoordinator
         @Binding var isPresented: Bool
         @Binding var isKeyRecovered: Bool
         @Binding var isErrorPresented: Bool
@@ -122,7 +121,6 @@ extension EnterBananaSplitPasswordModal {
         init(
             service: BananaSplitRecoveryService = BananaSplitRecoveryService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            navigation: NavigationCoordinator = NavigationCoordinator(),
             isPresented: Binding<Bool>,
             isKeyRecovered: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
@@ -132,7 +130,6 @@ extension EnterBananaSplitPasswordModal {
         ) {
             self.service = service
             self.seedsMediator = seedsMediator
-            self.navigation = navigation
             _isPresented = isPresented
             _isKeyRecovered = isKeyRecovered
             _isErrorPresented = isErrorPresented

@@ -122,7 +122,7 @@ struct SignSpecEnterPasswordModal: View {
 
 extension SignSpecEnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private let navigation: NavigationCoordinator
+        private let service: SignSpecService
         @Binding var isPresented: Bool
         @Binding var shouldPresentError: Bool
         @Binding var dataModel: MEnterPassword
@@ -138,27 +138,22 @@ extension SignSpecEnterPasswordModal {
             shouldPresentError: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
             detailsContent: Binding<MSufficientCryptoReady?>,
-            navigation: NavigationCoordinator = NavigationCoordinator()
+            service: SignSpecService = SignSpecService()
         ) {
             _isPresented = isPresented
             _shouldPresentError = shouldPresentError
             _dataModel = dataModel
             _detailsContent = detailsContent
-            self.navigation = navigation
+            self.service = service
             subscribeToUpdates()
         }
 
         func onCancelTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
-        }
-
-        func onErrorDismiss() {
             isPresented = false
         }
 
         func onDoneTap() {
-            let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
+            let actionResult = service.attemptPassword(password)
             switch actionResult?.modalData {
             case let .enterPassword(value):
                 dataModel = value
@@ -168,7 +163,6 @@ extension SignSpecEnterPasswordModal {
                 isPresented = false
                 shouldPresentError = false
             default:
-                navigation.performFake(navigation: .init(action: .goBack))
                 proceedtoErrorState()
             }
         }
