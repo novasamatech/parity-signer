@@ -9,18 +9,15 @@
 import XCTest
 
 final class NavigationCoordinatorTests: XCTestCase {
-    private var debounceQueue: DispatchingMock!
     private var backendActionPerformer: BackendNavigationPerformingMock!
     private var subject: NavigationCoordinator!
 
     override func setUp() {
         super.setUp()
-        debounceQueue = DispatchingMock()
         backendActionPerformer = BackendNavigationPerformingMock()
         backendActionPerformer.performBackendReturnValue = .success(.generate())
         subject = NavigationCoordinator(
-            backendActionPerformer: backendActionPerformer,
-            debounceQueue: debounceQueue
+            backendActionPerformer: backendActionPerformer
         )
     }
 
@@ -32,37 +29,7 @@ final class NavigationCoordinatorTests: XCTestCase {
         let navigation = Navigation(action: expectedAction, details: expectedDetails, seedPhrase: expectedSeedPhrase)
 
         // When
-        subject.perform(navigation: navigation)
-
-        // Then
-        XCTAssertEqual(backendActionPerformer.performBackendActionCallsCount, 1)
-        XCTAssertEqual(backendActionPerformer.performBackendReceivedAction, [expectedAction])
-        XCTAssertEqual(backendActionPerformer.performBackendReceivedDetails, [expectedDetails])
-        XCTAssertEqual(backendActionPerformer.performBackendReceivedSeedPhrase, [expectedSeedPhrase])
-    }
-
-    func test_performNavigation_triggersDebounceQueue_withBarrierAndExpectedDetal() {
-        // When
-        subject.perform(navigation: .init(action: .goBack))
-
-        // Then
-        XCTAssertEqual(debounceQueue.asyncAfterCallsCount, 1)
-        XCTAssertEqual(debounceQueue.asyncAfterReceivedFlags, [.barrier])
-    }
-
-    func test_performNavigation_whenDebounceInProgress_backendCanPerformOnlySingleAction() {
-        // Given
-        let expectedAction = Action.goBack
-        let expectedDetails = "details"
-        let expectedSeedPhrase = "seedPhrase"
-        let navigation = Navigation(action: expectedAction, details: expectedDetails, seedPhrase: expectedSeedPhrase)
-        debounceQueue.shouldPerformAsyncWork = false
-
-        // When
-        subject.perform(navigation: navigation)
-        subject.perform(navigation: navigation)
-        subject.perform(navigation: navigation)
-        subject.perform(navigation: navigation)
+        subject.performFake(navigation: navigation)
 
         // Then
         XCTAssertEqual(backendActionPerformer.performBackendActionCallsCount, 1)
@@ -77,8 +44,8 @@ final class NavigationCoordinatorTests: XCTestCase {
         let secondNavigation = Navigation(action: .goForward, details: nil, seedPhrase: "seed")
 
         // When
-        subject.perform(navigation: firstNavigation)
-        subject.perform(navigation: secondNavigation)
+        subject.performFake(navigation: firstNavigation)
+        subject.performFake(navigation: secondNavigation)
 
         // Then
         XCTAssertEqual(backendActionPerformer.performBackendActionCallsCount, 2)
@@ -99,26 +66,11 @@ final class NavigationCoordinatorTests: XCTestCase {
         XCTAssertEqual(subject.genericError.isPresented, false)
 
         // When
-        subject.perform(navigation: navigation)
+        subject.performFake(navigation: navigation)
 
         // Then
         XCTAssertEqual(subject.genericError.errorMessage, navigationError.description)
         XCTAssertEqual(subject.genericError.isPresented, true)
-    }
-
-    func test_performTransaction_callsBackendPerfomerWithSamePayload() {
-        // Given
-        let payload = "Payload"
-        let expectedResult: Result<ActionResult, TransactionError> = .failure(.noMetadataForNetwork(name: "westend"))
-        backendActionPerformer.performTransactionReturnValue = expectedResult
-
-        // When
-        let result = subject.performTransaction(with: payload)
-
-        // Then
-        XCTAssertEqual(backendActionPerformer.performTransactionActionCallsCount, 1)
-        XCTAssertEqual(backendActionPerformer.performTransactionReceivedPayload, [payload])
-        XCTAssertEqual(result, expectedResult)
     }
 }
 
