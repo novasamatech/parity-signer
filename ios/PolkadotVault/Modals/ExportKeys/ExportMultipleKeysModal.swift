@@ -191,7 +191,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -202,7 +202,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -213,7 +213,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )

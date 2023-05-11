@@ -33,10 +33,12 @@ extension AppState {
     }
 }
 
-extension AppState {
-    static let preview = AppState(
-        userData: UserData(
-            allNetworks: PreviewData.networks
+#if DEBUG
+    extension AppState {
+        static let preview = AppState(
+            userData: UserData(
+                allNetworks: MmNetwork.stubList
+            )
         )
-    )
-}
+    }
+#endif

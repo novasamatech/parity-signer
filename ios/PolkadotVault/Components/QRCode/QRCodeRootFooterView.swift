@@ -57,7 +57,7 @@ struct QRCodeRootFooterView_Previews: PreviewProvider {
             VStack {
                 Spacer()
                 QRCodeRootFooterView(
-                    viewModel: PreviewData.qrCodeRootFooterViewModel
+                    viewModel: .stub
                 )
                 .background(Asset.fill6Solid.swiftUIColor)
                 Spacer()

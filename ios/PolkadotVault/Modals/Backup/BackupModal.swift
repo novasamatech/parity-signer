@@ -121,7 +121,7 @@ struct BackupModal_Previews: PreviewProvider {
         VStack {
             BackupModal(
                 isShowingBackupModal: Binding<Bool>.constant(true),
-                viewModel: PreviewData.exampleBackupViewModel
+                viewModel: .stub
             )
         }
         .previewLayout(.sizeThatFits)

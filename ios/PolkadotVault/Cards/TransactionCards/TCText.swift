@@ -20,6 +20,6 @@ struct TCText: View {
 
 struct TCText_Previews: PreviewProvider {
     static var previews: some View {
-        TCText(text: PreviewData.exampleMarkdownDocs)
+        TCText(text: Stubs.stubMarkdownDocs)
     }
 }

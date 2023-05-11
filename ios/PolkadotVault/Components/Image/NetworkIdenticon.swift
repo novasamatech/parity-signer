@@ -47,7 +47,7 @@ struct NetworkIdenticon: View {
         static var previews: some View {
             VStack(alignment: .center, spacing: 10) {
                 NetworkIdenticon(
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
+                    identicon: .stubIdenticon,
                     network: "polkadot",
                     background: Asset.backgroundPrimary.swiftUIColor
                 )

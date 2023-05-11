@@ -375,17 +375,16 @@ extension TransactionPreview {
             // Single transaction
             TransactionPreview(viewModel: .init(
                 isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub],
+                signature: .stub
             ))
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
                 isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction, PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub, .stub],
+                signature: .stub
             ))
-//        .preferredColorScheme(.dark)
         }
     }
 #endif

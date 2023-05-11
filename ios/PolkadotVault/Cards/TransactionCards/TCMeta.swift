@@ -43,7 +43,7 @@ struct TCMeta_Previews: PreviewProvider {
             specname: "Westend",
             specsVersion: "9230",
             metaHash: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-            metaIdPic: .svg(image: PreviewData.exampleIdenticon)
+            metaIdPic: .stubIdenticon
         ))
     }
 }

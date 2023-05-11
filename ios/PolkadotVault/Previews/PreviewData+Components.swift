@@ -7,63 +7,53 @@
 
 import Foundation
 
-extension PreviewData {
-    static let qrCodeContainerViewModel = QrData.regular(data: PreviewData.exampleQRCode)
-
-    static let animatedQrCodeViewModel = AnimatedQRCodeViewModel(
-        qrCodes: [PreviewData.exampleQRCode, PreviewData.exampleQRCode]
+extension AnimatedQRCodeViewModel {
+    static let stub: AnimatedQRCodeViewModel = .init(
+        qrCodes: [
+            Stubs.stubQRCode,
+            Stubs.stubQRCode
+        ]
     )
+}
 
-    static let qrCodeAddressFooterViewModel = QRCodeAddressFooterViewModel(
-        identicon: .svg(image: PreviewData.exampleIdenticon),
+extension QRCodeAddressFooterViewModel {
+    static let stub: QRCodeAddressFooterViewModel = .init(
+        identicon: .stubIdenticon,
         networkLogo: "polkadot",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
+}
 
-    static let qrCodeAddressFooterViewModelNoPath = QRCodeAddressFooterViewModel(
-        identicon: .svg(image: PreviewData.exampleIdenticon),
-        networkLogo: "polkadot",
-        base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
-    )
-
-    static let qrCodeAddressFooterViewModelVeryLongPath = QRCodeAddressFooterViewModel(
-        identicon: .svg(image: PreviewData.exampleIdenticon),
-        networkLogo: "polkadot",
-        base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
-    )
-
-    static let qrCodeRootFooterViewModel = QRCodeRootFooterViewModel(
+extension QRCodeRootFooterViewModel {
+    static let stub: QRCodeRootFooterViewModel = .init(
         keyName: "Staking",
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 }
 
-extension PreviewData {
-    static let exampleExportPrivateKey = ExportPrivateKeyViewModel(
-        qrCode: qrCodeContainerViewModel,
-        addressFooter: qrCodeAddressFooterViewModel
+extension ExportPrivateKeyViewModel {
+    static let stub: ExportPrivateKeyViewModel = .init(
+        qrCode: .stubRegular,
+        addressFooter: .stub
     )
-
-    static func exampleKeyDetailsPublicKey(
-        isKeyExposed: Bool = true,
-        isRootKey: Bool = true
-    ) -> KeyDetailsPublicKeyViewModel {
-        .init(
-            qrCodes: [],
-            footer: PreviewData.qrCodeAddressFooterViewModel,
-            isKeyExposed: isKeyExposed,
-            isRootKey: isRootKey,
-            networkTitle: "Polkadot",
-            networkLogo: "polkadot",
-            keySetName: "My Key Set",
-            path: "//polkadot",
-            hasPassword: true
-        )
-    }
 }
 
-extension PreviewData {
-    static let seedPhraseViewModel = SeedPhraseViewModel(
+extension KeyDetailsPublicKeyViewModel {
+    static let stub: KeyDetailsPublicKeyViewModel = .init(
+        qrCodes: [Stubs.stubQRCode],
+        footer: .stub,
+        isKeyExposed: false,
+        isRootKey: false,
+        networkTitle: "Polkadot",
+        networkLogo: "polkadot",
+        keySetName: "My Key Set",
+        path: "//polkadot",
+        hasPassword: true
+    )
+}
+
+extension SeedPhraseViewModel {
+    static let stub: SeedPhraseViewModel = .init(
         seedPhrase: """
         awesome change room lottery song useless elephant dry educate type debate
          season give exact gift push bid rich atom system pig put welcome exit
@@ -71,90 +61,113 @@ extension PreviewData {
     )
 }
 
-extension PreviewData {
-    static let exampleKeySummary = KeySummaryViewModel(
+extension KeySummaryViewModel {
+    static let stub: KeySummaryViewModel = .init(
         keyName: "Main Polkadot",
         base58: "15322Gsc678...0HA04H0A"
     )
+}
 
-    static let exampleDerivedKeyOverview = DerivedKeyOverviewViewModel(
-        identicon: .svg(image: PreviewData.exampleIdenticon),
+extension DerivedKeyOverviewViewModel {
+    static let stub: DerivedKeyOverviewViewModel = .init(
+        identicon: .stubIdenticon,
         path: "//polkadot",
         hasPassword: false,
         network: "Polkadot",
         networkLogo: "polkadot"
     )
 
-    static let exampleDerivedKeyOverviews: [DerivedKeyOverviewViewModel] = [
-        DerivedKeyOverviewViewModel(
-            identicon: .svg(image: PreviewData.exampleIdenticon),
+    static let stubs: [DerivedKeyOverviewViewModel] = [
+        .init(
+            identicon: .stubIdenticon,
             path: "",
             hasPassword: false,
             network: "Kusama",
             networkLogo: "kusama"
         ),
-        DerivedKeyOverviewViewModel(
-            identicon: .svg(image: PreviewData.exampleIdenticon),
+        .init(
+            identicon: .stubIdenticon,
             path: "//polkadot",
             hasPassword: false,
             network: "Polkadot",
             networkLogo: "polkadot"
         ),
-        DerivedKeyOverviewViewModel(
-            identicon: .svg(image: PreviewData.exampleIdenticon),
+        .init(
+            identicon: .stubIdenticon,
             path: "//astar",
             hasPassword: false,
             network: "Astar",
             networkLogo: "astar"
         ),
-        DerivedKeyOverviewViewModel(
-            identicon: .svg(image: PreviewData.exampleIdenticon),
+        .init(
+            identicon: .stubIdenticon,
             path: "//kusama",
             hasPassword: true,
             network: "Kusama",
             networkLogo: "kusama"
         ),
-        DerivedKeyOverviewViewModel(
-            identicon: .svg(image: PreviewData.exampleIdenticon),
+        .init(
+            identicon: .stubIdenticon,
             path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
             hasPassword: true,
             network: "Kusama",
             networkLogo: "kusama"
         )
     ]
+}
 
-    static let exampleBackupViewModel = BackupModalViewModel(
-        header: exampleKeySummary,
-        derivedKeys: exampleDerivedKeyOverviews,
-        seedPhrase: seedPhraseViewModel
+extension BackupModalViewModel {
+    static let stub: BackupModalViewModel = .init(
+        header: .stub,
+        derivedKeys: DerivedKeyOverviewViewModel.stubs,
+        seedPhrase: .stub
     )
+}
 
-    static let exampleSettingsBackupViewModel = SettingsBackupViewModel(
+extension SettingsBackupViewModel {
+    static let stub: SettingsBackupViewModel = .init(
         keyName: "Main Polkadot",
-        seedPhrase: seedPhraseViewModel
+        seedPhrase: .stub
     )
 }
 
-extension PreviewData {
-    static let exampleExportMultipleKeysModal = ExportMultipleKeysModalViewModel(
-        selectedItems: .keySets(KeySetListViewModelBuilder().build(for: PreviewData.mseeds).list),
-        count: mseeds.seedNameCards.count
+extension ExportMultipleKeysModalViewModel {
+    static let stub: ExportMultipleKeysModalViewModel = .init(
+        selectedItems: .keySets(KeySetViewModel.stubs),
+        count: 3
     )
 }
 
-extension PreviewData {
-    static let transactionSummary: TransactionSummaryModel = .init(
+extension KeySetViewModel {
+    static let stub: KeySetViewModel = .init(
+        seed: .stub,
+        keyName: "key name",
+        derivedKeys: nil,
+        identicon: .stubIdenticon,
+        networks: []
+    )
+
+    static let stubs: [KeySetViewModel] = [
+        .init(seed: .stub, keyName: "key name", derivedKeys: nil, identicon: .stubIdenticon, networks: []),
+        .init(seed: .stub, keyName: "key name", derivedKeys: nil, identicon: .stubIdenticon, networks: [])
+    ]
+}
+
+extension TransactionSummaryModel {
+    static let stub: TransactionSummaryModel = .init(
         pallet: "Balances",
         method: "transfer_keep_alive",
         destination: "1219xC79CXV31543DDXoQMjuA",
         value: "0.2 WND"
     )
+}
 
-    static let transactionSignature: TransactionSignatureRenderable = .init(
+extension TransactionSignatureRenderable {
+    static let stub: TransactionSignatureRenderable = .init(
         path: "//polkadot//1",
         name: "Parity Keys",
         network: "polkadot",
         base58: "1219xC79CXV31543DDXoQMjuA",
-        identicon: .svg(image: PreviewData.exampleIdenticon)
+        identicon: .stubIdenticon
     )
 }

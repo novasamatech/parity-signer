@@ -19,6 +19,6 @@ struct TCAuthorPlain: View {
 
 struct TCAuthorPlain_Previews: PreviewProvider {
     static var previews: some View {
-        TCAuthorPlain(value: MscId(base58: PreviewData.base58, identicon: .svg(image: PreviewData.exampleIdenticon)))
+        TCAuthorPlain(value: .stub)
     }
 }

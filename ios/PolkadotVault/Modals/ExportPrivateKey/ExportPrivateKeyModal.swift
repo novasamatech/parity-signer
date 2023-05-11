@@ -115,7 +115,7 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
+                    viewModel: .stub
                 )
             }
             .previewDevice("iPhone 11 Pro")
@@ -124,7 +124,7 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
+                    viewModel: .stub
                 )
             }
             .previewDevice("iPod touch (7th generation)")
@@ -133,7 +133,7 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             VStack {
                 ExportPrivateKeyModal(
                     isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
+                    viewModel: .stub
                 )
             }
             .previewDevice("iPhone 8")

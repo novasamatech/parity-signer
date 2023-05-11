@@ -137,7 +137,7 @@ struct ErrorBottomModal_Previews: PreviewProvider {
             // General Error
             ErrorBottomModal(
                 viewModel: .alertError(
-                    message: PreviewData.exampleErrorMessage
+                    message: Stubs.stubErrorMessage
                 ),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
