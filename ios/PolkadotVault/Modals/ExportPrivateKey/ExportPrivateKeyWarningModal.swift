@@ -61,16 +61,18 @@ struct ExportPrivateKeyWarningModal: View {
     }
 }
 
-struct ExportPrivateKeyWarningModal_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            ExportPrivateKeyWarningModal(
-                isPresentingExportKeysWarningModal: Binding<Bool>.constant(true),
-                shouldPresentExportKeysModal: Binding<Bool>.constant(false)
-            )
+#if DEBUG
+    struct ExportPrivateKeyWarningModal_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                ExportPrivateKeyWarningModal(
+                    isPresentingExportKeysWarningModal: Binding<Bool>.constant(true),
+                    shouldPresentExportKeysModal: Binding<Bool>.constant(false)
+                )
+            }
+            .background(.red)
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .background(.red)
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

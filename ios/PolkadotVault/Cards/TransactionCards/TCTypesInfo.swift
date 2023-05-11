@@ -22,16 +22,14 @@ struct TCTypesInfo: View {
     }
 }
 
-struct TCTypesInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            TCTypesInfo(
-                content: MTypesInfo(
-                    typesOnFile: false,
-                    typesHash: "typesHas",
-                    typesIdPic: .stubIdenticon
+#if DEBUG
+    struct TCTypesInfo_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                TCTypesInfo(
+                    content: .stub
                 )
-            )
+            }
         }
     }
-}
+#endif

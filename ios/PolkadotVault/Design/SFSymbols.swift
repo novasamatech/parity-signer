@@ -11,18 +11,6 @@ import SwiftUI
 ///
 /// Refer to https://developer.apple.com/sf-symbols/ for currently available combinations
 enum SFSymbols: String {
-    case airplane
-    case aqi
-    case clear
-    case circle
-    case checkmark
-    case chevron
-    case doc
-    case ellipsis
-    case eye
-    case exclamationmark
-    case gearshape
-    case iphoneArrow = "iphone.and.arrow"
     case lock
     case minus
     case plus

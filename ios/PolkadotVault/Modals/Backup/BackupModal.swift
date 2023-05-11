@@ -116,15 +116,17 @@ struct BackupModal: View {
     }
 }
 
-struct BackupModal_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            BackupModal(
-                isShowingBackupModal: Binding<Bool>.constant(true),
-                viewModel: .stub
-            )
+#if DEBUG
+    struct BackupModal_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                BackupModal(
+                    isShowingBackupModal: Binding<Bool>.constant(true),
+                    viewModel: .stub
+                )
+            }
+            .previewLayout(.sizeThatFits)
+            .preferredColorScheme(.dark)
         }
-        .previewLayout(.sizeThatFits)
-        .preferredColorScheme(.dark)
     }
-}
+#endif

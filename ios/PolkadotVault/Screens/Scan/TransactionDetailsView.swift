@@ -55,9 +55,3 @@ extension TransactionDetailsView {
         }
     }
 }
-
-// struct TransactionPreview_Previews: PreviewProvider {
-// static var previews: some View {
-//     TransactionDetailsView(viewModel: .init(isPresented: Binding<Bool>.constant(true), transaction: .init(content: MTransaction(content: .init(author: nil, error: nil, extensions: <#T##[TransactionCard]?#>, importingDerivations: <#T##[TransactionCard]?#>, message: <#T##[TransactionCard]?#>, meta: <#T##[TransactionCard]?#>, method: [.init(index: 1, indent: 1, card:.met)], newSpecs: <#T##[TransactionCard]?#>, verifier: <#T##[TransactionCard]?#>, warning: <#T##[TransactionCard]?#>, typesInfo: <#T##[TransactionCard]?#>), ttype: .sign, authorInfo: nil, networkInfo: nil))))
-// }
-// }

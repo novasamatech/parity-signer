@@ -17,8 +17,10 @@ struct TCAuthorPlain: View {
     }
 }
 
-struct TCAuthorPlain_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthorPlain(value: .stub)
+#if DEBUG
+    struct TCAuthorPlain_Previews: PreviewProvider {
+        static var previews: some View {
+            TCAuthorPlain(value: .stub)
+        }
     }
-}
+#endif

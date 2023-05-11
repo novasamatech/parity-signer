@@ -424,10 +424,12 @@ extension NetworkSettingsDetails {
     }
 }
 
-struct NetworkSettingsDetails_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
+#if DEBUG
+    struct NetworkSettingsDetails_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

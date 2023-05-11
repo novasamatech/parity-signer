@@ -55,27 +55,3 @@ struct LogsMoreActionsModal: View {
         )
     }
 }
-
-// struct KeyDetailsActionsModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        KeyDetailsActionsModal(
-//            isShowingActionSheet: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator(),
-//            removeSeed: {}
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            KeyDetailsActionsModal(
-//                isShowingActionSheet: Binding<Bool>.constant(true),
-//                navigation: NavigationCoordinator(),
-//                removeSeed: {}
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

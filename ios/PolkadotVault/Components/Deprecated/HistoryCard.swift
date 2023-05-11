@@ -38,9 +38,3 @@ struct HistoryCard: View {
         .background(danger ? Asset.accentRed300.swiftUIColor.opacity(0.3) : Asset.backgroundSecondary.swiftUIColor)
     }
 }
-
-// struct HistoryCard_Previews: PreviewProvider {
-// static var previews: some View {
-// HistoryCard()
-// }
-// }

@@ -73,24 +73,26 @@ struct PublicKeyActionsModal: View {
     }
 }
 
-struct PublicKeyActionsModal_Previews: PreviewProvider {
-    static var previews: some View {
-        PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true),
-            isExportKeyAvailable: true
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack {
+#if DEBUG
+    struct PublicKeyActionsModal_Previews: PreviewProvider {
+        static var previews: some View {
             PublicKeyActionsModal(
                 isShowingActionSheet: Binding<Bool>.constant(true),
-                isExportKeyAvailable: false
+                isExportKeyAvailable: true
             )
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack {
+                PublicKeyActionsModal(
+                    isShowingActionSheet: Binding<Bool>.constant(true),
+                    isExportKeyAvailable: false
+                )
+                .preferredColorScheme(.light)
+                .previewLayout(.sizeThatFits)
+            }
+            .background(.black)
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)
         }
-        .background(.black)
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

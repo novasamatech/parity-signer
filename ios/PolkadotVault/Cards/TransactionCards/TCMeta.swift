@@ -37,6 +37,7 @@ struct TCMeta: View {
     }
 }
 
+<<<<<<< Updated upstream
 struct TCMeta_Previews: PreviewProvider {
     static var previews: some View {
         TCMeta(value: MMetadataRecord(
@@ -45,5 +46,12 @@ struct TCMeta_Previews: PreviewProvider {
             metaHash: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
             metaIdPic: .stubIdenticon
         ))
+=======
+#if DEBUG
+    struct TCMeta_Previews: PreviewProvider {
+        static var previews: some View {
+            TCMeta(value: .stub)
+        }
+>>>>>>> Stashed changes
     }
-}
+#endif

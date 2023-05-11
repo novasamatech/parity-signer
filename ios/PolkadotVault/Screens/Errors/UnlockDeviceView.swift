@@ -62,8 +62,10 @@ extension UnlockDeviceView {
     }
 }
 
-struct UnlockDeviceView_Previews: PreviewProvider {
-    static var previews: some View {
-        UnlockDeviceView(viewModel: .init(passwordProtectionStatePublisher: PasswordProtectionStatePublisher()))
+#if DEBUG
+    struct UnlockDeviceView_Previews: PreviewProvider {
+        static var previews: some View {
+            UnlockDeviceView(viewModel: .init(passwordProtectionStatePublisher: PasswordProtectionStatePublisher()))
+        }
     }
-}
+#endif

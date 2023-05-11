@@ -52,13 +52,15 @@ struct KeyListMoreMenuModal: View {
     }
 }
 
-struct KeyListMoreMenuModal_Previews: PreviewProvider {
-    static var previews: some View {
-        KeyListMoreMenuModal(
-            isPresented: Binding<Bool>.constant(true),
-            isExportKeysSelected: Binding<Bool>.constant(false)
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
+#if DEBUG
+    struct KeyListMoreMenuModal_Previews: PreviewProvider {
+        static var previews: some View {
+            KeyListMoreMenuModal(
+                isPresented: Binding<Bool>.constant(true),
+                isExportKeysSelected: Binding<Bool>.constant(false)
+            )
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+        }
     }
-}
+#endif

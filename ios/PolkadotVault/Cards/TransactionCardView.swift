@@ -17,9 +17,3 @@ struct TransactionCardView: View {
         .padding(.leading, CGFloat(card.indent) * Spacing.extraSmall)
     }
 }
-
-// struct TransactionCardView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TransactionCardView(card: TransactionCard(index: 0, indent: 0, card: .error("this is a preview")))
-//    }
-// }

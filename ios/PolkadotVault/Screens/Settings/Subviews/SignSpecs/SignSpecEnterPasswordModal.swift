@@ -181,15 +181,17 @@ extension SignSpecEnterPasswordModal {
     }
 }
 
-struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
-    static var previews: some View {
-        SignSpecEnterPasswordModal(
-            viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                shouldPresentError: Binding<Bool>.constant(false),
-                dataModel: Binding<MEnterPassword>.constant(.stub),
-                detailsContent: .constant(nil)
+#if DEBUG
+    struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
+        static var previews: some View {
+            SignSpecEnterPasswordModal(
+                viewModel: .init(
+                    isPresented: Binding<Bool>.constant(true),
+                    shouldPresentError: Binding<Bool>.constant(false),
+                    dataModel: Binding<MEnterPassword>.constant(.stub),
+                    detailsContent: .constant(nil)
+                )
             )
-        )
+        }
     }
-}
+#endif

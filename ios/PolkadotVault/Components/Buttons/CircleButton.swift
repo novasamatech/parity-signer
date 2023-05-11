@@ -31,19 +31,3 @@ struct CloseModalButton: View {
         )
     }
 }
-
-//
-// struct CloseModalButton_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack(alignment: .center) {
-//            CloseModalButton(action: {})
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack(alignment: .center) {
-//            CloseModalButton(action: {})
-//        }
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

@@ -18,8 +18,10 @@ struct TCText: View {
     }
 }
 
-struct TCText_Previews: PreviewProvider {
-    static var previews: some View {
-        TCText(text: Stubs.stubMarkdownDocs)
+#if DEBUG
+    struct TCText_Previews: PreviewProvider {
+        static var previews: some View {
+            TCText(text: Stubs.stubMarkdownDocs)
+        }
     }
-}
+#endif

@@ -136,14 +136,14 @@ private struct CentralTabBarButton: View {
     }
 }
 
-/// To test preview with different `Tab` selected, just substitute `selectedTab` with
-/// `Binding<Tab>.constant(<any enum Tab value here>)`
-struct TabBarView_Previews: PreviewProvider {
-    static var previews: some View {
-        TabBarView(viewModel: .mock)
-            .previewLayout(.sizeThatFits)
+#if DEBUG
+    struct TabBarView_Previews: PreviewProvider {
+        static var previews: some View {
+            TabBarView(viewModel: .mock)
+                .previewLayout(.sizeThatFits)
+        }
     }
-}
+#endif
 
 extension TabBarView.ViewModel {
     static let mock = TabBarView.ViewModel(
