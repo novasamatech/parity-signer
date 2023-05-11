@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SignSpecsListView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -21,7 +20,6 @@ struct SignSpecsListView: View {
                     leftButtons: [.init(
                         type: .arrow,
                         action: {
-                            viewModel.onBackTap()
                             presentationMode.wrappedValue.dismiss()
                         }
                     )],
@@ -40,18 +38,21 @@ struct SignSpecsListView: View {
                 }
             }
             NavigationLink(
-                destination: SignSpecDetails(viewModel: .init(content: viewModel.detailsContent))
-                    .navigationBarHidden(true),
+                destination: SignSpecDetails(viewModel: .init(
+                    content: viewModel.detailsContent,
+                    onComplete: viewModel.onDetailsCompletion
+                ))
+                .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDetails
             ) { EmptyView() }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(navigation: navigation)
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
-        .fullScreenCover(
+        .background(Asset.backgroundPrimary.swiftUIColor)
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword,
-            onDismiss: { viewModel.onPasswordModalDismiss() }
+            onDismiss: viewModel.onPasswordModalDismiss
         ) {
             SignSpecEnterPasswordModal(
                 viewModel: .init(
@@ -63,11 +64,8 @@ struct SignSpecsListView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
-            isPresented: $viewModel.isPresentingError,
-            onDismiss: {
-                navigation.perform(navigation: .init(action: .navbarSettings))
-            }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(
                 viewModel: viewModel.presentableError,
@@ -114,10 +112,10 @@ struct SignSpecsListView: View {
 
 extension SignSpecsListView {
     final class ViewModel: ObservableObject {
+        private let networkKey: String
         let content: MSignSufficientCrypto
         private let seedsMediator: SeedsMediating
-        private weak var navigation: NavigationCoordinator!
-
+        private let service: SignSpecService
         @Published var detailsContent: MSufficientCryptoReady!
         @Published var isPresentingDetails: Bool = false
         @Published var isPresentingEnterPassword: Bool = false
@@ -125,45 +123,47 @@ extension SignSpecsListView {
         @Published var isPresentingError: Bool = false
         @Published var enterPassword: MEnterPassword!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
+            networkKey: String,
             content: MSignSufficientCrypto,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            service: SignSpecService = SignSpecService()
         ) {
+            self.networkKey = networkKey
             self.content = content
             self.seedsMediator = seedsMediator
+            self.service = service
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+        func onDetailsCompletion() {
+            service.signSpecList(networkKey)
         }
-
-        func onBackTap() {}
 
         func onPasswordModalDismiss() {
             enterPassword = nil
             if detailsContent != nil {
                 isPresentingDetails = true
                 return
+            } else {
+                service.signSpecList(networkKey)
             }
             if shouldPresentError {
                 shouldPresentError = false
                 isPresentingError = true
-            } else {
-                navigation.perform(navigation: .init(action: .goBack))
+                service.signSpecList(networkKey)
             }
         }
 
         func onRecordTap(_ keyRecord: MRawKey) {
             let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
-            guard !seedPhrase.isEmpty else { return }
-            let actionResult = navigation.performFake(
-                navigation: .init(
-                    action: .goForward,
-                    details: keyRecord.addressKey,
-                    seedPhrase: seedPhrase
-                )
-            )
+            guard !seedPhrase.isEmpty,
+                  let actionResult = service.attemptSigning(keyRecord, seedPhrase) else { return }
             switch actionResult.modalData {
             case let .enterPassword(enterPassword):
                 self.enterPassword = enterPassword

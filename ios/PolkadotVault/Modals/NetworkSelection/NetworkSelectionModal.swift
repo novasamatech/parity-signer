@@ -179,7 +179,6 @@ struct NetworkSelectionModal_Previews: PreviewProvider {
         NetworkSelectionModal(
             viewModel: .init(isPresented: Binding<Bool>.constant(true))
         )
-        .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }

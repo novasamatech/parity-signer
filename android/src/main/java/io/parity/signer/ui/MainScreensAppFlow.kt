@@ -19,8 +19,8 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.findActivity
-import io.parity.signer.screens.onboarding.UnlockAppAuthScreen
-import io.parity.signer.screens.onboarding.WaitingScreen
+import io.parity.signer.screens.initial.UnlockAppAuthScreen
+import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.ui.rustnavigationselectors.*
 
 

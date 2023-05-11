@@ -14,4 +14,9 @@ extension MKeyAndNetworkCard {
             networkSpecsKey: network.networkSpecsKey
         )
     }
+
+    /// To be used for Rust navigation to present Public Key Details view
+    var publicKeyDetails: String {
+        "\(key.addressKey)\n\(network.networkSpecsKey)"
+    }
 }

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
@@ -42,7 +41,7 @@ struct BackupSelectKeyView: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingBackupModal,
             onDismiss: { viewModel.seedPhraseToPresent = .init(keyName: "", seedPhrase: .init(seedPhrase: "")) }
         ) {
@@ -52,7 +51,7 @@ struct BackupSelectKeyView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert
         ) {
             ErrorBottomModal(
@@ -97,7 +96,6 @@ extension BackupSelectKeyView {
         )
         private var awaitingSeedName: String?
         private weak var connectivityMediator: ConnectivityMediator!
-        private weak var navigation: NavigationCoordinator!
         let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
 

@@ -21,16 +21,11 @@ enum OnboardingState: Equatable {
 final class OnboardingStateMachine: ObservableObject {
     @Published var currentState: OnboardingState = .overview
     private let onboardingMediator: OnboardingMediator
-    private weak var navigation: NavigationCoordinator!
 
     init(
         onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
     ) {
         self.onboardingMediator = onboardingMediator
-    }
-
-    func use(navigation: NavigationCoordinator) {
-        self.navigation = navigation
     }
 
     @ViewBuilder
@@ -103,6 +98,5 @@ final class OnboardingStateMachine: ObservableObject {
     func finishOnboarding() {
         currentState = .overview
         onboardingMediator.onboard()
-        navigation.perform(navigation: .init(action: .start))
     }
 }

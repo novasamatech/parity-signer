@@ -12,9 +12,9 @@ struct DerivationPathNameView: View {
     @FocusState var focusedPath: Bool
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @State var isUpdatingText = false
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -22,8 +22,8 @@ struct DerivationPathNameView: View {
                 viewModel: NavigationBarViewModel(
                     title: Localizable.CreateDerivedKey.Modal.Path.title.string,
                     leftButtons: [.init(
-                        type: .xmark,
-                        action: viewModel.onDismissTap
+                        type: .arrow,
+                        action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(
                         type: .activeAction(
@@ -112,16 +112,26 @@ struct DerivationPathNameView: View {
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.onAppear()
             focusedPath = true
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingInfoModal
         ) {
             DerivationMethodsInfoView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingInfoModal
+                )
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingConfirmation
+        ) {
+            CreateDerivedKeyConfirmationView(
+                viewModel: .init(
+                    derivationPath: viewModel.unwrappedDerivationPath(),
+                    onCompletion: viewModel.onConfirmationCompletion
                 )
             )
             .clearModalBackground()
@@ -171,10 +181,12 @@ extension View {
 
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private let createKeyService: CreateDerivedKeyService
-
         private let seedName: String
+        private let onComplete: () -> Void
+        private var skipValidation = false
+        private let cancelBag = CancelBag()
+
         @Published var inputText: String = ""
         @Published var maskedText: String = ""
         @Published var passwordConfirmation: String = ""
@@ -182,11 +194,9 @@ extension DerivationPathNameView {
         @Published var isPasswordValid: Bool = true
         @Published var isMainActionDisabled: Bool = true
         @Published var derivationPathError: String?
-        @Binding var derivationPath: String?
+        @Published var isPresentingConfirmation: Bool = false
+        @Published var derivationPath: String?
         @Binding var networkSelection: NetworkSelection
-        @Binding var isPresented: Bool
-        private var skipValidation = false
-        private let cancelBag = CancelBag()
 
         var isEntrySuggestionActive: Bool {
             DerivationPathComponent.allCases.contains { inputText == $0.description } && derivationPathError == nil
@@ -194,25 +204,19 @@ extension DerivationPathNameView {
 
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
-        @Published var presentableInfoModal: ErrorBottomModalViewModel = .derivationPathsInfo()
+        @Published var presentableInfoModal: ErrorBottomModalViewModel!
 
         init(
             seedName: String,
-            derivationPath: Binding<String?>,
-            isPresented: Binding<Bool>,
             networkSelection: Binding<NetworkSelection>,
-            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
+            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            onComplete: @escaping () -> Void
         ) {
             self.seedName = seedName
-            _derivationPath = derivationPath
-            _isPresented = isPresented
             _networkSelection = networkSelection
             self.createKeyService = createKeyService
+            self.onComplete = onComplete
             subscribeToChanges()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onAppear() {
@@ -225,17 +229,23 @@ extension DerivationPathNameView {
             }
         }
 
-        func onDismissTap() {
-            isPresented = false
-        }
-
         func onRightNavigationButtonTap() {
             derivationPath = inputText
-            isPresented = false
-        }
-
-        func onDerivationPathQuestionTap() {
-            isPresented = false
+            let completion: (Result<Void, Error>) -> Void = { result in
+                switch result {
+                case .success:
+                    self.isPresentingConfirmation = true
+                case let .failure(error):
+                    self.presentableInfoModal = .alertError(message: error.localizedDescription)
+                    self.isPresentingInfoModal = true
+                }
+            }
+            switch networkSelection {
+            case let .network(network):
+                createKeyService.createDerivedKey(seedName, unwrappedDerivationPath(), network.key, completion)
+            case .allowedOnAnyNetwork:
+                createKeyService.createDerivedKeyOnAllNetworks(seedName, unwrappedDerivationPath(), completion)
+            }
         }
 
         func onInfoBoxTap() {
@@ -252,6 +262,11 @@ extension DerivationPathNameView {
 
         func onPasswordedPathTap() {
             inputText.append(DerivationPathComponent.passworded.description)
+        }
+
+        func onConfirmationCompletion() {
+            isPresentingConfirmation = false
+            onComplete()
         }
 
         func validateDerivationPath() {
@@ -333,6 +348,10 @@ extension DerivationPathNameView {
         private func isInitialEntry() -> Bool {
             inputText == DerivationPathComponent.hard.description
         }
+
+        func unwrappedDerivationPath() -> String {
+            derivationPath ?? ""
+        }
     }
 }
 
@@ -342,12 +361,10 @@ extension DerivationPathNameView {
             DerivationPathNameView(
                 viewModel: .init(
                     seedName: "Keys",
-                    derivationPath: .constant("path"),
-                    isPresented: .constant(true),
-                    networkSelection: .constant(.allowedOnAnyNetwork([]))
+                    networkSelection: .constant(.allowedOnAnyNetwork([])),
+                    onComplete: {}
                 )
             )
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

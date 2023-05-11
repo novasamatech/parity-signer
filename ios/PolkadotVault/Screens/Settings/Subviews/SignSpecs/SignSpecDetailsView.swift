@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SignSpecDetails: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var navigation: NavigationCoordinator
     @State var isShowingFullAddress: Bool = false
     @Environment(\.presentationMode) var presentationMode
 
@@ -56,9 +55,6 @@ struct SignSpecDetails: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
@@ -142,7 +138,7 @@ struct SignSpecDetails: View {
 extension SignSpecDetails {
     final class ViewModel: ObservableObject {
         var content: MSufficientCryptoReady
-        private weak var navigation: NavigationCoordinator!
+        private let onComplete: () -> Void
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -150,18 +146,16 @@ extension SignSpecDetails {
         private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            content: MSufficientCryptoReady
+            content: MSufficientCryptoReady,
+            onComplete: @escaping () -> Void
         ) {
             self.content = content
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.onComplete = onComplete
         }
 
         func onBackTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
             dismissRequest.send()
+            onComplete()
         }
     }
 }

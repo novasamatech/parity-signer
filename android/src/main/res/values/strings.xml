@@ -223,13 +223,6 @@
 	<string name="banana_split_password_password_error_wrong">The password you entered is incorrect</string>
 	<string name="banana_split_password_error_seed_phrase_exists">This seed phrase already exists</string>
 	<string name="banana_split_password_error_cannot_save_seed">Given combination of seed phrase and seed name couldn\'t be saved.</string>
-	<string name="derivation_screen_title">Create Derived Key</string>
-	<string name="derivation_screen_network_header">Choose Network</string>
-	<string name="derivation_screen_network_label">Network</string>
-	<string name="derivation_screen_derivation_header">Derivation Path</string>
-	<string name="derivation_screen_dirivation_help_content_description">Derivation help button</string>
-	<string name="derivation_screen_path_placeholder">// Add Path Name</string>
-	<string name="derivation_screen_derivation_note_description">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="derivation_help_path_title">Derivation Paths</string>
 	<string name="derivation_help_methods_title">Derivation Methods</string>
 	<string name="derivation_help_keys_title">Derived Keys</string>
@@ -257,8 +250,6 @@
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 	<string name="derivation_path_hint_it_is_root">Empty path = creating root</string>
 	<string name="enter_password_input_label">Enter password</string>
-	<string name="network_selection_buttomsheet_title">Choose Network</string>
-	<string name="network_selection_selected_network_mark">Selected network</string>
   <string name="derivation_screen_derivation_button_create">Create Derived Key</string>
 	<string name="derivation_path_screen_error_wrong_path">Derivation path is wrong</string>
 	<string name="derivation_path_screen_error_collision_path">Key with this Derivation path name already exists</string>
@@ -368,10 +359,38 @@
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
 	<string name="logs_add_comment_title">Add Note</string>
-	<string name="add_log_note_placeholder">Enter log note</string>
+  <string name="add_log_note_placeholder">Enter log note</string>
   <string name="key_details_public_label_network">Network</string>
 	<string name="key_details_public_label_path">Derivation Path</string>
 	<string name="key_details_public_label_keyset">Key Set Name</string>
+	<string name="derivation_network_select_title">Select Network</string>
+  <string name="derive_key_network_all">Allow use on any network</string>
+	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
+	<string name="networks_screen_add_net_network">Add new network</string>
+	<string name="networks_help_screen_1">Step 1/2</string>
+	<string name="networks_help_screen_2">Step 2/2</string>
+	<string name="networks_help_title_add_networks">How to Add Networks</string>
+	<string name="networks_help_title_add_metadata">How to Update Network’s Metadata</string>
+	<string name="step_number_1">1</string>
+	<string name="step_number_2">2</string>
+	<string name="step_number_3">3</string>
+	<string name="step_number_4">4</string>
+	<string name="network_help_networks_go_portal">Go to Portal where your network is stored</string>
+	<string name="network_help_networks_choose_network">Choose the Network you need</string>
+	<string name="network_help_networks_press_next">Press “Next” When You’re Done</string>
+	<string name="network_help_networks_go_scan">Scan "Chain spec" QR to add the missing network</string>
+	<string name="network_help_networks_scan_cta">Scan Chain Spec</string>
+	<string name="network_help_metadata_go_portal">Go to the Portal where your network’s metadata is stored</string>
+	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
+	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
+	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
+    <string name="onboarding_skip">Skip</string>
+	<string name="onboarding_welcome">Welcome to Polkadot Vault</string>
+	<string name="onboarding_header_1">Turn Your Smartphone Into a Hardware Wallet</string>
+	<string name="onboarding_header_2">Generate and Store Multiple Private Keys</string>
+	<string name="onboarding_header_3">Sign Transactions While Keeping Your Private Keys Offline</string>
+	<string name="onboarding_header_4">Add New Networks and Update Them Without Breaking the Air Gap</string>
+    <string name="onboarding_cta_continue">Continue</string>
 
 </resources>
 

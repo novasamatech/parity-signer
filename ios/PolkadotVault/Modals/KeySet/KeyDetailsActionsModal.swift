@@ -13,7 +13,6 @@ struct KeyDetailsActionsModal: View {
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
     @Binding var shouldPresentSelectionOverlay: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
@@ -29,10 +28,7 @@ struct KeyDetailsActionsModal: View {
                     )
                     ActionSheetButton(
                         action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .backupSeed))
-                                shouldPresentBackupModal.toggle()
-                            }
+                            animateDismissal { shouldPresentBackupModal.toggle() }
                         },
                         icon: Asset.backupKey.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.backup.key
@@ -54,10 +50,6 @@ struct KeyDetailsActionsModal: View {
                 .padding(.bottom, Spacing.medium)
             }
         )
-        .onAppear {
-            // We need to fake right button action here, or Rust state machine won't work for `Backup` action
-            navigation.perform(navigation: .init(action: .rightButtonAction))
-        }
     }
 
     private func animateDismissal(_ completion: @escaping () -> Void = {}) {
@@ -75,7 +67,6 @@ struct KeyDetailsActionsModal: View {
 //    static var previews: some View {
 //        KeyDetailsActionsModal(
 //            isShowingActionSheet: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator(),
 //            removeSeed: {}
 //        )
 //        .preferredColorScheme(.dark)
@@ -83,7 +74,6 @@ struct KeyDetailsActionsModal: View {
 //        VStack {
 //            KeyDetailsActionsModal(
 //                isShowingActionSheet: Binding<Bool>.constant(true),
-//                navigation: NavigationCoordinator(),
 //                removeSeed: {}
 //            )
 //            .preferredColorScheme(.light)

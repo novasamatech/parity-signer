@@ -36,7 +36,7 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 		}
 		composable(route = LogsSubgraph.logs_add_comment) {
 			AddLogCommentScreen(
-				onBack = {navController.popBackStack()}
+				onBack = { navController.popBackStack() }
 			)
 		}
 	}

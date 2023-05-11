@@ -11,19 +11,18 @@ import SwiftUI
 struct MainScreenContainer: View {
     @StateObject var viewModel: ViewModel
     @StateObject var onboarding: OnboardingStateMachine
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         switch viewModel.viewState {
         case .authenticated:
             AuthenticatedScreenContainer(viewModel: .init())
         case .deviceLocked:
-            UnlockDeviceView(viewModel: .init())
+            UnlockDeviceView(viewModel: .init(
+                passwordProtectionStatePublisher: viewModel
+                    .passwordProtectionStatePublisher
+            ))
         case .onboarding:
             onboarding.currentView()
-                .onAppear {
-                    onboarding.use(navigation: navigation)
-                }
         case .noPincode:
             DevicePincodeRequired(viewModel: .init())
         }
@@ -41,7 +40,7 @@ extension MainScreenContainer {
     final class ViewModel: ObservableObject {
         private let authenticationStateMediator: AuthenticatedStateMediator
         private let onboardingMediator: OnboardingMediator
-        private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
+        let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
 

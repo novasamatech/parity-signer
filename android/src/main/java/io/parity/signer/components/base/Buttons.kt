@@ -26,6 +26,7 @@ fun PrimaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
+	activeText: Color = Color.White,
 	activeBackground: Color = MaterialTheme.colors.pink500,
 	onClicked: Callback,
 ) {
@@ -33,8 +34,9 @@ fun PrimaryButtonWide(
 		label = label,
 		modifier = modifier.fillMaxWidth(1f),
 		isEnabled = isEnabled,
+		activeText = activeText,
 		activeBackground = activeBackground,
-		onClicked = onClicked
+		onClicked = onClicked,
 	)
 }
 
@@ -43,6 +45,7 @@ fun PrimaryButton(
 	label: String,
 	modifier: Modifier = Modifier,
 	isEnabled: Boolean = true,
+	activeText: Color = Color.White,
 	activeBackground: Color = MaterialTheme.colors.pink500,
 	onClicked: Callback
 ) {
@@ -63,7 +66,7 @@ fun PrimaryButton(
 	) {
 		Text(
 			text = label,
-			color = if (isEnabled) Color.White else MaterialTheme.colors.primaryButtonDisabledText,
+			color = if (isEnabled) activeText else MaterialTheme.colors.primaryButtonDisabledText,
 			style = SignerTypeface.TitleS,
 			textAlign = TextAlign.Center,
 			maxLines = 1,

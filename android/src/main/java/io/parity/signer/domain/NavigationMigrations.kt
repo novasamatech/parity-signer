@@ -11,13 +11,13 @@ object NavigationMigrations {
 		localNavAction: LocalNavAction?,
 		globalNavAction: ActionResult
 	): Boolean {
-
 		return when (localNavAction) {
 			else -> when (globalNavAction.screenData) {
-				is ScreenData.SeedSelector -> false
-				is ScreenData.Settings -> false
-				is ScreenData.Keys -> false
-				else -> true
+				is ScreenData.RecoverSeedName -> true
+				is ScreenData.RecoverSeedPhrase -> true
+				is ScreenData.SelectSeedForBackup -> true
+				is ScreenData.SignSufficientCrypto -> true
+				else -> false
 			}
 		}
 	}

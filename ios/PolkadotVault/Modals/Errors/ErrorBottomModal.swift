@@ -146,14 +146,6 @@ struct ErrorBottomModal_Previews: PreviewProvider {
                 viewModel: .seedPhraseAlreadyExists(),
                 isShowingBottomAlert: Binding<Bool>.constant(true)
             )
-            ErrorBottomModal(
-                viewModel: .derivedKeysInfo(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            ErrorBottomModal(
-                viewModel: .derivationPathsInfo(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
         }
         .preferredColorScheme(.dark)
         .previewLayout(.sizeThatFits)

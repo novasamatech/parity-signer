@@ -40,7 +40,6 @@ fun NetworkDetailsScreen(
     onRemoveMetadataCallback: (version: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-
 		ScreenHeader(
 			title = null,
 			onBack = { rootNavigator.backAction() },

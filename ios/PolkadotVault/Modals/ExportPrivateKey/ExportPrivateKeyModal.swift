@@ -16,7 +16,6 @@ struct ExportPrivateKeyModal: View {
     @State private var animateBackground: Bool = false
 
     @Binding var isPresentingExportKeysModal: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject var applicationStatePublisher: ApplicationStatePublisher
     let viewModel: ExportPrivateKeyViewModel
 
@@ -141,6 +140,5 @@ struct ExportPrivateKeyModal_Previews: PreviewProvider {
             .background(.gray)
             .preferredColorScheme(.dark)
         }
-        .environmentObject(NavigationCoordinator())
     }
 }

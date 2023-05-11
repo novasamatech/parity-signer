@@ -12,7 +12,6 @@ struct LogsMoreActionsModal: View {
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentClearConfirmationModal: Bool
     @Binding var shouldPresentAddNoteModal: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(

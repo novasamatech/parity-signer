@@ -12,15 +12,10 @@ struct AddKeySetModal: View {
     @Binding var shouldShowCreateKeySet: Bool
     @Binding var shouldShowRecoverKeySet: Bool
     @State private var animateBackground: Bool = false
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
-            backgroundTapAction: {
-                animateDismissal {
-                    navigation.perform(navigation: .init(action: .rightButtonAction))
-                }
-            },
+            backgroundTapAction: { animateDismissal() },
             animateBackground: $animateBackground,
             content: {
                 VStack(alignment: .leading) {
@@ -48,11 +43,7 @@ struct AddKeySetModal: View {
                         text: Localizable.AddKeySet.Button.recover.key
                     )
                     EmptyButton(
-                        action: {
-                            animateDismissal {
-                                navigation.perform(navigation: .init(action: .rightButtonAction))
-                            }
-                        },
+                        action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )

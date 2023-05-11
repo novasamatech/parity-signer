@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NetworkSelectionSettings: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -58,8 +57,15 @@ struct NetworkSelectionSettings: View {
             ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(navigation: navigation)
+        .fullScreenModal(
+            isPresented: $viewModel.isShowingQRScanner,
+            onDismiss: viewModel.onQRScannerDismiss
+        ) {
+            CameraView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingQRScanner
+                )
+            )
         }
     }
 
@@ -88,11 +94,11 @@ struct NetworkSelectionSettings: View {
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private weak var navigation: NavigationCoordinator!
         private let service: ManageNetworksService
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetails: String!
         @Published var isPresentingDetails = false
+        @Published var isShowingQRScanner: Bool = false
 
         init(
             service: ManageNetworksService = ManageNetworksService()
@@ -102,20 +108,17 @@ extension NetworkSelectionSettings {
             onDetailsDismiss()
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
         func onTap(_ network: MmNetwork) {
             selectedDetails = network.key
             isPresentingDetails = true
         }
 
         func onAddTap() {
-            navigation.qrScannerDismissUpdate = { [weak self] in
-                self?.updateNetworks()
-            }
-            navigation.shouldPresentQRScanner = true
+            isShowingQRScanner = true
+        }
+
+        func onQRScannerDismiss() {
+            updateNetworks()
         }
     }
 }
@@ -138,6 +141,5 @@ struct NetworkSelectionSettings_Previews: PreviewProvider {
         NetworkSelectionSettings(
             viewModel: .init()
         )
-        .environmentObject(NavigationCoordinator())
     }
 }

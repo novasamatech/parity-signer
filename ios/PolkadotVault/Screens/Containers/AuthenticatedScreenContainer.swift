@@ -10,79 +10,109 @@ import SwiftUI
 struct AuthenticatedScreenContainer: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
+    @EnvironmentObject private var appState: AppState
     @StateObject var viewModel: ViewModel
-    @StateObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
-    @GestureState private var dragOffset = CGSize.zero
     @State private var isShowingQRScanner: Bool = false
 
     var body: some View {
-        viewModel.mainScreenFactory.screen(for: navigation.actionResult.screenData)
-            .bottomEdgeOverlay(
-                overlayView: CameraView(
-                    viewModel: .init(
-                        isPresented: $navigation.shouldPresentQRScanner
-                    )
-                ),
-                isPresented: $isShowingQRScanner
-            )
-            .onReceive(navigation.$shouldPresentQRScanner) { shouldPresent in
-                withAnimation {
-                    if shouldPresent {
-                        // Pretend to go to QR Scanner tab, to be able to display transaction later
-                        navigation.performFake(navigation: .init(action: .start))
-                        navigation.performFake(navigation: .init(action: .navbarScan))
-                        isShowingQRScanner = true
-                    } else {
-                        if let dismissalUpdate = navigation.qrScannerDismissUpdate {
-                            // Override default tab navigation when we want to end on specific screen after camera
-                            // dismissal
-                            dismissalUpdate()
-                            navigation.qrScannerDismissUpdate = nil
-                        } else if let action = navigation.selectedTab.action {
-                            // "Pretend" to go back to previous tab (as we don't change `selectedTab` when showing QR
-                            // screen
-                            // now), but do
-                            // it for real before dismissing QR code scanner to have dataset to display as we might have
-                            // ventured
-                            // into transaction details
-                            navigation.performFake(navigation: .init(action: .start))
-                            navigation.perform(navigation: .init(action: action))
-                        }
-                        isShowingQRScanner = false
-                    }
-                }
+        ZStack {
+            if viewModel.selectedTab == .keys {
+                KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
             }
-            .environmentObject(snackBarPresentation)
-            .bottomSnackbar(snackBarPresentation.viewModel, isPresented: $snackBarPresentation.isSnackbarPresented)
-            .fullScreenCover(
-                isPresented: $navigation.genericError.isPresented
-            ) {
-                ErrorBottomModal(
-                    viewModel: .alertError(message: navigation.genericError.errorMessage),
-                    dismissAction: viewModel.onDismissErrorTap(),
-                    isShowingBottomAlert: $navigation.genericError.isPresented
+            if viewModel.selectedTab == .settings {
+                SettingsView(viewModel: .init(tabBarViewModel: tabBarViewModel()))
+            }
+        }
+        .animation(.default, value: AnimationDuration.standard)
+        .fullScreenModal(
+            isPresented: $viewModel.isShowingQRScanner,
+            onDismiss: viewModel.onQRScannerDismiss
+        ) {
+            CameraView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingQRScanner,
+                    onComplete: $viewModel.onQRScannerDismissalComplete
                 )
-                .clearModalBackground()
-            }
+            )
+        }
+        .fullScreenModal(
+            isPresented: $navigation.genericError.isPresented
+        ) {
+            ErrorBottomModal(
+                viewModel: .alertError(message: navigation.genericError.errorMessage),
+                dismissAction: viewModel.onDismissErrorTap(),
+                isShowingBottomAlert: $navigation.genericError.isPresented
+            )
+            .clearModalBackground()
+        }
+        .onAppear {
+            viewModel.use(appState: appState)
+            viewModel.onAppear()
+        }
+    }
+
+    private func tabBarViewModel() -> TabBarView.ViewModel {
+        .init(
+            selectedTab: $viewModel.selectedTab,
+            onQRCodeTap: viewModel.onQRCodeTap,
+            onKeysTap: viewModel.onKeysTap,
+            onSettingsTap: viewModel.onSettingsTap
+        )
     }
 }
 
 extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
-        private let navigation: NavigationCoordinator
-        let mainScreenFactory: MainScreensFactory
+        private weak var appState: AppState!
+        private let initialisationService: AppInitialisationService
+
+        @Published var selectedTab: Tab = .keys
+        @Published var isShowingQRScanner: Bool = false
+        /// Informs main view dispatcher whether we should get back to previous tab when dismissing camera view
+        /// or navigate to explicit screen
+        /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
+        ///
+        /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other
+        /// time
+        @Published var qrScannerDismissUpdate: (() -> Void)?
+        @Published var onQRScannerDismissalComplete: () -> Void = {}
 
         init(
-            navigation: NavigationCoordinator = NavigationCoordinator(),
-            mainScreenFactory: MainScreensFactory = MainScreensFactory()
+            initialisationService: AppInitialisationService = AppInitialisationService()
         ) {
-            self.navigation = navigation
-            self.mainScreenFactory = mainScreenFactory
-            navigation.perform(navigation: .init(action: .start))
+            self.initialisationService = initialisationService
+        }
+
+        func use(appState: AppState) {
+            self.appState = appState
+        }
+
+        func onAppear() {
+            initialisationService.initialiseAppSession()
+        }
+
+        func onQRCodeTap() {
+            isShowingQRScanner = true
+        }
+
+        func onKeysTap() {
+            selectedTab = .keys
+        }
+
+        func onSettingsTap() {
+            selectedTab = .settings
         }
 
         func onDismissErrorTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            initialisationService.resetNavigationState()
+        }
+
+        func onQRScannerDismiss() {
+            qrScannerDismissUpdate?()
+            qrScannerDismissUpdate = nil
+            onQRScannerDismissalComplete()
+            onQRScannerDismissalComplete = {}
+            appState.userData.keyListRequiresUpdate = true
         }
     }
 }

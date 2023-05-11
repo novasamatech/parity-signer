@@ -11,7 +11,6 @@ import SwiftUI
 struct PolkadotVaultApp: App {
     @StateObject var connectivityMediator = ServiceLocator.connectivityMediator
     @StateObject var navigation = NavigationCoordinator()
-    @StateObject var appState = AppState()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
@@ -32,7 +31,7 @@ struct PolkadotVaultApp: App {
                 .background(Asset.backgroundPrimary.swiftUIColor)
                 .environmentObject(navigation)
                 .environmentObject(connectivityMediator)
-                .environmentObject(appState)
+                .environmentObject(ServiceLocator.appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
             }

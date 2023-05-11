@@ -5,64 +5,13 @@
 //  Created by Krzysztof Rodak on 13/09/2022.
 //
 
+import Combine
 import SwiftUI
-
-struct KeyDetailsPublicKeyViewModel: Equatable {
-    let qrCodes: [[UInt8]]
-    let footer: QRCodeAddressFooterViewModel
-    let isKeyExposed: Bool
-    let isRootKey: Bool
-    let networkTitle: String
-    let networkLogo: String
-    let keySetName: String
-    let path: String
-    let hasPassword: Bool
-
-    init(_ keyDetails: MKeyDetails) {
-        qrCodes = [keyDetails.qr.payload]
-        footer = .init(
-            identicon: keyDetails.address.identicon,
-
-            networkLogo: keyDetails.networkInfo.networkLogo,
-            base58: keyDetails.base58
-        )
-        isKeyExposed = keyDetails.address.secretExposed
-        isRootKey = keyDetails.isRootKey
-        networkTitle = keyDetails.networkInfo.networkTitle
-        networkLogo = keyDetails.networkInfo.networkLogo
-        keySetName = keyDetails.address.seedName
-        path = keyDetails.address.path
-        hasPassword = keyDetails.address.hasPwd
-    }
-
-    init(
-        qrCodes: [[UInt8]],
-        footer: QRCodeAddressFooterViewModel,
-        isKeyExposed: Bool,
-        isRootKey: Bool,
-        networkTitle: String,
-        networkLogo: String,
-        keySetName: String,
-        path: String,
-        hasPassword: Bool
-    ) {
-        self.qrCodes = qrCodes
-        self.footer = footer
-        self.isKeyExposed = isKeyExposed
-        self.isRootKey = isRootKey
-        self.networkTitle = networkTitle
-        self.networkLogo = networkLogo
-        self.keySetName = keySetName
-        self.path = path
-        self.hasPassword = hasPassword
-    }
-}
 
 struct KeyDetailsPublicKeyView: View {
     @StateObject var viewModel: ViewModel
-
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         GeometryReader { geo in
@@ -72,10 +21,7 @@ struct KeyDetailsPublicKeyView: View {
                     viewModel: .init(
                         title: Localizable.PublicKeyDetails.Label.title.string,
                         subtitle: viewModel.navigationSubtitle(),
-                        leftButtons: [.init(
-                            type: .xmark,
-                            action: viewModel.onBackTap
-                        )],
+                        leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreButtonTap)]
                     )
                 )
@@ -124,13 +70,12 @@ struct KeyDetailsPublicKeyView: View {
                 minHeight: geo.size.height
             )
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .onAppear {
-                viewModel.use(navigation: navigation)
-                viewModel.onAppear()
-            }
+        }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
         // Action sheet
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -140,12 +85,13 @@ struct KeyDetailsPublicKeyView: View {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $viewModel.shouldPresentExportKeysWarningModal,
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal
+                shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal,
+                isExportKeyAvailable: viewModel.isExportKeyAvailable
             )
             .clearModalBackground()
         }
         // Export private key warning
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysWarningModal,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -159,7 +105,7 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Export private key modal
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysModal,
             onDismiss: viewModel.onExportKeysDismissal
         ) {
@@ -170,16 +116,15 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Remove key modal
-        .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetSingleKey,
                 mainAction: viewModel.onRemoveKeyTap(),
-                dismissAction: viewModel.onRemoveKeyDismissal(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -265,11 +210,12 @@ private extension KeyDetailsPublicKeyView {
 extension KeyDetailsPublicKeyView {
     final class ViewModel: ObservableObject {
         private let keyDetails: MKeyDetails
-        private let forgetKeyActionHandler: ForgetSingleKeyAction
+        private let publicKeyDetails: String
+        private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
+        private let snackbarPresentation: BottomSnackbarPresentation
 
-        private weak var navigation: NavigationCoordinator!
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
         @Published var isShowingRemoveConfirmation = false
@@ -280,31 +226,34 @@ extension KeyDetailsPublicKeyView {
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
+        var isExportKeyAvailable: Bool {
+            keyDetails.address.hasPwd == false
+        }
+
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
+        private let onCompletion: () -> Void
 
         init(
             keyDetails: MKeyDetails,
-            forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
+            publicKeyDetails: String,
+            publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            onCompletion: @escaping () -> Void
         ) {
             self.keyDetails = keyDetails
-            self.forgetKeyActionHandler = forgetKeyActionHandler
+            self.publicKeyDetails = publicKeyDetails
+            self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
+            self.snackbarPresentation = snackbarPresentation
+            self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
-        }
-
-        func onAppear() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-            forgetKeyActionHandler.use(navigation: navigation)
-        }
-
-        func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
         }
 
         func onMoreButtonTap() {
@@ -317,12 +266,12 @@ extension KeyDetailsPublicKeyView {
 
         func checkForActionsPresentation() {
             if shouldPresentExportKeysWarningModal {
-                shouldPresentExportKeysWarningModal.toggle()
+                shouldPresentExportKeysWarningModal = false
                 if warningStateMediator.alert {
-                    isPresentingConnectivityAlert.toggle()
+                    isPresentingConnectivityAlert = true
                 } else {
                     exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey(keyDetails)
-                    isPresentingExportKeysWarningModal.toggle()
+                    isPresentingExportKeysWarningModal = true
                 }
             }
             if shouldPresentRemoveConfirmationModal {
@@ -332,18 +281,12 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onWarningDismissal() {
-            if shouldPresentExportKeysModal {
-                shouldPresentExportKeysModal.toggle()
-                isPresentingExportKeysModal.toggle()
-            } else {
-                // If user cancelled, mimic Rust state machine and hide "..." modal menu
-                navigation.perform(navigation: .init(action: .rightButtonAction))
-            }
+            guard shouldPresentExportKeysModal else { return }
+            shouldPresentExportKeysModal.toggle()
+            isPresentingExportKeysModal.toggle()
         }
 
         func onExportKeysDismissal() {
-            // When user finished Export Private Key interaction, mimic Rust state machine and hide "..." modal menu
-            navigation.perform(navigation: .init(action: .rightButtonAction))
             exportPrivateKeyViewModel = nil
         }
 
@@ -353,14 +296,14 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onRemoveKeyTap() {
-            forgetKeyActionHandler.forgetSingleKey(keyDetails.address.seedName)
-        }
-
-        func onRemoveKeyDismissal() {
-            // We need to fake right button action here or Rust machine will break
-            // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
-            // so we need to inform Rust we actually hid it
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+            publicKeyDetailsService.forgetSingleKey(keyDetails.address.seedName)
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.PublicKeyDetailsModal.Confirmation.snackbar.string,
+                style: .warning
+            )
+            snackbarPresentation.isSnackbarPresented = true
+            onCompletion()
+            dismissRequest.send()
         }
     }
 }
@@ -370,13 +313,14 @@ struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         Group {
             KeyDetailsPublicKeyView(
                 viewModel: .init(
-                    keyDetails: PreviewData.mkeyDetails
+                    keyDetails: PreviewData.mkeyDetails,
+                    publicKeyDetails: "publicKeyDetails",
+                    onCompletion: {}
                 )
             )
         }
         .previewLayout(.sizeThatFits)
         .preferredColorScheme(.dark)
-        .environmentObject(NavigationCoordinator())
         .environmentObject(ConnectivityMediator())
     }
 }

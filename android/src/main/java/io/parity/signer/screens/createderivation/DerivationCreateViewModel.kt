@@ -13,10 +13,13 @@ import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.tryCreateAddress
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 
 class DerivationCreateViewModel : ViewModel() {
@@ -37,9 +40,10 @@ class DerivationCreateViewModel : ViewModel() {
 		MutableStateFlow(INITIAL_DERIVATION_PATH)
 	val path: StateFlow<String> = _path.asStateFlow()
 
-	private val _selectedNetwork: MutableStateFlow<NetworkModel> =
-		MutableStateFlow(allNetworks.first())
-	val selectedNetwork: StateFlow<NetworkModel> = _selectedNetwork.asStateFlow()
+	private val _selectedNetwork: MutableStateFlow<SelectedNetwork> =
+		MutableStateFlow(SelectedNetwork.Network(allNetworks.first()))
+	val selectedNetwork: StateFlow<SelectedNetwork> =
+		_selectedNetwork.asStateFlow()
 
 	fun updatePath(newPath: String) {
 		_path.value = newPath
@@ -63,7 +67,7 @@ class DerivationCreateViewModel : ViewModel() {
 		return uniffiInteractor.getAllNetworks().mapError()
 	}
 
-	fun updateSelectedNetwork(newNetwork: NetworkModel) {
+	fun updateSelectedNetwork(newNetwork: SelectedNetwork) {
 		_selectedNetwork.value = newNetwork
 	}
 
@@ -85,12 +89,29 @@ class DerivationCreateViewModel : ViewModel() {
 	}
 
 	private fun getBackendCheck(path: String): DerivationCheck? {
-		return runBlocking {
-			uniffiInteractor.validateDerivationPath(
-				path,
-				seedName,
-				selectedNetwork.value.key
-			).mapError()
+		return when (val selectedNetwork = selectedNetwork.value) {
+			SelectedNetwork.AllNetworks -> runBlocking {
+				allNetworks
+					.map { network ->
+						async(Dispatchers.IO) {
+							uniffiInteractor.validateDerivationPath(
+								path,
+								seedName,
+								network.key
+							).mapError()
+						}
+					}
+					.map { it.await() }
+					.firstOrNull { it?.buttonGood == false || it?.collision != null
+						|| it?.error != null }
+			}
+			is SelectedNetwork.Network -> runBlocking {
+				uniffiInteractor.validateDerivationPath(
+					path,
+					seedName,
+					selectedNetwork.networkModel.key
+				).mapError()
+			}
 		}
 	}
 
@@ -101,12 +122,30 @@ class DerivationCreateViewModel : ViewModel() {
 				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
 			if (phrase.isNotBlank()) {
 				try {
-					tryCreateAddress(
-						seedName,
-						phrase,
-						path.value,
-						selectedNetwork.value.key
-					)
+					when (val selectedNetwork = selectedNetwork.value) {
+						SelectedNetwork.AllNetworks -> {
+							withContext(Dispatchers.IO) {
+								allNetworks
+									.map {
+										async {
+											tryCreateAddress(
+												seedName,
+												phrase,
+												path.value,
+												it.key,
+											)
+										}
+									}
+									.map { it.await() }
+							}
+						}
+						is SelectedNetwork.Network -> tryCreateAddress(
+							seedName,
+							phrase,
+							path.value,
+							selectedNetwork.networkModel.key
+						)
+					}
 					Toast.makeText(
 						context,
 						context.getString(R.string.create_derivations_success),
@@ -138,6 +177,11 @@ class DerivationCreateViewModel : ViewModel() {
 	enum class DerivationPathValidity {
 		ALL_GOOD, WRONG_PATH, COLLISION_PATH, EMPTY_PASSWORD, CONTAIN_SPACES
 	}
+}
+
+sealed class SelectedNetwork {
+	class Network(val networkModel: NetworkModel) : SelectedNetwork()
+	object AllNetworks : SelectedNetwork()
 }
 
 internal const val INITIAL_DERIVATION_PATH = "//"

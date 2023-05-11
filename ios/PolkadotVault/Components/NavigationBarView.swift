@@ -197,7 +197,6 @@ struct NavigationBarView: View {
             }
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif
