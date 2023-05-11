@@ -100,9 +100,3 @@ struct TransactionCardSelector: View {
         }
     }
 }
-
-// struct TransactionCardSelector_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TransactionCardSelector()
-//    }
-// }

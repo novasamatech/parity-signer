@@ -47,8 +47,10 @@ struct TCEnumVariantName: View {
     }
 }
 
-struct TCEnumVariantName_Previews: PreviewProvider {
-    static var previews: some View {
-        TCEnumVariantName(value: MscEnumVariantName(name: "Name", docsEnumVariant: PreviewData.exampleMarkdownDocs))
+#if DEBUG
+    struct TCEnumVariantName_Previews: PreviewProvider {
+        static var previews: some View {
+            TCEnumVariantName(value: .stub)
+        }
     }
-}
+#endif

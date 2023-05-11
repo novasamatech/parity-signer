@@ -50,21 +50,23 @@ struct NavbarActionButton: View {
     }
 }
 
-struct NavbarActionButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            NavbarActionButton(
-                action: {},
-                title: "Done"
-            )
-            NavbarActionButton(
-                action: {},
-                title: "Done",
-                isDisabled: .constant(true)
-            )
+#if DEBUG
+    struct NavbarActionButton_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                NavbarActionButton(
+                    action: {},
+                    title: "Done"
+                )
+                NavbarActionButton(
+                    action: {},
+                    title: "Done",
+                    isDisabled: .constant(true)
+                )
+            }
+            .padding()
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .padding()
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

@@ -62,25 +62,3 @@ struct KeyDetailsActionsModal: View {
         )
     }
 }
-
-// struct KeyDetailsActionsModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        KeyDetailsActionsModal(
-//            isShowingActionSheet: Binding<Bool>.constant(true),
-//            removeSeed: {}
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            KeyDetailsActionsModal(
-//                isShowingActionSheet: Binding<Bool>.constant(true),
-//                removeSeed: {}
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

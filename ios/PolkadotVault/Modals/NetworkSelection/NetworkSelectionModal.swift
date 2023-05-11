@@ -174,6 +174,7 @@ extension NetworkSelectionModal {
     }
 }
 
+#if DEBUG
 struct NetworkSelectionModal_Previews: PreviewProvider {
     static var previews: some View {
         NetworkSelectionModal(
@@ -182,3 +183,4 @@ struct NetworkSelectionModal_Previews: PreviewProvider {
         .environmentObject(AppState.preview)
     }
 }
+#endif

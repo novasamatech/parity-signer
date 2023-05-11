@@ -44,31 +44,33 @@ struct NavbarButton: View {
     }
 }
 
-struct NavbarButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            NavbarButton(
-                action: {},
-                icon: Asset.arrowBack.swiftUIImage
-            )
-            NavbarButton(
-                action: {},
-                icon: Asset.moreDots.swiftUIImage
-            )
+#if DEBUG
+    struct NavbarButton_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                NavbarButton(
+                    action: {},
+                    icon: Asset.arrowBack.swiftUIImage
+                )
+                NavbarButton(
+                    action: {},
+                    icon: Asset.moreDots.swiftUIImage
+                )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack(alignment: .leading, spacing: 10) {
+                NavbarButton(
+                    action: {},
+                    icon: Asset.arrowBack.swiftUIImage
+                )
+                NavbarButton(
+                    action: {},
+                    icon: Asset.moreDots.swiftUIImage
+                )
+            }
+            .preferredColorScheme(.light)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .leading, spacing: 10) {
-            NavbarButton(
-                action: {},
-                icon: Asset.arrowBack.swiftUIImage
-            )
-            NavbarButton(
-                action: {},
-                icon: Asset.moreDots.swiftUIImage
-            )
-        }
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

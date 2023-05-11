@@ -136,10 +136,12 @@ private extension NetworkSelectionSettings.ViewModel {
     }
 }
 
-struct NetworkSelectionSettings_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
+#if DEBUG
+    struct NetworkSelectionSettings_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

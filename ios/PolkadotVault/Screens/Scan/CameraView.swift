@@ -275,18 +275,15 @@ extension CameraView {
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
 
         @Binding var isPresented: Bool
-        @Binding var onComplete: () -> Void
         private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
 
         init(
             isPresented: Binding<Bool>,
-            onComplete: Binding<() -> Void> = .constant {},
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService()
         ) {
             _isPresented = isPresented
-            _onComplete = onComplete
             self.seedsMediator = seedsMediator
             self.scanService = scanService
         }

@@ -51,19 +51,21 @@ struct QRCodeRootFooterView: View {
     }
 }
 
-struct QRCodeRootFooterView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                Spacer()
-                QRCodeRootFooterView(
-                    viewModel: PreviewData.qrCodeRootFooterViewModel
-                )
-                .background(Asset.fill6Solid.swiftUIColor)
-                Spacer()
+#if DEBUG
+    struct QRCodeRootFooterView_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VStack {
+                    Spacer()
+                    QRCodeRootFooterView(
+                        viewModel: .stub
+                    )
+                    .background(Asset.fill6Solid.swiftUIColor)
+                    Spacer()
+                }
+                .background(.white)
+                .preferredColorScheme(.dark)
             }
-            .background(.white)
-            .preferredColorScheme(.dark)
         }
     }
-}
+#endif

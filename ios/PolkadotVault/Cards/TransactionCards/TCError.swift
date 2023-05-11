@@ -22,8 +22,10 @@ struct TCError: View {
     }
 }
 
-struct TCError_Previews: PreviewProvider {
-    static var previews: some View {
-        TCError(text: "Error body I guess")
+#if DEBUG
+    struct TCError_Previews: PreviewProvider {
+        static var previews: some View {
+            TCError(text: "Error body I guess")
+        }
     }
-}
+#endif

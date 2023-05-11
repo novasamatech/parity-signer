@@ -308,19 +308,21 @@ extension KeyDetailsPublicKeyView {
     }
 }
 
-struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            KeyDetailsPublicKeyView(
-                viewModel: .init(
-                    keyDetails: PreviewData.mkeyDetails,
-                    publicKeyDetails: "publicKeyDetails",
-                    onCompletion: {}
+#if DEBUG
+    struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                KeyDetailsPublicKeyView(
+                    viewModel: .init(
+                        keyDetails: .stub,
+                        publicKeyDetails: "publicKeyDetails",
+                        onCompletion: {}
+                    )
                 )
-            )
+            }
+            .previewLayout(.sizeThatFits)
+            .preferredColorScheme(.dark)
+            .environmentObject(ConnectivityMediator())
         }
-        .previewLayout(.sizeThatFits)
-        .preferredColorScheme(.dark)
-        .environmentObject(ConnectivityMediator())
     }
-}
+#endif

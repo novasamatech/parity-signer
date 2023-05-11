@@ -30,8 +30,7 @@ struct AuthenticatedScreenContainer: View {
         ) {
             CameraView(
                 viewModel: .init(
-                    isPresented: $viewModel.isShowingQRScanner,
-                    onComplete: $viewModel.onQRScannerDismissalComplete
+                    isPresented: $viewModel.isShowingQRScanner
                 )
             )
         }
@@ -68,14 +67,6 @@ extension AuthenticatedScreenContainer {
 
         @Published var selectedTab: Tab = .keys
         @Published var isShowingQRScanner: Bool = false
-        /// Informs main view dispatcher whether we should get back to previous tab when dismissing camera view
-        /// or navigate to explicit screen
-        /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
-        ///
-        /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other
-        /// time
-        @Published var qrScannerDismissUpdate: (() -> Void)?
-        @Published var onQRScannerDismissalComplete: () -> Void = {}
 
         init(
             initialisationService: AppInitialisationService = AppInitialisationService()
@@ -108,10 +99,6 @@ extension AuthenticatedScreenContainer {
         }
 
         func onQRScannerDismiss() {
-            qrScannerDismissUpdate?()
-            qrScannerDismissUpdate = nil
-            onQRScannerDismissalComplete()
-            onQRScannerDismissalComplete = {}
             appState.userData.keyListRequiresUpdate = true
         }
     }

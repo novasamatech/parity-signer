@@ -67,17 +67,17 @@ struct QRCodeAddressFooterView: View {
             VStack {
                 Spacer()
                 QRCodeAddressFooterView(
-                    viewModel: PreviewData.qrCodeAddressFooterViewModel,
+                    viewModel: .stub,
                     backgroundColor: Asset.fill6Solid.swiftUIColor
                 )
                 Spacer()
                 QRCodeAddressFooterView(
-                    viewModel: PreviewData.qrCodeAddressFooterViewModelNoPath,
+                    viewModel: .stub,
                     backgroundColor: Asset.fill12.swiftUIColor
                 )
                 Spacer()
                 QRCodeAddressFooterView(
-                    viewModel: PreviewData.qrCodeAddressFooterViewModelVeryLongPath,
+                    viewModel: .stub,
                     backgroundColor: Asset.backgroundSecondary.swiftUIColor
                 )
                 Spacer()

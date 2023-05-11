@@ -106,7 +106,7 @@ extension SeedPhraseView {
                 Spacer()
                 SeedPhraseView(
                     viewModel: .init(
-                        dataModel: PreviewData.seedPhraseViewModel
+                        dataModel: .stub
                     )
                 )
                 .padding(Spacing.medium)
