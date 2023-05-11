@@ -209,13 +209,11 @@ GEM
       xcpretty (~> 0.2, >= 0.0.7)
 
 PLATFORMS
-  arm64-darwin-21
   arm64-darwin-22
-  x86_64-darwin-19
   x86_64-darwin-20
 
 DEPENDENCIES
   fastlane
 
 BUNDLED WITH
-   2.3.11
+   2.4.13
