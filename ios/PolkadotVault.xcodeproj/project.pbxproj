@@ -2506,7 +2506,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.0.3;
+				MARKETING_VERSION = 6.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2541,7 +2541,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.0.3;
+				MARKETING_VERSION = 6.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
