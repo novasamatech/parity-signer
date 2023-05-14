@@ -855,10 +855,6 @@ fn populate_addresses(
     // Gets updated after each successful `create_address` run.
     let mut history_prep: Vec<Event> = Vec::new();
 
-    // Collect all networks known to Vault.
-    // Note: networks with all `Encryption` variants are used here if they are
-    // in the Vault database.
-    let specs_set = get_all_networks(database)?;
     // Make seed keys if requested.
     // Seed keys **must** be possible to generate,
     // if a seed key has a collision with some other key, it is an error
@@ -866,22 +862,6 @@ fn populate_addresses(
         let prep_data = create_address(database, &address_prep, "", None, seed_name, seed_phrase)?;
         address_prep = prep_data.address_prep;
         history_prep.extend_from_slice(&prep_data.history_prep);
-    }
-    for network_specs in specs_set.iter() {
-        // make keys with default derivation if possible;
-        // key with default derivation may collide with some other key,
-        // this should not prevent generating a seed;
-        if let Ok(prep_data) = create_address(
-            database,
-            &address_prep,
-            "",
-            Some(&network_specs.specs),
-            seed_name,
-            seed_phrase,
-        ) {
-            address_prep = prep_data.address_prep;
-            history_prep.extend_from_slice(&prep_data.history_prep);
-        }
     }
     Ok(PrepData {
         address_prep,

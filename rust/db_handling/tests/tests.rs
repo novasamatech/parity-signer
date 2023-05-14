@@ -61,10 +61,6 @@ use definitions::helpers::multisigner_to_public;
 use definitions::navigation::MAddressCard;
 use tempfile::tempdir;
 
-fn kusama_genesis() -> H256 {
-    H256::from_str("0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe").unwrap()
-}
-
 fn westend_genesis() -> H256 {
     H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
 }
@@ -81,12 +77,8 @@ fn print_seed_names() {
         identicon: SignerImage::Png {
             image: alice_sr_root().to_vec(),
         },
-        used_in_networks: vec![
-            "kusama".to_string(),
-            "polkadot".to_string(),
-            "westend".to_string(),
-        ],
-        derived_keys_count: 4, // "//westend", "//kusama", "//polkadot", "//Alice"
+        used_in_networks: vec!["westend".to_string()],
+        derived_keys_count: 1, // "//Alice"
     }];
     assert_eq!(cards, expected_cards);
 }
@@ -107,12 +99,8 @@ fn print_seed_names_with_orphan() {
             identicon: SignerImage::Png {
                 image: alice_sr_root().to_vec(),
             },
-            used_in_networks: vec![
-                "kusama".to_string(),
-                "polkadot".to_string(),
-                "westend".to_string(),
-            ],
-            derived_keys_count: 4,
+            used_in_networks: vec!["westend".to_string()],
+            derived_keys_count: 1,
         },
         SeedNameCard {
             seed_name: "BobGhost".to_string(),
@@ -135,77 +123,24 @@ fn print_all_ids() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let keys = print_all_identities(&db).unwrap();
 
-    let public_key = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string();
-
-    let expected_keys = vec![
-        MRawKey {
-            address_key: format!(
-                "01{}{}",
-                public_key, "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
-            ),
-            public_key: public_key.clone(),
-            address: Address {
-                seed_name: "Alice".to_string(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: false,
-                path: "".to_string(),
-                secret_exposed: false,
+    let expected_keys = vec![MRawKey {
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string(),
+        address: Address {
+            seed_name: "Alice".to_string(),
+            identicon: SignerImage::Png {
+                image: alice_sr_alice().to_vec(),
             },
-            network_logo: "polkadot".to_owned(),
+            has_pwd: false,
+            path: "//Alice".to_string(),
+            secret_exposed: false,
         },
-        MRawKey {
-            address_key: format!(
-                "01{}{}",
-                public_key, "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
-            ),
-            public_key: public_key.clone(),
-            address: Address {
-                seed_name: "Alice".to_string(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: false,
-                path: "".to_string(),
-                secret_exposed: false,
-            },
-            network_logo: "kusama".to_owned(),
-        },
-        MRawKey {
-            address_key: format!("01{}01{}", public_key, hex::encode(westend_genesis())),
-            public_key,
-            address: Address {
-                seed_name: "Alice".to_string(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: false,
-                path: "".to_string(),
-                secret_exposed: false,
-            },
-            network_logo: "westend".to_owned(),
-        },
-        MRawKey {
-            address_key: concat!(
-                "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
-                "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-            )
-            .to_string(),
-            public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-                .to_string(),
-            address: Address {
-                seed_name: "Alice".to_string(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_alice().to_vec(),
-                },
-                has_pwd: false,
-                path: "//Alice".to_string(),
-                secret_exposed: false,
-            },
-            network_logo: "westend".to_owned(),
-        },
-    ];
+        network_logo: "westend".to_owned(),
+    }];
 
     assert_eq!(keys, expected_keys);
 }
@@ -357,41 +292,15 @@ fn backup_prep_alice() {
     let backup = backup_prep(&db, "Alice").unwrap();
     let expected_backup = MBackup {
         seed_name: "Alice".to_string(),
-        derivations: vec![
-            DerivationPack {
-                network_title: "polkadot".to_string(),
-                network_logo: "polkadot".to_string(),
-                network_order: 0.to_string(),
-                id_set: vec![DerivationEntry {
-                    path: "".to_string(),
-                    has_pwd: false,
-                }],
-            },
-            DerivationPack {
-                network_title: "kusama".to_string(),
-                network_logo: "kusama".to_string(),
-                network_order: 1.to_string(),
-                id_set: vec![DerivationEntry {
-                    path: "".to_string(),
-                    has_pwd: false,
-                }],
-            },
-            DerivationPack {
-                network_title: "westend".to_string(),
-                network_logo: "westend".to_string(),
-                network_order: 2.to_string(),
-                id_set: vec![
-                    DerivationEntry {
-                        path: "".to_string(),
-                        has_pwd: false,
-                    },
-                    DerivationEntry {
-                        path: "//Alice".to_string(),
-                        has_pwd: false,
-                    },
-                ],
-            },
-        ],
+        derivations: vec![DerivationPack {
+            network_title: "westend".to_string(),
+            network_logo: "westend".to_string(),
+            network_order: 2.to_string(),
+            id_set: vec![DerivationEntry {
+                path: "//Alice".to_string(),
+                has_pwd: false,
+            }],
+        }],
     };
     assert_eq!(backup, expected_backup);
 }
@@ -799,7 +708,7 @@ fn test_generate_default_addresses_for_alice() {
     try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
     {
         let addresses = open_tree(&db, ADDRTREE).unwrap();
-        assert_eq!(addresses.len(), 4);
+        assert_eq!(addresses.len(), 1);
     }
     let chainspecs = default_chainspecs();
     let default_addresses = addresses_set_seed_name_network(
@@ -809,27 +718,7 @@ fn test_generate_default_addresses_for_alice() {
     )
     .unwrap();
 
-    let expected_default_addresses = vec![(
-        MultiSigner::Sr25519(
-            Public::try_from(
-                hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
-                    .unwrap()
-                    .as_ref(),
-            )
-            .unwrap(),
-        ),
-        AddressDetails {
-            seed_name: "Alice".to_string(),
-            path: "".to_string(),
-            has_pwd: false,
-            network_id: Some(NetworkSpecsKey::from_parts(
-                &kusama_genesis(),
-                &Encryption::Sr25519,
-            )),
-            encryption: Encryption::Sr25519,
-            secret_exposed: false,
-        },
-    )];
+    let expected_default_addresses = vec![];
 
     assert_eq!(default_addresses, expected_default_addresses);
 
@@ -837,7 +726,7 @@ fn test_generate_default_addresses_for_alice() {
     let test_key = AddressKey::from_parts(
         &hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(),
         &Encryption::Sr25519,
-        Some(kusama_genesis()),
+        None,
     )
     .unwrap();
     assert!(identities.contains_key(test_key.key()).unwrap());
@@ -901,6 +790,14 @@ fn test_identity_deletion() {
     let chainspecs = default_chainspecs();
     let network_specs_key_0 =
         NetworkSpecsKey::from_parts(&chainspecs[0].specs.genesis_hash, &Encryption::Sr25519);
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//Alice",
+        &network_specs_key_0,
+    )
+    .unwrap();
     // let network_specs_key_1 =
     //    NetworkSpecsKey::from_parts(&chainspecs[1].specs.genesis_hash, &Encryption::Sr25519);
     let mut identities = addresses_set_seed_name_network(&db, "Alice", &network_specs_key_0)
@@ -953,56 +850,9 @@ fn history_with_identities() {
     let history_printed_after_create_seed: Vec<_> =
         get_history(&db).unwrap().into_iter().map(|e| e.1).collect();
 
-    let element3 = vec![
-        Event::SeedCreated {
-            seed_created: "Alice".to_string(),
-        },
-        Event::IdentityAdded {
-            identity_history: IdentityHistory {
-                seed_name: "Alice".to_string(),
-                encryption: Encryption::Sr25519,
-                public_key: hex::decode(
-                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-                )
-                .unwrap(),
-                path: "".to_string(),
-                network_genesis_hash: H256::from_str(
-                    "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-                )
-                .unwrap(),
-            },
-        },
-        Event::IdentityAdded {
-            identity_history: IdentityHistory {
-                seed_name: "Alice".to_string(),
-                encryption: Encryption::Sr25519,
-                public_key: hex::decode(
-                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-                )
-                .unwrap(),
-                path: "".to_string(),
-                network_genesis_hash: H256::from_str(
-                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-                )
-                .unwrap(),
-            },
-        },
-        Event::IdentityAdded {
-            identity_history: IdentityHistory {
-                seed_name: "Alice".to_string(),
-                encryption: Encryption::Sr25519,
-                public_key: hex::decode(
-                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
-                )
-                .unwrap(),
-                path: "".to_string(),
-                network_genesis_hash: H256::from_str(
-                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                )
-                .unwrap(),
-            },
-        },
-    ];
+    let element3 = vec![Event::SeedCreated {
+        seed_created: "Alice".to_string(),
+    }];
 
     assert!(entries_contain_event(
         &history_printed_after_create_seed,
@@ -2058,24 +1908,6 @@ fn remove_all_westend() {
                 )
                 .unwrap(),
             }
-        }
-    ));
-    assert!(entries_contain_event(
-        &history,
-        &Event::IdentityRemoved {
-            identity_history: IdentityHistory {
-                seed_name: "Alice".to_string(),
-                encryption: Encryption::Sr25519,
-                public_key: hex::decode(
-                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
-                )
-                .unwrap(),
-                path: "".to_string(),
-                network_genesis_hash: H256::from_str(
-                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-                )
-                .unwrap()
-            },
         }
     ));
 
