@@ -125,6 +125,7 @@ fun KeysetRecoverPhraseScreen(
 @Composable
 private fun PreviewKeysetRecoverPhraseScreen() {
 	SignerNewTheme {
+//		KeysetRecoverModel.stub()
 		KeysetRecoverPhraseScreen(EmptyNavigator(), {_,_ ->})
 	}
 }
