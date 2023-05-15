@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EnterPasswordModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @State var animateBackground: Bool = false
@@ -76,7 +75,6 @@ struct EnterPasswordModal: View {
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focusedField = .secure
             }
         }
@@ -124,7 +122,7 @@ struct EnterPasswordModal: View {
 
 extension EnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let service: ScanTabService
         @Binding var isPresented: Bool
         @Binding var isErrorPresented: Bool
         @Binding var dataModel: MEnterPassword
@@ -136,11 +134,13 @@ extension EnterPasswordModal {
         private var cancelBag = CancelBag()
 
         init(
+            service: ScanTabService = ScanTabService(),
             isPresented: Binding<Bool>,
             isErrorPresented: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
             signature: Binding<MSignatureReady?>
         ) {
+            self.service = service
             _isPresented = isPresented
             _isErrorPresented = isErrorPresented
             _dataModel = dataModel
@@ -148,15 +148,8 @@ extension EnterPasswordModal {
             subscribeToUpdates()
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
         func onCancelTap() {
-            // Dismissing password modal goes to `Log` screen
-            navigation.performFake(navigation: .init(action: .goBack))
-            // Pretending to navigate back to `Scan` so navigation states for new QR code scan will work
-            navigation.performFake(navigation: .init(action: .navbarScan))
+            service.resetNavigationState()
             isPresented = false
         }
 
@@ -165,9 +158,9 @@ extension EnterPasswordModal {
         }
 
         func onDoneTap() {
-            let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
+            let actionResult = service.attemptPassword(password)
             // If navigation returned `enterPassword`, it means password is invalid
-            if case let .enterPassword(value) = actionResult.modalData {
+            if case let .enterPassword(value) = actionResult?.modalData {
                 if value.counter > 3 {
                     proceedtoErrorState()
                     return
@@ -177,8 +170,7 @@ extension EnterPasswordModal {
             }
             // If we got signature from navigation, we should return to camera view and there check for further
             // navigation to Transaction Details
-            if case let .signatureReady(value) = actionResult.modalData {
-                navigation.performFake(navigation: .init(action: .goBack))
+            if case let .signatureReady(value) = actionResult?.modalData {
                 isPresented = false
                 isErrorPresented = false
                 // This needs to trigger navigation to Transaction Details in parent camera view via Binding
@@ -186,18 +178,15 @@ extension EnterPasswordModal {
                 return
             }
             // If we got `Log`, we need to hide password modal, "navigate" to camera view and present
-            if case .log = actionResult.screenData {
+            if case .log = actionResult?.screenData {
                 proceedtoErrorState()
             }
         }
 
         private func proceedtoErrorState() {
-            navigation.performFake(navigation: .init(action: .goBack))
-            // Inform parent camera view to present error for too many failed attempts at password
+            service.resetNavigationState()
             isPresented = false
             isErrorPresented = true
-            // Fake navigation to camera, as were brought back to `Log` screen on navstate error handling
-            navigation.performFake(navigation: .init(action: .navbarScan))
         }
 
         private func subscribeToUpdates() {
@@ -209,37 +198,17 @@ extension EnterPasswordModal {
     }
 }
 
-struct EnterPasswordModal_Previews: PreviewProvider {
-    static var previews: some View {
-        EnterPasswordModal(
-            viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                isErrorPresented: Binding<Bool>.constant(false),
-                dataModel: Binding<MEnterPassword>.constant(
-                    .init(
-                        authorInfo: .init(
-                            base58: PreviewData.base58,
-                            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                            address: .init(
-                                path: "//polkadot",
-                                hasPwd: true,
-                                identicon: .svg(image: PreviewData.exampleIdenticon),
-                                seedName: "Parity Keys",
-                                secretExposed: true
-                            )
-                        ),
-                        networkInfo: MscNetworkInfo(
-                            networkTitle: "Polkadot",
-                            networkLogo: "polkadot",
-                            networkSpecsKey: "sr25519"
-                        ),
-                        counter: 2
-                    )
-                ),
-                signature: Binding<MSignatureReady?>.constant(nil)
+#if DEBUG
+    struct EnterPasswordModal_Previews: PreviewProvider {
+        static var previews: some View {
+            EnterPasswordModal(
+                viewModel: .init(
+                    isPresented: Binding<Bool>.constant(true),
+                    isErrorPresented: Binding<Bool>.constant(false),
+                    dataModel: Binding<MEnterPassword>.constant(.stub),
+                    signature: Binding<MSignatureReady?>.constant(nil)
+                )
             )
-        )
-        .environmentObject(NavigationCoordinator())
-//        .preferredColorScheme(.dark)
+        }
     }
-}
+#endif

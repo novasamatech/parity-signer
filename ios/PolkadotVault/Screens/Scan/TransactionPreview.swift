@@ -18,7 +18,6 @@ struct TransactionPreview: View {
     @FocusState private var focus: Bool
     @State private var isLogNoteVisible: Bool = false
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -41,7 +40,6 @@ struct TransactionPreview: View {
             }
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.onAppear()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
@@ -236,7 +234,7 @@ extension TransactionPreview {
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
-        private weak var navigation: NavigationCoordinator!
+        private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
         private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
@@ -251,7 +249,8 @@ extension TransactionPreview {
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService()
+            importKeysService: ImportDerivedKeysService = ImportDerivedKeysService(),
+            scanService: ScanTabService = ScanTabService()
         ) {
             _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
@@ -259,10 +258,7 @@ extension TransactionPreview {
             self.seedsMediator = seedsMediator
             self.snackbarPresentation = snackbarPresentation
             self.importKeysService = importKeysService
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.scanService = scanService
         }
 
         func onAppear() {
@@ -302,23 +298,22 @@ extension TransactionPreview {
         }
 
         func onBackButtonTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onDoneTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onCancelTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            scanService.resetNavigationState()
             dismissRequest.send()
         }
 
         func onApproveTap() {
-            navigation.performFake(navigation: .init(action: .goForward))
-            navigation.performFake(navigation: .init(action: .start))
+            scanService.onTransactionApprove()
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
                 snackbarPresentation.viewModel = .init(
@@ -380,19 +375,16 @@ extension TransactionPreview {
             // Single transaction
             TransactionPreview(viewModel: .init(
                 isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub],
+                signature: .stub
             ))
-            .environmentObject(NavigationCoordinator())
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
                 isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction, PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub, .stub],
+                signature: .stub
             ))
-            .environmentObject(NavigationCoordinator())
-//        .preferredColorScheme(.dark)
         }
     }
 #endif

@@ -244,81 +244,10 @@ extension TCDerivations {
         static var previews: some View {
             VStack {
                 TCDerivations(
-                    value: .constant([
-                        PreviewData.exampleSeedKeysPreview
-                    ]),
+                    value: .constant(SeedKeysPreview.stubList),
                     viewModel: .init()
                 )
             }
         }
-    }
-
-    extension PreviewData {
-        static let exampleSeedKeysPreview = SeedKeysPreview(
-            name: "Derivation 1",
-            multisigner: ["long address", "encryption"],
-            derivedKeys: [
-                .init(
-                    address: "address",
-                    derivationPath: "//kusama",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: nil,
-                    networkTitle: "Kusama",
-                    status: .alreadyExists
-                ),
-                .init(
-                    address: "GD5434gFGFD543Dgdf",
-                    derivationPath: "//westendMain",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: true,
-                    networkTitle: "Westend",
-                    status: .invalid(errors: [.badFormat])
-                ),
-                .init(
-                    address: "address",
-                    derivationPath: "//polka",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: false,
-                    networkTitle: "Polkadot",
-                    status: .importable
-                ),
-                .init(
-                    address: "address",
-                    derivationPath: "//polkadot//parachains",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: true,
-                    networkTitle: "Polkadot",
-                    status: .importable
-                ),
-                .init(
-                    address: "address",
-                    derivationPath: "",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: false,
-                    networkTitle: nil,
-                    status: .importable
-                ),
-                .init(
-                    address: "address",
-                    derivationPath: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
-                    encryption: .ed25519,
-                    genesisHash: .init([3, 4, 5]),
-                    identicon: .svg(image: PreviewData.exampleIdenticon),
-                    hasPwd: true,
-                    networkTitle: nil,
-                    status: .importable
-                )
-            ]
-        )
     }
 #endif

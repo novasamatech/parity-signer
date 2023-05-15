@@ -13,7 +13,6 @@ struct KeyDetailsActionsModal: View {
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
     @Binding var shouldPresentSelectionOverlay: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
@@ -63,27 +62,3 @@ struct KeyDetailsActionsModal: View {
         )
     }
 }
-
-// struct KeyDetailsActionsModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        KeyDetailsActionsModal(
-//            isShowingActionSheet: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator(),
-//            removeSeed: {}
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            KeyDetailsActionsModal(
-//                isShowingActionSheet: Binding<Bool>.constant(true),
-//                navigation: NavigationCoordinator(),
-//                removeSeed: {}
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

@@ -143,9 +143,3 @@ struct OldTransactionBlock: View {
         .frame(width: UIScreen.main.bounds.size.width)
     }
 }
-
-// struct HistoryCardExtended_Previews: PreviewProvider {
-// static var previews: some View {
-// HistoryCardExtended()
-// }
-// }

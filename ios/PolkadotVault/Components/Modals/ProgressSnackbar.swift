@@ -93,11 +93,14 @@ struct ProgressSnackbarDemo: View {
     }
 }
 
-struct ProgressSnackbar_Previews: PreviewProvider {
-    static var previews: some View {
-        ProgressSnackbarDemo(
-            viewModel: ProgressSnackbarViewModel()
-        )
-        .preferredColorScheme(.light)
+#if DEBUG
+    struct ProgressSnackbar_Previews: PreviewProvider {
+        static var previews: some View {
+            ProgressSnackbarDemo(
+                viewModel: ProgressSnackbarViewModel()
+            )
+            .preferredColorScheme(.light)
+        }
     }
-}
+
+#endif

@@ -87,15 +87,17 @@ struct VerticalActionsBottomModal: View {
     }
 }
 
-struct VerticalActionsBottomModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VerticalActionsBottomModal(
-                viewModel: .removeGeneralVerifier,
-                mainAction: {}(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
+#if DEBUG
+    struct VerticalActionsBottomModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VerticalActionsBottomModal(
+                    viewModel: .removeGeneralVerifier,
+                    mainAction: {}(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+            }
+            .previewLayout(.sizeThatFits)
         }
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

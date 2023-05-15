@@ -19,13 +19,15 @@ struct TCID: View {
     }
 }
 
-struct TCID_Previews: PreviewProvider {
-    static var previews: some View {
-        TCID(
-            value: MscId(
-                base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-                identicon: .svg(image: PreviewData.exampleIdenticon)
+#if DEBUG
+    struct TCID_Previews: PreviewProvider {
+        static var previews: some View {
+            TCID(
+                value: MscId(
+                    base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+                    identicon: .stubIdenticon
+                )
             )
-        )
+        }
     }
-}
+#endif

@@ -12,7 +12,6 @@ struct NetworkSettingsDetailsActionModal: View {
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentRemoveNetworkConfirmation: Bool
     @Binding var shouldSignSpecs: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(

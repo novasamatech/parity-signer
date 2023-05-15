@@ -77,29 +77,3 @@ struct FullScreenRoundedModal<Content: View>: View {
         .ignoresSafeArea(edges: ignoredEdges)
     }
 }
-
-//
-// struct FullScreenRoundedModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack {
-//            FullScreenRoundedModal {
-//                Text("Test label")
-//                    .padding()
-//                Text("Test label")
-//                    .padding()
-//            }
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            FullScreenRoundedModal {
-//                Text("Test label")
-//                    .padding()
-//                Text("Test label")
-//                    .padding()
-//            }
-//        }
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

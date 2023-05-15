@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SignSpecEnterPasswordModal: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @State var animateBackground: Bool = false
@@ -76,7 +75,6 @@ struct SignSpecEnterPasswordModal: View {
             }
             .background(Asset.backgroundTertiary.swiftUIColor)
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focusedField = .secure
             }
         }
@@ -124,7 +122,7 @@ struct SignSpecEnterPasswordModal: View {
 
 extension SignSpecEnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
+        private let service: SignSpecService
         @Binding var isPresented: Bool
         @Binding var shouldPresentError: Bool
         @Binding var dataModel: MEnterPassword
@@ -139,31 +137,24 @@ extension SignSpecEnterPasswordModal {
             isPresented: Binding<Bool>,
             shouldPresentError: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
-            detailsContent: Binding<MSufficientCryptoReady?>
+            detailsContent: Binding<MSufficientCryptoReady?>,
+            service: SignSpecService = SignSpecService()
         ) {
             _isPresented = isPresented
             _shouldPresentError = shouldPresentError
             _dataModel = dataModel
             _detailsContent = detailsContent
+            self.service = service
             subscribeToUpdates()
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
         func onCancelTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
-            isPresented = false
-        }
-
-        func onErrorDismiss() {
             isPresented = false
         }
 
         func onDoneTap() {
-            let actionResult = navigation.performFake(navigation: .init(action: .goForward, details: password))
-            switch actionResult.modalData {
+            let actionResult = service.attemptPassword(password)
+            switch actionResult?.modalData {
             case let .enterPassword(value):
                 dataModel = value
                 isValid = false
@@ -172,7 +163,6 @@ extension SignSpecEnterPasswordModal {
                 isPresented = false
                 shouldPresentError = false
             default:
-                navigation.performFake(navigation: .init(action: .goBack))
                 proceedtoErrorState()
             }
         }
@@ -191,36 +181,17 @@ extension SignSpecEnterPasswordModal {
     }
 }
 
-struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
-    static var previews: some View {
-        SignSpecEnterPasswordModal(
-            viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                shouldPresentError: Binding<Bool>.constant(false),
-                dataModel: Binding<MEnterPassword>.constant(
-                    .init(
-                        authorInfo: .init(
-                            base58: PreviewData.base58,
-                            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                            address: .init(
-                                path: "//polkadot",
-                                hasPwd: true,
-                                identicon: .svg(image: PreviewData.exampleIdenticon),
-                                seedName: "Parity Keys",
-                                secretExposed: true
-                            )
-                        ),
-                        networkInfo: MscNetworkInfo(
-                            networkTitle: "Polkadot",
-                            networkLogo: "polkadot",
-                            networkSpecsKey: "sr25519"
-                        ),
-                        counter: 2
-                    )
-                ),
-                detailsContent: .constant(nil)
+#if DEBUG
+    struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
+        static var previews: some View {
+            SignSpecEnterPasswordModal(
+                viewModel: .init(
+                    isPresented: Binding<Bool>.constant(true),
+                    shouldPresentError: Binding<Bool>.constant(false),
+                    dataModel: Binding<MEnterPassword>.constant(.stub),
+                    detailsContent: .constant(nil)
+                )
             )
-        )
-        .environmentObject(NavigationCoordinator())
+        }
     }
-}
+#endif

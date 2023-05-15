@@ -10,7 +10,6 @@ import SwiftUI
 
 struct NetworkSettingsDetails: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -20,7 +19,6 @@ struct NetworkSettingsDetails: View {
                     leftButtons: [.init(
                         type: .arrow,
                         action: {
-                            viewModel.onBackTap()
                             presentationMode.wrappedValue.dismiss()
                         }
                     )],
@@ -99,9 +97,6 @@ struct NetworkSettingsDetails: View {
                 ) { EmptyView() }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .onAppear {
-                viewModel.use(navigation: navigation)
-            }
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
@@ -314,7 +309,6 @@ private extension NetworkSettingsDetails {
 
 extension NetworkSettingsDetails {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private let cancelBag = CancelBag()
         private let snackbarPresentation: BottomSnackbarPresentation
         private let networkDetailsService: ManageNetworkDetailsService
@@ -362,14 +356,6 @@ extension NetworkSettingsDetails {
             metadataToDelete = nil
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
-        func onBackTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
-        }
-
         func onAddTap() {
             isShowingQRScanner = true
         }
@@ -391,7 +377,6 @@ extension NetworkSettingsDetails {
         func cancelMetadataRemoval() {
             metadataToDelete = nil
             isPresentingRemoveMetadataConfirmation = false
-            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         func onMoreMenuTap() {
@@ -423,7 +408,6 @@ extension NetworkSettingsDetails {
 
         func cancelNetworkRemoval() {
             isPresentingRemoveNetworkConfirmation = false
-            navigation.performFake(navigation: .init(action: .goBack))
         }
 
         private func updateView() {
@@ -440,11 +424,12 @@ extension NetworkSettingsDetails {
     }
 }
 
-struct NetworkSettingsDetails_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
-        .environmentObject(NavigationCoordinator())
+#if DEBUG
+    struct NetworkSettingsDetails_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

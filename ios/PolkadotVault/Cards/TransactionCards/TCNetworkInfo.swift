@@ -22,10 +22,12 @@ struct TCNetworkInfo: View {
     }
 }
 
-struct TCNetworkInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNetworkInfo(
-            content: MscNetworkInfo(networkTitle: "Polkadot", networkLogo: "polkadot", networkSpecsKey: "spec keys")
-        )
+#if DEBUG
+    struct TCNetworkInfo_Previews: PreviewProvider {
+        static var previews: some View {
+            TCNetworkInfo(
+                content: .stub
+            )
+        }
     }
-}
+#endif

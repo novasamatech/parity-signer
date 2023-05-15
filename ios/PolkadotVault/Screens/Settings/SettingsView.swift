@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
@@ -42,16 +41,16 @@ struct SettingsView: View {
                                 .padding(.bottom, Spacing.extraSmall)
                         }
                     }
-                    Spacer()
-                    TabBarView(
-                        selectedTab: .settings,
-                        onQRCodeTap: viewModel.onQRCodeTap
-                    )
                 }
                 .background(Asset.backgroundPrimary.swiftUIColor)
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)
-                ConnectivityAlertOverlay(viewModel: .init())
+                VStack(spacing: 0) {
+                    ConnectivityAlertOverlay(viewModel: .init())
+                    TabBarView(
+                        viewModel: viewModel.tabBarViewModel
+                    )
+                }
                 NavigationLink(
                     destination: detailView(viewModel.detailScreen)
                         .navigationBarHidden(true),
@@ -61,7 +60,6 @@ struct SettingsView: View {
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
             viewModel.loadData()
         }
@@ -107,20 +105,18 @@ extension SettingsView {
         @Published var isDetailsPresented = false
         @Published var detailScreen: SettingsItem?
         private weak var appState: AppState!
-        private weak var navigation: NavigationCoordinator!
         private let onboardingMediator: OnboardingMediator
-        let onQRCodeTap: () -> Void
+        private let settingsService: SettingsTabService
+        let tabBarViewModel: TabBarView.ViewModel
 
         init(
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
-            onQRCodeTap: @escaping () -> Void
+            settingsService: SettingsTabService = SettingsTabService(),
+            tabBarViewModel: TabBarView.ViewModel
         ) {
             self.onboardingMediator = onboardingMediator
-            self.onQRCodeTap = onQRCodeTap
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.settingsService = settingsService
+            self.tabBarViewModel = tabBarViewModel
             listenToUpdates()
         }
 
@@ -135,8 +131,7 @@ extension SettingsView {
         private func listenToUpdates() {
             $isDetailsPresented.sink { [weak self] isPresented in
                 guard let self = self, !isPresented else { return }
-                self.navigation.performFake(navigation: .init(action: .start))
-                self.navigation.performFake(navigation: .init(action: .navbarSettings))
+                self.settingsService.onSettingsTabDisplay()
             }.store(in: cancelBag)
         }
 
@@ -160,12 +155,6 @@ extension SettingsView {
                 detailScreen = .networks
                 isDetailsPresented = true
             case .verifier:
-                navigation.performFake(navigation: .init(action: .start))
-                navigation.performFake(navigation: .init(action: .navbarSettings))
-                guard case let .vVerifier(value) = navigation
-                    .performFake(navigation: .init(action: .viewGeneralVerifier)).screenData else { return }
-                navigation.performFake(navigation: .init(action: .goBack))
-                appState.userData.verifierDetails = value
                 detailScreen = .verifier
                 isDetailsPresented = true
             }
@@ -177,7 +166,7 @@ extension SettingsView {
 
         func wipe() {
             onboardingMediator.onboard()
-            navigation.perform(navigation: .init(action: .start))
+            isPresentingWipeConfirmation = false
         }
     }
 }
@@ -194,8 +183,7 @@ struct SettingsViewRenderable: Equatable {
 #if DEBUG
     struct SettingsView_Previews: PreviewProvider {
         static var previews: some View {
-            SettingsView(viewModel: .init(onQRCodeTap: {}))
-                .environmentObject(NavigationCoordinator())
+            SettingsView(viewModel: .init(tabBarViewModel: .mock))
         }
     }
 #endif

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LogsListView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
@@ -44,7 +43,6 @@ struct LogsListView: View {
             ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.loadData()
         }
         .fullScreenModal(
@@ -90,7 +88,6 @@ extension LogsListView {
         @Published var isPresentingAddNoteModal = false
         @Published var selectedDetails: MLogDetails!
         @Published var isPresentingDetails = false
-        private weak var navigation: NavigationCoordinator!
         private let logsService: LogsService
         private let snackBarPresentation: BottomSnackbarPresentation
         private let renderableBuilder: LogEntryRenderableBuilder
@@ -103,10 +100,6 @@ extension LogsListView {
             self.logsService = logsService
             self.snackBarPresentation = snackBarPresentation
             self.renderableBuilder = renderableBuilder
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func loadData() {
@@ -177,7 +170,6 @@ extension LogsListView {
     struct LogsListView_Previews: PreviewProvider {
         static var previews: some View {
             LogsListView(viewModel: .init())
-                .environmentObject(NavigationCoordinator())
         }
     }
 #endif

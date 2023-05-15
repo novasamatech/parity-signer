@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NetworkSelectionSettings: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -58,9 +57,6 @@ struct NetworkSelectionSettings: View {
             ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .fullScreenModal(
             isPresented: $viewModel.isShowingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
@@ -98,7 +94,6 @@ struct NetworkSelectionSettings: View {
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private weak var navigation: NavigationCoordinator!
         private let service: ManageNetworksService
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetails: String!
@@ -111,10 +106,6 @@ extension NetworkSelectionSettings {
             self.service = service
             updateNetworks()
             onDetailsDismiss()
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
         }
 
         func onTap(_ network: MmNetwork) {
@@ -145,11 +136,12 @@ private extension NetworkSelectionSettings.ViewModel {
     }
 }
 
-struct NetworkSelectionSettings_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
-        .environmentObject(NavigationCoordinator())
+#if DEBUG
+    struct NetworkSelectionSettings_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

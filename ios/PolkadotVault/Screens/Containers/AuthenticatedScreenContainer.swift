@@ -15,18 +15,22 @@ struct AuthenticatedScreenContainer: View {
     @State private var isShowingQRScanner: Bool = false
 
     var body: some View {
-        viewModel.mainScreenFactory.screen(
-            for: navigation.actionResult.screenData,
-            onQRCodeTap: viewModel.onQRCodeTap
-        )
+        ZStack {
+            if viewModel.selectedTab == .keys {
+                KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
+            }
+            if viewModel.selectedTab == .settings {
+                SettingsView(viewModel: .init(tabBarViewModel: tabBarViewModel()))
+            }
+        }
+        .animation(.default, value: AnimationDuration.standard)
         .fullScreenModal(
             isPresented: $viewModel.isShowingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
         ) {
             CameraView(
                 viewModel: .init(
-                    isPresented: $viewModel.isShowingQRScanner,
-                    onComplete: $viewModel.onQRScannerDismissalComplete
+                    isPresented: $viewModel.isShowingQRScanner
                 )
             )
         }
@@ -41,39 +45,33 @@ struct AuthenticatedScreenContainer: View {
             .clearModalBackground()
         }
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
             viewModel.onAppear()
         }
+    }
+
+    private func tabBarViewModel() -> TabBarView.ViewModel {
+        .init(
+            selectedTab: $viewModel.selectedTab,
+            onQRCodeTap: viewModel.onQRCodeTap,
+            onKeysTap: viewModel.onKeysTap,
+            onSettingsTap: viewModel.onSettingsTap
+        )
     }
 }
 
 extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
-        private weak var navigation: NavigationCoordinator!
         private weak var appState: AppState!
-        let mainScreenFactory: MainScreensFactory
+        private let initialisationService: AppInitialisationService
 
+        @Published var selectedTab: Tab = .keys
         @Published var isShowingQRScanner: Bool = false
-        /// Informs main view dispatcher whether we should get back to previous tab when dismissing camera view
-        /// or navigate to explicit screen
-        /// For some flow, i.e. Key Set Recovery, default navigation would not be intended
-        ///
-        /// Should be reseted after one dismissal when set to `nil`, so tab navigation is treated as default each other
-        /// time
-        @Published var qrScannerDismissUpdate: (() -> Void)?
-        @Published var onQRScannerDismissalComplete: () -> Void = {}
 
         init(
-            navigation: NavigationCoordinator = NavigationCoordinator(),
-            mainScreenFactory: MainScreensFactory = MainScreensFactory()
+            initialisationService: AppInitialisationService = AppInitialisationService()
         ) {
-            self.navigation = navigation
-            self.mainScreenFactory = mainScreenFactory
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.initialisationService = initialisationService
         }
 
         func use(appState: AppState) {
@@ -81,22 +79,26 @@ extension AuthenticatedScreenContainer {
         }
 
         func onAppear() {
-            navigation.perform(navigation: .init(action: .start))
+            initialisationService.initialiseAppSession()
         }
 
         func onQRCodeTap() {
             isShowingQRScanner = true
         }
 
+        func onKeysTap() {
+            selectedTab = .keys
+        }
+
+        func onSettingsTap() {
+            selectedTab = .settings
+        }
+
         func onDismissErrorTap() {
-            navigation.performFake(navigation: .init(action: .goBack))
+            initialisationService.resetNavigationState()
         }
 
         func onQRScannerDismiss() {
-            qrScannerDismissUpdate?()
-            qrScannerDismissUpdate = nil
-            onQRScannerDismissalComplete()
-            onQRScannerDismissalComplete = {}
             appState.userData.keyListRequiresUpdate = true
         }
     }
