@@ -9,8 +9,6 @@ import kotlinx.coroutines.launch
 
 class KeysetRecoverViewModel: ViewModel() {
 
-
-
 	fun addSeed(
 		seedName: String,
 		seedPhrase: String,
@@ -28,6 +26,10 @@ class KeysetRecoverViewModel: ViewModel() {
 	}
 
 	fun onTextEntry(newText: String) {
+//todo dmitry
+	}
 
+	fun addWord(word: String) {
+//todo dmitry
 	}
 }
