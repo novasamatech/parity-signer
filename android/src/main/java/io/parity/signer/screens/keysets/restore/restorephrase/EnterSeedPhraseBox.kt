@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.restore
+package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
