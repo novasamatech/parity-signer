@@ -22,8 +22,7 @@ internal fun SharedViewModel.tellRustSeedNames() {
 
 /**
  * Add seed, encrypt it, and create default accounts
- *
- * @param createRoots is fake and should always be true. It's added for educational reasons
+ * todo dmitry remove
  */
 @Deprecated("Use SeedRepository directly")
 fun SharedViewModel.addSeed(

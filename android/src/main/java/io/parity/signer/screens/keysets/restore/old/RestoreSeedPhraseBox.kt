@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.screens.keysets.restore.old
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
