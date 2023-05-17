@@ -47,10 +47,10 @@ fun EnterSeedPhraseBox(
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		crossAxisSpacing = 4.dp,
 		modifier = Modifier
-			.padding(horizontal = 16.dp)
+			.padding(horizontal = 8.dp)
 			.padding(top = 8.dp, bottom = 16.dp)
 			.background(MaterialTheme.colors.fill6, innerShape)
-			.padding(16.dp),
+			.padding(8.dp),
 	) {
 
 		enteredWords.onEachIndexed { index, word ->
