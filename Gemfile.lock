@@ -214,6 +214,7 @@ PLATFORMS
 
 DEPENDENCIES
   fastlane
+  xcodeproj
 
 BUNDLED WITH
    2.4.13
