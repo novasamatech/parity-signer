@@ -312,7 +312,6 @@
 		6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */; };
 		6DFE588D297A72B1002BFDBF /* JailbreakDetectionPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */; };
 		6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588E297A9F78002BFDBF /* ServiceError.swift */; };
-		FBB96B8FBED70D111694924B /* signer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5601B210EBA913225CA5160C /* signer.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -397,7 +396,6 @@
 		2DE72BD526A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		5601B210EBA913225CA5160C /* signer.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = signer.xcframework; path = Frameworks/signer.xcframework; sourceTree = SOURCE_ROOT; };
 		6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt8+Formatting.swift"; sourceTree = "<group>"; };
 		6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedScreenContainer.swift; sourceTree = "<group>"; };
 		6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
@@ -680,7 +678,6 @@
 			files = (
 				6D971ABC2941B1C600121A36 /* SVGView in Frameworks */,
 				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
-				FBB96B8FBED70D111694924B /* signer.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -883,7 +880,6 @@
 		2DE72C0B26A992D9002BB752 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5601B210EBA913225CA5160C /* signer.xcframework */,
 				2DE72C0C26A992D9002BB752 /* libresolv.tbd */,
 			);
 			name = Frameworks;
