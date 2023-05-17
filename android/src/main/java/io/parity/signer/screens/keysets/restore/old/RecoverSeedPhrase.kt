@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
+import io.parity.signer.screens.keysets.restore.restorephrase.RestoreSeedPhraseSuggest
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
@@ -59,9 +60,8 @@ fun RecoverSeedPhrase(
 
 		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseSuggest(
-			guessWord,
-			button
-		)
+			guessWord
+		) { word -> button(Action.PUSH_WORD, word) }
 		Spacer(Modifier.weight(0.1f))
 		if (recoverSeedPhrase.keyboard) {
 			BigButton(
