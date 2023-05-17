@@ -302,7 +302,6 @@
 		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
 		6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751A28B399AC0040012E /* CornerRadius.swift */; };
 		6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751D28B39F630040012E /* KeySetRow.swift */; };
-		6DF7751F28B3A0500040012E /* BuildFile in Resources */ = {isa = PBXBuildFile; };
 		6DF8316728F9BA4A00CB2BCE /* CapsuleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF8316628F9BA4A00CB2BCE /* CapsuleButton.swift */; };
 		6DF91F3E29C06B5F000A6BB2 /* Verifier+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF91F3D29C06B5F000A6BB2 /* Verifier+Show.swift */; };
 		6DF91F4029C06B70000A6BB2 /* VerifierValue+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF91F3F29C06B70000A6BB2 /* VerifierValue+Show.swift */; };
@@ -313,7 +312,7 @@
 		6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */; };
 		6DFE588D297A72B1002BFDBF /* JailbreakDetectionPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */; };
 		6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588E297A9F78002BFDBF /* ServiceError.swift */; };
-		7D314DC56C12CA507D7D1FB2 /* signer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCD9AAFCAE9459AA32EFDAAB /* signer.xcframework */; };
+		B5DE3956C3AB61120A92F0F6 /* signer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76CC4E61A07A497211460645 /* signer.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -671,7 +670,7 @@
 		6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatePublisher.swift; sourceTree = "<group>"; };
 		6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectionPublisher.swift; sourceTree = "<group>"; };
 		6DFE588E297A9F78002BFDBF /* ServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceError.swift; sourceTree = "<group>"; };
-		DCD9AAFCAE9459AA32EFDAAB /* signer.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = signer.xcframework; path = Frameworks/signer.xcframework; sourceTree = "<group>"; };
+		76CC4E61A07A497211460645 /* signer.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = signer.xcframework; path = Frameworks/signer.xcframework; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -681,7 +680,7 @@
 			files = (
 				6D971ABC2941B1C600121A36 /* SVGView in Frameworks */,
 				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
-				7D314DC56C12CA507D7D1FB2 /* signer.xcframework in Frameworks */,
+				B5DE3956C3AB61120A92F0F6 /* signer.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,7 +884,6 @@
 			isa = PBXGroup;
 			children = (
 				2DE72C0C26A992D9002BB752 /* libresolv.tbd */,
-				DCD9AAFCAE9459AA32EFDAAB /* signer.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2008,7 +2006,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6DF7751F28B3A0500040012E /* BuildFile in Resources */,
 				6D57DC6E289E524800005C63 /* Inter-SemiBold.otf in Resources */,
 				6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */,
 				6DEA1B1728D4593100D170B7 /* RobotoMono-Bold.ttf in Resources */,
@@ -2085,6 +2082,7 @@
 		};
 		6D9DECCB2A14DC120020C52A /* Build Signer framework */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
