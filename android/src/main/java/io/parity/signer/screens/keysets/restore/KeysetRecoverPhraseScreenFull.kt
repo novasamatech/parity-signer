@@ -1,10 +1,8 @@
 package io.parity.signer.screens.keysets.restore
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreenView
@@ -15,26 +13,32 @@ fun KeysetRecoverPhraseScreenFull(
 	rootNavigator: Navigator,
 	initialRecoverSeedPhrase: KeysetRecoverModel,
 ) {
-	var keySetName by remember { mutableStateOf("") }
 
-	val canProceed = keySetName.isNotEmpty() //&& !seedNames.contains(keySetName)
-	val viewModel = viewModel<KeysetRecoverViewModel>()
+	val viewModel: KeysetRecoverViewModel = viewModel()
 
-	KeysetRecoverPhraseScreenView(
-		model = initialRecoverSeedPhrase,
-		backAction = {rootNavigator.backAction()},
-		onNewInput = {newInput -> },
-		onAddSuggestedWord = {suggestedWord -> },
+	val state = viewModel.recoverState.collectAsState()
 
-//		addSeed = { seedName, //todo dmitry remove
-//								seedPhrase ->
-//			viewModel.addSeed(
-//				seedName = seedName,
-//				seedPhrase = seedPhrase,
-//				navigator = rootNavigator
-//			)
-//		}
-	)
+	LaunchedEffect(key1 = Unit) {
+		viewModel.initValue(initialRecoverSeedPhrase)
+	}
+
+	state.value?.let { state ->
+		KeysetRecoverPhraseScreenView(
+			model = initialRecoverSeedPhrase,
+			backAction = { rootNavigator.backAction() },
+			onNewInput = { newInput -> },
+			onAddSuggestedWord = { suggestedWord -> },
+			onDone = {
+				state.readySeed?.let { seedFinal ->
+					viewModel.addSeed(
+						seedName = state.seedName,
+						seedPhrase = seedFinal,
+						navigator = rootNavigator
+					)
+				}
+			}
+		)
+	}
 }
 
 

@@ -394,6 +394,7 @@
 	<string name="recovert_key_set_title">Recover Key set</string>
 	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
 	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
+    <string name="recover_key_set_subtitle">Secret Recovery Phrase</string>
 
 </resources>
 

@@ -25,7 +25,8 @@ fun KeysetRecoverPhraseScreenView(
 	backAction: Callback,
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
-//	addSeed: ( //todo check old
+	onDone: Callback,
+//	addSeed: ( //todo dmitry check old
 //		seedName: String,
 //		seedPhrase: String,
 //	) -> Unit,
@@ -41,15 +42,12 @@ fun KeysetRecoverPhraseScreenView(
 			canProceed = model.readySeed != null,
 			title = stringResource(R.string.recovert_key_set_title),
 			btnText = stringResource(R.string.generic_done),
-			onDone = {
-//				posted.value = true
-//				onDone(note.value)
-			},
+			onDone = onDone,
 			onClose = backAction,
 			backNotClose = true,
 		)
 		Text(
-			text = "Secret Recovery Phrase",//todo dmitry fix
+			text = stringResource(R.string.recover_key_set_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -83,9 +81,11 @@ fun KeysetRecoverPhraseScreenView(
 private fun PreviewKeysetRecoverPhraseScreenView() {
 	SignerNewTheme {
 		KeysetRecoverPhraseScreenView(
-			KeysetRecoverModel.stub(),
-			{},
-			{ _ -> },
-			{ _ -> })
+			model = KeysetRecoverModel.stub(),
+			backAction = {},
+			onNewInput = { _ -> },
+			onAddSuggestedWord = { _ -> },
+			onDone = {}
+		)
 	}
 }
