@@ -22,16 +22,15 @@ let package = Package(
             exclude: [
                 "Frameworks"
             ],
-            publicHeadersPath: "Signer/Generated/**",
             cSettings: [
-                .headerSearchPath("Signer/Generated/**")
+                .headerSearchPath("Signer/include/**")
             ],
             linkerSettings: [
                 .linkedLibrary("libresolv.tbd")
             ],
             plugins: ["GenerateSigner"]
         ),
-        .binaryTarget(name: "signer", path: "Signer/Frameworks/signer.xcframework"),
+        .binaryTarget(name: "signer", path: "Sources/Signer/Frameworks/signer.xcframework"),
         .plugin(
             name: "GenerateRustSigner",
             capability: .command(

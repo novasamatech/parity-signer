@@ -85,7 +85,7 @@ android/debug
 # iOS
 ios/PolkadotVault/Database/Database/*
 ios/PolkadotVault/Generated
-ios/PolkadotVault/Packages/Signer/Sources/Signer/Generated
+ios/Packages/Signer/Sources/Signer/Generated
 
 # rust
 rust/target
