@@ -17,6 +17,7 @@ import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
+import io.parity.signer.domain.navigate
 import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
@@ -153,12 +154,16 @@ fun CombinedScreensSelector(
 		}
 		//todo dmitry fix it new screen
 		is ScreenData.RecoverSeedPhrase ->
-			KeysetRecoverPhraseScreenFull(
-				initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
-				rootNavigator = rootNavigator,
-//			button = sharedViewModel::navigate, //todo dmitry remove
-//			addSeed = sharedViewModel::addSeed
-			)
+			Box(
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			) {
+				KeysetRecoverPhraseScreenFull(
+					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
+					rootNavigator = rootNavigator,
+				)
+			}
 
 		is ScreenData.Scan -> {
 			ScanNavSubgraph(

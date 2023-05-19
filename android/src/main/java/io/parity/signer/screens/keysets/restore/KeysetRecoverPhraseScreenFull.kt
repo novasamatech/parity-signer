@@ -22,7 +22,7 @@ fun KeysetRecoverPhraseScreenFull(
 
 	state.value?.let { state ->
 		KeysetRecoverPhraseScreenView(
-			model = initialRecoverSeedPhrase,
+			model = state,
 			backAction = { rootNavigator.backAction() },
 			onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
 			onAddSuggestedWord = { suggestedWord -> viewModel.addWord(suggestedWord)  },
