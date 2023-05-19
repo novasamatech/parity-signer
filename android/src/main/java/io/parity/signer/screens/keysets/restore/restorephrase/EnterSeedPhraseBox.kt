@@ -43,7 +43,6 @@ fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
 	progressWord: String,
 	onEnteredChange: (progressWord: String) -> Unit,
-	onTryProceed: Callback,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
@@ -67,15 +66,14 @@ fun EnterSeedPhraseBox(
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
 		BasicTextField(
-			modifier = Modifier
-				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = progressWord,
 			onValueChange = onEnteredChange,//todo dmitry
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
+				.padding(vertical = 8.dp, horizontal = 12.dp)
+				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
 		)
 	}
 
@@ -127,7 +125,7 @@ private fun PreviewSeedPhraseRestoreComponentFinished() {
 		"long", "text", "here", "how", "printed"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "", {}, {})
+		EnterSeedPhraseBox(entered, "", {})
 	}
 }
 
@@ -147,7 +145,7 @@ private fun PreviewSeedPhraseRestoreComponentInProgress() {
 		"long", "text", "here", "how"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "printed", {}, {})
+		EnterSeedPhraseBox(entered, "printed", {})
 	}
 }
 

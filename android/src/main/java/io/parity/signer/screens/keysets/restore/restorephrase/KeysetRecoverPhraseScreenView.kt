@@ -15,29 +15,30 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.screens.keysets.restore.KeysetRecoverModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
 @Composable
 fun KeysetRecoverPhraseScreenView(
-	recoverSeedPhrase: KeysetRecoverModel,
+	model: KeysetRecoverModel,
 	backAction: Callback,
-	addSeed: (
-		seedName: String,
-		seedPhrase: String,
-	) -> Unit,
+	onNewInput: (input: String) -> Unit,
+	onAddSuggestedWord: (input: String) -> Unit,
+//	addSeed: ( //todo check old
+//		seedName: String,
+//		seedPhrase: String,
+//	) -> Unit,
 ) {
 
 	Column(
-		Modifier
-			.fillMaxSize(1f)
-			.background(MaterialTheme.colors.background),
+        Modifier
+            .fillMaxSize(1f)
+            .background(MaterialTheme.colors.background),
 	) {
 
 		ScreenHeaderWithButton(
-			canProceed = canProceed,
+			canProceed = model.readySeed != null,
 			title = stringResource(R.string.recovert_key_set_title),
 			btnText = stringResource(R.string.generic_done),
 			onDone = {
@@ -52,19 +53,21 @@ fun KeysetRecoverPhraseScreenView(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 8.dp, bottom = 20.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = 8.dp, bottom = 20.dp),
 		)
 
 		EnterSeedPhraseBox(
-			enteredWords =, progressWord =,
-			onEnteredChange =, onTryProceed =
+			enteredWords = model.draft,
+			progressWord = model.userInput,
+			onEnteredChange = onNewInput,
 		)
-
-		RestoreSeedPhraseSuggest(guessWord =, onClicked =)
+		RestoreSeedPhraseSuggest(
+			guessWord = model.suggestedWords,
+			onClicked = onAddSuggestedWord,
+		)
 	}
 }
-
 
 
 @Preview(
@@ -81,6 +84,8 @@ private fun PreviewKeysetRecoverPhraseScreenView() {
 	SignerNewTheme {
 		KeysetRecoverPhraseScreenView(
 			KeysetRecoverModel.stub(),
-			{ _, _ -> })
+			{},
+			{ _ -> },
+			{ _ -> })
 	}
 }
