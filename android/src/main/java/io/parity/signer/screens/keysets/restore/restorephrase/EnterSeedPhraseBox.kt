@@ -102,7 +102,7 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 		Spacer(Modifier.padding(start = 6.dp))
 		Text(
 			text = word,
-			color = MaterialTheme.colors.textSecondary,
+			color = MaterialTheme.colors.primary,
 			style = PhraseWordStyle,
 		)
 	}

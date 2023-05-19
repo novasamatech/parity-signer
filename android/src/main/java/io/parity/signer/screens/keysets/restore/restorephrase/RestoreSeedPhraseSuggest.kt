@@ -29,7 +29,7 @@ fun RestoreSeedPhraseSuggest(
 	onClicked: (word: String) -> Unit,
 ) {
 	LazyRow(
-		contentPadding = PaddingValues(horizontal = 8.dp),
+		contentPadding = PaddingValues(horizontal = 16.dp),
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		modifier = modifier,
 	) {

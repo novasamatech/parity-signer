@@ -62,7 +62,6 @@ internal fun KeysetRecoverPhraseScreenView(
 		RestoreSeedPhraseSuggest(
 			guessWord = model.suggestedWords,
 			onClicked = onAddSuggestedWord,
-			modifier = Modifier.padding(horizontal = 8.dp),
 		)
 	}
 }
