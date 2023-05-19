@@ -25,7 +25,7 @@ done
 
 # Delete the existing XCFramework
 printf "Deleting existing XCFramework...\n"
-rm -rf "../../${LIB_NAME}.xcframework"
+rm -rf "../../ios/Packages/signerFFI/${LIB_NAME}.xcframework"
 
 # Create the universal XCFramework
 printf "Creating universal XCFramework...";
@@ -35,6 +35,6 @@ mkdir -p "../target/universal"
 xcodebuild -create-xcframework \
   -library "../target/aarch64-apple-ios/release/lib${LIB_NAME}.a" \
   -library "../target/x86_64-apple-ios/release/lib${LIB_NAME}.a" \
-  -output "../../ios/${LIB_NAME}.xcframework"
+  -output "../../ios/Packages/signerFFI/$${LIB_NAME}.xcframework"
 
 printf "Build completed successfully!\n";

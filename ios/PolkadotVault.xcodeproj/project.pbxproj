@@ -69,6 +69,7 @@
 		6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */; };
 		6D199C9F292A8D1100E79113 /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */; };
 		6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */; };
+		6D1ABD7E2A1653A800B24E91 /* Signer in Frameworks */ = {isa = PBXBuildFile; productRef = 6D1ABD7D2A1653A800B24E91 /* Signer */; };
 		6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */; };
 		6D25E6B129FFAD1000376AB9 /* BananaSplitRecoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */; };
 		6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6B22A02323A00376AB9 /* FullscreenModal.swift */; };
@@ -259,7 +260,6 @@
 		6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11328AD12FA004CA2FD /* Tab.swift */; };
 		6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */; };
 		6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */; };
-		6DDEF13228AE6039004CA2FD /* signer.udl in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12E28AE5EDA004CA2FD /* signer.udl */; };
 		6DDEF13C28AE7A30004CA2FD /* ApplicationInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */; };
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
 		6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */; };
@@ -308,24 +308,6 @@
 		6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588E297A9F78002BFDBF /* ServiceError.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXBuildRule section */
-		6DDEF12B28AE5D8F004CA2FD /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = "*.udl";
-			fileType = pattern.proxy;
-			inputFiles = (
-			);
-			isEditable = 1;
-			outputFiles = (
-				"$(PROJECT_DIR)/PolkadotVault/Generated/$(INPUT_FILE_BASE).swift",
-				"$(PROJECT_DIR)/PolkadotVault/Generated/$(INPUT_FILE_BASE)FFI.h",
-			);
-			runOncePerArchitecture = 0;
-			script = "# Skip during indexing phase in XCode 13+ \nif [ $ACTION == \"indexbuild\" ]; then\n  echo \"Not parsing *.udl files during indexing.\"\n  exit 0 \nfi\n\n# Skip for preview builds\nif [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Not parsing *.udl files during preview builds.\"\n  exit 0\nfi\n\n$HOME/.cargo/bin/uniffi-bindgen generate $INPUT_FILE_PATH --language swift --out-dir $PROJECT_DIR/PolkadotVault/Generated\n";
-		};
-/* End PBXBuildRule section */
-
 /* Begin PBXContainerItemProxy section */
 		2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -342,7 +324,6 @@
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkInfo.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
-		2D75EF9C280EC3B000C48FAF /* PolkadotVault-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PolkadotVault-Bridging-Header.h"; sourceTree = "<group>"; };
 		2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "terms-and-conditions.txt"; sourceTree = "<group>"; };
 		2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "privacy-policy.txt"; sourceTree = "<group>"; };
 		2DA5F8302756652600D8DD29 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
@@ -376,7 +357,6 @@
 		2DE72BCF26A588C9002BB752 /* PolkadotVaultTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolkadotVaultTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BD526A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
-		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt8+Formatting.swift"; sourceTree = "<group>"; };
 		6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedScreenContainer.swift; sourceTree = "<group>"; };
 		6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
@@ -520,6 +500,7 @@
 		6D971AC62942465C00121A36 /* QrData+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QrData+Helpers.swift"; sourceTree = "<group>"; };
 		6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAgreementsView.swift; sourceTree = "<group>"; };
 		6D9921B6297FB471004891B6 /* PasswordProtectionStatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectionStatePublisher.swift; sourceTree = "<group>"; };
+		6D9DECD42A1635600020C52A /* Signer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Signer; sourceTree = "<group>"; };
 		6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappingHStack.swift; sourceTree = "<group>"; };
 		6DA08B8729ACFC230027CFCB /* InlineTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InlineTextField.swift; sourceTree = "<group>"; };
 		6DA08B8929B614C20027CFCB /* RecoverKeySetSeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverKeySetSeedPhraseView.swift; sourceTree = "<group>"; };
@@ -594,9 +575,6 @@
 		6DDEF11328AD12FA004CA2FD /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilder.swift; sourceTree = "<group>"; };
 		6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilderTests.swift; sourceTree = "<group>"; };
-		6DDEF12E28AE5EDA004CA2FD /* signer.udl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = signer.udl; path = ../../../rust/signer/src/signer.udl; sourceTree = "<group>"; };
-		6DDEF13328AE6542004CA2FD /* signerFFI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
-		6DDEF13428AE6542004CA2FD /* signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
 		6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationInformation.swift; sourceTree = "<group>"; };
 		6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
@@ -651,7 +629,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D971ABC2941B1C600121A36 /* SVGView in Frameworks */,
-				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
+				6D1ABD7E2A1653A800B24E91 /* Signer in Frameworks */,
 				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -669,8 +647,6 @@
 		2D75EF9E280F02B900C48FAF /* Generated */ = {
 			isa = PBXGroup;
 			children = (
-				6DDEF13428AE6542004CA2FD /* signer.swift */,
-				6DDEF13328AE6542004CA2FD /* signerFFI.h */,
 				6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */,
 				6D01997D289D238700F4C317 /* Localizable.swift */,
 				6D4C0755289B369200B2EE48 /* Assets.swift */,
@@ -788,7 +764,7 @@
 		2DE72BB526A588C7002BB752 = {
 			isa = PBXGroup;
 			children = (
-				2D75EF9C280EC3B000C48FAF /* PolkadotVault-Bridging-Header.h */,
+				6D9DECD32A16354D0020C52A /* Packages */,
 				2DE72BC026A588C7002BB752 /* PolkadotVault */,
 				2DE72BD226A588C9002BB752 /* PolkadotVaultTests */,
 				2DE72BBF26A588C7002BB752 /* Products */,
@@ -857,7 +833,6 @@
 		2DE72C0B26A992D9002BB752 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2DE72C0C26A992D9002BB752 /* libresolv.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1118,7 +1093,6 @@
 			children = (
 				2D7A7BE126C3FB680053C1E0 /* Docs */,
 				6D971ABD2941B20F00121A36 /* identicon_example.svg */,
-				6DDEF12E28AE5EDA004CA2FD /* signer.udl */,
 				6D57DC57289E524800005C63 /* Localizable.strings */,
 				6D57DC59289E524800005C63 /* Assets.xcassets */,
 				6D57DC5C289E524800005C63 /* Templates */,
@@ -1433,6 +1407,14 @@
 				6D3A538D299B162F0004DDDD /* OnboardingScreenshotsView.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		6D9DECD32A16354D0020C52A /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6D9DECD42A1635600020C52A /* Signer */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 		6DA08B8B29B614EA0027CFCB /* NewKeySet */ = {
@@ -1857,7 +1839,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "PolkadotVault" */;
 			buildPhases = (
-				6DDEF13528AE65D7004CA2FD /* Build libsigner.a */,
 				6DDEF13A28AE744F004CA2FD /* Generate Database */,
 				6D4C0750289AC2F400B2EE48 /* Run SwiftGen */,
 				6DBD21F0289983DB005D539B /* Run Code Formatter */,
@@ -1867,7 +1848,6 @@
 				2DE72BBC26A588C7002BB752 /* Resources */,
 			);
 			buildRules = (
-				6DDEF12B28AE5D8F004CA2FD /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -1875,6 +1855,7 @@
 			packageProductDependencies = (
 				6D971ABB2941B1C600121A36 /* SVGView */,
 				6D971AC92942E79100121A36 /* QRCode */,
+				6D1ABD7D2A1653A800B24E91 /* Signer */,
 			);
 			productName = PolkadotVault;
 			productReference = 2DE72BBE26A588C7002BB752 /* PolkadotVault.app */;
@@ -2091,7 +2072,6 @@
 				6D4F779B29CAF55200374C83 /* SignSpecDetailsView.swift in Sources */,
 				6DF07AE229C1140500C01DE8 /* SetUpNetworksStepOneView.swift in Sources */,
 				6DF5E7A42923DD4400F2B5B4 /* Text+Markdown.swift in Sources */,
-				6DDEF13228AE6039004CA2FD /* signer.udl in Sources */,
 				6DF8316728F9BA4A00CB2BCE /* CapsuleButton.swift in Sources */,
 				6DCC572728D8C0490014278A /* BackupModal.swift in Sources */,
 				6DDD73732940471900F04CE7 /* Event+AdditionalValue.swift in Sources */,
@@ -2686,6 +2666,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6D1ABD7D2A1653A800B24E91 /* Signer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Signer;
+		};
 		6D971ABB2941B1C600121A36 /* SVGView */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6D971ABA2941B1C600121A36 /* XCRemoteSwiftPackageReference "SVGView" */;

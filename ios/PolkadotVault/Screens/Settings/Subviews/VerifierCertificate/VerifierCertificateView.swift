@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import Signer
 
 struct VerifierCertificateView: View {
     @StateObject var viewModel: ViewModel
