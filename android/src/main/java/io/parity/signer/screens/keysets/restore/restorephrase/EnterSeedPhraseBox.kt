@@ -5,13 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +48,10 @@ fun EnterSeedPhraseBox(
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
+
+	val focusManager = LocalFocusManager.current
+	val focusRequester = remember { FocusRequester() }
+
 	FlowRow(
 		mainAxisSize = SizeMode.Expand,
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
@@ -63,11 +73,18 @@ fun EnterSeedPhraseBox(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = progressWord,
 			onValueChange = onEnteredChange,//todo dmitry
+			modifier = Modifier
+				.focusRequester(focusRequester)
+				.fillMaxWidth(1f)
 		)
 	}
 
 	DisableScreenshots()
 	KeepScreenOn()
+	DisposableEffect(Unit) {
+		focusRequester.requestFocus()
+		onDispose { focusManager.clearFocus() }
+	}
 }
 
 

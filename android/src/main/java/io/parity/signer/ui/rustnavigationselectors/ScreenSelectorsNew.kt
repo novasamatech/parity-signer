@@ -26,7 +26,8 @@ import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
-import io.parity.signer.screens.keysets.restore.old.RecoverSeedPhrase
+import io.parity.signer.screens.keysets.restore.KeysetRecoverPhraseScreenFull
+import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
@@ -132,10 +133,11 @@ fun CombinedScreensSelector(
 			}
 		}
 		//todo dmitry fix it new screen
-		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
-			recoverSeedPhrase = screenData.f,
-			button = sharedViewModel::navigate,
-			addSeed = sharedViewModel::addSeed
+		is ScreenData.RecoverSeedPhrase -> KeysetRecoverPhraseScreenFull(
+			initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
+			rootNavigator = rootNavigator,
+//			button = sharedViewModel::navigate, //todo dmitry fix
+//			addSeed = sharedViewModel::addSeed
 		)
 		is ScreenData.Scan -> {
 			ScanNavSubgraph(
