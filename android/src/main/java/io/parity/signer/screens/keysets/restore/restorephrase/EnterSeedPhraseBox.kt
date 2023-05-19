@@ -66,8 +66,8 @@ fun EnterSeedPhraseBox(
 		}
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = progressWord,
-			onValueChange = onEnteredChange,//todo dmitry
+			value = " " + progressWord, //as was before, should been moved to rust but need to align with iOS
+			onValueChange = onEnteredChange,
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.fillMaxWidth(1f)
