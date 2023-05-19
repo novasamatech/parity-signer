@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -19,7 +18,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,7 +28,6 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
-import io.parity.signer.domain.Callback
 import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
@@ -35,22 +35,25 @@ import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
-import io.parity.signer.ui.theme.textSecondary
 
 
 @Composable
 fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
-	progressWord: String,
+	userInput: String,
 	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
-	val innerShape =
-		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
+	val innerShape = RoundedCornerShape(innerRound)
 
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
+
+	val seedWord = TextFieldValue(//todo dmitry check and fix
+		" " + userInput,
+		selection = TextRange(userInput.length + 1)
+	)
 
 	FlowRow(
 		mainAxisSize = SizeMode.Expand,
@@ -60,17 +63,15 @@ fun EnterSeedPhraseBox(
 			.background(MaterialTheme.colors.fill6, innerShape)
 			.padding(8.dp),
 	) {
-
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = " " + progressWord, //as was before, should been moved to rust but need to align with iOS
-			onValueChange = onEnteredChange,
+			value = seedWord, //as was before, should been moved to rust but need to align with iOS
+			onValueChange = { onEnteredChange(it.text) },
 			modifier = Modifier
 				.focusRequester(focusRequester)
-				.fillMaxWidth(1f)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
 				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
 		)

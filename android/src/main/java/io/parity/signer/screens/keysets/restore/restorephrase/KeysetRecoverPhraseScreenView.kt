@@ -2,9 +2,12 @@ package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +32,10 @@ internal fun KeysetRecoverPhraseScreenView(
 ) {
 
 	Column(
-        Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background),
+		Modifier
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
+			.verticalScroll(rememberScrollState()),
 	) {
 
 		ScreenHeaderWithButton(
@@ -47,13 +51,13 @@ internal fun KeysetRecoverPhraseScreenView(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 8.dp, bottom = 2.dp),
+				.padding(horizontal = 24.dp)
+				.padding(top = 8.dp, bottom = 2.dp),
 		)
 
 		EnterSeedPhraseBox(
 			enteredWords = model.draft,
-			progressWord = model.userInput,
+			userInput = model.userInput,
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 				.padding(top = 8.dp, bottom = 12.dp),
