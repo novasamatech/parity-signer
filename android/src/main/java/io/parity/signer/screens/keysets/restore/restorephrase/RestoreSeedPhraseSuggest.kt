@@ -25,11 +25,13 @@ import io.parity.signer.ui.theme.pink300
 @Composable
 fun RestoreSeedPhraseSuggest(
 	guessWord: List<String>,
+	modifier: Modifier = Modifier,
 	onClicked: (word: String) -> Unit,
 ) {
 	LazyRow(
 		contentPadding = PaddingValues(horizontal = 8.dp),
-		horizontalArrangement = Arrangement.spacedBy(4.dp)
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		modifier = modifier,
 	) {
 		this.items(
 			items = guessWord,
@@ -76,6 +78,6 @@ private fun SeedPhraseButton(word: String, select: () -> Unit) {
 @Composable
 private fun PreviewRestoreSeedPhraseSuggest() {
 	SignerNewTheme {
-		RestoreSeedPhraseSuggest(listOf("word1", "word2", "word3"), {})
+		RestoreSeedPhraseSuggest(listOf("word1", "word2", "word3"), Modifier, {})
 	}
 }

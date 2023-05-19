@@ -48,17 +48,21 @@ internal fun KeysetRecoverPhraseScreenView(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 8.dp, bottom = 20.dp),
+                .padding(top = 8.dp, bottom = 2.dp),
 		)
 
 		EnterSeedPhraseBox(
 			enteredWords = model.draft,
 			progressWord = model.userInput,
+			modifier = Modifier
+				.padding(horizontal = 16.dp)
+				.padding(top = 8.dp, bottom = 12.dp),
 			onEnteredChange = onNewInput,
 		)
 		RestoreSeedPhraseSuggest(
 			guessWord = model.suggestedWords,
 			onClicked = onAddSuggestedWord,
+			modifier = Modifier.padding(horizontal = 8.dp),
 		)
 	}
 }

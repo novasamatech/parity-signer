@@ -42,6 +42,7 @@ import io.parity.signer.ui.theme.textSecondary
 fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
 	progressWord: String,
+	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
@@ -55,9 +56,7 @@ fun EnterSeedPhraseBox(
 		mainAxisSize = SizeMode.Expand,
 		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		crossAxisSpacing = 4.dp,
-		modifier = Modifier
-			.padding(horizontal = 8.dp)
-			.padding(top = 8.dp, bottom = 16.dp)
+		modifier = modifier
 			.background(MaterialTheme.colors.fill6, innerShape)
 			.padding(8.dp),
 	) {
@@ -125,7 +124,7 @@ private fun PreviewSeedPhraseRestoreComponentFinished() {
 		"long", "text", "here", "how", "printed"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "", {})
+		EnterSeedPhraseBox(entered, "", Modifier, {})
 	}
 }
 
@@ -145,7 +144,7 @@ private fun PreviewSeedPhraseRestoreComponentInProgress() {
 		"long", "text", "here", "how"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "printed", {})
+		EnterSeedPhraseBox(entered, "printed", Modifier, {})
 	}
 }
 
