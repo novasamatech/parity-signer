@@ -20,16 +20,12 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
 @Composable
-fun KeysetRecoverPhraseScreenView(
+internal fun KeysetRecoverPhraseScreenView(
 	model: KeysetRecoverModel,
 	backAction: Callback,
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
-//	addSeed: ( //todo dmitry check old
-//		seedName: String,
-//		seedPhrase: String,
-//	) -> Unit,
 ) {
 
 	Column(

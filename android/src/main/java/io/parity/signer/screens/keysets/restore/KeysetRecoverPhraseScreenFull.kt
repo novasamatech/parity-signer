@@ -13,9 +13,7 @@ fun KeysetRecoverPhraseScreenFull(
 	rootNavigator: Navigator,
 	initialRecoverSeedPhrase: KeysetRecoverModel,
 ) {
-
 	val viewModel: KeysetRecoverViewModel = viewModel()
-
 	val state = viewModel.recoverState.collectAsState()
 
 	LaunchedEffect(key1 = Unit) {
@@ -26,8 +24,8 @@ fun KeysetRecoverPhraseScreenFull(
 		KeysetRecoverPhraseScreenView(
 			model = initialRecoverSeedPhrase,
 			backAction = { rootNavigator.backAction() },
-			onNewInput = { newInput -> },
-			onAddSuggestedWord = { suggestedWord -> },
+			onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
+			onAddSuggestedWord = { suggestedWord -> viewModel.onTextEntry(suggestedWord)  },
 			onDone = {
 				state.readySeed?.let { seedFinal ->
 					viewModel.addSeed(
