@@ -68,6 +68,8 @@ enum Heights {
     static let onboardingAgreementRecord: CGFloat = 52
 
     static let signSpecsListRowHeight: CGFloat = 96
+
+    static let createKeyNetworkItemHeight: CGFloat = 64
 }
 
 enum Sizes {

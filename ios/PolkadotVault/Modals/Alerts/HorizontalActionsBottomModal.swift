@@ -122,20 +122,22 @@ struct HorizontalActionsBottomModal: View {
     }
 }
 
-struct HorizontalActionsBottomModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            HorizontalActionsBottomModal(
-                viewModel: .forgetKeySet,
-                mainAction: {}(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            HorizontalActionsBottomModal(
-                viewModel: .forgetSingleKey,
-                mainAction: {}(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
+#if DEBUG
+    struct HorizontalActionsBottomModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                HorizontalActionsBottomModal(
+                    viewModel: .forgetKeySet,
+                    mainAction: {}(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+                HorizontalActionsBottomModal(
+                    viewModel: .forgetSingleKey,
+                    mainAction: {}(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+            }
+            .previewLayout(.sizeThatFits)
         }
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

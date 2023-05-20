@@ -27,12 +27,10 @@ struct TCTXSpecPlain: View {
     }
 }
 
-struct TCTXSpecPlain_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTXSpecPlain(content: MscTxSpecPlain(
-            networkGenesisHash: .init([3, 4, 5]),
-            version: "9230",
-            txVersion: "tx9230"
-        ))
+#if DEBUG
+    struct TCTXSpecPlain_Previews: PreviewProvider {
+        static var previews: some View {
+            TCTXSpecPlain(content: .stub)
+        }
     }
-}
+#endif

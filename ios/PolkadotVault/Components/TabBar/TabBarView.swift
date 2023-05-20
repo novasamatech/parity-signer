@@ -12,28 +12,22 @@ import SwiftUI
 /// `body` should rely on system `TabView` or its subclass, when navigation is moved to native system
 struct TabBarView: View {
     @Environment(\.colorScheme) var deviceColorScheme: ColorScheme
-
-    /// Handles navigation when `Tab` is selected
-    @EnvironmentObject private var navigation: NavigationCoordinator
-    /// View model reflecting selected tab in bottom navigation
-    ///
-    /// For now this value is based on `FooterButton` from `ActionResult`, but when navigation is moved
-    /// to native system this should be `private let` and not derived from external view models
-    @Binding var selectedTab: Tab
-
-    private let viewModelBuilder = TabViewModelBuilder()
+    @StateObject var viewModel: ViewModel
 
     var body: some View {
         HStack {
-            ForEach(Tab.allCases, id: \.self) { tab in
-                if tab == .scanner {
-                    CentralTabBarButton(viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab))
-                } else {
-                    TabBarButton(
-                        viewModel: viewModelBuilder.build(for: tab, isSelected: tab == selectedTab)
-                    )
-                }
-            }
+            TabBarButton(
+                viewModel: viewModel.keysTab,
+                onTap: viewModel.onKeysTap
+            )
+            CentralTabBarButton(
+                viewModel: viewModel.scannerTab,
+                onQRCodeTap: viewModel.onQRCodeTap
+            )
+            TabBarButton(
+                viewModel: viewModel.settingsTab,
+                onTap: viewModel.onSettingsTap
+            )
         }
         .frame(height: Heights.tabbarHeight)
         .background(Asset.backgroundSecondary.swiftUIColor)
@@ -41,30 +35,56 @@ struct TabBarView: View {
             Divider().background(deviceColorScheme == .dark ? Asset.fill30LightOnly.swiftUIColor : Color.clear),
             alignment: .top
         )
+        .onChange(of: viewModel.selectedTab, perform: viewModel.onTabChange(_:))
+    }
+}
+
+extension TabBarView {
+    final class ViewModel: ObservableObject {
+        let onQRCodeTap: () -> Void
+        let onKeysTap: () -> Void
+        let onSettingsTap: () -> Void
+        @Binding var selectedTab: Tab
+        @Published var keysTab: TabViewModel!
+        @Published var scannerTab: TabViewModel = TabViewModelBuilder().build(for: .scanner, isSelected: false)
+        @Published var settingsTab: TabViewModel!
+
+        init(
+            selectedTab: Binding<Tab>,
+            onQRCodeTap: @escaping () -> Void,
+            onKeysTap: @escaping () -> Void,
+            onSettingsTap: @escaping () -> Void
+        ) {
+            _selectedTab = selectedTab
+            self.onQRCodeTap = onQRCodeTap
+            self.onKeysTap = onKeysTap
+            self.onSettingsTap = onSettingsTap
+            onTabChange(selectedTab.wrappedValue)
+        }
+
+        func onTabChange(_ tab: Tab) {
+            keysTab = TabViewModelBuilder().build(for: .keys, isSelected: tab == .keys)
+            settingsTab = TabViewModelBuilder().build(for: .settings, isSelected: tab == .settings)
+        }
     }
 }
 
 /// View mimicing single `.tabItem()` within `TabView` equivalent view (here: TabBarView)
 private struct TabBarButton: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
-
     private let viewModel: TabViewModel
+    let onTap: () -> Void
 
     init(
-        viewModel: TabViewModel
+        viewModel: TabViewModel,
+        onTap: @escaping () -> Void
     ) {
         self.viewModel = viewModel
+        self.onTap = onTap
     }
 
     var body: some View {
         Button(
-            action: {
-                if let action = viewModel.action {
-                    navigation.perform(navigation: .init(action: action))
-                } else {
-                    navigation.shouldPresentQRScanner.toggle()
-                }
-            },
+            action: onTap,
             label: {
                 VStack {
                     viewModel.icon
@@ -86,25 +106,20 @@ private struct TabBarButton: View {
 
 /// View mimicing single `.tabItem()` within `TabView` equivalent view (here: TabBarView)
 private struct CentralTabBarButton: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
-
     private let viewModel: TabViewModel
+    let onQRCodeTap: () -> Void
 
     init(
-        viewModel: TabViewModel
+        viewModel: TabViewModel,
+        onQRCodeTap: @escaping () -> Void
     ) {
         self.viewModel = viewModel
+        self.onQRCodeTap = onQRCodeTap
     }
 
     var body: some View {
         Button(
-            action: {
-                if let action = viewModel.action {
-                    navigation.perform(navigation: .init(action: action))
-                } else {
-                    navigation.shouldPresentQRScanner.toggle()
-                }
-            },
+            action: onQRCodeTap,
             label: {
                 viewModel.icon
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
@@ -121,14 +136,20 @@ private struct CentralTabBarButton: View {
     }
 }
 
-/// To test preview with different `Tab` selected, just substitute `selectedTab` with
-/// `Binding<Tab>.constant(<any enum Tab value here>)`
-struct TabBarView_Previews: PreviewProvider {
-    static var previews: some View {
-        TabBarView(
-            selectedTab: Binding<Tab>.constant(.keys)
-        )
-        .previewLayout(.sizeThatFits)
-        .environmentObject(NavigationCoordinator())
+#if DEBUG
+    struct TabBarView_Previews: PreviewProvider {
+        static var previews: some View {
+            TabBarView(viewModel: .mock)
+                .previewLayout(.sizeThatFits)
+        }
     }
+#endif
+
+extension TabBarView.ViewModel {
+    static let mock = TabBarView.ViewModel(
+        selectedTab: .constant(.keys),
+        onQRCodeTap: {},
+        onKeysTap: {},
+        onSettingsTap: {}
+    )
 }

@@ -20,7 +20,7 @@ final class ManageNetworksService {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarSettings))
         guard case let .manageNetworks(value) = navigation
-            .performFake(navigation: .init(action: .manageNetworks)).screenData else { return [] }
+            .performFake(navigation: .init(action: .manageNetworks))?.screenData else { return [] }
         return value.networks
     }
 }

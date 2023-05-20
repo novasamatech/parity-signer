@@ -12,16 +12,18 @@ struct PublicKeyActionsModal: View {
     @Binding private var shouldPresentExportKeysWarningModal: Bool
     @Binding private var isShowingActionSheet: Bool
     @Binding private var shouldPresentRemoveConfirmationModal: Bool
-    @EnvironmentObject private var navigation: NavigationCoordinator
+    private let isExportKeyAvailable: Bool
 
     init(
         shouldPresentExportKeysWarningModal: Binding<Bool> = Binding<Bool>.constant(false),
         isShowingActionSheet: Binding<Bool> = Binding<Bool>.constant(false),
-        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false)
+        shouldPresentRemoveConfirmationModal: Binding<Bool> = Binding<Bool>.constant(false),
+        isExportKeyAvailable: Bool
     ) {
         _shouldPresentExportKeysWarningModal = shouldPresentExportKeysWarningModal
         _isShowingActionSheet = isShowingActionSheet
         _shouldPresentRemoveConfirmationModal = shouldPresentRemoveConfirmationModal
+        self.isExportKeyAvailable = isExportKeyAvailable
     }
 
     var body: some View {
@@ -30,9 +32,7 @@ struct PublicKeyActionsModal: View {
             animateBackground: $animateBackground,
             content: {
                 VStack(alignment: .leading, spacing: 0) {
-                    // Don't show `Export Private Key` if intermediate state is broken or when key is password protected
-                    if let currentKeyDetails = navigation.currentKeyDetails,
-                       currentKeyDetails.address.hasPwd == false {
+                    if isExportKeyAvailable {
                         ActionSheetButton(
                             action: {
                                 animateDismissal {
@@ -73,23 +73,26 @@ struct PublicKeyActionsModal: View {
     }
 }
 
-struct PublicKeyActionsModal_Previews: PreviewProvider {
-    static var previews: some View {
-        PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true)
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack {
+#if DEBUG
+    struct PublicKeyActionsModal_Previews: PreviewProvider {
+        static var previews: some View {
             PublicKeyActionsModal(
-                isShowingActionSheet: Binding<Bool>.constant(true)
+                isShowingActionSheet: Binding<Bool>.constant(true),
+                isExportKeyAvailable: true
             )
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack {
+                PublicKeyActionsModal(
+                    isShowingActionSheet: Binding<Bool>.constant(true),
+                    isExportKeyAvailable: false
+                )
+                .preferredColorScheme(.light)
+                .previewLayout(.sizeThatFits)
+            }
+            .background(.black)
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)
         }
-        .background(.black)
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
-        .environmentObject(NavigationCoordinator())
     }
-}
+#endif

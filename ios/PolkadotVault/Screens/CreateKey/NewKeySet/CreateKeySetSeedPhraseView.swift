@@ -73,7 +73,7 @@ struct CreateKeySetSeedPhraseView: View {
             }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingInfo
         ) {
             ErrorBottomModal(
@@ -135,7 +135,7 @@ extension CreateKeySetSeedPhraseView {
                         awesome change room lottery song useless elephant dry educate type debate
                         season give exact gift push bid rich atom system pig put welcome exit
                         """,
-                        identicon: .svg(image: PreviewData.exampleIdenticon)
+                        identicon: .stubIdenticon
                     ),
                     isPresented: .constant(true)
                 )

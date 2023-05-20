@@ -163,6 +163,47 @@ class UniffiInteractor(val appContext: Context) {
 				UniffiResult.Error(e)
 			}
 		}
+
+	suspend fun getLogs(): UniffiResult<MLog> =
+	withContext(Dispatchers.IO) {
+		try {
+			val validationResult = io.parity.signer.uniffi.getLogs()
+			UniffiResult.Success(validationResult)
+		} catch (e: ErrorDisplayed) {
+			UniffiResult.Error(e)
+		}
+	}
+
+	suspend fun getLogDetails(logIndex: UInt): UniffiResult<MLogDetails> =
+		withContext(Dispatchers.IO) {
+			try {
+				val validationResult = io.parity.signer.uniffi.getLogDetails(logIndex)
+				UniffiResult.Success(validationResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun clearLogHistory(): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val validationResult = io.parity.signer.uniffi.clearLogHistory()
+				UniffiResult.Success(validationResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun addCommentToLogs(userComment: String): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val validationResult = io.parity.signer.uniffi.handleLogComment(userComment)
+				UniffiResult.Success(validationResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 }
 
 sealed class UniffiResult<T> {
@@ -173,6 +214,12 @@ sealed class UniffiResult<T> {
 sealed class OperationResult<out T, out E> {
 	data class Ok<out T>(val result: T) : OperationResult<T, Nothing>()
 	data class Err<out E>(val error: E) : OperationResult<Nothing, E>()
+}
+
+sealed class CompletableResult<out T, out E>{
+	data class Ok<out T>(val result: T): CompletableResult<T, Nothing>()
+	data class Err<out E>(val error: E) : CompletableResult<Nothing, E>()
+	object InProgress: CompletableResult<Nothing, Nothing>()
 }
 
 fun <T> UniffiResult<T>.mapError(): T? {

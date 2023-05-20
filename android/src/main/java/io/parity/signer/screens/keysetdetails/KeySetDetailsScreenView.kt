@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar2
-import io.parity.signer.components.panels.BottomBar2State
+import io.parity.signer.components.panels.BottomBar
+import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandable
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
@@ -51,7 +51,7 @@ fun KeySetDetailsScreenView(
 	Column {
 		KeySetDetailsHeader(
 			onAddKey = {
-				navigator.navigate(Action.NEW_KEY, "") //new derived key
+				navigator.navigate(Action.NEW_KEY) //new derived key
 			},
 			onBack = { navigator.backAction() },
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
@@ -108,7 +108,7 @@ fun KeySetDetailsScreenView(
 					.padding(end = 16.dp, bottom = 24.dp)
 			)
 		}
-		BottomBar2(navigator, BottomBar2State.KEYS)
+		BottomBar(navigator, BottomBarState.KEYS)
 	}
 }
 

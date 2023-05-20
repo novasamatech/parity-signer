@@ -79,8 +79,10 @@ extension DevicePincodeRequired {
     }
 }
 
-struct DevicePincodeRequired_Previews: PreviewProvider {
-    static var previews: some View {
-        DevicePincodeRequired(viewModel: .init())
+#if DEBUG
+    struct DevicePincodeRequired_Previews: PreviewProvider {
+        static var previews: some View {
+            DevicePincodeRequired(viewModel: .init())
+        }
     }
-}
+#endif

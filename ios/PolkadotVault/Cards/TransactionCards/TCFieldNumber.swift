@@ -54,13 +54,10 @@ private extension MscFieldNumber {
     }
 }
 
-struct TCFieldNumber_Previews: PreviewProvider {
-    static var previews: some View {
-        TCFieldNumber(value: MscFieldNumber(
-            number: "number",
-            docsFieldNumber: "docsFieldNumber",
-            pathType: "pathType",
-            docsType: PreviewData.exampleMarkdownDocs
-        ))
+#if DEBUG
+    struct TCFieldNumber_Previews: PreviewProvider {
+        static var previews: some View {
+            TCFieldNumber(value: .stub)
+        }
     }
-}
+#endif

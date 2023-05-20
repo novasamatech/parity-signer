@@ -10,6 +10,7 @@ import SwiftUI
 struct TCCall: View {
     let value: MscCall
     @State private var showDoc = false
+
     var body: some View {
         Button(
             action: {
@@ -46,8 +47,10 @@ struct TCCall: View {
     }
 }
 
-struct TCCall_Previews: PreviewProvider {
-    static var previews: some View {
-        TCCall(value: MscCall(methodName: "method name", docs: PreviewData.exampleMarkdownDocs))
+#if DEBUG
+    struct TCCall_Previews: PreviewProvider {
+        static var previews: some View {
+            TCCall(value: .stub)
+        }
     }
-}
+#endif

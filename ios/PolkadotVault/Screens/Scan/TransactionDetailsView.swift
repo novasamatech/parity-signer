@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TransactionDetailsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,9 +32,6 @@ struct TransactionDetailsView: View {
                 .padding(.horizontal, Spacing.large)
             }
         }
-        .onAppear {
-            viewModel.use(navigation: navigation)
-        }
         .background(Asset.backgroundPrimary.swiftUIColor)
     }
 }
@@ -43,7 +39,6 @@ struct TransactionDetailsView: View {
 extension TransactionDetailsView {
     final class ViewModel: ObservableObject {
         @Binding var isPresented: Bool
-        private weak var navigation: NavigationCoordinator!
 
         let transaction: MTransaction
 
@@ -55,18 +50,8 @@ extension TransactionDetailsView {
             self.transaction = transaction
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
         func onBackButtonTap() {
             isPresented = false
         }
     }
 }
-
-// struct TransactionPreview_Previews: PreviewProvider {
-// static var previews: some View {
-//     TransactionDetailsView(viewModel: .init(isPresented: Binding<Bool>.constant(true), transaction: .init(content: MTransaction(content: .init(author: nil, error: nil, extensions: <#T##[TransactionCard]?#>, importingDerivations: <#T##[TransactionCard]?#>, message: <#T##[TransactionCard]?#>, meta: <#T##[TransactionCard]?#>, method: [.init(index: 1, indent: 1, card:.met)], newSpecs: <#T##[TransactionCard]?#>, verifier: <#T##[TransactionCard]?#>, warning: <#T##[TransactionCard]?#>, typesInfo: <#T##[TransactionCard]?#>), ttype: .sign, authorInfo: nil, networkInfo: nil))))
-// }
-// }

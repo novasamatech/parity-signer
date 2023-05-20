@@ -62,22 +62,12 @@ struct TCAddNewNetwork: View {
     }
 }
 
-struct TCAddNewNetwork_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAddNewNetwork(
-            value: NetworkSpecs(
-                base58prefix: 231,
-                color: "black",
-                decimals: 4,
-                encryption: .sr25519,
-                genesisHash: H256(repeating: 3, count: 4),
-                logo: "polkadot",
-                name: "polkadot",
-                pathId: "1",
-                secondaryColor: "pink",
-                title: "Polka",
-                unit: "DOT"
+#if DEBUG
+    struct TCAddNewNetwork_Previews: PreviewProvider {
+        static var previews: some View {
+            TCAddNewNetwork(
+                value: .stub
             )
-        )
+        }
     }
-}
+#endif

@@ -54,16 +54,18 @@ struct TCFieldName: View {
     }
 }
 
-struct TCFieldName_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            TCFieldName(value: MscFieldName(
-                name: "Namefdsfds",
-                docsFieldName: "docsfieldname",
-                pathType: "pathType",
-                docsType: "docsType"
-            ))
+#if DEBUG
+    struct TCFieldName_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                TCFieldName(value: MscFieldName(
+                    name: "Namefdsfds",
+                    docsFieldName: "docsfieldname",
+                    pathType: "pathType",
+                    docsType: "docsType"
+                ))
+            }
+            .preferredColorScheme(.dark)
         }
-        .preferredColorScheme(.dark)
     }
-}
+#endif

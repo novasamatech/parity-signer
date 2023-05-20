@@ -174,12 +174,13 @@ extension NetworkSelectionModal {
     }
 }
 
+#if DEBUG
 struct NetworkSelectionModal_Previews: PreviewProvider {
     static var previews: some View {
         NetworkSelectionModal(
             viewModel: .init(isPresented: Binding<Bool>.constant(true))
         )
-        .environmentObject(NavigationCoordinator())
         .environmentObject(AppState.preview)
     }
 }
+#endif

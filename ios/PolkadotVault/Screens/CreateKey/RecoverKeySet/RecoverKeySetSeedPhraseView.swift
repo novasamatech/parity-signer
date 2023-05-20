@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RecoverKeySetSeedPhraseView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject var navigation: NavigationCoordinator
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @FocusState private var focus: Bool
 
     var body: some View {
@@ -17,12 +17,7 @@ struct RecoverKeySetSeedPhraseView: View {
             NavigationBarView(
                 viewModel: .init(
                     title: Localizable.RecoverSeedPhrase.Label.title.string,
-                    leftButtons: [
-                        .init(
-                            type: .arrow,
-                            action: viewModel.onBackTap
-                        )
-                    ],
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: [.init(
                         type: .activeAction(
                             Localizable.RecoverSeedPhrase.Action.done.key,
@@ -73,10 +68,9 @@ struct RecoverKeySetSeedPhraseView: View {
                 }
             }
             .onAppear {
-                viewModel.use(navigation: navigation)
                 focus = true
             }
-            .fullScreenCover(
+            .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
                 ErrorBottomModal(
@@ -175,8 +169,8 @@ extension RecoverKeySetSeedPhraseView {
         private let seedsMediator: SeedsMediating
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
-        private weak var navigation: NavigationCoordinator!
-
+        private let service: RecoverKeySetService
+        @Binding var isPresented: Bool
         @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = " "
         @Published var previousUserInput: String = " "
@@ -193,24 +187,19 @@ extension RecoverKeySetSeedPhraseView {
 
         init(
             content: MRecoverSeedPhrase,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            isPresented: Binding<Bool>,
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            service: RecoverKeySetService = RecoverKeySetService()
         ) {
             self.content = content
             self.seedsMediator = seedsMediator
+            self.service = service
+            _isPresented = isPresented
             regenerateGrid()
         }
 
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-        }
-
-        func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
-        }
-
         func onGuessTap(_ guess: String) {
-            let result = navigation.performFake(navigation: .init(action: .pushWord, details: guess))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard let updatedContent = service.updateGuess(guess) else { return }
             content = updatedContent
             userInput = " "
         }
@@ -219,8 +208,7 @@ extension RecoverKeySetSeedPhraseView {
             guard !shouldSkipUpdate else { return }
             shouldSkipUpdate = true
             let wordToSend = word.isEmpty && !previousUserInput.isEmpty ? " " : word
-            let result = navigation.performFake(navigation: .init(action: .textEntry, details: wordToSend))
-            guard case let .recoverSeedPhrase(updatedContent) = result.screenData else { return }
+            guard let updatedContent = service.onUserEntry(wordToSend) else { return }
             content = updatedContent
             if content.userInput != userInput {
                 userInput = content.userInput
@@ -244,11 +232,8 @@ extension RecoverKeySetSeedPhraseView {
                 seedPhrase: seedPhrase,
                 shouldCheckForCollision: false
             )
-            navigation.perform(navigation: .init(
-                action: .goForward,
-                details: BackendConstants.true,
-                seedPhrase: seedPhrase
-            ))
+            service.finishKeySetRecover(seedPhrase)
+            isPresented = false
         }
 
         private func regenerateGrid() {

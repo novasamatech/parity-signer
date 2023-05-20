@@ -48,27 +48,29 @@ struct InlineButton: View {
     }
 }
 
-struct InlineButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            InlineButton(
-                action: {},
-                icon: Asset.add.swiftUIImage,
-                text: Localizable.TransactionSign.Action.note.string
-            )
-            .padding(10)
+#if DEBUG
+    struct InlineButton_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                InlineButton(
+                    action: {},
+                    icon: Asset.add.swiftUIImage,
+                    text: Localizable.TransactionSign.Action.note.string
+                )
+                .padding(10)
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack(alignment: .leading, spacing: 10) {
+                InlineButton(
+                    action: {},
+                    icon: Asset.add.swiftUIImage,
+                    text: Localizable.TransactionSign.Action.note.string
+                )
+                .padding(10)
+            }
+            .preferredColorScheme(.light)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack(alignment: .leading, spacing: 10) {
-            InlineButton(
-                action: {},
-                icon: Asset.add.swiftUIImage,
-                text: Localizable.TransactionSign.Action.note.string
-            )
-            .padding(10)
-        }
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

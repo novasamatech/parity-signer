@@ -88,7 +88,7 @@ struct DerivedKeyOverviewRow: View {
             VStack(alignment: .leading) {
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         path: "",
                         hasPassword: false,
                         network: "Kusama",
@@ -97,7 +97,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         path: "//polkadot",
                         hasPassword: false,
                         network: "Polkadot",
@@ -106,7 +106,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         path: "//astar",
                         hasPassword: false,
                         network: "Astar",
@@ -115,7 +115,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         path: "//kusama",
                         hasPassword: true,
                         network: "Kusama",
@@ -124,7 +124,7 @@ struct DerivedKeyOverviewRow: View {
                 )
                 DerivedKeyOverviewRow(
                     DerivedKeyOverviewViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         path: "//kusama//verylongpathsolongthatmightbemultilineandhaspasswordtoo",
                         hasPassword: true,
                         network: "Kusama",

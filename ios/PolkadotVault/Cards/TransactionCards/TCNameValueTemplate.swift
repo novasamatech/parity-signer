@@ -55,14 +55,16 @@ struct TCNamedValueCard: View {
     }
 }
 
-struct TCNamedValueCard_Previews: PreviewProvider {
-    static var previews: some View {
-        TCNamedValueCard(name: "Name", value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq")
-        TCNamedValueCard(name: "Name", value: "value")
-        TCNamedValueCard(
-            name: "Name",
-            value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-            valueInSameLine: false
-        )
+#if DEBUG
+    struct TCNamedValueCard_Previews: PreviewProvider {
+        static var previews: some View {
+            TCNamedValueCard(name: "Name", value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq")
+            TCNamedValueCard(name: "Name", value: "value")
+            TCNamedValueCard(
+                name: "Name",
+                value: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+                valueInSameLine: false
+            )
+        }
     }
-}
+#endif

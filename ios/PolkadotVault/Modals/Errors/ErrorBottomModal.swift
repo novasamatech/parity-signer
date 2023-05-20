@@ -122,40 +122,34 @@ struct ErrorBottomModal: View {
     }
 }
 
-struct ErrorBottomModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            // Connectivity
-            ErrorBottomModal(
-                viewModel: .connectivityOn(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            ErrorBottomModal(
-                viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            // General Error
-            ErrorBottomModal(
-                viewModel: .alertError(
-                    message: PreviewData.exampleErrorMessage
-                ),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            // Key Set Management
-            ErrorBottomModal(
-                viewModel: .seedPhraseAlreadyExists(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            ErrorBottomModal(
-                viewModel: .derivedKeysInfo(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
-            ErrorBottomModal(
-                viewModel: .derivationPathsInfo(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
+#if DEBUG
+    struct ErrorBottomModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                // Connectivity
+                ErrorBottomModal(
+                    viewModel: .connectivityOn(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+                ErrorBottomModal(
+                    viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+                // General Error
+                ErrorBottomModal(
+                    viewModel: .alertError(
+                        message: Stubs.stubErrorMessage
+                    ),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+                // Key Set Management
+                ErrorBottomModal(
+                    viewModel: .seedPhraseAlreadyExists(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

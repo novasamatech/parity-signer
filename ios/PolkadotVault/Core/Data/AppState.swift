@@ -17,33 +17,28 @@ final class AppState: ObservableObject {
 
 extension AppState {
     final class UserData {
-        var keysData: MKeysNew?
         var allNetworks: [MmNetwork] = []
         var selectedNetworks: [MmNetwork] = []
-        var verifierDetails: MVerifierDetails!
-        var manageNetworks: MManageNetworks!
+        @Published var keyListRequiresUpdate: Bool
 
         init(
-            keysData: MKeysNew? = nil,
             allNetworks: [MmNetwork] = [],
             selectedNetworks: [MmNetwork] = [],
-            verifierDetails: MVerifierDetails! = nil,
-            manageNetworks: MManageNetworks! = nil
+            keyListRequiresUpdate: Bool = false
         ) {
-            self.keysData = keysData
             self.allNetworks = allNetworks
             self.selectedNetworks = selectedNetworks
-            self.verifierDetails = verifierDetails
-            self.manageNetworks = manageNetworks
+            _keyListRequiresUpdate = .init(initialValue: keyListRequiresUpdate)
         }
     }
 }
 
-extension AppState {
-    static let preview = AppState(
-        userData: UserData(
-            keysData: PreviewData.mKeyNew,
-            allNetworks: PreviewData.networks
+#if DEBUG
+    extension AppState {
+        static let preview = AppState(
+            userData: UserData(
+                allNetworks: MmNetwork.stubList
+            )
         )
-    )
-}
+    }
+#endif

@@ -5,47 +5,13 @@
 //  Created by Krzysztof Rodak on 13/09/2022.
 //
 
+import Combine
 import SwiftUI
-
-struct KeyDetailsPublicKeyViewModel: Equatable {
-    let qrCodes: [[UInt8]]
-    let footer: QRCodeAddressFooterViewModel
-    let isKeyExposed: Bool
-    let isRootKey: Bool
-
-    init(_ keyDetails: MKeyDetails) {
-        qrCodes = [keyDetails.qr.payload]
-        footer = .init(
-            identicon: keyDetails.address.identicon,
-            rootKeyName: keyDetails.address.seedName,
-            path: keyDetails.address.path,
-            hasPassword: keyDetails.address.hasPwd,
-            network: keyDetails.networkInfo.networkTitle,
-            networkLogo: keyDetails.networkInfo.networkLogo,
-            base58: keyDetails.base58
-        )
-        isKeyExposed = keyDetails.address.secretExposed
-        isRootKey = keyDetails.isRootKey
-    }
-
-    init(
-        qrCodes: [[UInt8]],
-        footer: QRCodeAddressFooterViewModel,
-        isKeyExposed: Bool,
-        isRootKey: Bool
-    ) {
-        self.qrCodes = qrCodes
-        self.footer = footer
-        self.isKeyExposed = isKeyExposed
-        self.isRootKey = isRootKey
-    }
-}
 
 struct KeyDetailsPublicKeyView: View {
     @StateObject var viewModel: ViewModel
-
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         GeometryReader { geo in
@@ -55,15 +21,27 @@ struct KeyDetailsPublicKeyView: View {
                     viewModel: .init(
                         title: Localizable.PublicKeyDetails.Label.title.string,
                         subtitle: viewModel.navigationSubtitle(),
-                        leftButtons: [.init(
-                            type: .xmark,
-                            action: viewModel.onBackTap
-                        )],
+                        leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreButtonTap)]
                     )
                 )
                 ScrollView {
-                    VStack {
+                    VStack(spacing: Spacing.medium) {
+                        // Exposed key alert
+                        if viewModel.renderable.isKeyExposed {
+                            HStack(alignment: .center, spacing: 0) {
+                                Localizable.KeyScreen.Label.hotkey.text
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .font(PrimaryFont.labelXS.font)
+                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                Spacer().frame(maxWidth: Spacing.small)
+                                Asset.exclamationRed.swiftUIImage
+                                    .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            }
+                            .padding(Spacing.medium)
+                            .strokeContainerBackground(CornerRadius.small, state: .error)
+                        }
+                        // QR Code container
                         VStack(spacing: 0) {
                             AnimatedQRCodeView(
                                 viewModel: Binding<AnimatedQRCodeViewModel>.constant(
@@ -79,23 +57,12 @@ struct KeyDetailsPublicKeyView: View {
                             )
                         }
                         .strokeContainerBackground()
-                        // Exposed key alert
-                        if viewModel.renderable.isKeyExposed {
-                            HStack {
-                                Localizable.KeyScreen.Label.hotkey.text
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Spacer().frame(maxWidth: Spacing.medium)
-                                Asset.exclamationRed.swiftUIImage
-                            }
-                            .padding()
-                            .foregroundColor(Asset.accentRed300.swiftUIColor)
-                            .font(PrimaryFont.bodyM.font)
-                            .strokeContainerBackground(CornerRadius.small, state: .error)
-                        }
+                        // Key data
+                        keyDetails()
+                            .padding(.bottom, Spacing.extraExtraLarge)
                     }
                     .padding([.leading, .trailing], Spacing.large)
-                    .padding([.top, .bottom], Spacing.flexibleComponentSpacer)
-                    Spacer()
+                    .padding(.top, Spacing.extraSmall)
                 }
             }
             .frame(
@@ -103,13 +70,12 @@ struct KeyDetailsPublicKeyView: View {
                 minHeight: geo.size.height
             )
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .onAppear {
-                viewModel.use(navigation: navigation)
-                viewModel.onAppear()
-            }
+        }
+        .onReceive(viewModel.dismissViewRequest) { _ in
+            presentationMode.wrappedValue.dismiss()
         }
         // Action sheet
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -119,12 +85,13 @@ struct KeyDetailsPublicKeyView: View {
             PublicKeyActionsModal(
                 shouldPresentExportKeysWarningModal: $viewModel.shouldPresentExportKeysWarningModal,
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal
+                shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal,
+                isExportKeyAvailable: viewModel.isExportKeyAvailable
             )
             .clearModalBackground()
         }
         // Export private key warning
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysWarningModal,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -138,7 +105,7 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Export private key modal
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingExportKeysModal,
             onDismiss: viewModel.onExportKeysDismissal
         ) {
@@ -149,16 +116,15 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         // Remove key modal
-        .fullScreenCover(isPresented: $viewModel.isShowingRemoveConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetSingleKey,
                 mainAction: viewModel.onRemoveKeyTap(),
-                dismissAction: viewModel.onRemoveKeyDismissal(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
         }
-        .fullScreenCover(
+        .fullScreenModal(
             isPresented: $viewModel.isPresentingConnectivityAlert,
             onDismiss: {
                 // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
@@ -176,14 +142,80 @@ struct KeyDetailsPublicKeyView: View {
     }
 }
 
+private extension KeyDetailsPublicKeyView {
+    @ViewBuilder
+    func keyDetails() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                Localizable.PublicKeyDetails.Label.network.text
+                    .frame(height: Spacing.large, alignment: .center)
+                    .padding(.vertical, Spacing.small)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Spacer()
+                NetworkIconCapsuleView(
+                    networkLogo: viewModel.renderable.networkLogo,
+                    networkTitle: viewModel.renderable.networkTitle
+                )
+            }
+            Divider()
+            rowWrapper(
+                Localizable.PublicKeyDetails.Label.derivation.string,
+                viewModel.renderable.path.isEmpty && !viewModel.renderable.hasPassword ? Localizable.PublicKeyDetails
+                    .Label.emptyPath.text : fullPath
+            )
+            rowWrapper(
+                Localizable.PublicKeyDetails.Label.keySetName.string,
+                Text(viewModel.renderable.keySetName),
+                isLast: true
+            )
+        }
+        .font(PrimaryFont.bodyL.font)
+        .padding(.horizontal, Spacing.medium)
+        .containerBackground()
+    }
+
+    @ViewBuilder
+    func rowWrapper(
+        _ key: String,
+        _ value: some View,
+        isLast: Bool = false
+    ) -> some View {
+        HStack(spacing: Spacing.medium) {
+            Text(key)
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .frame(height: Spacing.large, alignment: .center)
+            Spacer()
+            value
+                .frame(idealWidth: .infinity, alignment: .trailing)
+                .multilineTextAlignment(.trailing)
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+        }
+        .padding(.vertical, Spacing.small)
+        if !isLast {
+            Divider()
+        }
+    }
+
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
+    /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    var fullPath: Text {
+        viewModel.renderable.hasPassword ?
+            Text(
+                "\(viewModel.renderable.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
+            ) :
+            Text(viewModel.renderable.path)
+    }
+}
+
 extension KeyDetailsPublicKeyView {
     final class ViewModel: ObservableObject {
         private let keyDetails: MKeyDetails
-        private let forgetKeyActionHandler: ForgetSingleKeyAction
+        private let publicKeyDetails: String
+        private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
+        private let snackbarPresentation: BottomSnackbarPresentation
 
-        private weak var navigation: NavigationCoordinator!
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
         @Published var isShowingRemoveConfirmation = false
@@ -194,31 +226,34 @@ extension KeyDetailsPublicKeyView {
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
+        var isExportKeyAvailable: Bool {
+            keyDetails.address.hasPwd == false
+        }
+
+        var dismissViewRequest: AnyPublisher<Void, Never> {
+            dismissRequest.eraseToAnyPublisher()
+        }
+
+        private let dismissRequest = PassthroughSubject<Void, Never>()
+        private let onCompletion: () -> Void
 
         init(
             keyDetails: MKeyDetails,
-            forgetKeyActionHandler: ForgetSingleKeyAction = ForgetSingleKeyAction(),
+            publicKeyDetails: String,
+            publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
+            onCompletion: @escaping () -> Void
         ) {
             self.keyDetails = keyDetails
-            self.forgetKeyActionHandler = forgetKeyActionHandler
+            self.publicKeyDetails = publicKeyDetails
+            self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
+            self.snackbarPresentation = snackbarPresentation
+            self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
-        }
-
-        func onAppear() {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
-            forgetKeyActionHandler.use(navigation: navigation)
-        }
-
-        func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
         }
 
         func onMoreButtonTap() {
@@ -231,12 +266,12 @@ extension KeyDetailsPublicKeyView {
 
         func checkForActionsPresentation() {
             if shouldPresentExportKeysWarningModal {
-                shouldPresentExportKeysWarningModal.toggle()
+                shouldPresentExportKeysWarningModal = false
                 if warningStateMediator.alert {
-                    isPresentingConnectivityAlert.toggle()
+                    isPresentingConnectivityAlert = true
                 } else {
                     exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey(keyDetails)
-                    isPresentingExportKeysWarningModal.toggle()
+                    isPresentingExportKeysWarningModal = true
                 }
             }
             if shouldPresentRemoveConfirmationModal {
@@ -246,18 +281,12 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onWarningDismissal() {
-            if shouldPresentExportKeysModal {
-                shouldPresentExportKeysModal.toggle()
-                isPresentingExportKeysModal.toggle()
-            } else {
-                // If user cancelled, mimic Rust state machine and hide "..." modal menu
-                navigation.perform(navigation: .init(action: .rightButtonAction))
-            }
+            guard shouldPresentExportKeysModal else { return }
+            shouldPresentExportKeysModal.toggle()
+            isPresentingExportKeysModal.toggle()
         }
 
         func onExportKeysDismissal() {
-            // When user finished Export Private Key interaction, mimic Rust state machine and hide "..." modal menu
-            navigation.perform(navigation: .init(action: .rightButtonAction))
             exportPrivateKeyViewModel = nil
         }
 
@@ -267,30 +296,33 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onRemoveKeyTap() {
-            forgetKeyActionHandler.forgetSingleKey(keyDetails.address.seedName)
-        }
-
-        func onRemoveKeyDismissal() {
-            // We need to fake right button action here or Rust machine will break
-            // In old UI, if you dismiss equivalent of this modal, underlying modal would still be there,
-            // so we need to inform Rust we actually hid it
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+            publicKeyDetailsService.forgetSingleKey(keyDetails.address.seedName)
+            snackbarPresentation.viewModel = .init(
+                title: Localizable.PublicKeyDetailsModal.Confirmation.snackbar.string,
+                style: .warning
+            )
+            snackbarPresentation.isSnackbarPresented = true
+            onCompletion()
+            dismissRequest.send()
         }
     }
+}
 
+#if DEBUG
     struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
         static var previews: some View {
             Group {
                 KeyDetailsPublicKeyView(
                     viewModel: .init(
-                        keyDetails: PreviewData.mkeyDetails
+                        keyDetails: .stub,
+                        publicKeyDetails: "publicKeyDetails",
+                        onCompletion: {}
                     )
                 )
             }
             .previewLayout(.sizeThatFits)
             .preferredColorScheme(.dark)
-            .environmentObject(NavigationCoordinator())
             .environmentObject(ConnectivityMediator())
         }
     }
-}
+#endif

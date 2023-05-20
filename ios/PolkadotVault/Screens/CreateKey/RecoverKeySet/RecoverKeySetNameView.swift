@@ -10,97 +10,113 @@ import SwiftUI
 struct RecoverKeySetNameView: View {
     @StateObject var viewModel: ViewModel
     @FocusState private var nameFocused: Bool
-    @EnvironmentObject var navigation: NavigationCoordinator
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            NavigationBarView(
-                viewModel: .init(
-                    title: nil,
-                    leftButtons: [.init(
-                        type: .xmark,
-                        action: viewModel.onBackTap
-                    )],
-                    rightButtons: [.init(
-                        type: .activeAction(
-                            Localizable.RecoverSeedName.Action.next.key,
-                            .constant(!viewModel.isActionAvailable())
-                        ),
-                        action: {
-                            nameFocused = false
-                            viewModel.onNextTap()
-                        }
-                    )]
-                )
-            )
+        NavigationView {
             VStack(alignment: .leading, spacing: 0) {
-                Localizable.RecoverSeedName.Label.title.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.titleL.font)
-                    .padding(.top, Spacing.extraSmall)
-                Localizable.RecoverSeedName.Label.content.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.bodyL.font)
-                    .padding(.vertical, Spacing.extraSmall)
-                TextField("", text: $viewModel.seedName)
-                    .submitLabel(.done)
-                    .primaryTextFieldStyle(
-                        Localizable.seedName.string,
-                        text: $viewModel.seedName
+                NavigationBarView(
+                    viewModel: .init(
+                        title: nil,
+                        leftButtons: [.init(
+                            type: .xmark,
+                            action: viewModel.onBackTap
+                        )],
+                        rightButtons: [.init(
+                            type: .activeAction(
+                                Localizable.RecoverSeedName.Action.next.key,
+                                .constant(!viewModel.isActionAvailable())
+                            ),
+                            action: {
+                                nameFocused = false
+                                viewModel.onNextTap()
+                            }
+                        )]
                     )
-                    .focused($nameFocused)
-                    .onSubmit {
-                        nameFocused = false
-                        viewModel.onSubmitTap()
-                    }
-                    .onAppear {
-                        nameFocused = true
-                        viewModel.onAppear()
-                    }
-                    .padding(.vertical, Spacing.medium)
-                Localizable.RecoverSeedName.Label.footer.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
-                Spacer()
+                )
+                mainContent()
+                NavigationLink(
+                    destination:
+                    RecoverKeySetSeedPhraseView(
+                        viewModel: .init(
+                            content: viewModel.detailsContent,
+                            isPresented: $viewModel.isPresented
+                        )
+                    )
+                    .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingDetails
+                ) { EmptyView() }
             }
-            .padding(.horizontal, Spacing.large)
+            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationBarHidden(true)
         }
-        .onAppear {
-            viewModel.use(navigation: navigation)
+    }
+
+    @ViewBuilder
+    func mainContent() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Localizable.RecoverSeedName.Label.title.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.titleL.font)
+                .padding(.top, Spacing.extraSmall)
+            Localizable.RecoverSeedName.Label.content.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyL.font)
+                .padding(.vertical, Spacing.extraSmall)
+            TextField("", text: $viewModel.seedName)
+                .submitLabel(.done)
+                .primaryTextFieldStyle(
+                    Localizable.seedName.string,
+                    text: $viewModel.seedName
+                )
+                .focused($nameFocused)
+                .onSubmit {
+                    nameFocused = false
+                    viewModel.onSubmitTap()
+                }
+                .onAppear {
+                    nameFocused = true
+                    viewModel.onAppear()
+                }
+                .padding(.vertical, Spacing.medium)
+            Localizable.RecoverSeedName.Label.footer.text
+                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .font(PrimaryFont.captionM.font)
+            Spacer()
         }
+        .padding(.horizontal, Spacing.large)
     }
 }
 
 extension RecoverKeySetNameView {
     final class ViewModel: ObservableObject {
         @Published var seedName: String = ""
-        weak var navigation: NavigationCoordinator!
-        private let content: MRecoverSeedName
-
+        private let service: RecoverKeySetService
         private let seedsMediator: SeedsMediating
+        @Binding var isPresented: Bool
+        @Published var isPresentingDetails: Bool = false
+        @Published var detailsContent: MRecoverSeedPhrase!
 
         init(
-            content: MRecoverSeedName,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            service: RecoverKeySetService = RecoverKeySetService(),
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            isPresented: Binding<Bool>
         ) {
-            self.content = content
+            self.service = service
             self.seedsMediator = seedsMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            _isPresented = isPresented
         }
 
         func onAppear() {
-            seedName = content.seedName
+            seedName = service.recoverKeySetStart(seedsMediator.seedNames.isEmpty).seedName
         }
 
         func onBackTap() {
-            navigation.perform(navigation: .init(action: .goBack))
+            isPresented = false
         }
 
         func onNextTap() {
-            navigation.perform(navigation: .init(action: .goForward, details: seedName))
+            detailsContent = service.continueKeySetRecovery(seedName)
+            isPresentingDetails = true
         }
 
         func isActionAvailable() -> Bool {

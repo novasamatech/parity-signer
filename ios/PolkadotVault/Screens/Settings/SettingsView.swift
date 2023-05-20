@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
@@ -27,11 +26,7 @@ struct SettingsView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(viewModel.renderable.items, id: \.id) { renderable in
-                                NavigationLink(
-                                    destination: detailView(viewModel.detailScreen)
-                                        .navigationBarHidden(true),
-                                    isActive: $viewModel.isDetailsPresented
-                                ) { EmptyView() }
+
                                 SettingsRowView(renderable: renderable)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
@@ -46,23 +41,29 @@ struct SettingsView: View {
                                 .padding(.bottom, Spacing.extraSmall)
                         }
                     }
-                    Spacer()
-                    TabBarView(
-                        selectedTab: $navigation.selectedTab
-                    )
                 }
+                .background(Asset.backgroundPrimary.swiftUIColor)
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)
-                ConnectivityAlertOverlay(viewModel: .init())
+                VStack(spacing: 0) {
+                    ConnectivityAlertOverlay(viewModel: .init())
+                    TabBarView(
+                        viewModel: viewModel.tabBarViewModel
+                    )
+                }
+                NavigationLink(
+                    destination: detailView(viewModel.detailScreen)
+                        .navigationBarHidden(true),
+                    isActive: $viewModel.isDetailsPresented
+                ) { EmptyView() }
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
-            viewModel.use(navigation: navigation)
             viewModel.use(appState: appState)
             viewModel.loadData()
         }
-        .fullScreenCover(isPresented: $viewModel.isPresentingWipeConfirmation) {
+        .fullScreenModal(isPresented: $viewModel.isPresentingWipeConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .wipeAll,
                 mainAction: viewModel.wipe(),
@@ -104,17 +105,18 @@ extension SettingsView {
         @Published var isDetailsPresented = false
         @Published var detailScreen: SettingsItem?
         private weak var appState: AppState!
-        private weak var navigation: NavigationCoordinator!
         private let onboardingMediator: OnboardingMediator
+        private let settingsService: SettingsTabService
+        let tabBarViewModel: TabBarView.ViewModel
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
+            settingsService: SettingsTabService = SettingsTabService(),
+            tabBarViewModel: TabBarView.ViewModel
         ) {
             self.onboardingMediator = onboardingMediator
-        }
-
-        func use(navigation: NavigationCoordinator) {
-            self.navigation = navigation
+            self.settingsService = settingsService
+            self.tabBarViewModel = tabBarViewModel
             listenToUpdates()
         }
 
@@ -129,8 +131,7 @@ extension SettingsView {
         private func listenToUpdates() {
             $isDetailsPresented.sink { [weak self] isPresented in
                 guard let self = self, !isPresented else { return }
-                self.navigation.performFake(navigation: .init(action: .start))
-                self.navigation.performFake(navigation: .init(action: .navbarSettings))
+                self.settingsService.onSettingsTabDisplay()
             }.store(in: cancelBag)
         }
 
@@ -151,16 +152,9 @@ extension SettingsView {
                 detailScreen = .backup
                 isDetailsPresented = true
             case .networks:
-                guard case let .manageNetworks(value) = navigation
-                    .performFake(navigation: .init(action: .manageNetworks)).screenData else { return }
-                appState.userData.manageNetworks = value
                 detailScreen = .networks
                 isDetailsPresented = true
             case .verifier:
-                guard case let .vVerifier(value) = navigation
-                    .performFake(navigation: .init(action: .viewGeneralVerifier)).screenData else { return }
-                navigation.performFake(navigation: .init(action: .goBack))
-                appState.userData.verifierDetails = value
                 detailScreen = .verifier
                 isDetailsPresented = true
             }
@@ -172,7 +166,7 @@ extension SettingsView {
 
         func wipe() {
             onboardingMediator.onboard()
-            navigation.perform(navigation: .init(action: .start))
+            isPresentingWipeConfirmation = false
         }
     }
 }
@@ -189,8 +183,7 @@ struct SettingsViewRenderable: Equatable {
 #if DEBUG
     struct SettingsView_Previews: PreviewProvider {
         static var previews: some View {
-            SettingsView(viewModel: .init())
-                .environmentObject(NavigationCoordinator())
+            SettingsView(viewModel: .init(tabBarViewModel: .mock))
         }
     }
 #endif

@@ -17,10 +17,6 @@ extension QRCodeRootFooterViewModel {
 extension QRCodeAddressFooterViewModel {
     init(_ derivedKey: DerivedKeyExportModel) {
         identicon = derivedKey.viewModel.identicon
-        rootKeyName = derivedKey.viewModel.rootKeyName
-        path = derivedKey.viewModel.path
-        hasPassword = derivedKey.viewModel.hasPassword
-        network = derivedKey.keyData.network.networkTitle
         networkLogo = derivedKey.keyData.network.networkLogo
         base58 = derivedKey.viewModel.base58
     }
@@ -38,7 +34,6 @@ struct ExportMultipleKeysModalViewModel: Equatable {
 
 struct ExportMultipleKeysModal: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var navigation: NavigationCoordinator
 
     var body: some View {
         FullScreenRoundedModal(
@@ -196,7 +191,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -207,7 +202,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -218,7 +213,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -227,7 +222,6 @@ private extension ExportMultipleKeysModal {
                 .background(.gray)
                 .preferredColorScheme(.dark)
             }
-            .environmentObject(NavigationCoordinator())
         }
     }
 #endif

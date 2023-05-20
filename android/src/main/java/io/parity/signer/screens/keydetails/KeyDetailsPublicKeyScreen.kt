@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,12 +19,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.IdentIconWithNetwork
+import io.parity.signer.components.NetworkLabelWithIcon
 import io.parity.signer.components.base.ScreenHeaderClose
-import io.parity.signer.components.sharedcomponents.KeyCard
-import io.parity.signer.domain.*
+import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.KeyDetailsModel
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -55,11 +61,16 @@ fun KeyDetailsPublicKeyScreen(
 			Column(
 				modifier = Modifier.verticalScroll(rememberScrollState())
 			) {
+
+				if (model.secretExposed) {
+					ExposedKeyAlarm()
+				}
+
 				val plateShape =
 					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 				Column(
 					modifier = Modifier
-						.padding(start = 24.dp, end = 24.dp, top = 50.dp, bottom = 8.dp)
+						.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
 						.clip(plateShape)
 						.border(
 							BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -94,15 +105,102 @@ fun KeyDetailsPublicKeyScreen(
 							modifier = Modifier.size(264.dp)
 						)
 					}
-					KeyCard(model.address)
+					Row(
+						Modifier.padding(16.dp),
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						ShowBase58Collapsible(
+							base58 = model.address.cardBase.base58,
+							modifier = Modifier
+								.weight(1f)
+						)
+						IdentIconWithNetwork(
+							identicon = model.address.cardBase.identIcon,
+							networkLogoName = model.address.network,
+							size = 36.dp,
+							modifier = Modifier.padding(start = 8.dp)
+						)
+					}
 				}
-				if (model.secretExposed) {
-					ExposedKeyAlarm()
-				}
+				BottomKeyPlate(plateShape, model)
 			}
 		}
 	}
 }
+
+@Composable
+private fun BottomKeyPlate(
+	plateShape: RoundedCornerShape,
+	model: KeyDetailsModel
+) {
+	Column(
+		modifier = Modifier
+			.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+			.background(MaterialTheme.colors.fill6, plateShape)
+			.padding(horizontal = 16.dp)
+	) {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_network),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			NetworkLabelWithIcon(
+				model.networkInfo.networkTitle,
+				model.networkInfo.networkLogo,
+			)
+		}
+		SignerDivider(sidePadding = 0.dp)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_path),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.padding(start = 16.dp).weight(1f))
+			val path = model.address.cardBase.path
+			Text(
+				text = path.ifEmpty {
+					stringResource(R.string.derivation_key_empty_path_placeholder)
+				},
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.primary,
+				textAlign = TextAlign.End
+			)
+		}
+		SignerDivider(sidePadding = 0.dp)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.defaultMinSize(minHeight = 48.dp)
+				.padding(vertical = 8.dp)
+		) {
+			Text(
+				text = stringResource(R.string.key_details_public_label_keyset),
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.textTertiary
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			Text(
+				text = model.address.cardBase.seedName,
+				style = SignerTypeface.BodyL,
+				color = MaterialTheme.colors.primary
+			)
+		}
+	}
+}
+
 
 @Composable
 private fun ExposedKeyAlarm() {
@@ -112,16 +210,16 @@ private fun ExposedKeyAlarm() {
 		modifier = Modifier
 			.padding(vertical = 8.dp, horizontal = 24.dp)
 			.border(
-				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				BorderStroke(1.dp, MaterialTheme.colors.fill12),
 				innerShape
 			)
-			.background(MaterialTheme.colors.fill6, innerShape)
+			.background(MaterialTheme.colors.red500fill12, innerShape)
 
 	) {
 		Text(
 			text = stringResource(R.string.key_details_exposed_notification_label),
 			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyM,
+			style = SignerTypeface.LabelS,
 			modifier = Modifier
 				.weight(1f)
 				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
@@ -149,7 +247,6 @@ private fun ExposedKeyAlarm() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenDerived() {
-	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
@@ -169,7 +266,6 @@ private fun PreviewKeyDetailsScreenDerived() {
 )
 @Composable
 private fun PreviewKeyDetailsScreenRoot() {
-	val state = remember { mutableStateOf(NetworkState.Past) }
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {

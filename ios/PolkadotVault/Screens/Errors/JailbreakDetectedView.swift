@@ -28,10 +28,12 @@ struct JailbreakDetectedView: View {
     }
 }
 
-struct JailbreakDetectedView_Previews: PreviewProvider {
-    static var previews: some View {
-        JailbreakDetectedView()
-            .preferredColorScheme(.dark)
-            .previewLayout(.sizeThatFits)
+#if DEBUG
+    struct JailbreakDetectedView_Previews: PreviewProvider {
+        static var previews: some View {
+            JailbreakDetectedView()
+                .preferredColorScheme(.dark)
+                .previewLayout(.sizeThatFits)
+        }
     }
-}
+#endif
