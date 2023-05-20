@@ -41,13 +41,6 @@ fun KeySetsNavSubgraph(
 					networkState = networkState,
 				)
 			}
-			LaunchedEffect(key1 = Unit) {
-				if (model.keys.isEmpty()) {
-					//workaround to hide create new bottom sheet while #1618 is not merged
-					//https://github.com/paritytech/parity-signer/pull/1618
-					rootNavigator.navigate(Action.GO_BACK)
-				}
-			}
 		}
 		composable(KeySetsNavSubgraph.homeMenu) {
 			Box(modifier = Modifier.statusBarsPadding()) {
