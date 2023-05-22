@@ -16,14 +16,10 @@ final class RecoverKeySetService {
         self.navigation = navigation
     }
 
-    func recoverKeySetStart(_ isFirstKeySet: Bool) -> MRecoverSeedName! {
+    func recoverKeySetStart() -> MRecoverSeedName! {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarKeys))
-        // We need to call this conditionally, as if there are no seeds,
-        // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-        if !isFirstKeySet {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
-        }
+        navigation.performFake(navigation: .init(action: .rightButtonAction))
         guard case let .recoverSeedName(value) = navigation.performFake(navigation: .init(action: .recoverSeed))?
             .screenData else { return nil }
         return value
