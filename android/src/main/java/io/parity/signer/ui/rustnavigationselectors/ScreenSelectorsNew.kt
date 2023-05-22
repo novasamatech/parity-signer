@@ -152,7 +152,6 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
-		//todo dmitry fix it new screen
 		is ScreenData.RecoverSeedPhrase ->
 			Box(
 				modifier = Modifier

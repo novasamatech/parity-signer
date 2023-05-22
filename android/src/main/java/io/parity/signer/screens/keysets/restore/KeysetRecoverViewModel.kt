@@ -41,7 +41,6 @@ class KeysetRecoverViewModel : ViewModel() {
 	}
 
 	fun onTextEntry(newText: String) {
-//todo dmitry
 		val uniffiInteractor = ServiceLocator.uniffiInteractor
 		val result =
 			runBlocking { uniffiInteractor.navigate(Action.TEXT_ENTRY, newText) }
@@ -62,18 +61,20 @@ class KeysetRecoverViewModel : ViewModel() {
 	}
 
 	fun addWord(word: String) {
-//todo dmitry
 		val uniffiInteractor = ServiceLocator.uniffiInteractor
 		val result =
 			runBlocking { uniffiInteractor.navigate(Action.PUSH_WORD, word) }
 		when (result) {
 			is OperationResult.Err -> {
-				//todo dmitry logs
+				submitErrorState("error in add suggestion word $result")
 			}
 
 			is OperationResult.Ok -> {
 				val screenData =
-					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: return
+					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: let {
+						submitErrorState("wrong state in add suggestion word $result")
+						return
+					}
 				_recoverState.value = screenData.f.toKeysetRecoverModel()
 			}
 		}

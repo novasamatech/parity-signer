@@ -23,6 +23,7 @@ import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
 
+//todo dmitry remove
 @Composable
 fun RestoreSeedPhraseBox(
 	seedPhrase: List<String>,
