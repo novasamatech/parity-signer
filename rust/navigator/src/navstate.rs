@@ -120,11 +120,7 @@ impl State {
         let mut errorline = String::new();
         match db_handling::interface_signer::purge_transactions(&self.db) {
             Ok(()) => {
-                if self.seed_names.is_empty() {
-                    new_navstate = self.correct_seed_selector();
-                } else {
-                    new_navstate = Navstate::clean_screen(Screen::SeedSelector);
-                }
+                new_navstate = Navstate::clean_screen(Screen::SeedSelector);
             }
             Err(e) => {
                 new_navstate.alert = Alert::Error;
@@ -1702,15 +1698,7 @@ impl State {
     }
 
     fn correct_seed_selector(&self) -> Navstate {
-        if self.seed_names.is_empty() {
-            Navstate {
-                screen: Screen::SeedSelector,
-                modal: Modal::NewSeedMenu,
-                alert: Alert::Empty,
-            }
-        } else {
-            Navstate::clean_screen(Screen::SeedSelector)
-        }
+        Navstate::clean_screen(Screen::SeedSelector)
     }
 }
 

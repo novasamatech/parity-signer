@@ -16,14 +16,10 @@ final class CreateKeySetService {
         self.navigation = navigation
     }
 
-    func createKeySet(_ isFirstKeySet: Bool, seedName: String) -> MNewSeedBackup! {
+    func createKeySet(seedName: String) -> MNewSeedBackup! {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarKeys))
-        // We need to call this conditionally, as if there are no seeds,
-        // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-        if !isFirstKeySet {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
-        }
+        navigation.performFake(navigation: .init(action: .rightButtonAction))
         navigation.performFake(navigation: .init(action: .newSeed))
         guard case let .newSeedBackup(value) = navigation
             .performFake(navigation: .init(action: .goForward, details: seedName))?.modalData else { return nil }
