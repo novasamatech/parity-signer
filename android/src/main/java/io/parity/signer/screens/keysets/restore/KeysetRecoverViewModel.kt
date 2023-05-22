@@ -1,10 +1,12 @@
 package io.parity.signer.screens.keysets.restore
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.OperationResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ScreenData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,12 +47,15 @@ class KeysetRecoverViewModel : ViewModel() {
 			runBlocking { uniffiInteractor.navigate(Action.TEXT_ENTRY, newText) }
 		when (result) {
 			is OperationResult.Err -> {
-				//todo dmitry logs
+				submitErrorState("error in restore text entry $result")
 			}
 
 			is OperationResult.Ok -> {
 				val screenData =
-					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: return
+					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: let {
+						submitErrorState("wrong state keyset restore text entry $result")
+						return
+					}
 				_recoverState.value = screenData.f.toKeysetRecoverModel()
 			}
 		}

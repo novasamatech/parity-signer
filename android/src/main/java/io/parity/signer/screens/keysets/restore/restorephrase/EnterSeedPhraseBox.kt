@@ -68,8 +68,8 @@ fun EnterSeedPhraseBox(
 		}
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = seedWord, //as was before, should been moved to rust but need to align with iOS
-			onValueChange = { onEnteredChange(it.text) },
+			value = " " + userInput, //as was before, should been moved to rust but need to align with iOS
+			onValueChange = { onEnteredChange(it) },
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
