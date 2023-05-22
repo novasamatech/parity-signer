@@ -107,7 +107,7 @@ extension RecoverKeySetNameView {
         }
 
         func onAppear() {
-            seedName = service.recoverKeySetStart(seedsMediator.seedNames.isEmpty).seedName
+            seedName = service.recoverKeySetStart().seedName
         }
 
         func onBackTap() {
