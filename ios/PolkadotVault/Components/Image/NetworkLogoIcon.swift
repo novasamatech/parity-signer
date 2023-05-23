@@ -61,6 +61,7 @@ struct NetworkLogoIcon: View {
                 NetworkLogoIcon(networkName: "kusama")
                 NetworkLogoIcon(networkName: "westend")
                 NetworkLogoIcon(networkName: "acala")
+                NetworkLogoIcon(networkName: "frequency")
                 NetworkLogoIcon(networkName: "moonbeam")
                 NetworkLogoIcon(networkName: "astar")
                 NetworkLogoIcon(networkName: "moonriver")
