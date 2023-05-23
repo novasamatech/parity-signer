@@ -112,7 +112,7 @@ extension EnterKeySetNameView {
         }
 
         func onNextTap() {
-            detailsContent = service.createKeySet(seedsMediator.seedNames.isEmpty, seedName: seedName)
+            detailsContent = service.createKeySet(seedName: seedName)
             isPresentingDetails = true
         }
 
