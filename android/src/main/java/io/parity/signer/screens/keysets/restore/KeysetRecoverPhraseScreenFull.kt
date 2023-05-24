@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreenView
+import kotlinx.coroutines.Dispatchers
 
 
 @Composable
@@ -14,7 +15,9 @@ fun KeysetRecoverPhraseScreenFull(
 	initialRecoverSeedPhrase: KeysetRecoverModel,
 ) {
 	val viewModel: KeysetRecoverViewModel = viewModel()
-	val state = viewModel.recoverState.collectAsState()
+	//Dispatchers.Main.immediate because it used in TextField to workaround bug
+	//https://issuetracker.google.com/issues/160257648
+	val state = viewModel.recoverState.collectAsState(Dispatchers.Main.immediate)
 
 	LaunchedEffect(key1 = Unit) {
 		viewModel.initValue(initialRecoverSeedPhrase)

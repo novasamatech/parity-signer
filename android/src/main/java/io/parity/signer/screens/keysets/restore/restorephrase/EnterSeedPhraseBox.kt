@@ -33,6 +33,7 @@ import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 
@@ -50,9 +51,11 @@ fun EnterSeedPhraseBox(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
-	val seedWord = TextFieldValue(//todo dmitry check and fix
-		" " + userInput,
-		selection = TextRange(userInput.length + 1)
+	val userInputValueInternal = " " + userInput
+	//to always keep position after artificially added " "
+	val seedWord = TextFieldValue(
+		userInputValueInternal,
+		selection = TextRange(userInputValueInternal.length)
 	)
 
 	FlowRow(
@@ -69,11 +72,16 @@ fun EnterSeedPhraseBox(
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord, //as was before redesign, should been moved to rust but need to align with iOS
-			onValueChange = { onEnteredChange(it.text) },
+			onValueChange = {
+				if (it.text != userInputValueInternal) {
+					onEnteredChange(it.text)
+				}
+			},
 			modifier = Modifier
+//				.background(MaterialTheme.colors.fill30) //todo dmitry remove
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
+				.defaultMinSize(minWidth = 80.dp, minHeight = 24.dp),
 		)
 	}
 
