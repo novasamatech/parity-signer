@@ -237,8 +237,13 @@ pub fn signer_init_with_cert(database: &sled::Db) -> Result<()> {
 
 /// Initiate Vault database with general verifier set up to `Verifier(None)`.
 ///
+/// Remove any default metadata and network specs from the database.
+///
 /// Function is applied during `Remove general certificate` procedure.
 pub fn signer_init_no_cert(database: &sled::Db) -> Result<()> {
+    use constants::{METATREE, SPECSTREE};
+    database.drop_tree(SPECSTREE)?;
+    database.drop_tree(METATREE)?;
     init_db(database, Verifier { v: None })
 }
 
