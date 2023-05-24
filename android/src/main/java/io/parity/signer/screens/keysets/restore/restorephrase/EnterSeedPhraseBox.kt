@@ -60,10 +60,12 @@ fun EnterSeedPhraseBox(
 
 	FlowRow(
 		mainAxisSize = SizeMode.Expand,
-		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
+		mainAxisSpacing = 4.dp,
+		mainAxisAlignment = FlowMainAxisAlignment.Start,
 		crossAxisSpacing = 4.dp,
 		modifier = modifier
 			.background(MaterialTheme.colors.fill6, innerShape)
+			.defaultMinSize(minHeight = 156.dp)
 			.padding(8.dp),
 	) {
 		enteredWords.onEachIndexed { index, word ->
@@ -78,10 +80,9 @@ fun EnterSeedPhraseBox(
 				}
 			},
 			modifier = Modifier
-//				.background(MaterialTheme.colors.fill30) //todo dmitry remove
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.defaultMinSize(minWidth = 80.dp, minHeight = 24.dp),
+				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
 		)
 	}
 
