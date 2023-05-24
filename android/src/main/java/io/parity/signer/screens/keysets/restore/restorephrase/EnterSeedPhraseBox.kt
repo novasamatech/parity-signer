@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextRange
@@ -33,7 +34,6 @@ import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 
@@ -79,6 +79,7 @@ fun EnterSeedPhraseBox(
 					onEnteredChange(it.text)
 				}
 			},
+			cursorBrush = SolidColor(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
