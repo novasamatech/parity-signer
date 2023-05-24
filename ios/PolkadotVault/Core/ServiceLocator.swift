@@ -12,6 +12,10 @@ enum ServiceLocator {
     /// We store this in `ServiceLocator` as singleton, to be able to use it outside SwiftUI views which could use
     /// `@EnvironmentalObject`
     static var bottomSnackbarPresentation: BottomSnackbarPresentation = BottomSnackbarPresentation()
+    /// Responsible for presentation of generic error bottom sheet alert component
+    /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
+    static var navigationErrorPresentation: NavigationErrorPresentation = NavigationErrorPresentation()
+
     /// As long as we have `SharedDataModel` as tech debt, we need to have seeds mediator as singleton which is
     /// unfortunate but necessary for now; to be able to use it outside SwiftUI views it can't be `@EnvironmentalObject`
     static var seedsMediator: SeedsMediating = SeedsMediator()

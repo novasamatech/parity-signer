@@ -29,7 +29,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         )
 
         // When
-        let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
+        let result = subject.build(for: [seedNameCard])
 
         // Then
         XCTAssertEqual(result.list.first?.seed, seedNameCard)
@@ -51,7 +51,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         )
 
         // When
-        let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
+        let result = subject.build(for: [seedNameCard])
 
         // Then
         XCTAssertEqual(result.list.first?.seed, seedNameCard)
@@ -73,7 +73,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         )
 
         // When
-        let result = subject.build(for: MSeeds(seedNameCards: [seedNameCard]))
+        let result = subject.build(for: [seedNameCard])
 
         // Then
         XCTAssertEqual(result.list.first?.seed, seedNameCard)

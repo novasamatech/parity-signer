@@ -15,15 +15,14 @@ typealias NavigationRequest = (Navigation) -> Void
 /// We should keep this to minimum
 final class NavigationCoordinator: ObservableObject {
     private let backendActionPerformer: BackendNavigationPerforming
-
-    /// Responsible for presentation of generic error bottom sheet alert component
-    /// Currently error is based on `actionResult.alertData` component when app receives `.errorData(message)` value
-    @Published var genericError = GenericErrorViewModel()
+    @Published var navigationErrorPresentation: NavigationErrorPresentation
 
     init(
-        backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter()
+        backendActionPerformer: BackendNavigationPerforming = BackendNavigationAdapter(),
+        navigationErrorPresentation: NavigationErrorPresentation = ServiceLocator.navigationErrorPresentation
     ) {
         self.backendActionPerformer = backendActionPerformer
+        _navigationErrorPresentation = .init(initialValue: navigationErrorPresentation)
     }
 }
 
@@ -40,8 +39,8 @@ extension NavigationCoordinator {
             updateGlobalViews(action)
             return action
         case let .failure(error):
-            genericError.errorMessage = error.description
-            genericError.isPresented = true
+            navigationErrorPresentation.errorMessage = error.description
+            navigationErrorPresentation.isPresented = true
             return nil
         }
     }
@@ -50,8 +49,8 @@ extension NavigationCoordinator {
 private extension NavigationCoordinator {
     func updateGlobalViews(_ actionResult: ActionResult) {
         if case let .errorData(message) = actionResult.alertData {
-            genericError.errorMessage = message
-            genericError.isPresented = true
+            navigationErrorPresentation.errorMessage = message
+            navigationErrorPresentation.isPresented = true
         }
     }
 }

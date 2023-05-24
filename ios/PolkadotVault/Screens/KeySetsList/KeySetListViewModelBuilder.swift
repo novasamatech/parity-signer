@@ -38,9 +38,9 @@ struct KeySetViewModel: Equatable, Identifiable {
 
 /// Builds view model for `KeySetList` table view
 final class KeySetListViewModelBuilder {
-    func build(for seed: MSeeds) -> KeySetListViewModel {
+    func build(for seeds: [SeedNameCard]) -> KeySetListViewModel {
         KeySetListViewModel(
-            list: seed.seedNameCards.map {
+            list: seeds.map {
                 KeySetViewModel(
                     seed: $0,
                     keyName: $0.seedName,

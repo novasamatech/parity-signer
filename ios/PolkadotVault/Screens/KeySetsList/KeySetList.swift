@@ -253,7 +253,7 @@ extension KeySetList {
         private let cancelBag = CancelBag()
         private let modelBuilder: KeySetListViewModelBuilder
         private weak var appState: AppState!
-        @Published var dataModel: MSeeds = .init(seedNameCards: [])
+        @Published var dataModel: [SeedNameCard] = []
         @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
         let tabBarViewModel: TabBarView.ViewModel
@@ -280,7 +280,7 @@ extension KeySetList {
             }.store(in: cancelBag)
         }
 
-        func updateView(_ dataModel: MSeeds) {
+        func updateView(_ dataModel: [SeedNameCard]) {
             listViewModel = modelBuilder.build(for: dataModel)
         }
 

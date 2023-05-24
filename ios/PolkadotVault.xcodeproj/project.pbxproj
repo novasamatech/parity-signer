@@ -227,7 +227,7 @@
 		6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */; };
 		6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */; };
 		6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */; };
-		6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4A28EC51D600CC959F /* GenericError.swift */; };
+		6DBF6E4B28EC51D600CC959F /* NavigationErrorPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4A28EC51D600CC959F /* NavigationErrorPresentation.swift */; };
 		6DC0FC98296695D000A45883 /* SeedKeysPreview+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */; };
 		6DC33717295559EA0067284B /* NetworkSettingsDetailsActionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */; };
 		6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */; };
@@ -561,7 +561,7 @@
 		6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModal.swift; sourceTree = "<group>"; };
 		6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModalViewModel.swift; sourceTree = "<group>"; };
 		6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediator.swift; sourceTree = "<group>"; };
-		6DBF6E4A28EC51D600CC959F /* GenericError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericError.swift; sourceTree = "<group>"; };
+		6DBF6E4A28EC51D600CC959F /* NavigationErrorPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationErrorPresentation.swift; sourceTree = "<group>"; };
 		6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SeedKeysPreview+Helpers.swift"; sourceTree = "<group>"; };
 		6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetailsActionModal.swift; sourceTree = "<group>"; };
 		6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusModifier.swift; sourceTree = "<group>"; };
@@ -1554,7 +1554,7 @@
 		6DBF6E4928EC51A700CC959F /* Errors */ = {
 			isa = PBXGroup;
 			children = (
-				6DBF6E4A28EC51D600CC959F /* GenericError.swift */,
+				6DBF6E4A28EC51D600CC959F /* NavigationErrorPresentation.swift */,
 				6DB99036295C160D001101DC /* ConnectivityAlertOverlay.swift */,
 			);
 			path = Errors;
@@ -2168,7 +2168,7 @@
 				6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */,
-				6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */,
+				6DBF6E4B28EC51D600CC959F /* NavigationErrorPresentation.swift in Sources */,
 				6D932CE2292E0AF8008AD883 /* View+Placeholder.swift in Sources */,
 				6D850BDE292F7B4D00BA9017 /* EnterPasswordModal.swift in Sources */,
 				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,

@@ -35,12 +35,12 @@ struct AuthenticatedScreenContainer: View {
             )
         }
         .fullScreenModal(
-            isPresented: $navigation.genericError.isPresented
+            isPresented: $navigation.navigationErrorPresentation.isPresented
         ) {
             ErrorBottomModal(
-                viewModel: .alertError(message: navigation.genericError.errorMessage),
+                viewModel: .alertError(message: navigation.navigationErrorPresentation.errorMessage),
                 dismissAction: viewModel.onDismissErrorTap(),
-                isShowingBottomAlert: $navigation.genericError.isPresented
+                isShowingBottomAlert: $navigation.navigationErrorPresentation.isPresented
             )
             .clearModalBackground()
         }
