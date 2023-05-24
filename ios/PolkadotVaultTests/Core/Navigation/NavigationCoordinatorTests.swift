@@ -63,14 +63,14 @@ final class NavigationCoordinatorTests: XCTestCase {
         let navigationError = NavigationError(message: message)
         let navigation = Navigation(action: .navbarLog)
         backendActionPerformer.performBackendReturnValue = .failure(navigationError)
-        XCTAssertEqual(subject.genericError.isPresented, false)
+        XCTAssertEqual(subject.navigationErrorPresentation.isPresented, false)
 
         // When
         subject.performFake(navigation: navigation)
 
         // Then
-        XCTAssertEqual(subject.genericError.errorMessage, navigationError.description)
-        XCTAssertEqual(subject.genericError.isPresented, true)
+        XCTAssertEqual(subject.navigationErrorPresentation.errorMessage, navigationError.description)
+        XCTAssertEqual(subject.navigationErrorPresentation.isPresented, true)
     }
 }
 
