@@ -74,11 +74,14 @@ fun EnterSeedPhraseBox(
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
+		//workaround for //https://issuetracker.google.com/issues/160257648 - update to new TextField
+		var lastPostedData: String? = null
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord, //as was before redesign, should been moved to rust but need to align with iOS
 			onValueChange = {
-				if (it.text != userInputValueInternal) {
+				if (it.text != lastPostedData) {
+					lastPostedData = it.text
 					onEnteredChange(it.text)
 				}
 			},
