@@ -25,6 +25,14 @@ class KeysetRecoverViewModel : ViewModel() {
 		}
 	}
 
+	/**
+	 * Ideally navigation scope should reset this VM, but since this screen
+	 * is handled in rust-navigation state machine, need to clean state manually for now
+	 */
+	fun resetState() {
+		_recoverState.value = null
+	}
+
 	fun addSeed(
 		seedName: String,
 		seedPhrase: String,

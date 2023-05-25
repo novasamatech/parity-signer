@@ -26,11 +26,14 @@ fun KeysetRecoverPhraseScreenFull(
 	state.value?.let { state ->
 		KeysetRecoverPhraseScreenView(
 			model = state,
-			backAction = { rootNavigator.backAction() },
+			backAction = {
+				viewModel.resetState()
+				rootNavigator.backAction() },
 			onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
 			onAddSuggestedWord = { suggestedWord -> viewModel.addWord(suggestedWord)  },
 			onDone = {
 				state.readySeed?.let { seedFinal ->
+					viewModel.resetState()
 					viewModel.addSeed(
 						seedName = state.seedName,
 						seedPhrase = seedFinal,
