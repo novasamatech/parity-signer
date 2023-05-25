@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysets.restore
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.backend.OperationResult
@@ -21,7 +20,9 @@ class KeysetRecoverViewModel : ViewModel() {
 	val recoverState = _recoverState.asStateFlow()
 
 	fun initValue(model: KeysetRecoverModel) {
-		_recoverState.value = model
+		if (_recoverState.value == null) {
+			_recoverState.value = model
+		}
 	}
 
 	fun addSeed(
