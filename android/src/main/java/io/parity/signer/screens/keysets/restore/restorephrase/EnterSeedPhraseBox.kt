@@ -19,6 +19,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,8 +35,10 @@ import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textTertiary
 
 
 @Composable
@@ -83,7 +86,17 @@ fun EnterSeedPhraseBox(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp),
+				.defaultMinSize(minWidth = 10.dp, minHeight = 24.dp),
+			decorationBox = @Composable { innerTextField ->
+				innerTextField()
+				if (enteredWords.isEmpty() && userInput.isEmpty()) {
+					Text(
+						text = stringResource(R.string.enter_seed_phease_box_placeholder),
+						color = MaterialTheme.colors.textTertiary,
+						style = SignerTypeface.BodyL,
+					)
+				}
+			}
 		)
 	}
 

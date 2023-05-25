@@ -33,6 +33,7 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
@@ -95,7 +96,14 @@ fun KeysetRecoverNameScreen(
 					}
 				}
 			),
-			placeholder = { Text(text = stringResource(R.string.new_key_set_name_placeholder)) },
+			maxLines = 1,
+			placeholder = {
+				Text(
+					text = stringResource(R.string.new_key_set_name_placeholder),
+					color = MaterialTheme.colors.textTertiary,
+					style = SignerTypeface.BodyL,
+				)
+			},
 			singleLine = true,
 			textStyle = SignerTypeface.LabelM,
 			colors = TextFieldDefaults.textFieldColors(textColor = MaterialTheme.colors.primary),
@@ -132,11 +140,11 @@ data class KeysetRecoverModel(
 		fun stub(): KeysetRecoverModel {
 			return KeysetRecoverModel(
 				seedName = "some",
-					userInput = "ggf",
-					suggestedWords = listOf("ggfhg", "goha"),
-					draft =listOf("somve", "words", "that", "are", "draft"),
-					readySeed ="somve words that are draft",
-				)
+				userInput = "ggf",
+				suggestedWords = listOf("ggfhg", "goha"),
+				draft = listOf("somve", "words", "that", "are", "draft"),
+				readySeed = "somve words that are draft",
+			)
 		}
 	}
 }
