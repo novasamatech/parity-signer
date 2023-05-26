@@ -2,7 +2,10 @@ package io.parity.signer.screens.keysets.create
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -18,19 +21,17 @@ import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkModel
 import io.parity.signer.screens.keysetdetails.backup.SeedPhraseBox
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.uniffi.MNewSeedBackup
 
-
+//todo dmitry update
 @Composable
-internal fun NewKeySetBackupScreen(
-	model: NewSeedBackupModel,
-	onProceed: Callback,
-	onBack: Callback,
+fun NewKeySetSelectNetwork(
+	onProceed: (List<NetworkModel>) -> Unit,
+	onBack: Callback
 ) {
-
 	Column(
 		modifier = Modifier
 			.fillMaxSize(1f)
@@ -50,7 +51,6 @@ internal fun NewKeySetBackupScreen(
 				.padding(horizontal = 24.dp)
 				.padding(bottom = 8.dp),
 		)
-		SeedPhraseBox(seedPhrase = model.seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier
@@ -67,26 +67,6 @@ internal fun NewKeySetBackupScreen(
 }
 
 
-/**
- * Local copy of shared [MNewSeedBackup] class
- */
-data class NewSeedBackupModel(
-	var seed: String,
-	var seedPhrase: String,
-) {
-	companion object {
-		fun createStub(): NewSeedBackupModel =
-			NewSeedBackupModel(
-				"seed name",
-				" some long words some some words that consists key phrase"
-			)
-	}
-}
-
-fun MNewSeedBackup.toNewSeedBackupModel(): NewSeedBackupModel =
-	NewSeedBackupModel(seed = seed, seedPhrase = seedPhrase)
-
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -97,41 +77,8 @@ fun MNewSeedBackup.toNewSeedBackupModel(): NewSeedBackupModel =
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewNewKeySetBackupScreen() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
+private fun PreviewNewKeySetSelectNetwork() {
 	SignerNewTheme {
-		NewKeySetBackupScreen(model, {}, {})
-	}
-}
-
-
-@Preview
-@Composable
-private fun PreviewNewKeySetBackupScreenNarrow() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
-	Box(modifier = Modifier.size(height = 400.dp, width = 150.dp)) {
-		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
-		}
-	}
-}
-
-@Preview
-@Composable
-private fun PreviewNewKeySetBackupScreenShort() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
-	Box(modifier = Modifier.size(height = 400.dp, width = 200.dp)) {
-		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
-		}
+		NewKeySetSelectNetwork({}, {})
 	}
 }
