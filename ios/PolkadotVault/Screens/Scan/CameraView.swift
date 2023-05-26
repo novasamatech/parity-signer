@@ -125,9 +125,9 @@ struct CameraView: View {
         ) {
             TransactionPreview(
                 viewModel: .init(
-                    isPresented: $viewModel.isPresentingTransactionPreview,
                     content: viewModel.transactions,
-                    signature: viewModel.signature
+                    signature: viewModel.signature,
+                    onCompletion: viewModel.onTransactionPreviewCompletion(_:)
                 )
             )
         }
@@ -135,7 +135,6 @@ struct CameraView: View {
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
                 model.start()
-
                 // User entered invalid password too many times, present error
                 if viewModel.shouldPresentError {
                     // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
@@ -214,6 +213,10 @@ struct CameraView: View {
             )
             .clearModalBackground()
         }
+        .bottomSnackbar(
+            viewModel.snackbarViewModel,
+            isPresented: $viewModel.isSnackbarPresented
+        )
     }
 
     var multipleTransactionOverlay: some View {
@@ -273,6 +276,8 @@ extension CameraView {
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         @Binding var isPresented: Bool
         private let scanService: ScanTabService
@@ -347,6 +352,39 @@ extension CameraView {
 
         func dismissView() {
             isPresented = false
+        }
+
+        func onTransactionPreviewCompletion(_ completionAction: TransactionPreview.OnCompletionAction) {
+            isPresentingTransactionPreview = false
+            switch completionAction {
+            case .onImportKeysFailure:
+                snackbarViewModel = .init(
+                    title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                    style: .warning
+                )
+            case let .onNetworkAdded(network):
+                snackbarViewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
+                    style: .info
+                )
+                isSnackbarPresented = true
+            case let .onNetworkMetadataAdded(network, metadataVersion):
+                snackbarViewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.metadata(network, metadataVersion),
+                    style: .info
+                )
+                isSnackbarPresented = true
+            case let .onDerivedKeysImport(derivedKeysCount):
+                if derivedKeysCount == 1 {
+                    snackbarViewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
+                } else {
+                    snackbarViewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Success
+                            .multiple(derivedKeysCount)
+                    )
+                }
+                isSnackbarPresented = true
+            }
         }
     }
 }

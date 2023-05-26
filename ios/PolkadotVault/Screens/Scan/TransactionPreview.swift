@@ -229,36 +229,40 @@ struct TransactionPreview: View {
 }
 
 extension TransactionPreview {
+    enum OnCompletionAction: Equatable {
+        case onImportKeysFailure
+        case onNetworkAdded(String)
+        case onNetworkMetadataAdded(network: String, metadataVersion: String)
+        case onDerivedKeysImport(count: Int)
+    }
+
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
         private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
-        private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
         private let dismissRequest = PassthroughSubject<Void, Never>()
+        private let onCompletion: (OnCompletionAction) -> Void
 
         let signature: MSignatureReady?
 
         init(
-            isPresented: Binding<Bool>,
             content: [MTransaction],
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             importKeysService: ImportDerivedKeysService = ImportDerivedKeysService(),
-            scanService: ScanTabService = ScanTabService()
+            scanService: ScanTabService = ScanTabService(),
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
-            _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
             self.signature = signature
             self.seedsMediator = seedsMediator
-            self.snackbarPresentation = snackbarPresentation
             self.importKeysService = importKeysService
             self.scanService = scanService
+            self.onCompletion = onCompletion
         }
 
         func onAppear() {
@@ -275,12 +279,8 @@ extension TransactionPreview {
                 case let .success(updatedSeeds):
                     self.updateImportDerivationsData(updatedSeeds)
                 case .failure:
-                    self.snackbarPresentation.viewModel = .init(
-                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
-                        style: .warning
-                    )
-                    self.snackbarPresentation.isSnackbarPresented = true
-                    self.isPresented = false
+                    self.onCompletion(.onImportKeysFailure)
+                    self.dismissRequest.send()
                 }
             }
         }
@@ -316,17 +316,9 @@ extension TransactionPreview {
             scanService.onTransactionApprove()
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
-                snackbarPresentation.viewModel = .init(
-                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
-                    style: .info
-                )
-                snackbarPresentation.isSnackbarPresented = true
+                onCompletion(.onNetworkAdded(network))
             case let .metadata(network, version):
-                snackbarPresentation.viewModel = .init(
-                    title: Localizable.TransactionSign.Snackbar.metadata(network, version),
-                    style: .info
-                )
-                snackbarPresentation.isSnackbarPresented = true
+                onCompletion(.onNetworkMetadataAdded(network: network, metadataVersion: version))
             default:
                 ()
             }
@@ -340,25 +332,11 @@ extension TransactionPreview {
                 let derivedKeysCount = self.dataModel.map(\.content).importableKeysCount
                 switch result {
                 case .success:
-                    if derivedKeysCount == 1 {
-                        self.snackbarPresentation
-                            .viewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
-                    } else {
-                        self.snackbarPresentation
-                            .viewModel = .init(
-                                title: Localizable.ImportKeys.Snackbar.Success
-                                    .multiple(derivedKeysCount)
-                            )
-                    }
+                    self.onCompletion(.onDerivedKeysImport(count: derivedKeysCount))
                 case .failure:
-                    self.snackbarPresentation.viewModel = .init(
-                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
-                        style: .warning
-                    )
+                    self.onCompletion(.onImportKeysFailure)
                 }
-
-                self.snackbarPresentation.isSnackbarPresented = true
-                self.isPresented = false
+                self.dismissRequest.send()
             }
         }
 
@@ -374,16 +352,16 @@ extension TransactionPreview {
         static var previews: some View {
             // Single transaction
             TransactionPreview(viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
                 content: [.stub],
-                signature: .stub
+                signature: .stub,
+                onCompletion: { _ in }
             ))
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
                 content: [.stub, .stub],
-                signature: .stub
+                signature: .stub,
+                onCompletion: { _ in }
             ))
         }
     }

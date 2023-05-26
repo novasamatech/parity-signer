@@ -77,7 +77,6 @@ struct CreateDerivedKeyConfirmationView: View {
 
 extension CreateDerivedKeyConfirmationView {
     final class ViewModel: ObservableObject {
-        private let snackbarPresentation: BottomSnackbarPresentation
         private let onCompletion: () -> Void
         @Published var animateBackground: Bool = false
         @Published var isActionDisabled: Bool = true
@@ -87,11 +86,9 @@ extension CreateDerivedKeyConfirmationView {
 
         init(
             derivationPath: String,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             onCompletion: @escaping () -> Void
         ) {
             self.derivationPath = derivationPath
-            self.snackbarPresentation = snackbarPresentation
             self.onCompletion = onCompletion
         }
 
@@ -104,11 +101,7 @@ extension CreateDerivedKeyConfirmationView {
         }
 
         func confirmAction() {
-            snackbarPresentation.viewModel = .init(
-                title: Localizable.CreateDerivedKey.Snackbar.created.string,
-                style: .info
-            )
-            snackbarPresentation.isSnackbarPresented = true
+
             onCompletion()
         }
 
