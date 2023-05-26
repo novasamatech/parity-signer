@@ -59,25 +59,6 @@ fun BigButton(
 }
 
 /**
- * Suggest buttons for seed phrase recovery screen
- */
-@Composable
-fun SeedPhraseButton(word: String, select: () -> Unit) {
-	Surface(
-		shape = MaterialTheme.shapes.small,
-		color = MaterialTheme.colors.Crypto100,
-		modifier = Modifier.clickable(onClick = select)
-	) {
-		Text(
-			word,
-			style = CryptoTypography.body2,
-			color = MaterialTheme.colors.Crypto400,
-			modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-		)
-	}
-}
-
-/**
  * Small buttons for multiselect screen
  */
 @Composable
@@ -117,7 +98,6 @@ fun SmallButton(
 private fun PreviewOldButtons() {
 	Column {
 		BigButton("BigButton", action = {})
-		SeedPhraseButton("SeedPhraseButton") {}
 		SmallButton("SmallButton") {}
 	}
 }

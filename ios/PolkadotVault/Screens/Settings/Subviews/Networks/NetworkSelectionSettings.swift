@@ -50,7 +50,10 @@ struct NetworkSelectionSettings: View {
             }
             NavigationLink(
                 destination: NetworkSettingsDetails(
-                    viewModel: .init(networkKey: viewModel.selectedDetails)
+                    viewModel: .init(
+                        networkKey: viewModel.selectedDetailsKey,
+                        networkDetails: viewModel.selectedDetails
+                    )
                 )
                 .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDetails
@@ -95,21 +98,26 @@ extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let service: ManageNetworksService
+        private let networkDetailsService: ManageNetworkDetailsService
         @Published var networks: [MmNetwork] = []
-        @Published var selectedDetails: String!
+        @Published var selectedDetailsKey: String!
+        @Published var selectedDetails: MNetworkDetails!
         @Published var isPresentingDetails = false
         @Published var isShowingQRScanner: Bool = false
 
         init(
-            service: ManageNetworksService = ManageNetworksService()
+            service: ManageNetworksService = ManageNetworksService(),
+            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.service = service
+            self.networkDetailsService = networkDetailsService
             updateNetworks()
             onDetailsDismiss()
         }
 
         func onTap(_ network: MmNetwork) {
-            selectedDetails = network.key
+            selectedDetailsKey = network.key
+            selectedDetails = networkDetailsService.refreshCurrentNavigationState(network.key)
             isPresentingDetails = true
         }
 

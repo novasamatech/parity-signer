@@ -13,8 +13,17 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.domain.*
+import io.parity.signer.domain.LocalNavAction
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.SharedViewModel
+import io.parity.signer.domain.navigate
 import io.parity.signer.domain.storage.addSeed
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.domain.toKeyDetailsModel
+import io.parity.signer.domain.toKeySetDetailsModel
+import io.parity.signer.domain.toKeySetsSelectModel
+import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
@@ -25,6 +34,9 @@ import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
+import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
+import io.parity.signer.screens.keysets.restore.KeysetRecoverPhraseScreenFull
+import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
@@ -34,7 +46,11 @@ import io.parity.signer.screens.settings.networks.list.toNetworksListModel
 import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ErrorDisplayed
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
 fun CombinedScreensSelector(
@@ -55,6 +71,7 @@ fun CombinedScreensSelector(
 				networkState = networkState,
 			)
 		}
+
 		is ScreenData.Keys -> {
 			val keys = try {
 				keysBySeedName(screenData.f)
@@ -72,6 +89,7 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+
 		is ScreenData.KeyDetails ->
 			Box(modifier = Modifier.statusBarsPadding()) {
 				screenData.f?.toKeyDetailsModel()?.let { model ->
@@ -85,6 +103,7 @@ fun CombinedScreensSelector(
 						rootNavigator.backAction()
 					}
 			}
+
 		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.Settings ->
 			SettingsScreenSubgraph(
@@ -94,6 +113,7 @@ fun CombinedScreensSelector(
 				wipeToFactory = sharedViewModel::wipeToFactory,
 				networkState = networkState
 			)
+
 		is ScreenData.ManageNetworks ->
 			Box(modifier = Modifier.statusBarsPadding()) {
 				NetworksListSubgraph(
@@ -101,11 +121,13 @@ fun CombinedScreensSelector(
 					rootNavigator = rootNavigator
 				)
 			}
+
 		is ScreenData.NNetworkDetails ->
 			NetworkDetailsSubgraph(
 				screenData.f.toNetworkDetailsModel(),
 				rootNavigator,
 			)
+
 		is ScreenData.NewSeed ->
 			Box(
 				modifier = Modifier
@@ -117,11 +139,37 @@ fun CombinedScreensSelector(
 					seedNames = seedNames.value,
 				)
 			}
+
+		is ScreenData.RecoverSeedName -> {
+			Box(
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			) {
+				KeysetRecoverNameScreen(
+					rootNavigator = rootNavigator,
+					seedNames = seedNames.value,
+				)
+			}
+		}
+		is ScreenData.RecoverSeedPhrase ->
+			Box(
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			) {
+				KeysetRecoverPhraseScreenFull(
+					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
+					rootNavigator = rootNavigator,
+				)
+			}
+
 		is ScreenData.Scan -> {
 			ScanNavSubgraph(
 				rootNavigator = rootNavigator
 			)
 		}
+
 		is ScreenData.Transaction -> {
 			Log.e(
 				"Selector",
@@ -129,6 +177,7 @@ fun CombinedScreensSelector(
 			)
 			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
+
 		is ScreenData.DeriveKey -> {
 			Box(
 				modifier = Modifier
@@ -139,11 +188,13 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+
 		is ScreenData.VVerifier -> VerifierScreenFull(
 			screenData.f.toVerifierDetailsModels(),
 			sharedViewModel::wipeToJailbreak,
 			rootNavigator,
 		)
+
 		else -> {} //old Selector showing them
 	}
 }
@@ -172,6 +223,7 @@ fun BottomSheetSelector(
 						)
 					}
 				}
+
 				else -> {}
 			}
 		} else {
@@ -185,6 +237,7 @@ fun BottomSheetSelector(
 							keyDetails = sharedViewModel.lastOpenedKeyDetails
 						)
 					}
+
 				is ModalData.NewSeedMenu ->
 					//old design
 					BottomSheetWrapperRoot(onClosedAction = {
@@ -195,6 +248,7 @@ fun BottomSheetSelector(
 							navigator = sharedViewModel.navigator,
 						)
 					}
+
 				is ModalData.NewSeedBackup -> {
 					NewKeySetBackupScreenFull(
 						model = modalData.f.toNewSeedBackupModel(),
@@ -202,6 +256,7 @@ fun BottomSheetSelector(
 						onCreateKeySet = sharedViewModel::addSeed
 					)
 				}
+
 				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
 				is ModalData.EnterPassword ->
 					BottomSheetWrapperRoot(onClosedAction = {
@@ -218,6 +273,7 @@ fun BottomSheetSelector(
 							onClose = { navigator.backAction() },
 						)
 					}
+
 				is ModalData.SignatureReady -> {} //part of camera flow now
 				//old design
 				is ModalData.LogComment -> {} //moved to logs subgraph, part of settigns now

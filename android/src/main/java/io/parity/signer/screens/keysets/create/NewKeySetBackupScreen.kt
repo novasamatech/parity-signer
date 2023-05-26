@@ -18,7 +18,7 @@ import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.keysetdetails.backup.BackupPhraseBox
+import io.parity.signer.screens.keysetdetails.backup.SeedPhraseBox
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MNewSeedBackup
@@ -53,7 +53,7 @@ internal fun NewKeySetBackupScreen(
 				.padding(horizontal = 24.dp)
 				.padding(bottom = 8.dp),
 		)
-		BackupPhraseBox(seedPhrase = model.seedPhrase)
+		SeedPhraseBox(seedPhrase = model.seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier

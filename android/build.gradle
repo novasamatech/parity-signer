@@ -87,9 +87,9 @@ task buildDB (type: Exec) {
 }
 
 dependencies {
-	implementation 'androidx.core:core-ktx:1.9.0'
+	implementation 'androidx.core:core-ktx:1.10.1'
 	implementation 'androidx.appcompat:appcompat:1.6.1'
-	implementation 'com.google.android.material:material:1.8.0'
+	implementation 'com.google.android.material:material:1.9.0'
 	implementation "androidx.compose.ui:ui:$compose_libs_version"
 	implementation "androidx.compose.material:material:$compose_libs_version"
 	implementation "androidx.compose.material:material-icons-extended:$compose_libs_version"
@@ -99,9 +99,9 @@ dependencies {
 	implementation "androidx.navigation:navigation-compose:2.5.3"
 	implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 	implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
-	implementation 'androidx.activity:activity-compose:1.7.0'
-	implementation 'androidx.security:security-crypto:1.1.0-alpha05'
-	implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha05'
+	implementation 'androidx.activity:activity-compose:1.7.1'
+	implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+	implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha06'
 	implementation 'androidx.biometric:biometric:1.1.0'
 	implementation 'androidx.camera:camera-core:1.2.0'
 	implementation 'androidx.camera:camera-lifecycle:1.2.0'
@@ -110,13 +110,13 @@ dependencies {
 	implementation 'com.google.mlkit:barcode-scanning:17.1.0'
 	implementation 'com.halilibo.compose-richtext:richtext-commonmark-android:0.16.0'
 	implementation 'com.halilibo.compose-richtext:richtext-ui-material-android:0.16.0'
-	implementation 'androidx.core:core-ktx:1.9.0'
+	implementation 'androidx.core:core-ktx:1.10.1'
 	implementation "net.java.dev.jna:jna:5.13.0@aar"
 	testImplementation 'junit:junit:4.13.2'
 	testImplementation "org.mockito:mockito-core:5.3.1"
 	testImplementation "androidx.test:core:1.5.0"
 	testImplementation "androidx.test.ext:junit:1.1.4"
-	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
 	testImplementation 'junit:junit:4.13.2'
 	androidTestImplementation 'androidx.test.ext:junit:1.1.4'
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'

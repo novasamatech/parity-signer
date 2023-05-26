@@ -250,7 +250,7 @@
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 	<string name="derivation_path_hint_it_is_root">Empty path = creating root</string>
 	<string name="enter_password_input_label">Enter password</string>
-  <string name="derivation_screen_derivation_button_create">Create Derived Key</string>
+	<string name="derivation_screen_derivation_button_create">Create Derived Key</string>
 	<string name="derivation_path_screen_error_wrong_path">Derivation path is wrong</string>
 	<string name="derivation_path_screen_error_collision_path">Key with this Derivation path name already exists</string>
 	<string name="derivation_path_screen_error_password_empty">Password is empty</string>
@@ -268,7 +268,7 @@
 	<string name="import_derivations_error_key_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
 	<string name="import_derivations_error_network_missing">Some keys can not be imported until their networks are added. Please add missing networks and their metadata. </string>
 	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>
-<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
+	<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
 	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
 	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
@@ -282,7 +282,7 @@
 	<string name="screen_lock_title">Set Up Screen Lock</string>
 	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin, pattern or fingerprint. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
 	<string name="screen_lock_open_settings_button">Go to Settings</string>
-  <string name="documents_terms_of_service">Terms of service</string>
+	<string name="documents_terms_of_service">Terms of service</string>
 	<string name="documents_privacy_policy">Privacy policy</string>
 	<string name="documents_accepted_checkmark">I’ve read and accept the Terms of Service and Privacy Policy</string>
 	<string name="documents_accept_cta_button">I Agree</string>
@@ -359,12 +359,12 @@
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
 	<string name="logs_add_comment_title">Add Note</string>
-  <string name="add_log_note_placeholder">Enter log note</string>
-  <string name="key_details_public_label_network">Network</string>
+	<string name="add_log_note_placeholder">Enter log note</string>
+	<string name="key_details_public_label_network">Network</string>
 	<string name="key_details_public_label_path">Derivation Path</string>
 	<string name="key_details_public_label_keyset">Key Set Name</string>
 	<string name="derivation_network_select_title">Select Network</string>
-  <string name="derive_key_network_all">Allow use on any network</string>
+	<string name="derive_key_network_all">Allow use on any network</string>
 	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
 	<string name="networks_screen_add_net_network">Add new network</string>
 	<string name="networks_help_screen_1">Step 1/2</string>
@@ -384,13 +384,18 @@
 	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
 	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
 	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
-    <string name="onboarding_skip">Skip</string>
+	<string name="onboarding_skip">Skip</string>
 	<string name="onboarding_welcome">Welcome to Polkadot Vault</string>
 	<string name="onboarding_header_1">Turn Your Smartphone Into a Hardware Wallet</string>
 	<string name="onboarding_header_2">Generate and Store Multiple Private Keys</string>
 	<string name="onboarding_header_3">Sign Transactions While Keeping Your Private Keys Offline</string>
 	<string name="onboarding_header_4">Add New Networks and Update Them Without Breaking the Air Gap</string>
-    <string name="onboarding_cta_continue">Continue</string>
+	<string name="onboarding_cta_continue">Continue</string>
+	<string name="recovert_key_set_title">Recover Key set</string>
+	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
+	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
+    <string name="recover_key_set_subtitle">Secret Recovery Phrase</string>
+    <string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
 
 </resources>
 

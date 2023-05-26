@@ -121,7 +121,6 @@ internal fun TransactionsScreenFull(
 	}
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun getTransactionsTitle(
 	previewType: TransactionPreviewType,
