@@ -20,7 +20,7 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.SnackBarCircularCountDownTimer
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
-import io.parity.signer.screens.keysetdetails.backup.BackupPhraseBox
+import io.parity.signer.screens.keysetdetails.backup.SeedPhraseBox
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -76,7 +76,7 @@ private fun SeedBackupBottomSheet(
 				R.string.subtitle_secret_recovery_phrase,
 				Modifier.padding(top = 14.dp, bottom = 8.dp)
 			)
-			BackupPhraseBox(seedPhrase)
+			SeedPhraseBox(seedPhrase)
 			Spacer(modifier = Modifier.size(height = timerSize.value, width = 1.dp))
 		}
 	}

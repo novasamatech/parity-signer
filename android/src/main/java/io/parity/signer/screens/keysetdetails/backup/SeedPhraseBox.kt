@@ -35,19 +35,19 @@ private val RobotoFontFamily = FontFamily(
 	Font(R.font.robotomono_regular, FontWeight.Medium),
 	Font(R.font.robotomono_bold, FontWeight.Bold),
 )
-private val PhraseNumberStyle: TextStyle = TextStyle(
+internal val PhraseNumberStyle: TextStyle = TextStyle(
 	fontFamily = RobotoFontFamily,
 	fontWeight = FontWeight.Normal,
 	fontSize = 13.sp
 )
-private val PhraseWordStyle: TextStyle = TextStyle(
+internal val PhraseWordStyle: TextStyle = TextStyle(
 	fontFamily = RobotoFontFamily,
 	fontWeight = FontWeight.Bold,
 	fontSize = 13.sp
 )
 
 @Composable
-fun BackupPhraseBox(seedPhrase: String) {
+fun SeedPhraseBox(seedPhrase: String) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
@@ -62,7 +62,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 	) {
 		val words = seedPhrase.split(" ")
 		for (index in 0..words.lastIndex) {
-			BackupPhraseItem(index = index + 1, word = words[index])
+			SeedPhraseItem(index = index + 1, word = words[index])
 		}
 	}
 
@@ -72,7 +72,7 @@ fun BackupPhraseBox(seedPhrase: String) {
 
 
 @Composable
-private fun BackupPhraseItem(index: Int, word: String) {
+private fun SeedPhraseItem(index: Int, word: String) {
 	Row(Modifier
 		.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp)
 		.padding(vertical = 2.dp)
@@ -104,8 +104,8 @@ private fun BackupPhraseItem(index: Int, word: String) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewBackupPhraseBox() {
+private fun PreviewSeedPhraseBox() {
 	SignerNewTheme {
-		BackupPhraseBox("some workds used for secret veryverylong special long text here to see how printed")
+		SeedPhraseBox("some workds used for secret veryverylong special long text here to see how printed")
 	}
 }
