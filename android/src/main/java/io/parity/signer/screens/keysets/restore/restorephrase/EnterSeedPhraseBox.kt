@@ -2,10 +2,12 @@ package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
@@ -32,10 +34,12 @@ import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
 import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.domain.KeepScreenOn
+import io.parity.signer.domain.conditional
 import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
@@ -76,6 +80,7 @@ fun EnterSeedPhraseBox(
 		}
 		//workaround for //https://issuetracker.google.com/issues/160257648 - update to new TextField
 		var lastPostedData: String? = null
+		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord, //as was before redesign, should been moved to rust but need to align with iOS
@@ -89,10 +94,12 @@ fun EnterSeedPhraseBox(
 			modifier = Modifier
 				.focusRequester(focusRequester)
 				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.defaultMinSize(minWidth = 10.dp, minHeight = 24.dp),
+				.conditional(!shouldShowPlaceholder) {
+					width(IntrinsicSize.Min)
+				},
 			decorationBox = @Composable { innerTextField ->
 				innerTextField()
-				if (enteredWords.isEmpty() && userInput.isEmpty()) {
+				if (shouldShowPlaceholder) {
 					Text(
 						text = stringResource(R.string.enter_seed_phease_box_placeholder),
 						color = MaterialTheme.colors.textTertiary,
@@ -117,7 +124,7 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 	Row(
 		Modifier
 			.background(MaterialTheme.colors.fill6, RoundedCornerShape(16.dp))
-			.defaultMinSize(minWidth = 100.dp, minHeight = 24.dp)
+			.defaultMinSize(minWidth = 40.dp, minHeight = 24.dp)
 			.padding(vertical = 8.dp, horizontal = 12.dp)
 	) {
 		Text(
@@ -145,10 +152,26 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
+private fun PreviewSeedPhraseRestoreComponentEmptry() {
+	SignerNewTheme {
+		EnterSeedPhraseBox(emptyList(), "", Modifier, {})
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
 private fun PreviewSeedPhraseRestoreComponentFinished() {
 	val entered = listOf(
 		"some", "workds", "used", "secret", "veryverylong", "special",
-		"long", "text", "here", "how", "printed"
+		"long", "text", "here", "how", "printed1234"
 	)
 	SignerNewTheme {
 		EnterSeedPhraseBox(entered, "", Modifier, {})
