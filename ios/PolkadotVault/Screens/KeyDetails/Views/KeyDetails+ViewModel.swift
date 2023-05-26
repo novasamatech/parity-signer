@@ -80,7 +80,7 @@ extension KeyDetailsView {
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            seedsMediator: SeedsMediating = SeedsMediator()
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.keyName = keyName
             self.keysData = keysData
