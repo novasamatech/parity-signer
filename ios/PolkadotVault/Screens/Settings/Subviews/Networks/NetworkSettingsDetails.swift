@@ -331,13 +331,14 @@ extension NetworkSettingsDetails {
 
         init(
             networkKey: String,
+            networkDetails: MNetworkDetails,
             snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.networkKey = networkKey
             self.snackbarPresentation = snackbarPresentation
             self.networkDetailsService = networkDetailsService
-            _networkDetails = .init(initialValue: networkDetailsService.refreshCurrentNavigationState(networkKey))
+            _networkDetails = .init(initialValue: networkDetails)
             listenToNavigationUpdates()
         }
 
@@ -396,6 +397,7 @@ extension NetworkSettingsDetails {
         }
 
         func removeNetwork() {
+            isPresentingRemoveNetworkConfirmation = false
             snackbarPresentation.viewModel = .init(
                 title: Localizable.Settings.NetworkDetails.DeleteNetwork.Label
                     .confirmation(networkDetails.title),
@@ -411,10 +413,13 @@ extension NetworkSettingsDetails {
         }
 
         private func updateView() {
-            networkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
+            guard let updatedNetworkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
+            else { return }
+            networkDetails = updatedNetworkDetails
         }
 
         private func listenToNavigationUpdates() {
+            guard cancelBag.subscriptions.isEmpty else { return }
             $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
                 guard let self = self, !isPresentingSignSpecList else { return }
                 self.signSpecList = nil
