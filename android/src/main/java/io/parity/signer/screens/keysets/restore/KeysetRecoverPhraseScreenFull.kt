@@ -1,9 +1,12 @@
 package io.parity.signer.screens.keysets.restore
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.parity.signer.R
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreenView
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +27,7 @@ fun KeysetRecoverPhraseScreenFull(
 	}
 
 	state.value?.let { state ->
+		val context = LocalContext.current
 		KeysetRecoverPhraseScreenView(
 			model = state,
 			backAction = {
@@ -40,6 +44,11 @@ fun KeysetRecoverPhraseScreenFull(
 						seedPhrase = seedFinal,
 						navigator = rootNavigator
 					)
+					Toast.makeText(
+						context,
+						context.getText(R.string.key_set_has_been_recovered_toast),
+						Toast.LENGTH_LONG
+					).show()
 				}
 			}
 		)

@@ -396,6 +396,7 @@
 	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
     <string name="recover_key_set_subtitle">Secret Recovery Phrase</string>
     <string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
+    <string name="key_set_has_been_recovered_toast">Key Set Has Been Recovered</string>
 
 </resources>
 
