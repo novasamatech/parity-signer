@@ -75,6 +75,15 @@ struct LogNoteModal: View {
         .onAppear {
             focused = true
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -85,16 +94,15 @@ extension LogNoteModal {
         @Published var isActionDisabled: Bool = true
         private var cancelBag = CancelBag()
         private let logsService: LogsService
-        private let snackBarPresentation: BottomSnackbarPresentation
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
 
         init(
             isPresented: Binding<Bool>,
-            logsService: LogsService = LogsService(),
-            snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation
+            logsService: LogsService = LogsService()
         ) {
             _isPresented = isPresented
             self.logsService = logsService
-            self.snackBarPresentation = snackBarPresentation
             subscribeToUpdates()
         }
 
@@ -109,8 +117,8 @@ extension LogNoteModal {
                 case .success:
                     self.isPresented = false
                 case let .failure(error):
-                    self.snackBarPresentation.viewModel = .init(title: error.description)
-                    self.snackBarPresentation.isSnackbarPresented = true
+                    self.presentableError = .init(title: error.description)
+                    self.isPresentingError = true
                 }
             }
         }

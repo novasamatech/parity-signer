@@ -10,6 +10,10 @@ import Foundation
 import SwiftUI
 
 extension KeyDetailsView {
+    enum OnCompletionAction: Equatable {
+        case keySetDeleted
+    }
+
     enum ViewState {
         case emptyState
         case list
@@ -23,7 +27,6 @@ extension KeyDetailsView {
 
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
-        private let snackbarPresentation: BottomSnackbarPresentation
         private let seedsMediator: SeedsMediating
         let keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
@@ -56,6 +59,8 @@ extension KeyDetailsView {
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
         @Published var viewState: ViewState = .list
         @Published var backupModal: BackupModalViewModel?
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         // Derive New Key
         @Published var isPresentingDeriveNewKey: Bool = false
@@ -66,7 +71,7 @@ extension KeyDetailsView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
-
+        private let onCompletion: (OnCompletionAction) -> Void
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
@@ -79,8 +84,8 @@ extension KeyDetailsView {
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            seedsMediator: SeedsMediating = SeedsMediator()
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.keyName = keyName
             self.keysData = keysData
@@ -90,8 +95,8 @@ extension KeyDetailsView {
             self.keyDetailsActionsService = keyDetailsActionsService
             self.warningStateMediator = warningStateMediator
             self.appState = appState
-            self.snackbarPresentation = snackbarPresentation
             self.seedsMediator = seedsMediator
+            self.onCompletion = onCompletion
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
@@ -148,19 +153,37 @@ extension KeyDetailsView {
         func onRemoveKeySetConfirmationTap() {
             let isRemoved = seedsMediator.removeSeed(seedName: removeSeed)
             guard isRemoved else { return }
-
             keyDetailsActionsService.forgetKeySetAction(keyName)
-            // Present snackbar from bottom as action confirmation
-            snackbarPresentation.viewModel = .init(
-                title: Localizable.KeySetsModal.Confirmation.snackbar.string,
-                style: .warning
-            )
-            snackbarPresentation.isSnackbarPresented = true
             dismissRequest.send()
+            onCompletion(.keySetDeleted)
         }
 
         func onRemoveKeySetModalDismiss() {
             keyDetailsActionsService.resetNavigationStateToKeyDetails(keyName)
+        }
+
+        func onPublicKeyCompletion(_ completionAction: KeyDetailsPublicKeyView.OnCompletionAction) {
+            switch completionAction {
+            case .derivedKeyDeleted:
+                refreshData()
+                snackbarViewModel = .init(
+                    title: Localizable.PublicKeyDetailsModal.Confirmation.snackbar.string,
+                    style: .warning
+                )
+                isSnackbarPresented = true
+            }
+        }
+
+        func onAddDerivedKeyCompletion(_ completionAction: CreateKeyNetworkSelectionView.OnCompletionAction) {
+            switch completionAction {
+            case .derivedKeyCreated:
+                refreshData()
+                snackbarViewModel = .init(
+                    title: Localizable.CreateDerivedKey.Snackbar.created.string,
+                    style: .info
+                )
+                isSnackbarPresented = true
+            }
         }
     }
 }

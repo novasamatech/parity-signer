@@ -135,6 +135,7 @@ class SeedRepository(
 	) {
 		storage.addSeed(seedName, seedPhrase)
 		tellRustSeedNames()
+		//createRoots is fake and should always be true. It's added for educational reasons
 		val alwaysCreateRoots = "true"
 		navigator.navigate(
 			action = Action.GO_FORWARD,

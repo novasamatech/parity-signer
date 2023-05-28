@@ -80,7 +80,7 @@ private fun KeySetBackupBottomSheet(
 				R.string.subtitle_secret_recovery_phrase,
 				Modifier.padding(top = 14.dp, bottom = 8.dp)
 			)
-			BackupPhraseBox(seedPhrase)
+			SeedPhraseBox(seedPhrase)
 			//derived keys
 			BottomSheetSubtitle(
 				R.string.subtitle_derived_keys,

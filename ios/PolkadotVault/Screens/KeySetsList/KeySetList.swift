@@ -157,6 +157,10 @@ struct KeySetList: View {
                 isExportKeysSelected.toggle()
             }
         }
+        .bottomSnackbar(
+            viewModel.snackbarViewModel,
+            isPresented: $viewModel.isSnackbarPresented
+        )
     }
 
     func keyList() -> some View {
@@ -172,7 +176,8 @@ struct KeySetList: View {
                         KeyDetailsView(
                             viewModel: .init(
                                 keyName: $0.keyName,
-                                keysData: detailsToPresent
+                                keysData: detailsToPresent,
+                                onCompletion: viewModel.onKeyDetailsCompletion(_:)
                             )
                         )
                         .navigationBarHidden(true),
@@ -258,6 +263,8 @@ extension KeySetList {
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
         let tabBarViewModel: TabBarView.ViewModel
         let keyDetailsService: KeyDetailsService
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
@@ -294,6 +301,18 @@ extension KeySetList {
             _ completion: @escaping (Result<MKeysNew, ServiceError>) -> Void
         ) {
             keyDetailsService.getKeys(for: seedName, completion)
+        }
+
+        func onKeyDetailsCompletion(_ completionAction: KeyDetailsView.OnCompletionAction) {
+            switch completionAction {
+            case .keySetDeleted:
+                updateData()
+                snackbarViewModel = .init(
+                    title: Localizable.KeySetsModal.Confirmation.snackbar.string,
+                    style: .warning
+                )
+                isSnackbarPresented = true
+            }
         }
     }
 }

@@ -208,13 +208,16 @@ private extension KeyDetailsPublicKeyView {
 }
 
 extension KeyDetailsPublicKeyView {
+    enum OnCompletionAction: Equatable {
+        case derivedKeyDeleted
+    }
+
     final class ViewModel: ObservableObject {
         private let keyDetails: MKeyDetails
         private let publicKeyDetails: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
-        private let snackbarPresentation: BottomSnackbarPresentation
 
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
@@ -235,7 +238,7 @@ extension KeyDetailsPublicKeyView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: () -> Void
+        private let onCompletion: (OnCompletionAction) -> Void
 
         init(
             keyDetails: MKeyDetails,
@@ -243,15 +246,13 @@ extension KeyDetailsPublicKeyView {
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            onCompletion: @escaping () -> Void
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.keyDetails = keyDetails
             self.publicKeyDetails = publicKeyDetails
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
-            self.snackbarPresentation = snackbarPresentation
             self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
         }
@@ -297,12 +298,7 @@ extension KeyDetailsPublicKeyView {
 
         func onRemoveKeyTap() {
             publicKeyDetailsService.forgetSingleKey(keyDetails.address.seedName)
-            snackbarPresentation.viewModel = .init(
-                title: Localizable.PublicKeyDetailsModal.Confirmation.snackbar.string,
-                style: .warning
-            )
-            snackbarPresentation.isSnackbarPresented = true
-            onCompletion()
+            onCompletion(.derivedKeyDeleted)
             dismissRequest.send()
         }
     }
@@ -316,7 +312,7 @@ extension KeyDetailsPublicKeyView {
                     viewModel: .init(
                         keyDetails: .stub,
                         publicKeyDetails: "publicKeyDetails",
-                        onCompletion: {}
+                        onCompletion: { _ in }
                     )
                 )
             }
