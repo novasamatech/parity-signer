@@ -26,10 +26,10 @@ import io.parity.signer.screens.keysetdetails.backup.SeedPhraseBox
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
-//todo dmitry update
+//todo dmitry add this
 @Composable
 fun NewKeySetSelectNetwork(
-	onProceed: (List<NetworkModel>) -> Unit,
+	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
 	onBack: Callback
 ) {
 	Column(
