@@ -92,15 +92,12 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 				Box(modifier = Modifier.padding(innerPadding)) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
-						networkState = shieldAlert,
 						navigate = sharedViewModel.navigator::navigate,
 						sharedViewModel = sharedViewModel
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
 						localNavAction = localNavAction.value,
-						networkState = shieldAlert,
-						navigate = sharedViewModel.navigator::navigate,
 						sharedViewModel = sharedViewModel,
 					)
 				}
