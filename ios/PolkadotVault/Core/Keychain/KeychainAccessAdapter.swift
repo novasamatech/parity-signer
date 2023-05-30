@@ -42,7 +42,7 @@ protocol KeychainAccessAdapting: AnyObject {
     ///            otherwise `.failure` with `KeychainError`
     func checkIfSeedPhraseAlreadyExists(seedPhrase: Data) -> Result<Bool, KeychainError>
     /// Remove all seeds from Keychain
-    func removeAllSeeds()
+    func removeAllSeeds() -> Bool
 }
 
 final class KeychainAccessAdapter: KeychainAccessAdapting {
@@ -176,8 +176,13 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
         return .success(false)
     }
 
-    func removeAllSeeds() {
+    func removeAllSeeds() -> Bool {
         let query = queryProvider.query(for: .deleteAll)
-        SecItemDelete(query)
+        let osStatus = SecItemDelete(query)
+        if osStatus == errSecSuccess {
+            return true
+        } else {
+            return false
+        }
     }
 }

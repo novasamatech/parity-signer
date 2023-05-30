@@ -35,7 +35,8 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
     }
 
     private func initialiseFirstRun() {
-        localDataCleanup()
+        seedsMediator.removeStalledSeeds()
+        databaseMediator.wipeDatabase()
     }
 
     private func initialiseOnboardedUserRun() {
@@ -43,12 +44,5 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
         do {
             try initNavigation(dbname: databaseMediator.databaseName, seedNames: seedsMediator.seedNames)
         } catch {}
-    }
-}
-
-private extension AppLaunchMediator {
-    func localDataCleanup() {
-        seedsMediator.removeAllSeeds()
-        databaseMediator.wipeDatabase()
     }
 }
