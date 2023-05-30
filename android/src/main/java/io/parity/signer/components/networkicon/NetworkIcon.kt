@@ -135,6 +135,7 @@ private fun getResourceIdForNetwork(networkName: String) =
 		"encointer-parachain" -> R.drawable.network_encointer_parachain
 		"equilibrium" -> R.drawable.network_equilibrium
 		"frequency" -> R.drawable.network_frequency
+		"frequency-rococo" -> R.drawable.network_frequency_rococo
 		"fusotao" -> R.drawable.network_fusotao
 		"geminis" -> R.drawable.network_geminis
 		"genshiro" -> R.drawable.network_genshiro
