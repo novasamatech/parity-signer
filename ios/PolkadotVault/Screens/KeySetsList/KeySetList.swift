@@ -10,17 +10,6 @@ import SwiftUI
 struct KeySetList: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject var appState: AppState
-    @State private var isShowingNewSeedMenu = false
-    @State private var isShowingCreateKeySet = false
-    @State private var isShowingMoreMenu = false
-    @State private var isExportKeysSelected = false
-    @State private var shouldShowCreateKeySet = false
-    @State private var shouldShowRecoverKeySet = false
-    @State private var isShowingRecoverKeySet = false
-    @State private var detailsToPresent: MKeysNew?
-    @State private var isShowingDetails = false
-
-    @State var selectedItems: [KeySetViewModel] = []
 
     var body: some View {
         NavigationView {
@@ -32,17 +21,12 @@ struct KeySetList: View {
                         viewModel: NavigationBarViewModel(
                             title: Localizable.KeySets.title.string,
                             leftButtons: [.init(
-                                type: isExportKeysSelected ? .xmark : .empty,
-                                action: {
-                                    isExportKeysSelected.toggle()
-                                    selectedItems.removeAll()
-                                }
+                                type: viewModel.isExportKeysSelected ? .xmark : .empty,
+                                action: viewModel.onCancelExportTap
                             )],
                             rightButtons: [.init(
-                                type: isExportKeysSelected ? .empty : .more,
-                                action: {
-                                    isShowingMoreMenu.toggle()
-                                }
+                                type: viewModel.isExportKeysSelected ? .empty : .more,
+                                action: viewModel.onShowMoreTap
                             )],
                             backgroundColor: Asset.backgroundSystem.swiftUIColor
                         )
@@ -63,13 +47,11 @@ struct KeySetList: View {
                 .navigationBarHidden(true)
                 VStack {
                     // Add Key Set
-                    if !isExportKeysSelected {
+                    if !viewModel.isExportKeysSelected {
                         VStack(spacing: 0) {
                             ConnectivityAlertOverlay(viewModel: .init())
                             PrimaryButton(
-                                action: {
-                                    isShowingNewSeedMenu.toggle()
-                                },
+                                action: viewModel.onAddKeySetTap,
                                 text: Localizable.KeySets.Action.add.key
                             )
                             .padding(.horizontal, Spacing.large)
@@ -80,62 +62,55 @@ struct KeySetList: View {
                         viewModel: viewModel.tabBarViewModel
                     )
                 }
-                if isExportKeysSelected {
+                if viewModel.isExportKeysSelected {
                     exportKeysOverlay
                 }
+                // Navigation Links
+                NavigationLink(
+                    destination:
+                    KeyDetailsView(viewModel: viewModel.keyDetails())
+                        .navigationBarHidden(true),
+                    isActive: $viewModel.isShowingDetails
+                ) { EmptyView() }
             }
         }
         .onAppear {
             viewModel.use(appState: appState)
             viewModel.updateData()
         }
-        .onChange(of: isShowingDetails, perform: { _ in
-            guard !isShowingDetails else { return }
+        .onChange(of: viewModel.isShowingDetails, perform: { _ in
+            guard !viewModel.isShowingDetails else { return }
             viewModel.updateData()
         })
         .fullScreenModal(
-            isPresented: $isShowingNewSeedMenu,
-            onDismiss: {
-                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
-                DispatchQueue.main.async {
-                    if shouldShowCreateKeySet {
-                        shouldShowCreateKeySet = false
-                        isShowingCreateKeySet = true
-                    }
-                    if shouldShowRecoverKeySet {
-                        shouldShowRecoverKeySet = false
-                        isShowingRecoverKeySet = true
-                    }
-                    if shouldShowRecoverKeySet {
-                        shouldShowRecoverKeySet = false
-                        isShowingRecoverKeySet = true
-                    }
-                }
-            }
+            isPresented: $viewModel.isShowingNewSeedMenu,
+            onDismiss: viewModel.onNewSeedMenuDismiss
         ) {
             AddKeySetModal(
-                isShowingNewSeedMenu: $isShowingNewSeedMenu,
-                shouldShowCreateKeySet: $shouldShowCreateKeySet,
-                shouldShowRecoverKeySet: $shouldShowRecoverKeySet
+                isShowingNewSeedMenu: $viewModel.isShowingNewSeedMenu,
+                shouldShowCreateKeySet: $viewModel.shouldShowCreateKeySet,
+                shouldShowRecoverKeySet: $viewModel.shouldShowRecoverKeySet
             )
             .clearModalBackground()
         }
         .fullScreenModal(
-            isPresented: $isShowingCreateKeySet,
+            isPresented: $viewModel.isShowingCreateKeySet,
             onDismiss: viewModel.updateData
         ) {
-            EnterKeySetNameView(viewModel: .init(isPresented: $isShowingCreateKeySet))
+            EnterKeySetNameView(viewModel: .init(isPresented: $viewModel.isShowingCreateKeySet))
         }
         .fullScreenModal(
-            isPresented: $isShowingRecoverKeySet,
+            isPresented: $viewModel.isShowingRecoverKeySet,
             onDismiss: viewModel.updateData
         ) {
-            RecoverKeySetNameView(viewModel: .init(isPresented: $isShowingRecoverKeySet))
+            RecoverKeySetNameView(viewModel: .init(isPresented: $viewModel.isShowingRecoverKeySet))
         }
-        .fullScreenModal(isPresented: $isShowingMoreMenu) {
+        .fullScreenModal(
+            isPresented: $viewModel.isShowingMoreMenu
+        ) {
             KeyListMoreMenuModal(
-                isPresented: $isShowingMoreMenu,
-                isExportKeysSelected: $isExportKeysSelected
+                isPresented: $viewModel.isShowingMoreMenu,
+                isExportKeysSelected: $viewModel.isExportKeysSelected
             )
             .clearModalBackground()
         }
@@ -145,16 +120,16 @@ struct KeySetList: View {
             ExportMultipleKeysModal(
                 viewModel: .init(
                     viewModel: ExportMultipleKeysModalViewModel(
-                        selectedItems: .keySets(selectedItems),
-                        count: selectedItems.count
+                        selectedItems: .keySets(viewModel.selectedItems),
+                        count: viewModel.selectedItems.count
                     ),
                     isPresented: $viewModel.isShowingKeysExportModal
                 )
             )
             .clearModalBackground()
             .onAppear {
-                selectedItems.removeAll()
-                isExportKeysSelected.toggle()
+                viewModel.selectedItems.removeAll()
+                viewModel.isExportKeysSelected.toggle()
             }
         }
         .bottomSnackbar(
@@ -171,18 +146,7 @@ struct KeySetList: View {
                     id: \.keyName
                 ) {
                     keyItem($0)
-                    NavigationLink(
-                        destination:
-                        KeyDetailsView(
-                            viewModel: .init(
-                                keyName: $0.keyName,
-                                keysData: detailsToPresent,
-                                onCompletion: viewModel.onKeyDetailsCompletion(_:)
-                            )
-                        )
-                        .navigationBarHidden(true),
-                        isActive: $isShowingDetails
-                    ) { EmptyView() }
+                        .padding([.horizontal, .bottom], Spacing.extraSmall)
                 }
                 Spacer()
                     .listRowBackground(Asset.backgroundSystem.swiftUIColor)
@@ -192,59 +156,37 @@ struct KeySetList: View {
         }
     }
 
-    func keyItem(_ viewModel: KeySetViewModel) -> some View {
+    func keyItem(_ keySetViewModel: KeySetViewModel) -> some View {
         KeySetRow(
-            viewModel: viewModel,
-            selectedItems: $selectedItems,
-            isExportKeysSelected: $isExportKeysSelected
+            viewModel: keySetViewModel,
+            selectedItems: $viewModel.selectedItems,
+            isExportKeysSelected: $viewModel.isExportKeysSelected
         )
-        .padding([.horizontal, .bottom], Spacing.extraSmall)
         .onTapGesture {
-            if isExportKeysSelected {
-                if selectedItems.contains(viewModel) {
-                    selectedItems.removeAll { $0 == viewModel }
-                } else {
-                    selectedItems.append(viewModel)
-                }
-            } else {
-                self.viewModel.loadKeysInformation(for: viewModel.keyName) { result in
-                    switch result {
-                    case let .success(keysData):
-                        detailsToPresent = keysData
-                        isShowingDetails = true
-                    case .failure:
-                        ()
-                    }
-                }
-            }
+            viewModel.onKeyTap(keySetViewModel)
         }
     }
 
     var exportKeysOverlay: some View {
         HStack {
-            Button(action: {
-                selectedItems = viewModel.listViewModel.list
-                viewModel.isShowingKeysExportModal.toggle()
-            }) {
+            Button(action: viewModel.onExportAllTap) {
                 Localizable.KeySets.More.Action.exportAll.text
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
                     .font(PrimaryFont.labelL.font)
             }
             .padding(.leading, Spacing.medium)
             Spacer()
-            Button(action: {
-                viewModel.isShowingKeysExportModal.toggle()
-            }) {
+            Button(action: viewModel.onExportSelectedTap) {
                 Localizable.KeySets.More.Action.exportSelected.text
                     .foregroundColor(
-                        selectedItems.isEmpty ?
+                        viewModel.selectedItems.isEmpty ?
                             Asset.textAndIconsDisabled.swiftUIColor :
                             Asset.accentPink300
                             .swiftUIColor
                     )
                     .font(PrimaryFont.labelL.font)
             }
-            .disabled(selectedItems.isEmpty)
+            .disabled(viewModel.selectedItems.isEmpty)
             .padding(.trailing, Spacing.medium)
         }
         .frame(height: Heights.tabbarHeight)
@@ -257,14 +199,28 @@ extension KeySetList {
         private let keyListService: KeyListService
         private let cancelBag = CancelBag()
         private let modelBuilder: KeySetListViewModelBuilder
+        private let keyDetailsService: KeyDetailsService
+        let tabBarViewModel: TabBarView.ViewModel
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
         private weak var appState: AppState!
         @Published var dataModel: MSeeds = .init(seedNameCards: [])
-        @Published var isShowingKeysExportModal = false
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
-        let tabBarViewModel: TabBarView.ViewModel
-        let keyDetailsService: KeyDetailsService
-        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var selectedItems: [KeySetViewModel] = []
+        @Published var detailsToPresent: MKeysNew?
+        @Published var detailsKeyName: String = ""
+
+        @Published var isShowingRecoverKeySet = false
+
+        @Published var isShowingKeysExportModal = false
         @Published var isSnackbarPresented: Bool = false
+        @Published var isShowingKeyDetails = false
+        @Published var isShowingNewSeedMenu = false
+        @Published var isShowingCreateKeySet = false
+        @Published var isShowingMoreMenu = false
+        @Published var isExportKeysSelected = false
+        @Published var shouldShowCreateKeySet = false
+        @Published var shouldShowRecoverKeySet = false
+        @Published var isShowingDetails = false
 
         init(
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
@@ -313,6 +269,76 @@ extension KeySetList {
                 )
                 isSnackbarPresented = true
             }
+        }
+
+        func onKeyTap(_ viewModel: KeySetViewModel) {
+            if isExportKeysSelected {
+                if selectedItems.contains(viewModel) {
+                    selectedItems.removeAll { $0 == viewModel }
+                } else {
+                    selectedItems.append(viewModel)
+                }
+            } else {
+                loadKeysInformation(for: viewModel.keyName) { result in
+                    switch result {
+                    case let .success(keysData):
+                        self.detailsToPresent = keysData
+                        self.detailsKeyName = viewModel.keyName
+                        self.isShowingDetails = true
+                    case .failure:
+                        self.detailsToPresent = nil
+                        self.detailsKeyName = ""
+                    }
+                }
+            }
+        }
+
+        func keyDetails() -> KeyDetailsView.ViewModel {
+            .init(
+                keyName: detailsKeyName,
+                keysData: detailsToPresent,
+                onCompletion: onKeyDetailsCompletion(_:)
+            )
+        }
+
+        func onNewSeedMenuDismiss() {
+            // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
+            DispatchQueue.main.async {
+                if self.shouldShowCreateKeySet {
+                    self.shouldShowCreateKeySet = false
+                    self.isShowingCreateKeySet = true
+                }
+                if self.shouldShowRecoverKeySet {
+                    self.shouldShowRecoverKeySet = false
+                    self.isShowingRecoverKeySet = true
+                }
+                if self.shouldShowRecoverKeySet {
+                    self.shouldShowRecoverKeySet = false
+                    self.isShowingRecoverKeySet = true
+                }
+            }
+        }
+
+        func onExportAllTap() {
+            selectedItems = listViewModel.list
+            isShowingKeysExportModal = true
+        }
+
+        func onExportSelectedTap() {
+            isShowingKeysExportModal = true
+        }
+
+        func onAddKeySetTap() {
+            isShowingNewSeedMenu = true
+        }
+
+        func onCancelExportTap() {
+            isExportKeysSelected = false
+            selectedItems.removeAll()
+        }
+
+        func onShowMoreTap() {
+            isShowingMoreMenu.toggle()
         }
     }
 }
