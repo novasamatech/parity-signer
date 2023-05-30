@@ -19,7 +19,6 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
     screenData: ScreenData,
-    networkState: State<NetworkState?>,
     navigate: (Action, String, String) -> Unit,
     sharedViewModel: SharedViewModel
 ) {
@@ -72,12 +71,8 @@ fun ScreenSelector(
 fun ModalSelector(
     modalData: ModalData?,
     localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    navigate: (Action, String, String) -> Unit,
     sharedViewModel: SharedViewModel
 ) {
-	val button2: (Action, String) -> Unit =
-		{ action, details -> navigate(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
