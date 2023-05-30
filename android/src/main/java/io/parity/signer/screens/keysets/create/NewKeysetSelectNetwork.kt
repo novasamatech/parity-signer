@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
@@ -64,11 +65,10 @@ fun NewKeySetSelectNetwork(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 8.dp),
 		)
 		Column(
 			modifier = Modifier
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 16.dp)
                 .background(
                     MaterialTheme.colors.fill6,
                     RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
@@ -84,8 +84,8 @@ fun NewKeySetSelectNetwork(
 				SignerDivider()
 			}
 		}
-		NotificationFrameTextImportant(
-			message = stringResource(R.string.new_key_set_backup_warning_message),
+		NotificationFrameText(
+			message = "Please note that keys with customly named derivation path name can be created from the key set screen separatley.",
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 		)

@@ -30,25 +30,25 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun NotificationFrameText(
-	@StringRes messageRes: Int,
+	message: String,
+	modifier: Modifier = Modifier,
 	withBorder: Boolean = true,
 ) {
 	val innerShape =
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.padding(8.dp)
 			.conditional(withBorder) {
 				border(
 					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-					innerShape
+					innerShape,
 				)
 			}
 			.background(MaterialTheme.colors.fill6, innerShape)
-
 	) {
 		Text(
-			text = stringResource(messageRes),
+			text = message,
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
@@ -120,7 +120,7 @@ private fun PreviewFrameContainers() {
 		Column(
 			modifier = Modifier.size(300.dp),
 		) {
-			NotificationFrameText(messageRes = R.string.key_set_export_description_content)
+			NotificationFrameText(message = stringResource(id = R.string.key_set_export_description_content))
 			SignerDivider()
 			NotificationFrameTextImportant(
 				message = stringResource(id = R.string.key_set_export_description_content),
