@@ -228,7 +228,7 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func removeStalledSeeds() {
-        guard keychainAccessAdapter.removeAllSeeds() else { return false }
+        _ = keychainAccessAdapter.removeAllSeeds()
         seedNames = []
     }
 }
