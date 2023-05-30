@@ -52,9 +52,9 @@ protocol SeedsMediating: AnyObject {
     /// - Parameter seedName: seed name to delete
     func removeSeed(seedName: String) -> Bool
     /// Clear all seeds from Keychain
-    func removeAllSeeds()
-
+    func removeAllSeeds() -> Bool
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool
+    func removeStalledSeeds()
 }
 
 /// Class handling all seeds-related operations that require access to Keychain
@@ -186,8 +186,8 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func removeSeed(seedName: String) -> Bool {
-        refreshSeeds()
-        guard authenticationStateMediator.authenticated else {
+        // Fetch item first, as this will trigger authentication if passcode is not cached
+        guard case .success = keychainAccessAdapter.retrieveSeed(with: seedName) else {
             return false
         }
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
@@ -203,9 +203,14 @@ final class SeedsMediator: SeedsMediating {
         }
     }
 
-    func removeAllSeeds() {
-        keychainAccessAdapter.removeAllSeeds()
+    func removeAllSeeds() -> Bool {
+        // Fetch seeds first, as this will trigger authentication if passcode is not cached
+        guard case .success = keychainAccessAdapter.retrieveSeeds(with: Set(seedNames)) else {
+            return false
+        }
+        guard keychainAccessAdapter.removeAllSeeds() else { return false }
         seedNames = []
+        return true
     }
 
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
@@ -220,6 +225,11 @@ final class SeedsMediator: SeedsMediating {
             authenticationStateMediator.authenticated = false
             return false
         }
+    }
+
+    func removeStalledSeeds() {
+        _ = keychainAccessAdapter.removeAllSeeds()
+        seedNames = []
     }
 }
 

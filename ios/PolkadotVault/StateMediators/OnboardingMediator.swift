@@ -32,20 +32,11 @@ final class OnboardingMediator: ObservableObject {
     }
 
     func onboard(verifierRemoved: Bool = false) {
-        seedsMediator.refreshSeeds()
-        localDataCleanup()
+        guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
         navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved)
-        seedsMediator.refreshSeeds()
         onboardingDone = true
         warningStateMediator.updateWarnings()
         initialisationService.initialiseAppSession()
-    }
-}
-
-private extension OnboardingMediator {
-    func localDataCleanup() {
-        seedsMediator.removeAllSeeds()
-        databaseMediator.wipeDatabase()
     }
 }
