@@ -22,7 +22,6 @@ import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetItemMultiselect(
 	model: KeySetModel,

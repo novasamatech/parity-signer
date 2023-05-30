@@ -30,7 +30,6 @@ import io.parity.signer.ui.theme.*
 /**
  * Default main screen with list Seeds/root keys
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun KeySetsSelectExportScreenContent(
 	model: KeySetsSelectModel,
