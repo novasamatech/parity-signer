@@ -39,13 +39,15 @@ import io.parity.signer.ui.theme.fill6
 
 //todo dmitry add this
 @Composable
-fun NewKeySetSelectNetwork(
+fun NewKeySetSelectNetworkScreen(
 	networks: List<NetworkModel>,
 	selected: MutableState<Set<NetworkModel>>,
 	onNetworkSelect: (NetworkModel) -> Unit, //todo dmitry
 	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
 	onBack: Callback
 ) {
+	//io/parity/signer/screens/keysetdetails/items/NetworkKeysExpandableMultiselect.kt:57
+	//todo dmitry example as it was done
 	Column(
 		modifier = Modifier
             .fillMaxSize(1f)
@@ -54,11 +56,11 @@ fun NewKeySetSelectNetwork(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
-			title = stringResource(R.string.new_key_set_backup_title),
+			title = "Create Keys", //todo dmitry
 			onBack = onBack,
 		)
 		Text(
-			text = stringResource(R.string.new_key_set_backup_subtitle),
+			text = "Choose networks for the keys to be created ", //todo dmitry
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -81,6 +83,7 @@ fun NewKeySetSelectNetwork(
 				}
 				SignerDivider()
 			}
+			//todo dmitry add all item?
 		}
 		NotificationFrameText(
 			message = "Please note that keys with customly named derivation path name can be created from the key set screen separatley.",
@@ -168,6 +171,6 @@ private fun PreviewNewKeySetSelectNetwork() {
 		mutableStateOf(setOf(networks[1]))
 	}
 	SignerNewTheme {
-		NewKeySetSelectNetwork(networks, selected, {}, {}, {})
+		NewKeySetSelectNetworkScreen(networks, selected, {}, {}, {})
 	}
 }
