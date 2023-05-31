@@ -576,3 +576,10 @@
 "NewSeed.Backup.BananaSplit.Label.Content" = "Banana Split is a self-contained HTML page, which makes your paper backups more resilient and secure using Shamir's secret sharing scheme. You can encrypt and split particularly sensitive information so that it's not physically stored in one place — your master password, seed phrase, etc.\n\nFor more details visit\nhttps://bs.parity.io";
 "NewSeed.Backup.BananaSplit.Label.Content.Highlight.1" = "Shamir's secret sharing scheme.";
 "NewSeed.Backup.BananaSplit.Label.Content.Highlight.2" = "https://bs.parity.io";
+
+"CreateKeysForNetwork.Label.Title" = "Create Keys";
+"CreateKeysForNetwork.Label.Header" = "Choose networks for the keys to be created ";
+"CreateKeysForNetwork.Label.Footer" = "Please note that keys with custom named derivation path name can be created from the key set screen separately.";
+"CreateKeysForNetwork.Action.SelectAll" = "Select All";
+"CreateKeysForNetwork.Action.Create" = "Add Keys to Key Set";
+

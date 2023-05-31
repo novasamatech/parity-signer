@@ -215,6 +215,7 @@
 		6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */; };
 		6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */; };
 		6DB9903F2962A97E001101DC /* ImportDerivedKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */; };
+		6DBA658C2A2656CC00F04492 /* CreateKeysForNetworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBA658B2A2656CC00F04492 /* CreateKeysForNetworksView.swift */; };
 		6DBBC1F2298CB09C00368638 /* NetworkIdenticon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBBC1F1298CB09C00368638 /* NetworkIdenticon.swift */; };
 		6DBBC1F4298CB0D700368638 /* ChainIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */; };
 		6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */; };
@@ -549,6 +550,7 @@
 		6DB9903A295EA7DE001101DC /* ActionableInfoBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionableInfoBoxView.swift; sourceTree = "<group>"; };
 		6DB9903C2962A619001101DC /* MTransaction+ImportDerivedKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTransaction+ImportDerivedKeys.swift"; sourceTree = "<group>"; };
 		6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDerivedKeysService.swift; sourceTree = "<group>"; };
+		6DBA658B2A2656CC00F04492 /* CreateKeysForNetworksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeysForNetworksView.swift; sourceTree = "<group>"; };
 		6DBBC1F1298CB09C00368638 /* NetworkIdenticon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkIdenticon.swift; sourceTree = "<group>"; };
 		6DBBC1F3298CB0D700368638 /* ChainIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ChainIcons.xcassets; sourceTree = "<group>"; };
 		6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagingProtocol.swift; sourceTree = "<group>"; };
@@ -1505,6 +1507,14 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		6DBA658A2A2656B400F04492 /* CreateKeysForNetworks */ = {
+			isa = PBXGroup;
+			children = (
+				6DBA658B2A2656CC00F04492 /* CreateKeysForNetworksView.swift */,
+			);
+			path = CreateKeysForNetworks;
+			sourceTree = "<group>";
+		};
 		6DBD21F5289A7983005D539B /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1790,6 +1800,7 @@
 		6DF3CFEA29936D33002DF203 /* CreateKey */ = {
 			isa = PBXGroup;
 			children = (
+				6DBA658A2A2656B400F04492 /* CreateKeysForNetworks */,
 				6DA08B8C29B614F20027CFCB /* RecoverKeySet */,
 				6DA08B8B29B614EA0027CFCB /* NewKeySet */,
 				6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */,
@@ -2119,6 +2130,7 @@
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */,
 				6D971AC5294229AE00121A36 /* UIFont+Roboto.swift in Sources */,
+				6DBA658C2A2656CC00F04492 /* CreateKeysForNetworksView.swift in Sources */,
 				6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */,
 				6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */,
 				6DA2ACAA2939E85700AAEADC /* Event+EventTitle.swift in Sources */,
