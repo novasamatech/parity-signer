@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -44,6 +46,7 @@ fun NewKeySetSelectNetworkScreen(
 	selected: MutableState<Set<NetworkModel>>,
 	onNetworkSelect: (NetworkModel) -> Unit, //todo dmitry
 	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
+	onAddAll: Callback,
 	onBack: Callback
 ) {
 	//io/parity/signer/screens/keysetdetails/items/NetworkKeysExpandableMultiselect.kt:57
@@ -64,7 +67,7 @@ fun NewKeySetSelectNetworkScreen(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
-                .padding(horizontal = 24.dp)
+				.padding(horizontal = 24.dp)
 		)
 		Column(
 			modifier = Modifier
@@ -83,7 +86,7 @@ fun NewKeySetSelectNetworkScreen(
 				}
 				SignerDivider()
 			}
-			//todo dmitry add all item?
+			NetworkItemMultiselectAll(onAddAll)
 		}
 		NotificationFrameText(
 			message = "Please note that keys with customly named derivation path name can be created from the key set screen separatley.",
@@ -139,6 +142,26 @@ private fun NetworkItemMultiselect(
 }
 
 
+@Composable
+private fun NetworkItemMultiselectAll(
+	onClick: Callback,
+) {
+	Row(
+		modifier = Modifier.clickable(onClick = onClick)
+			.height(68.dp)
+			.padding(horizontal = 16.dp)
+			.fillMaxWidth(1f),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Text(
+			text = "Select All", //todo dmitry
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.TitleS,
+		)
+	}
+}
+
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -171,6 +194,6 @@ private fun PreviewNewKeySetSelectNetwork() {
 		mutableStateOf(setOf(networks[1]))
 	}
 	SignerNewTheme {
-		NewKeySetSelectNetworkScreen(networks, selected, {}, {}, {})
+		NewKeySetSelectNetworkScreen(networks, selected, {}, {}, {}, {})
 	}
 }
