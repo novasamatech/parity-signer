@@ -27,13 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameText
-import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.KeySetModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -129,8 +127,8 @@ private fun NetworkItemMultiselect(
 		Spacer(modifier = Modifier.weight(1f))
 		SignerCheckbox(
 			isChecked = isSelected,
-			modifier = Modifier
-				.padding(end = 8.dp)
+			modifier = Modifier.padding(end = 8.dp),
+			uncheckedColor = MaterialTheme.colors.primary,
 		) {
 			onClick(network)
 		}
