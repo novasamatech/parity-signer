@@ -32,6 +32,7 @@ use definitions::{
     users::AddressDetails,
 };
 
+use constants::test_values::{alice_sr_kusama, alice_sr_polkadot, alice_sr_westend};
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -135,9 +136,12 @@ fn print_all_ids() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let keys = print_all_identities(&db).unwrap();
 
-    let polkadot_pubkey = "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730".to_string();
-    let kusama_pubkey = "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05".to_string();
-    let westend_pubkey = "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let polkadot_pubkey =
+        "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730".to_string();
+    let kusama_pubkey =
+        "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05".to_string();
+    let westend_pubkey =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
 
     let expected_keys = vec![
         MRawKey {
@@ -146,7 +150,7 @@ fn print_all_ids() {
             address: Address {
                 seed_name: "Alice".to_string(),
                 identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
+                    image: alice_sr_westend().to_vec(),
                 },
                 has_pwd: false,
                 path: "//westend".to_string(),
@@ -159,11 +163,11 @@ fn print_all_ids() {
                 "01{}{}",
                 kusama_pubkey, "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
             ),
-            public_key: kusama_pubkey.clone(),
+            public_key: kusama_pubkey,
             address: Address {
                 seed_name: "Alice".to_string(),
                 identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
+                    image: alice_sr_kusama().to_vec(),
                 },
                 has_pwd: false,
                 path: "//kusama".to_string(),
@@ -193,13 +197,14 @@ fn print_all_ids() {
         MRawKey {
             address_key: format!(
                 "01{}{}",
-                polkadot_pubkey, "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                polkadot_pubkey,
+                "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
             ),
-            public_key: polkadot_pubkey.clone(),
+            public_key: polkadot_pubkey,
             address: Address {
                 seed_name: "Alice".to_string(),
                 identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
+                    image: alice_sr_polkadot().to_vec(),
                 },
                 has_pwd: false,
                 path: "//polkadot".to_string(),
@@ -964,7 +969,7 @@ fn history_with_identities() {
                 seed_name: "Alice".to_string(),
                 encryption: Encryption::Sr25519,
                 public_key: hex::decode(
-                    "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
+                    "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
                 )
                 .unwrap(),
                 path: "//polkadot".to_string(),
@@ -2069,10 +2074,10 @@ fn remove_all_westend() {
                 seed_name: "Alice".to_string(),
                 encryption: Encryption::Sr25519,
                 public_key: hex::decode(
-                    "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
+                    "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                 )
                 .unwrap(),
-                path: "".to_string(),
+                path: "//westend".to_string(),
                 network_genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )

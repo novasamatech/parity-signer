@@ -312,17 +312,6 @@ fn bulk_signing_test_unpassworded() {
     populate_cold_nav_test(&db).unwrap();
 
     try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
-    let westend_genesis =
-        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-
-    try_create_address(
-        &db,
-        "Alice",
-        ALICE_SEED_PHRASE,
-        "//westend",
-        &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
-    )
-    .unwrap();
     let mut tx_state = TransactionState::new(&db, &hex::encode(payload)).unwrap();
 
     tx_state.update_seeds(&seeds);
@@ -611,48 +600,33 @@ fn export_import_addrs() {
             .into(),
         derived_keys: vec![
             DerivedKeyPreview {
-                address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Polkadot".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "EBJwHkVtAcF6nCKHd3h4H75NzgvMJxMS1X3WWd8a2DjaQx9".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Kusama".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_owned(),
-                derivation_path: None,
+                address: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_owned(),
+                derivation_path: Some("//westend".to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: H256::from_str(
                     "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
                 )
                 .unwrap(),
                 identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
+                    image: alice_sr_westend().to_vec(),
                 },
                 has_pwd: Some(false),
                 network_title: Some("Westend".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
+            },
+            DerivedKeyPreview {
+                address: "ErGkNDDPmnaRZKxwe4VBLonyBJVmucqURFMatEJTwktsuTv".to_owned(),
+                derivation_path: Some("//kusama".to_string()),
+                encryption: Encryption::Sr25519,
+                genesis_hash: H256::from_str(
+                    "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_kusama().to_vec(),
+                },
+                has_pwd: Some(false),
+                network_title: Some("Kusama".to_string()),
                 status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
@@ -665,6 +639,21 @@ fn export_import_addrs() {
                 },
                 has_pwd: Some(true),
                 network_title: Some("Westend".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
+            },
+            DerivedKeyPreview {
+                address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
+                derivation_path: Some("//polkadot".to_string()),
+                encryption: Encryption::Sr25519,
+                genesis_hash: H256::from_str(
+                    "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                )
+                .unwrap(),
+                identicon: SignerImage::Png {
+                    image: alice_sr_polkadot().to_vec(),
+                },
+                has_pwd: Some(false),
+                network_title: Some("Polkadot".to_string()),
                 status: DerivedKeyStatus::AlreadyExists,
             },
         ],
@@ -683,7 +672,7 @@ fn export_import_addrs() {
         "Alice".to_owned(),
         ExportedSet::Selected {
             s: vec![PathAndNetwork {
-                derivation: "".to_owned(),
+                derivation: "//polkadot".to_owned(),
                 network_specs_key: hex::encode(network_specs_key.key()),
             }],
         },
@@ -700,12 +689,12 @@ fn export_import_addrs() {
             .public()
             .into(),
         derived_keys: vec![DerivedKeyPreview {
-            address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-            derivation_path: None,
+            address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
+            derivation_path: Some("//polkadot".to_owned()),
             encryption: Encryption::Sr25519,
             genesis_hash: polkadot_genesis,
             identicon: SignerImage::Png {
-                image: alice_sr_root().to_vec(),
+                image: alice_sr_polkadot().to_vec(),
             },
             has_pwd: Some(false),
             network_title: Some("Polkadot".to_string()),
@@ -3432,7 +3421,7 @@ fn flow_test_1() {
                                 seed_name: "Alice".to_string(),
                                 encryption: Encryption::Sr25519,
                                 public_key: hex::decode(
-                                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                                    "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 ).unwrap(),
                                 path: "".to_string(),
                                 network_genesis_hash: H256::from_str(
@@ -3680,7 +3669,7 @@ fn flow_test_1() {
         name: "Alice".to_string(),
         multisigner: MultiSigner::Sr25519(
             Public::try_from(
-                hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
+                hex::decode("64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05")
                     .unwrap()
                     .as_ref(),
             )
@@ -3983,7 +3972,7 @@ fn flow_test_1() {
                     .as_bytes()
                     .to_vec(),
                 },
-                pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                pubkey: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                     .to_string(),
                 base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
                 address: Address {
@@ -4184,7 +4173,7 @@ fn flow_test_1() {
                             "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
                         public_key:
-                            "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                            "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
                         address: Address {
                             seed_name: "Alice".to_string(),
@@ -4314,7 +4303,7 @@ fn flow_test_1() {
     expected_action.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
             author_info: MAddressCard {
-                base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                base58: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                     .to_string(),
                 address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
@@ -4404,7 +4393,7 @@ fn flow_test_1() {
     let mut action = state.perform(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
-    let alice_public_hex = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+    let alice_public_hex = "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05";
     if let ScreenData::Log { ref f } = action.screen_data {
         assert_eq!(
             f.log[0].events[0],
@@ -4526,7 +4515,7 @@ fn flow_test_1() {
                             "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                                 .to_string(),
                         public_key:
-                            "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                            "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                                 .to_string(),
                         network_logo: "westend".to_string(),
                     },
@@ -4626,7 +4615,7 @@ fn flow_test_1() {
         modal_data: Some(ModalData::SufficientCryptoReady {
             f: MSufficientCryptoReady {
                 author_info: MAddressCard {
-                    base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                    base58: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                         .to_string(),
 
                     address_key:
@@ -4760,7 +4749,7 @@ fn flow_test_1() {
             author_info: MAddressCard {
                 address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                base58: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                     .to_string(),
                 address: Address {
                     identicon: SignerImage::Png {
