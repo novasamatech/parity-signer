@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct FullscreenModal<ModalContent: View>: ViewModifier {
-    @ObservedObject var snackBarPresentation = ServiceLocator.bottomSnackbarPresentation
     @Binding var isPresented: Bool
     let onDismiss: () -> Void
     let modalContent: () -> ModalContent
@@ -16,10 +15,6 @@ struct FullscreenModal<ModalContent: View>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fullScreenCover(isPresented: $isPresented, onDismiss: onDismiss, content: modalContent)
-            .bottomSnackbar(
-                snackBarPresentation.viewModel,
-                isPresented: $snackBarPresentation.isSnackbarPresented
-            )
     }
 }
 

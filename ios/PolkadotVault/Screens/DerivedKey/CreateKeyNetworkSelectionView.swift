@@ -133,6 +133,10 @@ struct CreateKeyNetworkSelectionView: View {
 }
 
 extension CreateKeyNetworkSelectionView {
+    enum OnCompletionAction: Equatable {
+        case derivedKeyCreated
+    }
+
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
@@ -151,17 +155,20 @@ extension CreateKeyNetworkSelectionView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
+        private let onCompletion: (OnCompletionAction) -> Void
 
         init(
             seedName: String,
             keyName: String,
             networkService: GetAllNetworksService = GetAllNetworksService(),
-            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService()
+            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.seedName = seedName
             self.keyName = keyName
             self.networkService = networkService
             self.createKeyService = createKeyService
+            self.onCompletion = onCompletion
             updateNetworks()
             listenToChanges()
         }
@@ -177,6 +184,7 @@ extension CreateKeyNetworkSelectionView {
         }
 
         func onKeyCreationComplete() {
+            onCompletion(.derivedKeyCreated)
             dismissRequest.send()
         }
 
@@ -211,7 +219,8 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
             CreateKeyNetworkSelectionView(
                 viewModel: .init(
                     seedName: "seedName",
-                    keyName: "keyName"
+                    keyName: "keyName",
+                    onCompletion: { _ in }
                 )
             )
         }
