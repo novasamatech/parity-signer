@@ -10,7 +10,6 @@ import SwiftUI
 
 struct CreateKeysForNetworksView: View {
     @StateObject var viewModel: ViewModel
-    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         GeometryReader { geo in
@@ -18,10 +17,6 @@ struct CreateKeysForNetworksView: View {
                 // Navigation Bar
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        leftButtons: [.init(
-                            type: .arrow,
-                            action: { presentationMode.wrappedValue.dismiss() }
-                        )],
                         backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
                 )
@@ -49,19 +44,6 @@ struct CreateKeysForNetworksView: View {
                 minHeight: geo.size.height
             )
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .onReceive(viewModel.dismissViewRequest) { _ in
-                presentationMode.wrappedValue.dismiss()
-            }
-            .fullScreenModal(
-                isPresented: $viewModel.isNetworkTutorialPresented,
-                onDismiss: viewModel.updateNetworks
-            ) {
-                NavigationView {
-                    AddKeySetUpNetworksStepOneView(viewModel: .init())
-                        .navigationBarBackButtonHidden(true)
-                        .navigationViewStyle(.stack)
-                }
-            }
         }
     }
 
@@ -83,9 +65,6 @@ struct CreateKeysForNetworksView: View {
     @ViewBuilder
     func footer() -> some View {
         InfoBoxView(text: Localizable.CreateKeysForNetwork.Label.footer.string)
-            .onTapGesture {
-                viewModel.onInfoBoxTap()
-            }
             .padding(.bottom, Spacing.large)
     }
 
@@ -153,36 +132,24 @@ extension CreateKeysForNetworksView {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
-        private let keyName: String
         private let createKeyService: CreateDerivedKeyService
         let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = MmNetwork.stubList
         @Published var selectedNetworks: [MmNetwork] = []
-
-        // Tutorial
-        @Published var isNetworkTutorialPresented: Bool = false
-        var dismissViewRequest: AnyPublisher<Void, Never> {
-            dismissRequest.eraseToAnyPublisher()
-        }
-
-        private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: (OnCompletionAction) -> Void
+        @Binding var isPresented: Bool
 
         init(
             seedName: String,
-            keyName: String,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
-            onCompletion: @escaping (OnCompletionAction) -> Void
+            isPresented: Binding<Bool>
         ) {
             self.seedName = seedName
-            self.keyName = keyName
             self.networkService = networkService
             self.createKeyService = createKeyService
-            self.onCompletion = onCompletion
+            _isPresented = isPresented
             updateNetworks()
-            listenToChanges()
         }
 
         func selectAllNetworks() {
@@ -202,15 +169,14 @@ extension CreateKeysForNetworksView {
         }
 
         func onKeyCreationComplete() {
-            onCompletion(.derivedKeysCreated)
-            dismissRequest.send()
+            isPresented = false
         }
 
-        func onInfoBoxTap() {
-            isNetworkTutorialPresented = true
-        }
+        func onDoneTap() {
+            // Add logic to create keys
 
-        func onDoneTap() {}
+            onKeyCreationComplete()
+        }
     }
 }
 
@@ -222,15 +188,6 @@ private extension CreateKeysForNetworksView.ViewModel {
             }
         }
     }
-
-    func listenToChanges() {
-        $isNetworkTutorialPresented.sink { [weak self] isPresented in
-            guard let self = self, !isPresented else { return }
-            self.createKeyService.resetNavigationState(self.keyName)
-            self.updateNetworks()
-        }
-        .store(in: cancelBag)
-    }
 }
 
 #if DEBUG
@@ -239,8 +196,7 @@ private extension CreateKeysForNetworksView.ViewModel {
             CreateKeysForNetworksView(
                 viewModel: .init(
                     seedName: "seedName",
-                    keyName: "keyName",
-                    onCompletion: { _ in }
+                    isPresented: .constant(true)
                 )
             )
         }
