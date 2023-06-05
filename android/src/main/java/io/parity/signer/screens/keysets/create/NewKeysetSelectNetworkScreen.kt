@@ -39,13 +39,33 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 
-//todo dmitry add this
+
+//todo dmitry implement screen into flow
 @Composable
 fun NewKeySetSelectNetworkScreen(
 	networks: List<NetworkModel>,
-	selected: MutableState<Set<NetworkModel>>,
 	onNetworkSelect: (NetworkModel) -> Unit, //todo dmitry
 	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
+	onAddAll: Callback,
+	onBack: Callback
+) {
+	val selected = remember { mutableStateOf(emptySet<NetworkModel>()) }
+	NewKeySetSelectNetworkScreenPrivate(
+		networks = networks,
+			selected = selected,
+			onNetworkSelect = onNetworkSelect,
+			onProceed = onProceed,
+			onAddAll = onAddAll,
+			onBack = onBack,
+	)
+}
+
+@Composable
+private fun NewKeySetSelectNetworkScreenPrivate(
+	networks: List<NetworkModel>,
+	selected: MutableState<Set<NetworkModel>>,
+	onNetworkSelect: (NetworkModel) -> Unit,
+	onProceed: () -> Unit,
 	onAddAll: Callback,
 	onBack: Callback
 ) {
@@ -53,17 +73,17 @@ fun NewKeySetSelectNetworkScreen(
 	//todo dmitry example as it was done
 	Column(
 		modifier = Modifier
-            .fillMaxSize(1f)
-            .background(MaterialTheme.colors.background)
-            .verticalScroll(rememberScrollState()),
+			.fillMaxSize(1f)
+			.background(MaterialTheme.colors.background)
+			.verticalScroll(rememberScrollState()),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
-			title = stringResource(R.string.keyset_create_keys_title), //todo dmitry
+			title = stringResource(R.string.keyset_create_keys_title),
 			onBack = onBack,
 		)
 		Text(
-			text = stringResource(R.string.keyset_create_keys_subtitle), //todo dmitry
+			text = stringResource(R.string.keyset_create_keys_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -71,11 +91,11 @@ fun NewKeySetSelectNetworkScreen(
 		)
 		Column(
 			modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 16.dp)
-                .background(
-                    MaterialTheme.colors.fill6,
-                    RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-                )
+				.padding(horizontal = 8.dp, vertical = 16.dp)
+				.background(
+					MaterialTheme.colors.fill6,
+					RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+				)
 		) {
 			networks.forEach { network ->
 				NetworkItemMultiselect(
@@ -117,13 +137,13 @@ private fun NetworkItemMultiselect(
 		NetworkIcon(
 			networkLogoName = network.logo,
 			modifier = Modifier
-                .padding(
-                    top = 16.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 12.dp
-                )
-                .size(36.dp),
+				.padding(
+					top = 16.dp,
+					bottom = 16.dp,
+					start = 16.dp,
+					end = 12.dp
+				)
+				.size(36.dp),
 		)
 		Text(
 			text = network.title,
@@ -147,7 +167,8 @@ private fun NetworkItemMultiselectAll(
 	onClick: Callback,
 ) {
 	Row(
-		modifier = Modifier.clickable(onClick = onClick)
+		modifier = Modifier
+			.clickable(onClick = onClick)
 			.height(68.dp)
 			.padding(horizontal = 16.dp)
 			.fillMaxWidth(1f),
@@ -194,6 +215,6 @@ private fun PreviewNewKeySetSelectNetwork() {
 		mutableStateOf(setOf(networks[1]))
 	}
 	SignerNewTheme {
-		NewKeySetSelectNetworkScreen(networks, selected, {}, {}, {}, {})
+		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
 	}
 }
