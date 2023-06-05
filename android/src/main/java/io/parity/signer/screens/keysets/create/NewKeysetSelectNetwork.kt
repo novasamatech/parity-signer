@@ -59,11 +59,11 @@ fun NewKeySetSelectNetworkScreen(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
-			title = "Create Keys", //todo dmitry
+			title = stringResource(R.string.keyset_create_keys_title), //todo dmitry
 			onBack = onBack,
 		)
 		Text(
-			text = "Choose networks for the keys to be created ", //todo dmitry
+			text = stringResource(R.string.keyset_create_keys_subtitle), //todo dmitry
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -89,14 +89,14 @@ fun NewKeySetSelectNetworkScreen(
 			NetworkItemMultiselectAll(onAddAll)
 		}
 		NotificationFrameText(
-			message = "Please note that keys with customly named derivation path name can be created from the key set screen separatley.",
+			message = stringResource(R.string.keyset_create_keys_notification_text),
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 		)
 		Spacer(modifier = Modifier.weight(1f))
 
 		PrimaryButtonWide(
-			label = stringResource(R.string.new_key_set_backup_cta),
+			label = stringResource(R.string.keyset_create_keys_cta),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,
 		)
