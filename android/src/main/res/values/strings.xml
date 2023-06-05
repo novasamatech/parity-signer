@@ -397,6 +397,10 @@
     <string name="recover_key_set_subtitle">Secret Recovery Phrase</string>
     <string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
     <string name="key_set_has_been_recovered_toast">Key Set Has Been Recovered</string>
+    <string name="keyset_create_keys_title">Create Keys</string>
+	<string name="keyset_create_keys_subtitle">Choose networks for the keys to be created</string>
+	<string name="keyset_create_keys_notification_text">Please note that keys with customly named derivation path name can be created from the key set screen separatley.</string>
+	<string name="keyset_create_keys_cta">Create Keys</string>
 
 </resources>
 
