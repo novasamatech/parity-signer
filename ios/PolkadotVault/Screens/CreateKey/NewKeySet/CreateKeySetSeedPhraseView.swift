@@ -71,6 +71,14 @@ struct CreateKeySetSeedPhraseView: View {
                     .padding(Spacing.large)
                 }
             }
+            NavigationLink(
+                destination:
+                CreateKeysForNetworksView(
+                    viewModel: viewModel.createDerivedKeys()
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
@@ -91,6 +99,7 @@ extension CreateKeySetSeedPhraseView {
 
         let dataModel: MNewSeedBackup
         @Binding var isPresented: Bool
+        @Published var isPresentingDetails: Bool = false
         @Published var confirmBackup = false
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
@@ -115,11 +124,15 @@ extension CreateKeySetSeedPhraseView {
                 shouldCheckForCollision: true
             )
             service.confirmKeySetCreation(dataModel.seedPhrase)
-            isPresented = false
+            isPresentingDetails = true
         }
 
         func onInfoBoxTap() {
             isPresentingInfo = true
+        }
+
+        func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
+            .init(seedName: dataModel.seed, isPresented: $isPresented)
         }
     }
 }

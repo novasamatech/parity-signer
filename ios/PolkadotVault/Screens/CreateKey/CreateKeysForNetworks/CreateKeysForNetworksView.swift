@@ -130,12 +130,16 @@ extension CreateKeysForNetworksView {
     }
 
     final class ViewModel: ObservableObject {
+        private enum Constants {
+            static let preselectedNetworks: [String] = ["polkadot", "kusama", "westend"]
+        }
+
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
         let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
-        @Published var networks: [MmNetwork] = MmNetwork.stubList
+        @Published var networks: [MmNetwork] = []
         @Published var selectedNetworks: [MmNetwork] = []
         @Binding var isPresented: Bool
 
@@ -185,6 +189,7 @@ private extension CreateKeysForNetworksView.ViewModel {
         networkService.getNetworks {
             if case let .success(networks) = $0 {
                 self.networks = networks
+                self.selectedNetworks = networks.filter { Constants.preselectedNetworks.contains($0.title) }
             }
         }
     }
