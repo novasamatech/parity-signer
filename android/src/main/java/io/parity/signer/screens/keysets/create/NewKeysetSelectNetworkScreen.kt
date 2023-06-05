@@ -44,27 +44,34 @@ import io.parity.signer.ui.theme.fill6
 @Composable
 fun NewKeySetSelectNetworkScreen(
 	networks: List<NetworkModel>,
-	onNetworkSelect: (NetworkModel) -> Unit, //todo dmitry
 	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
 	onAddAll: Callback,
 	onBack: Callback
 ) {
-	val selected = remember { mutableStateOf(emptySet<NetworkModel>()) }
+	val selected =
+		remember { mutableStateOf(emptySet<String>()) } //todo dmitry select preselected netowrks
+
 	NewKeySetSelectNetworkScreenPrivate(
 		networks = networks,
-			selected = selected,
-			onNetworkSelect = onNetworkSelect,
-			onProceed = onProceed,
-			onAddAll = onAddAll,
-			onBack = onBack,
+		selectedNetworkKeys = selected,
+		onNetworkClick = { network ->
+			selected.value = if (selected.value.contains(network.key)) {
+				selected.value - network.key
+			} else {
+				selected.value + network.key
+			}
+		},
+		onProceed = onProceed,
+		onAddAll = onAddAll,
+		onBack = onBack,
 	)
 }
 
 @Composable
 private fun NewKeySetSelectNetworkScreenPrivate(
 	networks: List<NetworkModel>,
-	selected: MutableState<Set<NetworkModel>>,
-	onNetworkSelect: (NetworkModel) -> Unit,
+	selectedNetworkKeys: MutableState<Set<String>>,
+	onNetworkClick: (NetworkModel) -> Unit,
 	onProceed: () -> Unit,
 	onAddAll: Callback,
 	onBack: Callback
@@ -100,9 +107,9 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			networks.forEach { network ->
 				NetworkItemMultiselect(
 					network = network,
-					isSelected = selected.value.contains(network)
+					isSelected = selectedNetworkKeys.value.contains(network.key)
 				) { network ->
-					onNetworkSelect(network)
+					onNetworkClick(network)
 				}
 				SignerDivider()
 			}
