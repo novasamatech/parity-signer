@@ -1,6 +1,6 @@
 package io.parity.signer.bottomsheets.sufficientcrypto
 
-import io.parity.signer.backend.mapError
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 import kotlinx.coroutines.runBlocking
 

@@ -1,4 +1,4 @@
-package io.parity.signer.backend
+package io.parity.signer.domain.backend
 
 import android.content.Context
 import io.parity.signer.R
@@ -36,40 +36,40 @@ class UniffiInteractor(val appContext: Context) {
 	): OperationResult<ActionResult, NavigationError> =
 		withContext(Dispatchers.IO) {
 			try {
-				OperationResult.Ok(backendAction(action, details, seedPhrase))
+                OperationResult.Ok(backendAction(action, details, seedPhrase))
 			} catch (e: ErrorDisplayed) {
-				OperationResult.Err(
-					NavigationError(
-						appContext.getString(
-							R.string.navigation_error_general_message,
-							e.findErrorDisplayed()?.message ?: e.message
-						)
-					)
-				)
+                OperationResult.Err(
+                    NavigationError(
+                        appContext.getString(
+                            R.string.navigation_error_general_message,
+                            e.findErrorDisplayed()?.message ?: e.message
+                        )
+                    )
+                )
 			}
 		}
 
 	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
 		withContext(Dispatchers.IO) {
 			try {
-				OperationResult.Ok(
-					backendAction(
-						Action.TRANSACTION_FETCHED,
-						payload,
-						""
-					)
-				)
+                OperationResult.Ok(
+                    backendAction(
+                        Action.TRANSACTION_FETCHED,
+                        payload,
+                        ""
+                    )
+                )
 			} catch (e: ErrorDisplayed) {
-				OperationResult.Err(e.toTransactionError())
+                OperationResult.Err(e.toTransactionError())
 			} catch (e: Throwable) {
-				OperationResult.Err(
-					TransactionError.Generic(
-						appContext.getString(
-							R.string.navigation_error_general_message,
-							e.findErrorDisplayed()?.message ?: e.message
-						)
-					)
-				)
+                OperationResult.Err(
+                    TransactionError.Generic(
+                        appContext.getString(
+                            R.string.navigation_error_general_message,
+                            e.findErrorDisplayed()?.message ?: e.message
+                        )
+                    )
+                )
 			}
 		}
 
@@ -94,9 +94,9 @@ class UniffiInteractor(val appContext: Context) {
 				val keyInfo = exportKeyInfo(
 					selectedNames = seedsToExport.associateWith { ExportedSet.All },
 				)
-				UniffiResult.Success(keyInfo)
+                UniffiResult.Success(keyInfo)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -115,9 +115,9 @@ class UniffiInteractor(val appContext: Context) {
 
 				selectedNames = mapOf(seed to ExportedSet.Selected(pathAndNetworks)),
 			)
-			UniffiResult.Success(keyInfo)
+            UniffiResult.Success(keyInfo)
 		} catch (e: ErrorDisplayed) {
-			UniffiResult.Error(e)
+            UniffiResult.Error(e)
 		}
 	}
 
@@ -129,9 +129,9 @@ class UniffiInteractor(val appContext: Context) {
 						encodeToQr(it, false)
 					}
 				}.map { it.await() }
-				UniffiResult.Success(images)
+                UniffiResult.Success(images)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -140,9 +140,9 @@ class UniffiInteractor(val appContext: Context) {
 			try {
 				val networks =
 					io.parity.signer.uniffi.getAllNetworks().map { it.toNetworkModel() }
-				UniffiResult.Success(networks)
+                UniffiResult.Success(networks)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -158,9 +158,9 @@ class UniffiInteractor(val appContext: Context) {
 					path = path,
 					network = selectedNetworkSpecs
 				)
-				UniffiResult.Success(validationResult)
+                UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -168,9 +168,9 @@ class UniffiInteractor(val appContext: Context) {
 	withContext(Dispatchers.IO) {
 		try {
 			val validationResult = io.parity.signer.uniffi.getLogs()
-			UniffiResult.Success(validationResult)
+            UniffiResult.Success(validationResult)
 		} catch (e: ErrorDisplayed) {
-			UniffiResult.Error(e)
+            UniffiResult.Error(e)
 		}
 	}
 
@@ -178,9 +178,9 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val validationResult = io.parity.signer.uniffi.getLogDetails(logIndex)
-				UniffiResult.Success(validationResult)
+                UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -188,9 +188,9 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val validationResult = io.parity.signer.uniffi.clearLogHistory()
-				UniffiResult.Success(validationResult)
+                UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 
@@ -198,9 +198,9 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val validationResult = io.parity.signer.uniffi.handleLogComment(userComment)
-				UniffiResult.Success(validationResult)
+                UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+                UniffiResult.Error(e)
 			}
 		}
 

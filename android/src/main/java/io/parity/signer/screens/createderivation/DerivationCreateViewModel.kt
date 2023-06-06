@@ -5,7 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
-import io.parity.signer.backend.mapError
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
