@@ -4,6 +4,7 @@ import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,42 +47,49 @@ import io.parity.signer.ui.theme.fill6
 fun NewKeySetSelectNetworkScreen(
 	model: NewSeedBackupModel,
 	navigator: Navigator,
-	onBack: Callback
+	onBack: Callback,
+	modifier: Modifier = Modifier,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
-			mutableStateOf(networksViewModel.getDefaultPreselectedNetworks()
-				.map { it.key }.toSet()
+			mutableStateOf(
+				networksViewModel.getDefaultPreselectedNetworks()
+					.map { it.key }.toSet()
 			)
 		}
 	val networks = networksViewModel.getAllNetworks()
 
-	NewKeySetSelectNetworkScreenPrivate(
-		networks = networks,
-		selectedNetworkKeys = selected,
-		onNetworkClick = { network ->
-			selected.value = if (selected.value.contains(network.key)) {
-				selected.value - network.key
-			} else {
-				selected.value + network.key
-			}
-		},
-		onProceed = { networksViewModel.createKeySetWithNetworks(
-			seedName = model.seed, seedPhrase = model.seedPhrase,
-			networksForKeys = selected.value.mapNotNull {
-					selected -> networks.find { it.key == selected } }.toSet(),
-			navigator = navigator,
-		) },
-		onAddAll = {
-			selected.value = if (selected.value.size == networks.size) {
-				networksViewModel.getDefaultPreselectedNetworks().map { it.key }.toSet()
-			} else {
-				networks.map { it.key }.toSet()
-			}
-		},
-		onBack = onBack,
-	)
+	Box(modifier = modifier) {
+		NewKeySetSelectNetworkScreenPrivate(
+			networks = networks,
+			selectedNetworkKeys = selected,
+			onNetworkClick = { network ->
+				selected.value = if (selected.value.contains(network.key)) {
+					selected.value - network.key
+				} else {
+					selected.value + network.key
+				}
+			},
+			onProceed = {
+				networksViewModel.createKeySetWithNetworks(
+					seedName = model.seed, seedPhrase = model.seedPhrase,
+					networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
+						.toSet(),
+					navigator = navigator,
+				)
+			},
+			onAddAll = {
+				selected.value = if (selected.value.size == networks.size) {
+					networksViewModel.getDefaultPreselectedNetworks().map { it.key }
+						.toSet()
+				} else {
+					networks.map { it.key }.toSet()
+				}
+			},
+			onBack = onBack,
+		)
+	}
 }
 
 @Composable
