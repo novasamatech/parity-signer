@@ -246,3 +246,97 @@ private fun PreviewNewKeySetSelectNetwork() {
 		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
 	}
 }
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewNewKeySetSelectNetworkVeryLong() {
+	val networks = listOf(
+		NetworkModel(
+			key = "0",
+			logo = "polkadot",
+			title = "Polkadot",
+		),
+		NetworkModel(
+			key = "1",
+			logo = "Kusama",
+			title = "Kusama",
+		),
+		NetworkModel(
+			key = "2",
+			logo = "Wastend",
+			title = "Wastend",
+		),
+		NetworkModel(
+			key = "0",
+			logo = "polkadot",
+			title = "Polkadot",
+		),
+		NetworkModel(
+			key = "1",
+			logo = "Kusama",
+			title = "Kusama",
+		),
+		NetworkModel(
+			key = "2",
+			logo = "Wastend",
+			title = "Wastend",
+		),
+		NetworkModel(
+			key = "0",
+			logo = "polkadot",
+			title = "Polkadot",
+		),
+		NetworkModel(
+			key = "1",
+			logo = "Kusama",
+			title = "Kusama",
+		),
+		NetworkModel(
+			key = "2",
+			logo = "Wastend",
+			title = "Wastend",
+		),
+		NetworkModel(
+			key = "0",
+			logo = "polkadot",
+			title = "Polkadot",
+		),
+		NetworkModel(
+			key = "1",
+			logo = "Kusama",
+			title = "Kusama",
+		),
+		NetworkModel(
+			key = "2",
+			logo = "Wastend",
+			title = "Wastend",
+		),
+		NetworkModel(
+			key = "0",
+			logo = "polkadot",
+			title = "Polkadot",
+		),
+		NetworkModel(
+			key = "1",
+			logo = "Kusama",
+			title = "Kusama",
+		),
+		NetworkModel(
+			key = "2",
+			logo = "Wastend",
+			title = "Wastend",
+		),
+	)
+	val selected = setOf(networks[1].key)
+	SignerNewTheme {
+		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
+	}
+}
