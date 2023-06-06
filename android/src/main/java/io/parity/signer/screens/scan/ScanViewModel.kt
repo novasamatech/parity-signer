@@ -5,8 +5,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
-import io.parity.signer.backend.OperationResult
-import io.parity.signer.backend.mapError
+import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator

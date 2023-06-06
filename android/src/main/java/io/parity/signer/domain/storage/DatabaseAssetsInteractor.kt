@@ -11,8 +11,10 @@ import java.io.FileOutputStream
 /**
  * All interactions should happen only when user is authorised
  */
-class DatabaseAssetsInteractor(private val context: Context,
-															 private val seedStorage: SeedStorage) {
+class DatabaseAssetsInteractor(
+	private val context: Context,
+	private val seedStorage: SeedStorage
+) {
 	private val dbName: String = context.getDbNameFromContext()
 
 	/**

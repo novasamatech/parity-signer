@@ -2,7 +2,7 @@ package io.parity.signer.screens.keysets.restore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.parity.signer.backend.OperationResult
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.submitErrorState

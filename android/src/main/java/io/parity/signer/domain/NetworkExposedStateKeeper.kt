@@ -8,7 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.provider.Settings
-import io.parity.signer.backend.UniffiInteractor
+import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.uniffi.historyAcknowledgeWarnings
 import io.parity.signer.uniffi.historyGetWarnings
 import kotlinx.coroutines.flow.MutableStateFlow
