@@ -580,6 +580,9 @@
 "CreateKeysForNetwork.Label.Title" = "Create Keys";
 "CreateKeysForNetwork.Label.Header" = "Choose networks for the keys to be created ";
 "CreateKeysForNetwork.Label.Footer" = "Please note that keys with custom named derivation path name can be created from the key set screen separately.";
+"CreateKeysForNetwork.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
 "CreateKeysForNetwork.Action.SelectAll" = "Select All";
 "CreateKeysForNetwork.Action.Create" = "Add Keys to Key Set";
-
+"CreateKeysForNetwork.Action.Skip" = "Skip";
+"ErrorDisplayed.DbNotInitialized" = "Database not initialized";
+"ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";

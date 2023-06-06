@@ -65,6 +65,7 @@
 		6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */; };
 		6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16687C28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift */; };
 		6D16687F28F86DE0008C664A /* CameraButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D16687E28F86DE0008C664A /* CameraButton.swift */; };
+		6D17D2A12A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17D2A02A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift */; };
 		6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */; };
 		6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */; };
 		6D199C9F292A8D1100E79113 /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */; };
@@ -402,6 +403,7 @@
 		6D16685C28F5C15C008C664A /* CameraVideoOutputDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraVideoOutputDelegate.swift; sourceTree = "<group>"; };
 		6D16687C28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EnvironmentValues+SafeAreaInsets.swift"; sourceTree = "<group>"; };
 		6D16687E28F86DE0008C664A /* CameraButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButton.swift; sourceTree = "<group>"; };
+		6D17D2A02A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorDisplayed+LocalizedDescription.swift"; sourceTree = "<group>"; };
 		6D17EF8228EDC951008626E9 /* Encryption+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encryption+RawRepresentable.swift"; sourceTree = "<group>"; };
 		6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewUIView.swift; sourceTree = "<group>"; };
 		6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
@@ -1042,6 +1044,7 @@
 			children = (
 				6D8F813B2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift */,
 				6D3423342994F0D200F3BA27 /* ErrorBottomModalViewModel+TransactionErrors.swift */,
+				6D17D2A02A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift */,
 			);
 			path = Errors;
 			sourceTree = "<group>";
@@ -2155,6 +2158,7 @@
 				6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */,
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				6D971AC32941CDF600121A36 /* Identicon.swift in Sources */,
+				6D17D2A12A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift in Sources */,
 				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
 				6D8973AB2A08EE1E0046A2F3 /* SignSpecService.swift in Sources */,
 				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,

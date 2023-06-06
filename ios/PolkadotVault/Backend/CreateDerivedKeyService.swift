@@ -7,6 +7,25 @@
 
 import Foundation
 
+enum CreateDerivedKeyError: Error {
+    case noKeysCreates(errors: [String])
+    case keysNotCreated([(network: MmNetwork, error: String)])
+
+    var localizedDescription: String {
+        switch self {
+        case let .keysNotCreated(networksWithErrors):
+            return networksWithErrors.reduce(into: "") {
+                $0 += (
+                    Localizable.CreateKeysForNetwork.Error
+                        .derivedKeyForNetwork($1.network.title, $1.error) + "\n"
+                )
+            }
+        case let .noKeysCreates(errors):
+            return errors.reduce(into: "") { $0 += ($1 + "\n") }
+        }
+    }
+}
+
 final class CreateDerivedKeyService {
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
@@ -26,6 +45,44 @@ final class CreateDerivedKeyService {
         self.callQueue = callQueue
         self.callbackQueue = callbackQueue
         self.navigation = navigation
+    }
+
+    func createDerivedKeys(
+        _ seedName: String,
+        networks: [MmNetwork],
+        completion: @escaping (Result<Void, CreateDerivedKeyError>) -> Void
+    ) {
+        let pathAndNetworks: [(path: String, network: MmNetwork)] = networks
+            .map { (path: "//\($0.title)", network: $0) }
+        var occuredErrors: [(network: MmNetwork, error: String)] = []
+        callQueue.async {
+            let result: Result<Void, CreateDerivedKeyError>
+            let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
+            pathAndNetworks.forEach {
+                do {
+                    try tryCreateAddress(
+                        seedName: seedName,
+                        seedPhrase: seedPhrase,
+                        path: $0.path,
+                        network: $0.network.key
+                    )
+                } catch let displayedError as ErrorDisplayed {
+                    occuredErrors.append((network: $0.network, error: displayedError.localizedDescription))
+                } catch {
+                    occuredErrors.append((network: $0.network, error: error.localizedDescription))
+                }
+            }
+            if occuredErrors.isEmpty {
+                result = .success(())
+            } else if occuredErrors.count == pathAndNetworks.count {
+                result = .failure(.noKeysCreates(errors: occuredErrors.map(\.error)))
+            } else {
+                result = .failure(.keysNotCreated(occuredErrors))
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
     }
 
     func createDerivedKey(
