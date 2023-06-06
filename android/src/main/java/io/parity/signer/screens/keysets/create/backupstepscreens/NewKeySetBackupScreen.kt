@@ -31,7 +31,6 @@ internal fun NewKeySetBackupScreen(
 	onBack: Callback,
 	modifier: Modifier = Modifier,
 ) {
-
 	Column(
 		modifier = modifier
 			.fillMaxSize(1f)

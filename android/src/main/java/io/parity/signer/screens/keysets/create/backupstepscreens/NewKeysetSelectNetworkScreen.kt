@@ -63,7 +63,7 @@ fun NewKeySetSelectNetworkScreen(
 	Box(modifier = modifier) {
 		NewKeySetSelectNetworkScreenPrivate(
 			networks = networks,
-			selectedNetworkKeys = selected,
+			selectedNetworkKeys = selected.value,
 			onNetworkClick = { network ->
 				selected.value = if (selected.value.contains(network.key)) {
 					selected.value - network.key
@@ -95,7 +95,7 @@ fun NewKeySetSelectNetworkScreen(
 @Composable
 private fun NewKeySetSelectNetworkScreenPrivate(
 	networks: List<NetworkModel>,
-	selectedNetworkKeys: MutableState<Set<String>>,
+	selectedNetworkKeys: Set<String>,
 	onNetworkClick: (NetworkModel) -> Unit,
 	onProceed: Callback,
 	onAddAll: Callback,
@@ -130,7 +130,7 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			networks.forEach { network ->
 				NetworkItemMultiselect(
 					network = network,
-					isSelected = selectedNetworkKeys.value.contains(network.key)
+					isSelected = selectedNetworkKeys.contains(network.key)
 				) { network ->
 					onNetworkClick(network)
 				}
@@ -241,9 +241,7 @@ private fun PreviewNewKeySetSelectNetwork() {
 			title = "Wastend",
 		),
 	)
-	val selected = remember<MutableState<Set<String>>> {
-		mutableStateOf(setOf(networks[1].key))
-	}
+	val selected = setOf(networks[1].key)
 	SignerNewTheme {
 		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
 	}
