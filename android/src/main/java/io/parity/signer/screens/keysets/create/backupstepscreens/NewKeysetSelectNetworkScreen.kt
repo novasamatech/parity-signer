@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.create
+package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import SignerCheckbox
 import android.content.res.Configuration
@@ -44,8 +44,7 @@ import io.parity.signer.ui.theme.fill6
 @Composable
 fun NewKeySetSelectNetworkScreen(
 	networks: List<NetworkModel>,
-	onProceed: () -> Unit, // todo dmitry onProceed: (List<NetworkModel>) -> Unit,
-	onAddAll: Callback,
+	onProceed: (Set<String>) -> Unit,
 	onBack: Callback
 ) {
 	val selected =
@@ -61,8 +60,14 @@ fun NewKeySetSelectNetworkScreen(
 				selected.value + network.key
 			}
 		},
-		onProceed = onProceed,
-		onAddAll = onAddAll,
+		onProceed = { onProceed(selected.value) },
+		onAddAll = {
+			selected.value = if (selected.value.size == networks.size) {
+				emptySet<String>() //todo dmitry as above reset to default
+			} else {
+				networks.map { it.key }.toSet()
+			}
+		},
 		onBack = onBack,
 	)
 }
@@ -72,7 +77,7 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 	networks: List<NetworkModel>,
 	selectedNetworkKeys: MutableState<Set<String>>,
 	onNetworkClick: (NetworkModel) -> Unit,
-	onProceed: () -> Unit,
+	onProceed: Callback,
 	onAddAll: Callback,
 	onBack: Callback
 ) {
