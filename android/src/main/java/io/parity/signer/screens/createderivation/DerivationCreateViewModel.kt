@@ -11,6 +11,7 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
+import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.Dispatchers
@@ -28,10 +29,9 @@ class DerivationCreateViewModel : ViewModel() {
 	private var seedRepository: SeedRepository =
 		ServiceLocator.activityScope!!.seedRepository
 	private val pathAnalyzer: DerivationPathAnalyzer = DerivationPathAnalyzer()
+	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
 
-	private var _allNetworks: List<NetworkModel> = runBlocking { getNetworks() }!!
-	val allNetworks: List<NetworkModel>
-		get() = _allNetworks
+	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
 	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
@@ -41,7 +41,7 @@ class DerivationCreateViewModel : ViewModel() {
 	val path: StateFlow<String> = _path.asStateFlow()
 
 	private val _selectedNetwork: MutableStateFlow<SelectedNetwork> =
-		MutableStateFlow(SelectedNetwork.Network(allNetworks.first()))
+		MutableStateFlow(SelectedNetwork.Network(getAllNetworks().first()))
 	val selectedNetwork: StateFlow<SelectedNetwork> =
 		_selectedNetwork.asStateFlow()
 
@@ -53,7 +53,8 @@ class DerivationCreateViewModel : ViewModel() {
 	 * should be called each time we open this flow again
 	 */
 	fun refreshCachedDependencies() {
-		_allNetworks = runBlocking { getNetworks() }!!
+		allNetworksUseCase.updateCache()
+		//todo dmitry update selected network if old one was removed
 		seedRepository = ServiceLocator.activityScope!!.seedRepository
 	}
 
@@ -61,10 +62,6 @@ class DerivationCreateViewModel : ViewModel() {
 		refreshCachedDependencies()
 		seedName = seed
 		this.rootNavigator = rootNavigator
-	}
-
-	private suspend fun getNetworks(): List<NetworkModel>? {
-		return uniffiInteractor.getAllNetworks().mapError()
 	}
 
 	fun updateSelectedNetwork(newNetwork: SelectedNetwork) {
@@ -91,7 +88,7 @@ class DerivationCreateViewModel : ViewModel() {
 	private fun getBackendCheck(path: String): DerivationCheck? {
 		return when (val selectedNetwork = selectedNetwork.value) {
 			SelectedNetwork.AllNetworks -> runBlocking {
-				allNetworks
+				getAllNetworks()
 					.map { network ->
 						async(Dispatchers.IO) {
 							uniffiInteractor.validateDerivationPath(
@@ -125,7 +122,7 @@ class DerivationCreateViewModel : ViewModel() {
 					when (val selectedNetwork = selectedNetwork.value) {
 						SelectedNetwork.AllNetworks -> {
 							withContext(Dispatchers.IO) {
-								allNetworks
+								getAllNetworks()
 									.map {
 										async {
 											tryCreateAddress(
