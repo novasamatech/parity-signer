@@ -29,10 +29,11 @@ internal fun NewKeySetBackupScreen(
 	model: NewSeedBackupModel,
 	onProceed: Callback,
 	onBack: Callback,
+	modifier: Modifier = Modifier,
 ) {
 
 	Column(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),

@@ -1,7 +1,9 @@
 package io.parity.signer.screens.keysets.create
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +32,7 @@ fun NewKeySetBackupStepSubgraph(
 					navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation)
 				},
 				onBack = rootNavigator::backAction,
+				modifier = Modifier.statusBarsPadding(),
 			)
 			BackHandler(onBack = rootNavigator::backAction)
 		}
@@ -38,6 +41,7 @@ fun NewKeySetBackupStepSubgraph(
 				model = model,
 				onProceed = {},
 				onBack = {},
+				modifier = Modifier.statusBarsPadding(),
 			)
 			BottomSheetWrapperRoot(onClosedAction = { navController.popBackStack() }) {
 				NewKeySetBackupBottomSheet(
@@ -53,6 +57,7 @@ fun NewKeySetBackupStepSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				onBack = { navController.popBackStack() },
+				modifier = Modifier.statusBarsPadding(),
 			)
 		}
 	}
