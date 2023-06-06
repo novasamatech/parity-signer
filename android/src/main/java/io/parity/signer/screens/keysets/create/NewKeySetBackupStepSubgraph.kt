@@ -28,9 +28,8 @@ fun NewKeySetBackupStepSubgraph(
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = {
-					navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation)
-				},
+				onProceed = { navController.navigate(
+					NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) },
 				onBack = rootNavigator::backAction,
 				modifier = Modifier.statusBarsPadding(),
 			)
@@ -43,20 +42,21 @@ fun NewKeySetBackupStepSubgraph(
 				onBack = {},
 				modifier = Modifier.statusBarsPadding(),
 			)
-			BottomSheetWrapperRoot(onClosedAction = { navController.popBackStack() }) {
+			BottomSheetWrapperRoot(onClosedAction = navController::popBackStack) {
 				NewKeySetBackupBottomSheet(
 					onProceed = {
 						navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks)
 					},
-					onCancel = { navController.popBackStack() },
+					onCancel = navController::popBackStack,
 				)
 			}
+			BackHandler(onBack = navController::popBackStack)
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 			NewKeySetSelectNetworkScreen(
 				model = model,
 				navigator = rootNavigator,
-				onBack = { navController.popBackStack() },
+				onBack = navController::popBackStack,
 				modifier = Modifier.statusBarsPadding(),
 			)
 		}
