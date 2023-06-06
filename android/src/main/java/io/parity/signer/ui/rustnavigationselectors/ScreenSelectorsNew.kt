@@ -29,7 +29,7 @@ import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
 import io.parity.signer.screens.keysets.KeySetsNavSubgraph
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreenFull
+import io.parity.signer.screens.keysets.create.NewKeySetBackupStepSubgraph
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
@@ -151,6 +151,7 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+
 		is ScreenData.RecoverSeedPhrase ->
 			Box(
 				modifier = Modifier
@@ -249,11 +250,15 @@ fun BottomSheetSelector(
 					}
 
 				is ModalData.NewSeedBackup -> {
-					NewKeySetBackupScreenFull(
+					NewKeySetBackupStepSubgraph(
 						model = modalData.f.toNewSeedBackupModel(),
-						onBack = { navigator.backAction() },
-						onCreateKeySet = sharedViewModel::addSeed
+						rootNavigator = navigator,
 					)
+//					NewKeySetBackupScreenFull( //todo dmitry remove
+//						model = modalData.f.toNewSeedBackupModel(),
+//						onBack = { navigator.backAction() },
+//						onCreateKeySet = sharedViewModel::addSeed
+//					)
 				}
 
 				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now

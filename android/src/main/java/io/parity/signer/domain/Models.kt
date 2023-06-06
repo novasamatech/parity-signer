@@ -263,6 +263,9 @@ data class NetworkModel(
 	}
 }
 
+fun NetworkModel.createDefaultPath(): String = "//${this.title}"
+
+
 fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	key = networkSpecsKey,
 	logo = networkLogo,
