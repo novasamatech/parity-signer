@@ -1,6 +1,21 @@
 package io.parity.signer.domain.usecases
 
+import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.backend.UniffiInteractor
+import io.parity.signer.domain.backend.mapError
+import kotlinx.coroutines.runBlocking
 
-class AllNetworksUseCase {
 
+class AllNetworksUseCase(val uniffiInteractor: UniffiInteractor) {
+	private var allNetworks: List<NetworkModel> = runBlocking { getNetworks() }!!
+
+	fun updateCache(): Unit {
+		allNetworks = runBlocking { getNetworks() }!!
+	}
+
+	fun getAllNetworks(): List<NetworkModel> = allNetworks
+
+	private suspend fun getNetworks(): List<NetworkModel>? {
+		return uniffiInteractor.getAllNetworks().mapError()
+	}
 }
