@@ -6,9 +6,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewSeedBackupModel
+import io.parity.signer.ui.BottomSheetWrapperRoot
 
 
 @Composable
@@ -35,11 +37,17 @@ fun NewKeySetBackupStepSubgraph(
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = {
-					navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks)
-				},
-				onBack = { navController.popBackStack() },
+				onProceed = {},
+				onBack = {},
 			)
+			BottomSheetWrapperRoot(onClosedAction = { navController.popBackStack() }) {
+				NewKeySetBackupBottomSheet(
+					onProceed = {
+						onCreateKeySet(model.seed, model.seedPhrase)
+					},
+					onCancel = { navController.popBackStack() },
+				)
+			}
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 			NewKeySetSelectNetworkScreen(
