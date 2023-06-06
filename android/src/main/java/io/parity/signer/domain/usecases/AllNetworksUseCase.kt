@@ -15,7 +15,7 @@ class AllNetworksUseCase(val uniffiInteractor: UniffiInteractor) {
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworks
 
-	private val preselectedkeys = listOf<String>("polkadot", "kusama", "westend")
+	private val preselectedkeys = listOf<String>("Polkadot", "Kusama", "Westend")
 
 	fun getDefaultPreselectedNetworks(): List<NetworkModel> = allNetworks
 		.filter { preselectedkeys.contains(it.key) }
