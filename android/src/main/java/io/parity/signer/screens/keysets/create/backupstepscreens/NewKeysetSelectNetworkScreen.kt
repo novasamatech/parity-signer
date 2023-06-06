@@ -223,8 +223,8 @@ private fun PreviewNewKeySetSelectNetwork() {
 			title = "Wastend",
 		),
 	)
-	val selected = remember<MutableState<Set<NetworkModel>>> {
-		mutableStateOf(setOf(networks[1]))
+	val selected = remember<MutableState<Set<String>>> {
+		mutableStateOf(setOf(networks[1].key))
 	}
 	SignerNewTheme {
 		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
