@@ -197,7 +197,7 @@ private fun NetworkItemMultiselectAll(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			text = "Select All", //todo dmitry
+			text = stringResource(R.string.keyset_create_keys_select_all),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 		)

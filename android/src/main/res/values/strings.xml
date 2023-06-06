@@ -401,6 +401,7 @@
 	<string name="keyset_create_keys_subtitle">Choose networks for the keys to be created</string>
 	<string name="keyset_create_keys_notification_text">Please note that keys with customly named derivation path name can be created from the key set screen separatley.</string>
 	<string name="keyset_create_keys_cta">Create Keys</string>
+    <string name="keyset_create_keys_select_all">Select All</string>
 
 </resources>
 
