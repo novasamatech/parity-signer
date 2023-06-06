@@ -1,11 +1,11 @@
 package io.parity.signer.screens.keysets.create
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.domain.Callback
-import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
@@ -16,8 +16,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 @Composable
 fun NewKeySetBackupStepSubgraph(
 	model: NewSeedBackupModel,
-	onBackExit: Callback,
-	onCreateKeySet: (String, String) -> Unit
+	rootNavigator: Navigator,
 ) {
 	val navController = rememberNavController()
 	NavHost(
@@ -30,9 +29,9 @@ fun NewKeySetBackupStepSubgraph(
 				onProceed = {
 					navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation)
 				},
-				onBack = onBackExit,
+				onBack = rootNavigator::backAction,
 			)
-			//todo dmitry handle back
+			BackHandler(onBack = rootNavigator::backAction)
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
@@ -43,7 +42,7 @@ fun NewKeySetBackupStepSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = { navController.popBackStack() }) {
 				NewKeySetBackupBottomSheet(
 					onProceed = {
-						onCreateKeySet(model.seed, model.seedPhrase)
+						navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks)
 					},
 					onCancel = { navController.popBackStack() },
 				)
@@ -51,8 +50,8 @@ fun NewKeySetBackupStepSubgraph(
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 			NewKeySetSelectNetworkScreen(
-				networks = emptyList<NetworkModel>(),//todo dmitry check it out as in create derivation
-				onProceed = {}, //todo dmitry implement
+				model = model,
+				navigator = rootNavigator,
 				onBack = { navController.popBackStack() },
 			)
 		}

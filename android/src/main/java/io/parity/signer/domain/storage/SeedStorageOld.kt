@@ -22,8 +22,9 @@ internal fun SharedViewModel.tellRustSeedNames() {
 
 /**
  * Add seed, encrypt it, and create default accounts
+ * todo dmitry switch to usecase
  */
-@Deprecated("Use SeedRepository directly in viewmodel")
+@Deprecated("Use CreateKeySetUseCase")
 fun SharedViewModel.addSeed(
 	seedName: String,
 	seedPhrase: String,

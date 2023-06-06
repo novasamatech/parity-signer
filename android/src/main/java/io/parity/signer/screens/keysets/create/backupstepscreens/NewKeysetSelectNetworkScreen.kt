@@ -27,6 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
@@ -34,21 +35,27 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 
 
-//todo dmitry implement screen into flow
 @Composable
 fun NewKeySetSelectNetworkScreen(
-	networks: List<NetworkModel>,
-	onProceed: (Set<String>) -> Unit,
+	model: NewSeedBackupModel,
+	navigator: Navigator,
 	onBack: Callback
 ) {
-	val selected =
-		remember { mutableStateOf(emptySet<String>()) } //todo dmitry select preselected netowrks
+	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
+	val selected: MutableState<Set<String>> =
+		remember {
+			mutableStateOf(networksViewModel.getDefaultPreselectedNetworks()
+				.map { it.key }.toSet()
+			)
+		}
+	val networks = networksViewModel.getAllNetworks()
 
 	NewKeySetSelectNetworkScreenPrivate(
 		networks = networks,
@@ -60,10 +67,15 @@ fun NewKeySetSelectNetworkScreen(
 				selected.value + network.key
 			}
 		},
-		onProceed = { onProceed(selected.value) },
+		onProceed = { networksViewModel.createKeySetWithNetworks(
+			seedName = model.seed, seedPhrase = model.seedPhrase,
+			networksForKeys = selected.value.mapNotNull {
+					selected -> networks.find { it.key == selected } }.toSet(),
+			navigator = navigator,
+		) },
 		onAddAll = {
 			selected.value = if (selected.value.size == networks.size) {
-				emptySet<String>() //todo dmitry as above reset to default
+				networksViewModel.getDefaultPreselectedNetworks().map { it.key }.toSet()
 			} else {
 				networks.map { it.key }.toSet()
 			}
@@ -81,8 +93,6 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 	onAddAll: Callback,
 	onBack: Callback
 ) {
-	//io/parity/signer/screens/keysetdetails/items/NetworkKeysExpandableMultiselect.kt:57
-	//todo dmitry example as it was done
 	Column(
 		modifier = Modifier
 			.fillMaxSize(1f)
