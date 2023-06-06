@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.create
+package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 
 /**
  * 2/2 step of new key set creation
+ * todo dmitry remove it when new subgraph created
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
