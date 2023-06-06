@@ -254,11 +254,6 @@ fun BottomSheetSelector(
 						model = modalData.f.toNewSeedBackupModel(),
 						rootNavigator = navigator,
 					)
-//					NewKeySetBackupScreenFull( //todo dmitry remove
-//						model = modalData.f.toNewSeedBackupModel(),
-//						onBack = { navigator.backAction() },
-//						onCreateKeySet = sharedViewModel::addSeed
-//					)
 				}
 
 				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now

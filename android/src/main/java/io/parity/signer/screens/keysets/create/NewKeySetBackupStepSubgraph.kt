@@ -1,7 +1,11 @@
 package io.parity.signer.screens.keysets.create
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -20,16 +24,26 @@ fun NewKeySetBackupStepSubgraph(
 	model: NewSeedBackupModel,
 	rootNavigator: Navigator,
 ) {
+
+	//background
+	Box(modifier = Modifier.fillMaxSize(1f).statusBarsPadding()
+		.background(MaterialTheme.colors.background))
+
+
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetBackup,
 	) {
+		val onProceedFromBackupInitial = { //to cache so screen can be taked from caches during navigation
+			navController.navigate(
+				NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
+			)
+		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = { navController.navigate(
-					NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) },
+				onProceed = onProceedFromBackupInitial,
 				onBack = rootNavigator::backAction,
 				modifier = Modifier.statusBarsPadding(),
 			)
@@ -38,8 +52,8 @@ fun NewKeySetBackupStepSubgraph(
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = {},
-				onBack = {},
+				onProceed = onProceedFromBackupInitial,
+				onBack = rootNavigator::backAction,
 				modifier = Modifier.statusBarsPadding(),
 			)
 			BottomSheetWrapperRoot(onClosedAction = navController::popBackStack) {
