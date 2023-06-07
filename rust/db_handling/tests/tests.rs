@@ -32,6 +32,7 @@ use definitions::{
     users::AddressDetails,
 };
 
+use db_handling::identities::create_key_set;
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -2000,4 +2001,57 @@ fn test_export_secret_key() {
         .find(|(_, a)| a.path == child_path)
         .unwrap();
     assert!(child_address.secret_exposed);
+}
+
+#[test]
+fn test_create_key_set_generate_default_addresses() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
+    let westend_specs_key = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    create_key_set(&db, "Alice", ALICE_SEED_PHRASE, vec![westend_specs_key.to_owned()]).unwrap();
+    {
+        let addresses = open_tree(&db, ADDRTREE).unwrap();
+        assert_eq!(addresses.len(), 2);
+    }
+    let default_addresses = addresses_set_seed_name_network(
+        &db,
+        "Alice",
+        &NetworkSpecsKey::from_hex(westend_specs_key).unwrap(),
+    )
+    .unwrap();
+
+    let expected_default_addresses = vec![(
+        MultiSigner::Sr25519(
+            Public::try_from(
+                hex::decode("3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34")
+                    .unwrap()
+                    .as_ref(),
+            )
+            .unwrap(),
+        ),
+        AddressDetails {
+            seed_name: "Alice".to_string(),
+            path: "//westend".to_string(),
+            has_pwd: false,
+            network_id: Some(NetworkSpecsKey::from_parts(
+                &westend_genesis(),
+                &Encryption::Sr25519,
+            )),
+            encryption: Encryption::Sr25519,
+            secret_exposed: false,
+        },
+    )];
+
+    assert_eq!(default_addresses, expected_default_addresses);
+
+    let identities: Tree = db.open_tree(ADDRTREE).unwrap();
+    let test_key = AddressKey::from_parts(
+        &hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(),
+        &Encryption::Sr25519,
+        None,
+    )
+    .unwrap();
+    assert!(identities.contains_key(test_key.key()).unwrap());
 }

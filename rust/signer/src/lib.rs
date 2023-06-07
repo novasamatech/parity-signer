@@ -442,6 +442,20 @@ fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplay
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
+fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDisplayed> {
+    db_handling::interface_signer::print_new_seed(new_seed_name)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn create_key_set(
+    seed_name: &str,
+    seed_phrase: &str,
+    networks: Vec<String>,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::identities::create_key_set(&get_db()?, seed_name, seed_phrase, networks)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.

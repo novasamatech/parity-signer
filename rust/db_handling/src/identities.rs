@@ -899,6 +899,50 @@ pub fn try_create_seed(
         .apply(database)
 }
 
+/// Creates seed into Vault: add default addresses for `derive_for_networks` in the Vault
+///
+/// Each network has a default derivation path, recorded in [`NetworkSpecs`]
+/// field `path_id`, normally `path_id` is `//<network_name>`.
+///
+/// `derive_for_networks` is a list of network ids to derive addresses for.
+pub fn create_key_set(
+    database: &sled::Db,
+    seed_name: &str,
+    seed_phrase: &str,
+    derive_for_networks: Vec<String>,
+) -> Result<()> {
+    let mut events: Vec<Event> = vec![Event::SeedCreated {
+        seed_created: seed_name.to_string(),
+    }];
+    // create seed root key
+    let mut prep_data = populate_addresses(database, seed_name, seed_phrase, true)?;
+
+    for network_key in derive_for_networks {
+        let network_spec_key = NetworkSpecsKey::from_hex(&network_key)?;
+        let network = get_network_specs(database, &network_spec_key)?.specs;
+        let new_prep = create_address(
+            database,
+            &prep_data.address_prep,
+            &network.path_id,
+            Some(&network),
+            seed_name,
+            seed_phrase,
+        )?;
+        prep_data
+            .address_prep
+            .extend_from_slice(&new_prep.address_prep);
+        prep_data
+            .history_prep
+            .extend_from_slice(&new_prep.history_prep);
+    }
+
+    events.extend_from_slice(&prep_data.history_prep);
+    TrDbCold::new()
+        .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made
+        .set_history(events_to_batch(database, events)?) // add corresponding history
+        .apply(database)
+}
+
 /// Remove address from the Vault database.
 ///
 /// Address is determined by [`MultiSigner`] and [`NetworkSpecsKey`] of the
