@@ -136,6 +136,15 @@ struct DerivationPathNameView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingInfoModal
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableInfoModal,
+                isShowingBottomAlert: $viewModel.isPresentingInfoModal
+            )
+            .clearModalBackground()
+        }
     }
 
     @ViewBuilder

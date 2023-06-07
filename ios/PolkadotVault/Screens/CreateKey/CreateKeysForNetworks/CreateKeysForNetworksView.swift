@@ -29,21 +29,31 @@ struct CreateKeysForNetworksView: View {
                             networkSelection()
                             footer()
                         }
-                        PrimaryButton(
-                            action: viewModel.onDoneTap,
-                            text: Localizable.CreateKeysForNetwork.Action.create.key,
-                            style: .primary()
-                        )
-                        .padding(Spacing.large)
                     }
                 }
                 .padding(Spacing.extraSmall)
+                Spacer()
+                PrimaryButton(
+                    action: viewModel.onDoneTap,
+                    text: viewModel.actionTitle(),
+                    style: .primary()
+                )
+                .padding(Spacing.large)
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
             .frame(
                 minWidth: geo.size.width,
                 minHeight: geo.size.height
             )
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .fullScreenModal(
+                isPresented: $viewModel.isPresentingError
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.errorViewModel,
+                    isShowingBottomAlert: $viewModel.isPresentingError
+                )
+                .clearModalBackground()
+            }
         }
     }
 
@@ -137,10 +147,14 @@ extension CreateKeysForNetworksView {
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
         private let createKeyService: CreateDerivedKeyService
-        let seedName: String
+        private let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
         @Published var selectedNetworks: [MmNetwork] = []
+        // Error presentatation
+        @Published var isPresentingError: Bool = false
+        @Published var errorViewModel: ErrorBottomModalViewModel!
+
         @Binding var isPresented: Bool
 
         init(
@@ -154,6 +168,12 @@ extension CreateKeysForNetworksView {
             self.createKeyService = createKeyService
             _isPresented = isPresented
             updateNetworks()
+        }
+
+        func actionTitle() -> LocalizedStringKey {
+            selectedNetworks.isEmpty ?
+                Localizable.CreateKeysForNetwork.Action.skip.key :
+                Localizable.CreateKeysForNetwork.Action.create.key
         }
 
         func selectAllNetworks() {
@@ -177,9 +197,18 @@ extension CreateKeysForNetworksView {
         }
 
         func onDoneTap() {
-            // Add logic to create keys
-
-            onKeyCreationComplete()
+            createKeyService.createDerivedKeys(
+                seedName,
+                networks: selectedNetworks
+            ) { result in
+                switch result {
+                case .success:
+                    self.isPresented = false
+                case let .failure(error):
+                    self.errorViewModel = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
     }
 }
@@ -187,10 +216,9 @@ extension CreateKeysForNetworksView {
 private extension CreateKeysForNetworksView.ViewModel {
     func updateNetworks() {
         networkService.getNetworks {
-            if case let .success(networks) = $0 {
-                self.networks = networks
-                self.selectedNetworks = networks.filter { Constants.preselectedNetworks.contains($0.title) }
-            }
+            guard case let .success(networks) = $0 else { return }
+            self.networks = networks
+            self.selectedNetworks = networks.filter { Constants.preselectedNetworks.contains($0.title) }
         }
     }
 }
