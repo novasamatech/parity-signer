@@ -17,7 +17,6 @@ import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
-import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toKeySetDetailsModel
@@ -34,7 +33,7 @@ import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewSeedMenu
 import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
-import io.parity.signer.screens.keysets.restore.KeysetRecoverPhraseScreenFull
+import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
@@ -158,7 +157,7 @@ fun CombinedScreensSelector(
 					.statusBarsPadding()
 					.imePadding()
 			) {
-				KeysetRecoverPhraseScreenFull(
+				KeysetRecoverPhraseScreen(
 					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
 					rootNavigator = rootNavigator,
 				)
