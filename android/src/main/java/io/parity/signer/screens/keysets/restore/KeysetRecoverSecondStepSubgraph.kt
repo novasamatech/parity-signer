@@ -18,7 +18,7 @@ import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhras
 @Composable
 fun NewKeysetRecoverSecondStepSubgraph(
 	rootNavigator: Navigator,
-	initialRecoverSeedPhrase: KeysetRecoverModel,
+	recoverSeedPhrase: KeysetRecoverModel,
 ) {
 //background
 	Box(
@@ -36,17 +36,18 @@ fun NewKeysetRecoverSecondStepSubgraph(
 		composable(KeysetRecoverSubgraph.KeysetRecoverSeed) {
 			//todo dmitry viewmodel? add
 			KeysetRecoverPhraseScreen(
-				rootNavigator, initialRecoverSeedPhrase
+				rootNavigator, recoverSeedPhrase
 			)
 			BackHandler(onBack = rootNavigator::backAction)
 		}
 		composable(KeysetRecoverSubgraph.KeysetRecoverNetworks) {
-//			NewKeySetSelectNetworkScreen(//todo dmitry new screen
-//				model = model,
-//				navigator = rootNavigator,
-//				onBack = navController::popBackStack,
-//				modifier = Modifier.statusBarsPadding(),
-//			)
+			RecoverKeysetSelectNetworkScreen(
+				seedName = recoverSeedPhrase.seedName,
+				seedPhrase = recoverSeedPhrase.readySeed!!,
+				rootNavigator = rootNavigator,
+				onBack = navController::popBackStack,
+				modifier = Modifier.statusBarsPadding(),
+			)
 		}
 	}
 }
