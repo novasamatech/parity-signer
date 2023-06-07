@@ -2010,7 +2010,13 @@ fn test_create_key_set_generate_default_addresses() {
 
     populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
     let westend_specs_key = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    create_key_set(&db, "Alice", ALICE_SEED_PHRASE, vec![westend_specs_key.to_owned()]).unwrap();
+    create_key_set(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        vec![westend_specs_key.to_owned()],
+    )
+    .unwrap();
     {
         let addresses = open_tree(&db, ADDRTREE).unwrap();
         assert_eq!(addresses.len(), 2);
