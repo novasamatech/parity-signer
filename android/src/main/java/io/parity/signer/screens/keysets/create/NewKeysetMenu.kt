@@ -25,7 +25,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun NewSeedMenu(
+fun NewKeysetMenu(
 	networkState: State<NetworkState?>,
 	navigator: Navigator,
 ) {
@@ -88,7 +88,7 @@ fun NewSeedMenu(
 private fun PreviewNewSeedMenu() {
 	val state = remember { mutableStateOf(NetworkState.Past) }
 	SignerNewTheme {
-		NewSeedMenu(
+		NewKeysetMenu(
 			state,
 			EmptyNavigator(),
 		)
