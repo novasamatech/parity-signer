@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,7 +20,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.KeysetRecoverModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverViewModel
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -32,7 +29,8 @@ import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun KeysetRecoverPhraseScreen(
-	rootNavigator: Navigator,
+	onContinue: Callback,
+	onBack: Callback,
 	initialRecoverSeedPhrase: KeysetRecoverModel,
 ) {
 	val viewModel: KeysetRecoverViewModel = viewModel()
@@ -40,33 +38,23 @@ fun KeysetRecoverPhraseScreen(
 	//https://issuetracker.google.com/issues/160257648
 	val state = viewModel.recoverState.collectAsState(Dispatchers.Main.immediate)
 
+//	todo dmitry pass this state above
 	LaunchedEffect(key1 = Unit) {
 		viewModel.initValue(initialRecoverSeedPhrase)
 	}
 
 	state.value?.let { state ->
-		val context = LocalContext.current
 		KeysetRecoverPhraseScreenView(
 			model = state,
 			backAction = {
 				viewModel.resetState()
-				rootNavigator.backAction()
+				onBack()
 			},
 			onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
 			onAddSuggestedWord = { suggestedWord -> viewModel.addWord(suggestedWord) },
 			onDone = {
 				state.readySeed?.let { seedFinal ->
-					viewModel.resetState()
-					viewModel.addSeed(
-						seedName = state.seedName,
-						seedPhrase = seedFinal,
-						navigator = rootNavigator
-					)
-					Toast.makeText(
-						context,
-						context.getText(R.string.key_set_has_been_recovered_toast),
-						Toast.LENGTH_LONG
-					).show()
+					onContinue()
 				}
 			}
 		)
@@ -82,18 +70,16 @@ private fun KeysetRecoverPhraseScreenView(
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
 ) {
-
 	Column(
 		Modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
 	) {
-
 		ScreenHeaderWithButton(
 			canProceed = model.readySeed != null,
 			title = stringResource(R.string.recovert_key_set_title),
-			btnText = stringResource(R.string.generic_done),
+			btnText = stringResource(R.string.button_next),
 			onDone = onDone,
 			onClose = backAction,
 			backNotClose = true,
@@ -106,7 +92,6 @@ private fun KeysetRecoverPhraseScreenView(
 				.padding(horizontal = 24.dp)
 				.padding(top = 8.dp, bottom = 2.dp),
 		)
-
 		EnterSeedPhraseBox(
 			enteredWords = model.draft,
 			userInput = model.userInput,

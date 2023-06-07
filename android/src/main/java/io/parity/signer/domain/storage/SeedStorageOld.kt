@@ -20,25 +20,6 @@ internal fun SharedViewModel.tellRustSeedNames() {
 	updateSeedNames(allNames.toList())
 }
 
-/**
- * Add seed, encrypt it, and create default accounts
- * todo dmitry switch to usecase
- */
-@Deprecated("Use CreateKeySetUseCase")
-fun SharedViewModel.addSeed(
-	seedName: String,
-	seedPhrase: String,
-) {
-	viewModelScope.launch {
-		val repository = ServiceLocator.activityScope!!.seedRepository
-		repository.addSeed(
-			seedName = seedName,
-			seedPhrase = seedPhrase,
-			navigator = navigator,
-			isOptionalAuth = false
-		)
-	}
-}
 
 /**
  * Fetch seed from strongbox; must be in unlocked scope
