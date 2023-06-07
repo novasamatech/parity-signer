@@ -158,7 +158,7 @@ fun CombinedScreensSelector(
 					.imePadding()
 			) {
 				NewKeysetRecoverSecondStepSubgraph(
-					recoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
+					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
 					rootNavigator = rootNavigator,
 				)
 			}
