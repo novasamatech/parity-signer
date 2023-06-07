@@ -30,9 +30,10 @@ import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
 import io.parity.signer.screens.keysets.KeySetsNavSubgraph
 import io.parity.signer.screens.keysets.create.NewKeySetBackupStepSubgraph
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
-import io.parity.signer.screens.keysets.create.NewSeedMenu
+import io.parity.signer.screens.keysets.create.NewKeysetMenu
 import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
+import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -157,7 +158,7 @@ fun CombinedScreensSelector(
 					.statusBarsPadding()
 					.imePadding()
 			) {
-				KeysetRecoverPhraseScreen(
+				NewKeysetRecoverSecondStepSubgraph(
 					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
 					rootNavigator = rootNavigator,
 				)
@@ -242,7 +243,7 @@ fun BottomSheetSelector(
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
 					}) {
-						NewSeedMenu(
+						NewKeysetMenu(
 							networkState = networkState,
 							navigator = sharedViewModel.navigator,
 						)
