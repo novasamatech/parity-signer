@@ -1,18 +1,12 @@
-package io.parity.signer.screens.keysets.create.backupstepscreens
+package io.parity.signer.screens.keysets.restore
 
-import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -34,19 +28,22 @@ import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselect
+import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselectAll
+import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 
 
 @Composable
-fun NewKeySetSelectNetworkScreen(
-	model: NewSeedBackupModel,
-	navigator: Navigator,
+fun RecoverKeysetSelectNetworkScreen(
+	seedName: String,
+	seedPhrase: String,
+	rootNavigator: Navigator,
 	onBack: Callback,
 	modifier: Modifier = Modifier,
 ) {
@@ -61,7 +58,7 @@ fun NewKeySetSelectNetworkScreen(
 	val networks = networksViewModel.getAllNetworks()
 
 	Box(modifier = modifier) {
-		NewKeySetSelectNetworkScreenPrivate(
+		RecoverKeysetSelectNetworkScreenPrivate(
 			networks = networks,
 			selectedNetworkKeys = selected.value,
 			onNetworkClick = { network ->
@@ -73,10 +70,10 @@ fun NewKeySetSelectNetworkScreen(
 			},
 			onProceed = {
 				networksViewModel.createKeySetWithNetworks(
-					seedName = model.seed, seedPhrase = model.seedPhrase,
+					seedName = seedName, seedPhrase = seedPhrase,
 					networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 						.toSet(),
-					navigator = navigator,
+					navigator = rootNavigator,
 				)
 			},
 			onAddAll = {
@@ -93,7 +90,7 @@ fun NewKeySetSelectNetworkScreen(
 }
 
 @Composable
-private fun NewKeySetSelectNetworkScreenPrivate(
+private fun RecoverKeysetSelectNetworkScreenPrivate(
 	networks: List<NetworkModel>,
 	selectedNetworkKeys: Set<String>,
 	onNetworkClick: (NetworkModel) -> Unit,
@@ -109,11 +106,11 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ScreenHeader(
-			title = stringResource(R.string.keyset_create_keys_title),
+			title = stringResource(R.string.keyset_recover_keys_title),
 			onBack = onBack,
 		)
 		Text(
-			text = stringResource(R.string.keyset_create_keys_subtitle),
+			text = stringResource(R.string.keyset_recover_keys_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -139,75 +136,16 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			NetworkItemMultiselectAll(onAddAll)
 		}
 		NotificationFrameText(
-			message = stringResource(R.string.keyset_create_keys_notification_text),
+			message = stringResource(R.string.keyset_recover_keys_notification_text),
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 		)
 		Spacer(modifier = Modifier.weight(1f))
 
 		PrimaryButtonWide(
-			label = stringResource(R.string.keyset_create_keys_cta),
+			label = stringResource(R.string.keyset_recover_keys_cta),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,
-		)
-	}
-}
-
-
-@Composable
-internal fun NetworkItemMultiselect(
-	network: NetworkModel,
-	isSelected: Boolean,
-	onClick: (NetworkModel) -> Unit,
-) {
-	Row(
-		modifier = Modifier.clickable { onClick(network) },
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		NetworkIcon(
-			networkLogoName = network.logo,
-			modifier = Modifier
-				.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
-				.size(36.dp),
-		)
-		Text(
-			text = network.title,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
-		)
-		Spacer(modifier = Modifier.weight(1f))
-		SignerCheckbox(
-			isChecked = isSelected,
-			modifier = Modifier.padding(end = 8.dp),
-			uncheckedColor = MaterialTheme.colors.primary,
-		) {
-			onClick(network)
-		}
-	}
-}
-
-
-@Composable
-internal fun NetworkItemMultiselectAll(
-	onClick: Callback,
-) {
-	Row(
-		modifier = Modifier
-			.clickable(onClick = onClick)
-			.height(68.dp)
-			.padding(horizontal = 16.dp)
-			.fillMaxWidth(1f),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Text(
-			text = stringResource(R.string.keyset_create_keys_select_all),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
 		)
 	}
 }
@@ -243,7 +181,7 @@ private fun PreviewNewKeySetSelectNetwork() {
 	)
 	val selected = setOf(networks[1].key)
 	SignerNewTheme {
-		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
+		RecoverKeysetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
 	}
 }
 
@@ -337,6 +275,6 @@ private fun PreviewNewKeySetSelectNetworkVeryLong() {
 	)
 	val selected = setOf(networks[1].key)
 	SignerNewTheme {
-		NewKeySetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
+		RecoverKeysetSelectNetworkScreenPrivate(networks, selected, {}, {}, {}, {})
 	}
 }
