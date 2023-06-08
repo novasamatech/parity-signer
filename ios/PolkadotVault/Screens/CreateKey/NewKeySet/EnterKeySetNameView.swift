@@ -49,6 +49,15 @@ struct EnterKeySetNameView: View {
             .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
+            .fullScreenModal(
+                isPresented: $viewModel.isPresentingError
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.presentableError,
+                    isShowingBottomAlert: $viewModel.isPresentingError
+                )
+                .clearModalBackground()
+            }
         }
     }
 
@@ -92,6 +101,8 @@ extension EnterKeySetNameView {
         @Published var seedName: String = ""
         @Published var isPresentingDetails: Bool = false
         @Published var detailsContent: MNewSeedBackup!
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel!
         @Binding var isPresented: Bool
 
         private let seedsMediator: SeedsMediating
@@ -112,8 +123,16 @@ extension EnterKeySetNameView {
         }
 
         func onNextTap() {
-            detailsContent = service.createKeySet(seedName: seedName)
-            isPresentingDetails = true
+            service.createKeySet(seedName: seedName) { result in
+                switch result {
+                case let .success(seedBackup):
+                    self.detailsContent = seedBackup
+                    self.isPresentingDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func isActionAvailable() -> Bool {

@@ -609,65 +609,18 @@ fn export_import_addrs() {
             .0
             .public()
             .into(),
-        derived_keys: vec![
-            DerivedKeyPreview {
-                address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Polkadot".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
+        derived_keys: vec![DerivedKeyPreview {
+            address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+            derivation_path: Some("//secret".to_owned()),
+            encryption: Encryption::Sr25519,
+            genesis_hash: westend_genesis,
+            identicon: SignerImage::Png {
+                image: alice_sr_secret_abracadabra().to_vec(),
             },
-            DerivedKeyPreview {
-                address: "EBJwHkVtAcF6nCKHd3h4H75NzgvMJxMS1X3WWd8a2DjaQx9".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Kusama".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Westend".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
-                derivation_path: Some("//secret".to_owned()),
-                encryption: Encryption::Sr25519,
-                genesis_hash: westend_genesis,
-                identicon: SignerImage::Png {
-                    image: alice_sr_secret_abracadabra().to_vec(),
-                },
-                has_pwd: Some(true),
-                network_title: Some("Westend".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-        ],
+            has_pwd: Some(true),
+            network_title: Some("Westend".to_string()),
+            status: DerivedKeyStatus::AlreadyExists,
+        }],
     }];
 
     assert_eq!(addrs, addrs_expected);
@@ -699,18 +652,7 @@ fn export_import_addrs() {
             .0
             .public()
             .into(),
-        derived_keys: vec![DerivedKeyPreview {
-            address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-            derivation_path: None,
-            encryption: Encryption::Sr25519,
-            genesis_hash: polkadot_genesis,
-            identicon: SignerImage::Png {
-                image: alice_sr_root().to_vec(),
-            },
-            has_pwd: Some(false),
-            network_title: Some("Polkadot".to_string()),
-            status: DerivedKeyStatus::AlreadyExists,
-        }],
+        derived_keys: vec![],
     }];
 
     assert_eq!(addrs_filtered, addrs_expected_filtered);
