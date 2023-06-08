@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysets.restore
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,14 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.R
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
+import kotlinx.coroutines.Dispatchers
 
 
 @Composable
@@ -31,40 +33,49 @@ fun NewKeysetRecoverSecondStepSubgraph(
 			.background(MaterialTheme.colors.background)
 	)
 
+	val viewModel: KeysetRecoverViewModel = viewModel()
+	//Dispatchers.Main.immediate because it used in TextField to workaround bug
+	//https://issuetracker.google.com/issues/160257648
+	val state = viewModel.recoverState.collectAsState(Dispatchers.Main.immediate)
+
+	LaunchedEffect(key1 = Unit) {
+		viewModel.initValue(initialRecoverSeedPhrase)
+	}
+
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
 		startDestination = KeysetRecoverSubgraph.KeysetRecoverSeed,
 	) {
 		composable(KeysetRecoverSubgraph.KeysetRecoverSeed) {
-			val context = LocalContext.current
-			//todo dmitry viewmodel? add
-			KeysetRecoverPhraseScreen(
-				onContinue = { seed ->
-					viewModel.resetState()
-					viewModel.addSeed(
-						seedName = state.seedName,
-						seedPhrase = seedFinal,
-						navigator = rootNavigator
-					)
-					Toast.makeText(
-						context,
-						context.getText(R.string.key_set_has_been_recovered_toast),
-						Toast.LENGTH_LONG
-					).show()
-										 },//todo dmitry
-				onBack = {rootNavigator.backAction()},
-				rootNavigator = rootNavigator,
-				initialRecoverSeedPhrase = initialRecoverSeedPhrase,
-			)
-			BackHandler(onBack = rootNavigator::backAction)
+			val fullBackAction = {
+				viewModel.resetState()
+				rootNavigator.backAction()
+			}
+			state.value?.let { stateModel ->
+				KeysetRecoverPhraseScreen(
+					model = stateModel,
+					backAction = fullBackAction,
+					onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
+					onAddSuggestedWord = { suggestedWord ->
+						viewModel.addWord(suggestedWord)
+					},
+					onDone = {
+						stateModel.readySeed?.let { seedFinal ->
+							navController.navigate(KeysetRecoverSubgraph.KeysetRecoverNetworks)
+						}
+					},
+				)
+			}
+			BackHandler(onBack = fullBackAction)
 		}
 		composable(KeysetRecoverSubgraph.KeysetRecoverNetworks) {
 			RecoverKeysetSelectNetworkScreen(
-				seedName = initialRecoverSeedPhrase.seedName,
-				seedPhrase = initialRecoverSeedPhrase.readySeed!!,//todo dmitry this is not last
+				seedName = state.value!!.seedName,
+				seedPhrase = state.value!!.readySeed!!,
 				rootNavigator = rootNavigator,
 				onBack = navController::popBackStack,
+				onExitCleanup = { viewModel.resetState() },
 				modifier = Modifier.statusBarsPadding(),
 			)
 		}

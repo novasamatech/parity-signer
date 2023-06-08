@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysets.restore
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +47,7 @@ fun RecoverKeysetSelectNetworkScreen(
 	seedPhrase: String,
 	rootNavigator: Navigator,
 	onBack: Callback,
+	onExitCleanup: Callback,//as we don't have full platform navigation that will clear viewmodel state
 	modifier: Modifier = Modifier,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
@@ -58,6 +61,7 @@ fun RecoverKeysetSelectNetworkScreen(
 	val networks = networksViewModel.getAllNetworks()
 
 	Box(modifier = modifier) {
+		val context = LocalContext.current
 		RecoverKeysetSelectNetworkScreenPrivate(
 			networks = networks,
 			selectedNetworkKeys = selected.value,
@@ -75,6 +79,12 @@ fun RecoverKeysetSelectNetworkScreen(
 						.toSet(),
 					navigator = rootNavigator,
 				)
+				Toast.makeText(
+					context,
+					context.getText(R.string.key_set_has_been_recovered_toast),
+					Toast.LENGTH_LONG
+				).show()
+				onExitCleanup()
 			},
 			onAddAll = {
 				selected.value = if (selected.value.size == networks.size) {

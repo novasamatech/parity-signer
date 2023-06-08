@@ -54,7 +54,6 @@ class DerivationCreateViewModel : ViewModel() {
 	 */
 	fun refreshCachedDependencies() {
 		allNetworksUseCase.updateCache()
-		//todo dmitry update selected network if old one was removed
 		seedRepository = ServiceLocator.activityScope!!.seedRepository
 	}
 
