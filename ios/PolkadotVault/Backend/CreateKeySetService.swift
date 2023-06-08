@@ -8,29 +8,51 @@
 import Foundation
 
 final class CreateKeySetService {
-    private let navigation: NavigationCoordinator
+    private let callQueue: Dispatching
+    private let callbackQueue: Dispatching
 
     init(
-        navigation: NavigationCoordinator = NavigationCoordinator()
+        callQueue: Dispatching = DispatchQueue(label: "CreateKeySetService", qos: .userInitiated),
+        callbackQueue: Dispatching = DispatchQueue.main
     ) {
-        self.navigation = navigation
+        self.callQueue = callQueue
+        self.callbackQueue = callbackQueue
     }
 
-    func createKeySet(seedName: String) -> MNewSeedBackup! {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .rightButtonAction))
-        navigation.performFake(navigation: .init(action: .newSeed))
-        guard case let .newSeedBackup(value) = navigation
-            .performFake(navigation: .init(action: .goForward, details: seedName))?.modalData else { return nil }
-        return value
+    func createKeySet(
+        seedName: String,
+        _ completion: @escaping (Result<MNewSeedBackup, Error>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<MNewSeedBackup, Error>
+            do {
+                let seedBackup = try printNewSeed(newSeedName: seedName)
+                result = .success(seedBackup)
+            } catch {
+                result = .failure(error)
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
     }
 
-    func confirmKeySetCreation(_ seedPhrase: String) {
-        navigation.performFake(navigation: .init(
-            action: .goForward,
-            details: BackendConstants.true,
-            seedPhrase: seedPhrase
-        ))
+    func confirmKeySetCreation(
+        seedName: String,
+        seedPhrase: String,
+        _ completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<Void, Error>
+            do {
+                try PolkadotVault.createKeySet(seedName: seedName, seedPhrase: seedPhrase, networks: [])
+                result = .success(())
+            } catch {
+                result = .failure(error)
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
     }
 }
