@@ -35,7 +35,7 @@ struct CreateKeysForNetworksView: View {
                 Spacer()
                 PrimaryButton(
                     action: viewModel.onDoneTap,
-                    text: viewModel.actionTitle(),
+                    text: Localizable.CreateKeysForNetwork.Action.create.key,
                     style: .primary()
                 )
                 .padding(Spacing.large)
@@ -135,6 +135,11 @@ struct CreateKeysForNetworksView: View {
 }
 
 extension CreateKeysForNetworksView {
+    enum Mode: Equatable {
+        case createKeySet(seedPhrase: String)
+        case recoverKeySet
+    }
+
     enum OnCompletionAction: Equatable {
         case derivedKeysCreated
     }
@@ -146,8 +151,11 @@ extension CreateKeysForNetworksView {
 
         private let cancelBag = CancelBag()
         private let networkService: GetAllNetworksService
+        private let createKeySetService: CreateKeySetService
         private let createKeyService: CreateDerivedKeyService
+        private let seedsMediator: SeedsMediating
         private let seedName: String
+        private let mode: Mode
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
         @Published var selectedNetworks: [MmNetwork] = []
@@ -159,21 +167,21 @@ extension CreateKeysForNetworksView {
 
         init(
             seedName: String,
+            mode: Mode,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            createKeySetService: CreateKeySetService = CreateKeySetService(),
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>
         ) {
             self.seedName = seedName
+            self.mode = mode
             self.networkService = networkService
             self.createKeyService = createKeyService
+            self.createKeySetService = createKeySetService
+            self.seedsMediator = seedsMediator
             _isPresented = isPresented
             updateNetworks()
-        }
-
-        func actionTitle() -> LocalizedStringKey {
-            selectedNetworks.isEmpty ?
-                Localizable.CreateKeysForNetwork.Action.skip.key :
-                Localizable.CreateKeysForNetwork.Action.create.key
         }
 
         func selectAllNetworks() {
@@ -197,16 +205,38 @@ extension CreateKeysForNetworksView {
         }
 
         func onDoneTap() {
-            createKeyService.createDerivedKeys(
-                seedName,
-                networks: selectedNetworks
-            ) { result in
-                switch result {
-                case .success:
-                    self.isPresented = false
-                case let .failure(error):
-                    self.errorViewModel = .alertError(message: error.localizedDescription)
-                    self.isPresentingError = true
+            switch mode {
+            case let .createKeySet(seedPhrase):
+                seedsMediator.createSeed(
+                    seedName: seedName,
+                    seedPhrase: seedPhrase,
+                    shouldCheckForCollision: true
+                )
+                createKeySetService.confirmKeySetCreation(
+                    seedName: seedName,
+                    seedPhrase: seedPhrase,
+                    networks: selectedNetworks
+                ) { result in
+                    switch result {
+                    case .success:
+                        self.isPresented = false
+                    case let .failure(error):
+                        self.errorViewModel = .alertError(message: error.localizedDescription)
+                        self.isPresentingError = true
+                    }
+                }
+            case .recoverKeySet:
+                createKeyService.createDerivedKeys(
+                    seedName,
+                    networks: selectedNetworks
+                ) { result in
+                    switch result {
+                    case .success:
+                        self.isPresented = false
+                    case let .failure(error):
+                        self.errorViewModel = .alertError(message: error.localizedDescription)
+                        self.isPresentingError = true
+                    }
                 }
             }
         }
@@ -229,6 +259,7 @@ private extension CreateKeysForNetworksView.ViewModel {
             CreateKeysForNetworksView(
                 viewModel: .init(
                     seedName: "seedName",
+                    mode: .createKeySet(seedPhrase: ""),
                     isPresented: .constant(true)
                 )
             )

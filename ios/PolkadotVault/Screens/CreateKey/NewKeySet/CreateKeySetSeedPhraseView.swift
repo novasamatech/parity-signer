@@ -99,8 +99,8 @@ extension CreateKeySetSeedPhraseView {
 
         let dataModel: MNewSeedBackup
         @Binding var isPresented: Bool
-        @Published var isPresentingDetails: Bool = false
         @Published var confirmBackup = false
+        @Published var isPresentingDetails: Bool = false
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
         private let service: CreateKeySetService
@@ -118,32 +118,19 @@ extension CreateKeySetSeedPhraseView {
         }
 
         func onCreateTap() {
-            seedsMediator.createSeed(
-                seedName: dataModel.seed,
-                seedPhrase: dataModel.seedPhrase,
-                shouldCheckForCollision: true
-            )
-            service.confirmKeySetCreation(
-                seedName: dataModel.seed,
-                seedPhrase: dataModel.seedPhrase
-            ) { result in
-                switch result {
-                case .success:
-                    self.isPresented = false
-                case let .failure(error):
-                    self.presentableInfo = .alertError(message: error.localizedDescription)
-                    self.isPresentingInfo = true
-                }
-            }
+            isPresentingDetails = true
         }
 
         func onInfoBoxTap() {
-            presentableInfo = .bananaSplitExplanation()
             isPresentingInfo = true
         }
 
         func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
-            .init(seedName: dataModel.seed, isPresented: $isPresented)
+            .init(
+                seedName: dataModel.seed,
+                mode: .createKeySet(seedPhrase: dataModel.seedPhrase),
+                isPresented: $isPresented
+            )
         }
     }
 }

@@ -242,11 +242,11 @@ extension RecoverKeySetSeedPhraseView {
                 shouldCheckForCollision: false
             )
             service.finishKeySetRecover(seedPhrase)
-            isPresented = false
+            isPresentingDetails = true
         }
 
         func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
-            .init(seedName: content.seedName, isPresented: $isPresented)
+            .init(seedName: content.seedName, mode: .recoverKeySet, isPresented: $isPresented)
         }
     }
 }
