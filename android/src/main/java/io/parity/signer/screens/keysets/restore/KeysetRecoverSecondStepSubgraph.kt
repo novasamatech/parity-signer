@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,9 +27,9 @@ fun NewKeysetRecoverSecondStepSubgraph(
 //background
 	Box(
 		modifier = Modifier
-			.fillMaxSize(1f)
-			.statusBarsPadding()
-			.background(MaterialTheme.colors.background)
+            .fillMaxSize(1f)
+            .statusBarsPadding()
+            .background(MaterialTheme.colors.background)
 	)
 
 	val viewModel: KeysetRecoverViewModel = viewModel()
@@ -38,8 +37,9 @@ fun NewKeysetRecoverSecondStepSubgraph(
 	//https://issuetracker.google.com/issues/160257648
 	val state = viewModel.recoverState.collectAsState(Dispatchers.Main.immediate)
 
-	LaunchedEffect(key1 = Unit) {
+	DisposableEffect(key1 = Unit) {
 		viewModel.initValue(initialRecoverSeedPhrase)
+		onDispose { viewModel.resetState() }
 	}
 
 	val navController = rememberNavController()
@@ -48,14 +48,10 @@ fun NewKeysetRecoverSecondStepSubgraph(
 		startDestination = KeysetRecoverSubgraph.KeysetRecoverSeed,
 	) {
 		composable(KeysetRecoverSubgraph.KeysetRecoverSeed) {
-			val fullBackAction = {
-				viewModel.resetState()
-				rootNavigator.backAction()
-			}
 			state.value?.let { stateModel ->
 				KeysetRecoverPhraseScreen(
 					model = stateModel,
-					backAction = fullBackAction,
+					backAction = rootNavigator::backAction,
 					onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
 					onAddSuggestedWord = { suggestedWord ->
 						viewModel.addWord(suggestedWord)
@@ -67,7 +63,7 @@ fun NewKeysetRecoverSecondStepSubgraph(
 					},
 				)
 			}
-			BackHandler(onBack = fullBackAction)
+			BackHandler(onBack = rootNavigator::backAction)
 		}
 		composable(KeysetRecoverSubgraph.KeysetRecoverNetworks) {
 			RecoverKeysetSelectNetworkScreen(
@@ -75,7 +71,6 @@ fun NewKeysetRecoverSecondStepSubgraph(
 				seedPhrase = state.value!!.readySeed!!,
 				rootNavigator = rootNavigator,
 				onBack = navController::popBackStack,
-				onExitCleanup = { viewModel.resetState() },
 				modifier = Modifier.statusBarsPadding(),
 			)
 		}

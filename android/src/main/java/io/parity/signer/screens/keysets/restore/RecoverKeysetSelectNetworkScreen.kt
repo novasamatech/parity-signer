@@ -47,7 +47,6 @@ fun RecoverKeysetSelectNetworkScreen(
 	seedPhrase: String,
 	rootNavigator: Navigator,
 	onBack: Callback,
-	onExitCleanup: Callback,//as we don't have full platform navigation that will clear viewmodel state
 	modifier: Modifier = Modifier,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
@@ -84,7 +83,6 @@ fun RecoverKeysetSelectNetworkScreen(
 					context.getText(R.string.key_set_has_been_recovered_toast),
 					Toast.LENGTH_LONG
 				).show()
-				onExitCleanup()
 			},
 			onAddAll = {
 				selected.value = if (selected.value.size == networks.size) {
