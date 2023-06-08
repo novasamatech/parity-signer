@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
@@ -27,12 +28,14 @@ class NewKeySetNetworksViewModel : ViewModel() {
 		seedName: String, seedPhrase: String,
 		networksForKeys: Set<NetworkModel>,
 		navigator: Navigator,
+		onAfterFinishCleanup: Callback = {},
 	): Unit {
 		viewModelScope.launch {
 			createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,
 				networksForKeys, navigator
 			)
+			onAfterFinishCleanup()
 		}
 	}
 }
