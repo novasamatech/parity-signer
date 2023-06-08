@@ -629,6 +629,12 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void handle_log_comment([ByRef] string user_input);
+
+    [Throws=ErrorDisplayed]
+    MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
+
+    [Throws=ErrorDisplayed]
+    void create_key_set([ByRef] string seed_name, [ByRef] string seed_phrase, sequence<string> networks);
 };
 
 dictionary MKeysNew {

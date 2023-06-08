@@ -855,10 +855,6 @@ fn populate_addresses(
     // Gets updated after each successful `create_address` run.
     let mut history_prep: Vec<Event> = Vec::new();
 
-    // Collect all networks known to Vault.
-    // Note: networks with all `Encryption` variants are used here if they are
-    // in the Vault database.
-    let specs_set = get_all_networks(database)?;
     // Make seed keys if requested.
     // Seed keys **must** be possible to generate,
     // if a seed key has a collision with some other key, it is an error
@@ -866,22 +862,6 @@ fn populate_addresses(
         let prep_data = create_address(database, &address_prep, "", None, seed_name, seed_phrase)?;
         address_prep = prep_data.address_prep;
         history_prep.extend_from_slice(&prep_data.history_prep);
-    }
-    for network_specs in specs_set.iter() {
-        // make keys with default derivation if possible;
-        // key with default derivation may collide with some other key,
-        // this should not prevent generating a seed;
-        if let Ok(prep_data) = create_address(
-            database,
-            &address_prep,
-            "",
-            Some(&network_specs.specs),
-            seed_name,
-            seed_phrase,
-        ) {
-            address_prep = prep_data.address_prep;
-            history_prep.extend_from_slice(&prep_data.history_prep);
-        }
     }
     Ok(PrepData {
         address_prep,
@@ -915,6 +895,50 @@ pub fn try_create_seed(
     events.extend_from_slice(&prep_data.history_prep);
     TrDbCold::new()
         .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made in populate_addresses
+        .set_history(events_to_batch(database, events)?) // add corresponding history
+        .apply(database)
+}
+
+/// Creates seed into Vault: add default addresses for `derive_for_networks` in the Vault
+///
+/// Each network has a default derivation path, recorded in [`NetworkSpecs`]
+/// field `path_id`, normally `path_id` is `//<network_name>`.
+///
+/// `derive_for_networks` is a list of network ids to derive addresses for.
+pub fn create_key_set(
+    database: &sled::Db,
+    seed_name: &str,
+    seed_phrase: &str,
+    derive_for_networks: Vec<String>,
+) -> Result<()> {
+    let mut events: Vec<Event> = vec![Event::SeedCreated {
+        seed_created: seed_name.to_string(),
+    }];
+    // create seed root key
+    let mut prep_data = populate_addresses(database, seed_name, seed_phrase, true)?;
+
+    for network_key in derive_for_networks {
+        let network_spec_key = NetworkSpecsKey::from_hex(&network_key)?;
+        let network = get_network_specs(database, &network_spec_key)?.specs;
+        let new_prep = create_address(
+            database,
+            &prep_data.address_prep,
+            &network.path_id,
+            Some(&network),
+            seed_name,
+            seed_phrase,
+        )?;
+        prep_data
+            .address_prep
+            .extend_from_slice(&new_prep.address_prep);
+        prep_data
+            .history_prep
+            .extend_from_slice(&new_prep.history_prep);
+    }
+
+    events.extend_from_slice(&prep_data.history_prep);
+    TrDbCold::new()
+        .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made
         .set_history(events_to_batch(database, events)?) // add corresponding history
         .apply(database)
 }

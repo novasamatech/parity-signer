@@ -123,11 +123,22 @@ extension CreateKeySetSeedPhraseView {
                 seedPhrase: dataModel.seedPhrase,
                 shouldCheckForCollision: true
             )
-            service.confirmKeySetCreation(dataModel.seedPhrase)
-            isPresentingDetails = true
+            service.confirmKeySetCreation(
+                seedName: dataModel.seed,
+                seedPhrase: dataModel.seedPhrase
+            ) { result in
+                switch result {
+                case .success:
+                    self.isPresented = false
+                case let .failure(error):
+                    self.presentableInfo = .alertError(message: error.localizedDescription)
+                    self.isPresentingInfo = true
+                }
+            }
         }
 
         func onInfoBoxTap() {
+            presentableInfo = .bananaSplitExplanation()
             isPresentingInfo = true
         }
 
