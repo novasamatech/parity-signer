@@ -1,7 +1,10 @@
 package io.parity.signer.screens.keysets.create.backupstepscreens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
@@ -22,7 +25,8 @@ class NewKeySetNetworksViewModel : ViewModel() {
 
 	fun createKeySetWithNetworks(
 		seedName: String, seedPhrase: String,
-		networksForKeys: Set<NetworkModel>, navigator: Navigator
+		networksForKeys: Set<NetworkModel>,
+		navigator: Navigator,
 	): Unit {
 		viewModelScope.launch {
 			createKeySetUseCase.createKeySetWithNetworks(
