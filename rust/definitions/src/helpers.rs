@@ -188,8 +188,16 @@ pub fn print_multisigner_as_base58_or_eth(
             }
         }
         None => match multi_signer {
-            MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check(),
-            MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Ed25519(pubkey) => {
+                let version = Ss58AddressFormat::try_from("BareEd25519")
+                    .expect("unable to make Ss58AddressFormat from `BareEd25519`");
+                pubkey.to_ss58check_with_version(version)
+            }
+            MultiSigner::Sr25519(pubkey) => {
+                let version = Ss58AddressFormat::try_from("BareSr25519")
+                    .expect("unable to make Ss58AddressFormat from `BareSr25519`");
+                pubkey.to_ss58check_with_version(version)
+            }
             MultiSigner::Ecdsa(pubkey) => {
                 if encryption == Encryption::Ethereum {
                     print_ethereum_address(pubkey)
@@ -303,5 +311,33 @@ mod tests {
         let ss58 = print_multisigner_as_base58_or_eth(&multisigner, None, encryption);
         let result = base58_or_eth_to_multisigner(&ss58, &Encryption::Sr25519).unwrap();
         assert_eq!(result, multisigner);
+    }
+
+    #[test]
+    fn test_print_multisigner_polkadot() {
+        let multisigner = Sr25519(sr25519::Public(
+            hex::decode("4a755d99a3cbafc1918769c292848bc87bc2e3cb3e09c17856a1c7d0c784b41c")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        ));
+        assert_eq!(
+            print_multisigner_as_base58_or_eth(&multisigner, Some(0), Encryption::Sr25519),
+            "12gdQgfKFbiuba7hHS81MMr1rQH2amezrCbWixXZoUKzAm3q"
+        );
+    }
+
+    #[test]
+    fn test_print_multisigner_no_network() {
+        let multisigner = Sr25519(sr25519::Public(
+            hex::decode("4a755d99a3cbafc1918769c292848bc87bc2e3cb3e09c17856a1c7d0c784b41c")
+                .unwrap()
+                .try_into()
+                .unwrap(),
+        ));
+        assert_eq!(
+            print_multisigner_as_base58_or_eth(&multisigner, None, Encryption::Sr25519),
+            "8UHfgCidtbdkdXABy12jG7SVtRKdxHX399eLeAsGKvUT2U6"
+        );
     }
 }
