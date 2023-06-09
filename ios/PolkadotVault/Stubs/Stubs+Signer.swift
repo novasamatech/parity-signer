@@ -216,14 +216,15 @@ extension MmNetwork {
         key: "polkadot",
         title: "Polkadot",
         logo: "polkadot",
-        order: 1
+        order: 1,
+        pathId: "//polkadot"
     )
 
     static let stubList: [MmNetwork] = [
         MmNetwork(key: "polkadot", title: "Polkadot", logo: "polkadot", order: 1, pathId: "//polkadot"),
         MmNetwork(key: "kusama", title: "Kusama", logo: "kusama", order: 2, pathId: "//kusama"),
         MmNetwork(key: "westend", title: "Westend", logo: "westend", order: 3, pathId: "//westend"),
-        MmNetwork(key: "astar", title: "Astar", logo: "astar", order: 4, pathId: "//astar"),
+        MmNetwork(key: "astar", title: "Astar", logo: "astar", order: 4, pathId: "//astar")
     ]
 }
 
