@@ -20,15 +20,15 @@ struct CreateKeysForNetworksView: View {
                         backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
                 )
-                // Network List
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
                         // Title + Header
                         mainContent()
-                        VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                            networkSelection()
-                            footer()
-                        }
+                            .padding(.bottom, Spacing.medium)
+                        // Network List
+                        networkSelection()
+                            .padding(.bottom, Spacing.medium)
+                        footer()
                     }
                 }
                 .padding(Spacing.extraSmall)

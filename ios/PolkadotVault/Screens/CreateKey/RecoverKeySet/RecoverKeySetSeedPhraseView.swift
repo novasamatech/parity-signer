@@ -70,6 +70,7 @@ struct RecoverKeySetSeedPhraseView: View {
             .onAppear {
                 focus = true
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
