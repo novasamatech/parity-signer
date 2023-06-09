@@ -263,7 +263,7 @@ data class NetworkModel(
 	}
 }
 
-fun NetworkModel.createDefaultPath(): String = "//${this.title}"
+fun NetworkModel.createDefaultPath(): String = "//${this.title}" //todo dmitry remove this as rust version is different
 
 
 fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
