@@ -399,6 +399,7 @@ pub struct MMNetwork {
     pub title: String,
     pub logo: String,
     pub order: u8,
+    pub path_id: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

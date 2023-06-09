@@ -205,18 +205,21 @@ fn show_all_networks_no_flag() {
             title: "polkadot".to_string(),
             logo: "polkadot".to_string(),
             order: 0,
+            path_id: "//polkadot".to_string(),
         },
         MMNetwork {
             key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
             title: "kusama".to_string(),
             logo: "kusama".to_string(),
             order: 1,
+            path_id: "//kusama".to_string(),
         },
         MMNetwork {
             key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
             title: "westend".to_string(),
             logo: "westend".to_string(),
             order: 2,
+            path_id: "//westend".to_string(),
         },
     ];
     assert_eq!(networks, expected_networks);
