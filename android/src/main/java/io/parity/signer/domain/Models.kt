@@ -253,7 +253,7 @@ data class NetworkModel(
 	val key: String,
 	val logo: String,
 	val title: String,
-	val pathId: String,
+	val pathId: String, //default path for this network
 ) {
 	companion object {
 		fun createStub(networkName: String? = null): NetworkModel = NetworkModel(
@@ -265,15 +265,13 @@ data class NetworkModel(
 	}
 }
 
-fun NetworkModel.createDefaultPath(): String = "//${this.pathId}"
-
 fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	key = networkSpecsKey,
 	logo = networkLogo,
 	title = networkTitle.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
-	pathId = networkTitle,
+	pathId = "//${networkTitle.toLowerCase()}",
 )
 
 fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(

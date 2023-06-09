@@ -3,7 +3,6 @@ package io.parity.signer.domain.usecases
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
-import io.parity.signer.domain.createDefaultPath
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.tryCreateAddress
 
@@ -29,7 +28,7 @@ class CreateKeySetViaStateMachineUseCase() {
 			try {
 				tryCreateAddress(
 					seedName = seedName, seedPhrase = seedPhrase,
-					path = networkKey.createDefaultPath(), network = networkKey.key,
+					path = networkKey.pathId, network = networkKey.key,
 				)
 			} catch (e: Exception) {
 				submitErrorState("can't create network key for new keyset, ${e.message}")
