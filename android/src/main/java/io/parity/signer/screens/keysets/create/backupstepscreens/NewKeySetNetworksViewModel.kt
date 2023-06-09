@@ -1,10 +1,7 @@
 package io.parity.signer.screens.keysets.create.backupstepscreens
 
-import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
