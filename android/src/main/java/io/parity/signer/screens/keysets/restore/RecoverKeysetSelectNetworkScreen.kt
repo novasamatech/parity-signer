@@ -175,16 +175,19 @@ private fun PreviewNewKeySetSelectNetwork() {
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 	)
 	val selected = setOf(networks[1].key)
@@ -209,76 +212,91 @@ private fun PreviewNewKeySetSelectNetworkVeryLong() {
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "polkadot",
 		),
 	)
 	val selected = setOf(networks[1].key)

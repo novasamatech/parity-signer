@@ -252,19 +252,20 @@ fun QrData.getData(): List<UByte> =
 data class NetworkModel(
 	val key: String,
 	val logo: String,
-	val title: String
+	val title: String,
+	val pathId: String,
 ) {
 	companion object {
 		fun createStub(networkName: String? = null): NetworkModel = NetworkModel(
 			key = "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
 			logo = networkName ?: "polkadot",
 			title = networkName?.lowercase() ?: "Polkadot",
+			pathId = "polkadot"
 		)
 	}
 }
 
-fun NetworkModel.createDefaultPath(): String = "//${this.title}" //todo dmitry remove this as rust version is different
-
+fun NetworkModel.createDefaultPath(): String = "//${this.pathId}"
 
 fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	key = networkSpecsKey,
@@ -272,14 +273,7 @@ fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	title = networkTitle.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
-)
-
-fun Network.toNetworkModel(): NetworkModel = NetworkModel(
-	key = key,
-	logo = logo,
-	title = title.replaceFirstChar {
-		if (it.isLowerCase()) it.titlecase() else it.toString()
-	},
+	pathId = networkTitle,
 )
 
 fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
@@ -288,6 +282,7 @@ fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 	title = title.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
+	pathId = pathId,
 )
 
 

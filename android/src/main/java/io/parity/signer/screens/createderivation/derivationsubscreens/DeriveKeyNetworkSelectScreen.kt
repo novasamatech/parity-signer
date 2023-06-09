@@ -185,16 +185,19 @@ private fun PreviewDeriveKeyNetworkSelectScreen() {
 			key = "0",
 			logo = "polkadot",
 			title = "Polkadot",
+			pathId = "polkadot",
 		),
 		NetworkModel(
 			key = "1",
 			logo = "Kusama",
 			title = "Kusama",
+			pathId = "kusama",
 		),
 		NetworkModel(
 			key = "2",
 			logo = "Wastend",
 			title = "Wastend",
+			pathId = "wastend",
 		),
 	)
 	SignerNewTheme {
