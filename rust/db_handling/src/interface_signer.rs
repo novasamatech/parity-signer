@@ -326,6 +326,7 @@ pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
             title: n.specs.name,
             logo: n.specs.logo,
             order: n.order,
+            path_id: n.specs.path_id,
         })
         .collect::<Vec<_>>();
     networks.sort_by(|a, b| a.order.cmp(&b.order));
