@@ -505,6 +505,7 @@ dictionary MMNetwork {
     string title;
     string logo;
     u8 order;
+    string path_id;
 };
 
 dictionary MManageNetworks {
