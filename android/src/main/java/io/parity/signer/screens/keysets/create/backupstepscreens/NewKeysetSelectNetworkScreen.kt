@@ -114,7 +114,7 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			btnText = stringResource(R.string.button_next),
 			onClose = onBack,
 			onButton = null,
-			backNotClose = false,
+			backNotClose = true,
 		)
 		Text(
 			text = stringResource(R.string.keyset_create_keys_title),

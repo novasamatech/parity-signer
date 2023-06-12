@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -28,7 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
@@ -111,11 +110,21 @@ private fun RecoverKeysetSelectNetworkScreenPrivate(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
-		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		ScreenHeader(
-			title = stringResource(R.string.keyset_recover_keys_title),
-			onBack = onBack,
+		ScreenHeaderProgressWithButton(
+			canProceed = false,
+			currentStep = 3,
+			allSteps = 3,
+			btnText = stringResource(R.string.button_next),
+			onClose = onBack,
+			onButton = null,
+			backNotClose = true,
+		)
+		Text(
+			text = stringResource(R.string.keyset_recover_keys_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.TitleL,
+			modifier = Modifier.padding(horizontal = 24.dp),
 		)
 		Text(
 			text = stringResource(R.string.keyset_recover_keys_subtitle),
