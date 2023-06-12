@@ -322,7 +322,7 @@ error and asks to load the metadata.
     `RuntimeMetadata` versions supported by Vault are `V12`, `V13`, and `V14`.
 The crucial feature of the `V14` is that the metadata contains the description
 of the types used in the call and extensions production. `V12` and `V13` are
-legacy versions and provide only text identifires for the types, and in order to
+legacy versions and provide only text identifiers for the types, and in order to
 use them, the supplemental types information is needed.
 
 5. Process the extensions.
@@ -485,7 +485,7 @@ Calls in `V12` and `V13` metadata are distinguished by any element of the set
 of calls type identifiers in string argument type.
 
     At the moment the numbers that should be displayed as balance in
-transacrtions with `V14` metadata are determined by the type name `type_name` of
+transactions with `V14` metadata are determined by the type name `type_name` of
 the corresponding
 [`Field`](https://docs.rs/scale-info/latest/scale_info/struct.Field.html)
 being:
@@ -733,12 +733,12 @@ Network metadata that can get into Vault and can be used by Vault only if it
 complies with following requirements:
 
 - metadata vector starts with `b"meta"` prelude
-- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/enum.RuntimeMetadata.html)
+- part of the metadata vector after `b"meta"` prelude is decodable as [`RuntimeMetadata`](https://docs.rs/frame-metadata/latest/frame_metadata/enum.RuntimeMetadata.html)
 - `RuntimeMetadata` version of the metadata is `V12`, `V13` or `V14`
 - Metadata has `System` pallet
 - There is `Version` constant in `System` pallet
 - `Version` is decodable as [`RuntimeVersion`](https://paritytech.github.io/substrate/master/sp_version/struct.RuntimeVersion.html)
-- If the metadata contains base58 prefix, it must be decodeable as `u16` or `u8`
+- If the metadata contains base58 prefix, it must be decodable as `u16` or `u8`
 
 Additionally, if the metadata `V14` is received, its associated extensions will
 be scanned and user will be warned if the extensions are incompatible with
