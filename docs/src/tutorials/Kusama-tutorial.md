@@ -2,7 +2,7 @@
 
 This tutorial will walk you through setting up a Kusama account with the Polkadot Vault Android or iOS App and then use this account together with [Polkadot-js apps](https://polkadot.js.org/apps/) to see your balance and transfer funds or perform any extrinsic from this account.
 
-* Notice: The UI maybe variant for different versions, but the functionalities are the same in `v4` version.
+* Notice: The UI may be variant for different versions, but the functionalities are the same in `v4` version.
 
 ## Summary
 
