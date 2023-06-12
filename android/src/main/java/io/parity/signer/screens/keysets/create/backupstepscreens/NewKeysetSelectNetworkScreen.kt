@@ -32,7 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
@@ -106,11 +106,23 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
-		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		ScreenHeader(
-			title = stringResource(R.string.keyset_create_keys_title),
-			onBack = onBack,
+		ScreenHeaderProgressWithButton(
+			canProceed = false,
+			currentStep = 3,
+			allSteps = 3,
+			btnText = stringResource(R.string.button_next),
+			onClose = onBack,
+			onButton = null,
+			backNotClose = false,
+		)
+		Text(
+			text = stringResource(R.string.keyset_create_keys_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.TitleL,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(bottom = 8.dp),
 		)
 		Text(
 			text = stringResource(R.string.keyset_create_keys_subtitle),

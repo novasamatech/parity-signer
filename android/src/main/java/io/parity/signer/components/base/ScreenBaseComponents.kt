@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -241,7 +242,7 @@ fun ScreenHeaderProgressWithButton(
 	allSteps: Int,
 	btnText: String,
 	onClose: Callback,
-	onButton: Callback,
+	onButton: Callback?,
 	modifier: Modifier = Modifier,
 	backNotClose: Boolean = false,
 ) {
@@ -295,14 +296,15 @@ fun ScreenHeaderProgressWithButton(
 		Box(
 			contentAlignment = Alignment.CenterEnd,
 		) {
-			PrimaryButtonGreyDisabled(
-				label = btnText,
-				isEnabled = canProceed,
-			) {
-				if (canProceed) {
-					onButton()
+				PrimaryButtonGreyDisabled(
+					label = btnText,
+					isEnabled = canProceed,
+					modifier = Modifier.alpha(if (onButton == null) 0f else 1f)
+				) {
+					if (canProceed) {
+						onButton?.invoke()
+					}
 				}
-			}
 		}
 	}
 }
@@ -367,6 +369,15 @@ private fun PreviewScreenBaseComponent() {
 				btnText = "Next",
 				onClose = {},
 				onButton = {},
+			)
+			ScreenHeaderProgressWithButton(
+				canProceed = true,
+				currentStep = 2,
+				allSteps = 3,
+				btnText = "Next",
+				onClose = {},
+				onButton = null,
+				backNotClose = true,
 			)
 		}
 	}

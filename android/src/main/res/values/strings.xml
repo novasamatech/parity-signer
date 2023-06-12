@@ -140,7 +140,6 @@
 	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
 	<string name="settings_version">Polkadot Vault version: %1$s</string>
 	<string name="button_next">Next</string>
-	<string name="new_key_set_backup_title">Recovery Phrase</string>
 	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
 	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
 	<string name="new_key_set_backup_cta">Create Key Set</string>

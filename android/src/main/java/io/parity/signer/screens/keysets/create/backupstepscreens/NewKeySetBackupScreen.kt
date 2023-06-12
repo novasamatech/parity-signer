@@ -2,13 +2,17 @@ package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.keysetdetails.backup.SeedPhraseBox
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -36,16 +40,20 @@ internal fun NewKeySetBackupScreen(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
-		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		ScreenHeader(
-			title = stringResource(R.string.new_key_set_backup_title),
-			onBack = onBack,
+		ScreenHeaderProgressWithButton(
+			canProceed = false,
+			currentStep = 2,
+			allSteps = 3,
+			btnText = stringResource(R.string.button_next),
+			onClose = onBack,
+			onButton = null,
+			backNotClose = false,
 		)
 		Text(
 			text = stringResource(R.string.new_key_set_backup_subtitle),
 			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
+			style = SignerTypeface.TitleL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
 				.padding(bottom = 8.dp),
