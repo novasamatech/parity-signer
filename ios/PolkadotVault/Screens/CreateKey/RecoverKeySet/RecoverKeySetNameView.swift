@@ -16,7 +16,6 @@ struct RecoverKeySetNameView: View {
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBarView(
                     viewModel: .init(
-                        title: nil,
                         leftButtons: [.init(
                             type: .xmark,
                             action: viewModel.onBackTap

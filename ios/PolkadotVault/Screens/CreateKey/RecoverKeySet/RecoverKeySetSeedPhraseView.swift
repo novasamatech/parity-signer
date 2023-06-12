@@ -16,7 +16,7 @@ struct RecoverKeySetSeedPhraseView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
-                    title: Localizable.RecoverSeedPhrase.Label.title.string,
+                    title: .title(Localizable.RecoverSeedPhrase.Label.title.string),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: [.init(
                         type: .activeAction(

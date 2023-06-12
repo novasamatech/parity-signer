@@ -22,7 +22,7 @@ struct CreateKeyNetworkSelectionView: View {
             // Navigation Bar
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.CreateDerivedKey.Label.title.string,
+                    title: .title(Localizable.CreateDerivedKey.Label.title.string),
                     leftButtons: [.init(
                         type: .xmark,
                         action: { presentationMode.wrappedValue.dismiss() }

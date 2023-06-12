@@ -17,7 +17,7 @@ struct SignSpecDetails: View {
         VStack {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.SignSpecsDetails.Label.title.string,
+                    title: .title(Localizable.SignSpecsDetails.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: viewModel.onBackTap

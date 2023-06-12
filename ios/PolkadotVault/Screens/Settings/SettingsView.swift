@@ -17,7 +17,7 @@ struct SettingsView: View {
                 VStack(spacing: 0) {
                     NavigationBarView(
                         viewModel: NavigationBarViewModel(
-                            title: Localizable.Settings.Label.title.string,
+                            title: .title(Localizable.Settings.Label.title.string),
                             leftButtons: [.init(type: .empty)],
                             rightButtons: [.init(type: .empty)],
                             backgroundColor: Asset.backgroundPrimary.swiftUIColor

@@ -17,7 +17,6 @@ struct AddKeySetUpNetworksStepTwoView: View {
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBarView(
                     viewModel: .init(
-                        title: nil,
                         leftButtons: [.init(
                             type: .arrow,
                             action: { presentationMode.wrappedValue.dismiss() }
