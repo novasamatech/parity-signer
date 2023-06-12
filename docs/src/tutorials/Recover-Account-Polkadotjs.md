@@ -2,7 +2,7 @@
 
 The default behavior on Polkadot Vault and [PolkadotJS Apps](https://polkadot.js.org/apps/) is a little different. This tutorial will walk you through recovering an account on Polkadot Vault from PolkadotJS Apps.
 
-* Notice: The UI maybe variant for different versions, but the functionalities are the same in `v4` version.
+* Notice: The UI may be variant for different versions, but the functionalities are the same in `v4` version.
 
 ## Get the mnemonic phrase and path
 
@@ -16,7 +16,7 @@ On Polkadot Vault, each mnemonic phrase represents an identity, every account st
 
 ![recover the identity](./images/Recover-Identity.png).
 
-After tapping one network from the list, you will have the default account created for this network with a default path (as on the above image, `//polkadot`), **but this one is different with the one created from Polkadot.js Apps**, because the paths are different. 
+After tapping one network from the list, you will have the default account created for this network with a default path (as on the above image, `//polkadot`), **but this one is different from the one created from Polkadot.js Apps**, because the paths are different. 
 
 ## create the account by path
 
