@@ -179,7 +179,7 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
     func removeAllSeeds() -> Bool {
         let query = queryProvider.query(for: .deleteAll)
         let osStatus = SecItemDelete(query)
-        if osStatus == errSecSuccess {
+        if osStatus == errSecSuccess || osStatus == errSecItemNotFound {
             return true
         } else {
             return false

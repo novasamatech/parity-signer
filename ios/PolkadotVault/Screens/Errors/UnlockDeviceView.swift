@@ -42,22 +42,18 @@ extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
         private let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
-        private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
 
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            passwordProtectionStatePublisher: PasswordProtectionStatePublisher
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
         ) {
             self.seedsMediator = seedsMediator
             self.warningStateMediator = warningStateMediator
-            self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
         }
 
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
             warningStateMediator.updateWarnings()
-            passwordProtectionStatePublisher.isProtected = true
         }
     }
 }
@@ -65,7 +61,7 @@ extension UnlockDeviceView {
 #if DEBUG
     struct UnlockDeviceView_Previews: PreviewProvider {
         static var previews: some View {
-            UnlockDeviceView(viewModel: .init(passwordProtectionStatePublisher: PasswordProtectionStatePublisher()))
+            UnlockDeviceView(viewModel: .init())
         }
     }
 #endif

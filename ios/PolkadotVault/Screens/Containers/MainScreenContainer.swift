@@ -17,10 +17,7 @@ struct MainScreenContainer: View {
         case .authenticated:
             AuthenticatedScreenContainer(viewModel: .init())
         case .deviceLocked:
-            UnlockDeviceView(viewModel: .init(
-                passwordProtectionStatePublisher: viewModel
-                    .passwordProtectionStatePublisher
-            ))
+            UnlockDeviceView(viewModel: .init())
         case .onboarding:
             onboarding.currentView()
         case .noPincode:
@@ -40,7 +37,7 @@ extension MainScreenContainer {
     final class ViewModel: ObservableObject {
         private let authenticationStateMediator: AuthenticatedStateMediator
         private let onboardingMediator: OnboardingMediator
-        let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
+        private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
 

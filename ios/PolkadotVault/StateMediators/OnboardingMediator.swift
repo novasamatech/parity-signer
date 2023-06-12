@@ -35,6 +35,7 @@ final class OnboardingMediator: ObservableObject {
         guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
         navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved)
+        seedsMediator.refreshSeeds()
         onboardingDone = true
         warningStateMediator.updateWarnings()
         initialisationService.initialiseAppSession()
