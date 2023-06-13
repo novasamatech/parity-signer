@@ -12,6 +12,8 @@ struct HorizontalActionsBottomModalViewModel {
     let content: String?
     let dismissActionLabel: LocalizedStringKey
     let mainActionLabel: LocalizedStringKey
+    var mainActionStyle: ActionButtonStyle = .primaryDestructive()
+    var alignment: HorizontalAlignment = .center
 
     static let forgetKeySet = HorizontalActionsBottomModalViewModel(
         title: Localizable.KeySetsModal.Confirmation.Label.title.string,
@@ -54,6 +56,15 @@ struct HorizontalActionsBottomModalViewModel {
         dismissActionLabel: Localizable.Settings.NetworkDetails.More.Delete.Action.cancel.key,
         mainActionLabel: Localizable.Settings.NetworkDetails.More.Delete.Action.remove.key
     )
+
+    static let createEmptyKeySet = HorizontalActionsBottomModalViewModel(
+        title: Localizable.CreateKeysForNetwork.Modal.title.string,
+        content: Localizable.CreateKeysForNetwork.Modal.content.string,
+        dismissActionLabel: Localizable.CreateKeysForNetwork.Modal.cancel.key,
+        mainActionLabel: Localizable.CreateKeysForNetwork.Modal.done.key,
+        mainActionStyle: .primary(),
+        alignment: .leading
+    )
 }
 
 struct HorizontalActionsBottomModal: View {
@@ -81,14 +92,14 @@ struct HorizontalActionsBottomModal: View {
             animateBackground: $animateBackground,
             safeAreaInsetsMode: .full,
             content: {
-                VStack(alignment: .center, spacing: Spacing.medium) {
+                VStack(alignment: viewModel.alignment, spacing: Spacing.medium) {
                     Text(viewModel.title)
                         .font(PrimaryFont.titleL.font)
                     if let content = viewModel.content {
                         Text(content)
                             .font(PrimaryFont.bodyL.font)
                             .lineSpacing(Spacing.extraExtraSmall)
-                            .multilineTextAlignment(.center)
+                            .multilineTextAlignment(viewModel.alignment == .center ? .center : .leading)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     }
                     HStack {
@@ -99,7 +110,7 @@ struct HorizontalActionsBottomModal: View {
                         PrimaryButton(
                             action: { animateDismissal(mainAction()) },
                             text: viewModel.mainActionLabel,
-                            style: .primaryDestructive()
+                            style: viewModel.mainActionStyle
                         )
                     }
                     .padding(.top, Spacing.medium)

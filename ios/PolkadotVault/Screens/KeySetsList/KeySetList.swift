@@ -19,7 +19,7 @@ struct KeySetList: View {
                     // Navigation Bar
                     NavigationBarView(
                         viewModel: NavigationBarViewModel(
-                            title: Localizable.KeySets.title.string,
+                            title: .title(Localizable.KeySets.title.string),
                             leftButtons: [.init(
                                 type: viewModel.isExportKeysSelected ? .xmark : .empty,
                                 action: viewModel.onCancelExportTap

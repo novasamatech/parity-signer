@@ -14,7 +14,7 @@ struct TransactionDetailsView: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
-                    title: Localizable.TransactionPreview.Label.title.string,
+                    title: .title(Localizable.TransactionPreview.Label.title.string),
                     leftButtons: [.init(type: .xmark, action: viewModel.onBackButtonTap)],
                     rightButtons: [.init(type: .empty)]
                 )

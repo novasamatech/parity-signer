@@ -15,7 +15,7 @@ struct NetworkSelectionSettings: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.Networks.Label.title.string,
+                    title: .title(Localizable.Settings.Networks.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }

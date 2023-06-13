@@ -16,7 +16,7 @@ struct SignSpecsListView: View {
         VStack {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.SignSpecsList.Label.title.string,
+                    title: .title(Localizable.SignSpecsList.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: {

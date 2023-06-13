@@ -24,10 +24,10 @@ struct TransactionPreview: View {
         VStack {
             NavigationBarView(
                 viewModel: .init(
-                    title: title(
+                    title: .title(title(
                         viewModel.dataModel.count,
                         previewType: viewModel.dataModel.first?.content.previewType
-                    ),
+                    )),
                     leftButtons: [.init(type: .xmark, action: viewModel.onBackButtonTap)],
                     rightButtons: [.init(type: .empty)]
                 )
