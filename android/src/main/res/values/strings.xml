@@ -144,7 +144,7 @@
 	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
 	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
 	<string name="new_key_set_backup_cta">Create Key Set</string>
-	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have written down your secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
 	<string name="transaction_field_from">From</string>
@@ -291,7 +291,7 @@
 	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
 	<string name="airgap_onboarding_disconnect_cable_header">Disconnect all cables</string>
 	<string name="airgap_onboarding_title">Set Up Air Gap Mode</string>
-	<string name="airgap_onboarding_subtitle">Please Follow this steps to enable Air Gap mode and keep it enabled all the time</string>
+	<string name="airgap_onboarding_subtitle">Please Follow these steps to enable Air Gap mode and keep it enabled all the time</string>
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
