@@ -14,7 +14,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
+import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
@@ -63,7 +63,7 @@ fun ScanNavSubgraph(
 	val transactionsValue = transactions.value
 	val bananaQrData = bananaSplitPassword.value
 	if (bananaQrData != null) {
-		BananaSplitPasswordScreen(
+		BananaSplitSubgraph(
 			qrData = bananaQrData,
 			onClose = {
 				backAction()
