@@ -16,7 +16,7 @@ struct BackupSelectKeyView: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.SelectKey.title.string,
+                    title: .title(Localizable.Settings.SelectKey.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }

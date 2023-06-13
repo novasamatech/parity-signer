@@ -15,7 +15,7 @@ struct LogDetailsView: View {
         VStack(alignment: .center, spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
-                    title: Localizable.LogDetails.Label.title.string,
+                    title: .title(Localizable.LogDetails.Label.title.string),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })]
                 )
             )

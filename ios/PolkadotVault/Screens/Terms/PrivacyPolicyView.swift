@@ -15,7 +15,7 @@ struct PrivacyPolicyView: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.PrivacyPolicy.Label.title.string,
+                    title: .title(Localizable.Settings.PrivacyPolicy.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }

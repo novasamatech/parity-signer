@@ -22,7 +22,7 @@ struct LogsListView: View {
             VStack(spacing: 0) {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: Localizable.LogsList.Label.title.string,
+                        title: .title(Localizable.LogsList.Label.title.string),
                         leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                         backgroundColor: Asset.backgroundPrimary.swiftUIColor

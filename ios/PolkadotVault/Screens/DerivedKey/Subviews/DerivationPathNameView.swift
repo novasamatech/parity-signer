@@ -20,7 +20,7 @@ struct DerivationPathNameView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.CreateDerivedKey.Modal.Path.title.string,
+                    title: .title(Localizable.CreateDerivedKey.Modal.Path.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }
@@ -133,6 +133,15 @@ struct DerivationPathNameView: View {
                     derivationPath: viewModel.unwrappedDerivationPath(),
                     onCompletion: viewModel.onConfirmationCompletion
                 )
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingInfoModal
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableInfoModal,
+                isShowingBottomAlert: $viewModel.isPresentingInfoModal
             )
             .clearModalBackground()
         }

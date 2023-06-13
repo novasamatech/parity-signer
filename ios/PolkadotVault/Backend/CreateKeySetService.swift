@@ -40,12 +40,17 @@ final class CreateKeySetService {
     func confirmKeySetCreation(
         seedName: String,
         seedPhrase: String,
+        networks: [MmNetwork],
         _ completion: @escaping (Result<Void, Error>) -> Void
     ) {
         callQueue.async {
             let result: Result<Void, Error>
             do {
-                try PolkadotVault.createKeySet(seedName: seedName, seedPhrase: seedPhrase, networks: [])
+                try PolkadotVault.createKeySet(
+                    seedName: seedName,
+                    seedPhrase: seedPhrase,
+                    networks: networks.map(\.key)
+                )
                 result = .success(())
             } catch {
                 result = .failure(error)

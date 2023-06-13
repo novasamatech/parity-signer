@@ -70,6 +70,10 @@ enum Heights {
     static let signSpecsListRowHeight: CGFloat = 96
 
     static let createKeyNetworkItemHeight: CGFloat = 64
+    static let createKeysForNetworkItemHeight: CGFloat = 64
+
+    static let navigationBarProgressViewHeight: CGFloat = 6
+    static let navigationBarProgressViewWidth: CGFloat = 40
 }
 
 enum Sizes {

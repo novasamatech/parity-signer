@@ -15,7 +15,7 @@ struct TermsOfServiceView: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.TermsOfService.Label.title.string,
+                    title: .title(Localizable.Settings.TermsOfService.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }

@@ -16,7 +16,7 @@ struct EnterKeySetNameView: View {
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBarView(
                     viewModel: .init(
-                        title: nil,
+                        title: .progress(current: 1, upTo: 3),
                         leftButtons: [.init(
                             type: .xmark,
                             action: viewModel.onBackTap
