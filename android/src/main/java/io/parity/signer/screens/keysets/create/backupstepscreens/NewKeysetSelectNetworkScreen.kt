@@ -4,7 +4,6 @@ import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,12 +15,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -30,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
+import io.parity.signer.bottomsheets.ProceedEmptyKeysetConfirmation
 import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
@@ -38,17 +42,19 @@ import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewKeySetSelectNetworkScreen(
 	model: NewSeedBackupModel,
 	navigator: Navigator,
 	onBack: Callback,
-	modifier: Modifier = Modifier,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
@@ -60,36 +66,63 @@ fun NewKeySetSelectNetworkScreen(
 		}
 	val networks = networksViewModel.getAllNetworks()
 
-	Box(modifier = modifier) {
-		NewKeySetSelectNetworkScreenPrivate(
-			networks = networks,
-			selectedNetworkKeys = selected.value,
-			onNetworkClick = { network ->
-				selected.value = if (selected.value.contains(network.key)) {
-					selected.value - network.key
-				} else {
-					selected.value + network.key
-				}
+	val confirmBottomSheetState =
+		rememberModalBottomSheetState(
+			ModalBottomSheetValue.Hidden,
+			confirmValueChange = {
+				it != ModalBottomSheetValue.HalfExpanded
 			},
-			onProceed = {
-				networksViewModel.createKeySetWithNetworks(
-					seedName = model.seed, seedPhrase = model.seedPhrase,
-					networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
-						.toSet(),
-					navigator = navigator,
-				)
-			},
-			onAddAll = {
-				selected.value = if (selected.value.size == networks.size) {
-					networksViewModel.getDefaultPreselectedNetworks().map { it.key }
-						.toSet()
-				} else {
-					networks.map { it.key }.toSet()
-				}
-			},
-			onBack = onBack,
+			skipHalfExpanded = false
+		)
+	val scope = rememberCoroutineScope()
+
+	val onProceedAction = {
+		networksViewModel.createKeySetWithNetworks(
+			seedName = model.seed, seedPhrase = model.seedPhrase,
+			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
+				.toSet(),
+			navigator = navigator,
 		)
 	}
+
+	BottomSheetWrapperContent(
+		bottomSheetState = confirmBottomSheetState,
+		bottomSheetContent = {
+			ProceedEmptyKeysetConfirmation(
+				onCancel = { scope.launch { confirmBottomSheetState.hide() } },
+				onProceed = onProceedAction,
+			)
+		},
+		mainContent = {
+			NewKeySetSelectNetworkScreenPrivate(
+				networks = networks,
+				selectedNetworkKeys = selected.value,
+				onNetworkClick = { network ->
+					selected.value = if (selected.value.contains(network.key)) {
+						selected.value - network.key
+					} else {
+						selected.value + network.key
+					}
+				},
+				onProceed = {
+					if (selected.value.isNotEmpty()) {
+						onProceedAction()
+					} else {
+						scope.launch { confirmBottomSheetState.show() }
+					}
+				},
+				onAddAll = {
+					selected.value = if (selected.value.size == networks.size) {
+						networksViewModel.getDefaultPreselectedNetworks().map { it.key }
+							.toSet()
+					} else {
+						networks.map { it.key }.toSet()
+					}
+				},
+				onBack = onBack,
+			)
+		},
+	)
 }
 
 @Composable

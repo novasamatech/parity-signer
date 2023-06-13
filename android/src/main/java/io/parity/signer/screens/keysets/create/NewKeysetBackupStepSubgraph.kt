@@ -71,7 +71,6 @@ fun NewKeySetBackupStepSubgraph(
 				model = model,
 				navigator = rootNavigator,
 				onBack = navController::popBackStack,
-				modifier = Modifier.statusBarsPadding(),
 			)
 		}
 	}
