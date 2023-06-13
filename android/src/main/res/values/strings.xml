@@ -406,6 +406,8 @@
 	<string name="keyset_recover_keys_subtitle">"Choose networks for the keys to be recovered "</string>
 	<string name="keyset_recover_keys_notification_text">Please note that only root keys will be added on this step. If you key set has keys with customly added derivation path name, please restore them separately from the recovered key set screen.</string>
 	<string name="keyset_recover_keys_cta">Recover Keys</string>
+	<string name="key_set_no_networks_title">Proceed with the Empty Key Set?</string>
+	<string name="key_set_no_networks_subtitle">"Since you haven't selected any keys, you key set will be empty. Are you sure? "</string>
 
 </resources>
 
