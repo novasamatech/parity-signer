@@ -37,49 +37,18 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun BananaSplitPasswordScreen(
-	qrData: List<String>,
 	onClose: Callback,
-	onSuccess: (newSeed: String) -> Unit,
-	onErrorWrongPassword: Callback,
-	onCustomError: (errorText: String) -> Unit,
+	onDone: Callback,
+	bananaViewModel: BananaSplitViewModel,
 	modifier: Modifier = Modifier,
 ) {
-
-	val bananaViewModel: BananaSplitViewModel = viewModel()
 
 	val name = bananaViewModel.seedName.collectAsState()
 	val password = bananaViewModel.password.collectAsState()
 	val nameCollision = bananaViewModel.seedCollision.collectAsState()
 	val wrongPassword = bananaViewModel.wrongPasswordCurrent.collectAsState()
 
-	LaunchedEffect(Unit) {
-		bananaViewModel.initState(qrData)
 
-		launch {
-			bananaViewModel.isWrongPasswordTerminal.collect {
-				if (it) {
-					onErrorWrongPassword()
-					bananaViewModel.cleanState()
-				}
-			}
-		}
-		launch {
-			bananaViewModel.isCustomErrorTerminal
-				.filterNotNull()
-				.collect {
-					onCustomError(it)
-					bananaViewModel.cleanState()
-				}
-		}
-		launch {
-			bananaViewModel.isSuccessTerminal
-				.filterNotNull()
-				.collect {
-					onSuccess(it)
-					bananaViewModel.cleanState()
-				}
-		}
-	}
 
 	val context = LocalContext.current
 	BananaSplitPasswordInternal(
@@ -90,9 +59,7 @@ fun BananaSplitPasswordScreen(
 		wrongPassword = wrongPassword,
 		onChangePassword = bananaViewModel::updatePassword,
 		onChangeSeedName = bananaViewModel::updateSeedName,
-		onDoneTap = {
-			runBlocking { bananaViewModel.onDoneTap(context) }
-		},
+		onDoneTap = onDone,
 		modifier = modifier,
 	)
 }
