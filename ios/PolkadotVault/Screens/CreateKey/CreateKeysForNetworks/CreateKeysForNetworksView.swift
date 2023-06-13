@@ -14,16 +14,16 @@ struct CreateKeysForNetworksView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
-        GeometryReader { geo in
-            VStack(alignment: .leading, spacing: 0) {
-                // Navigation Bar
-                NavigationBarView(
-                    viewModel: NavigationBarViewModel(
-                        title: .progress(current: 3, upTo: 3),
-                        leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
-                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
-                    )
+        VStack(alignment: .leading, spacing: 0) {
+            // Navigation Bar
+            NavigationBarView(
+                viewModel: NavigationBarViewModel(
+                    title: .progress(current: 3, upTo: 3),
+                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
+                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
+            )
+            GeometryReader { geo in
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
                         mainContent()
@@ -39,11 +39,11 @@ struct CreateKeysForNetworksView: View {
                     }
                     .frame(
                         minWidth: geo.size.width,
-                        minHeight: geo.size.height - Heights.navigationBarHeight - safeAreaInsets.top - safeAreaInsets
-                            .bottom
+                        minHeight: geo.size.height
                     )
                 }
             }
+
             .background(Asset.backgroundPrimary.swiftUIColor)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
