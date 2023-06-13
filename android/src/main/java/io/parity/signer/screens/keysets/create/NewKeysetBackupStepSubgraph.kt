@@ -26,8 +26,12 @@ fun NewKeySetBackupStepSubgraph(
 ) {
 
 	//background
-	Box(modifier = Modifier.fillMaxSize(1f).statusBarsPadding()
-		.background(MaterialTheme.colors.background))
+	Box(
+		modifier = Modifier
+            .fillMaxSize(1f)
+            .statusBarsPadding()
+            .background(MaterialTheme.colors.background)
+	)
 
 
 	val navController = rememberNavController()
@@ -36,10 +40,10 @@ fun NewKeySetBackupStepSubgraph(
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetBackup,
 	) {
 		val onProceedFromBackupInitial = { //to cache so screen can be taked from caches during navigation
-			navController.navigate(
-				NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
-			)
-		}
+				navController.navigate(
+					NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
+				)
+			}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
 				model = model,
@@ -59,7 +63,9 @@ fun NewKeySetBackupStepSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = navController::popBackStack) {
 				NewKeySetBackupBottomSheet(
 					onProceed = {
-						navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks)
+						navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
+							popUpTo(NewKeySetBackupStepSubgraph.NewKeySetBackup)
+						}
 					},
 					onCancel = navController::popBackStack,
 				)
