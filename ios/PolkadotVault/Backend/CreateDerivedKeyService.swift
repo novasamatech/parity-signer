@@ -53,7 +53,7 @@ final class CreateDerivedKeyService {
         completion: @escaping (Result<Void, CreateDerivedKeyError>) -> Void
     ) {
         let pathAndNetworks: [(path: String, network: MmNetwork)] = networks
-            .map { (path: "//\($0.title)", network: $0) }
+            .map { (path: $0.pathId, network: $0) }
         var occuredErrors: [(network: MmNetwork, error: String)] = []
         callQueue.async {
             let result: Result<Void, CreateDerivedKeyError>
