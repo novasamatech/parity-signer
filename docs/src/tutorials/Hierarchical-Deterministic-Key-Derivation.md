@@ -2,7 +2,7 @@
 
 Polkadot Vault `v4` has introduced the Hierarchical Deterministic Key Derivation (HDKD) feature for Substrate networks. This article explains how to use this feature.
 
-* Notice: The UI maybe variant for different versions, but the functionalities are the same in `v4` version.
+* Notice: The UI may be variant for different versions, but the functionalities are the same in `v4` version.
 
 ## Introduction
 

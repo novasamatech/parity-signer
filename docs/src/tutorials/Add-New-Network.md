@@ -1,6 +1,6 @@
 # Add New Network
 
-Polkadot Vault supports adding any substrate-based networks or updating and existing network via QR code.
+Polkadot Vault supports adding any substrate-based networks or updating an existing network via QR code.
 
 After you've installed [required software](#Prerequisites), you need to add *Network's Specs* to Vault and add *Network Metadata* for this network, so that Vault is able to decode, and you could read and verify transactions you are signing on this network.
 
@@ -114,7 +114,7 @@ Now your `<spec-qr>` is in `parity-signer/rust/files/signed`
 
 ### Feed Network Specs into Vault
 
-In Vault open scanner, scan your your `<spec-qr>` and approve chain specs.
+In Vault open scanner, scan your `<spec-qr>` and approve chain specs.
 
 <br/>
 
@@ -165,7 +165,7 @@ cargo run --release make --goal qr --crypto <crypto> --msg load-metadata --paylo
 cargo run --release make --goal qr --crypto sr25519 --msg load-metadata --payload sign_me_load-metadata_statemintV800 --verifier-hex 0x927c307614dba6ec42f84411cc1e93c6579893859ce5a7ac3d8c2fb1649d1542 --signature-hex 6a8f8dab854bec99bd8534102a964a4e71f4370683e7ff116c84d7e8d5cb344efd3b90d27059b7c8058f5c4a5230b792009c351a16c007237921bcae2ede2d84
 ```
 
-This QR might take some time to be generated. After it is finished you can find your `<metadata-qr>` in `parity-signer/rust/files/signed`. It is a multipart QR-"movie", if you image viewer does not render it correctly, we suggest to open it in a browser.
+This QR might take some time to be generated. After it is finished you can find your `<metadata-qr>` in `parity-signer/rust/files/signed`. It is a multipart QR-"movie", if your image viewer does not render it correctly, we suggest to open it in a browser.
 
 ### Feed Network Metadata into Vault
 
