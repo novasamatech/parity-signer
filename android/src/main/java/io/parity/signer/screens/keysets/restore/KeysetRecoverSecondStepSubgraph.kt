@@ -71,7 +71,6 @@ fun NewKeysetRecoverSecondStepSubgraph(
 				seedPhrase = state.value!!.readySeed!!,
 				rootNavigator = rootNavigator,
 				onBack = navController::popBackStack,
-				modifier = Modifier.statusBarsPadding(),
 			)
 		}
 	}
