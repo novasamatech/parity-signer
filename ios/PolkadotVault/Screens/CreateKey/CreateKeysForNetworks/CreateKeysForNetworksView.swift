@@ -10,6 +10,8 @@ import SwiftUI
 
 struct CreateKeysForNetworksView: View {
     @StateObject var viewModel: ViewModel
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
         GeometryReader { geo in
@@ -17,34 +19,32 @@ struct CreateKeysForNetworksView: View {
                 // Navigation Bar
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
+                        title: .progress(current: 3, upTo: 3),
+                        leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
                 )
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Title + Header
                         mainContent()
-                            .padding(.bottom, Spacing.medium)
-                        // Network List
                         networkSelection()
-                            .padding(.bottom, Spacing.medium)
                         footer()
+                        Spacer()
+                        PrimaryButton(
+                            action: viewModel.onDoneTap,
+                            text: Localizable.CreateKeysForNetwork.Action.create.key,
+                            style: .primary()
+                        )
+                        .padding(Spacing.large)
                     }
+                    .frame(
+                        minWidth: geo.size.width,
+                        minHeight: geo.size.height - Heights.navigationBarHeight - safeAreaInsets.top - safeAreaInsets
+                            .bottom
+                    )
                 }
-                .padding(Spacing.extraSmall)
-                Spacer()
-                PrimaryButton(
-                    action: viewModel.onDoneTap,
-                    text: Localizable.CreateKeysForNetwork.Action.create.key,
-                    style: .primary()
-                )
-                .padding(Spacing.large)
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            .frame(
-                minWidth: geo.size.width,
-                minHeight: geo.size.height
-            )
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
@@ -54,28 +54,37 @@ struct CreateKeysForNetworksView: View {
                 )
                 .clearModalBackground()
             }
+            .fullScreenModal(isPresented: $viewModel.isPresentingConfirmation) {
+                HorizontalActionsBottomModal(
+                    viewModel: .createEmptyKeySet,
+                    mainAction: viewModel.onCreateEmptyKeySetTap(),
+                    isShowingBottomAlert: $viewModel.isPresentingConfirmation
+                )
+                .clearModalBackground()
+            }
         }
     }
 
     @ViewBuilder
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Localizable.CreateKeysForNetwork.Label.title.text
+            Text(viewModel.title())
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
-            Localizable.CreateKeysForNetwork.Label.header.text
+            Text(viewModel.header())
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
         }
         .padding(.horizontal, Spacing.large)
+        .padding(.bottom, Spacing.medium)
     }
 
     @ViewBuilder
     func footer() -> some View {
         InfoBoxView(text: Localizable.CreateKeysForNetwork.Label.footer.string)
-            .padding(.bottom, Spacing.large)
+            .padding(.horizontal, Spacing.medium)
     }
 
     @ViewBuilder
@@ -92,6 +101,8 @@ struct CreateKeysForNetworksView: View {
             selectAllNetworks()
         }
         .containerBackground()
+        .padding(.horizontal, Spacing.extraSmall)
+        .padding(.bottom, Spacing.medium)
     }
 
     @ViewBuilder
@@ -138,6 +149,7 @@ extension CreateKeysForNetworksView {
     enum Mode: Equatable {
         case createKeySet(seedPhrase: String)
         case recoverKeySet
+        case bananaSplit
     }
 
     enum OnCompletionAction: Equatable {
@@ -156,14 +168,16 @@ extension CreateKeysForNetworksView {
         private let seedsMediator: SeedsMediating
         private let seedName: String
         private let mode: Mode
+        @Binding var isPresented: Bool
+
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
         @Published var selectedNetworks: [MmNetwork] = []
         // Error presentatation
         @Published var isPresentingError: Bool = false
         @Published var errorViewModel: ErrorBottomModalViewModel!
-
-        @Binding var isPresented: Bool
+        // Confirmation presentation
+        @Published var isPresentingConfirmation: Bool = false
 
         init(
             seedName: String,
@@ -205,40 +219,39 @@ extension CreateKeysForNetworksView {
         }
 
         func onDoneTap() {
-            switch mode {
-            case let .createKeySet(seedPhrase):
-                seedsMediator.createSeed(
-                    seedName: seedName,
-                    seedPhrase: seedPhrase,
-                    shouldCheckForCollision: true
-                )
-                createKeySetService.confirmKeySetCreation(
-                    seedName: seedName,
-                    seedPhrase: seedPhrase,
-                    networks: selectedNetworks
-                ) { result in
-                    switch result {
-                    case .success:
-                        self.isPresented = false
-                    case let .failure(error):
-                        self.errorViewModel = .alertError(message: error.localizedDescription)
-                        self.isPresentingError = true
-                    }
-                }
-            case .recoverKeySet:
-                createKeyService.createDerivedKeys(
-                    seedName,
-                    networks: selectedNetworks
-                ) { result in
-                    switch result {
-                    case .success:
-                        self.isPresented = false
-                    case let .failure(error):
-                        self.errorViewModel = .alertError(message: error.localizedDescription)
-                        self.isPresentingError = true
-                    }
-                }
+            if selectedNetworks.isEmpty {
+                isPresentingConfirmation = true
+            } else {
+                createKeySet()
             }
+        }
+
+        func onCreateEmptyKeySetTap() {
+            createKeySet()
+        }
+    }
+}
+
+extension CreateKeysForNetworksView.ViewModel {
+    func title() -> String {
+        switch mode {
+        case .recoverKeySet:
+            return Localizable.CreateKeysForNetwork.Label.Title.recover.string
+        case .createKeySet:
+            return Localizable.CreateKeysForNetwork.Label.Title.create.string
+        case .bananaSplit:
+            return Localizable.CreateKeysForNetwork.Label.Title.bananaSplit.string
+        }
+    }
+
+    func header() -> String {
+        switch mode {
+        case .recoverKeySet:
+            return Localizable.CreateKeysForNetwork.Label.Header.recover.string
+        case .createKeySet:
+            return Localizable.CreateKeysForNetwork.Label.Header.create.string
+        case .bananaSplit:
+            return Localizable.CreateKeysForNetwork.Label.Header.bananaSplit.string
         }
     }
 }
@@ -249,6 +262,44 @@ private extension CreateKeysForNetworksView.ViewModel {
             guard case let .success(networks) = $0 else { return }
             self.networks = networks
             self.selectedNetworks = networks.filter { Constants.preselectedNetworks.contains($0.title) }
+        }
+    }
+
+    func createKeySet() {
+        switch mode {
+        case let .createKeySet(seedPhrase):
+            seedsMediator.createSeed(
+                seedName: seedName,
+                seedPhrase: seedPhrase,
+                shouldCheckForCollision: true
+            )
+            createKeySetService.confirmKeySetCreation(
+                seedName: seedName,
+                seedPhrase: seedPhrase,
+                networks: selectedNetworks
+            ) { result in
+                switch result {
+                case .success:
+                    self.isPresented = false
+                case let .failure(error):
+                    self.errorViewModel = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
+        case .recoverKeySet,
+             .bananaSplit:
+            createKeyService.createDerivedKeys(
+                seedName,
+                networks: selectedNetworks
+            ) { result in
+                switch result {
+                case .success:
+                    self.isPresented = false
+                case let .failure(error):
+                    self.errorViewModel = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
     }
 }

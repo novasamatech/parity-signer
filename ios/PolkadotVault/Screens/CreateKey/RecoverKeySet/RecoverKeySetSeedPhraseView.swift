@@ -16,11 +16,11 @@ struct RecoverKeySetSeedPhraseView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
-                    title: .title(Localizable.RecoverSeedPhrase.Label.title.string),
+                    title: .progress(current: 2, upTo: 3),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: [.init(
                         type: .activeAction(
-                            Localizable.RecoverSeedPhrase.Action.done.key,
+                            Localizable.RecoverSeedPhrase.Action.next.key,
                             .constant(viewModel.content.readySeed == nil)
                         ),
                         action: viewModel.onDoneTap
@@ -29,12 +29,22 @@ struct RecoverKeySetSeedPhraseView: View {
             )
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
+                    Localizable.RecoverSeedPhrase.Label.title.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.titleL.font)
+                        .padding(.top, Spacing.extraSmall)
                     Localizable.RecoverSeedPhrase.Label.header.text
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .font(PrimaryFont.bodyL.font)
-                        .padding(.leading, Spacing.large)
-                        .padding(.top, Spacing.large)
-                        .padding(.bottom, Spacing.small)
+                        .padding(.vertical, Spacing.extraSmall)
+                    HStack {
+                        Spacer()
+                    }
+                }
+                .padding(.top, Spacing.extraExtraSmall)
+                .padding(.bottom, Spacing.medium)
+                .padding(.horizontal, Spacing.large)
+                VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .leading, spacing: 0) {
                         WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
                             switch gridElement {

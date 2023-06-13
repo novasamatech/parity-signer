@@ -10,85 +10,94 @@ import SwiftUI
 struct CreateKeySetSeedPhraseView: View {
     @StateObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
-        VStack(spacing: 0) {
-            NavigationBarView(
-                viewModel: .init(
-                    title: nil,
-                    leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })]
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                NavigationBarView(
+                    viewModel: .init(
+                        title: .progress(current: 2, upTo: 3),
+                        leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })]
+                    )
                 )
-            )
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Localizable.NewSeed.Backup.Label.header.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.titleM.font)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(Spacing.extraSmall)
-                    HStack {
-                        Spacer()
-                    }
-                }
-                .padding(.top, Spacing.extraExtraSmall)
-                .padding(.bottom, Spacing.medium)
-                .padding(.horizontal, Spacing.large)
-                VStack(alignment: .leading, spacing: 0) {
-                    SeedPhraseView(viewModel: .init(dataModel: .init(seedPhrase: viewModel.dataModel.seedPhrase)))
-                        .padding(.bottom, Spacing.extraSmall)
-                        .padding(.horizontal, Spacing.medium)
-                    AttributedTintInfoBox(text: Localizable.createKeySetSeedPhraseInfo())
-                        .padding(.horizontal, Spacing.medium)
-                        .padding(.bottom, Spacing.large)
-                        .contentShape(Rectangle())
-                        .onTapGesture { viewModel.onInfoBoxTap() }
-                    Button(
-                        action: {
-                            viewModel.confirmBackup.toggle()
-                        },
-                        label: {
-                            HStack {
-                                (
-                                    viewModel.confirmBackup ? Asset.checkboxChecked.swiftUIImage : Asset.checkboxEmpty
-                                        .swiftUIImage
-                                )
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
-                                Localizable.NewSeed.Backup.Label.confirmation.text
-                                    .multilineTextAlignment(.leading)
-                                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                                Spacer()
-                            }
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Localizable.NewSeed.Backup.Label.header.text
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(PrimaryFont.titleM.font)
+                            .multilineTextAlignment(.leading)
+                            .lineSpacing(Spacing.extraSmall)
+                        HStack {
+                            Spacer()
                         }
-                    )
+                    }
+                    .padding(.top, Spacing.extraExtraSmall)
+                    .padding(.bottom, Spacing.medium)
                     .padding(.horizontal, Spacing.large)
-                    .padding(.bottom, Spacing.extraSmall)
-                    Spacer()
-                    PrimaryButton(
-                        action: viewModel.onCreateTap,
-                        text: Localizable.NewSeed.Backup.Action.create.key,
-                        style: .primary(isDisabled: .constant(!viewModel.confirmBackup))
+                    VStack(alignment: .leading, spacing: 0) {
+                        SeedPhraseView(viewModel: .init(dataModel: .init(seedPhrase: viewModel.dataModel.seedPhrase)))
+                            .padding(.bottom, Spacing.extraSmall)
+                            .padding(.horizontal, Spacing.medium)
+                        AttributedTintInfoBox(text: Localizable.createKeySetSeedPhraseInfo())
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.bottom, Spacing.large)
+                            .contentShape(Rectangle())
+                            .onTapGesture { viewModel.onInfoBoxTap() }
+                        Button(
+                            action: {
+                                viewModel.confirmBackup.toggle()
+                            },
+                            label: {
+                                HStack {
+                                    (
+                                        viewModel.confirmBackup ? Asset.checkboxChecked.swiftUIImage : Asset
+                                            .checkboxEmpty
+                                            .swiftUIImage
+                                    )
+                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                    Localizable.NewSeed.Backup.Label.confirmation.text
+                                        .multilineTextAlignment(.leading)
+                                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                    Spacer()
+                                }
+                            }
+                        )
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.bottom, Spacing.extraSmall)
+                        Spacer()
+                        PrimaryButton(
+                            action: viewModel.onCreateTap,
+                            text: Localizable.NewSeed.Backup.Action.create.key,
+                            style: .primary(isDisabled: .constant(!viewModel.confirmBackup))
+                        )
+                        .padding(Spacing.large)
+                    }
+                    .frame(
+                        minWidth: geo.size.width,
+                        minHeight: geo.size.height - Heights.navigationBarHeight - safeAreaInsets.top - safeAreaInsets
+                            .bottom
                     )
-                    .padding(Spacing.large)
                 }
+                NavigationLink(
+                    destination:
+                    CreateKeysForNetworksView(
+                        viewModel: viewModel.createDerivedKeys()
+                    )
+                    .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingDetails
+                ) { EmptyView() }
             }
-            NavigationLink(
-                destination:
-                CreateKeysForNetworksView(
-                    viewModel: viewModel.createDerivedKeys()
+            .background(Asset.backgroundPrimary.swiftUIColor)
+            .fullScreenModal(
+                isPresented: $viewModel.isPresentingInfo
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.presentableInfo,
+                    isShowingBottomAlert: $viewModel.isPresentingInfo
                 )
-                .navigationBarHidden(true),
-                isActive: $viewModel.isPresentingDetails
-            ) { EmptyView() }
-        }
-        .background(Asset.backgroundPrimary.swiftUIColor)
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingInfo
-        ) {
-            ErrorBottomModal(
-                viewModel: viewModel.presentableInfo,
-                isShowingBottomAlert: $viewModel.isPresentingInfo
-            )
-            .clearModalBackground()
+                .clearModalBackground()
+            }
         }
     }
 }
