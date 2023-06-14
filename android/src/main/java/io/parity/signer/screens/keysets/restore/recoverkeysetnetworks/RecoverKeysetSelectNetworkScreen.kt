@@ -64,17 +64,7 @@ fun RecoverKeysetSelectNetworkScreen(
 		}
 	val networks = networksViewModel.getAllNetworks()
 
-	val confirmBottomSheetState =
-		rememberModalBottomSheetState(
-			ModalBottomSheetValue.Hidden,
-			confirmValueChange = {
-				it != ModalBottomSheetValue.HalfExpanded
-			},
-			skipHalfExpanded = false
-		)
-	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
-
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
 			seedName = seedName, seedPhrase = seedPhrase,
@@ -88,6 +78,17 @@ fun RecoverKeysetSelectNetworkScreen(
 			Toast.LENGTH_LONG
 		).show()
 	}
+
+
+	val confirmBottomSheetState =
+		rememberModalBottomSheetState(
+			ModalBottomSheetValue.Hidden,
+			confirmValueChange = {
+				it != ModalBottomSheetValue.HalfExpanded
+			},
+			skipHalfExpanded = false
+		)
+	val scope = rememberCoroutineScope()
 
 	BottomSheetWrapperContent(
 		bottomSheetState = confirmBottomSheetState,
