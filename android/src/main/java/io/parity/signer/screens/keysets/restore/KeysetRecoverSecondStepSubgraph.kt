@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Navigator
+import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import kotlinx.coroutines.Dispatchers
 

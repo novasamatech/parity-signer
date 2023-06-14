@@ -56,7 +56,7 @@ fun NewKeySetSelectNetworkScreen(
 	navigator: Navigator,
 	onBack: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(

@@ -1,9 +1,8 @@
-package io.parity.signer.screens.keysets.restore
+package io.parity.signer.screens.keysets.restore.recoverkeysetnetworks
 
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +38,7 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselect
 import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselectAll
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
+import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksWithNavigatorViewModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -55,7 +54,7 @@ fun RecoverKeysetSelectNetworkScreen(
 	rootNavigator: Navigator,
 	onBack: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(
