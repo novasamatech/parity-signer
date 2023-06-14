@@ -67,7 +67,7 @@ internal fun NewKeySetBackupScreen(
 		Spacer(modifier = Modifier.weight(1f))
 
 		PrimaryButtonWide(
-			label = stringResource(R.string.new_key_set_backup_cta),
+			label = stringResource(R.string.button_next),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,
 		)

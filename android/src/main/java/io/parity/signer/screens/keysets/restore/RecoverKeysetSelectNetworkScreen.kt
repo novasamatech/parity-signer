@@ -194,7 +194,7 @@ private fun RecoverKeysetSelectNetworkScreenPrivate(
 		Spacer(modifier = Modifier.weight(1f))
 
 		PrimaryButtonWide(
-			label = stringResource(R.string.keyset_recover_keys_cta),
+			label = stringResource(R.string.generic_done),
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,
 		)
