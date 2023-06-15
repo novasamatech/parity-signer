@@ -12,7 +12,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -22,7 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.ScreenHeaderWithButton
+import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -50,18 +55,20 @@ fun NewKeySetNameScreen(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background),
 	) {
-
-		ScreenHeaderWithButton(
+		ScreenHeaderProgressWithButton(
 			canProceed = canProceed,
+			currentStep = 1,
+			allSteps = 3,
 			btnText = stringResource(R.string.button_next),
-			modifier = Modifier.padding(start = 8.dp),
-			onClose = { rootNavigator.backAction() }
-		) {
-			if (canProceed) {
-				rootNavigator.navigate(Action.GO_FORWARD, keySetName)
-				focusManager.clearFocus(true)
-			}
-		}
+			onClose = { rootNavigator.backAction() },
+			onButton = {
+				if (canProceed) {
+					rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+					focusManager.clearFocus(true)
+				}
+			},
+			backNotClose = false,
+		)
 		Text(
 			text = stringResource(R.string.new_key_set_title),
 			color = MaterialTheme.colors.primary,

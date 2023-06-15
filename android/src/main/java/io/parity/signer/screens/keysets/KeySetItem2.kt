@@ -39,23 +39,23 @@ fun KeySetItem2(
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Column() {
-			if (model.derivedKeysCount > 0.toUInt()) {
-				Text(
-					text = pluralStringResource(
-						id = R.plurals.key_sets_item_derived_subtitle,
-						count = model.derivedKeysCount.toInt(),
-						model.derivedKeysCount.toInt(),
-					),
-					color = MaterialTheme.colors.textTertiary,
-					style = SignerTypeface.BodyM,
-					modifier = Modifier.padding(horizontal = 16.dp)
-						.padding(top = 16.dp)
-				)
-			}
+			Text(
+				text = pluralStringResource(
+					id = R.plurals.key_sets_item_derived_subtitle,
+					count = model.derivedKeysCount.toInt(),
+					model.derivedKeysCount.toInt(),
+				),
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyM,
+				modifier = Modifier
+					.padding(horizontal = 16.dp)
+					.padding(top = 16.dp)
+			)
 			//title
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier.padding(horizontal = 16.dp)
+				modifier = Modifier
+					.padding(horizontal = 16.dp)
 					.padding(top = 4.dp, bottom = 24.dp),
 			) {
 
@@ -78,7 +78,8 @@ fun KeySetItem2(
 			//icons
 			if (model.usedInNetworks.isNotEmpty()) {
 				Row(
-					modifier = Modifier.padding(horizontal = 12.dp)
+					modifier = Modifier
+						.padding(horizontal = 12.dp)
 						.padding(bottom = 16.dp)
 				) {
 					model.usedInNetworks.take(7).forEachIndexed { index, network ->
@@ -118,6 +119,28 @@ private fun PreviewKeySetItem() {
 				PreviewData.exampleIdenticonPng,
 				listOf("westend", "some", "polkadot", "www", "kusama"),
 				2.toUInt()
+			)
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetItemEmpty() {
+	SignerNewTheme {
+		KeySetItem2(
+			KeySetModel(
+				"My special key set",
+				PreviewData.exampleIdenticonPng,
+				emptyList(),
+				0.toUInt(),
 			)
 		)
 	}

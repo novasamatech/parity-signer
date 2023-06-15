@@ -2,7 +2,7 @@ package io.parity.signer.dependencygraph
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import io.parity.signer.backend.UniffiInteractor
+import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper

@@ -17,8 +17,6 @@ import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
-import io.parity.signer.domain.navigate
-import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toKeySetDetailsModel
@@ -30,12 +28,12 @@ import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
 import io.parity.signer.screens.keysets.KeySetsNavSubgraph
-import io.parity.signer.screens.keysets.create.NewKeySetBackupScreenFull
+import io.parity.signer.screens.keysets.create.NewKeySetBackupStepSubgraph
 import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
-import io.parity.signer.screens.keysets.create.NewSeedMenu
-import io.parity.signer.screens.keysets.create.toNewSeedBackupModel
+import io.parity.signer.screens.keysets.create.NewKeysetMenu
+import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
-import io.parity.signer.screens.keysets.restore.KeysetRecoverPhraseScreenFull
+import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
 import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
@@ -152,13 +150,14 @@ fun CombinedScreensSelector(
 				)
 			}
 		}
+
 		is ScreenData.RecoverSeedPhrase ->
 			Box(
 				modifier = Modifier
 					.statusBarsPadding()
 					.imePadding()
 			) {
-				KeysetRecoverPhraseScreenFull(
+				NewKeysetRecoverSecondStepSubgraph(
 					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
 					rootNavigator = rootNavigator,
 				)
@@ -243,17 +242,16 @@ fun BottomSheetSelector(
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
 					}) {
-						NewSeedMenu(
+						NewKeysetMenu(
 							networkState = networkState,
 							navigator = sharedViewModel.navigator,
 						)
 					}
 
 				is ModalData.NewSeedBackup -> {
-					NewKeySetBackupScreenFull(
+					NewKeySetBackupStepSubgraph(
 						model = modalData.f.toNewSeedBackupModel(),
-						onBack = { navigator.backAction() },
-						onCreateKeySet = sharedViewModel::addSeed
+						rootNavigator = navigator,
 					)
 				}
 

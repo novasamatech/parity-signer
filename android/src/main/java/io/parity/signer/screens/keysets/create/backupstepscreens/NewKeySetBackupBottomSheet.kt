@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.create
+package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -56,7 +56,7 @@ internal fun NewKeySetBackupBottomSheet(
 		RowButtonsBottomSheet(
 			modifier = Modifier.padding(24.dp),
 			labelCancel = stringResource(id = R.string.generic_cancel),
-			labelCta = stringResource(id = R.string.generic_done),
+			labelCta = stringResource(id = R.string.button_next),
 			onClickedCancel = onCancel,
 			onClickedCta = onProceed,
 			isCtaEnabled = confirmBackup && confirmNotLoose,

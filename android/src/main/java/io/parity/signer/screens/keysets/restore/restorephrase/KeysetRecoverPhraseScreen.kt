@@ -2,7 +2,6 @@ package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,45 +15,50 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.ScreenHeaderWithButton
+import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.keysets.restore.KeysetRecoverModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
+
 @Composable
-internal fun KeysetRecoverPhraseScreenView(
+fun KeysetRecoverPhraseScreen(
 	model: KeysetRecoverModel,
 	backAction: Callback,
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
 ) {
-
 	Column(
 		Modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
 	) {
-
-		ScreenHeaderWithButton(
+		ScreenHeaderProgressWithButton(
 			canProceed = model.readySeed != null,
-			title = stringResource(R.string.recovert_key_set_title),
-			btnText = stringResource(R.string.generic_done),
-			onDone = onDone,
+			currentStep = 2,
+			allSteps = 3,
+			btnText = stringResource(R.string.button_next),
 			onClose = backAction,
+			onButton = onDone,
 			backNotClose = true,
 		)
 		Text(
-			text = stringResource(R.string.recover_key_set_subtitle),
+			text = stringResource(R.string.recover_key_set_phrase_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.TitleL,
+			modifier = Modifier.padding(horizontal = 24.dp),
+		)
+		Text(
+			text = stringResource(R.string.recover_key_set_phrase_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
 				.padding(top = 8.dp, bottom = 2.dp),
 		)
-
 		EnterSeedPhraseBox(
 			enteredWords = model.draft,
 			userInput = model.userInput,
@@ -83,12 +87,12 @@ internal fun KeysetRecoverPhraseScreenView(
 @Composable
 private fun PreviewKeysetRecoverPhraseScreenView() {
 	SignerNewTheme {
-		KeysetRecoverPhraseScreenView(
+		KeysetRecoverPhraseScreen(
 			model = KeysetRecoverModel.stub(),
 			backAction = {},
 			onNewInput = { _ -> },
 			onAddSuggestedWord = { _ -> },
-			onDone = {}
+			onDone = {},
 		)
 	}
 }

@@ -1,7 +1,7 @@
 package io.parity.signer.components.qrcode
 
-import io.parity.signer.backend.UniffiInteractor
-import io.parity.signer.backend.mapError
+import io.parity.signer.domain.backend.UniffiInteractor
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
 
 

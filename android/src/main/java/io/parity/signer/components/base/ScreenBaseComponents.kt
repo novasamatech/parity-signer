@@ -3,7 +3,15 @@ package io.parity.signer.components.base
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -14,6 +22,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -24,6 +33,8 @@ import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.fill12
+import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
 
@@ -224,6 +235,80 @@ fun ScreenHeaderWithButton(
 }
 
 
+@Composable
+fun ScreenHeaderProgressWithButton(
+	canProceed: Boolean,
+	currentStep: Int,
+	allSteps: Int,
+	btnText: String,
+	onClose: Callback,
+	onButton: Callback?,
+	modifier: Modifier = Modifier,
+	backNotClose: Boolean = false,
+) {
+	Row(
+		modifier = modifier.padding(
+			start = 8.dp,
+			end = 8.dp,
+			top = 8.dp,
+			bottom = 8.dp
+		),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		if (backNotClose) {
+			Image(
+				imageVector = Icons.Filled.ArrowBackIos,
+				contentDescription = stringResource(R.string.description_back_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(end = 8.dp)
+					.clickable(onClick = onClose)
+					.padding(8.dp)
+					.size(24.dp)
+			)
+		} else {
+			Image(
+				imageVector = Icons.Filled.Close,
+				contentDescription = stringResource(R.string.description_back_button),
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.padding(end = 8.dp)
+					.clickable(onClick = onClose)
+					.padding(8.dp)
+					.size(24.dp)
+					.align(Alignment.CenterVertically)
+			)
+		}
+		Box(
+			modifier = Modifier.weight(1f),
+			contentAlignment = Alignment.Center,
+		) {
+			PageIndicatorLine(
+				totalDots = allSteps,
+				selectedIndex = currentStep,
+				selectedColor = MaterialTheme.colors.pink500,
+				unSelectedColor = MaterialTheme.colors.fill12,
+				modifier = Modifier
+					.padding(horizontal = 16.dp, vertical = 16.dp)
+					.width((allSteps * 42).dp),
+			)
+		}
+		Box(
+			contentAlignment = Alignment.CenterEnd,
+		) {
+				PrimaryButtonGreyDisabled(
+					label = btnText,
+					isEnabled = canProceed,
+					modifier = Modifier.alpha(if (onButton == null) 0f else 1f)
+				) {
+					if (canProceed) {
+						onButton?.invoke()
+					}
+				}
+		}
+	}
+}
+
 @Preview(
 	name = "day",
 	group = "themes",
@@ -241,9 +326,7 @@ fun ScreenHeaderWithButton(
 @Composable
 private fun PreviewScreenBaseComponent() {
 	SignerNewTheme() {
-		Column(
-			modifier = Modifier.size(500.dp),
-		) {
+		Column() {
 			ScreenHeader(
 				null,
 				onBack = {},
@@ -278,6 +361,23 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 				differentMenuIcon = Icons.Filled.HelpOutline,
+			)
+			ScreenHeaderProgressWithButton(
+				canProceed = true,
+				currentStep = 2,
+				allSteps = 3,
+				btnText = "Next",
+				onClose = {},
+				onButton = {},
+			)
+			ScreenHeaderProgressWithButton(
+				canProceed = true,
+				currentStep = 2,
+				allSteps = 3,
+				btnText = "Next",
+				onClose = {},
+				onButton = null,
+				backNotClose = true,
 			)
 		}
 	}

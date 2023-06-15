@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.parity.signer.backend.CompletableResult
-import io.parity.signer.backend.OperationResult
-import io.parity.signer.backend.UniffiResult
+import io.parity.signer.domain.backend.CompletableResult
+import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.findActivity
