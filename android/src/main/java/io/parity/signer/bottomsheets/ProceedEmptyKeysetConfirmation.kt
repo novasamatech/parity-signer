@@ -39,6 +39,7 @@ internal fun ProceedEmptyKeysetConfirmation(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
+				.padding(top = 8.dp)
 		)
 		RowButtonsBottomSheet(
 			modifier = Modifier.padding(24.dp),
