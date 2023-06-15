@@ -9,12 +9,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreen
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -92,14 +92,11 @@ fun BananaSplitSubgraph(
 			BackHandler(onBack = onClose)
 		}
 		composable(BananaSplitNavigationSubgraph.BananaSplitNavigationNetworks) {
+			val context = LocalContext.current
 			RecoverKeysetSelectNetworkBananaFlowScreen(
-				seedName = state.value!!.seedName,
-				seedPhrase = state.value!!.readySeed!!,
 				onBack = navController::popBackStack,
+				onDone = {networks -> bananaViewModel.onDoneTap(context, networks) }
 			)
-			on done tap = {
-				runBlocking { bananaViewModel.onDoneTap(context) }
-			}
 		}
 	}
 }

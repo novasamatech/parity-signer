@@ -14,10 +14,8 @@ import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKey
 
 @Composable
 fun RecoverKeysetSelectNetworkBananaFlowScreen(
-	seedName: String,
-	seedPhrase: String,
 	onBack: Callback,
-	onFinished: Callback,//todo take this process instead of local viewmodel
+	onDone: (networksKeys: Set<String>) -> Unit,//todo take this process instead of local viewmodel
 ) {
 	val networksViewModel: BananaNetworksViewModel = viewModel()
 	val defaultSelectedNetworks = networksViewModel.getDefaultPreselectedNetworks()
@@ -38,7 +36,7 @@ fun RecoverKeysetSelectNetworkBananaFlowScreen(
 			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 		)
-		onFinished()//todo dmitry rewrite
+		onDone()//todo dmitry rewrite
 		Toast.makeText(
 			context,
 			context.getText(R.string.key_set_has_been_recovered_toast),

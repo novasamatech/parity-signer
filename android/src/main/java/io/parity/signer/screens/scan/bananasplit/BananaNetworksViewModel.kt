@@ -13,24 +13,9 @@ import kotlinx.coroutines.launch
 class BananaNetworksViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
-	private val createKeySetUseCase = CreateKeySetUseCase()
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
 	fun getDefaultPreselectedNetworks(): List<NetworkModel> =
 		allNetworksUseCase.getDefaultPreselectedNetworks()
-
-	fun createKeySetWithNetworks(
-		seedName: String, seedPhrase: String,
-		networkForKeys: Set<NetworkModel>,
-		onAfterCreate: Callback = {},
-	): Unit {
-		viewModelScope.launch {
-			createKeySetUseCase.createKeySetWithNetworks(
-				seedName, seedPhrase,
-				networkForKeys.map { it.key },
-			)
-			onAfterCreate()
-		}
-	}
 }
