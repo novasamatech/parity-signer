@@ -15,8 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
+import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowScreen
 import kotlinx.coroutines.Dispatchers
 
 
@@ -67,7 +67,7 @@ fun NewKeysetRecoverSecondStepSubgraph(
 			BackHandler(onBack = rootNavigator::backAction)
 		}
 		composable(KeysetRecoverSubgraph.KeysetRecoverNetworks) {
-			RecoverKeysetSelectNetworkScreen(
+			RecoverKeysetSelectNetworkRestoreFlowScreen(
 				seedName = state.value!!.seedName,
 				seedPhrase = state.value!!.readySeed!!,
 				rootNavigator = rootNavigator,

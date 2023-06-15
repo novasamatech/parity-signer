@@ -46,40 +46,15 @@ import io.parity.signer.ui.theme.fill6
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun RecoverKeysetSelectNetworkScreen(
-	seedName: String,
-	seedPhrase: String,
-	rootNavigator: Navigator,
-	onBack: Callback,
+@OptIn(ExperimentalMaterialApi::class)
+fun RecoverKeysetSelectNetworkScreenBase(
+	onProceedAction: () -> Unit,
+	networks: List<NetworkModel>,
+	selected: MutableState<Set<String>>,
+	defaultSelectedNetworks: Set<String>,
+	onBack: Callback
 ) {
-	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
-	val selected: MutableState<Set<String>> =
-		remember {
-			mutableStateOf(
-				networksViewModel.getDefaultPreselectedNetworks()
-					.map { it.key }.toSet()
-			)
-		}
-	val networks = networksViewModel.getAllNetworks()
-
-	val context = LocalContext.current
-	val onProceedAction = {
-		networksViewModel.createKeySetWithNetworks(
-			seedName = seedName, seedPhrase = seedPhrase,
-			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
-				.toSet(),
-			navigator = rootNavigator,
-		)
-		Toast.makeText(
-			context,
-			context.getText(R.string.key_set_has_been_recovered_toast),
-			Toast.LENGTH_LONG
-		).show()
-	}
-
-
 	val confirmBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
@@ -118,8 +93,7 @@ fun RecoverKeysetSelectNetworkScreen(
 				},
 				onAddAll = {
 					selected.value = if (selected.value.size == networks.size) {
-						networksViewModel.getDefaultPreselectedNetworks().map { it.key }
-							.toSet()
+						defaultSelectedNetworks
 					} else {
 						networks.map { it.key }.toSet()
 					}

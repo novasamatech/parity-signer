@@ -1,0 +1,36 @@
+package io.parity.signer.screens.scan.bananasplit
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.usecases.AllNetworksUseCase
+import io.parity.signer.domain.usecases.CreateKeySetUseCase
+import kotlinx.coroutines.launch
+
+
+class BananaNetworksViewModel : ViewModel() {
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
+	private val createKeySetUseCase = CreateKeySetUseCase()
+
+	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
+
+	fun getDefaultPreselectedNetworks(): List<NetworkModel> =
+		allNetworksUseCase.getDefaultPreselectedNetworks()
+
+	fun createKeySetWithNetworks(
+		seedName: String, seedPhrase: String,
+		networkForKeys: Set<NetworkModel>,
+		onAfterCreate: Callback = {},
+	): Unit {
+		viewModelScope.launch {
+			createKeySetUseCase.createKeySetWithNetworks(
+				seedName, seedPhrase,
+				networkForKeys.map { it.key },
+			)
+			onAfterCreate()
+		}
+	}
+}

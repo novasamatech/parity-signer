@@ -92,10 +92,9 @@ fun BananaSplitSubgraph(
 			BackHandler(onBack = onClose)
 		}
 		composable(BananaSplitNavigationSubgraph.BananaSplitNavigationNetworks) {
-			RecoverKeysetSelectNetworkScreen(
+			RecoverKeysetSelectNetworkBananaFlowScreen(
 				seedName = state.value!!.seedName,
 				seedPhrase = state.value!!.readySeed!!,
-				rootNavigator = rootNavigator,
 				onBack = navController::popBackStack,
 			)
 			on done tap = {
