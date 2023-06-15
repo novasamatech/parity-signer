@@ -144,8 +144,8 @@ struct ErrorBottomModalViewModel {
     static func seedPhraseAlreadyExists(_ action: @escaping @autoclosure () -> Void = {}())
         -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            title: Localizable.EnterBananaSplitPasswordModal.Error.SeedPhraseExists.title.string,
-            content: Localizable.EnterBananaSplitPasswordModal.Error.SeedPhraseExists.message.string,
+            title: Localizable.EnterBananaSplitPasswordView.Error.SeedPhraseExists.title.string,
+            content: Localizable.EnterBananaSplitPasswordView.Error.SeedPhraseExists.message.string,
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }
