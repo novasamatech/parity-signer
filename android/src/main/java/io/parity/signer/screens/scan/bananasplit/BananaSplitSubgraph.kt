@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
+import io.parity.signer.screens.scan.bananasplit.networks.RecoverKeysetSelectNetworkBananaFlowScreen
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -27,7 +28,6 @@ fun BananaSplitSubgraph(
 	onSuccess: (newSeed: String) -> Unit,
 	onErrorWrongPassword: Callback,
 	onCustomError: (errorText: String) -> Unit,
-	modifier: Modifier = Modifier,
 ) {
 
 	val bananaViewModel: BananaSplitViewModel = viewModel()
@@ -95,7 +95,9 @@ fun BananaSplitSubgraph(
 			val context = LocalContext.current
 			RecoverKeysetSelectNetworkBananaFlowScreen(
 				onBack = navController::popBackStack,
-				onDone = {networks -> bananaViewModel.onDoneTap(context, networks) }
+				onDone = { networks ->
+					runBlocking { bananaViewModel.onDoneTap(context, networks) }
+				}
 			)
 		}
 	}

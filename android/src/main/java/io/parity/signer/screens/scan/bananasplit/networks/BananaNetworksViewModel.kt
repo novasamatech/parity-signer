@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit
+package io.parity.signer.screens.scan.bananasplit.networks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

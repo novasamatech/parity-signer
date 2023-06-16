@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan.bananasplit
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -87,13 +88,16 @@ class BananaSplitViewModel() : ViewModel() {
 									context.getString(R.string.banana_split_password_error_seed_phrase_exists)
 								return
 							}
-							val isSaved = runBlocking {
-								createKeySetUseCase.createKeySetWithNetworks(
-									seedName, seedPhrase.s,
-									networksKeys.toList(),
-								)
-							}
+							val isSaved = createKeySetUseCase.createKeySetWithNetworks(
+								seedName, seedPhrase.s,
+								networksKeys.toList(),
+							)
 							//todo dmitry post toast
+							Toast.makeText(
+								context,
+								context.getText(R.string.key_set_has_been_recovered_toast),
+								Toast.LENGTH_LONG
+							).show()
 							if (!isSaved) {
 								_isCustomErrorTerminal.value =
 									context.getString(R.string.banana_split_password_error_cannot_save_seed)
