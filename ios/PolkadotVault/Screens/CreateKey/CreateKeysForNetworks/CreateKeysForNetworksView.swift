@@ -46,7 +46,8 @@ struct CreateKeysForNetworksView: View {
 
             .background(Asset.backgroundPrimary.swiftUIColor)
             .fullScreenModal(
-                isPresented: $viewModel.isPresentingError
+                isPresented: $viewModel.isPresentingError,
+                onDismiss: { viewModel.onErrorDismiss?() }
             ) {
                 ErrorBottomModal(
                     viewModel: viewModel.errorViewModel,
@@ -174,6 +175,7 @@ extension CreateKeysForNetworksView {
         private let seedPhrase: String
         private let mode: Mode
         private let onCompletion: (OnCompletionAction) -> Void
+        var onErrorDismiss: (() -> Void)?
 
         @Binding var isPresented: Bool
 
@@ -324,6 +326,7 @@ private extension CreateKeysForNetworksView.ViewModel {
                 self.isPresented = false
                 self.onCompletion(.recoveredKeySet(seedName: self.seedName))
             case let .failure(error):
+                self.onErrorDismiss = { self.isPresented = false }
                 self.errorViewModel = .alertError(message: error.localizedDescription)
                 self.isPresentingError = true
             }
@@ -370,6 +373,7 @@ private extension CreateKeysForNetworksView.ViewModel {
                 self.isPresented = false
                 self.onCompletion(.bananaSplitRecovery(seedName: self.seedName))
             case let .failure(error):
+                self.onErrorDismiss = { self.isPresented = false }
                 self.errorViewModel = .alertError(message: error.localizedDescription)
                 self.isPresentingError = true
             }
