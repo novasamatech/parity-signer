@@ -13,7 +13,7 @@ class CreateKeySetUseCase() {
 		networksKeys: List<String>,
 	): Boolean {
 		val repository = ServiceLocator.activityScope!!.seedRepository
-		return repository.addSeed( //todo dmitry validate check this method.
+		return repository.addSeed(
 			seedName = seedName,
 			seedPhrase = seedPhrase,
 			networksKeys = networksKeys,
