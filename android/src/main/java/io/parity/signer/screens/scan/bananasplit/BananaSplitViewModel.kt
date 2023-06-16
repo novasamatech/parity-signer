@@ -92,12 +92,6 @@ class BananaSplitViewModel() : ViewModel() {
 								seedName, seedPhrase.s,
 								networksKeys.toList(),
 							)
-							//todo dmitry post toast
-							Toast.makeText(
-								context,
-								context.getText(R.string.key_set_has_been_recovered_toast),
-								Toast.LENGTH_LONG
-							).show()
 							if (!isSaved) {
 								_isCustomErrorTerminal.value =
 									context.getString(R.string.banana_split_password_error_cannot_save_seed)

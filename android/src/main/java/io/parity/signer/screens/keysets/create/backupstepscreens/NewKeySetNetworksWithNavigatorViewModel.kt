@@ -9,6 +9,7 @@ import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.domain.usecases.CreateKeySetViaStateMachineUseCase
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class NewKeySetNetworksWithNavigatorViewModel : ViewModel() {
@@ -25,14 +26,12 @@ class NewKeySetNetworksWithNavigatorViewModel : ViewModel() {
 		seedName: String, seedPhrase: String,
 		networksForKeys: Set<NetworkModel>,
 		navigator: Navigator,
-		onAfterFinishCleanup: Callback = {},
-	): Unit {
-		viewModelScope.launch {
+	): Boolean {
+		return runBlocking {
 			createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,
 				networksForKeys, navigator
 			)
-			onAfterFinishCleanup()
 		}
 	}
 }

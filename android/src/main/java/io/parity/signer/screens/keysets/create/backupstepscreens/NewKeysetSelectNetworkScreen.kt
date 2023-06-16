@@ -2,6 +2,7 @@ package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import SignerCheckbox
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,6 +68,7 @@ fun NewKeySetSelectNetworkScreen(
 		}
 	val networks = networksViewModel.getAllNetworks()
 
+	val context = LocalContext.current
 	val confirmBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
@@ -77,12 +80,19 @@ fun NewKeySetSelectNetworkScreen(
 	val scope = rememberCoroutineScope()
 
 	val onProceedAction = {
-		networksViewModel.createKeySetWithNetworks(
+		val isSuccess = networksViewModel.createKeySetWithNetworks(
 			seedName = model.seed, seedPhrase = model.seedPhrase,
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			navigator = navigator,
 		)
+		if (isSuccess) {
+			Toast.makeText(
+				context,
+				context.getText(R.string.key_set_has_been_created_toast),
+				Toast.LENGTH_LONG
+			).show()
+		}
 	}
 
 	BottomSheetWrapperContent(
