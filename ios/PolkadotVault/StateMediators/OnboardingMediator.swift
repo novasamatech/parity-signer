@@ -34,10 +34,12 @@ final class OnboardingMediator: ObservableObject {
     func onboard(verifierRemoved: Bool = false) {
         guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
-        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved)
-        seedsMediator.refreshSeeds()
-        onboardingDone = true
-        warningStateMediator.updateWarnings()
-        initialisationService.initialiseAppSession()
+        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] in
+            guard let self = self else { return }
+            seedsMediator.refreshSeeds()
+            onboardingDone = true
+            warningStateMediator.updateWarnings()
+            initialisationService.initialiseAppSession()
+        }
     }
 }
