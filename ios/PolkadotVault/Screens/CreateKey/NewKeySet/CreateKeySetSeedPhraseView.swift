@@ -113,16 +113,19 @@ extension CreateKeySetSeedPhraseView {
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
         private let service: CreateKeySetService
+        private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         init(
             dataModel: MNewSeedBackup,
             isPresented: Binding<Bool>,
             service: CreateKeySetService = CreateKeySetService(),
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.dataModel = dataModel
             self.service = service
             self.seedsMediator = seedsMediator
+            self.onCompletion = onCompletion
             _isPresented = isPresented
         }
 
@@ -137,8 +140,10 @@ extension CreateKeySetSeedPhraseView {
         func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
             .init(
                 seedName: dataModel.seed,
-                mode: .createKeySet(seedPhrase: dataModel.seedPhrase),
-                isPresented: $isPresented
+                seedPhrase: dataModel.seedPhrase,
+                mode: .createKeySet,
+                isPresented: $isPresented,
+                onCompletion: onCompletion
             )
         }
     }
@@ -157,7 +162,8 @@ extension CreateKeySetSeedPhraseView {
                         """,
                         identicon: .stubIdenticon
                     ),
-                    isPresented: .constant(true)
+                    isPresented: .constant(true),
+                    onCompletion: { _ in }
                 )
             )
         }
