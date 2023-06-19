@@ -97,13 +97,23 @@ struct KeySetList: View {
             isPresented: $viewModel.isShowingCreateKeySet,
             onDismiss: viewModel.updateData
         ) {
-            EnterKeySetNameView(viewModel: .init(isPresented: $viewModel.isShowingCreateKeySet))
+            EnterKeySetNameView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingCreateKeySet,
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
+                )
+            )
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingRecoverKeySet,
             onDismiss: viewModel.updateData
         ) {
-            RecoverKeySetNameView(viewModel: .init(isPresented: $viewModel.isShowingRecoverKeySet))
+            RecoverKeySetNameView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingRecoverKeySet,
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
+                )
+            )
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingMoreMenu
@@ -339,6 +349,22 @@ extension KeySetList {
 
         func onShowMoreTap() {
             isShowingMoreMenu.toggle()
+        }
+
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            let message: String
+            switch completionAction {
+            case let .createKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName),
+                 let .bananaSplitRecovery(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+            }
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
         }
     }
 }

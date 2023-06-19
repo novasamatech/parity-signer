@@ -189,6 +189,7 @@ extension RecoverKeySetSeedPhraseView {
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
         private let service: RecoverKeySetService
+        private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
         @Binding var isPresented: Bool
         @Published var isPresentingDetails: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
@@ -209,11 +210,13 @@ extension RecoverKeySetSeedPhraseView {
             content: MRecoverSeedPhrase,
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: RecoverKeySetService = RecoverKeySetService()
+            service: RecoverKeySetService = RecoverKeySetService(),
+            onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.content = content
             self.seedsMediator = seedsMediator
             self.service = service
+            self.onCompletion = onCompletion
             _isPresented = isPresented
             regenerateGrid()
         }
@@ -241,23 +244,17 @@ extension RecoverKeySetSeedPhraseView {
         }
 
         func onDoneTap() {
-            let seedPhrase = content.readySeed ?? ""
-            if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
-                presentableError = .seedPhraseAlreadyExists()
-                isPresentingError = true
-                return
-            }
-            seedsMediator.createSeed(
-                seedName: content.seedName,
-                seedPhrase: seedPhrase,
-                shouldCheckForCollision: false
-            )
-            service.finishKeySetRecover(seedPhrase)
             isPresentingDetails = true
         }
 
         func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
-            .init(seedName: content.seedName, mode: .recoverKeySet, isPresented: $isPresented)
+            .init(
+                seedName: content.seedName,
+                seedPhrase: content.readySeed ?? "",
+                mode: .recoverKeySet,
+                isPresented: $isPresented,
+                onCompletion: onCompletion
+            )
         }
     }
 }
