@@ -135,30 +135,14 @@ struct CameraView: View {
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
                 model.start()
-                // User entered invalid password too many times, present error
-                if viewModel.shouldPresentError {
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.isPresentingError = true }
-                    return
-                }
                 viewModel.clearTransactionState()
-
-                // User proceeded successfully with key recovery, dismiss camera
-                if viewModel.wasBananaSplitKeyRecovered {
-                    viewModel.dismissView()
-                    viewModel.onBananaSplitComplete()
-                }
             }
         ) {
-            EnterBananaSplitPasswordModal(
+            EnterBananaSplitPasswordView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
-                    isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
-                    isErrorPresented: $viewModel.shouldPresentError,
-                    presentableError: $viewModel.presentableError,
                     qrCodeData: $model.bucket,
-                    onComplete: $viewModel.onBananaSplitComplete
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
                 )
             )
         }
@@ -268,8 +252,6 @@ extension CameraView {
 
         // Banana split flow
         @Published var isPresentingEnterBananaSplitPassword: Bool = false
-        @Published var wasBananaSplitKeyRecovered: Bool = false
-        @Published var onBananaSplitComplete: () -> Void = {}
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -347,6 +329,7 @@ extension CameraView {
         }
 
         func presentBananaSplitPassword() {
+            isPresentingProgressSnackbar = false
             isPresentingEnterBananaSplitPassword = true
         }
 
@@ -385,6 +368,22 @@ extension CameraView {
                 }
                 isSnackbarPresented = true
             }
+        }
+
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            let message: String
+            switch completionAction {
+            case let .createKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName),
+                 let .bananaSplitRecovery(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+            }
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
         }
     }
 }

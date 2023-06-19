@@ -441,16 +441,17 @@
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";
 
-"EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
-"EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
-"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter Banana split password";
-"EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
-"EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
-"EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
-"EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
-"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
-"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
-"EnterBananaSplitPasswordModal.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
+"EnterBananaSplitPasswordView.Label.Title" = "Banana Split Recovery";
+"EnterBananaSplitPasswordView.Label.EnterName" = "Enter display name for recovered key set";
+"EnterBananaSplitPasswordView.Label.EnterPassword" = "Enter Banana split password";
+"EnterBananaSplitPasswordView.Placeholder.EnterName" = "Display name";
+"EnterBananaSplitPasswordView.Placeholder.EnterPassword" = "Password";
+"EnterBananaSplitPasswordView.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"EnterBananaSplitPasswordView.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
+"EnterBananaSplitPasswordView.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
+"EnterBananaSplitPasswordView.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
+"EnterBananaSplitPasswordView.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
+"EnterBananaSplitPasswordView.Action.Next" = "Next";
 
 "CreateDerivedKey.Label.Title" = "Select Network";
 "CreateDerivedKey.Label.Footer.Network" = "Learn more about How to Set up networks";
@@ -591,6 +592,8 @@
 "CreateKeysForNetwork.Modal.Content" = "Since you haven't selected any keys, you key set will be empty. Are you sure?";
 "CreateKeysForNetwork.Modal.Cancel" = "Cancel";
 "CreateKeysForNetwork.Modal.Done" = "Done";
+"CreateKeysForNetwork.Snackbar.KeySetCreated" = " %@ Key Set Has Been Added";
+"CreateKeysForNetwork.Snackbar.KeySetRecovered" = "%@ Key Set Has Been Recovered";
 
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";

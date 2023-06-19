@@ -49,6 +49,7 @@ final class CreateDerivedKeyService {
 
     func createDerivedKeys(
         _ seedName: String,
+        _ seedPhrase: String,
         networks: [MmNetwork],
         completion: @escaping (Result<Void, CreateDerivedKeyError>) -> Void
     ) {
@@ -57,7 +58,6 @@ final class CreateDerivedKeyService {
         var occuredErrors: [(network: MmNetwork, error: String)] = []
         callQueue.async {
             let result: Result<Void, CreateDerivedKeyError>
-            let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
             pathAndNetworks.forEach {
                 do {
                     try tryCreateAddress(
