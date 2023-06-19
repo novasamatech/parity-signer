@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 hex = "0.4.3"
-parity-scale-codec = "3.5.0"
+parity-scale-codec = "3.6.0"
 zeroize = { version = "1.6.0", features = ["std"] }
 
 definitions = { path = "../definitions", default-features = false }
