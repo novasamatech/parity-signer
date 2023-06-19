@@ -407,6 +407,10 @@
 	<string name="keyset_recover_keys_notification_text">Please note that only root keys will be added on this step. If you key set has keys with customly added derivation path name, please restore them separately from the recovered key set screen.</string>
 	<string name="key_set_no_networks_title">Proceed with the Empty Key Set?</string>
 	<string name="key_set_no_networks_subtitle">"Since you haven't selected any keys, you key set will be empty. Are you sure? "</string>
+	<string name="add_network_add_keys_title">Create Key for the %1$s Network?</string>
+	<string name="add_network_add_keys_cta">Create Key</string>
+	<string name="add_network_add_keys_list_title">Create Key for the %1$s Network</string>
+	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
 
 </resources>
 

@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,14 +24,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -49,8 +44,6 @@ fun BananaSplitPasswordScreen(
 	val wrongPassword = bananaViewModel.wrongPasswordCurrent.collectAsState()
 
 
-
-	val context = LocalContext.current
 	BananaSplitPasswordInternal(
 		onClose = onClose,
 		name = name,
