@@ -93,7 +93,8 @@ private fun AddNetworkAddKeysBottomSheet(
 				),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
-				modifier = Modifier.padding(horizontal = 24.dp),
+				modifier = Modifier.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 24.dp),
 			)
 			Text(
 				text = stringResource(R.string.add_network_add_keys_list_subtitle),
@@ -104,7 +105,7 @@ private fun AddNetworkAddKeysBottomSheet(
 			)
 			Column(
 				modifier = Modifier
-					.padding(horizontal = 8.dp, vertical = 16.dp)
+					.padding(8.dp)
 					.background(
 						MaterialTheme.colors.fill6,
 						RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
@@ -120,11 +121,6 @@ private fun AddNetworkAddKeysBottomSheet(
 				}
 				KeysetItemMultiselectAll(onAddAll)
 			}
-			NotificationFrameText(
-				message = stringResource(R.string.keyset_recover_keys_notification_text),
-				modifier = Modifier
-					.padding(horizontal = 16.dp)
-			)
 		}
 		PrimaryButtonWide(
 			label = stringResource(R.string.generic_done),
@@ -149,8 +145,15 @@ private fun KeysetItemMultiselect(
 			text = keyset,
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
+			modifier = Modifier
+				.weight(1f)
+				.padding(
+					top = 16.dp,
+					bottom = 16.dp,
+					start = 16.dp,
+					end = 12.dp,
+				)
 		)
-		Spacer(modifier = Modifier.weight(1f))
 		SignerCheckbox(
 			isChecked = isSelected,
 			modifier = Modifier.padding(end = 8.dp),
