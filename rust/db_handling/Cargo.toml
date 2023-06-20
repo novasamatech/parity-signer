@@ -12,7 +12,7 @@ defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
 hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
-parity-scale-codec = {version = "3.5.0", features = ["derive"]}
+parity-scale-codec = {version = "3.6.1", features = ["derive"]}
 plot_icon = {version = "0.3.0", default-features = false, features = ["pix"]}
 regex = "1.8.4"
 sled = "0.34.6"
