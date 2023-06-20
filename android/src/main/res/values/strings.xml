@@ -411,6 +411,7 @@
 	<string name="add_network_add_keys_cta">Create Key</string>
 	<string name="add_network_add_keys_list_title">Create Key for the %1$s Network</string>
 	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
+	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
 
 </resources>
 

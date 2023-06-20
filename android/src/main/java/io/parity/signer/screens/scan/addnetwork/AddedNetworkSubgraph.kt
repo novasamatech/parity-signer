@@ -1,19 +1,17 @@
 package io.parity.signer.screens.scan.addnetwork
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 
@@ -23,13 +21,6 @@ fun AddedNetworkSubgraph(
 	onClose: Callback
 ) {
 	val viewModel: AddedNetworkViewModel = viewModel()
-
-	Box(
-		modifier = Modifier
-            .fillMaxSize(1f)
-            .statusBarsPadding()
-            .background(MaterialTheme.colors.background)
-	)
 
 	val navController = rememberNavController()
 	NavHost(
@@ -51,12 +42,27 @@ fun AddedNetworkSubgraph(
 			BackHandler(onBack = onClose)
 		}
 		composable(AddedNetworkNavigationSubgraph.AddedNetworkNavigationAllKeysets) {
+			val context = LocalContext.current
 			BottomSheetWrapperRoot(onClosedAction = onClose) {
 				AddNetworkAddKeysBottomSheet(
 					networkTitle = networkAdded.title,
-					seeds = emptyList(),//todo dmitry get from viewmodel
+					seeds = viewModel.getSeedList(),
 					onCancel = onClose,
-					onDone = {},//todo dmitry implement
+					onDone = { seeds ->
+						val isSuccess = viewModel.processAddNetworkToSeeds(
+							networkAdded,
+							seeds
+						)
+						if (isSuccess) {
+							Toast.makeText(
+								context,
+								context.getString(R.string.add_network_add_keys_success_message),
+								Toast.LENGTH_SHORT
+							).show()
+						} else {
+							submitErrorState("Error in add networks - this is unexpected")
+						}
+					},
 				)
 			}
 			BackHandler(onBack = onClose)

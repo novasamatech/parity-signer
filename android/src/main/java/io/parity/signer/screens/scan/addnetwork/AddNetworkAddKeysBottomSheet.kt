@@ -16,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,29 +37,29 @@ fun AddNetworkAddKeysBottomSheet(
 	networkTitle: String,
 	seeds: List<String>,
 	onCancel: Callback,
-	onDone: (keys: List<String>) -> Unit,
+	onDone: (seeds: List<String>) -> Unit,
 ) {
-	val selected = remember { mutableStateOf(mutableSetOf<String>()) }
+	var selected = remember { mutableSetOf<String>() }
 	AddNetworkAddKeysBottomSheet(
 		networkTitle = networkTitle,
 		seeds = seeds,
-		selectedSeeds = selected.value,
+		selectedSeeds = selected,
 		onAddKeyset = { keyset ->
-			if (selected.value.contains(keyset)) {
-				selected.value.remove(keyset)
+			if (selected.contains(keyset)) {
+				selected.remove(keyset)
 			} else {
-				selected.value.add(keyset)
+				selected.add(keyset)
 			}
 		},
 		onAddAll = {
-			if (selected.value.size >= seeds.size) {
-				selected.value = mutableSetOf()
+			if (selected.size >= seeds.size) {
+				selected = mutableSetOf()
 			} else {
-				selected.value = seeds.toMutableSet()
+				selected = seeds.toMutableSet()
 			}
 		},
 		onCancel = onCancel,
-		onDone = {},
+		onDone = { onDone(selected.toList()) },
 	)
 }
 
@@ -80,8 +79,8 @@ private fun AddNetworkAddKeysBottomSheet(
 	) {
 		Column(
 			modifier = Modifier
-				.weight(1f, fill = false)
-				.verticalScroll(rememberScrollState()),
+                .weight(1f, fill = false)
+                .verticalScroll(rememberScrollState()),
 		) {
 			Text(
 				text = stringResource(
@@ -91,8 +90,8 @@ private fun AddNetworkAddKeysBottomSheet(
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(top = 32.dp, bottom = 24.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 32.dp, bottom = 24.dp),
 			)
 			Text(
 				text = stringResource(R.string.add_network_add_keys_list_subtitle),
@@ -103,11 +102,11 @@ private fun AddNetworkAddKeysBottomSheet(
 			)
 			Column(
 				modifier = Modifier
-					.padding(8.dp)
-					.background(
-						MaterialTheme.colors.fill6,
-						RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-					)
+                    .padding(8.dp)
+                    .background(
+                        MaterialTheme.colors.fill6,
+                        RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+                    )
 			) {
 				seeds.forEach { keyset ->
 					KeysetItemMultiselect(
@@ -147,13 +146,13 @@ private fun KeysetItemMultiselect(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-				.weight(1f)
-				.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp,
-				)
+                .weight(1f)
+                .padding(
+                    top = 16.dp,
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 12.dp,
+                )
 		)
 		SignerCheckbox(
 			isChecked = isSelected,
@@ -172,10 +171,10 @@ private fun KeysetItemMultiselectAll(
 ) {
 	Row(
 		modifier = Modifier
-			.clickable(onClick = onClick)
-			.height(68.dp)
-			.padding(horizontal = 16.dp)
-			.fillMaxWidth(1f),
+            .clickable(onClick = onClick)
+            .height(68.dp)
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(1f),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
@@ -202,12 +201,17 @@ private fun PreviewAddNetworkAddKeysBottomSheet() {
 	SignerNewTheme {
 		AddNetworkAddKeysBottomSheet(
 			networkTitle = "Ascend",
-				seeds = listOf("My special key", "Special", "Main", "Very very very very very vey vcey vey very vey long keyset"),
-				selectedSeeds = setOf("Special"),
-				onAddKeyset = {},
-				onAddAll = {},
-				onCancel = {},
-				onDone = {},
+			seeds = listOf(
+				"My special key",
+				"Special",
+				"Main",
+				"Very very very very very vey vcey vey very vey long keyset"
+			),
+			selectedSeeds = setOf("Special"),
+			onAddKeyset = {},
+			onAddAll = {},
+			onCancel = {},
+			onDone = {},
 		)
 	}
 }
@@ -228,11 +232,26 @@ private fun PreviewAddNetworkAddKeysBottomSheetVeryLong() {
 	SignerNewTheme {
 		AddNetworkAddKeysBottomSheet(
 			networkTitle = "Ascend",
-			seeds = listOf("My special key", "Special", "Main",
-				"Very very very very very vey vcey vey very vey long keyset", "some more",
-				"some more","some more","some more","some more","some more","some more",
-				"some more","some more","some more","some more","some more","some more",),
-			selectedSeeds = setOf("Special"),
+			seeds = listOf(
+				"My special key",
+				"Special",
+				"Main",
+				"Very very very very very vey vcey vey very vey long keyset",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+				"some more",
+			),
+			selectedSeeds = setOf(),
 			onAddKeyset = {},
 			onAddAll = {},
 			onCancel = {},
