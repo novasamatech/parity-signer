@@ -13,6 +13,7 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -49,18 +50,20 @@ fun AddedNetworkSubgraph(
 					seeds = viewModel.getSeedList(),
 					onCancel = onClose,
 					onDone = { seeds ->
-						val isSuccess = viewModel.processAddNetworkToSeeds(
-							networkAdded,
-							seeds
-						)
-						if (isSuccess) {
-							Toast.makeText(
-								context,
-								context.getString(R.string.add_network_add_keys_success_message),
-								Toast.LENGTH_SHORT
-							).show()
-						} else {
-							submitErrorState("Error in add networks - this is unexpected")
+						runBlocking {
+							val isSuccess = viewModel.processAddNetworkToSeeds(
+								networkAdded,
+								seeds,
+							)
+							if (isSuccess) {
+								Toast.makeText(
+									context,
+									context.getString(R.string.add_network_add_keys_success_message),
+									Toast.LENGTH_SHORT
+								).show()
+							} else {
+								submitErrorState("Error in add networks - this is unexpected")
+							}
 						}
 					},
 				)
