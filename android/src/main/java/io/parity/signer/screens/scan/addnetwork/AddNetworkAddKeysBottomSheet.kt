@@ -80,6 +80,7 @@ private fun AddNetworkAddKeysBottomSheet(
 	) {
 		Column(
 			modifier = Modifier
+				.weight(1f, fill = false)
 				.verticalScroll(rememberScrollState()),
 		) {
 			Text(
@@ -207,6 +208,35 @@ private fun PreviewAddNetworkAddKeysBottomSheet() {
 				onAddAll = {},
 				onCancel = {},
 				onDone = {},
+		)
+	}
+}
+
+
+@SuppressLint("UnrememberedMutableState")
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewAddNetworkAddKeysBottomSheetVeryLong() {
+	SignerNewTheme {
+		AddNetworkAddKeysBottomSheet(
+			networkTitle = "Ascend",
+			seeds = listOf("My special key", "Special", "Main",
+				"Very very very very very vey vcey vey very vey long keyset", "some more",
+				"some more","some more","some more","some more","some more","some more",
+				"some more","some more","some more","some more","some more","some more",),
+			selectedSeeds = setOf("Special"),
+			onAddKeyset = {},
+			onAddAll = {},
+			onCancel = {},
+			onDone = {},
 		)
 	}
 }
