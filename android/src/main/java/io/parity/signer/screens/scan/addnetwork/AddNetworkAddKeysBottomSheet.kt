@@ -7,8 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,8 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.NotificationFrameText
-import io.parity.signer.components.base.PrimaryButtonWide
+import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -79,7 +76,6 @@ private fun AddNetworkAddKeysBottomSheet(
 ) {
 	Column(
 		modifier = Modifier
-			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 	) {
 		Column(
@@ -93,7 +89,8 @@ private fun AddNetworkAddKeysBottomSheet(
 				),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
-				modifier = Modifier.padding(horizontal = 24.dp)
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
 					.padding(top = 32.dp, bottom = 24.dp),
 			)
 			Text(
@@ -122,10 +119,13 @@ private fun AddNetworkAddKeysBottomSheet(
 				KeysetItemMultiselectAll(onAddAll)
 			}
 		}
-		PrimaryButtonWide(
-			label = stringResource(R.string.generic_done),
+		RowButtonsBottomSheet(
+			labelCancel = stringResource(R.string.generic_cancel),
+			labelCta = stringResource(R.string.add_network_add_keys_cta),
+			onClickedCancel = onCancel,
+			onClickedCta = onDone,
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-			onClicked = onDone,
+			isCtaEnabled = selectedSeeds.isNotEmpty()
 		)
 	}
 }

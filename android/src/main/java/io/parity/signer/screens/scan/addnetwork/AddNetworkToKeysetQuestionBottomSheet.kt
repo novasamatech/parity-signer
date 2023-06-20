@@ -20,7 +20,7 @@ import io.parity.signer.ui.theme.*
 
 
 @Composable
-fun AddNetworkToKeysetBottomSheet(
+fun AddNetworkToKeysetQuestionBottomSheet(
 	networkModel: NetworkModel,
 	onConfirm: Callback,
 	onCancel: Callback,
@@ -77,6 +77,6 @@ fun AddNetworkToKeysetBottomSheet(
 private fun PreviewAddNetworkToKeysetBottomSheet() {
 	SignerNewTheme {
 		val network = NetworkModel.createStub()
-		AddNetworkToKeysetBottomSheet(network, {}, {})
+		AddNetworkToKeysetQuestionBottomSheet(network, {}, {})
 	}
 }
