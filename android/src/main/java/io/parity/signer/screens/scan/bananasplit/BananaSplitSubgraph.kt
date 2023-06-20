@@ -74,12 +74,6 @@ fun BananaSplitSubgraph(
 		navController = navController,
 		startDestination = BananaSplitNavigationSubgraph.BananaSplitNavigationPassword,
 	) {
-		val onProceedFromBackupInitial =
-			{ //to cache so screen can be taked from caches during navigation
-				navController.navigate(
-					BananaSplitNavigationSubgraph.BananaSplitNavigationNetworks
-				)
-			}
 		composable(BananaSplitNavigationSubgraph.BananaSplitNavigationPassword) {
 			BananaSplitPasswordScreen(
 				onClose = onClose,
@@ -104,7 +98,7 @@ fun BananaSplitSubgraph(
 }
 
 
-internal object BananaSplitNavigationSubgraph {
+private object BananaSplitNavigationSubgraph {
 	const val BananaSplitNavigationPassword = "banana_split_step_password"
 	const val BananaSplitNavigationNetworks = "banana_split_step_networks"
 }
