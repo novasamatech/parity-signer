@@ -81,7 +81,7 @@ struct Snackbar: View {
         .background(viewModel.style.tintColor)
         .cornerRadius(CornerRadius.small)
         .padding([.top, .bottom])
-        .padding([.leading, .trailing], Spacing.extraSmall)
+        .padding(.horizontal, Spacing.extraSmall)
     }
 }
 

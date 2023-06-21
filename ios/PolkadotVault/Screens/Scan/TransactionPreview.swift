@@ -168,7 +168,7 @@ struct TransactionPreview: View {
             }
             if ![.done, .sign, .read].contains(transactionType) {
                 EmptyButton(
-                    action: viewModel.onCancelTap,
+                    action: viewModel.onCancelTap(),
                     text: Localizable.TransactionPreview.Action.cancel.key
                 )
             }

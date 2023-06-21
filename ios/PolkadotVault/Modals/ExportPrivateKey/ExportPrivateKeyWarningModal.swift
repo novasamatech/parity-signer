@@ -41,13 +41,11 @@ struct ExportPrivateKeyWarningModal: View {
                         text: Localizable.KeyExportWarning.Action.export.key
                     )
                     EmptyButton(
-                        action: {
-                            animateDismissal()
-                        },
+                        action: animateDismissal(),
                         text: Localizable.KeyExportWarning.Action.cancel.key
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.medium)
             }
         )

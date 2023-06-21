@@ -63,12 +63,12 @@ struct FullScreenRoundedModal<Content: View>: View {
                 }
             // Modal content
             VStack(alignment: .leading, spacing: 0) {
-                Spacer().frame(height: Spacing.topSafeAreaSpacing)
+                Spacer().frame(height: Spacing.topSafeAreaSpacing + safeAreaInsets.top)
                     .background(animateBackground ? Color.black.opacity(0.5) : .clear)
                     .onTapGesture(perform: backgroundTapAction)
                 VStack(alignment: .leading, spacing: Spacing.medium, content: content)
                     .padding(.top, Spacing.medium)
-                    .padding([.leading, .trailing], 0)
+                    .padding(.horizontal, 0)
                     .padding(.bottom, safeAreaInsetsMode.inset(safeAreaInsets.bottom))
                     .background(Asset.backgroundTertiary.swiftUIColor)
                     .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])

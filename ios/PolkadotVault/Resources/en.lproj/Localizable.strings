@@ -595,5 +595,17 @@
 "CreateKeysForNetwork.Snackbar.KeySetCreated" = " %@ Key Set Has Been Added";
 "CreateKeysForNetwork.Snackbar.KeySetRecovered" = "%@ Key Set Has Been Recovered";
 
+"AddKeysForNetworkModal.Label.Title" = "Create Key for the %@ Network?";
+"AddKeysForNetworkModal.Action.Accept" = "Create Key";
+"AddKeysForNetworkModal.Action.Cancel" = "Cancel";
+"SelectKeySetsForNetworkKey.Label.Title" = "Create key for the %@ Network";
+"SelectKeySetsForNetworkKey.Label.Content" = "Select Key Set for the derived key to be created";
+"SelectKeySetsForNetworkKey.Action.SelectAll" = "Select All";
+"SelectKeySetsForNetworkKey.Action.Cancel" = "Cancel";
+"SelectKeySetsForNetworkKey.Action.Create" = "Create Key";
+"SelectKeySetsForNetworkKey.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
+"SelectKeySetsForNetworkKey.Error.NoNetwork" = "Network could not be retrieved";
+"SelectKeySetsForNetworkKey.Snackbar.KeysCreated" = "Derived Keys have been created";
+
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";

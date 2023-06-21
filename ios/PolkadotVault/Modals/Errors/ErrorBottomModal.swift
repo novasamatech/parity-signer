@@ -97,14 +97,14 @@ struct ErrorBottomModal: View {
                         }
                         if let tertiaryAction = viewModel.tertiaryAction {
                             EmptyButton(
-                                action: { animateDismissal(tertiaryAction.action()) },
+                                action: animateDismissal(tertiaryAction.action()),
                                 text: tertiaryAction.label
                             )
                         }
                     }
                     .padding(.top, Spacing.medium)
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding([.top, .bottom], Spacing.extraSmall)
                 .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }

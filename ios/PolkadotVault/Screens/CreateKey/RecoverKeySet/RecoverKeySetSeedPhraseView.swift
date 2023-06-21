@@ -147,7 +147,7 @@ struct RecoverKeySetSeedPhraseView: View {
             .foregroundColor(Asset.accentPink300.swiftUIColor)
             .font(PrimaryFont.labelS.font)
             .padding([.top, .bottom], Spacing.extraSmall)
-            .padding([.leading, .trailing], Spacing.small)
+            .padding(.horizontal, Spacing.small)
             .background(Asset.accentPink12.swiftUIColor)
             .clipShape(Capsule())
             .onTapGesture {

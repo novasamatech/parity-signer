@@ -26,6 +26,25 @@ enum CreateDerivedKeyError: Error {
     }
 }
 
+enum CreateDerivedKeyForKeySetsError: Error {
+    case noNetwork
+    case keysNotCreated([(seedName: String, error: String)])
+
+    var localizedDescription: String {
+        switch self {
+        case let .keysNotCreated(seedNamesWithErrors):
+            return seedNamesWithErrors.reduce(into: "") {
+                $0 += (
+                    Localizable.SelectKeySetsForNetworkKey.Error
+                        .derivedKeyForNetwork($1.seedName, $1.error) + "\n"
+                )
+            }
+        case .noNetwork:
+            return Localizable.SelectKeySetsForNetworkKey.Error.noNetwork.string
+        }
+    }
+}
+
 final class CreateDerivedKeyService {
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
@@ -132,6 +151,46 @@ final class CreateDerivedKeyService {
                 result = .success(())
             } catch {
                 result = .failure(error)
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
+    func createDerivedKeyForKeySets(
+        _ seedNames: [String],
+        _ networkName: String,
+        _ completion: @escaping (Result<Void, CreateDerivedKeyForKeySetsError>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<Void, CreateDerivedKeyForKeySetsError>
+            let seeds = self.seedsMediator.getSeeds(seedNames: Set(seedNames))
+            var occuredErrors: [(seedName: String, error: String)] = []
+
+            guard let network = try? getAllNetworks()
+                .first(where: { $0.title == networkName }) else {
+                result = .failure(.noNetwork)
+                return
+            }
+            seeds.forEach {
+                do {
+                    try tryCreateAddress(
+                        seedName: $0.key,
+                        seedPhrase: $0.value,
+                        path: network.pathId,
+                        network: network.key
+                    )
+                } catch let displayedError as ErrorDisplayed {
+                    occuredErrors.append((seedName: $0.key, error: displayedError.localizedDescription))
+                } catch {
+                    occuredErrors.append((seedName: $0.key, error: error.localizedDescription))
+                }
+            }
+            if occuredErrors.isEmpty {
+                result = .success(())
+            } else {
+                result = .failure(.keysNotCreated(occuredErrors))
             }
             self.callbackQueue.async {
                 completion(result)
