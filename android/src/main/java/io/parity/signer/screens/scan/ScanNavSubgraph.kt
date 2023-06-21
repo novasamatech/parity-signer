@@ -115,6 +115,7 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
+						//todo dmitry in this case show add network dialogue
 					}
 					is TransactionPreviewType.Metadata -> {
 						Toast.makeText(

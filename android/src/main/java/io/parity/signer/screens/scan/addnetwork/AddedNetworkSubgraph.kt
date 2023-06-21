@@ -61,6 +61,7 @@ fun AddedNetworkSubgraph(
 									context.getString(R.string.add_network_add_keys_success_message),
 									Toast.LENGTH_SHORT
 								).show()
+								onClose()
 							} else {
 								submitErrorState("Error in add networks - this is unexpected")
 							}
