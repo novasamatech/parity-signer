@@ -115,6 +115,8 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
+						scanViewModel.clearState()
+						rootNavigator.navigate(Action.GO_FORWARD)
 						//todo dmitry in this case show add network dialogue
 					}
 					is TransactionPreviewType.Metadata -> {
@@ -127,13 +129,15 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
+						scanViewModel.clearState()
+						rootNavigator.navigate(Action.GO_FORWARD)
 					}
 					else -> {
 						//nothing
+						scanViewModel.clearState()
+						rootNavigator.navigate(Action.GO_FORWARD)
 					}
 				}
-				scanViewModel.clearState()
-				rootNavigator.navigate(Action.GO_FORWARD)
 			},
 			onImportKeys = {
 				scanViewModel.onImportKeysTap(transactionsValue, context)
