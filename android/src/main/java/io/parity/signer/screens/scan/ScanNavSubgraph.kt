@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
+import io.parity.signer.screens.scan.addnetwork.AddedNetworkSubgraph
 import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
@@ -43,6 +45,8 @@ fun ScanNavSubgraph(
 	val transactionError = scanViewModel.transactionError.collectAsState()
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
+
+	var addedNetworkName: String? = remember {null}
 
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
@@ -115,9 +119,8 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
-						scanViewModel.clearState()
-						rootNavigator.navigate(Action.GO_FORWARD)
 						//todo dmitry in this case show add network dialogue
+						addedNetworkName = previewType.network
 					}
 					is TransactionPreviewType.Metadata -> {
 						Toast.makeText(
@@ -129,15 +132,17 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
-						scanViewModel.clearState()
-						rootNavigator.navigate(Action.GO_FORWARD)
 					}
 					else -> {
 						//nothing
-						scanViewModel.clearState()
-						rootNavigator.navigate(Action.GO_FORWARD)
 					}
 				}
+				//finally clear transaction state and stay in scan screen
+				scanViewModel.clearState()
+				val fakeNavigator = FakeNavigator()
+				fakeNavigator.navigate(Action.GO_FORWARD)
+				fakeNavigator.navigate(Action.START)
+				fakeNavigator.navigate(Action.NAVBAR_SCAN)
 			},
 			onImportKeys = {
 				scanViewModel.onImportKeysTap(transactionsValue, context)
@@ -170,6 +175,14 @@ fun ScanNavSubgraph(
 				},
 			)
 		}
+	} ?: addedNetworkName?.let {addedNetwork ->
+		AddedNetworkSubgraph(
+			networkNameAdded = addedNetwork,
+				onClose = {
+					addedNetworkName = null
+					//todo navigation for it?
+				}
+		)
 	} ?: if (errorWrongPassword.value) {
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			WrongPasswordBottomSheet(
