@@ -131,6 +131,7 @@ struct SelectKeySetsForNetworkKeyView: View {
 
 extension SelectKeySetsForNetworkKeyView {
     enum OnCompletionAction: Equatable {
+        case onCancel
         case onDerivedKeysCreated
     }
 
@@ -182,6 +183,7 @@ extension SelectKeySetsForNetworkKeyView {
         }
 
         func onCancelTap() {
+            onCompletion(.onCancel)
             isPresented = false
         }
 

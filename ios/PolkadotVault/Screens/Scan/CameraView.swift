@@ -9,7 +9,7 @@ import AVFoundation
 import SwiftUI
 
 struct CameraView: View {
-    @StateObject var model = CameraService()
+    @StateObject var model: CameraService = CameraService()
     @StateObject var viewModel: ViewModel
     @StateObject var progressViewModel: ProgressSnackbarViewModel = ProgressSnackbarViewModel()
     @Environment(\.safeAreaInsets) private var safeAreaInsets
@@ -97,6 +97,7 @@ struct CameraView: View {
                 .compositingGroup()
             }
             .onAppear {
+                viewModel.use(cameraModel: model)
                 progressViewModel.title = Localizable.Scanner.Label.multipart.string
                 progressViewModel.cancelActionTitle = Localizable.Scanner.Action.cancel.string
                 progressViewModel.cancelAction = {
@@ -116,12 +117,7 @@ struct CameraView: View {
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingTransactionPreview,
-            onDismiss: {
-                model.multipleTransactions = []
-                model.start()
-                viewModel.clearTransactionState()
-            }
+            isPresented: $viewModel.isPresentingTransactionPreview
         ) {
             TransactionPreview(
                 viewModel: .init(
@@ -284,6 +280,8 @@ extension CameraView {
         private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
 
+        private weak var cameraModel: CameraService?
+
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
@@ -296,6 +294,10 @@ extension CameraView {
 
         func onAppear() {
             scanService.startQRScan()
+        }
+
+        func use(cameraModel: CameraService) {
+            self.cameraModel = cameraModel
         }
 
         func checkForTransactionNavigation(_ payload: String?) {
@@ -360,6 +362,7 @@ extension CameraView {
             isPresentingTransactionPreview = false
             switch completionAction {
             case .onImportKeysFailure:
+                resumeCamera()
                 snackbarViewModel = .init(
                     title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
                     style: .warning
@@ -375,12 +378,14 @@ extension CameraView {
                     self.isPresentingAddKeysForNetwork = true
                 }
             case let .onNetworkMetadataAdded(network, metadataVersion):
+                resumeCamera()
                 snackbarViewModel = .init(
                     title: Localizable.TransactionSign.Snackbar.metadata(network, metadataVersion),
                     style: .info
                 )
                 isSnackbarPresented = true
             case let .onDerivedKeysImport(derivedKeysCount):
+                resumeCamera()
                 if derivedKeysCount == 1 {
                     snackbarViewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
                 } else {
@@ -390,6 +395,10 @@ extension CameraView {
                     )
                 }
                 isSnackbarPresented = true
+            case .onDone:
+                resumeCamera()
+            case .onDismissal:
+                resumeCamera()
             }
         }
 
@@ -435,14 +444,18 @@ extension CameraView {
             case .cancel:
                 shouldPresentKeySetSelection = false
                 networkName = nil
+                resumeCamera()
             case .create:
                 shouldPresentKeySetSelection = true
             }
         }
 
         func onAddKeysDismissal() {
-            guard shouldPresentKeySetSelection else { return }
-            isPresentingKeySetSelection = true
+            if shouldPresentKeySetSelection {
+                isPresentingKeySetSelection = true
+            } else {
+                resumeCamera()
+            }
         }
 
         func onSelectKeySetsForNetworkCompletion(_ onComplete: SelectKeySetsForNetworkKeyView.OnCompletionAction) {
@@ -454,7 +467,16 @@ extension CameraView {
                 )
                 isSnackbarPresented = true
                 networkName = nil
+            case .onCancel:
+                ()
             }
+            resumeCamera()
+        }
+
+        private func resumeCamera() {
+            cameraModel?.multipleTransactions = []
+            cameraModel?.start()
+            clearTransactionState()
         }
     }
 }
