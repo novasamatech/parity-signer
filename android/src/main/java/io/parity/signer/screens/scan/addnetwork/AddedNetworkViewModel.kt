@@ -43,7 +43,10 @@ class AddedNetworkViewModel : ViewModel() {
 		var result = true
 		val seedPairs = repository.fillSeedToPhrasesAuth(seeds)
 		when (seedPairs) {
-			is RepoResult.Failure -> TODO() //todo dmitry implement
+			is RepoResult.Failure -> {
+				result = false
+				submitErrorState("failed to add network to seeds with error ${seedPairs.error}")
+			}
 			is RepoResult.Success -> seedPairs.result.forEach { seedPair ->
 				try {
 					tryCreateAddress(
