@@ -57,7 +57,7 @@ struct CameraView: View {
                                 isPressed: $model.isTorchOn
                             )
                         }
-                        .padding([.leading, .trailing], Spacing.medium)
+                        .padding(.horizontal, Spacing.medium)
                         .padding(.top, Spacing.medium + safeAreaInsets.top)
                         Spacer()
                         // Camera cutout
@@ -71,7 +71,7 @@ struct CameraView: View {
                                         .padding(-Spacing.extraExtraSmall)
                                 )
                         }
-                        .padding([.leading, .trailing], Spacing.medium)
+                        .padding(.horizontal, Spacing.medium)
                         Spacer()
                         // Text description
                         VStack(alignment: .center, spacing: Spacing.small) {
@@ -149,28 +149,12 @@ struct CameraView: View {
         .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
-                // Clear password modal state no matter what
-                defer { viewModel.enterPassword = nil }
-
-                // User forgot password
-                if viewModel.shouldPresentError {
-                    viewModel.presentableError = .signingForgotPassword()
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.isPresentingError = true }
-                    return
+                viewModel.onEnterPasswordDismissal()
+                if !viewModel.shouldPresentError, viewModel.signature == nil {
+                    // Dismissed by user
+                    model.payload = nil
+                    model.start()
                 }
-                // User entered valid password, signature is ready
-                if viewModel.signature != nil {
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.continueWithSignature() }
-                    return
-                }
-                // Dismissed by user
-                model.payload = nil
-                model.start()
-                viewModel.clearTransactionState()
             }
         ) {
             EnterPasswordModal(
@@ -194,6 +178,27 @@ struct CameraView: View {
             ErrorBottomModal(
                 viewModel: viewModel.presentableError,
                 isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddKeysForNetwork,
+            onDismiss: viewModel.onAddKeysDismissal
+        ) {
+            AddKeysForNetworkModal(
+                viewModel: .init(
+                    networkName: viewModel.networkName,
+                    isPresented: $viewModel.isPresentingAddKeysForNetwork,
+                    onCompletion: viewModel.onAddKeysCompletion(_:)
+                )
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingKeySetSelection
+        ) {
+            SelectKeySetsForNetworkKeyView(
+                viewModel: selectKeySetsForNetworkViewModel()
             )
             .clearModalBackground()
         }
@@ -233,6 +238,14 @@ struct CameraView: View {
         ).string
         return key.signMultiple(model.multipleTransactions.count, suffix)
     }
+
+    func selectKeySetsForNetworkViewModel() -> SelectKeySetsForNetworkKeyView.ViewModel {
+        .init(
+            networkName: viewModel.networkName,
+            isPresented: $viewModel.isPresentingKeySetSelection,
+            onCompletion: viewModel.onSelectKeySetsForNetworkCompletion(_:)
+        )
+    }
 }
 
 extension CameraView {
@@ -252,6 +265,12 @@ extension CameraView {
 
         // Banana split flow
         @Published var isPresentingEnterBananaSplitPassword: Bool = false
+
+        // Create Keys for network
+        @Published var isPresentingAddKeysForNetwork: Bool = false
+        @Published var shouldPresentKeySetSelection: Bool = false
+        @Published var isPresentingKeySetSelection: Bool = false
+        var networkName: String!
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -351,6 +370,10 @@ extension CameraView {
                     style: .info
                 )
                 isSnackbarPresented = true
+                networkName = network
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.isPresentingAddKeysForNetwork = true
+                }
             case let .onNetworkMetadataAdded(network, metadataVersion):
                 snackbarViewModel = .init(
                     title: Localizable.TransactionSign.Snackbar.metadata(network, metadataVersion),
@@ -384,6 +407,54 @@ extension CameraView {
                 style: .info
             )
             isSnackbarPresented = true
+        }
+
+        func onEnterPasswordDismissal() {
+            // User forgot password
+            if shouldPresentError {
+                presentableError = .signingForgotPassword()
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                // async
+                DispatchQueue.main.async { self.isPresentingError = true }
+                return
+            }
+            // User entered valid password, signature is ready
+            if signature != nil {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                // async
+                DispatchQueue.main.async { self.continueWithSignature() }
+                return
+            }
+            // Dismissed by user
+            clearTransactionState()
+            enterPassword = nil
+        }
+
+        func onAddKeysCompletion(_ onCompletion: AddKeysForNetworkModal.OnCompletionAction) {
+            switch onCompletion {
+            case .cancel:
+                shouldPresentKeySetSelection = false
+                networkName = nil
+            case .create:
+                shouldPresentKeySetSelection = true
+            }
+        }
+
+        func onAddKeysDismissal() {
+            guard shouldPresentKeySetSelection else { return }
+            isPresentingKeySetSelection = true
+        }
+
+        func onSelectKeySetsForNetworkCompletion(_ onComplete: SelectKeySetsForNetworkKeyView.OnCompletionAction) {
+            switch onComplete {
+            case .onDerivedKeysCreated:
+                snackbarViewModel = .init(
+                    title: Localizable.SelectKeySetsForNetworkKey.Snackbar.keysCreated.string,
+                    style: .info
+                )
+                isSnackbarPresented = true
+                networkName = nil
+            }
         }
     }
 }
