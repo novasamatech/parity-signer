@@ -1,5 +1,6 @@
 package io.parity.signer.domain
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
@@ -34,6 +35,8 @@ interface Navigator {
 	fun navigate(action: LocalNavRequest)
 
 	fun backAction()
+
+	fun resetNavigationState(context: Context)
 }
 
 
@@ -121,6 +124,11 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 		}
 	}
 
+	override fun resetNavigationState(context: Context) {
+		val allNames = singleton.seedStorage.getSeedNames()
+		initNavigation(context.getDbNameFromContext(), allNames.toList())
+	}
+
 	private fun backRustNavigation() {
 		val lastRustNavAction = singleton.actionResult.value
 		if (lastRustNavAction == null) {
@@ -153,6 +161,9 @@ class EmptyNavigator : Navigator {
 
 	override fun backAction() {
 	}
+
+	override fun resetNavigationState(context: Context) {
+	}
 }
 
 class FakeNavigator : Navigator {
@@ -171,6 +182,11 @@ class FakeNavigator : Navigator {
 
 	override fun backAction() {
 		navigate(Action.GO_BACK)
+	}
+
+	override fun resetNavigationState(context: Context) {
+		val allNames = ServiceLocator.seedStorage.getSeedNames()
+		initNavigation(context.getDbNameFromContext(), allNames.toList())
 	}
 }
 
