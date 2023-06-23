@@ -27,7 +27,7 @@ fun AddedNetworkSheetsSubgraph(
 
 	var addedNetwork: NetworkModel? = remember { null }
 	LaunchedEffect(key1 = networkNameAdded) {
-		addedNetwork = viewModel.getNetworkByName(networkNameAdded)?.run {
+		addedNetwork = viewModel.getNetworkByName(networkNameAdded) ?: run {
 			onClose()
 			null
 		}
