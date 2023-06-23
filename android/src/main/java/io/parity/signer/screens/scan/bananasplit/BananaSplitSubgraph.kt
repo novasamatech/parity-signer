@@ -95,6 +95,7 @@ fun BananaSplitSubgraph(
 				}
 			}
 		)
+		BackHandler(onBack = bananaViewModel::backToBananaRestore)
 	}
 }
 
