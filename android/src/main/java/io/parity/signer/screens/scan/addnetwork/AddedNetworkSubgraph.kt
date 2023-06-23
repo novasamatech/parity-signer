@@ -19,7 +19,7 @@ import kotlinx.coroutines.runBlocking
 
 
 @Composable
-fun AddedNetworkSubgraph(
+fun AddedNetworkSheetsSubgraph(
 	networkNameAdded: String,
 	onClose: Callback
 ) {

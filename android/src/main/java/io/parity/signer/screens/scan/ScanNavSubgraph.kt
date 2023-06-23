@@ -15,7 +15,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.scan.addnetwork.AddedNetworkSubgraph
+import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
 import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
@@ -46,7 +46,7 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	var addedNetworkName: String? = remember {null}
+	var addedNetworkName: String? = remember { null }
 
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
@@ -119,9 +119,9 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
-						//todo dmitry in this case show add network dialogue
 						addedNetworkName = previewType.network
 					}
+
 					is TransactionPreviewType.Metadata -> {
 						Toast.makeText(
 							context,
@@ -133,6 +133,7 @@ fun ScanNavSubgraph(
 							Toast.LENGTH_LONG
 						).show()
 					}
+
 					else -> {
 						//nothing
 					}
@@ -175,13 +176,12 @@ fun ScanNavSubgraph(
 				},
 			)
 		}
-	} ?: addedNetworkName?.let {addedNetwork ->
-		AddedNetworkSubgraph(
+	} ?: addedNetworkName?.let { addedNetwork ->
+		AddedNetworkSheetsSubgraph(
 			networkNameAdded = addedNetwork,
-				onClose = {
-					addedNetworkName = null
-					//todo navigation for it?
-				}
+			onClose = {
+				addedNetworkName = null
+			}
 		)
 	} ?: if (errorWrongPassword.value) {
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
