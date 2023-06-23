@@ -24,14 +24,13 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
-import io.parity.signer.screens.createderivation.SelectedNetwork
 import io.parity.signer.ui.theme.*
 
 @Composable
 fun DeriveKeyNetworkSelectScreen(
 	networks: List<NetworkModel>,
 	onClose: Callback,
-	onNetworkSelect: (SelectedNetwork) -> Unit,
+	onNetworkSelect: (NetworkModel) -> Unit,
 	onNetworkHelp: Callback,
 	modifier: Modifier = Modifier
 ) {
@@ -52,18 +51,16 @@ fun DeriveKeyNetworkSelectScreen(
 		) {
 			networks.forEach { network ->
 				NetworkItem(network) { network ->
-					onNetworkSelect(SelectedNetwork.Network(network))
+					onNetworkSelect(network)
 				}
 				SignerDivider()
-			}
-			AllNetworksItem() {
-				onNetworkSelect(SelectedNetwork.AllNetworks)
 			}
 		}
 		NetworkHelpAlarm(
 			Modifier
 				.padding(horizontal = 8.dp)
-				.clickable(onClick = onNetworkHelp))
+				.clickable(onClick = onNetworkHelp)
+		)
 		Spacer(modifier = Modifier.weight(1f))
 	}
 }
@@ -99,39 +96,9 @@ private fun NetworkItem(
 			contentDescription = null,
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 			modifier = Modifier
-                .padding(2.dp)// because it's 28 not 32pd
-                .padding(end = 16.dp)
-                .size(28.dp)
-		)
-	}
-}
-
-@Composable
-private fun AllNetworksItem(
-	onClick: (SelectedNetwork) -> Unit,
-) {
-	Row(
-		modifier = Modifier
-            .height(70.dp)
-            .clickable { onClick(SelectedNetwork.AllNetworks) },
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Text(
-			text = stringResource(R.string.derive_key_network_all),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
-			modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .weight(1f)
-		)
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-			modifier = Modifier
-                .padding(2.dp)// because it's 28 not 32pd
-                .padding(end = 16.dp)
-                .size(28.dp)
+				.padding(2.dp)// because it's 28 not 32pd
+				.padding(end = 16.dp)
+				.size(28.dp)
 		)
 	}
 }
@@ -142,11 +109,11 @@ fun NetworkHelpAlarm(modifier: Modifier = Modifier) {
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = modifier
-            .padding(vertical = 8.dp)
-            .border(
-                BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                innerShape
-            )
+			.padding(vertical = 8.dp)
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
 	) {
 
 		Text(
@@ -154,16 +121,16 @@ fun NetworkHelpAlarm(modifier: Modifier = Modifier) {
 			color = MaterialTheme.colors.textTertiary,
 			style = SignerTypeface.BodyM,
 			modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
 		)
 		Icon(
 			imageVector = Icons.Outlined.HelpOutline,
 			contentDescription = null,
 			tint = MaterialTheme.colors.pink300,
 			modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(start = 18.dp, end = 18.dp)
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
 		)
 	}
 }
