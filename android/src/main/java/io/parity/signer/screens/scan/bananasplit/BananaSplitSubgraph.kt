@@ -66,6 +66,14 @@ fun BananaSplitSubgraph(
 
 	val isBananaRestorable = bananaViewModel.isBananaRestorable.collectAsState()
 	val context = LocalContext.current
+
+	BackHandler(onBack = {
+		if (isBananaRestorable.value) {
+			bananaViewModel.backToBananaRestore()
+		} else {
+			onClose()
+		}
+	})
 	//background
 	Box(
 		modifier = Modifier
@@ -85,7 +93,6 @@ fun BananaSplitSubgraph(
 			bananaViewModel = bananaViewModel,
 			modifier = Modifier.statusBarsPadding(),
 		)
-		BackHandler(onBack = onClose)
 	} else {
 		RecoverKeysetSelectNetworkBananaFlowScreen(
 			onBack = bananaViewModel::backToBananaRestore,
@@ -95,7 +102,6 @@ fun BananaSplitSubgraph(
 				}
 			}
 		)
-		BackHandler(onBack = bananaViewModel::backToBananaRestore)
 	}
 }
 
