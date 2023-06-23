@@ -3,13 +3,11 @@ package io.parity.signer.screens.keysets.create.backupstepscreens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.domain.usecases.CreateKeySetViaStateMachineUseCase
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 class NewKeySetNetworksWithNavigatorViewModel : ViewModel() {
@@ -26,12 +24,14 @@ class NewKeySetNetworksWithNavigatorViewModel : ViewModel() {
 		seedName: String, seedPhrase: String,
 		networksForKeys: Set<NetworkModel>,
 		navigator: Navigator,
-	): Boolean {
-		return runBlocking {
-			createKeySetUseCase.createKeySetWithNetworks(
+		onPostReaction: (Boolean) -> Unit,
+	): Unit {
+		viewModelScope.launch {
+			val result = createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,
 				networksForKeys, navigator
 			)
+			onPostReaction(result)
 		}
 	}
 }

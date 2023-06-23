@@ -80,19 +80,21 @@ fun NewKeySetSelectNetworkScreen(
 	val scope = rememberCoroutineScope()
 
 	val onProceedAction = {
-		val isSuccess = networksViewModel.createKeySetWithNetworks(
+		networksViewModel.createKeySetWithNetworks(
 			seedName = model.seed, seedPhrase = model.seedPhrase,
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			navigator = navigator,
+			onPostReaction = { isSuccess ->
+				if (isSuccess) {
+					Toast.makeText(
+						context,
+						context.getText(R.string.key_set_has_been_created_toast),
+						Toast.LENGTH_LONG
+					).show()
+				}
+			}
 		)
-		if (isSuccess) {
-			Toast.makeText(
-				context,
-				context.getText(R.string.key_set_has_been_created_toast),
-				Toast.LENGTH_LONG
-			).show()
-		}
 	}
 
 	BottomSheetWrapperContent(

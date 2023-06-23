@@ -22,9 +22,10 @@ fun RecoverKeysetSelectNetworkRestoreFlowScreen(
 	onBack: Callback,
 ) {
 	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
-	val defaultSelectedNetworks = networksViewModel.getDefaultPreselectedNetworks()
-		.map { it.key }
-		.toSet()
+	val defaultSelectedNetworks =
+		networksViewModel.getDefaultPreselectedNetworks()
+			.map { it.key }
+			.toSet()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(
@@ -40,12 +41,16 @@ fun RecoverKeysetSelectNetworkRestoreFlowScreen(
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			navigator = rootNavigator,
+			onPostReaction = { isSuccess ->
+				if (isSuccess) {
+					Toast.makeText(
+						context,
+						context.getText(R.string.key_set_has_been_recovered_toast),
+						Toast.LENGTH_LONG
+					).show()
+				}
+			}
 		)
-		Toast.makeText(
-			context,
-			context.getText(R.string.key_set_has_been_recovered_toast),
-			Toast.LENGTH_LONG
-		).show()
 	}
 
 	RecoverKeysetSelectNetworkScreenBase(
