@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +48,8 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	var addedNetworkName: String? = remember { null }
+	var addedNetworkName: MutableState<String?> =
+		remember { mutableStateOf(null) }
 
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
@@ -73,6 +76,14 @@ fun ScanNavSubgraph(
 				backAction()
 			},
 			onSuccess = { seedName ->
+				Toast.makeText(
+					context,
+					context.getString(
+						R.string.key_set_has_been_recovered_toast,
+						seedName
+					),
+					Toast.LENGTH_LONG
+				).show()
 				scanViewModel.clearState()
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
@@ -119,7 +130,7 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
-						addedNetworkName = previewType.network
+						addedNetworkName.value = previewType.network
 					}
 
 					is TransactionPreviewType.Metadata -> {
@@ -176,11 +187,11 @@ fun ScanNavSubgraph(
 				},
 			)
 		}
-	} ?: addedNetworkName?.let { addedNetwork ->
+	} ?: addedNetworkName.value?.let { addedNetwork ->
 		AddedNetworkSheetsSubgraph(
 			networkNameAdded = addedNetwork,
 			onClose = {
-				addedNetworkName = null
+				addedNetworkName.value = null
 			}
 		)
 	} ?: if (errorWrongPassword.value) {

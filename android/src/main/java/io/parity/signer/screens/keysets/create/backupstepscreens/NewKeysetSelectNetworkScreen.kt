@@ -89,7 +89,7 @@ fun NewKeySetSelectNetworkScreen(
 				if (isSuccess) {
 					Toast.makeText(
 						context,
-						context.getText(R.string.key_set_has_been_created_toast),
+						context.getString(R.string.key_set_has_been_created_toast, model.seed),
 						Toast.LENGTH_LONG
 					).show()
 				}

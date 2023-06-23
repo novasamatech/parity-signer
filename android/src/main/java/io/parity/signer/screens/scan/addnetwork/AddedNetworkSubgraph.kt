@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,16 +27,15 @@ fun AddedNetworkSheetsSubgraph(
 ) {
 	val viewModel: AddedNetworkViewModel = viewModel()
 
-	var addedNetwork: NetworkModel? = remember { null }
+	val addedNetwork: MutableState<NetworkModel?> = remember { mutableStateOf(null) }
 	LaunchedEffect(key1 = networkNameAdded) {
-		addedNetwork = viewModel.getNetworkByName(networkNameAdded) ?: run {
+		addedNetwork.value = viewModel.getNetworkByName(networkNameAdded) ?: run {
 			onClose()
 			null
 		}
 	}
 
-	addedNetwork?.let { addedNetwork ->
-
+	addedNetwork.value?.let { addedNetwork ->
 		val navController = rememberNavController()
 		NavHost(
 			navController = navController,
