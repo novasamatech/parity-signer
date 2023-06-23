@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +20,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.screens.scan.bananasplit.networks.RecoverKeysetSelectNetworkBananaFlowScreen
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -32,14 +33,17 @@ fun BananaSplitSubgraph(
 
 	val bananaViewModel: BananaSplitViewModel = viewModel()
 
-	LaunchedEffect(Unit) {
+	DisposableEffect(qrData) {
 		bananaViewModel.initState(qrData)
-
+		onDispose {
+			bananaViewModel.cleanState()
+		}
+	}
+	LaunchedEffect(key1 = qrData) {
 		launch {
 			bananaViewModel.isWrongPasswordTerminal.collect {
 				if (it) {
 					onErrorWrongPassword()
-					bananaViewModel.cleanState()
 				}
 			}
 		}
@@ -48,7 +52,6 @@ fun BananaSplitSubgraph(
 				.filterNotNull()
 				.collect {
 					onCustomError(it)
-					bananaViewModel.cleanState()
 				}
 		}
 		launch {
@@ -56,7 +59,6 @@ fun BananaSplitSubgraph(
 				.filterNotNull()
 				.collect {
 					onSuccess(it)
-					bananaViewModel.cleanState()
 				}
 		}
 	}
@@ -64,9 +66,9 @@ fun BananaSplitSubgraph(
 	//background
 	Box(
 		modifier = Modifier
-			.fillMaxSize(1f)
-			.statusBarsPadding()
-			.background(MaterialTheme.colors.background)
+            .fillMaxSize(1f)
+            .statusBarsPadding()
+            .background(MaterialTheme.colors.background)
 	)
 
 	val navController = rememberNavController()
@@ -90,7 +92,9 @@ fun BananaSplitSubgraph(
 			RecoverKeysetSelectNetworkBananaFlowScreen(
 				onBack = navController::popBackStack,
 				onDone = { networks ->
-					runBlocking { bananaViewModel.onDoneTap(context, networks) }
+					bananaViewModel.viewModelScope.launch {
+						bananaViewModel.onDoneTap(context, networks)
+					}
 				}
 			)
 		}

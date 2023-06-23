@@ -14,7 +14,6 @@ import io.parity.signer.uniffi.QrSequenceDecodeException
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.runBlocking
 
 
 class BananaSplitViewModel() : ViewModel() {
@@ -92,6 +91,7 @@ class BananaSplitViewModel() : ViewModel() {
 								seedName, seedPhrase.s,
 								networksKeys.toList(),
 							)
+							//todo dmitry handle wrong password before we proceed
 							if (!isSaved) {
 								_isCustomErrorTerminal.value =
 									context.getString(R.string.banana_split_password_error_cannot_save_seed)
