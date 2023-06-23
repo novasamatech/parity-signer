@@ -1,10 +1,11 @@
 package io.parity.signer.screens.scan.bananasplit
 
 import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.mapState
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.usecases.CreateKeySetUseCase
@@ -14,6 +15,8 @@ import io.parity.signer.uniffi.QrSequenceDecodeException
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 
 class BananaSplitViewModel() : ViewModel() {
@@ -27,6 +30,10 @@ class BananaSplitViewModel() : ViewModel() {
 
 	//String is seed name
 	val isSuccessTerminal = _isSuccessTerminal.asStateFlow()
+
+	//storing seed phrase between screens while user selecting networks
+	private val _seedPhrase =  MutableStateFlow<String?>(null)
+	val isBananaRestorable = _seedPhrase.mapState(viewModelScope) { it != null }
 
 	//ongoing events
 	private val _password = MutableStateFlow<String>("")
@@ -51,6 +58,7 @@ class BananaSplitViewModel() : ViewModel() {
 	}
 
 	fun cleanState() {
+		_seedPhrase.value = null
 		_password.value = ""
 		_seedName.value = ""
 		_seedCollision.value = false
@@ -73,33 +81,40 @@ class BananaSplitViewModel() : ViewModel() {
 		_seedName.value = newSeedName
 	}
 
-	suspend fun onDoneTap(context: Context, networksKeys: Set<String>) {
-		val password = password.value
+	fun backToBananaRestore() {
+		_seedPhrase.value = null
+	}
+
+	suspend fun onFinishWithNetworks(context: Context, networksKeys: Set<String>) {
 		val seedName = seedName.value
+		val seedPhrase = _seedPhrase.value!!
+		val isSaved = createKeySetUseCase.createKeySetWithNetworks(
+			seedName, seedPhrase,
+			networksKeys.toList(),
+		)
+		if (!isSaved) {
+			_isCustomErrorTerminal.value =
+				context.getString(R.string.banana_split_password_error_cannot_save_seed)
+			return
+		}
+		_isSuccessTerminal.value = seedName
+	}
+	suspend fun onBananaDoneTry(context: Context) {
+		val password = password.value
+
 		try {
 			when (val qrResult =
 				qrparserTryDecodeQrSequence(qrCodeData, password, true)) {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
-					when (val seedPhrase = qrResult.b) {
+					when (val seedPhraseResult = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
-							if (seedRepository.isSeedPhraseCollision(seedPhrase.s)) {
+							if (seedRepository.isSeedPhraseCollision(seedPhraseResult.s)) {
 								_isCustomErrorTerminal.value =
 									context.getString(R.string.banana_split_password_error_seed_phrase_exists)
 								return
 							}
-							val isSaved = createKeySetUseCase.createKeySetWithNetworks(
-								seedName, seedPhrase.s,
-								networksKeys.toList(),
-							)
-							//todo dmitry handle wrong password before we proceed
-							if (!isSaved) {
-								_isCustomErrorTerminal.value =
-									context.getString(R.string.banana_split_password_error_cannot_save_seed)
-								return
-							}
-							_isSuccessTerminal.value = seedName
+							_seedPhrase.value = seedPhraseResult.s
 						}
-
 						BananaSplitRecoveryResult.RequestPassword -> {
 							submitErrorState("We passed password but recieved password request again, should be unreacheble ")
 						}

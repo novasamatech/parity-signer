@@ -9,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
@@ -63,46 +64,38 @@ fun BananaSplitSubgraph(
 		}
 	}
 
+	val isBananaRestorable = bananaViewModel.isBananaRestorable.collectAsState()
+	val context = LocalContext.current
 	//background
 	Box(
 		modifier = Modifier
-            .fillMaxSize(1f)
-            .statusBarsPadding()
-            .background(MaterialTheme.colors.background)
+			.fillMaxSize(1f)
+			.statusBarsPadding()
+			.background(MaterialTheme.colors.background)
 	)
 
-	val navController = rememberNavController()
-	NavHost(
-		navController = navController,
-		startDestination = BananaSplitNavigationSubgraph.BananaSplitNavigationPassword,
-	) {
-		composable(BananaSplitNavigationSubgraph.BananaSplitNavigationPassword) {
-			BananaSplitPasswordScreen(
-				onClose = onClose,
-				onDone = {
-					navController.navigate(BananaSplitNavigationSubgraph.BananaSplitNavigationNetworks)
-				},
-				bananaViewModel = bananaViewModel,
-				modifier = Modifier.statusBarsPadding(),
-			)
-			BackHandler(onBack = onClose)
-		}
-		composable(BananaSplitNavigationSubgraph.BananaSplitNavigationNetworks) {
-			val context = LocalContext.current
-			RecoverKeysetSelectNetworkBananaFlowScreen(
-				onBack = navController::popBackStack,
-				onDone = { networks ->
-					bananaViewModel.viewModelScope.launch {
-						bananaViewModel.onDoneTap(context, networks)
-					}
+	if (!isBananaRestorable.value) {
+		BananaSplitPasswordScreen(
+			onClose = onClose,
+			onDone = {
+				bananaViewModel.viewModelScope.launch {
+					bananaViewModel.onBananaDoneTry(context)
 				}
-			)
-		}
+			},
+			bananaViewModel = bananaViewModel,
+			modifier = Modifier.statusBarsPadding(),
+		)
+		BackHandler(onBack = onClose)
+	} else {
+		RecoverKeysetSelectNetworkBananaFlowScreen(
+			onBack = bananaViewModel::backToBananaRestore,
+			onDone = { networks ->
+				bananaViewModel.viewModelScope.launch {
+					bananaViewModel.onFinishWithNetworks(context, networks)
+				}
+			}
+		)
 	}
 }
 
 
-private object BananaSplitNavigationSubgraph {
-	const val BananaSplitNavigationPassword = "banana_split_step_password"
-	const val BananaSplitNavigationNetworks = "banana_split_step_networks"
-}
