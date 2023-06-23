@@ -1,11 +1,10 @@
 package io.parity.signer.domain
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
