@@ -453,17 +453,21 @@
 "EnterBananaSplitPasswordView.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
 "EnterBananaSplitPasswordView.Action.Next" = "Next";
 
-"CreateDerivedKey.Label.Title" = "Select Network";
-"CreateDerivedKey.Label.Footer.Network" = "Learn more about How to Set up networks";
+"CreateDerivedKey.Label.Title" = "Create Derived Key";
+"CreateDerivedKey.Label.Subtitle" = "Step 1 / 2";
+"CreateDerivedKey.Label.Header" = "Select Network";
+"CreateDerivedKey.Label.Footer.Network" = "Haven’t found a network needed?\nLearn more about how to set up networks";
 "CreateDerivedKey.Label.Network.Title" = "Choose Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
 
-"CreateDerivedKey.Modal.Path.Title" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Path.Title" = "Create Derived Key";
+"CreateDerivedKey.Modal.Path.Subtitle" = "Step 2 / 2";
+"CreateDerivedKey.Modal.Path.Header" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
 "CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
 "CreateDerivedKey.Modal.Path.Action.HardPath" = "//";
 "CreateDerivedKey.Modal.Path.Action.PasswordedPath" = "///Password";
-"CreateDerivedKey.Modal.Path.Footer.Path" = "Path name example //network//1";
+"CreateDerivedKey.Modal.Path.Footer.Path" = "Proceed with default or enter custom.\nPath name example: //<network>//0. ";
 "CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";

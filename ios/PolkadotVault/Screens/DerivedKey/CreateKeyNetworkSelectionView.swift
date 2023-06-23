@@ -8,11 +8,6 @@
 import Combine
 import SwiftUI
 
-enum NetworkSelection {
-    case network(MmNetwork)
-    case allowedOnAnyNetwork([MmNetwork])
-}
-
 struct CreateKeyNetworkSelectionView: View {
     @StateObject var viewModel: ViewModel
     @Environment(\.presentationMode) var presentationMode
@@ -22,7 +17,10 @@ struct CreateKeyNetworkSelectionView: View {
             // Navigation Bar
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: .title(Localizable.CreateDerivedKey.Label.title.string),
+                    title: .subtitle(
+                        title: Localizable.CreateDerivedKey.Label.title.string,
+                        subtitle: Localizable.CreateDerivedKey.Label.subtitle.string
+                    ),
                     leftButtons: [.init(
                         type: .xmark,
                         action: { presentationMode.wrappedValue.dismiss() }
@@ -30,22 +28,25 @@ struct CreateKeyNetworkSelectionView: View {
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
+            .padding(.bottom, Spacing.extraSmall)
             // Content
+            Localizable.CreateDerivedKey.Label.header.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyL.font)
+                .padding(.horizontal, Spacing.large)
+                .padding(.bottom, Spacing.small)
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                VStack(alignment: .leading, spacing: 0) {
                     networkSelection()
+                        .padding(Spacing.extraSmall)
                     footer()
+                        .padding(Spacing.medium)
                 }
             }
-            .padding(Spacing.extraSmall)
             // Navigation Links
             NavigationLink(
                 destination: DerivationPathNameView(
-                    viewModel: .init(
-                        seedName: viewModel.seedName,
-                        networkSelection: $viewModel.networkSelection,
-                        onComplete: viewModel.onKeyCreationComplete
-                    )
+                    viewModel: viewModel.derivationPathViewModel()
                 )
                 .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDerivationPath
@@ -69,7 +70,7 @@ struct CreateKeyNetworkSelectionView: View {
 
     @ViewBuilder
     func footer() -> some View {
-        AttributedInfoBoxView(text: AttributedString(Localizable.CreateDerivedKey.Label.Footer.network.string))
+        TransparentHelpBox(text: Localizable.CreateDerivedKey.Label.Footer.network.string)
             .onTapGesture {
                 viewModel.onInfoBoxTap()
             }
@@ -86,7 +87,6 @@ struct CreateKeyNetworkSelectionView: View {
                 Divider()
                     .padding(.horizontal, Spacing.medium)
             }
-            allowOnAnyNetwork()
         }
         .containerBackground()
     }
@@ -111,25 +111,6 @@ struct CreateKeyNetworkSelectionView: View {
             viewModel.selectNetwork(network)
         }
     }
-
-    @ViewBuilder
-    func allowOnAnyNetwork() -> some View {
-        HStack(alignment: .center, spacing: 0) {
-            Localizable.CreateDerivedKey.Label.Network.onAny.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(PrimaryFont.titleS.font)
-            Spacer()
-            Asset.chevronRight.swiftUIImage
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                .padding(.trailing, Spacing.extraSmall)
-        }
-        .contentShape(Rectangle())
-        .padding(.horizontal, Spacing.medium)
-        .frame(height: Heights.createKeyNetworkItemHeight)
-        .onTapGesture {
-            viewModel.selectAllNetworks()
-        }
-    }
 }
 
 extension CreateKeyNetworkSelectionView {
@@ -142,10 +123,11 @@ extension CreateKeyNetworkSelectionView {
         private let networkService: GetAllNetworksService
         private let keyName: String
         private let createKeyService: CreateDerivedKeyService
+        private let keySet: MKeysNew
         let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
-        @Published var networkSelection: NetworkSelection = .allowedOnAnyNetwork([])
+        @Published var networkSelection: MmNetwork!
 
         // Tutorial
         @Published var isNetworkTutorialPresented: Bool = false
@@ -160,12 +142,14 @@ extension CreateKeyNetworkSelectionView {
         init(
             seedName: String,
             keyName: String,
+            keySet: MKeysNew,
             networkService: GetAllNetworksService = GetAllNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.seedName = seedName
             self.keyName = keyName
+            self.keySet = keySet
             self.networkService = networkService
             self.createKeyService = createKeyService
             self.onCompletion = onCompletion
@@ -174,22 +158,26 @@ extension CreateKeyNetworkSelectionView {
         }
 
         func selectNetwork(_ network: MmNetwork) {
-            networkSelection = .network(network)
+            networkSelection = network
             isPresentingDerivationPath = true
         }
 
-        func selectAllNetworks() {
-            networkSelection = .allowedOnAnyNetwork(networks)
-            isPresentingDerivationPath = true
-        }
-
-        func onKeyCreationComplete() {
+        private func onKeyCreationComplete() {
             onCompletion(.derivedKeyCreated)
             dismissRequest.send()
         }
 
         func onInfoBoxTap() {
             isNetworkTutorialPresented = true
+        }
+
+        func derivationPathViewModel() -> DerivationPathNameView.ViewModel {
+            .init(
+                seedName: seedName,
+                keySet: keySet,
+                networkSelection: networkSelection,
+                onComplete: onKeyCreationComplete
+            )
         }
     }
 }
@@ -220,6 +208,7 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
                 viewModel: .init(
                     seedName: "seedName",
                     keyName: "keyName",
+                    keySet: .stub,
                     onCompletion: { _ in }
                 )
             )

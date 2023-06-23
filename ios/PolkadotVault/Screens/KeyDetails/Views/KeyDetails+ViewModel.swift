@@ -185,6 +185,16 @@ extension KeyDetailsView {
                 isSnackbarPresented = true
             }
         }
+
+        func createDerivedKeyViewModel() -> CreateKeyNetworkSelectionView.ViewModel {
+            .init(
+                seedName: keysData?.root?.address.seedName ?? "",
+                keyName: keyName,
+                // swiftlint: disable:next force_unwrapping
+                keySet: keysData!,
+                onCompletion: onAddDerivedKeyCompletion(_:)
+            )
+        }
     }
 }
 
