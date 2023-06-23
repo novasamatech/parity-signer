@@ -48,7 +48,7 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
-	var addedNetworkName: MutableState<String?> =
+	val addedNetworkName: MutableState<String?> =
 		remember { mutableStateOf(null) }
 
 	val showingModals = transactionError.value != null ||

@@ -17,7 +17,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -27,7 +26,8 @@ fun AddedNetworkSheetsSubgraph(
 ) {
 	val viewModel: AddedNetworkViewModel = viewModel()
 
-	val addedNetwork: MutableState<NetworkModel?> = remember { mutableStateOf(null) }
+	val addedNetwork: MutableState<NetworkModel?> =
+		remember { mutableStateOf(null) }
 	LaunchedEffect(key1 = networkNameAdded) {
 		addedNetwork.value = viewModel.getNetworkByName(networkNameAdded) ?: run {
 			onClose()
@@ -63,22 +63,22 @@ fun AddedNetworkSheetsSubgraph(
 						seeds = viewModel.getSeedList(),
 						onCancel = onClose,
 						onDone = { seeds ->
-							runBlocking {
-								val isSuccess = viewModel.processAddNetworkToSeeds(
-									addedNetwork,
-									seeds,
-								)
-								if (isSuccess) {
-									Toast.makeText(
-										context,
-										context.getString(R.string.add_network_add_keys_success_message),
-										Toast.LENGTH_SHORT
-									).show()
-									onClose()
-								} else {
-									submitErrorState("Error in add networks - this is unexpected")
-								}
-							}
+							viewModel.processAddNetworkToSeeds(
+								network = addedNetwork,
+								seeds = seeds,
+								onAfterProcess = { isSuccess ->
+									if (isSuccess) {
+										Toast.makeText(
+											context,
+											context.getString(R.string.add_network_add_keys_success_message),
+											Toast.LENGTH_SHORT
+										).show()
+										onClose()
+									} else {
+										submitErrorState("Error in add networks - this is unexpected")
+									}
+								},
+							)
 						},
 					)
 				}

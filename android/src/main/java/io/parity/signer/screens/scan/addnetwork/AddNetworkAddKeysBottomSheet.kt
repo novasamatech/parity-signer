@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,27 +40,27 @@ fun AddNetworkAddKeysBottomSheet(
 	onCancel: Callback,
 	onDone: (seeds: List<String>) -> Unit,
 ) {
-	var selected = remember { mutableSetOf<String>() }
+	val selected = remember { mutableStateOf(setOf<String>()) }
 	AddNetworkAddKeysBottomSheet(
 		networkTitle = networkTitle,
 		seeds = seeds,
-		selectedSeeds = selected,
+		selectedSeeds = selected.value,
 		onAddKeyset = { keyset ->
-			if (selected.contains(keyset)) {
-				selected.remove(keyset)
+			if (selected.value.contains(keyset)) {
+				selected.value = selected.value - keyset
 			} else {
-				selected.add(keyset)
+				selected.value = selected.value + keyset
 			}
 		},
 		onAddAll = {
-			if (selected.size >= seeds.size) {
-				selected = mutableSetOf()
+			if (selected.value.size >= seeds.size) {
+				selected.value = setOf()
 			} else {
-				selected = seeds.toMutableSet()
+				selected.value = seeds.toMutableSet()
 			}
 		},
 		onCancel = onCancel,
-		onDone = { onDone(selected.toList()) },
+		onDone = { onDone(selected.value.toList()) },
 	)
 }
 
@@ -79,8 +80,8 @@ private fun AddNetworkAddKeysBottomSheet(
 	) {
 		Column(
 			modifier = Modifier
-                .weight(1f, fill = false)
-                .verticalScroll(rememberScrollState()),
+				.weight(1f, fill = false)
+				.verticalScroll(rememberScrollState()),
 		) {
 			Text(
 				text = stringResource(
@@ -90,8 +91,8 @@ private fun AddNetworkAddKeysBottomSheet(
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 32.dp, bottom = 24.dp),
+					.padding(horizontal = 24.dp)
+					.padding(top = 32.dp, bottom = 24.dp),
 			)
 			Text(
 				text = stringResource(R.string.add_network_add_keys_list_subtitle),
@@ -102,11 +103,11 @@ private fun AddNetworkAddKeysBottomSheet(
 			)
 			Column(
 				modifier = Modifier
-                    .padding(8.dp)
-                    .background(
-                        MaterialTheme.colors.fill6,
-                        RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-                    )
+					.padding(8.dp)
+					.background(
+						MaterialTheme.colors.fill6,
+						RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+					)
 			) {
 				seeds.forEach { keyset ->
 					KeysetItemMultiselect(
@@ -146,13 +147,13 @@ private fun KeysetItemMultiselect(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleS,
 			modifier = Modifier
-                .weight(1f)
-                .padding(
-                    top = 16.dp,
-                    bottom = 16.dp,
-                    start = 16.dp,
-                    end = 12.dp,
-                )
+				.weight(1f)
+				.padding(
+					top = 16.dp,
+					bottom = 16.dp,
+					start = 16.dp,
+					end = 12.dp,
+				)
 		)
 		SignerCheckbox(
 			isChecked = isSelected,
@@ -171,10 +172,10 @@ private fun KeysetItemMultiselectAll(
 ) {
 	Row(
 		modifier = Modifier
-            .clickable(onClick = onClick)
-            .height(68.dp)
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(1f),
+			.clickable(onClick = onClick)
+			.height(68.dp)
+			.padding(horizontal = 16.dp)
+			.fillMaxWidth(1f),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
