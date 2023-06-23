@@ -60,7 +60,7 @@ struct KeyDetailsPublicKeyView: View {
                         keyDetails()
                             .padding(.bottom, Spacing.extraExtraLarge)
                     }
-                    .padding([.leading, .trailing], Spacing.large)
+                    .padding(.horizontal, Spacing.large)
                     .padding(.top, Spacing.extraSmall)
                 }
             }
