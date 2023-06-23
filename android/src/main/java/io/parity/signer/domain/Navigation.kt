@@ -34,7 +34,6 @@ interface Navigator {
 	fun navigate(action: LocalNavRequest)
 
 	fun backAction()
-
 }
 
 
@@ -56,7 +55,10 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 			val navigationAction = runBlocking {
 				val result = uniffiInteractor.navigate(action, details, seedPhrase)
 				when (result) {
-					is OperationResult.Err -> singleton._actionResult.value?.copy(alertData = AlertData.ErrorData(result.error.message))
+					is OperationResult.Err -> singleton._actionResult.value?.copy(
+						alertData = AlertData.ErrorData(result.error.message)
+					)
+
 					is OperationResult.Ok -> result.result
 				}
 			} ?: return
@@ -154,14 +156,13 @@ class EmptyNavigator : Navigator {
 
 	override fun backAction() {
 	}
-
 }
 
 class FakeNavigator : Navigator {
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		try {
-		backendAction(action, details, seedPhrase)
-		} catch (e: ErrorDisplayed){
+			backendAction(action, details, seedPhrase)
+		} catch (e: ErrorDisplayed) {
 			Log.e("fake navigation error", e.message ?: e.toString())
 		}
 		//do nothing with result
@@ -174,7 +175,6 @@ class FakeNavigator : Navigator {
 	override fun backAction() {
 		navigate(Action.GO_BACK)
 	}
-
 }
 
 
