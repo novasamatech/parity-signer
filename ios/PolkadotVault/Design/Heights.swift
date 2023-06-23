@@ -50,6 +50,7 @@ enum Heights {
     static let networkLogoOverlay: CGFloat = 18
     /// Height for `Network Logo` when used in list collections, 36 pt
     static let networkLogoInCell: CGFloat = 36
+    static let networkLogoInModal: CGFloat = 80
     static let networkLogoInList: CGFloat = 32
     static let networkLogoInHeader: CGFloat = 56
     /// Height for `Network Logo` when used in small capsule view, 24 pt
@@ -71,6 +72,7 @@ enum Heights {
 
     static let createKeyNetworkItemHeight: CGFloat = 64
     static let createKeysForNetworkItemHeight: CGFloat = 64
+    static let selectKeySetsForNetworkKeyItemHeight: CGFloat = 64
 
     static let navigationBarProgressViewHeight: CGFloat = 6
     static let navigationBarProgressViewWidth: CGFloat = 40

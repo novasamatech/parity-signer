@@ -173,14 +173,9 @@ struct KeyDetailsView: View {
             onDismiss: viewModel.refreshData
         ) {
             NavigationView {
-                CreateKeyNetworkSelectionView(viewModel: .init(
-                    seedName: viewModel.keysData?.root?.address
-                        .seedName ?? "",
-                    keyName: viewModel.keyName,
-                    onCompletion: viewModel.onAddDerivedKeyCompletion(_:)
-                ))
-                .navigationViewStyle(StackNavigationViewStyle())
-                .navigationBarHidden(true)
+                CreateKeyNetworkSelectionView(viewModel: viewModel.createDerivedKeyViewModel())
+                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationBarHidden(true)
             }
         }
         .bottomSnackbar(

@@ -55,7 +55,7 @@ struct ProgressSnackbar: View {
             .background(Asset.fill12Solid.swiftUIColor)
             .cornerRadius(CornerRadius.medium)
         }
-        .padding([.leading, .trailing], Spacing.medium)
+        .padding(.horizontal, Spacing.medium)
         .padding(.bottom, Spacing.large + safeAreaInsets.bottom)
     }
 }

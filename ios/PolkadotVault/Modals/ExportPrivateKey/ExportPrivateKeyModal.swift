@@ -61,7 +61,7 @@ struct ExportPrivateKeyModal: View {
                     )
                     .fixedSize(horizontal: false, vertical: true)
                     .strokeContainerBackground()
-                    .padding([.leading, .trailing], Spacing.large)
+                    .padding(.horizontal, Spacing.large)
                     // Bottom "Hide" container
                     ExportPrivateKeyAddressFooter(hideAction: animateDismissal)
                         .padding(.horizontal, Spacing.extraSmall)
@@ -104,7 +104,7 @@ private struct ExportPrivateKeyAddressFooter: View {
                 )
             )
         }
-        .padding([.leading, .trailing], Spacing.large)
+        .padding(.horizontal, Spacing.large)
         .padding([.top, .bottom], Spacing.extraSmall)
     }
 }
