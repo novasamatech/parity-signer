@@ -130,34 +130,6 @@ final class CreateDerivedKeyService {
         }
     }
 
-    func createDerivedKeyOnAllNetworks(
-        _ seedName: String,
-        _ path: String,
-        _ completion: @escaping (Result<Void, Error>) -> Void
-    ) {
-        callQueue.async {
-            let result: Result<Void, Error>
-            let seedPhrase = self.seedsMediator.getSeed(seedName: seedName)
-            do {
-                try getAllNetworks()
-                    .forEach {
-                        try tryCreateAddress(
-                            seedName: seedName,
-                            seedPhrase: seedPhrase,
-                            path: path,
-                            network: $0.key
-                        )
-                    }
-                result = .success(())
-            } catch {
-                result = .failure(error)
-            }
-            self.callbackQueue.async {
-                completion(result)
-            }
-        }
-    }
-
     func createDerivedKeyForKeySets(
         _ seedNames: [String],
         _ networkName: String,

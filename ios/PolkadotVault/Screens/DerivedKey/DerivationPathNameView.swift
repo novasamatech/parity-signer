@@ -20,7 +20,10 @@ struct DerivationPathNameView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: .title(Localizable.CreateDerivedKey.Modal.Path.title.string),
+                    title: .subtitle(
+                        title: Localizable.CreateDerivedKey.Modal.Path.title.string,
+                        subtitle: Localizable.CreateDerivedKey.Modal.Path.subtitle.string
+                    ),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }
@@ -35,6 +38,13 @@ struct DerivationPathNameView: View {
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
+            .padding(.bottom, Spacing.extraSmall)
+            // Content
+            Localizable.CreateDerivedKey.Modal.Path.header.text
+                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .font(PrimaryFont.bodyL.font)
+                .padding(.horizontal, Spacing.large)
+                .padding(.bottom, Spacing.small)
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     TextField("", text: $viewModel.inputText)
@@ -106,13 +116,12 @@ struct DerivationPathNameView: View {
                     Spacer()
                 }
                 .padding(.horizontal, Spacing.large)
-                .padding(.vertical, Spacing.medium)
+                .padding(.bottom, Spacing.medium)
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .onAppear {
-            viewModel.onAppear()
             focusedPath = true
         }
         .fullScreenModal(
@@ -191,7 +200,10 @@ extension View {
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
         private let createKeyService: CreateDerivedKeyService
+        private let createKeyNameService: CreateDerivedKeyNameService
         private let seedName: String
+        private let keySet: MKeysNew
+        private let networkSelection: MmNetwork
         private let onComplete: () -> Void
         private var skipValidation = false
         private let cancelBag = CancelBag()
@@ -205,7 +217,6 @@ extension DerivationPathNameView {
         @Published var derivationPathError: String?
         @Published var isPresentingConfirmation: Bool = false
         @Published var derivationPath: String?
-        @Binding var networkSelection: NetworkSelection
 
         var isEntrySuggestionActive: Bool {
             DerivationPathComponent.allCases.contains { inputText == $0.description } && derivationPathError == nil
@@ -217,25 +228,20 @@ extension DerivationPathNameView {
 
         init(
             seedName: String,
-            networkSelection: Binding<NetworkSelection>,
+            keySet: MKeysNew,
+            networkSelection: MmNetwork,
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            createKeyNameService: CreateDerivedKeyNameService = CreateDerivedKeyNameService(),
             onComplete: @escaping () -> Void
         ) {
             self.seedName = seedName
-            _networkSelection = networkSelection
+            self.keySet = keySet
+            self.networkSelection = networkSelection
             self.createKeyService = createKeyService
+            self.createKeyNameService = createKeyNameService
             self.onComplete = onComplete
             subscribeToChanges()
-        }
-
-        func onAppear() {
-            if derivationPath == nil {
-                skipValidation = true
-                inputText = DerivationPathComponent.hard.description
-                isMainActionDisabled = true
-            } else {
-                inputText = derivationPath ?? ""
-            }
+            prefillTextField()
         }
 
         func onRightNavigationButtonTap() {
@@ -249,12 +255,12 @@ extension DerivationPathNameView {
                     self.isPresentingInfoModal = true
                 }
             }
-            switch networkSelection {
-            case let .network(network):
-                createKeyService.createDerivedKey(seedName, unwrappedDerivationPath(), network.key, completion)
-            case .allowedOnAnyNetwork:
-                createKeyService.createDerivedKeyOnAllNetworks(seedName, unwrappedDerivationPath(), completion)
-            }
+            createKeyService.createDerivedKey(
+                seedName,
+                unwrappedDerivationPath(),
+                networkSelection.key,
+                completion
+            )
         }
 
         func onInfoBoxTap() {
@@ -283,66 +289,11 @@ extension DerivationPathNameView {
                 skipValidation = false
                 return
             }
-            switch networkSelection {
-            case let .network(network):
-                pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, network.key))
-            case let .allowedOnAnyNetwork(networks):
-                let checks = networks
-                    .map { network in createKeyService.checkForCollision(seedName, inputText, network.key) }
-                if let firstEncounteredError = checks
-                    .compactMap({
-                        if case let .success(derivationCheck) = $0 {
-                            return derivationCheck
-                        } else {
-                            return nil
-                        }
-                    }).first(where: { $0.buttonGood == false || $0.error != nil }) {
-                    pathErrorCheck(.success(firstEncounteredError))
-                } else {
-                    derivationPathError = nil
-                }
-            }
-        }
-
-        private func pathErrorCheck(_ result: Result<DerivationCheck, ServiceError>) {
-            switch result {
-            case let .success(derivationCheck):
-                if derivationCheck.collision != nil {
-                    derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.alreadyExists.string
-                } else if !derivationCheck.buttonGood {
-                    derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.pathInvalid.string
-                } else if derivationCheck.error != nil {
-                    derivationPathError = derivationCheck.error
-                } else {
-                    derivationPathError = nil
-                }
-            case let .failure(error):
-                presentableInfoModal = .alertError(message: error.localizedDescription)
-                isPresentingInfoModal = true
-            }
+            pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, networkSelection.key))
         }
 
         func onPasswordConfirmationDoneTap() {
             isPasswordValid = isPasswordConfirmationValid()
-        }
-
-        private func subscribeToChanges() {
-            Publishers
-                .CombineLatest3($isPassworded, $isPasswordValid, $derivationPathError)
-                .map { validators -> Bool in
-                    let (isPassworded, isPasswordValid, derivationPathError) = validators
-                    if isPassworded {
-                        return
-                            !isPasswordValid ||
-                            !self.isPasswordConfirmationValid() ||
-                            self.derivationPathError != nil
-
-                    } else {
-                        return derivationPathError != nil || self.isInitialEntry()
-                    }
-                }
-                .assign(to: \.isMainActionDisabled, on: self)
-                .store(in: cancelBag)
         }
 
         func isPasswordConfirmationValid() -> Bool {
@@ -354,12 +305,60 @@ extension DerivationPathNameView {
             return false
         }
 
-        private func isInitialEntry() -> Bool {
-            inputText == DerivationPathComponent.hard.description
-        }
-
         func unwrappedDerivationPath() -> String {
             derivationPath ?? ""
+        }
+    }
+}
+
+private extension DerivationPathNameView.ViewModel {
+    func prefillTextField() {
+        if derivationPath == nil {
+            inputText = createKeyNameService.defaultDerivedKeyName(keySet, network: networkSelection)
+            validateDerivationPath()
+        } else {
+            inputText = derivationPath ?? ""
+        }
+    }
+
+    func subscribeToChanges() {
+        Publishers
+            .CombineLatest3($isPassworded, $isPasswordValid, $derivationPathError)
+            .map { validators -> Bool in
+                let (isPassworded, isPasswordValid, derivationPathError) = validators
+                if isPassworded {
+                    return
+                        !isPasswordValid ||
+                        !self.isPasswordConfirmationValid() ||
+                        self.derivationPathError != nil
+
+                } else {
+                    return derivationPathError != nil || self.isInitialEntry()
+                }
+            }
+            .assign(to: \.isMainActionDisabled, on: self)
+            .store(in: cancelBag)
+    }
+
+    func isInitialEntry() -> Bool {
+        inputText == DerivationPathComponent.hard.description
+    }
+
+    func pathErrorCheck(_ result: Result<DerivationCheck, ServiceError>) {
+        switch result {
+        case let .success(derivationCheck):
+            if derivationCheck.collision != nil {
+                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.alreadyExists.string
+            } else if !derivationCheck.buttonGood {
+                derivationPathError = Localizable.CreateDerivedKey.Modal.Path.Error.pathInvalid.string
+            } else if derivationCheck.error != nil {
+                derivationPathError = derivationCheck.error
+            } else {
+                derivationPathError = nil
+            }
+        case let .failure(error):
+            presentableInfoModal = .alertError(message: error.localizedDescription)
+            isPresentingInfoModal = true
         }
     }
 }
@@ -370,7 +369,8 @@ extension DerivationPathNameView {
             DerivationPathNameView(
                 viewModel: .init(
                     seedName: "Keys",
-                    networkSelection: .constant(.allowedOnAnyNetwork([])),
+                    keySet: .stub,
+                    networkSelection: .stub,
                     onComplete: {}
                 )
             )
