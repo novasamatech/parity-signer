@@ -6,13 +6,16 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.KeyAndNetworkModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
+import io.parity.signer.domain.toKeyAndNetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.uniffi.DerivationCheck
+import io.parity.signer.uniffi.keysBySeedName
 import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +35,7 @@ class DerivationCreateViewModel : ViewModel() {
 
 	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
+	private lateinit var existingKeys: Set<KeyAndNetworkModel>
 
 	private val _path: MutableStateFlow<String> =
 		MutableStateFlow(INITIAL_DERIVATION_PATH)
@@ -57,6 +61,8 @@ class DerivationCreateViewModel : ViewModel() {
 	fun setInitValues(seed: String, rootNavigator: Navigator) {
 		refreshCachedDependencies()
 		seedName = seed
+		existingKeys =
+			keysBySeedName(seed).set.map { it.toKeyAndNetworkModel() }.toSet()
 		this.rootNavigator = rootNavigator
 	}
 
@@ -67,12 +73,13 @@ class DerivationCreateViewModel : ViewModel() {
 
 	fun getInitialPath(netWork: NetworkModel): String {
 		var path = netWork.pathId
-		if (checkPath(path) != DerivationPathValidity.COLLISION_PATH) {
+		val keys = existingKeys.filter { it.network.networkSpecsKey == netWork.key }
+		if (!keys.any { it.key.path == path }) {
 			return path
 		} else {
 			for (i in 0..Int.MAX_VALUE) {
 				path = "${netWork.pathId}//$i"
-				if (checkPath(path) != DerivationPathValidity.COLLISION_PATH) {
+				if (!keys.any { it.key.path == path }) {
 					return path
 				}
 			}
