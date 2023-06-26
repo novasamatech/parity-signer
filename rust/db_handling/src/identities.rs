@@ -128,11 +128,42 @@ pub struct TransactionBulkV1 {
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub enum ExportAddrs {
     V1(ExportAddrsV1),
+    V2(ExportAddrsV2),
 }
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct ExportAddrsV1 {
     pub addrs: Vec<SeedInfo>,
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub struct ExportAddrsV2 {
+    pub addrs: Vec<SeedInfo>,
+    features: Vec<VaultFeatures>,
+}
+
+impl ExportAddrsV2 {
+    pub fn new(addrs: Vec<SeedInfo>) -> Self {
+        Self {
+            addrs,
+            features: vec![
+                VaultFeatures::BulkOperations,
+                VaultFeatures::DynamicDerivations,
+            ],
+        }
+    }
+}
+
+impl From<ExportAddrsV2> for ExportAddrsV1 {
+    fn from(val: ExportAddrsV2) -> Self {
+        ExportAddrsV1 { addrs: val.addrs }
+    }
+}
+
+#[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
+pub enum VaultFeatures {
+    BulkOperations,
+    DynamicDerivations,
 }
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
@@ -248,7 +279,7 @@ pub fn export_all_addrs(
         });
     }
 
-    Ok(ExportAddrs::V1(ExportAddrsV1 { addrs }))
+    Ok(ExportAddrs::V2(ExportAddrsV2::new(addrs)))
 }
 
 pub fn import_all_addrs(
