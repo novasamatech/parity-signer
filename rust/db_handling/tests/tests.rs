@@ -32,7 +32,7 @@ use definitions::{
     users::AddressDetails,
 };
 
-use db_handling::identities::create_key_set;
+use db_handling::identities::{create_key_set, export_root_public};
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -2063,4 +2063,17 @@ fn test_create_key_set_generate_default_addresses() {
     )
     .unwrap();
     assert!(identities.contains_key(test_key.key()).unwrap());
+}
+
+#[test]
+fn test_export_root_public() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let qr = export_root_public(&db, "Alice").unwrap();
+    assert_eq!(
+        hex::encode(qr.data()),
+        "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string()
+    );
 }

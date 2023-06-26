@@ -456,6 +456,11 @@ fn create_key_set(
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
+fn export_root_public(seed_name: &str) -> anyhow::Result<QrData, ErrorDisplayed> {
+    db_handling::identities::export_root_public(&get_db()?, seed_name)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
 /// Must be called once to initialize logging from Rust in development mode.
 ///
 /// Do not use in production.

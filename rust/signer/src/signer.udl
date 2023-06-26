@@ -612,6 +612,9 @@ namespace signer {
     MKeysNew keys_by_seed_name([ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
+    QrData export_root_public([ByRef] string seed_name);
+
+    [Throws=ErrorDisplayed]
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload, boolean is_danger);
 
     [Throws=ErrorDisplayed]

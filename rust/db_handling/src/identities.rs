@@ -943,6 +943,17 @@ pub fn create_key_set(
         .apply(database)
 }
 
+pub fn export_root_public(database: &sled::Db, seed_name: &str) -> Result<QrData> {
+    let multisigner = get_addresses_by_seed_name(database, seed_name)?
+        .into_iter()
+        .find(|(_, address_details)| address_details.is_root())
+        .ok_or(Error::NoRootKeyForSeed(seed_name.to_owned()))?
+        .0;
+    Ok(QrData::Regular {
+        data: multisigner_to_public(&multisigner),
+    })
+}
+
 /// Remove address from the Vault database.
 ///
 /// Address is determined by [`MultiSigner`] and [`NetworkSpecsKey`] of the
