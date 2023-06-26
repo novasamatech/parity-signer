@@ -115,7 +115,7 @@ struct HorizontalActionsBottomModal: View {
                     }
                     .padding(.top, Spacing.medium)
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }

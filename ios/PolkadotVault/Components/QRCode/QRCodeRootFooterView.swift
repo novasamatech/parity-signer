@@ -45,7 +45,7 @@ struct QRCodeRootFooterView: View {
                 }
             }
         }
-        .padding([.leading, .trailing], Spacing.medium)
+        .padding(.horizontal, Spacing.medium)
         .padding([.top, .bottom], Spacing.medium)
         .fixedSize(horizontal: false, vertical: true)
     }

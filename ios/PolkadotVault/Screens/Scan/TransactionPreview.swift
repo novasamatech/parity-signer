@@ -168,7 +168,7 @@ struct TransactionPreview: View {
             }
             if ![.done, .sign, .read].contains(transactionType) {
                 EmptyButton(
-                    action: viewModel.onCancelTap,
+                    action: viewModel.onCancelTap(),
                     text: Localizable.TransactionPreview.Action.cancel.key
                 )
             }
@@ -230,6 +230,8 @@ struct TransactionPreview: View {
 
 extension TransactionPreview {
     enum OnCompletionAction: Equatable {
+        case onDismissal
+        case onDone
         case onImportKeysFailure
         case onNetworkAdded(String)
         case onNetworkMetadataAdded(network: String, metadataVersion: String)
@@ -300,16 +302,19 @@ extension TransactionPreview {
         func onBackButtonTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDismissal)
         }
 
         func onDoneTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDone)
         }
 
         func onCancelTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDismissal)
         }
 
         func onApproveTap() {
@@ -320,7 +325,7 @@ extension TransactionPreview {
             case let .metadata(network, version):
                 onCompletion(.onNetworkMetadataAdded(network: network, metadataVersion: version))
             default:
-                ()
+                onCompletion(.onDone)
             }
             dismissRequest.send()
         }

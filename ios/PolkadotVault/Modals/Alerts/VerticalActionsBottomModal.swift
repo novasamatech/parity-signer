@@ -69,7 +69,7 @@ struct VerticalActionsBottomModal: View {
                     }
                     .padding(.top, Spacing.extraSmall)
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }

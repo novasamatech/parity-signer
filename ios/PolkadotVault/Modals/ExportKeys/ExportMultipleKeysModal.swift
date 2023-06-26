@@ -66,7 +66,7 @@ struct ExportMultipleKeysModal: View {
                     }
                     .padding(Spacing.extraSmall)
                     .strokeContainerBackground()
-                    .padding([.leading, .trailing], Spacing.medium)
+                    .padding(.horizontal, Spacing.medium)
                 }
                 .padding(.bottom, Spacing.medium)
             }
@@ -132,7 +132,7 @@ private extension ExportMultipleKeysModal {
             }
         }
         .frame(height: Heights.actionSheetButton)
-        .padding([.leading, .trailing], Spacing.extraSmall)
+        .padding(.horizontal, Spacing.extraSmall)
         .background(Color.clear)
     }
 }
@@ -162,7 +162,7 @@ private struct ExportPrivateKeyAddressFooter: View {
                 )
             )
         }
-        .padding([.leading, .trailing], Spacing.large)
+        .padding(.horizontal, Spacing.large)
         .padding([.top, .bottom], Spacing.extraSmall)
     }
 }

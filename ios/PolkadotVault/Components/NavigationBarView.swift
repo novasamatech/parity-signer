@@ -82,7 +82,7 @@ struct NavigationBarView: View {
                         buttonView($0)
                     }
                 }
-                .padding([.leading, .trailing], Spacing.extraExtraSmall)
+                .padding(.horizontal, Spacing.extraExtraSmall)
                 titleView(viewModel.title)
             }
             .frame(maxWidth: .infinity)

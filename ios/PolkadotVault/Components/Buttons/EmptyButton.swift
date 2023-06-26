@@ -13,7 +13,7 @@ struct EmptyButton: View {
     private let style: ActionButtonStyle
 
     init(
-        action: @escaping () -> Void,
+        action: @escaping @autoclosure () -> Void,
         text: LocalizedStringKey,
         style: ActionButtonStyle = .emptyPrimary()
     ) {

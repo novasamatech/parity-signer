@@ -30,12 +30,12 @@ struct KeyListMoreMenuModal: View {
                         text: Localizable.KeySets.More.Action.export.key
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }
         )

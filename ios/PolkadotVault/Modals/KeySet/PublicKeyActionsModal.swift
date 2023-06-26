@@ -50,12 +50,12 @@ struct PublicKeyActionsModal: View {
                         style: .destructive
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
                 .padding(.bottom, Spacing.medium)
             }
