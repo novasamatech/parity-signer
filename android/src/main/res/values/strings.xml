@@ -364,10 +364,10 @@
 	<string name="key_details_public_label_keyset">Key Set Name</string>
 	<string name="derivation_network_select_title">Select Network</string>
 	<string name="derive_key_network_all">Allow use on any network</string>
-	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
+	<string name="derivation_create_help_network_setup_label">Haven’t found a network needed?\nLearn more about how to set up networks</string>
 	<string name="networks_screen_add_net_network">Add new network</string>
-	<string name="networks_help_screen_1">Step 1/2</string>
-	<string name="networks_help_screen_2">Step 2/2</string>
+	<string name="screen_step_1_2">Step 1/2</string>
+	<string name="screen_step_2_2">Step 2/2</string>
 	<string name="networks_help_title_add_networks">How to Add Networks</string>
 	<string name="networks_help_title_add_metadata">How to Update Network’s Metadata</string>
 	<string name="step_number_1">1</string>
@@ -406,6 +406,7 @@
 	<string name="keyset_recover_keys_notification_text">Please note that only root keys will be added on this step. If you key set has keys with customly added derivation path name, please restore them separately from the recovered key set screen.</string>
 	<string name="key_set_no_networks_title">Proceed with the Empty Key Set?</string>
 	<string name="key_set_no_networks_subtitle">"Since you haven't selected any keys, you key set will be empty. Are you sure? "</string>
+	<string name="create_derivation_title">Create Derived Key</string>
 
 </resources>
 

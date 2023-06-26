@@ -1,9 +1,19 @@
 package io.parity.signer.screens.createderivation.derivationsubscreens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,12 +29,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.ScreenHeaderClose
+import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.appliedStroke
+import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun DeriveKeyNetworkSelectScreen(
@@ -36,14 +51,26 @@ fun DeriveKeyNetworkSelectScreen(
 ) {
 
 	Column(modifier) {
-		ScreenHeaderClose(
-			title = stringResource(R.string.derivation_network_select_title),
+		ScreenHeaderWithButton(
+			canProceed = false,
+			title = stringResource(R.string.create_derivation_title),
+			subtitle = stringResource(R.string.screen_step_1_2),
+			btnText = null,
+			backNotClose = false,
 			onClose = onClose,
+			onDone = null,
+		)
+		Text(
+			text = stringResource(R.string.derivation_network_select_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyL,
+			modifier = Modifier
+				.padding(horizontal = 16.dp, vertical = 8.dp)
 		)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 8.dp)
+				.padding(horizontal = 8.dp, vertical = 8.dp)
 				.background(
 					MaterialTheme.colors.fill6,
 					RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
@@ -58,7 +85,7 @@ fun DeriveKeyNetworkSelectScreen(
 		}
 		NetworkHelpAlarm(
 			Modifier
-				.padding(horizontal = 8.dp)
+				.padding(horizontal = 24.dp)
 				.clickable(onClick = onNetworkHelp)
 		)
 		Spacer(modifier = Modifier.weight(1f))
