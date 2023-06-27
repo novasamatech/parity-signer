@@ -1,9 +1,7 @@
-package io.parity.signer.screens.keysets.restore
+package io.parity.signer.screens.keysets.restore.recoverkeysetnetworks
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,16 +16,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.ProceedEmptyKeysetConfirmation
 import io.parity.signer.components.base.NotificationFrameText
@@ -35,11 +29,9 @@ import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselect
 import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselectAll
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -47,24 +39,15 @@ import io.parity.signer.ui.theme.fill6
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun RecoverKeysetSelectNetworkScreen(
-	seedName: String,
-	seedPhrase: String,
-	rootNavigator: Navigator,
-	onBack: Callback,
+@OptIn(ExperimentalMaterialApi::class)
+fun RecoverKeysetSelectNetworkScreenBase(
+	networks: List<NetworkModel>,
+	selected: MutableState<Set<String>>,
+	defaultSelectedNetworks: Set<String>,
+	onProceedAction: Callback,
+	onBack: Callback
 ) {
-	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
-	val selected: MutableState<Set<String>> =
-		remember {
-			mutableStateOf(
-				networksViewModel.getDefaultPreselectedNetworks()
-					.map { it.key }.toSet()
-			)
-		}
-	val networks = networksViewModel.getAllNetworks()
-
 	val confirmBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
@@ -74,21 +57,6 @@ fun RecoverKeysetSelectNetworkScreen(
 			skipHalfExpanded = false
 		)
 	val scope = rememberCoroutineScope()
-	val context = LocalContext.current
-
-	val onProceedAction = {
-		networksViewModel.createKeySetWithNetworks(
-			seedName = seedName, seedPhrase = seedPhrase,
-			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
-				.toSet(),
-			navigator = rootNavigator,
-		)
-		Toast.makeText(
-			context,
-			context.getText(R.string.key_set_has_been_recovered_toast),
-			Toast.LENGTH_LONG
-		).show()
-	}
 
 	BottomSheetWrapperContent(
 		bottomSheetState = confirmBottomSheetState,
@@ -118,8 +86,7 @@ fun RecoverKeysetSelectNetworkScreen(
 				},
 				onAddAll = {
 					selected.value = if (selected.value.size == networks.size) {
-						networksViewModel.getDefaultPreselectedNetworks().map { it.key }
-							.toSet()
+						defaultSelectedNetworks
 					} else {
 						networks.map { it.key }.toSet()
 					}

@@ -3,8 +3,8 @@ package io.parity.signer.domain
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.BuildConfig
-import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
@@ -55,7 +55,10 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 			val navigationAction = runBlocking {
 				val result = uniffiInteractor.navigate(action, details, seedPhrase)
 				when (result) {
-					is OperationResult.Err -> singleton._actionResult.value?.copy(alertData = AlertData.ErrorData(result.error.message))
+					is OperationResult.Err -> singleton._actionResult.value?.copy(
+						alertData = AlertData.ErrorData(result.error.message)
+					)
+
 					is OperationResult.Ok -> result.result
 				}
 			} ?: return
@@ -158,8 +161,8 @@ class EmptyNavigator : Navigator {
 class FakeNavigator : Navigator {
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 		try {
-		backendAction(action, details, seedPhrase)
-		} catch (e: ErrorDisplayed){
+			backendAction(action, details, seedPhrase)
+		} catch (e: ErrorDisplayed) {
 			Log.e("fake navigation error", e.message ?: e.toString())
 		}
 		//do nothing with result

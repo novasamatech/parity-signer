@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.create.backupstepscreens
+package io.parity.signer.screens.scan.bananasplit.networks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,27 +10,12 @@ import io.parity.signer.domain.usecases.CreateKeySetUseCase
 import kotlinx.coroutines.launch
 
 
-class NewKeySetNetworksViewModel : ViewModel() {
+class BananaNetworksViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
-	private val createKeySetUseCase = CreateKeySetUseCase()
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
 	fun getDefaultPreselectedNetworks(): List<NetworkModel> =
 		allNetworksUseCase.getDefaultPreselectedNetworks()
-
-	fun createKeySetWithNetworks(
-		seedName: String, seedPhrase: String,
-		networkForKeys: Set<NetworkModel>,
-		onAfterCreate: Callback = {},
-	): Unit {
-		viewModelScope.launch {
-			createKeySetUseCase.createKeySetWithNetworks(
-				seedName, seedPhrase,
-				networkForKeys.map { it.key },
-			)
-			onAfterCreate()
-		}
-	}
 }
