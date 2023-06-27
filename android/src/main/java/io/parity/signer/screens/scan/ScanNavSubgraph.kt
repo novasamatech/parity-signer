@@ -4,7 +4,10 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
@@ -14,7 +17,8 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
+import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
+import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
@@ -44,6 +48,9 @@ fun ScanNavSubgraph(
 	val passwordModel = scanViewModel.passwordModel.collectAsState()
 	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
 
+	val addedNetworkName: MutableState<String?> =
+		remember { mutableStateOf(null) }
+
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
 
@@ -63,12 +70,20 @@ fun ScanNavSubgraph(
 	val transactionsValue = transactions.value
 	val bananaQrData = bananaSplitPassword.value
 	if (bananaQrData != null) {
-		BananaSplitPasswordScreen(
+		BananaSplitSubgraph(
 			qrData = bananaQrData,
 			onClose = {
 				backAction()
 			},
 			onSuccess = { seedName ->
+				Toast.makeText(
+					context,
+					context.getString(
+						R.string.key_set_has_been_recovered_toast,
+						seedName
+					),
+					Toast.LENGTH_LONG
+				).show()
 				scanViewModel.clearState()
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
@@ -81,7 +96,6 @@ fun ScanNavSubgraph(
 				scanViewModel.errorWrongPassword.value = true
 				scanViewModel.bananaSplitPassword.value = null
 			},
-			modifier = Modifier.statusBarsPadding(),
 		)
 	} else if (transactionsValue == null || showingModals) {
 
@@ -116,7 +130,9 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
+						addedNetworkName.value = previewType.network
 					}
+
 					is TransactionPreviewType.Metadata -> {
 						Toast.makeText(
 							context,
@@ -128,12 +144,17 @@ fun ScanNavSubgraph(
 							Toast.LENGTH_LONG
 						).show()
 					}
+
 					else -> {
 						//nothing
 					}
 				}
+				//finally clear transaction state and stay in scan screen
 				scanViewModel.clearState()
-				rootNavigator.navigate(Action.GO_FORWARD)
+				val fakeNavigator = FakeNavigator()
+				fakeNavigator.navigate(Action.GO_FORWARD)
+				fakeNavigator.navigate(Action.START)
+				fakeNavigator.navigate(Action.NAVBAR_SCAN)
 			},
 			onImportKeys = {
 				scanViewModel.onImportKeysTap(transactionsValue, context)
@@ -166,6 +187,13 @@ fun ScanNavSubgraph(
 				},
 			)
 		}
+	} ?: addedNetworkName.value?.let { addedNetwork ->
+		AddedNetworkSheetsSubgraph(
+			networkNameAdded = addedNetwork,
+			onClose = {
+				addedNetworkName.value = null
+			}
+		)
 	} ?: if (errorWrongPassword.value) {
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			WrongPasswordBottomSheet(
