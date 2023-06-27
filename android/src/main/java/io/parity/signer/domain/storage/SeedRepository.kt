@@ -90,6 +90,30 @@ class SeedRepository(
 		}
 	}
 
+	suspend fun fillSeedToPhrasesAuth(seedNames: List<String>): RepoResult<List<Pair<String, String>>> {
+		return try {
+				when (val authResult =
+					authentication.authenticate(activity)) {
+					AuthResult.AuthSuccess -> {
+						val result = seedNames.map { it to storage.getSeed(it) }
+						return if (result.any { it.second.isEmpty() }) {
+							RepoResult.Failure(IllegalStateException("phrase some are empty - broken storage?"))
+						} else {
+							RepoResult.Success(result)
+						}
+					}
+					AuthResult.AuthError,
+					AuthResult.AuthFailed,
+					AuthResult.AuthUnavailable -> {
+						RepoResult.Failure(RuntimeException("auth error - $authResult"))
+					}
+				}
+		} catch (e: java.lang.Exception) {
+			Log.d("get seed failure", e.toString())
+			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
+			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
+		}
+	}
 
 	/**
 	 * Add seed, encrypt it, and create default accounts

@@ -396,7 +396,8 @@
 	<string name="recover_key_set_phrase_title">Enter a Secret Recovery Phrase</string>
 	<string name="recover_key_set_phrase_subtitle">Enter a 24-word phrase you were given when you created your key set</string>
 	<string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
-	<string name="key_set_has_been_recovered_toast">Key Set Has Been Recovered</string>
+	<string name="key_set_has_been_recovered_toast">"%1$s Key Set Has Been Recovered"</string>
+	<string name="key_set_has_been_created_toast">"%1$s Key Set Has Been Created"</string>
 	<string name="keyset_create_keys_title">Create Keys</string>
 	<string name="keyset_create_keys_subtitle">Choose networks for the keys to be created</string>
 	<string name="keyset_create_keys_notification_text">Please note that keys with customly named derivation path name can be created from the key set screen separatley.</string>
@@ -406,6 +407,11 @@
 	<string name="keyset_recover_keys_notification_text">Please note that only root keys will be added on this step. If you key set has keys with customly added derivation path name, please restore them separately from the recovered key set screen.</string>
 	<string name="key_set_no_networks_title">Proceed with the Empty Key Set?</string>
 	<string name="key_set_no_networks_subtitle">"Since you haven't selected any keys, you key set will be empty. Are you sure? "</string>
+	<string name="add_network_add_keys_title">Create Key for the %1$s Network?</string>
+	<string name="add_network_add_keys_cta">Create Key</string>
+	<string name="add_network_add_keys_list_title">Create Key for the %1$s Network</string>
+	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
+	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
 	<string name="create_derivation_title">Create Derived Key</string>
 
 </resources>

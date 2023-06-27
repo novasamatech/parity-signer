@@ -16,23 +16,28 @@ class CreateKeySetViaStateMachineUseCase() {
 		seedPhrase: String,
 		networksKeys: Set<NetworkModel>,
 		navigator: Navigator
-	): Unit {
+	): Boolean {
 		val repository = ServiceLocator.activityScope!!.seedRepository
-		repository.addSeed(
+		var success = repository.addSeed(
 			seedName = seedName,
 			seedPhrase = seedPhrase,
 			navigator = navigator,
 			isOptionalAuth = false
 		)
-		networksKeys.forEach { networkKey ->
-			try {
-				tryCreateAddress(
-					seedName = seedName, seedPhrase = seedPhrase,
-					path = networkKey.pathId, network = networkKey.key,
-				)
-			} catch (e: Exception) {
-				submitErrorState("can't create network key for new keyset, ${e.message}")
+		if (success) {
+			networksKeys.forEach { networkKey ->
+				try {
+					tryCreateAddress(
+						seedName = seedName, seedPhrase = seedPhrase,
+						path = networkKey.pathId, network = networkKey.key,
+					)
+				} catch (e: Exception) {
+					success = false
+					submitErrorState("can't create network key for new keyset, ${e.message}")
+				}
 			}
 		}
+		return success
 	}
+
 }

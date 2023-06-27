@@ -2,6 +2,7 @@ package io.parity.signer.screens.keysets.create.backupstepscreens
 
 import SignerCheckbox
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,7 +58,7 @@ fun NewKeySetSelectNetworkScreen(
 	navigator: Navigator,
 	onBack: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(
@@ -66,6 +68,7 @@ fun NewKeySetSelectNetworkScreen(
 		}
 	val networks = networksViewModel.getAllNetworks()
 
+	val context = LocalContext.current
 	val confirmBottomSheetState =
 		rememberModalBottomSheetState(
 			ModalBottomSheetValue.Hidden,
@@ -82,6 +85,15 @@ fun NewKeySetSelectNetworkScreen(
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			navigator = navigator,
+			onPostReaction = { isSuccess ->
+				if (isSuccess) {
+					Toast.makeText(
+						context,
+						context.getString(R.string.key_set_has_been_created_toast, model.seed),
+						Toast.LENGTH_LONG
+					).show()
+				}
+			}
 		)
 	}
 

@@ -2,14 +2,21 @@ package io.parity.signer.screens.scan.bananasplit
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.FakeNavigator
+import io.parity.signer.domain.mapState
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.uniffi.*
+import io.parity.signer.domain.usecases.CreateKeySetUseCase
+import io.parity.signer.uniffi.BananaSplitRecoveryResult
+import io.parity.signer.uniffi.DecodeSequenceResult
+import io.parity.signer.uniffi.QrSequenceDecodeException
+import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 
 class BananaSplitViewModel() : ViewModel() {
@@ -24,6 +31,10 @@ class BananaSplitViewModel() : ViewModel() {
 	//String is seed name
 	val isSuccessTerminal = _isSuccessTerminal.asStateFlow()
 
+	//storing seed phrase between screens while user selecting networks
+	private val _seedPhrase =  MutableStateFlow<String?>(null)
+	val isBananaRestorable = _seedPhrase.mapState(viewModelScope) { it != null }
+
 	//ongoing events
 	private val _password = MutableStateFlow<String>("")
 	val password = _password.asStateFlow()
@@ -34,9 +45,8 @@ class BananaSplitViewModel() : ViewModel() {
 	private val _wrongPasswordCurrent = MutableStateFlow<Boolean>(false)
 	val wrongPasswordCurrent = _wrongPasswordCurrent.asStateFlow()
 
-
-	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
+	private val createKeySetUseCase = CreateKeySetUseCase()
 	private lateinit var qrCodeData: List<String>
 	private var invalidPasswordAttempts = 0
 
@@ -48,6 +58,7 @@ class BananaSplitViewModel() : ViewModel() {
 	}
 
 	fun cleanState() {
+		_seedPhrase.value = null
 		_password.value = ""
 		_seedName.value = ""
 		_seedCollision.value = false
@@ -70,51 +81,46 @@ class BananaSplitViewModel() : ViewModel() {
 		_seedName.value = newSeedName
 	}
 
-	suspend fun onDoneTap(context: Context) {
-		val password = password.value
+	fun backToBananaRestore() {
+		_seedPhrase.value = null
+	}
+
+	suspend fun onFinishWithNetworks(context: Context, networksKeys: Set<String>) {
 		val seedName = seedName.value
+		val seedPhrase = _seedPhrase.value!!
+		val isSaved = createKeySetUseCase.createKeySetWithNetworks(
+			seedName, seedPhrase,
+			networksKeys.toList(),
+		)
+		if (!isSaved) {
+			_isCustomErrorTerminal.value =
+				context.getString(R.string.banana_split_password_error_cannot_save_seed)
+			return
+		}
+		_isSuccessTerminal.value = seedName
+	}
+	suspend fun onBananaDoneTry(context: Context) {
+		val password = password.value
+
 		try {
 			when (val qrResult =
 				qrparserTryDecodeQrSequence(qrCodeData, password, true)) {
 				is DecodeSequenceResult.BBananaSplitRecoveryResult -> {
-					when (val seed = qrResult.b) {
+					when (val seedPhraseResult = qrResult.b) {
 						is BananaSplitRecoveryResult.RecoveredSeed -> {
-							if (seedRepository.isSeedPhraseCollision(seed.s)) {
+							if (seedRepository.isSeedPhraseCollision(seedPhraseResult.s)) {
 								_isCustomErrorTerminal.value =
 									context.getString(R.string.banana_split_password_error_seed_phrase_exists)
 								return
 							}
-							val fakeNavigator = FakeNavigator()
-							//fake navigations
-							fakeNavigator.navigate(Action.NAVBAR_KEYS)
-							// Key Set List state has different "modalData" state depending on whether user has at least one key or not
-							// So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
-							if (seedRepository.getLastKnownSeedNames().isNotEmpty()) {
-								fakeNavigator.navigate(Action.RIGHT_BUTTON_ACTION)
-							}
-							fakeNavigator.navigate(Action.RECOVER_SEED)
-							fakeNavigator.navigate(Action.GO_FORWARD, seedName)
-							// We should do additional check on whether seed can be successfully saved and not call navigation
-							// further if there are any issues (i.e. somehow seedname is still empty, etc)
-							val isSaved = seedRepository.addSeed(
-								seedName = seedName,
-								seedPhrase = seed.s,
-								navigator = FakeNavigator(),
-								isOptionalAuth = true,
-							)
-							if (!isSaved) {
-								_isCustomErrorTerminal.value =
-									context.getString(R.string.banana_split_password_error_cannot_save_seed)
-								return
-							}
-							fakeNavigator.navigate(Action.GO_BACK)
-							_isSuccessTerminal.value = seedName
+							_seedPhrase.value = seedPhraseResult.s
 						}
 						BananaSplitRecoveryResult.RequestPassword -> {
 							submitErrorState("We passed password but recieved password request again, should be unreacheble ")
 						}
 					}
 				}
+
 				is DecodeSequenceResult.Other -> {
 					submitErrorState("already processing banana split, but other qr code data happened to be here, submit it!, $qrResult")
 				}
@@ -129,10 +135,12 @@ class BananaSplitViewModel() : ViewModel() {
 					}
 					_wrongPasswordCurrent.value = true
 				}
+
 				is QrSequenceDecodeException.BananaSplit -> {
 					val error = e.s
 					_isCustomErrorTerminal.value = error
 				}
+
 				is QrSequenceDecodeException.GenericException -> {
 					val error = e.s
 					_isCustomErrorTerminal.value = error
