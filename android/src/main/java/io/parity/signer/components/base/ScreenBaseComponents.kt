@@ -37,15 +37,16 @@ import io.parity.signer.ui.theme.fill12
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
-
+//todo dmitry rename it to Screen Headers as other PR merged
 @Composable
 fun ScreenHeader(
 	title: String?,
 	onBack: Callback? = null,
 	onMenu: Callback? = null,
+	modifier: Modifier = Modifier,
 ) {
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth(1f)
 			.defaultMinSize(minHeight = 56.dp)
 	) {
