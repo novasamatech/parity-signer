@@ -236,14 +236,14 @@
 	<string name="derivation_help_keys_message1">If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys. </string>
 	<string name="derivation_help_keys_message2">We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.</string>
 	<string name="derivation_help_keys_message3">The main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.</string>
-	<string name="new_derivation_conformation_title">Write Down Your Derivation Path</string>
+	<string name="new_derivation_conformation_title">Write Down Your Derivation Path Name</string>
 	<string name="new_derivation_conformation_message">Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="new_derivation_conformation_path_headline">Derivation Path Name</string>
 	<string name="new_derivation_conformation_checkbox_wrote_down">I have written down my derivation path name</string>
 	<string name="derivation_path_screen_title">Derivation Path Name</string>
 	<string name="derivation_path_screen_help_tile_message_highlited_part">/soft, //hard, ///password</string>
 	<string name="derivation_path_screen_help_tile_message">Learn more about /soft, //hard, ///password derivation methods</string>
-	<string name="derivation_path_screen_subinput_hint">Path name example //network//1</string>
+	<string name="derivation_path_screen_subinput_hint">Proceed with default or enter custom. \nPath name example: //&lt;network&gt;//0.</string>
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
@@ -364,10 +364,10 @@
 	<string name="key_details_public_label_keyset">Key Set Name</string>
 	<string name="derivation_network_select_title">Select Network</string>
 	<string name="derive_key_network_all">Allow use on any network</string>
-	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
+	<string name="derivation_create_help_network_setup_label">Haven’t found a network needed?\nLearn more about how to set up networks</string>
 	<string name="networks_screen_add_net_network">Add new network</string>
-	<string name="networks_help_screen_1">Step 1/2</string>
-	<string name="networks_help_screen_2">Step 2/2</string>
+	<string name="screen_step_1_2">Step 1/2</string>
+	<string name="screen_step_2_2">Step 2/2</string>
 	<string name="networks_help_title_add_networks">How to Add Networks</string>
 	<string name="networks_help_title_add_metadata">How to Update Network’s Metadata</string>
 	<string name="step_number_1">1</string>
@@ -412,6 +412,7 @@
 	<string name="add_network_add_keys_list_title">Create Key for the %1$s Network</string>
 	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
 	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
+	<string name="create_derivation_title">Create Derived Key</string>
 
 </resources>
 
