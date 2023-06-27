@@ -24,8 +24,6 @@ fun ScreenSelector(
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
-	val seedNames =
-		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
