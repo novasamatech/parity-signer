@@ -214,6 +214,7 @@
 		6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */; };
 		6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */; };
 		6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */; };
+		6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */; };
 		6DB39AA62A45ABFB004B8FAA /* CreateDerivedKeyNameService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA52A45ABFB004B8FAA /* CreateDerivedKeyNameService.swift */; };
 		6DB39AA92A45C909004B8FAA /* TransparentHelpBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */; };
 		6DB99035295C1080001101DC /* ConnectivityAlertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */; };
@@ -557,6 +558,7 @@
 		6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageNetworkDetailsService.swift; sourceTree = "<group>"; };
 		6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedStateMediator.swift; sourceTree = "<group>"; };
 		6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediator.swift; sourceTree = "<group>"; };
+		6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDerivedKeysView.swift; sourceTree = "<group>"; };
 		6DB39AA52A45ABFB004B8FAA /* CreateDerivedKeyNameService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDerivedKeyNameService.swift; sourceTree = "<group>"; };
 		6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentHelpBox.swift; sourceTree = "<group>"; };
 		6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityAlertButton.swift; sourceTree = "<group>"; };
@@ -1539,12 +1541,12 @@
 			path = DynamicDerivations;
 			sourceTree = "<group>";
 		};
-		6DB39AA72A45C109004B8FAA /* Services */ = {
+		6DB39AA22A4579CF004B8FAA /* DynamicDerivations */ = {
 			isa = PBXGroup;
 			children = (
-				6DB39AA52A45ABFB004B8FAA /* CreateDerivedKeyNameService.swift */,
+				6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */,
 			);
-			path = Services;
+			path = DynamicDerivations;
 			sourceTree = "<group>";
 		};
 		6DBA658A2A2656B400F04492 /* CreateKeysForNetworks */ = {
@@ -2229,6 +2231,7 @@
 				6D52E3B12946FF5E00AD72F0 /* NetworkLogoIcon.swift in Sources */,
 				6D52E3A52946C3B400AD72F0 /* SettingsView.swift in Sources */,
 				6DA2ACA22939CB3900AAEADC /* CancelBag.swift in Sources */,
+				6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */,
 				6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */,
 				6D52E3A72946C45100AD72F0 /* SettingsItem.swift in Sources */,
 				6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift in Sources */,

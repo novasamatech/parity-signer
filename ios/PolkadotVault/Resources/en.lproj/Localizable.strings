@@ -613,3 +613,9 @@
 
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";
+
+"AddDerivedKeys.Label.Title" = "Add Derived Keys";
+"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
+"AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
+"AddDerivedKeys.Action.Done" = "Done";
+
