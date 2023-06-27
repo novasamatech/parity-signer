@@ -235,7 +235,6 @@ private fun KeySetDetailsEmptyList(onAdd: Callback) {
 				style = SignerTypeface.TitleM,
 				textAlign = TextAlign.Center,
 			)
-
 			SecondaryButtonWide(
 				label = stringResource(R.string.key_sets_details_screem_create_derived_button),
 				withBackground = true,
