@@ -141,7 +141,7 @@ private fun KeysetItemDerivedItem(model: KeysetDerivedModel) {
 			Spacer(modifier = Modifier.weight(1f))
 		}
 		model.keysets.forEach { keyset ->
-			SignerDivider(modifier = Modifier.padding(start = 48.dp))
+			SignerDivider()
 			KeyDerivedItem(model = keyset.key, keyset.key.path, onClick = null)
 		}
 	}
@@ -158,14 +158,14 @@ data class AddDerivedKeysModel(
 		fun createStub(): AddDerivedKeysModel = AddDerivedKeysModel(
 			listOf(
 				KeysetDerivedModel(
-					seedName = "my special keyset",
+					seedName = "My special keyset",
 					keysets = listOf(
 						KeyAndNetworkModel.createStub(),
 						KeyAndNetworkModel.createStub()
 					),
 				),
 				KeysetDerivedModel(
-					seedName = "my special keyset2",
+					seedName = "My special keyset2",
 					keysets = listOf(
 						KeyAndNetworkModel.createStub(),
 					),

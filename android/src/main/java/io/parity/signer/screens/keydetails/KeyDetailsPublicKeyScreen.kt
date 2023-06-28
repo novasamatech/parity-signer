@@ -45,6 +45,7 @@ import kotlinx.coroutines.runBlocking
 fun KeyDetailsPublicKeyScreen(
 	model: KeyDetailsModel,
 	rootNavigator: Navigator,
+	dynamic: Boolean = false,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
@@ -119,6 +120,14 @@ fun KeyDetailsPublicKeyScreen(
 							networkLogoName = model.address.network,
 							size = 36.dp,
 							modifier = Modifier.padding(start = 8.dp)
+						)
+					}
+					if (dynamic) {
+						SignerDivider()
+						Text( //todo dmitry finish
+							text = stringResource(R.string.key_details_public_label_network),
+							style = SignerTypeface.BodyL,
+							color = MaterialTheme.colors.textTertiary
 						)
 					}
 				}
