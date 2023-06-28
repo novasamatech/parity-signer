@@ -1,9 +1,22 @@
 package io.parity.signer.screens.keydetails
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -33,7 +46,14 @@ import io.parity.signer.domain.KeyDetailsModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.appliedStroke
+import io.parity.signer.ui.theme.fill12
+import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.red500
+import io.parity.signer.ui.theme.red500fill12
+import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.encodeToQr
 import kotlinx.coroutines.runBlocking
@@ -124,10 +144,14 @@ fun KeyDetailsPublicKeyScreen(
 					}
 					if (dynamic) {
 						SignerDivider()
-						Text( //todo dmitry finish
-							text = stringResource(R.string.key_details_public_label_network),
+						Text(
+							text = stringResource(R.string.dynamic_derivation_path_label),
 							style = SignerTypeface.BodyL,
-							color = MaterialTheme.colors.textTertiary
+							color = MaterialTheme.colors.textTertiary,
+							modifier = Modifier
+								.fillMaxWidth(1f)
+								.padding(vertical = 12.dp, horizontal = 8.dp),
+							textAlign = TextAlign.Center,
 						)
 					}
 				}
@@ -278,7 +302,7 @@ private fun PreviewKeyDetailsScreenRoot() {
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), true)
 		}
 	}
 }
