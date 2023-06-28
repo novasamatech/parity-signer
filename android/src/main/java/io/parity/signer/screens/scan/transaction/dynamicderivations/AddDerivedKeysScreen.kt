@@ -81,7 +81,7 @@ fun AddDerivedKeysScreen(
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
-				.padding(top = 8.dp, bottom = 20.dp),
+				.padding(top = 16.dp, bottom = 20.dp),
 		)
 		Box(
 			modifier = Modifier
