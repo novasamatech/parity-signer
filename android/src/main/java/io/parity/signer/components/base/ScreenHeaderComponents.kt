@@ -37,7 +37,6 @@ import io.parity.signer.ui.theme.fill12
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
-//todo dmitry rename it to Screen Headers as other PR merged
 @Composable
 fun ScreenHeader(
 	title: String?,
