@@ -42,7 +42,7 @@ internal fun HowUpdateMetadata(
 				.padding(16.dp)
 		) {
 			Text(
-				text = stringResource(R.string.networks_help_screen_2),
+				text = stringResource(R.string.screen_step_2_2),
 				style = SignerTypeface.CaptionM,
 				color = MaterialTheme.colors.textSecondary,
 				modifier = Modifier.padding(horizontal = 8.dp),
