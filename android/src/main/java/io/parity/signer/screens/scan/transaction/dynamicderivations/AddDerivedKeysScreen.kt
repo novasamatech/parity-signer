@@ -1,20 +1,28 @@
 package io.parity.signer.screens.scan.transaction.dynamicderivations
 
 import android.content.res.Configuration
-import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,10 +33,14 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyAndNetworkModel
+import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItem
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.encodeToQr
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AddDerivedKeysScreen(
@@ -45,13 +57,13 @@ fun AddDerivedKeysScreen(
 			modifier = Modifier.padding(horizontal = 8.dp)
 		)
 		Text(
-			text = "Add Derived Keys",
+			text = stringResource(R.string.add_derived_keys_screen_title),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.TitleL,
 			modifier = Modifier.padding(horizontal = 24.dp),
 		)
 		Text(
-			text = "Сheck the keys and scan QR code into Omni Wallet app",
+			text = stringResource(R.string.add_derived_keys_screen_subtitle),
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
@@ -59,19 +71,43 @@ fun AddDerivedKeysScreen(
 				.padding(top = 8.dp, bottom = 20.dp),
 		)
 
-		//todo dmitry list of keysets
-
-		Text(
-			text = "Scan QR code to add the keys",//todo dmitry export text in this screen
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 8.dp, bottom = 20.dp),
-		)
-		//todo dmitry qr code
 		model.keysets.forEach { keyset ->
 			KeysetItemDerivedItem(keyset)
+		}
+
+		Text(
+			text = stringResource(R.string.add_derived_keys_screen_scan_qr_code),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyL,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(top = 8.dp, bottom = 20.dp),
+		)
+		Box(
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.fillMaxWidth(1f)
+				.aspectRatio(1.1f)
+				.background(
+					Color.White,
+					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+				),
+			contentAlignment = Alignment.Center,
+		) {
+			val isPreview = LocalInspectionMode.current
+			val qrImage = remember {
+				if (isPreview) {
+					PreviewData.exampleQRImage
+				} else {
+					runBlocking { encodeToQr(model.qrData, false) }
+				}
+			}
+			Image(
+				bitmap = qrImage.intoImageBitmap(),
+				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
+				contentScale = ContentScale.Fit,
+				modifier = Modifier.size(264.dp)
+			)
 		}
 
 		SecondaryButtonWide(
@@ -87,11 +123,11 @@ fun AddDerivedKeysScreen(
 private fun KeysetItemDerivedItem(model: KeysetDerivedModel) {
 	Column(
 		modifier = Modifier
+			.padding(horizontal = 16.dp, vertical = 4.dp)
 			.background(
 				MaterialTheme.colors.fill6,
 				RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
 			)
-			.animateContentSize()
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically
@@ -104,17 +140,19 @@ private fun KeysetItemDerivedItem(model: KeysetDerivedModel) {
 			)
 			Spacer(modifier = Modifier.weight(1f))
 		}
-		//todo dmitry
 		model.keysets.forEach { keyset ->
 			SignerDivider(modifier = Modifier.padding(start = 48.dp))
-			KeyDerivedItem(model = keyset.key, keyset.key.path, onClick = { })
+			KeyDerivedItem(model = keyset.key, keyset.key.path, onClick = null)
 		}
 	}
 }
 
 
+
+
 data class AddDerivedKeysModel(
 	val keysets: List<KeysetDerivedModel>,
+	val qrData: List<UByte>,
 ) {
 	companion object {
 		fun createStub(): AddDerivedKeysModel = AddDerivedKeysModel(
@@ -130,10 +168,10 @@ data class AddDerivedKeysModel(
 					seedName = "my special keyset2",
 					keysets = listOf(
 						KeyAndNetworkModel.createStub(),
-						KeyAndNetworkModel.createStub()
 					),
 				)
-			)
+			),
+			qrData = PreviewData.exampleQRData,
 		)
 	}
 }

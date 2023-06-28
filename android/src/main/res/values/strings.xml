@@ -413,6 +413,9 @@
 	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
 	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
 	<string name="create_derivation_title">Create Derived Key</string>
+	<string name="add_derived_keys_screen_title">Add Derived Keys</string>
+	<string name="add_derived_keys_screen_subtitle">Сheck the keys and scan QR code into Omni Wallet app</string>
+	<string name="add_derived_keys_screen_scan_qr_code">Scan QR code to add the keys</string>
 
 </resources>
 
