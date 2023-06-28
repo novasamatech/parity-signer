@@ -47,7 +47,11 @@ fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
 	root = root?.toKeysModel(),
 )
 
-data class KeyAndNetworkModel(val key: KeyModel, val network: NetworkInfoModel)
+data class KeyAndNetworkModel(val key: KeyModel, val network: NetworkInfoModel) {
+	companion object {
+		fun createStub() = KeyAndNetworkModel(KeyModel.createStub(), NetworkInfoModel.createStub())
+	}
+}
 
 fun MKeyAndNetworkCard.toKeyAndNetworkModel() = KeyAndNetworkModel(
 	key = key.toKeyModel(),
