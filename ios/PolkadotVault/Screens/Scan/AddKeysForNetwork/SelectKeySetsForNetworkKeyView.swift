@@ -42,6 +42,7 @@ struct SelectKeySetsForNetworkKeyView: View {
                     }
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.small)
+                    .padding(.top, Spacing.medium)
                 }
             }
         )
@@ -59,18 +60,16 @@ struct SelectKeySetsForNetworkKeyView: View {
 
     @ViewBuilder
     func mainContent() -> some View {
-        VStack(alignment: .leading, spacing: Spacing.extraLarge) {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
             Text(Localizable.SelectKeySetsForNetworkKey.Label.title(viewModel.networkName))
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.titleL.font)
-                .padding(.top, Spacing.extraSmall)
             Localizable.SelectKeySetsForNetworkKey.Label.content.text
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .font(PrimaryFont.bodyL.font)
         }
         .padding(.horizontal, Spacing.large)
-        .padding(.bottom, Spacing.medium)
-        .padding(.top, Spacing.extraSmall)
+        .padding(.vertical, Spacing.medium)
     }
 
     @ViewBuilder

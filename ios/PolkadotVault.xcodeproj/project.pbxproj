@@ -727,7 +727,6 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
-				6DED2AB32A405DB800EF1C49 /* AddKeysForNetwork */,
 				6D52E3AD2946FF4900AD72F0 /* NetworkSelection */,
 				6DEFB53028FEE17800762219 /* ExportKeys */,
 				6DBF6E2528E44DBA00CC959F /* Errors */,
@@ -945,6 +944,8 @@
 		6D199C9D292A8CF300E79113 /* Scan */ = {
 			isa = PBXGroup;
 			children = (
+				6DED2AB32A405DB800EF1C49 /* AddKeysForNetwork */,
+				6DB39AA22A4579CF004B8FAA /* DynamicDerivations */,
 				6DF91F3C29C06B17000A6BB2 /* Services */,
 				6D34233829952EB500F3BA27 /* Errors */,
 				6D3423372994F11300F3BA27 /* Password */,
@@ -1516,6 +1517,14 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		6DB39AA22A4579CF004B8FAA /* DynamicDerivations */ = {
+			isa = PBXGroup;
+			children = (
+				6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */,
+			);
+			path = DynamicDerivations;
+			sourceTree = "<group>";
+		};
 		6DB39AA72A45C109004B8FAA /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -1790,8 +1799,8 @@
 		6DED2AB32A405DB800EF1C49 /* AddKeysForNetwork */ = {
 			isa = PBXGroup;
 			children = (
-				6D31E7C12A404B4900BF9D9B /* AddKeysForNetworkModal.swift */,
 				6DED2AB42A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift */,
+				6D31E7C12A404B4900BF9D9B /* AddKeysForNetworkModal.swift */,
 			);
 			path = AddKeysForNetwork;
 			sourceTree = "<group>";
