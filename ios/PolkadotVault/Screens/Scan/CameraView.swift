@@ -198,6 +198,14 @@ struct CameraView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddDerivedKeys
+        ) {
+            AddDerivedKeysView(
+                viewModel: addDerivedKeysView()
+            )
+            .clearModalBackground()
+        }
         .bottomSnackbar(
             viewModel.snackbarViewModel,
             isPresented: $viewModel.isSnackbarPresented
@@ -242,6 +250,14 @@ struct CameraView: View {
             onCompletion: viewModel.onSelectKeySetsForNetworkCompletion(_:)
         )
     }
+
+    func addDerivedKeysView() -> AddDerivedKeysView.ViewModel {
+        .init(
+            dataModel: .stub,
+            isPresented: $viewModel.isPresentingAddDerivedKeys,
+            onCompletion: viewModel.onAddDerivedKeyCompletion(_:)
+        )
+    }
 }
 
 extension CameraView {
@@ -267,6 +283,9 @@ extension CameraView {
         @Published var shouldPresentKeySetSelection: Bool = false
         @Published var isPresentingKeySetSelection: Bool = false
         var networkName: String!
+
+        // Dynamic Derived Keys
+        @Published var isPresentingAddDerivedKeys: Bool = false
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
@@ -477,6 +496,15 @@ extension CameraView {
             cameraModel?.multipleTransactions = []
             cameraModel?.start()
             clearTransactionState()
+        }
+
+        func onAddDerivedKeyCompletion(_ onComplete: AddDerivedKeysView.OnCompletionAction) {
+            switch onComplete {
+            case .onCancel:
+                ()
+            case .onDone:
+                ()
+            }
         }
     }
 }

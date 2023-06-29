@@ -19,7 +19,13 @@ struct AddDerivedKeyKeySetData: Equatable {
     let derivedKeys: [AddDerivedKeyDerivedKeyData]
 }
 
+struct AddDerivedKeysError: Equatable, Identifiable, Hashable {
+    let id = UUID()
+    let errorMessage: String
+}
+
 struct AddDerivedKeysData: Equatable {
+    let errors: [AddDerivedKeysError]
     let keySets: [AddDerivedKeyKeySetData]
     let qrPayload: [[UInt8]]
 }
@@ -41,6 +47,7 @@ struct AddDerivedKeysView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
                         mainContent()
+                        errorsSection()
                         keySets()
                         qrCodeFooter()
                         Spacer()
@@ -59,6 +66,20 @@ struct AddDerivedKeysView: View {
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
+    }
+
+    @ViewBuilder
+    func errorsSection() -> some View {
+        LazyVStack(spacing: Spacing.extraSmall) {
+            ForEach(
+                viewModel.dataModel.errors,
+                id: \.id
+            ) {
+                ActionableInfoBoxView(renderable: .init(text: $0.errorMessage), action: nil)
+                    .padding(.bottom, $0 == viewModel.dataModel.errors.last ? Spacing.extraSmall : 0)
+            }
+        }
+        .padding(.horizontal, Spacing.medium)
     }
 
     @ViewBuilder
@@ -154,10 +175,13 @@ struct AddDerivedKeysView: View {
 }
 
 extension AddDerivedKeysView {
-    enum OnCompletionAction: Equatable {}
+    enum OnCompletionAction: Equatable {
+        case onCancel
+        case onDone
+    }
 
     final class ViewModel: ObservableObject {
-        var dataModel: AddDerivedKeysData! = .stub
+        let dataModel: AddDerivedKeysData
         private let onCompletion: (OnCompletionAction) -> Void
         var onErrorDismiss: (() -> Void)?
 
@@ -166,17 +190,23 @@ extension AddDerivedKeysView {
         @Published var keySets: [MmNetwork] = []
 
         init(
+            dataModel: AddDerivedKeysData,
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
+            self.dataModel = dataModel
             _isPresented = isPresented
             self.onCompletion = onCompletion
         }
 
-        func onDoneTap() {}
+        func onDoneTap() {
+            isPresented = false
+            onCompletion(.onDone)
+        }
 
         func onBackTap() {
             isPresented = false
+            onCompletion(.onCancel)
         }
     }
 }
@@ -186,6 +216,14 @@ extension AddDerivedKeysView {
         static var previews: some View {
             AddDerivedKeysView(
                 viewModel: .init(
+                    dataModel: .stub,
+                    isPresented: .constant(true),
+                    onCompletion: { _ in }
+                )
+            )
+            AddDerivedKeysView(
+                viewModel: .init(
+                    dataModel: .stubWithErrors,
                     isPresented: .constant(true),
                     onCompletion: { _ in }
                 )
@@ -196,6 +234,65 @@ extension AddDerivedKeysView {
 
 extension AddDerivedKeysData {
     static let stub: AddDerivedKeysData = .init(
+        errors: [],
+        keySets: [
+            .init(
+                keySetName: "My Key Set",
+                derivedKeys: [
+                    .init(
+                        base58: "1B2lb765432457SkT",
+                        identicon: .stubIdenticon,
+                        network: "polkadot"
+                    ),
+                    .init(
+                        base58: "1iKLh365474566754ZTDE",
+                        identicon: .stubIdenticon,
+                        network: "polkadot"
+                    ),
+                    .init(
+                        base58: "1jkCfy543654765675DOKg",
+                        identicon: .stubIdenticon,
+                        network: "polkadot"
+                    )
+                ]
+            ),
+            .init(
+                keySetName: "Other Key Set",
+                derivedKeys: [
+                    .init(
+                        base58: "1B2lb7653464235453SkT",
+                        identicon: .stubIdenticon,
+                        network: "polkadot"
+                    )
+                ]
+            )
+        ],
+        qrPayload:
+        [
+            Stubs.stubQRCode
+        ]
+    )
+
+    static let stubWithErrors: AddDerivedKeysData = .init(
+        errors: [
+            .init(
+                errorMessage: """
+                Some keys can not be imported until their key sets are recovered. \
+                Please recover the missing Key Sets.
+                """
+            ),
+            .init(
+                errorMessage: """
+                Some keys can not be imported until their networks are added. \
+                Please add missing networks and their metadata.
+                """
+            ),
+            .init(
+                errorMessage: """
+                Some are hidden from the list because they have already been imported.
+                """
+            )
+        ],
         keySets: [
             .init(
                 keySetName: "My Key Set",
