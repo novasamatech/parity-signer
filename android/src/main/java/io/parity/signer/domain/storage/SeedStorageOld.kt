@@ -52,6 +52,9 @@ fun SharedViewModel.removeSeed(seedName: String) {
 			seedStorage.removeSeed(seedName)
 			tellRustSeedNames()
 			navigator.navigate(Action.REMOVE_SEED)
+			//as remove_seed navigating us to old Log screen
+			//this will open keyset list
+			navigator.navigate(Action.START)
 		} catch (e: java.lang.Exception) {
 			Log.d("remove seed error", e.toString())
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
