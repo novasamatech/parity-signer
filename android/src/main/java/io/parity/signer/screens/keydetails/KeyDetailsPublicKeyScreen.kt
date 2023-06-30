@@ -65,7 +65,7 @@ import kotlinx.coroutines.runBlocking
 fun KeyDetailsPublicKeyScreen(
 	model: KeyDetailsModel,
 	rootNavigator: Navigator,
-	dynamic: Boolean = false,
+	dynamic: Boolean = false,//todo dmitry pass it from rust
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
@@ -146,7 +146,7 @@ fun KeyDetailsPublicKeyScreen(
 						SignerDivider()
 						Text(
 							text = stringResource(R.string.dynamic_derivation_path_label),
-							style = SignerTypeface.BodyL,
+							style = SignerTypeface.CaptionM,
 							color = MaterialTheme.colors.textTertiary,
 							modifier = Modifier
 								.fillMaxWidth(1f)
