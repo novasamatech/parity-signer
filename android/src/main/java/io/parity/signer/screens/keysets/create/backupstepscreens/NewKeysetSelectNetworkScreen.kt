@@ -40,6 +40,7 @@ import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.items.NetworkItemMultiselect
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
@@ -207,44 +208,6 @@ private fun NewKeySetSelectNetworkScreenPrivate(
 			modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
 			onClicked = onProceed,
 		)
-	}
-}
-
-
-@Composable
-internal fun NetworkItemMultiselect(
-	network: NetworkModel,
-	isSelected: Boolean,
-	onClick: (NetworkModel) -> Unit,
-) {
-	Row(
-		modifier = Modifier.clickable { onClick(network) },
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		NetworkIcon(
-			networkLogoName = network.logo,
-			modifier = Modifier
-				.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
-				.size(36.dp),
-		)
-		Text(
-			text = network.title,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleS,
-		)
-		Spacer(modifier = Modifier.weight(1f))
-		SignerCheckbox(
-			isChecked = isSelected,
-			modifier = Modifier.padding(end = 8.dp),
-			uncheckedColor = MaterialTheme.colors.primary,
-		) {
-			onClick(network)
-		}
 	}
 }
 
