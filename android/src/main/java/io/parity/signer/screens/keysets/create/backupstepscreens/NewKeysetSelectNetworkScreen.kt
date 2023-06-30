@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysets.create.backupstepscreens
 
-import SignerCheckbox
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,7 +39,6 @@ import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.items.NetworkItemMultiselect
-import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
