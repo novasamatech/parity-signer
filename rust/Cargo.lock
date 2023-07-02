@@ -845,7 +845,7 @@ version = "0.1.0"
 dependencies = [
  "constants",
  "eth-blockies",
- "frame-metadata",
+ "frame-metadata 16.0.0",
  "hex",
  "libsecp256k1",
  "parity-scale-codec",
@@ -1175,6 +1175,18 @@ name = "frame-metadata"
 version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "878babb0b136e731cc77ec2fd883ff02745ff21e6fb662729953d44923df009c"
+dependencies = [
+ "cfg-if",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+]
+
+[[package]]
+name = "frame-metadata"
+version = "16.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87cf1549fba25a6fcac22785b61698317d958e96cac72a59102ea45b9ae64692"
 dependencies = [
  "cfg-if",
  "parity-scale-codec",
@@ -2561,7 +2573,7 @@ dependencies = [
  "bitvec",
  "defaults",
  "definitions",
- "frame-metadata",
+ "frame-metadata 16.0.0",
  "hex",
  "lazy_static",
  "num-bigint",
@@ -3347,7 +3359,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16a5e7810815bd295da73e4216d1dfbced3c7c7c7054d70fa5f6e4c58123fff4"
 dependencies = [
  "either",
- "frame-metadata",
+ "frame-metadata 15.1.0",
  "parity-scale-codec",
  "scale-bits",
  "scale-decode",
@@ -4202,7 +4214,7 @@ dependencies = [
  "base58",
  "blake2",
  "derivative",
- "frame-metadata",
+ "frame-metadata 15.1.0",
  "futures",
  "getrandom 0.2.6",
  "hex",
@@ -4230,7 +4242,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8e86cb719003f1cedf2710a6e55ca4c37aba4c989bbd3b81dd1c52af9e4827e"
 dependencies = [
  "darling",
- "frame-metadata",
+ "frame-metadata 15.1.0",
  "heck",
  "hex",
  "jsonrpsee 0.16.2",
@@ -4262,7 +4274,7 @@ version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2593ab5f53435e6352675af4f9851342607f37785d84c7a3fb3139550d3c35f0"
 dependencies = [
- "frame-metadata",
+ "frame-metadata 15.1.0",
  "parity-scale-codec",
  "scale-info",
  "sp-core-hashing 6.0.0",
@@ -4658,7 +4670,7 @@ dependencies = [
  "constants",
  "db_handling",
  "definitions",
- "frame-metadata",
+ "frame-metadata 16.0.0",
  "hex",
  "log",
  "nom",
