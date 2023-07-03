@@ -68,6 +68,7 @@ fun NetworkItemClickable(
 fun NetworkItemMultiselect(
 	network: NetworkModel,
 	isSelected: Boolean,
+	modifier: Modifier = Modifier,
 	onClick: (NetworkModel) -> Unit,
 ) {
 	Row(

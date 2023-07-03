@@ -29,11 +29,9 @@ fun NetworkFilterMenu(
 	onConfirm: (List<NetworkModel>) -> Unit,
 	onCancel: Callback,
 ) {
-	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
+			.fillMaxWidth(),
 	) {
 		BottomSheetHeader(title = "Filter keys by network", //todo dmitry export
 			onCloseClicked = onCancel)
