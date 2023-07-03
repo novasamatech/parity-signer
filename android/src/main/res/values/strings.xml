@@ -418,6 +418,7 @@
 	<string name="add_derived_keys_screen_scan_qr_code">Scan QR code to add the keys</string>
 	<string name="dynamic_derivation_path_label">Imported from Omni Wallet</string>
 	<string name="generic_clear_selection">Clear</string>
+	<string name="network_filters_header">Filter keys by network</string>
 
 </resources>
 
