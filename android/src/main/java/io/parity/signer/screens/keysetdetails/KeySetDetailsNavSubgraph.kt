@@ -29,7 +29,7 @@ fun KeySetDetailsNavSubgraph(
 
 		composable(KeySetDetailsNavSubgraph.home) {
 			KeySetDetailsScreenFull(
-				model = model,
+				fullModel = model,
 				navigator = rootNavigator,
 				navController = navController,
 				networkState = networkState,

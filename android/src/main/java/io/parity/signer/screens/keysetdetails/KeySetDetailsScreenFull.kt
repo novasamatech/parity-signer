@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,11 +15,12 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
 fun KeySetDetailsScreenFull(
-	model: KeySetDetailsModel,
+	fullModel: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
 	networkState: State<NetworkState?>, //for shield icon
@@ -25,14 +28,17 @@ fun KeySetDetailsScreenFull(
 ) {
 	val menuNavController = rememberNavController()
 
+	val keySetViewModel: KeySetDetailsViewModel = viewModel()
+
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
-			model = model,
+			model = fullModel,
 			navigator = navigator,
 			networkState = networkState,
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
-			}
+			},
+			//todo dmitry open KeySetDetailsMenuSubgraph.network_filter
 		)
 	}
 
@@ -76,6 +82,20 @@ fun KeySetDetailsScreenFull(
 				)
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.network_filter) {
+			val initialSelection =
+				keySetViewModel.filters.collectAsStateWithLifecycle()
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				NetworkFilterMenu(
+					networks = keySetViewModel.getAllNetworks(),
+					initialSelection = initialSelection.value,
+					onConfirm = {
+						keySetViewModel.setFilters(it)
+						closeAction()
+					},
+				)
+			}
+		}
 	}
 }
 
@@ -84,5 +104,6 @@ private object KeySetDetailsMenuSubgraph {
 	const val empty = "keys_menu_empty"
 	const val keys_menu = "keys_menu"
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
+	const val network_filter = "keys_network_filters"
 }
 

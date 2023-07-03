@@ -23,17 +23,17 @@ import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
-private fun NetworkFilterMenu(
+fun NetworkFilterMenu(
 	networks: List<NetworkModel>,
-	onConfirm: (List<NetworkModel>) -> Unit,
+	initialSelection: Set<String>,
+	onConfirm: (Set<NetworkModel>) -> Unit,
 ) {
-
-	//todo dmitry viewmodel and data source for shared preferences
 
 	val selected: MutableState<Set<NetworkModel>> =
 		remember {
 			mutableStateOf(
-				networks.subList(0, 1).toSet()//todo dmitry get from viewmodel
+				initialSelection.mapNotNull { selected -> networks.firstOrNull { it.key == selected } }
+					.toSet()
 			)
 		}
 
@@ -47,13 +47,12 @@ private fun NetworkFilterMenu(
 				selected.value + network.key
 			}
 		},
-		onConfirm = { onConfirm(selected.value.toList()) },
-		onCancel = { onConfirm(emptyList()) },
+		onConfirm = { onConfirm(selected.value) },
+		onCancel = { onConfirm(emptySet()) },
 	)
 }
 
 
-//todo dmitry work in progress
 @Composable
 private fun NetworkFilterMenu(
 	networks: List<NetworkModel>,
@@ -80,7 +79,9 @@ private fun NetworkFilterMenu(
 			)
 		}
 		RowButtonsBottomSheet(
-			modifier = Modifier.padding(24.dp).padding(top = 8.dp),
+			modifier = Modifier
+				.padding(24.dp)
+				.padding(top = 8.dp),
 			labelCancel = stringResource(R.string.generic_clear_selection),
 			labelCta = stringResource(id = R.string.generic_done),
 			onClickedCancel = onCancel,
