@@ -78,13 +78,12 @@ pub fn make_identicon_from_multisigner(
         IdenticonStyle::Dots => make_identicon(&multisigner_to_public(multisigner)),
         IdenticonStyle::Blockies => {
             if let MultiSigner::Ecdsa(ref public) = multisigner {
-                use eth_blockies::{eth_blockies_png_data, SeedString};
+                use eth_blockies::{BlockiesGenerator, EthBlockies, SeedInput};
                 let account = print_ethereum_address(public);
-                let account = account.canonicalize_ethaddr();
+                let account = account.to_ethaddr_seed();
                 let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
-                let compressed_output = false;
                 SignerImage::Png {
-                    image: eth_blockies_png_data(account, dimension, compressed_output),
+                    image: EthBlockies::png_data(account, dimension),
                 }
             } else {
                 SignerImage::Png {
@@ -96,12 +95,11 @@ pub fn make_identicon_from_multisigner(
 }
 
 pub fn make_identicon_from_id20(id: &[u8; 20]) -> SignerImage {
-    use eth_blockies::eth_blockies_png_data;
+    use eth_blockies::{BlockiesGenerator, EthBlockies};
 
     let account = format!("0x{}", hex::encode(id));
     let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
-    let compressed_output = false;
-    let image = eth_blockies_png_data(account, dimension, compressed_output);
+    let image = EthBlockies::png_data(account, dimension);
 
     SignerImage::Png { image }
 }
