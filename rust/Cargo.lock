@@ -1058,9 +1058,9 @@ dependencies = [
 
 [[package]]
 name = "eth-blockies"
-version = "1.0.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8932e43959186cffa4e9f5201c610dd0831b26e04d2c3de9d39a759c4cf0236d"
+checksum = "c3ca1aa0ad69bfb561a3235f6cd61b3381678e61bfc4f9b8aa5427a311ec64ed"
 dependencies = [
  "deflate",
 ]
