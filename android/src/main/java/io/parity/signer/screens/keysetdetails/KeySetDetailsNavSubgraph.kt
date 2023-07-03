@@ -28,7 +28,7 @@ fun KeySetDetailsNavSubgraph(
 	) {
 
 		composable(KeySetDetailsNavSubgraph.home) {
-			KeySetDetailsScreenFull(
+			KeySetDetailsScreenSubgraph(
 				fullModel = model,
 				navigator = rootNavigator,
 				navController = navController,
@@ -64,6 +64,7 @@ fun KeySetDetailsNavSubgraph(
 						model = model,
 						navigator = EmptyNavigator(),
 						networkState = networkState,
+						onFilterClicked = {},
 						onMenu = {},
 					)
 				}

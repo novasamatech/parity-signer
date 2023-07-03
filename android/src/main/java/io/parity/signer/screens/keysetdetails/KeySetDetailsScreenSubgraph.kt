@@ -19,7 +19,7 @@ import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
-fun KeySetDetailsScreenFull(
+fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
@@ -32,12 +32,15 @@ fun KeySetDetailsScreenFull(
 
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
-			model = fullModel,
+			model = fullModel,//todo dmitry filter model
 			navigator = navigator,
 			networkState = networkState,
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 			},
+			onFilterClicked = {
+				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
+			}
 			//todo dmitry open KeySetDetailsMenuSubgraph.network_filter
 		)
 	}
@@ -96,6 +99,7 @@ fun KeySetDetailsScreenFull(
 				)
 			}
 		}
+		//todo dmitry KeySetDetailsNavSubgraph.backup move here
 	}
 }
 
