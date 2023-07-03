@@ -15,6 +15,10 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.getSeedPhraseForBackup
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
+import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
@@ -41,7 +45,6 @@ fun KeySetDetailsScreenSubgraph(
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 			}
-			//todo dmitry open KeySetDetailsMenuSubgraph.network_filter
 		)
 	}
 
@@ -63,8 +66,9 @@ fun KeySetDetailsScreenSubgraph(
 						navController.navigate(KeySetDetailsNavSubgraph.multiselect)
 					},
 					onBackupClicked = {
-						menuNavController.popBackStack()
-						navController.navigate(KeySetDetailsNavSubgraph.backup)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
+						}
 					},
 					onCancel = {
 						menuNavController.popBackStack()
@@ -99,7 +103,24 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
-		//todo dmitry KeySetDetailsNavSubgraph.backup move here
+		composable(KeySetDetailsMenuSubgraph.backup) {
+			//preconditions
+			val backupModel = fullModel.toSeedBackupModel()
+			if (backupModel == null) {
+				submitErrorState(
+					"navigated to backup model but without root in KeySet " +
+						"it's impossible to backup"
+				)
+				closeAction()
+			} else {
+				//content
+				KeySetBackupFullOverlayBottomSheet(
+					model = backupModel,
+					getSeedPhraseForBackup = ::getSeedPhraseForBackup,
+					onClose = closeAction,
+				)
+			}
+		}
 	}
 }
 
@@ -109,5 +130,6 @@ private object KeySetDetailsMenuSubgraph {
 	const val keys_menu = "keys_menu"
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
 	const val network_filter = "keys_network_filters"
+	const val backup = "keyset_details_backup"
 }
 
