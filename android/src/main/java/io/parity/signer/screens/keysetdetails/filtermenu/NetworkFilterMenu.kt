@@ -3,6 +3,7 @@ package io.parity.signer.screens.keysetdetails.filtermenu
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.RowButtonsBottomSheet
@@ -68,15 +70,17 @@ private fun NetworkFilterMenu(
 			title = stringResource(R.string.network_filters_header),
 			onCloseClicked = onCancel
 		)
-		SignerDivider()
+		SignerDivider(sidePadding = 24.dp)
 		networks.forEach { network ->
 			NetworkItemMultiselect(
+				modifier = Modifier.padding(start = 8.dp, end = 4.dp),
 				network = network,
 				isSelected = selectedNetwors.contains(network),
 				onClick = onClick
 			)
 		}
 		RowButtonsBottomSheet(
+			modifier = Modifier.padding(24.dp).padding(top = 8.dp),
 			labelCancel = stringResource(R.string.generic_clear_selection),
 			labelCta = stringResource(id = R.string.generic_done),
 			onClickedCancel = onCancel,

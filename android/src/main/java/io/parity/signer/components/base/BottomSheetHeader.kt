@@ -21,8 +21,8 @@ import io.parity.signer.ui.theme.textSecondary
 @Composable
 fun BottomSheetHeader(
 	title: String,
-	subtitile: String? = null,
 	modifier: Modifier = Modifier,
+	subtitile: String? = null,
 	onCloseClicked: Callback?
 ) {
 	Row(

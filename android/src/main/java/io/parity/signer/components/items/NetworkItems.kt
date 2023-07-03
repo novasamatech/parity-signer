@@ -72,7 +72,7 @@ fun NetworkItemMultiselect(
 	onClick: (NetworkModel) -> Unit,
 ) {
 	Row(
-		modifier = Modifier.clickable { onClick(network) },
+		modifier = modifier.clickable { onClick(network) },
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		NetworkIcon(
