@@ -50,11 +50,11 @@ class DerivationPathAnalyzerTest {
 		assertTrue(analyzer.isCorrect("//seed///sdfsdf"))
 		assertTrue(analyzer.isCorrect("//seed//sdfsdf"))
 		assertTrue(analyzer.isCorrect("/asdd"))
+		assertTrue(analyzer.isCorrect("///")) // no password is another error - not correctness
 		assertTrue(analyzer.isCorrect("//seed///")) // no password is another error
+		assertTrue(analyzer.isCorrect("///sdf"))
 
 		assertFalse(analyzer.isCorrect("//"))
-		assertFalse(analyzer.isCorrect("///"))
-		assertFalse(analyzer.isCorrect("///sdf"))
 		assertTrue(analyzer.isCorrect(""))//root key
 	}
 }

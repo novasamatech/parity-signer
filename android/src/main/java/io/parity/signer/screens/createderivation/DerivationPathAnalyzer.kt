@@ -16,7 +16,7 @@ import kotlin.math.min
 
 class DerivationPathAnalyzer {
 	// stolen from rust/db_handling/src/identities.rs:99 where it was stolen from sp_core
-	private val regexCheckPath: Regex = "^((//?[^/]+)+)(///.*)?$".toRegex()
+	private val regexCheckPath: Regex = "^((//?[^/]+)*)(///.*)?$".toRegex()
 
 	fun isCorrect(path: String): Boolean {
 		return path.isEmpty() || regexCheckPath.matches(path)
