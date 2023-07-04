@@ -36,7 +36,6 @@ fun KeySetDetailsScreenSubgraph(
 	val filteredModel = keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
 
 	Box(Modifier.statusBarsPadding()) {
-		//todo dmitry items implement old ones instead of expandable
 		KeySetDetailsScreenView(
 			model = filteredModel.value,
 			navigator = navigator,
