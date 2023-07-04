@@ -33,10 +33,12 @@ fun KeySetDetailsScreenSubgraph(
 	val menuNavController = rememberNavController()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
+	val filteredModel = keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
 
 	Box(Modifier.statusBarsPadding()) {
+		//todo dmitry items implement old ones instead of expandable
 		KeySetDetailsScreenView(
-			model = fullModel,//todo dmitry filter model
+			model = filteredModel.value,
 			navigator = navigator,
 			networkState = networkState,
 			onMenu = {
@@ -77,7 +79,7 @@ fun KeySetDetailsScreenSubgraph(
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
 							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
-					}
+					},
 				)
 			}
 		}
