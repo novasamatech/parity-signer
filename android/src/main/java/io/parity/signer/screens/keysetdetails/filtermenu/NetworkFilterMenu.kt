@@ -42,9 +42,9 @@ fun NetworkFilterMenu(
 		selectedNetwors = selected.value,
 		onClick = { network ->
 			if (selected.value.contains(network)) {
-				selected.value - network.key
+				selected.value = selected.value - network
 			} else {
-				selected.value + network.key
+				selected.value = selected.value + network
 			}
 		},
 		onConfirm = { onConfirm(selected.value) },
