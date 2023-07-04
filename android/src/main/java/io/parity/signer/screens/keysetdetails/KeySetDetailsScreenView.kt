@@ -54,8 +54,7 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.conditional
-import io.parity.signer.domain.toNetworkModel
-import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandable
+import io.parity.signer.screens.keysetdetails.items.KeyDerivedItem
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -103,9 +102,10 @@ fun KeySetDetailsScreenView(
 						)
 					}
 
+					//todo dmitry show this if no elements
 					//filter row
 					Row(
-						modifier = Modifier.padding(horizontal = 24.dp),
+						modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						Text(
@@ -124,15 +124,13 @@ fun KeySetDetailsScreenView(
 						)
 					}
 
-					val models = model.keysAndNetwork.groupBy { it.network }
-					for (networkAndKeys in models.entries) {
-						NetworkKeysExpandable(
-							network = networkAndKeys.key.toNetworkModel(),
-							keys = networkAndKeys.value
-								.map { it.key }
-								.sortedBy { it.path }) { key, network ->
+					for (networkAndKeys in model.keysAndNetwork) {
+						KeyDerivedItem(
+							model = networkAndKeys.key,
+							networkLogo = networkAndKeys.network.networkLogo,
+						) {
 							val selectKeyDetails =
-								"${key.addressKey}\n${network.key}"
+								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
 							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 						}
 					}
