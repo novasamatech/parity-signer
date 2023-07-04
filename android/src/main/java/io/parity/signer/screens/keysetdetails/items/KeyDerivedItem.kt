@@ -45,7 +45,8 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun KeyDerivedItem(
 	model: KeyModel,
-	network: String,
+	networkLogo: String,
+	isDynamicDerived: Boolean = false,//todo dmitry pass
 	onClick: Callback? = {},
 ) {
 	Surface(
@@ -56,18 +57,23 @@ fun KeyDerivedItem(
 		},
 	) {
 		Row(
+			modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IdentIconWithNetwork(
-				identicon = model.identicon, networkLogoName = network,
-				size = 36.dp, modifier = Modifier.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
+				identicon = model.identicon,
+				networkLogoName = networkLogo,
+				size = 36.dp,
+				modifier = Modifier.padding(end = 12.dp),
 			)
 			Column(Modifier.weight(1f)) {
+				if (isDynamicDerived) {
+					Text(
+						text = stringResource(R.string.dynamic_derivation_path_label),
+						style = SignerTypeface.CaptionM,
+						color = MaterialTheme.colors.textTertiary,
+					)
+				}
 				if (model.path.isNotEmpty() || model.hasPwd) {
 					KeyPath(
 						path = model.path,
@@ -92,7 +98,7 @@ fun KeyDerivedItem(
 					colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
 					modifier = Modifier
 						.padding(2.dp)// because it's 28 not 32pd
-						.padding(end = 16.dp)
+						.padding(start = 12.dp)
 						.size(28.dp)
 				)
 			}
@@ -153,10 +159,17 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 @Composable
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
-		KeyDerivedItem(
-			KeyModel.createStub(),
-			"kusama"
-		)
+		Column {
+			KeyDerivedItem(
+				KeyModel.createStub(),
+				"kusama"
+			)
+			KeyDerivedItem(
+				KeyModel.createStub(),
+				"kusama",
+				true,
+			)
+		}
 	}
 }
 
