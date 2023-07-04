@@ -13,7 +13,7 @@ nom = "7.1.3"
 thiserror = "1.0.40"
 
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
-
+transaction_parsing = { path = "../transaction_parsing" }
 definitions = {path = "../definitions", default-features = false}
 
 [lib]

@@ -8,6 +8,8 @@ use parity_scale_codec::Decode;
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
+use definitions::navigation::DecodeSequenceResult;
+
 pub mod cards;
 pub mod check_signature;
 mod derivations;
@@ -24,9 +26,11 @@ use message::process_message;
 mod parse_transaction;
 pub use parse_transaction::entry_to_transactions_with_decoding;
 use parse_transaction::parse_transaction;
+pub mod dynamic_derivations;
 mod error;
 #[cfg(test)]
 mod tests;
+use crate::dynamic_derivations::decode_dynamic_derivations;
 
 pub use crate::error::{Error, Result};
 
@@ -62,6 +66,32 @@ fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<Transactio
         "c1" => add_specs(database, data_hex),
         "de" => process_derivations(database, data_hex),
         _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
+    }
+}
+
+/// Decode content of payload
+pub fn decode_payload(payload: &str) -> Result<DecodeSequenceResult> {
+    let data_hex = {
+        if let Some(a) = payload.strip_prefix("0x") {
+            a
+        } else {
+            payload
+        }
+    };
+
+    if data_hex.len() < 6 {
+        return Err(Error::TooShort);
+    }
+
+    if &data_hex[..2] != "53" {
+        return Err(Error::NotSubstrate(data_hex[..2].to_string()));
+    }
+
+    match &data_hex[4..6] {
+        "df" => decode_dynamic_derivations(data_hex),
+        _ => Ok(DecodeSequenceResult::Other {
+            s: payload.to_string(),
+        }),
     }
 }
 

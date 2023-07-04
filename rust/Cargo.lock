@@ -2873,6 +2873,7 @@ dependencies = [
  "nom",
  "raptorq",
  "thiserror",
+ "transaction_parsing",
 ]
 
 [[package]]
