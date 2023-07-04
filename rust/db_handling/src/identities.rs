@@ -52,10 +52,11 @@ use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
 use definitions::derivations::SeedKeysPreview;
+use definitions::dynamic_derivations::DynamicDerivationsAddressRequestV1;
 use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 use definitions::helpers::{get_multisigner, unhex};
-use definitions::navigation::ExportedSet;
+use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
 use definitions::{
@@ -296,6 +297,123 @@ pub fn import_all_addrs(
         .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
         .set_history(events_to_batch(database, events)?) // add corresponding history
         .apply(database)
+}
+
+pub fn import_dynamic_addrs(
+    database: &sled::Db,
+    seeds: HashMap<String, String>,
+    request: DynamicDerivationsAddressRequestV1,
+) -> Result<DDPreview> {
+    let mut is_some_already_imported = false;
+    let mut is_some_keyset_missing = false;
+    let mut is_some_network_missing = false;
+
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
+
+    let mut new_addrs: Vec<(AddressKey, AddressDetails)> = vec![];
+    let mut events: Vec<Event> = vec![];
+
+    let mut key_sets = vec![];
+
+    for (name, phrase) in &seeds {
+        let sr25519_public = sr25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ed25519_public = ed25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ecdsa_public = ecdsa::Pair::from_phrase(phrase, None).unwrap().0.public();
+        sr25519_signers.insert(sr25519_public, (name, phrase));
+        ed25519_signers.insert(ed25519_public, (name, phrase));
+        ecdsa_signers.insert(ecdsa_public, (name, phrase));
+    }
+
+    for seed_request in request.addrs {
+        let seed_name = match seed_request.multisigner {
+            MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
+            MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
+            MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
+        };
+        let (seed_name, seed_phrase) = match seed_name {
+            Some(&s) => s,
+            None => {
+                is_some_keyset_missing = true;
+                continue;
+            }
+        };
+        let mut derivations = vec![];
+        for derivation_request in seed_request.dynamic_derivations {
+            let network_specs_key = NetworkSpecsKey::from_parts(
+                &derivation_request.genesis_hash,
+                &derivation_request.encryption,
+            );
+            let network_specs = match get_network_specs(database, &network_specs_key) {
+                Ok(s) => s,
+                Err(_) => {
+                    is_some_network_missing = true;
+                    continue;
+                }
+            };
+            match create_address(
+                database,
+                &new_addrs,
+                &derivation_request.derivation_path,
+                Some(&network_specs.specs),
+                seed_name,
+                seed_phrase,
+            ) {
+                // success, updating address preparation set and `Event` set
+                Ok(prep_data) => {
+                    new_addrs = prep_data.address_prep;
+                    events.extend_from_slice(&prep_data.history_prep);
+                }
+                // exactly same address already exists, ignoring it
+                Err(Error::DerivationExists { .. }) => {
+                    is_some_already_imported = true;
+                    continue;
+                }
+
+                // some other error, processed as a real error
+                Err(e) => return Err(e),
+            }
+            let multisigner = new_addrs
+                .last()
+                .expect("new_addrs is never empty")
+                .0
+                .multi_signer();
+            let encryption = derivation_request.encryption;
+            derivations.push(DDDetail {
+                base58: print_multisigner_as_base58_or_eth(
+                    multisigner,
+                    Some(network_specs.specs.base58prefix),
+                    encryption,
+                ),
+                path: derivation_request.derivation_path,
+                network_logo: network_specs.specs.logo,
+                identicon: make_identicon_from_multisigner(
+                    multisigner,
+                    encryption.identicon_style(),
+                ),
+            })
+        }
+        if !derivations.is_empty() {
+            key_sets.push(DDKeySet {
+                seed_name: seed_name.to_string(),
+                derivations,
+            })
+        }
+    }
+
+    TrDbCold::new()
+        .set_addresses(upd_id_batch(Batch::default(), new_addrs)) // modify addresses data
+        .set_history(events_to_batch(database, events)?) // add corresponding history
+        .apply(database)?;
+
+    Ok(DDPreview {
+        qr: vec![],
+        key_sets,
+        is_some_already_imported,
+        is_some_keyset_missing,
+        is_some_network_missing,
+    })
 }
 
 pub fn inject_derivations_has_pwd(

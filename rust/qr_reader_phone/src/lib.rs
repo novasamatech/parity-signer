@@ -14,6 +14,7 @@ pub mod process_payload;
 use crate::parser::{parse_qr_payload, LegacyFrame, RaptorqFrame};
 pub use error::{Error, Result};
 use process_payload::{process_decoded_payload, InProgress, Ready};
+use transaction_parsing::decode_payload;
 
 pub fn get_payload(line: &str, cleaned: bool) -> Result<Vec<u8>> {
     let payload = match cleaned {
@@ -67,7 +68,7 @@ pub fn decode_sequence(
         }
     }
     match final_result {
-        Some(s) => Ok(DecodeSequenceResult::Other { s }),
+        Some(s) => Ok(decode_payload(&s)?),
         None => Err(Error::UnableToDecode),
     }
 }
@@ -110,7 +111,7 @@ mod tests {
     #[test]
     fn bad_sequence() {
         let jsonline = vec![
-            "400021234".to_string(),
+            "40003533412".to_string(),
             "400021456".to_string(),
             "400021578".to_string(),
         ];

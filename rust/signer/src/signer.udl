@@ -368,6 +368,26 @@ interface DerivedKeyStatus {
     Invalid(sequence<DerivedKeyError> errors);
 };
 
+dictionary DDPreview {
+    sequence<QrData> qr;
+    sequence<DDKeySet> key_sets;
+    boolean is_some_already_imported;
+    boolean is_some_keyset_missing;
+    boolean is_some_network_missing;
+};
+
+dictionary DDKeySet {
+    string seed_name;
+    sequence<DDDetail> derivations;
+};
+
+dictionary DDDetail {
+    string base58;
+    string path;
+    string network_logo;
+    SignerImage identicon;
+};
+
 [Enum]
 interface DerivedKeyError {
     NetworkMissing();
@@ -525,6 +545,7 @@ interface BananaSplitRecoveryResult {
 [Enum]
 interface DecodeSequenceResult {
     BBananaSplitRecoveryResult(BananaSplitRecoveryResult b);
+    DynamicDerivations(string s);
     Other(string s);
 };
 
@@ -574,6 +595,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void import_derivations(sequence<SeedKeysPreview> seed_derived_keys);
+
+    [Throws=ErrorDisplayed]
+    DDPreview import_dynamic_derivations(record<string, string> seeds, string payload);
 
     [Throws=ErrorDisplayed]
     sequence<SeedKeysPreview> populate_derivations_has_pwd(record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);
