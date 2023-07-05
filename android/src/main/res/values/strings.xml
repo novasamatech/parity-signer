@@ -420,6 +420,9 @@
 	<string name="generic_clear_selection">Clear</string>
 	<string name="network_filters_header">Filter keys by network</string>
     <string name="key_set_details_all_filtered_keys_title">Key Set has no Keys on Selected Network</string>
+    <string name="dymanic_derivation_error_some_already_imported">Some are hidden from the list because they have already been imported.</string>
+	<string name="dymanic_derivation_error_some_network_missing">"Some keys can not be imported until their networks are added. Please add missing networks and their metadata. "</string>
+	<string name="dymanic_derivation_error_some_keyst_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
 
 </resources>
 

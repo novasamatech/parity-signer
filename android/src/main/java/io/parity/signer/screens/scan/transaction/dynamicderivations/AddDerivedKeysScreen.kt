@@ -28,23 +28,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.NotificationFrameText
+import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.toBytes
+import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyAndNetworkModel
+import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.getData
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItem
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.DdDetail
+import io.parity.signer.uniffi.DdKeySet
+import io.parity.signer.uniffi.DdPreview
+import io.parity.signer.uniffi.QrData
+import io.parity.signer.uniffi.SignerImage
 import io.parity.signer.uniffi.encodeToQr
 import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AddDerivedKeysScreen(
-	model: AddDerivedKeysModel,
+	model: DdPreview,
 	onBack: Callback,
 ) {
 	Column(
@@ -71,7 +82,35 @@ fun AddDerivedKeysScreen(
 				.padding(top = 8.dp, bottom = 20.dp),
 		)
 
-		model.keysets.forEach { keyset ->
+		if (model.isSomeAlreadyImported) {
+			NotificationFrameTextImportant(
+				message = stringResource(R.string.dymanic_derivation_error_some_already_imported),
+				withBorder = false,
+				textColor = MaterialTheme.colors.primary,
+				modifier = Modifier.padding(bottom = 8.dp)
+					.padding(horizontal = 16.dp),
+			)
+		}
+		if (model.isSomeNetworkMissing) {
+			NotificationFrameTextImportant(
+				message = stringResource(R.string.dymanic_derivation_error_some_network_missing),
+				withBorder = false,
+				textColor = MaterialTheme.colors.primary,
+				modifier = Modifier.padding(bottom = 8.dp)
+					.padding(horizontal = 16.dp),
+			)
+		}
+		if (model.isSomeKeysetMissing) {
+			NotificationFrameTextImportant(
+				message = stringResource(R.string.dymanic_derivation_error_some_keyst_missing),
+				withBorder = false,
+				textColor = MaterialTheme.colors.primary,
+				modifier = Modifier.padding(bottom = 8.dp)
+					.padding(horizontal = 16.dp),
+			)
+		}
+
+		model.keySets.forEach { keyset ->
 			KeysetItemDerivedItem(keyset)
 		}
 
@@ -99,10 +138,10 @@ fun AddDerivedKeysScreen(
 				if (isPreview) {
 					PreviewData.exampleQRImage
 				} else {
-					runBlocking { encodeToQr(model.qrData, false) }
+					runBlocking { encodeToQr(model.qr.first().getData(), false) }
 				}
 			}
-			Image(
+			Image(//todo dmitry animated QR code
 				bitmap = qrImage.intoImageBitmap(),
 				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
 				contentScale = ContentScale.Fit,
@@ -120,7 +159,7 @@ fun AddDerivedKeysScreen(
 }
 
 @Composable
-private fun KeysetItemDerivedItem(model: KeysetDerivedModel) {
+private fun KeysetItemDerivedItem(model: DdKeySet) {
 	Column(
 		modifier = Modifier
 			.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -140,45 +179,58 @@ private fun KeysetItemDerivedItem(model: KeysetDerivedModel) {
 			)
 			Spacer(modifier = Modifier.weight(1f))
 		}
-		model.keysets.forEach { keyset ->
+		model.derivations.forEach { key ->
 			SignerDivider()
-			KeyDerivedItem(model = keyset.key, keyset.key.path, onClick = null)
+			KeyDerivedItem(model = key.toKeyModel(), key.networkLogo, onClick = null)
 		}
 	}
 }
 
 
+private fun DdDetail.toKeyModel() = KeyModel(
+	identicon = identicon.toImageContent(),
+		addressKey = "",
+		seedName = "",
+		base58 = base58,
+		hasPwd = false,
+		path = path,
+		secretExposed = false,
+)
 
-
-data class AddDerivedKeysModel(
-	val keysets: List<KeysetDerivedModel>,
-	val qrData: List<UByte>,
-) {
-	companion object {
-		fun createStub(): AddDerivedKeysModel = AddDerivedKeysModel(
-			listOf(
-				KeysetDerivedModel(
-					seedName = "My special keyset",
-					keysets = listOf(
-						KeyAndNetworkModel.createStub(),
-						KeyAndNetworkModel.createStub()
-					),
-				),
-				KeysetDerivedModel(
-					seedName = "My special keyset2",
-					keysets = listOf(
-						KeyAndNetworkModel.createStub(),
-					),
-				)
+private fun DdPreviewcreateStub(): DdPreview = DdPreview(
+	qr = listOf(
+		QrData.Regular(PreviewData.exampleQRData),
+	),
+	keySets = listOf(
+		DdKeySet(
+			seedName = "My special keyset",
+			derivations = listOf(
+				DdDetailcreateStub(),
+				DdDetailcreateStub(),
 			),
-			qrData = PreviewData.exampleQRData,
+		),
+		DdKeySet(
+			seedName = "My special keyset2",
+			derivations = listOf(
+				DdDetailcreateStub(),
+			),
 		)
-	}
-}
+	),
+	isSomeAlreadyImported = false,
+	isSomeKeysetMissing = true,
+	isSomeNetworkMissing = true,
+)
+
+private fun DdDetailcreateStub(): DdDetail = DdDetail(
+	base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
+	path = "//polkadot//path2",
+	networkLogo = "westend",
+	identicon = SignerImage.Png(PreviewData.exampleIdenticonPng.toBytes()),
+)
 
 data class KeysetDerivedModel(
 	val seedName: String,
-	val keysets: List<KeyAndNetworkModel>,
+	val keys: List<KeyAndNetworkModel>,
 )
 
 
@@ -197,7 +249,7 @@ private fun PreviewAddDerivedKeysScreen() {
 
 	SignerNewTheme {
 		AddDerivedKeysScreen(
-			model = AddDerivedKeysModel.createStub(),
+			model = DdPreviewcreateStub(),
 			onBack = {},
 		)
 	}

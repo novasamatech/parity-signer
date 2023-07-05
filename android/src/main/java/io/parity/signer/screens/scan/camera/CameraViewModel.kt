@@ -119,7 +119,9 @@ class CameraViewModel() : ViewModel() {
 				}
 
 				is DecodeSequenceResult.DynamicDerivations -> {
+					payload.s
 					//todo dmitry new option for dynamic derivation
+					//import_dynamic_derivations path
 				}
 			}
 
