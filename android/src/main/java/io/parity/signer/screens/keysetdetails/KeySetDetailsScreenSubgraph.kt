@@ -40,6 +40,7 @@ fun KeySetDetailsScreenSubgraph(
 			model = filteredModel.value,
 			navigator = navigator,
 			networkState = networkState,
+			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 			},

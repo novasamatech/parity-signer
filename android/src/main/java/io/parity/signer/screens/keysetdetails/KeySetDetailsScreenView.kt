@@ -73,6 +73,7 @@ fun KeySetDetailsScreenView(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
 	networkState: State<NetworkState?>, //for shield icon
+	fullModelWasEmpty: Boolean, //todo dmitry
 	onFilterClicked: Callback,
 	onMenu: Callback,
 ) {
@@ -91,37 +92,9 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					//seed
-					model.root?.let {
-						SeedKeyDetails(
-							model = it,
-							Modifier
-								.padding(horizontal = 24.dp, vertical = 8.dp)
-								.padding(bottom = 16.dp)
-						)
-					}
+					SeedKeyItemElement(model)
 
-					//todo dmitry show this if no elements
-					//filter row
-					Row(
-						modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
-							color = MaterialTheme.colors.textTertiary,
-							style = SignerTypeface.BodyM,
-							modifier = Modifier.weight(1f),
-						)
-						Icon(
-							painter = painterResource(id = R.drawable.ic_tune_28),
-							contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
-							modifier = Modifier
-								.clickable(onClick = onFilterClicked)
-								.size(28.dp),
-							tint = MaterialTheme.colors.pink300,
-						)
-					}
+					FilterRow(onFilterClicked)
 
 					for (networkAndKeys in model.keysAndNetwork) {
 						KeyDerivedItem(
@@ -134,18 +107,29 @@ fun KeySetDetailsScreenView(
 						}
 					}
 				}
-			} else {
+			} else if (fullModelWasEmpty) {
+				//no derived keys at all
 				Column() {
 					//seed
-					model.root?.let {
-						SeedKeyDetails(
-							model = it,
-							Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
-						)
-					}
+					SeedKeyItemElement(model)
 					KeySetDetailsEmptyList(onAdd = {
 						navigator.navigate(Action.NEW_KEY, "") //new derived key
 					})
+				}
+			} else {
+				Column() {
+					SeedKeyItemElement(model)
+					//no keys because filtered
+					FilterRow(onFilterClicked)
+					Spacer(modifier = Modifier.weight(0.5f))
+					Text(
+						text = stringResource(R.string.key_set_details_all_filtered_keys_title),
+						color = MaterialTheme.colors.primary,
+						style = SignerTypeface.TitleM,
+						textAlign = TextAlign.Center,
+						modifier = Modifier.padding(horizontal = 40.dp)
+					)
+					Spacer(modifier = Modifier.weight(0.5f))
 				}
 			}
 
@@ -157,6 +141,41 @@ fun KeySetDetailsScreenView(
 			)
 		}
 		BottomBar(navigator, BottomBarState.KEYS)
+	}
+}
+
+@Composable
+private fun SeedKeyItemElement(model: KeySetDetailsModel) {
+	model.root?.let {
+		SeedKeyDetails(
+			model = it,
+			Modifier
+				.padding(horizontal = 24.dp, vertical = 8.dp)
+				.padding(bottom = 16.dp)
+		)
+	}
+}
+
+@Composable
+private fun FilterRow(onFilterClicked: Callback) {
+	Row(
+		modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Text(
+			text = stringResource(R.string.key_sets_details_screem_derived_subtitle),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+			modifier = Modifier.weight(1f),
+		)
+		Icon(
+			painter = painterResource(id = R.drawable.ic_tune_28),
+			contentDescription = stringResource(R.string.key_sets_details_screem_filter_icon_description),
+			modifier = Modifier
+				.clickable(onClick = onFilterClicked)
+				.size(28.dp),
+			tint = MaterialTheme.colors.pink300,
+		)
 	}
 }
 
@@ -310,7 +329,7 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {})
 		}
 	}
 }
@@ -331,7 +350,28 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, true, {}, {})
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewKeySetDetailsScreenFiltered() {
+	val state = remember { mutableStateOf(NetworkState.Active) }
+	val mockModel =
+		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
+	SignerNewTheme {
+		Box(modifier = Modifier.size(350.dp, 550.dp)) {
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {})
 		}
 	}
 }
