@@ -52,7 +52,11 @@ use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
 use definitions::derivations::SeedKeysPreview;
-use definitions::dynamic_derivations::DynamicDerivationsAddressRequestV1;
+use definitions::dynamic_derivations::{
+    DynamicDerivationResponseInfo, DynamicDerivationsAddressRequestV1,
+    DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
+    DynamicDerivationsResponseInfo,
+};
 use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 use definitions::helpers::{get_multisigner, unhex};
@@ -70,6 +74,7 @@ use definitions::{
     helpers::make_identicon_from_multisigner,
     navigation::{Address, MKeyDetails, MSCNetworkInfo, QrData},
 };
+use qrcode_rtx::make_data_packs;
 
 #[cfg(feature = "active")]
 use crate::{
@@ -308,15 +313,14 @@ pub fn import_dynamic_addrs(
     let mut is_some_keyset_missing = false;
     let mut is_some_network_missing = false;
 
-    let mut sr25519_signers = HashMap::new();
-    let mut ed25519_signers = HashMap::new();
-    let mut ecdsa_signers = HashMap::new();
-
     let mut new_addrs: Vec<(AddressKey, AddressDetails)> = vec![];
     let mut events: Vec<Event> = vec![];
 
-    let mut key_sets = vec![];
+    let mut dd_key_sets = vec![];
 
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
     for (name, phrase) in &seeds {
         let sr25519_public = sr25519::Pair::from_phrase(phrase, None).unwrap().0.public();
         let ed25519_public = ed25519::Pair::from_phrase(phrase, None).unwrap().0.public();
@@ -326,13 +330,13 @@ pub fn import_dynamic_addrs(
         ecdsa_signers.insert(ecdsa_public, (name, phrase));
     }
 
-    for seed_request in request.addrs {
-        let seed_name = match seed_request.multisigner {
+    for seed_request in &request.addrs {
+        let seed_pair = match seed_request.multisigner {
             MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
             MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
             MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
         };
-        let (seed_name, seed_phrase) = match seed_name {
+        let (seed_name, seed_phrase) = match seed_pair {
             Some(&s) => s,
             None => {
                 is_some_keyset_missing = true;
@@ -340,7 +344,7 @@ pub fn import_dynamic_addrs(
             }
         };
         let mut derivations = vec![];
-        for derivation_request in seed_request.dynamic_derivations {
+        for derivation_request in &seed_request.dynamic_derivations {
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &derivation_request.genesis_hash,
                 &derivation_request.encryption,
@@ -386,7 +390,7 @@ pub fn import_dynamic_addrs(
                     Some(network_specs.specs.base58prefix),
                     encryption,
                 ),
-                path: derivation_request.derivation_path,
+                path: derivation_request.derivation_path.clone(),
                 network_logo: network_specs.specs.logo,
                 identicon: make_identicon_from_multisigner(
                     multisigner,
@@ -395,7 +399,7 @@ pub fn import_dynamic_addrs(
             })
         }
         if !derivations.is_empty() {
-            key_sets.push(DDKeySet {
+            dd_key_sets.push(DDKeySet {
                 seed_name: seed_name.to_string(),
                 derivations,
             })
@@ -407,13 +411,113 @@ pub fn import_dynamic_addrs(
         .set_history(events_to_batch(database, events)?) // add corresponding history
         .apply(database)?;
 
+    let qr = dd_response_qr(seeds, &request)?;
     Ok(DDPreview {
-        qr: vec![],
-        key_sets,
+        qr,
+        key_sets: dd_key_sets,
         is_some_already_imported,
         is_some_keyset_missing,
         is_some_network_missing,
     })
+}
+
+fn dd_response_qr(
+    seeds: HashMap<String, String>,
+    request: &DynamicDerivationsAddressRequestV1,
+) -> Result<Vec<QrData>> {
+    let response = dd_response(seeds, request)?;
+    let data = [&[0x53, 0xff, 0xdf], response.encode().as_slice()].concat();
+    make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))
+}
+
+/// Prepare `DynamicDerivationsAddressResponse` for the given request
+pub fn dd_response(
+    seeds: HashMap<String, String>,
+    request: &DynamicDerivationsAddressRequestV1,
+) -> Result<DynamicDerivationsAddressResponse> {
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
+    for phrase in seeds.values() {
+        let sr25519_public = sr25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ed25519_public = ed25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ecdsa_public = ecdsa::Pair::from_phrase(phrase, None).unwrap().0.public();
+        sr25519_signers.insert(sr25519_public, phrase);
+        ed25519_signers.insert(ed25519_public, phrase);
+        ecdsa_signers.insert(ecdsa_public, phrase);
+    }
+
+    let mut addrs = vec![];
+
+    for seed_request in &request.addrs {
+        let seed_phrase = match seed_request.multisigner {
+            MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
+            MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
+            MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
+        };
+        let seed_phrase = match seed_phrase {
+            Some(&s) => s,
+            None => {
+                continue;
+            }
+        };
+        let mut derivations = vec![];
+        for derivation_request in &seed_request.dynamic_derivations {
+            let path = derivation_request.derivation_path.as_str();
+            // create fixed-length string to avoid reallocations
+            let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
+            full_address.push_str(seed_phrase);
+            full_address.push_str(path);
+
+            let multisigner = match derivation_request.encryption {
+                Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Ed25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Sr25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Ecdsa | Encryption::Ethereum => {
+                    match ecdsa::Pair::from_string(&full_address, None) {
+                        Ok(a) => {
+                            full_address.zeroize();
+                            MultiSigner::Ecdsa(a.public())
+                        }
+                        Err(e) => {
+                            full_address.zeroize();
+                            return Err(Error::SecretStringError(e));
+                        }
+                    }
+                }
+            };
+            derivations.push(DynamicDerivationResponseInfo {
+                derivation_path: derivation_request.derivation_path.clone(),
+                encryption: derivation_request.encryption,
+                public_key: multisigner,
+            });
+        }
+        addrs.push(DynamicDerivationsResponseInfo {
+            multisigner: seed_request.multisigner.clone(),
+            dynamic_derivations: derivations,
+        })
+    }
+
+    Ok(DynamicDerivationsAddressResponse::V1(
+        DynamicDerivationsAddressResponseV1 { addrs },
+    ))
 }
 
 pub fn inject_derivations_has_pwd(

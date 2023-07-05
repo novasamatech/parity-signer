@@ -57,5 +57,5 @@ pub struct DynamicDerivationResponseInfo {
     /// The type of encryption in the network
     pub encryption: Encryption,
     /// Public key of the derivation path. The address may be derived from it.
-    pub public_key: Option<MultiSigner>,
+    pub public_key: MultiSigner,
 }

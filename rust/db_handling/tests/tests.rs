@@ -3,6 +3,7 @@ use sled::{Batch, Tree};
 use sp_core::sr25519::Public;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
+use std::collections::HashMap;
 use std::{convert::TryInto, str::FromStr};
 
 use constants::{
@@ -32,7 +33,7 @@ use definitions::{
     users::AddressDetails,
 };
 
-use db_handling::identities::create_key_set;
+use db_handling::identities::{create_key_set, dd_response, import_dynamic_addrs};
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -58,12 +59,21 @@ use db_handling::{
         reset_danger_status_to_safe,
     },
 };
+use definitions::dynamic_derivations::{
+    DynamicDerivationRequestInfo, DynamicDerivationsAddressRequestV1,
+    DynamicDerivationsAddressResponse, DynamicDerivationsRequestInfo,
+};
 use definitions::helpers::multisigner_to_public;
 use definitions::navigation::MAddressCard;
+
 use tempfile::tempdir;
 
 fn westend_genesis() -> H256 {
     H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
+}
+
+fn polkadot_genesis() -> H256 {
+    H256::from_str("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").unwrap()
 }
 
 #[test]
@@ -2063,4 +2073,95 @@ fn test_create_key_set_generate_default_addresses() {
     )
     .unwrap();
     assert!(identities.contains_key(test_key.key()).unwrap());
+}
+
+#[test]
+fn test_dynamic_derivations() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    create_key_set(&db, "Alice", ALICE_SEED_PHRASE, vec![]).unwrap();
+
+    let multisigner_path_set = get_multisigner_path_set(&db);
+    let (seed_multisigner, _) = multisigner_path_set
+        .iter()
+        .find(|(_q, path)| path.is_empty())
+        .unwrap();
+    let request = DynamicDerivationsAddressRequestV1 {
+        addrs: vec![DynamicDerivationsRequestInfo {
+            multisigner: seed_multisigner.clone(),
+            dynamic_derivations: vec![
+                DynamicDerivationRequestInfo {
+                    derivation_path: "//dd".to_string(),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: polkadot_genesis(),
+                },
+                DynamicDerivationRequestInfo {
+                    derivation_path: "//nonetwork".to_string(),
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::zero(),
+                },
+            ],
+        }],
+    };
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    let result = import_dynamic_addrs(&db, seeds.clone(), request.clone()).unwrap();
+    assert_eq!(result.key_sets.len(), 1);
+    let key_set = result
+        .key_sets
+        .get(0)
+        .expect("key set is missing from result");
+    assert_eq!(key_set.seed_name, "Alice");
+    assert_eq!(key_set.derivations.len(), 1);
+    let derivation = key_set
+        .derivations
+        .get(0)
+        .expect("dynamic derivations is missing from result");
+    assert_eq!(derivation.path, "//dd");
+    assert_eq!(
+        derivation.base58,
+        "14fiUi4zizXAAWP3HkMuS3qoCSP51owPoGaYhUmwuJZKTHwS"
+    );
+
+    let response = dd_response(seeds, &request).unwrap();
+    match response {
+        DynamicDerivationsAddressResponse::V1(r) => {
+            assert_eq!(r.addrs.len(), 1);
+            let key_set = r.addrs.get(0).unwrap();
+            assert_eq!(key_set.dynamic_derivations.len(), 2);
+            let derivation_1 = key_set.dynamic_derivations.get(0).unwrap();
+            assert_eq!(derivation_1.derivation_path, "//dd");
+            assert_eq!(
+                derivation_1.public_key,
+                MultiSigner::Sr25519(
+                    sp_core::sr25519::Public::try_from(
+                        hex::decode(
+                            "a23ba6f64806d989d494723a1178dc101407f03358270219b3e734d68ed2ab2f"
+                        )
+                        .unwrap()
+                        .as_ref()
+                    )
+                    .unwrap()
+                )
+            );
+
+            let derivation_2 = key_set.dynamic_derivations.get(1).unwrap();
+            assert_eq!("//nonetwork", derivation_2.derivation_path);
+            assert_eq!(
+                MultiSigner::Sr25519(
+                    sp_core::sr25519::Public::try_from(
+                        hex::decode(
+                            "d438e94ff924a54e473760f058f9329ebbe59abcf2b6cb92a4c9914cf3855571"
+                        )
+                        .unwrap()
+                        .as_ref()
+                    )
+                    .unwrap()
+                ),
+                derivation_2.public_key,
+            );
+        }
+    }
 }

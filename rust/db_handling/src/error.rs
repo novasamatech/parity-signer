@@ -388,6 +388,9 @@ pub enum Error {
 
     #[error("No root derivation for seed {0}")]
     NoRootKeyForSeed(String),
+
+    #[error("Data packing error: {0}")]
+    DataPacking(String),
 }
 
 /// DB handling result.
