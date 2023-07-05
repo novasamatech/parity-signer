@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan.transaction.dynamicderivations
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,9 +49,10 @@ fun AddDerivedKeysScreen(
 	model: DdPreview,
 	onBack: Callback,
 ) {
+	BackHandler(onBack = onBack)
+
 	Column(
-		modifier = Modifier
-			.verticalScroll(rememberScrollState()),
+		modifier = Modifier.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeader(
 			onBack = onBack,

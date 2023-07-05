@@ -43,6 +43,8 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var bananaSplitPassword: MutableStateFlow<List<String>?> =
 		MutableStateFlow(null)
+	var dynamicDerivations: MutableStateFlow<DdPreview?> =
+		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
 	val transactionError: MutableStateFlow<TransactionErrorModel?> =
@@ -51,7 +53,7 @@ class ScanViewModel : ViewModel() {
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
-	suspend fun performPayload(payload: String, context: Context) {
+	suspend fun performTransactionPayload(payload: String, context: Context) {
 		val fakeNavigator = FakeNavigator()
 		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
@@ -193,6 +195,21 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
+	suspend fun performDynamicDerivationPayload(payload: String, context: Context) {
+		when (val phrases = seedRepository.getAllSeeds()) {
+			is RepoResult.Failure -> {
+				Log.w(TAG, "signature transactions failure ${phrases.error}")
+				null
+				//todo dmitry show error submit error?
+			}
+			is RepoResult.Success -> {
+				val result = uniffiInteractor.importDynamicDerivations(phrases.result, payload)
+					.mapError()
+				dynamicDerivations.value = result
+			}
+		}
+	}
+
 	private fun updateTransactionsWithImportDerivations(
 		transactions: List<MTransaction>,
 		updatedKeys: List<SeedKeysPreview>
@@ -272,6 +289,7 @@ class ScanViewModel : ViewModel() {
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
 			|| bananaSplitPassword.value != null
+			|| dynamicDerivations.value != null
 		) {
 			clearState()
 			true
@@ -285,6 +303,7 @@ class ScanViewModel : ViewModel() {
 		signature.value = null
 		passwordModel.value = null
 		bananaSplitPassword.value = null
+		dynamicDerivations.value = null
 		transactionError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false
