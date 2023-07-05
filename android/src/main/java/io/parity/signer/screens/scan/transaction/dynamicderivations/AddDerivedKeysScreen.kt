@@ -1,45 +1,37 @@
 package io.parity.signer.screens.scan.transaction.dynamicderivations
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
+import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
+import io.parity.signer.components.qrcode.EmptyQrCodeProvider
 import io.parity.signer.components.toBytes
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.KeyAndNetworkModel
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.getData
-import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItem
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -50,8 +42,6 @@ import io.parity.signer.uniffi.DdKeySet
 import io.parity.signer.uniffi.DdPreview
 import io.parity.signer.uniffi.QrData
 import io.parity.signer.uniffi.SignerImage
-import io.parity.signer.uniffi.encodeToQr
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AddDerivedKeysScreen(
@@ -87,7 +77,8 @@ fun AddDerivedKeysScreen(
 				message = stringResource(R.string.dymanic_derivation_error_some_already_imported),
 				withBorder = false,
 				textColor = MaterialTheme.colors.primary,
-				modifier = Modifier.padding(bottom = 8.dp)
+				modifier = Modifier
+					.padding(bottom = 8.dp)
 					.padding(horizontal = 16.dp),
 			)
 		}
@@ -96,7 +87,8 @@ fun AddDerivedKeysScreen(
 				message = stringResource(R.string.dymanic_derivation_error_some_network_missing),
 				withBorder = false,
 				textColor = MaterialTheme.colors.primary,
-				modifier = Modifier.padding(bottom = 8.dp)
+				modifier = Modifier
+					.padding(bottom = 8.dp)
 					.padding(horizontal = 16.dp),
 			)
 		}
@@ -105,7 +97,8 @@ fun AddDerivedKeysScreen(
 				message = stringResource(R.string.dymanic_derivation_error_some_keyst_missing),
 				withBorder = false,
 				textColor = MaterialTheme.colors.primary,
-				modifier = Modifier.padding(bottom = 8.dp)
+				modifier = Modifier
+					.padding(bottom = 8.dp)
 					.padding(horizontal = 16.dp),
 			)
 		}
@@ -122,30 +115,17 @@ fun AddDerivedKeysScreen(
 				.padding(horizontal = 24.dp)
 				.padding(top = 16.dp, bottom = 20.dp),
 		)
-		Box(
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.fillMaxWidth(1f)
-				.aspectRatio(1.1f)
-				.background(
-					Color.White,
-					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-				),
-			contentAlignment = Alignment.Center,
-		) {
-			val isPreview = LocalInspectionMode.current
-			val qrImage = remember {
-				if (isPreview) {
-					PreviewData.exampleQRImage
-				} else {
-					runBlocking { encodeToQr(model.qr.first().getData(), false) }
-				}
-			}
-			Image(//todo dmitry animated QR code
-				bitmap = qrImage.intoImageBitmap(),
-				contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-				contentScale = ContentScale.Fit,
-				modifier = Modifier.size(264.dp)
+		if (LocalInspectionMode.current) {
+			AnimatedQrKeysInfo(
+				input = Unit,
+				provider = EmptyAnimatedQrKeysProvider(),
+				modifier = Modifier.padding(horizontal = 24.dp)
+			)
+		} else {
+			AnimatedQrKeysInfo<List<List<UByte>>>(
+				input = model.qr.map { it.getData() },
+				provider = EmptyQrCodeProvider(),
+				modifier = Modifier.padding(horizontal = 24.dp)
 			)
 		}
 
@@ -189,12 +169,12 @@ private fun KeysetItemDerivedItem(model: DdKeySet) {
 
 private fun DdDetail.toKeyModel() = KeyModel(
 	identicon = identicon.toImageContent(),
-		addressKey = "",
-		seedName = "",
-		base58 = base58,
-		hasPwd = false,
-		path = path,
-		secretExposed = false,
+	addressKey = "",
+	seedName = "",
+	base58 = base58,
+	hasPwd = false,
+	path = path,
+	secretExposed = false,
 )
 
 private fun DdPreviewcreateStub(): DdPreview = DdPreview(
@@ -228,11 +208,6 @@ private fun DdDetailcreateStub(): DdDetail = DdDetail(
 	identicon = SignerImage.Png(PreviewData.exampleIdenticonPng.toBytes()),
 )
 
-data class KeysetDerivedModel(
-	val seedName: String,
-	val keys: List<KeyAndNetworkModel>,
-)
-
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -245,8 +220,6 @@ data class KeysetDerivedModel(
 )
 @Composable
 private fun PreviewAddDerivedKeysScreen() {
-
-
 	SignerNewTheme {
 		AddDerivedKeysScreen(
 			model = DdPreviewcreateStub(),

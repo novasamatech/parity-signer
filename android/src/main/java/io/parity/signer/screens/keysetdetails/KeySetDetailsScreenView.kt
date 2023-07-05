@@ -73,7 +73,7 @@ fun KeySetDetailsScreenView(
 	model: KeySetDetailsModel,
 	navigator: Navigator,
 	networkState: State<NetworkState?>, //for shield icon
-	fullModelWasEmpty: Boolean, //todo dmitry
+	fullModelWasEmpty: Boolean,
 	onFilterClicked: Callback,
 	onMenu: Callback,
 ) {
