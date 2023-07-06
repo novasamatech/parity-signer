@@ -292,6 +292,7 @@ extension CameraView {
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
+        @Published var dynamicDerivationsPreview: DdPreview!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
@@ -574,6 +575,8 @@ private extension CameraView.ViewModel {
         dynamicDerivationsService.getDynamicDerivationsPreview(for: seedPhrases, payload: payload) { result in
             switch result {
             case let .success(preview):
+                self.dynamicDerivationsPreview = preview
+                self.isPresentingAddDerivedKeys = true
                 ()
             case let .failure(error):
                 self.presentableError = .alertError(message: error.localizedDescription)
