@@ -126,9 +126,6 @@ class CameraViewModel() : ViewModel() {
 				is DecodeSequenceResult.DynamicDerivations -> {
 					resetScanValues()
 					_dynamicDerivationPayload.value = payload.s
-
-					//todo dmitry new option for dynamic derivation
-					//import_dynamic_derivations path
 				}
 			}
 
