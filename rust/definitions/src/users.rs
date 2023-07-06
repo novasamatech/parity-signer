@@ -44,7 +44,7 @@ pub struct AddressDetails {
     /// address, or its parent address, had or could have secret exposed
     pub secret_exposed: bool,
 
-    /// whether the address key is imported from the external source (e.g. Nova Spektr)
+    /// whether the address key is imported from the external source (e.g. Nova Wallet)
     pub was_imported: bool,
 }
 
