@@ -39,7 +39,6 @@ import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
@@ -79,6 +78,7 @@ fun EnterSeedPhraseBox(
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
 		//workaround for //https://issuetracker.google.com/issues/160257648 - update to new TextField
+		//todo dmitry https://issuetracker.google.com/issues/235576056 - issue that it stuck fix #1935
 		var lastPostedData: String? = null
 		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
 		BasicTextField(
