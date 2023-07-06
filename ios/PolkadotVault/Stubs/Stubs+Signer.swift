@@ -22,7 +22,8 @@ extension MKeysCard {
         address: .stub,
         addressKey: "",
         base58: "",
-        swiped: false
+        swiped: false,
+        wasImported: false
     )
 }
 
