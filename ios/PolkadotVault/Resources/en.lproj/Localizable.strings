@@ -618,4 +618,6 @@
 "AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
 "AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
 "AddDerivedKeys.Action.Done" = "Done";
-
+"AddDerivedKeys.Error.KeySetMissing" = "Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.";
+"AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
+"AddDerivedKeys.Error.AlreadyImported" = "Some are hidden from the list because they have already been imported.";

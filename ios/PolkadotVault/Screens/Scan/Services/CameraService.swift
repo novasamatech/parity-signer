@@ -9,6 +9,16 @@ import AVKit
 import SwiftUI
 import UIKit
 
+enum DecodedPayloadType: Equatable {
+    case transaction
+    case dynamicDerivations
+}
+
+struct DecodedPayload: Equatable {
+    let payload: String
+    let type: DecodedPayloadType
+}
+
 final class CameraService: ObservableObject {
     private enum CameraSessionSetupResult {
         case success
@@ -22,7 +32,7 @@ final class CameraService: ObservableObject {
     @Published var isMultipleTransactionMode: Bool = false
 
     /// QR code payload decoded by Rust
-    @Published var payload: String?
+    @Published var payload: DecodedPayload?
     /// Number of expected frames for given payload
     @Published var total: Int = 0
     /// Number of already captured frames for given payload
@@ -148,23 +158,21 @@ private extension CameraService {
     func decode(completeOperationPayload: [String]) {
         do {
             let result = try qrparserTryDecodeQrSequence(data: completeOperationPayload, password: nil, cleaned: false)
-            switch result {
-            case let .bBananaSplitRecoveryResult(b: bananaResult):
-                switch bananaResult {
-                case .requestPassword:
-                    callbackQueue.async {
+            callbackQueue.async {
+                switch result {
+                case let .bBananaSplitRecoveryResult(b: bananaResult):
+                    switch bananaResult {
+                    case .requestPassword:
                         self.requestPassword = true
                         self.shutdown()
+                    case .recoveredSeed:
+                        () // Invalid code path, BS can't be recovered without a password
                     }
-                default:
-                    // Nothing else can happen here
-                    ()
-                }
-            case .dynamicDerivations:
-                ()
-            case let .other(s: payload):
-                callbackQueue.async {
-                    self.payload = payload
+                case let .dynamicDerivations(s: payload):
+                    self.payload = .init(payload: payload, type: .dynamicDerivations)
+                    self.shutdown()
+                case let .other(s: payload):
+                    self.payload = .init(payload: payload, type: .transaction)
                     self.shutdown()
                 }
             }

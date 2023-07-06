@@ -8,28 +8,6 @@
 import Combine
 import SwiftUI
 
-struct AddDerivedKeyDerivedKeyData: Equatable {
-    let base58: String
-    let identicon: SignerImage
-    let network: String
-}
-
-struct AddDerivedKeyKeySetData: Equatable {
-    let keySetName: String
-    let derivedKeys: [AddDerivedKeyDerivedKeyData]
-}
-
-struct AddDerivedKeysError: Equatable, Identifiable, Hashable {
-    let id = UUID()
-    let errorMessage: String
-}
-
-struct AddDerivedKeysData: Equatable {
-    let errors: [AddDerivedKeysError]
-    let keySets: [AddDerivedKeyKeySetData]
-    let qrPayload: [[UInt8]]
-}
-
 struct AddDerivedKeysView: View {
     @StateObject var viewModel: ViewModel
     @Environment(\.safeAreaInsets) private var safeAreaInsets
@@ -142,9 +120,18 @@ struct AddDerivedKeysView: View {
             )
             .padding(.vertical, Spacing.medium)
             .padding(.trailing, Spacing.extraSmall)
-            Text(key.base58.truncateMiddle())
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .font(PrimaryFont.bodyL.font)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(key.path)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                Spacer().frame(height: Spacing.extraExtraSmall)
+                HStack(spacing: Spacing.extraExtraSmall) {
+                    Text(key.base58.truncateMiddle())
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.bodyL.font)
+                        .lineLimit(1)
+                }
+            }
             Spacer()
         }
         .padding(.horizontal, Spacing.medium)
@@ -240,16 +227,19 @@ extension AddDerivedKeysData {
                 keySetName: "My Key Set",
                 derivedKeys: [
                     .init(
+                        path: "//polkadot//1",
                         base58: "1B2lb765432457SkT",
                         identicon: .stubIdenticon,
                         network: "polkadot"
                     ),
                     .init(
+                        path: "//polkadot//2",
                         base58: "1iKLh365474566754ZTDE",
                         identicon: .stubIdenticon,
                         network: "polkadot"
                     ),
                     .init(
+                        path: "//polkadot//3",
                         base58: "1jkCfy543654765675DOKg",
                         identicon: .stubIdenticon,
                         network: "polkadot"
@@ -260,6 +250,7 @@ extension AddDerivedKeysData {
                 keySetName: "Other Key Set",
                 derivedKeys: [
                     .init(
+                        path: "//polkadot//1",
                         base58: "1B2lb7653464235453SkT",
                         identicon: .stubIdenticon,
                         network: "polkadot"
@@ -298,16 +289,19 @@ extension AddDerivedKeysData {
                 keySetName: "My Key Set",
                 derivedKeys: [
                     .init(
+                        path: "//polkadot//1",
                         base58: "1B2lb765432457SkT",
                         identicon: .stubIdenticon,
                         network: "polkadot"
                     ),
                     .init(
+                        path: "//polkadot//2",
                         base58: "1iKLh365474566754ZTDE",
                         identicon: .stubIdenticon,
                         network: "polkadot"
                     ),
                     .init(
+                        path: "//polkadot//3",
                         base58: "1jkCfy543654765675DOKg",
                         identicon: .stubIdenticon,
                         network: "polkadot"
@@ -318,6 +312,7 @@ extension AddDerivedKeysData {
                 keySetName: "Other Key Set",
                 derivedKeys: [
                     .init(
+                        path: "//polkadot//1",
                         base58: "1B2lb7653464235453SkT",
                         identicon: .stubIdenticon,
                         network: "polkadot"
