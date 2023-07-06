@@ -485,6 +485,7 @@ extension CameraView {
             case .onDone:
                 ()
             }
+            resumeCamera()
         }
     }
 }

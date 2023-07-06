@@ -125,6 +125,7 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
+"KeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
@@ -142,6 +143,7 @@
 
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
+"PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
 "PublicKeyDetails.Label.Network" = "Network";
