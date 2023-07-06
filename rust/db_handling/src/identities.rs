@@ -284,6 +284,7 @@ pub fn import_all_addrs(
                 derived_key
                     .has_pwd
                     .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
+                false,
             ) {
                 // success, updating address preparation set and `Event` set
                 Ok(prep_data) => {
@@ -363,6 +364,7 @@ pub fn import_dynamic_addrs(
                 Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
+                true,
             ) {
                 // success, updating address preparation set and `Event` set
                 Ok(prep_data) => {
@@ -811,6 +813,7 @@ pub(crate) fn create_address(
     network_specs: Option<&NetworkSpecs>,
     seed_name: &str,
     seed_phrase: &str,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     // Check that the seed phrase is not empty.
     // In upstream, empty seed phrase means default Alice seed phrase.
@@ -880,9 +883,11 @@ pub(crate) fn create_address(
         seed_name,
         multisigner,
         has_pwd,
+        mark_as_imported,
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn create_derivation_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
@@ -891,6 +896,7 @@ pub(crate) fn create_derivation_address(
     seed_name: &str,
     ss58: &str,
     has_pwd: bool,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     let multisigner = base58_or_eth_to_multisigner(ss58, &network_specs.encryption)?;
     do_create_address(
@@ -901,9 +907,11 @@ pub(crate) fn create_derivation_address(
         seed_name,
         multisigner,
         has_pwd,
+        mark_as_imported,
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn do_create_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
@@ -912,6 +920,7 @@ fn do_create_address(
     seed_name: &str,
     multisigner: MultiSigner,
     has_pwd: bool,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     // Check that the seed name is not empty.
     if seed_name.is_empty() {
@@ -1015,6 +1024,7 @@ fn do_create_address(
                                 .map(|ns| ns.encryption)
                                 .unwrap_or(Encryption::Sr25519),
                             secret_exposed,
+                            was_imported: mark_as_imported,
                         };
                         address_prep.push((address_key, address_details));
                         Ok(PrepData {
@@ -1081,7 +1091,15 @@ fn populate_addresses(
     // Seed keys **must** be possible to generate,
     // if a seed key has a collision with some other key, it is an error
     if make_seed_keys {
-        let prep_data = create_address(database, &address_prep, "", None, seed_name, seed_phrase)?;
+        let prep_data = create_address(
+            database,
+            &address_prep,
+            "",
+            None,
+            seed_name,
+            seed_phrase,
+            false,
+        )?;
         address_prep = prep_data.address_prep;
         history_prep.extend_from_slice(&prep_data.history_prep);
     }
@@ -1149,6 +1167,7 @@ pub fn create_key_set(
             Some(&network),
             seed_name,
             seed_phrase,
+            false,
         )?;
         prep_data
             .address_prep
@@ -1316,6 +1335,7 @@ pub fn create_increment_set(
             Some(&network_specs.specs),
             &address_details.seed_name,
             seed_phrase,
+            false,
         )?;
         identity_adds = prep_data.address_prep;
         current_events.extend_from_slice(&prep_data.history_prep);
@@ -1495,6 +1515,7 @@ pub fn try_create_address(
                 Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
+                false,
             )?;
             let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
             TrDbCold::new()
@@ -1545,6 +1566,7 @@ pub fn generate_test_identities(database: &sled::Db) -> Result<()> {
                 Some(&network_specs.specs),
                 "Alice",
                 ALICE_SEED_PHRASE,
+                false,
             )?;
             address_prep = prep_data.address_prep;
             events.extend_from_slice(&prep_data.history_prep);

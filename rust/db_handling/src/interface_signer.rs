@@ -259,6 +259,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
                 base58,
                 address_key,
                 swiped: false,
+                was_imported: address_details.was_imported,
             };
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &network_specs.specs.genesis_hash,

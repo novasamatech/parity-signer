@@ -2060,6 +2060,7 @@ fn test_create_key_set_generate_default_addresses() {
             )),
             encryption: Encryption::Sr25519,
             secret_exposed: false,
+            was_imported: false,
         },
     )];
 

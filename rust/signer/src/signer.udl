@@ -278,6 +278,7 @@ dictionary MKeysCard {
     string address_key;
     string base58;
     boolean swiped;
+    boolean was_imported;
 };
 
 dictionary MSettings {
