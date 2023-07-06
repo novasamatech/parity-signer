@@ -47,12 +47,13 @@ import io.parity.signer.uniffi.SignerImage
 @Composable
 fun AddDerivedKeysScreen(
 	model: DdPreview,
+	modifier: Modifier = Modifier,
 	onBack: Callback,
 ) {
 	BackHandler(onBack = onBack)
 
 	Column(
-		modifier = Modifier.verticalScroll(rememberScrollState()),
+		modifier = modifier.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeader(
 			onBack = onBack,
