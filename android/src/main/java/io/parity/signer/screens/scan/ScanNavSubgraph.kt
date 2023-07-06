@@ -108,6 +108,7 @@ fun ScanNavSubgraph(
 	} else if (dynamicDerivationsData != null) {
 		AddDerivedKeysScreen(
 			model = dynamicDerivationsData,
+			modifier = Modifier.statusBarsPadding(),
 			onBack = scanViewModel::clearState,
 		)
 	} else if (transactionsValue == null || showingModals) {
