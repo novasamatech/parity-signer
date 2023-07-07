@@ -36,4 +36,4 @@ name = "definitions"
 crate-type = ["lib"]
 
 [dev-dependencies]
-pretty_assertions = "1.3.0"
+pretty_assertions = "1.4.0"
