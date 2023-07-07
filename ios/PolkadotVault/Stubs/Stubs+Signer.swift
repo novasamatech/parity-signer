@@ -65,7 +65,8 @@ extension MKeyDetails {
         pubkey: "",
         networkInfo: .stub,
         address: .stub,
-        base58: ""
+        base58: "",
+        wasImported: false
     )
 }
 

@@ -437,6 +437,7 @@ pub fn export_key(
         network_info,
         base58,
         address,
+        was_imported: address_details.was_imported,
     })
 }
 

@@ -419,6 +419,7 @@ dictionary MKeyDetails {
     MSCNetworkInfo network_info;
     Address address;
     string base58;
+    boolean was_imported;
 };
 
 dictionary MNewSeed {

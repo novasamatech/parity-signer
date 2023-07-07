@@ -1809,6 +1809,7 @@ pub fn export_secret_key(
             address_details.encryption,
         ),
         address,
+        was_imported: address_details.was_imported,
     })
 }
 
