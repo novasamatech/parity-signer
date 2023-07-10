@@ -46,7 +46,6 @@ import io.parity.signer.ui.theme.textTertiary
 fun KeyDerivedItem(
 	model: KeyModel,
 	networkLogo: String,
-	isDynamicDerived: Boolean = false,//todo dmitry pass
 	onClick: Callback? = {},
 ) {
 	Surface(
@@ -67,7 +66,7 @@ fun KeyDerivedItem(
 				modifier = Modifier.padding(end = 12.dp),
 			)
 			Column(Modifier.weight(1f)) {
-				if (isDynamicDerived) {
+				if (model.wasImported == true) {
 					Text(
 						text = stringResource(R.string.dynamic_derivation_path_label),
 						style = SignerTypeface.CaptionM,
@@ -161,13 +160,12 @@ private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		Column {
 			KeyDerivedItem(
-				KeyModel.createStub(),
+				KeyModel.createStub(wasImported = false),
 				"kusama"
 			)
 			KeyDerivedItem(
-				KeyModel.createStub(),
+				KeyModel.createStub(wasImported = true),
 				"kusama",
-				true,
 			)
 		}
 	}

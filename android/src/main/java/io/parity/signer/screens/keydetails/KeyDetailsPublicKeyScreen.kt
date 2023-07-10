@@ -65,7 +65,6 @@ import kotlinx.coroutines.runBlocking
 fun KeyDetailsPublicKeyScreen(
 	model: KeyDetailsModel,
 	rootNavigator: Navigator,
-	dynamic: Boolean = false,//todo dmitry pass it from rust
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
@@ -142,7 +141,7 @@ fun KeyDetailsPublicKeyScreen(
 							modifier = Modifier.padding(start = 8.dp)
 						)
 					}
-					if (dynamic) {
+					if (model.wasImported) {
 						SignerDivider()
 						Text(
 							text = stringResource(R.string.dynamic_derivation_path_label),
@@ -302,7 +301,7 @@ private fun PreviewKeyDetailsScreenRoot() {
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator(), true)
+			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
 		}
 	}
 }

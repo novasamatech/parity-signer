@@ -178,6 +178,7 @@ private fun DdDetail.toKeyModel() = KeyModel(
 	hasPwd = false,
 	path = path,
 	secretExposed = false,
+	wasImported = null
 )
 
 private fun DdPreviewcreateStub(): DdPreview = DdPreview(

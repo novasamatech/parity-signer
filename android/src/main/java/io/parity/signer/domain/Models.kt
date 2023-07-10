@@ -68,10 +68,11 @@ data class KeyModel(
 	val base58: String,
 	val hasPwd: Boolean,
 	val path: String,
-	val secretExposed: Boolean
+	val secretExposed: Boolean,
+	val wasImported: Boolean?,
 ) {
 	companion object {
-		fun createStub() = KeyModel(
+		fun createStub(wasImported: Boolean = false) = KeyModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			identicon = PreviewData.exampleIdenticonPng,
@@ -79,6 +80,7 @@ data class KeyModel(
 			path = "//polkadot//path2",
 			secretExposed = false,
 			seedName = "sdsdsd",
+			wasImported = wasImported,
 		)
 	}
 }
@@ -91,6 +93,7 @@ fun MAddressCard.toKeysModel() = KeyModel(
 	path = address.path,
 	secretExposed = address.secretExposed,
 	seedName = address.seedName,
+	wasImported = null,
 )
 
 /**
@@ -104,6 +107,7 @@ fun MKeysCard.toKeyModel() = KeyModel(
 	path = address.path,
 	secretExposed = address.secretExposed,
 	seedName = address.seedName,
+	wasImported = wasImported,
 )
 
 /**
@@ -167,6 +171,7 @@ data class KeyDetailsModel(
 	val address: KeyCardModel,
 	val base58: String,
 	val secretExposed: Boolean,
+	val wasImported: Boolean,
 ) {
 	val isRootKey = address.cardBase.path.isEmpty()
 
@@ -183,6 +188,7 @@ data class KeyDetailsModel(
 				address = keyCard,
 				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
+				wasImported = false,
 			)
 		}
 
@@ -200,6 +206,7 @@ data class KeyDetailsModel(
 				),
 				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
+				wasImported = false,
 			)
 		}
 	}
@@ -217,6 +224,7 @@ fun MKeyDetails.toKeyDetailsModel() =
 		),
 		base58 = base58,
 		secretExposed = address.secretExposed,
+		wasImported = wasImported,
 	)
 
 
