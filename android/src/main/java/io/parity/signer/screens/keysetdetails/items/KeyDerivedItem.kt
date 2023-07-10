@@ -71,6 +71,7 @@ fun KeyDerivedItem(
 						text = stringResource(R.string.dynamic_derivation_path_label),
 						style = SignerTypeface.CaptionM,
 						color = MaterialTheme.colors.textTertiary,
+						modifier = Modifier.padding(bottom = 4.dp)
 					)
 				}
 				if (model.path.isNotEmpty() || model.hasPwd) {
