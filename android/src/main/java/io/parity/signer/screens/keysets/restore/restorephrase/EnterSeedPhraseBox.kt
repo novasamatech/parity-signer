@@ -14,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -58,9 +59,13 @@ fun EnterSeedPhraseBox(
 	val focusRequester = remember { FocusRequester() }
 
 	val userInputValueInternal = " " + userInput
-	//to always keep position after artificially added " "
-	val seedWord = TextFieldValue(
-		userInputValueInternal,
+
+	//workaround for //https://issuetracker.google.com/issues/160257648 and https://issuetracker.google.com/issues/235576056 - update to new TextField
+	//for now need to keep this intermediate state
+	val seedWord = remember { mutableStateOf(TextFieldValue(" "))	}
+	seedWord.value = TextFieldValue(
+		text = userInputValueInternal,
+		//to always keep position after artificially added " "
 		selection = TextRange(userInputValueInternal.length)
 	)
 
@@ -70,33 +75,28 @@ fun EnterSeedPhraseBox(
 		mainAxisAlignment = FlowMainAxisAlignment.Start,
 		crossAxisSpacing = 4.dp,
 		modifier = modifier
-			.background(MaterialTheme.colors.fill6, innerShape)
-			.defaultMinSize(minHeight = 156.dp)
-			.padding(8.dp),
+            .background(MaterialTheme.colors.fill6, innerShape)
+            .defaultMinSize(minHeight = 156.dp)
+            .padding(8.dp),
 	) {
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
-		//workaround for //https://issuetracker.google.com/issues/160257648 - update to new TextField
-		//todo dmitry https://issuetracker.google.com/issues/235576056 - issue that it stuck fix #1935
-		var lastPostedData: String? = null
 		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = seedWord, //as was before redesign, should been moved to rust but need to align with iOS
+			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
 			onValueChange = {
-				if (it.text != lastPostedData) {
-					lastPostedData = it.text
-					onEnteredChange(it.text)
-				}
+				onEnteredChange(it.text)
+				seedWord.value = it
 			},
 			cursorBrush = SolidColor(MaterialTheme.colors.primary),
 			modifier = Modifier
-				.focusRequester(focusRequester)
-				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.conditional(!shouldShowPlaceholder) {
-					width(IntrinsicSize.Min)
-				},
+                .focusRequester(focusRequester)
+                .padding(vertical = 8.dp, horizontal = 12.dp)
+                .conditional(!shouldShowPlaceholder) {
+                    width(IntrinsicSize.Min)
+                },
 			decorationBox = @Composable { innerTextField ->
 				innerTextField()
 				if (shouldShowPlaceholder) {
@@ -122,10 +122,10 @@ fun EnterSeedPhraseBox(
 @Composable
 private fun EnterSeedPhraseWord(index: Int, word: String) {
 	Row(
-		Modifier
-			.background(MaterialTheme.colors.fill6, RoundedCornerShape(16.dp))
-			.defaultMinSize(minWidth = 40.dp, minHeight = 24.dp)
-			.padding(vertical = 8.dp, horizontal = 12.dp)
+        Modifier
+            .background(MaterialTheme.colors.fill6, RoundedCornerShape(16.dp))
+            .defaultMinSize(minWidth = 40.dp, minHeight = 24.dp)
+            .padding(vertical = 8.dp, horizontal = 12.dp)
 	) {
 		Text(
 			text = index.toString(),
