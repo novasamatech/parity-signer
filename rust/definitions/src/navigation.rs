@@ -151,6 +151,7 @@ pub struct MKeysCard {
     pub address_key: String,
     pub base58: String,
     pub swiped: bool,
+    pub was_imported: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -277,6 +278,7 @@ pub struct MKeyDetails {
     pub network_info: MSCNetworkInfo,
     pub base58: String,
     pub address: Address,
+    pub was_imported: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

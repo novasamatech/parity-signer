@@ -52,7 +52,11 @@ use constants::ADDRTREE;
 #[cfg(feature = "active")]
 use constants::ALICE_SEED_PHRASE;
 use definitions::derivations::SeedKeysPreview;
-use definitions::dynamic_derivations::DynamicDerivationsAddressRequestV1;
+use definitions::dynamic_derivations::{
+    DynamicDerivationResponseInfo, DynamicDerivationsAddressRequestV1,
+    DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
+    DynamicDerivationsResponseInfo,
+};
 use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
 use definitions::helpers::{get_multisigner, unhex};
@@ -70,6 +74,7 @@ use definitions::{
     helpers::make_identicon_from_multisigner,
     navigation::{Address, MKeyDetails, MSCNetworkInfo, QrData},
 };
+use qrcode_rtx::make_data_packs;
 
 #[cfg(feature = "active")]
 use crate::{
@@ -279,6 +284,7 @@ pub fn import_all_addrs(
                 derived_key
                     .has_pwd
                     .ok_or_else(|| Error::MissingPasswordInfo(path.to_owned()))?,
+                false,
             ) {
                 // success, updating address preparation set and `Event` set
                 Ok(prep_data) => {
@@ -308,15 +314,14 @@ pub fn import_dynamic_addrs(
     let mut is_some_keyset_missing = false;
     let mut is_some_network_missing = false;
 
-    let mut sr25519_signers = HashMap::new();
-    let mut ed25519_signers = HashMap::new();
-    let mut ecdsa_signers = HashMap::new();
-
     let mut new_addrs: Vec<(AddressKey, AddressDetails)> = vec![];
     let mut events: Vec<Event> = vec![];
 
-    let mut key_sets = vec![];
+    let mut dd_key_sets = vec![];
 
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
     for (name, phrase) in &seeds {
         let sr25519_public = sr25519::Pair::from_phrase(phrase, None).unwrap().0.public();
         let ed25519_public = ed25519::Pair::from_phrase(phrase, None).unwrap().0.public();
@@ -326,13 +331,13 @@ pub fn import_dynamic_addrs(
         ecdsa_signers.insert(ecdsa_public, (name, phrase));
     }
 
-    for seed_request in request.addrs {
-        let seed_name = match seed_request.multisigner {
+    for seed_request in &request.addrs {
+        let seed_pair = match seed_request.multisigner {
             MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
             MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
             MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
         };
-        let (seed_name, seed_phrase) = match seed_name {
+        let (seed_name, seed_phrase) = match seed_pair {
             Some(&s) => s,
             None => {
                 is_some_keyset_missing = true;
@@ -340,7 +345,7 @@ pub fn import_dynamic_addrs(
             }
         };
         let mut derivations = vec![];
-        for derivation_request in seed_request.dynamic_derivations {
+        for derivation_request in &seed_request.dynamic_derivations {
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &derivation_request.genesis_hash,
                 &derivation_request.encryption,
@@ -359,6 +364,7 @@ pub fn import_dynamic_addrs(
                 Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
+                true,
             ) {
                 // success, updating address preparation set and `Event` set
                 Ok(prep_data) => {
@@ -386,7 +392,7 @@ pub fn import_dynamic_addrs(
                     Some(network_specs.specs.base58prefix),
                     encryption,
                 ),
-                path: derivation_request.derivation_path,
+                path: derivation_request.derivation_path.clone(),
                 network_logo: network_specs.specs.logo,
                 identicon: make_identicon_from_multisigner(
                     multisigner,
@@ -395,7 +401,7 @@ pub fn import_dynamic_addrs(
             })
         }
         if !derivations.is_empty() {
-            key_sets.push(DDKeySet {
+            dd_key_sets.push(DDKeySet {
                 seed_name: seed_name.to_string(),
                 derivations,
             })
@@ -407,13 +413,113 @@ pub fn import_dynamic_addrs(
         .set_history(events_to_batch(database, events)?) // add corresponding history
         .apply(database)?;
 
+    let qr = dd_response_qr(seeds, &request)?;
     Ok(DDPreview {
-        qr: vec![],
-        key_sets,
+        qr,
+        key_sets: dd_key_sets,
         is_some_already_imported,
         is_some_keyset_missing,
         is_some_network_missing,
     })
+}
+
+fn dd_response_qr(
+    seeds: HashMap<String, String>,
+    request: &DynamicDerivationsAddressRequestV1,
+) -> Result<Vec<QrData>> {
+    let response = dd_response(seeds, request)?;
+    let data = [&[0x53, 0xff, 0xdf], response.encode().as_slice()].concat();
+    make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))
+}
+
+/// Prepare `DynamicDerivationsAddressResponse` for the given request
+pub fn dd_response(
+    seeds: HashMap<String, String>,
+    request: &DynamicDerivationsAddressRequestV1,
+) -> Result<DynamicDerivationsAddressResponse> {
+    let mut sr25519_signers = HashMap::new();
+    let mut ed25519_signers = HashMap::new();
+    let mut ecdsa_signers = HashMap::new();
+    for phrase in seeds.values() {
+        let sr25519_public = sr25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ed25519_public = ed25519::Pair::from_phrase(phrase, None).unwrap().0.public();
+        let ecdsa_public = ecdsa::Pair::from_phrase(phrase, None).unwrap().0.public();
+        sr25519_signers.insert(sr25519_public, phrase);
+        ed25519_signers.insert(ed25519_public, phrase);
+        ecdsa_signers.insert(ecdsa_public, phrase);
+    }
+
+    let mut addrs = vec![];
+
+    for seed_request in &request.addrs {
+        let seed_phrase = match seed_request.multisigner {
+            MultiSigner::Sr25519(p) => sr25519_signers.get(&p),
+            MultiSigner::Ed25519(p) => ed25519_signers.get(&p),
+            MultiSigner::Ecdsa(p) => ecdsa_signers.get(&p),
+        };
+        let seed_phrase = match seed_phrase {
+            Some(&s) => s,
+            None => {
+                continue;
+            }
+        };
+        let mut derivations = vec![];
+        for derivation_request in &seed_request.dynamic_derivations {
+            let path = derivation_request.derivation_path.as_str();
+            // create fixed-length string to avoid reallocations
+            let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
+            full_address.push_str(seed_phrase);
+            full_address.push_str(path);
+
+            let multisigner = match derivation_request.encryption {
+                Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Ed25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
+                    Ok(a) => {
+                        full_address.zeroize();
+                        MultiSigner::Sr25519(a.public())
+                    }
+                    Err(e) => {
+                        full_address.zeroize();
+                        return Err(Error::SecretStringError(e));
+                    }
+                },
+                Encryption::Ecdsa | Encryption::Ethereum => {
+                    match ecdsa::Pair::from_string(&full_address, None) {
+                        Ok(a) => {
+                            full_address.zeroize();
+                            MultiSigner::Ecdsa(a.public())
+                        }
+                        Err(e) => {
+                            full_address.zeroize();
+                            return Err(Error::SecretStringError(e));
+                        }
+                    }
+                }
+            };
+            derivations.push(DynamicDerivationResponseInfo {
+                derivation_path: derivation_request.derivation_path.clone(),
+                encryption: derivation_request.encryption,
+                public_key: multisigner,
+            });
+        }
+        addrs.push(DynamicDerivationsResponseInfo {
+            multisigner: seed_request.multisigner.clone(),
+            dynamic_derivations: derivations,
+        })
+    }
+
+    Ok(DynamicDerivationsAddressResponse::V1(
+        DynamicDerivationsAddressResponseV1 { addrs },
+    ))
 }
 
 pub fn inject_derivations_has_pwd(
@@ -707,6 +813,7 @@ pub(crate) fn create_address(
     network_specs: Option<&NetworkSpecs>,
     seed_name: &str,
     seed_phrase: &str,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     // Check that the seed phrase is not empty.
     // In upstream, empty seed phrase means default Alice seed phrase.
@@ -776,9 +883,11 @@ pub(crate) fn create_address(
         seed_name,
         multisigner,
         has_pwd,
+        mark_as_imported,
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn create_derivation_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
@@ -787,6 +896,7 @@ pub(crate) fn create_derivation_address(
     seed_name: &str,
     ss58: &str,
     has_pwd: bool,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     let multisigner = base58_or_eth_to_multisigner(ss58, &network_specs.encryption)?;
     do_create_address(
@@ -797,9 +907,11 @@ pub(crate) fn create_derivation_address(
         seed_name,
         multisigner,
         has_pwd,
+        mark_as_imported,
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn do_create_address(
     database: &sled::Db,
     input_batch_prep: &[(AddressKey, AddressDetails)],
@@ -808,6 +920,7 @@ fn do_create_address(
     seed_name: &str,
     multisigner: MultiSigner,
     has_pwd: bool,
+    mark_as_imported: bool,
 ) -> Result<PrepData> {
     // Check that the seed name is not empty.
     if seed_name.is_empty() {
@@ -911,6 +1024,7 @@ fn do_create_address(
                                 .map(|ns| ns.encryption)
                                 .unwrap_or(Encryption::Sr25519),
                             secret_exposed,
+                            was_imported: mark_as_imported,
                         };
                         address_prep.push((address_key, address_details));
                         Ok(PrepData {
@@ -977,7 +1091,15 @@ fn populate_addresses(
     // Seed keys **must** be possible to generate,
     // if a seed key has a collision with some other key, it is an error
     if make_seed_keys {
-        let prep_data = create_address(database, &address_prep, "", None, seed_name, seed_phrase)?;
+        let prep_data = create_address(
+            database,
+            &address_prep,
+            "",
+            None,
+            seed_name,
+            seed_phrase,
+            false,
+        )?;
         address_prep = prep_data.address_prep;
         history_prep.extend_from_slice(&prep_data.history_prep);
     }
@@ -1045,6 +1167,7 @@ pub fn create_key_set(
             Some(&network),
             seed_name,
             seed_phrase,
+            false,
         )?;
         prep_data
             .address_prep
@@ -1212,6 +1335,7 @@ pub fn create_increment_set(
             Some(&network_specs.specs),
             &address_details.seed_name,
             seed_phrase,
+            false,
         )?;
         identity_adds = prep_data.address_prep;
         current_events.extend_from_slice(&prep_data.history_prep);
@@ -1391,6 +1515,7 @@ pub fn try_create_address(
                 Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
+                false,
             )?;
             let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
             TrDbCold::new()
@@ -1441,6 +1566,7 @@ pub fn generate_test_identities(database: &sled::Db) -> Result<()> {
                 Some(&network_specs.specs),
                 "Alice",
                 ALICE_SEED_PHRASE,
+                false,
             )?;
             address_prep = prep_data.address_prep;
             events.extend_from_slice(&prep_data.history_prep);
@@ -1683,6 +1809,7 @@ pub fn export_secret_key(
             address_details.encryption,
         ),
         address,
+        was_imported: address_details.was_imported,
     })
 }
 

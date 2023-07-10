@@ -278,6 +278,7 @@ dictionary MKeysCard {
     string address_key;
     string base58;
     boolean swiped;
+    boolean was_imported;
 };
 
 dictionary MSettings {
@@ -418,6 +419,7 @@ dictionary MKeyDetails {
     MSCNetworkInfo network_info;
     Address address;
     string base58;
+    boolean was_imported;
 };
 
 dictionary MNewSeed {
