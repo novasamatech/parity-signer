@@ -15,12 +15,12 @@ lazy_static = "1.4.0"
 num-bigint = "0.4.3"
 parity-scale-codec = {version = "3.6.3", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
-regex = "1.8.4"
+regex = "1.9.1"
 scale-info = "2.9.0"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-thiserror = "1.0.40"
+thiserror = "1.0.43"
 
 [dev-dependencies]
 pretty_assertions = "1"
