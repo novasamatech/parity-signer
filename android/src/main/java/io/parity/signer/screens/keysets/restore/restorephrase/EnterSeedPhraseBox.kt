@@ -14,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -39,7 +40,6 @@ import io.parity.signer.screens.keysetdetails.backup.PhraseNumberStyle
 import io.parity.signer.screens.keysetdetails.backup.PhraseWordStyle
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.fill30
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
@@ -59,9 +59,13 @@ fun EnterSeedPhraseBox(
 	val focusRequester = remember { FocusRequester() }
 
 	val userInputValueInternal = " " + userInput
-	//to always keep position after artificially added " "
-	val seedWord = TextFieldValue(
-		userInputValueInternal,
+
+	//workaround for //https://issuetracker.google.com/issues/160257648 and https://issuetracker.google.com/issues/235576056 - update to new TextField
+	//for now need to keep this intermediate state
+	val seedWord = remember { mutableStateOf(TextFieldValue(" ")) }
+	seedWord.value = TextFieldValue(
+		text = userInputValueInternal,
+		//to always keep position after artificially added " "
 		selection = TextRange(userInputValueInternal.length)
 	)
 
@@ -78,17 +82,13 @@ fun EnterSeedPhraseBox(
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
-		//workaround for //https://issuetracker.google.com/issues/160257648 - update to new TextField
-		var lastPostedData: String? = null
 		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = seedWord, //as was before redesign, should been moved to rust but need to align with iOS
+			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
 			onValueChange = {
-				if (it.text != lastPostedData) {
-					lastPostedData = it.text
-					onEnteredChange(it.text)
-				}
+				onEnteredChange(it.text)
+				seedWord.value = it
 			},
 			cursorBrush = SolidColor(MaterialTheme.colors.primary),
 			modifier = Modifier
