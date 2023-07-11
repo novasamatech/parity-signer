@@ -27,6 +27,7 @@ fun NetworkFilterMenu(
 	networks: List<NetworkModel>,
 	initialSelection: Set<String>,
 	onConfirm: (Set<NetworkModel>) -> Unit,
+	onCancel: Callback,
 ) {
 
 	val selected: MutableState<Set<NetworkModel>> =
@@ -39,7 +40,7 @@ fun NetworkFilterMenu(
 
 	NetworkFilterMenu(
 		networks = networks,
-		selectedNetwors = selected.value,
+		selectedNetworks = selected.value,
 		onClick = { network ->
 			if (selected.value.contains(network)) {
 				selected.value = selected.value - network
@@ -48,7 +49,8 @@ fun NetworkFilterMenu(
 			}
 		},
 		onConfirm = { onConfirm(selected.value) },
-		onCancel = { onConfirm(emptySet()) },
+		onClean = { onConfirm(emptySet()) },
+		onCancel = onCancel,
 	)
 }
 
@@ -56,9 +58,10 @@ fun NetworkFilterMenu(
 @Composable
 private fun NetworkFilterMenu(
 	networks: List<NetworkModel>,
-	selectedNetwors: Set<NetworkModel>,
+	selectedNetworks: Set<NetworkModel>,
 	onClick: (NetworkModel) -> Unit,
 	onConfirm: Callback,
+	onClean: Callback,
 	onCancel: Callback,
 ) {
 	Column(
@@ -74,7 +77,7 @@ private fun NetworkFilterMenu(
 			NetworkItemMultiselect(
 				modifier = Modifier.padding(start = 8.dp, end = 4.dp),
 				network = network,
-				isSelected = selectedNetwors.contains(network),
+				isSelected = selectedNetworks.contains(network),
 				onClick = onClick
 			)
 		}
@@ -82,10 +85,10 @@ private fun NetworkFilterMenu(
 			modifier = Modifier
 				.padding(24.dp)
 				.padding(top = 8.dp),
-			isCtaEnabled = selectedNetwors.isNotEmpty(),
+			isCtaEnabled = selectedNetworks.isNotEmpty(),
 			labelCancel = stringResource(R.string.generic_clear_selection),
 			labelCta = stringResource(id = R.string.generic_done),
-			onClickedCancel = onCancel,
+			onClickedCancel = onClean,
 			onClickedCta = onConfirm,
 		)
 	}
@@ -126,9 +129,10 @@ private fun PreviewNetworkFilterMenu() {
 	SignerNewTheme {
 		NetworkFilterMenu(
 			networks = networks,
-			selectedNetwors = networks.subList(1, 1).toSet(),
+			selectedNetworks = networks.subList(1, 1).toSet(),
 			onClick = {},
 			onConfirm = {},
+			onClean = {},
 			onCancel = {},
 		)
 	}

@@ -102,6 +102,7 @@ fun KeySetDetailsScreenSubgraph(
 						keySetViewModel.setFilters(it)
 						closeAction()
 					},
+					onCancel = closeAction,
 				)
 			}
 		}
