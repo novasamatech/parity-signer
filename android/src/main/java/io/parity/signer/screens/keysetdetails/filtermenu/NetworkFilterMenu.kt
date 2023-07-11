@@ -82,6 +82,7 @@ private fun NetworkFilterMenu(
 			modifier = Modifier
 				.padding(24.dp)
 				.padding(top = 8.dp),
+			isCtaEnabled = selectedNetwors.isNotEmpty(),
 			labelCancel = stringResource(R.string.generic_clear_selection),
 			labelCta = stringResource(id = R.string.generic_done),
 			onClickedCancel = onCancel,
