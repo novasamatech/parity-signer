@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
@@ -32,7 +33,10 @@ fun KeySetDetailsScreenFull(
 			networkState = networkState,
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
-			}
+			},
+			onShowPublicKey = {title: String, key: String ->
+//todo dmitry implement
+			},
 		)
 	}
 
@@ -76,6 +80,15 @@ fun KeySetDetailsScreenFull(
 				)
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.keys_public_key) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				PublicKeyBottomSheetView(
+					name = "",//todo dmitry pass it
+					key = " ",
+					onClose = closeAction,
+				)
+			}
+		}
 	}
 }
 
@@ -84,5 +97,6 @@ private object KeySetDetailsMenuSubgraph {
 	const val empty = "keys_menu_empty"
 	const val keys_menu = "keys_menu"
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
+	const val keys_public_key = "keys_public_key"
 }
 

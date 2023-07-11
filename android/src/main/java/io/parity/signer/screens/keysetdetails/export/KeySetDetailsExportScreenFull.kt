@@ -55,6 +55,7 @@ fun KeySetDetailsExportScreenFull(
 						modalBottomSheetState.show()
 					}
 				},
+				onShowPublicKey = {_,_ ->}, //todo dmitry implement as not multiselect
 			)
 		},
 	)

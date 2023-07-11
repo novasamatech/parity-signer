@@ -157,10 +157,13 @@ fun KeyPath(
 }
 
 @Composable
-fun ShowBase58Collapsible(base58: String, modifier: Modifier = Modifier) {
+fun ShowBase58Collapsible(
+	base58: String,
+	modifier: Modifier = Modifier,
+) {
 	val expanded = remember { mutableStateOf(false) }
-	Row(
-		verticalAlignment = Alignment.CenterVertically,
+	Box(
+		contentAlignment = Alignment.CenterStart,
 		modifier = modifier
 			.clickable { expanded.value = !expanded.value }
 			.animateContentSize()
@@ -172,20 +175,30 @@ fun ShowBase58Collapsible(base58: String, modifier: Modifier = Modifier) {
 				style = SignerTypeface.BodyM
 			)
 		} else {
-			Text(
-				base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-				color = MaterialTheme.colors.textTertiary,
-				style = SignerTypeface.BodyM,
-				maxLines = 1,
-			)
-			Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-			Icon(
-				imageVector = Icons.Default.KeyboardArrowDown,
-				modifier = Modifier.size(20.dp),
-				contentDescription = stringResource(R.string.description_expand_button),
-				tint = MaterialTheme.colors.textSecondary
-			)
+			ShowBase58Collapsed(base58)
 		}
+	}
+}
+
+@Composable
+fun ShowBase58Collapsed(
+	base58: String,
+	modifier: Modifier = Modifier,
+) {
+	Row(modifier = modifier) {
+		Text(
+			base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+			maxLines = 1,
+		)
+		Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+		Icon(
+			imageVector = Icons.Default.KeyboardArrowDown,
+			modifier = Modifier.size(20.dp),
+			contentDescription = stringResource(R.string.description_expand_button),
+			tint = MaterialTheme.colors.textSecondary
+		)
 	}
 }
 
