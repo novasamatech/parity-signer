@@ -64,6 +64,7 @@ fun KeySetDetailsNavSubgraph(
 						model = model,
 						navigator = EmptyNavigator(),
 						networkState = networkState,
+						onShowPublicKey = {_,_ ->},
 						onMenu = {},
 					)
 				}
