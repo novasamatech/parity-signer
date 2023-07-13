@@ -24,9 +24,9 @@ use definitions::{
     metadata::MetaValues,
     navigation::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
-        DerivationPack, MBackup, MDeriveKey, MKeyDetails, MMMNetwork, MMNetwork, MManageMetadata,
-        MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSCNetworkInfo, MTypesInfo,
-        MVerifier, Network, NetworkSpecs, SeedNameCard, SignerImage,
+        DerivationPack, Identicon, MBackup, MDeriveKey, MKeyDetails, MMMNetwork, MMNetwork,
+        MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSCNetworkInfo,
+        MTypesInfo, MVerifier, Network, NetworkSpecs, SeedNameCard,
     },
     network_specs::{OrderedNetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
@@ -75,8 +75,8 @@ fn print_seed_names() {
     let cards = get_all_seed_names_with_identicons(&db, &[String::from("Alice")]).unwrap();
     let expected_cards = vec![SeedNameCard {
         seed_name: "Alice".to_string(),
-        identicon: SignerImage::Png {
-            image: alice_sr_root().to_vec(),
+        identicon: Identicon::Dots {
+            identity: alice_sr_root(),
         },
         used_in_networks: vec!["westend".to_string()],
         derived_keys_count: 1, // "//Alice"
@@ -97,16 +97,16 @@ fn print_seed_names_with_orphan() {
     let expected_cards = vec![
         SeedNameCard {
             seed_name: "Alice".to_string(),
-            identicon: SignerImage::Png {
-                image: alice_sr_root().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_root(),
             },
             used_in_networks: vec!["westend".to_string()],
             derived_keys_count: 1,
         },
         SeedNameCard {
             seed_name: "BobGhost".to_string(),
-            identicon: SignerImage::Png {
-                image: empty_png().to_vec(),
+            identicon: Identicon::Dots {
+                identity: empty_png(),
             },
             used_in_networks: vec![],
             derived_keys_count: 0,
@@ -117,7 +117,7 @@ fn print_seed_names_with_orphan() {
 
 #[test]
 fn print_all_ids() {
-    use definitions::navigation::SignerImage;
+    use definitions::navigation::Identicon;
     let dbname = tempdir().unwrap();
     let db = sled::open(dbname).unwrap();
 
@@ -133,8 +133,8 @@ fn print_all_ids() {
         public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string(),
         address: Address {
             seed_name: "Alice".to_string(),
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
             },
             has_pwd: false,
             path: "//Alice".to_string(),
@@ -237,7 +237,7 @@ fn first_standard_network() {
 
 #[test]
 fn export_alice_westend() {
-    use definitions::navigation::SignerImage;
+    use definitions::navigation::Identicon;
     let dbname = tempdir().unwrap();
     let db = sled::open(dbname).unwrap();
 
@@ -269,8 +269,8 @@ fn export_alice_westend() {
         pubkey: pubkey.to_string(),
         base58: expected_addr.to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -438,8 +438,8 @@ fn westend_network_details() {
             ttype: "general".to_string(),
             details: definitions::navigation::MVerifierDetails {
                 public_key: "".to_string(),
-                identicon: SignerImage::Png {
-                    image: empty_png().to_vec(),
+                identicon: Identicon::Dots {
+                    identity: empty_png().to_vec(),
                 },
                 encryption: "".to_string(),
             },
@@ -450,8 +450,8 @@ fn westend_network_details() {
                 specs_version: "9000".to_string(),
                 meta_hash: "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                     .to_string(),
-                meta_id_pic: SignerImage::Png {
-                    image: westend_9000().to_vec(),
+                meta_id_pic: Identicon::Dots {
+                    identity: westend_9000().to_vec(),
                 },
             },
             MMetadataRecord {
@@ -459,8 +459,8 @@ fn westend_network_details() {
                 specs_version: "9010".to_string(),
                 meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                     .to_string(),
-                meta_id_pic: SignerImage::Png {
-                    image: westend_9010().to_vec(),
+                meta_id_pic: Identicon::Dots {
+                    identity: westend_9010().to_vec(),
                 },
             },
         ],
@@ -488,8 +488,8 @@ fn westend_9010_metadata_details() {
         name: "westend".to_string(),
         version: "9010".to_string(),
         meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf".to_string(),
-        meta_id_pic: SignerImage::Png {
-            image: westend_9010().to_vec(),
+        meta_id_pic: Identicon::Dots {
+            identity: westend_9010().to_vec(),
         },
         networks: vec![MMMNetwork {
             title: "Westend".to_string(),
@@ -514,8 +514,8 @@ fn types_status_and_history() {
         types_hash: Some(
             "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
         ),
-        types_id_pic: Some(SignerImage::Png {
-            image: types_known().to_vec(),
+        types_id_pic: Some(Identicon::Dots {
+            identity: types_known().to_vec(),
         }),
     };
     assert_eq!(types, expected_types);
@@ -568,8 +568,8 @@ fn path_is_known() {
             address: Address {
                 path: "//Alice".to_string(),
                 has_pwd: false,
-                identicon: SignerImage::Png {
-                    image: alice_sr_alice().to_vec(),
+                identicon: Identicon::Dots {
+                    identity: alice_sr_alice().to_vec(),
                 },
                 seed_name: "Alice".to_string(),
                 secret_exposed: false,

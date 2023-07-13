@@ -840,13 +840,11 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
- "constants",
  "eth-blockies",
  "frame-metadata 16.0.0",
  "hex",
  "libsecp256k1",
  "parity-scale-codec",
- "plot_icon",
  "pretty_assertions",
  "sc-executor-common",
  "sc-executor-wasmi",
@@ -2687,11 +2685,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b92a0e6ac9a5007559362f0f41a4feaa3021a2ac07c54b8788fad354137b5fa"
 dependencies = [
  "blake2-rfc",
- "hex",
  "image",
  "palette",
  "png",
- "svg",
 ]
 
 [[package]]
@@ -4278,12 +4274,6 @@ dependencies = [
  "scale-info",
  "sp-core-hashing 6.0.0",
 ]
-
-[[package]]
-name = "svg"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e715e0c3fc987f4c435dc7189641fd9caa6919a74675ace605c38e201d278001"
 
 [[package]]
 name = "syn"

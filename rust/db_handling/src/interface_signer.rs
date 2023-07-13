@@ -3,14 +3,13 @@ use bip39::{Language, Mnemonic};
 use definitions::helpers::IdenticonStyle;
 use hex;
 use parity_scale_codec::Encode;
-use plot_icon::EMPTY_PNG;
 use sp_core::{blake2_256, sr25519, Pair};
 use sp_runtime::MultiSigner;
 use std::collections::{HashMap, HashSet};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
-use definitions::navigation::{MAddressCard, MKeyAndNetworkCard, MKeysNew, QrData, SignerImage};
+use definitions::navigation::{Identicon, MAddressCard, MKeyAndNetworkCard, MKeysNew, QrData};
 use definitions::network_specs::NetworkSpecs;
 use definitions::{
     crypto::Encryption,
@@ -134,11 +133,9 @@ pub fn get_all_seed_names_with_identicons(
 /// - the available seed key if there is only one
 /// - preferred seed key, if there are more than one; order of preference:
 /// `Sr25519`, `Ed25519`, `Ecdsa`
-fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerImage {
+fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Identicon {
     if multisigner_set.is_empty() {
-        SignerImage::Png {
-            image: EMPTY_PNG.to_vec(),
-        }
+        Identicon::default()
     } else {
         let mut got_sr25519 = None;
         let mut got_ed25519 = None;
@@ -157,9 +154,7 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> SignerIma
         } else if let Some(a) = got_ecdsa {
             make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
         } else {
-            SignerImage::Png {
-                image: EMPTY_PNG.to_vec(),
-            }
+            Identicon::default()
         }
     }
 }

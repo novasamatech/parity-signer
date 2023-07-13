@@ -1,6 +1,5 @@
 //! Common helper functions
 
-use constants::IDENTICON_IMG_SIZE;
 use hex;
 use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519};
 use sp_core::{
@@ -10,8 +9,6 @@ use sp_core::{
 };
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
-
-use plot_icon::{generate_png, EMPTY_PNG};
 
 #[cfg(target_os = "ios")]
 use plot_icon::generate_svg;
@@ -66,63 +63,48 @@ pub enum IdenticonStyle {
     Blockies,
 }
 
-use crate::navigation::SignerImage;
+use crate::navigation::Identicon;
 
 /// Print identicon from
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 pub fn make_identicon_from_multisigner(
     multisigner: &MultiSigner,
     style: IdenticonStyle,
-) -> SignerImage {
+) -> Identicon {
     match style {
-        IdenticonStyle::Dots => make_identicon(&multisigner_to_public(multisigner)),
+        IdenticonStyle::Dots => Identicon::Dots {
+            identity: multisigner_to_public(multisigner),
+        },
         IdenticonStyle::Blockies => {
             if let MultiSigner::Ecdsa(ref public) = multisigner {
-                use eth_blockies::{BlockiesGenerator, EthBlockies, SeedInput};
+                use eth_blockies::SeedInput;
                 let account = print_ethereum_address(public);
-                let account = account.to_ethaddr_seed();
-                let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
-                SignerImage::Png {
-                    image: EthBlockies::png_data(account, dimension),
+                Identicon::Blockies {
+                    identity: account.to_ethaddr_seed().to_vec(),
                 }
             } else {
-                SignerImage::Png {
-                    image: EMPTY_PNG.to_vec(),
-                }
+                Identicon::Blockies { identity: vec![] }
             }
         }
     }
 }
 
-pub fn make_identicon_from_id20(id: &[u8; 20]) -> SignerImage {
-    use eth_blockies::{BlockiesGenerator, EthBlockies};
-
+pub fn make_identicon_from_id20(id: &[u8; 20]) -> Identicon {
+    use eth_blockies::SeedInput;
     let account = format!("0x{}", hex::encode(id));
-    let dimension = (IDENTICON_IMG_SIZE, IDENTICON_IMG_SIZE);
-    let image = EthBlockies::png_data(account, dimension);
-
-    SignerImage::Png { image }
+    Identicon::Blockies {
+        identity: account.to_ethaddr_seed().to_vec(),
+    }
 }
 
-pub fn make_identicon_from_account(account: AccountId32) -> SignerImage {
+pub fn make_identicon_from_account(account: AccountId32) -> Identicon {
     make_identicon(&<[u8; 32]>::from(account))
 }
 
-#[cfg(target_os = "ios")]
-fn make_identicon(into_id: &[u8]) -> SignerImage {
-    let image = generate_svg(into_id).to_string().into_bytes();
-
-    SignerImage::Svg { image }
-}
-
-#[cfg(not(target_os = "ios"))]
-fn make_identicon(into_id: &[u8]) -> SignerImage {
-    let image = match generate_png(into_id, IDENTICON_IMG_SIZE as u16) {
-        Ok(a) => a,
-        Err(_) => EMPTY_PNG.to_vec(),
-    };
-
-    SignerImage::Png { image }
+fn make_identicon(into_id: &[u8]) -> Identicon {
+    Identicon::Dots {
+        identity: into_id.into(),
+    }
 }
 
 /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
@@ -249,14 +231,14 @@ pub fn base58_or_eth_to_multisigner(
 /// Print id pic for metadata hash
 ///
 /// Currently uses PNG identicon generator, could be changed later.
-pub fn pic_meta(meta_hash: &[u8]) -> SignerImage {
+pub fn pic_meta(meta_hash: &[u8]) -> Identicon {
     make_identicon(meta_hash)
 }
 
 /// Print id pic for hash of SCALE-encoded types data
 ///
 /// Currently uses PNG identicon generator, could be changed later.
-pub fn pic_types(types_hash: &[u8]) -> SignerImage {
+pub fn pic_types(types_hash: &[u8]) -> Identicon {
     make_identicon(types_hash)
 }
 
