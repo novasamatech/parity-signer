@@ -45,14 +45,13 @@ fun IdentIcon(
 			)
 		}
 		is ImageContent.Svg -> {
-			//todo #1457 implementSvg 			//todo dmitry svg
 			val context = LocalContext.current
 			val painter = rememberAsyncImagePainter(
 				model = ImageRequest.Builder(context)
 					.decoderFactory(SvgDecoder.Factory())
 					.data(identIcon.toByteArray())
 					.size(Size.ORIGINAL) // Set the target size to load the image at.
-					.build()
+					.build(),
 			)
 			Image(
 				painter = painter,
@@ -89,7 +88,11 @@ fun SignerImage.toImageContent(): ImageContent {
 }
 
 
-
+/**
+ * As svg parsed async and in preview Dispatchers.IO is not working
+ * run preview on device to see it.
+ * Consider creating custom coil.ImageLoader with main ui fetch and parse dispatchers. Maybe for preview only.
+ */
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
