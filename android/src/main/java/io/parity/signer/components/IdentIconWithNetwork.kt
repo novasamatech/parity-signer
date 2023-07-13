@@ -1,32 +1,30 @@
 package io.parity.signer.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.*
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import io.parity.signer.R
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
-import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -42,14 +40,11 @@ fun IdentIconWithNetwork(
 	CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 		Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 			val cutoutSize = size / 2
-			Image(
-				identicon.toBytes().intoImageBitmap(),
-				stringResource(R.string.description_identicon),
-				modifier = Modifier
-                    .size(size)
-                    .clip(CircleShape)
-                    .clip(SubIconCutShape(cutoutSize))
+			IdentIcon(
+				identicon = identicon, size = size,
+				modifier = Modifier.clip(SubIconCutShape(cutoutSize))
 			)
+
 			NetworkIcon(networkLogoName = networkLogoName, size = cutoutSize)
 		}
 	}
@@ -114,17 +109,17 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 @Composable
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
-		val icon = PreviewData.exampleIdenticonPng
+		val iconPng = PreviewData.exampleIdenticonPng
 		val network = NetworkModel.createStub().logo
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
-			IdentIconWithNetwork(icon, network)
-			IdentIconWithNetwork(icon, network)
-			IdentIconWithNetwork(icon, network, size = 18.dp)
-			IdentIconWithNetwork(icon, network, size = 18.dp)
-			IdentIconWithNetwork(icon, network, size = 56.dp)
-			IdentIconWithNetwork(icon, network, size = 56.dp)
+			IdentIconWithNetwork(iconPng, network)
+			IdentIconWithNetwork(iconPng, network)
+			IdentIconWithNetwork(iconPng, network, size = 18.dp)
+			IdentIconWithNetwork(iconPng, network, size = 18.dp)
+			IdentIconWithNetwork(iconPng, network, size = 56.dp)
+			IdentIconWithNetwork(iconPng, network, size = 56.dp)
 		}
 	}
 }
