@@ -1,15 +1,28 @@
 package io.parity.signer.screens.keysetdetails
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
@@ -30,10 +43,23 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarState
-import io.parity.signer.domain.*
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.EmptyNavigator
+import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.abbreviateString
+import io.parity.signer.domain.conditional
+import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandable
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.textDisabled
+import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.Action
 
 /**
@@ -70,7 +96,8 @@ fun KeySetDetailsScreenView(
 						SeedKeyDetails(
 							model = it,
 							onShowPublicKey = onShowPublicKey,
-							modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+							modifier = Modifier
+								.padding(horizontal = 24.dp, vertical = 8.dp)
 								.padding(bottom = 16.dp)
 						)
 					}
@@ -129,14 +156,13 @@ fun KeySetDetailsHeader(
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Image(
-			imageVector = Icons.Filled.ChevronLeft,
+			imageVector = Icons.Default.ArrowBackIosNew,
 			contentDescription = stringResource(R.string.description_back_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.padding(horizontal = 8.dp)
 				.clickable(onClick = onBack)
-				.padding(8.dp)
-				.size(24.dp)
+				.size(32.dp)
 				.align(Alignment.CenterVertically)
 		)
 		//center
@@ -148,19 +174,19 @@ fun KeySetDetailsHeader(
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.clickable(onClick = onAddKey)
-				.padding(8.dp)
-				.size(24.dp)
+				.padding(4.dp)
+				.size(32.dp)
 				.align(Alignment.CenterVertically)
 		)
 		Image(
-			imageVector = Icons.Filled.MoreHoriz,
+			imageVector = Icons.Default.MoreHoriz,
 			contentDescription = stringResource(R.string.description_menu_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.padding(end = 8.dp)
 				.clickable(onClick = onMenu)
-				.padding(8.dp)
-				.size(24.dp)
+				.padding(4.dp)
+				.size(32.dp)
 				.align(Alignment.CenterVertically)
 		)
 	}
@@ -266,7 +292,12 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {_,_ ->})
+			KeySetDetailsScreenView(
+				mockModel,
+				EmptyNavigator(),
+				state,
+				{},
+				{ _, _ -> })
 		}
 	}
 }
@@ -287,7 +318,12 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {_,_ ->})
+			KeySetDetailsScreenView(
+				mockModel,
+				EmptyNavigator(),
+				state,
+				{},
+				{ _, _ -> })
 		}
 	}
 }

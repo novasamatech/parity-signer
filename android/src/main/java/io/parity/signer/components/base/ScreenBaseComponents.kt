@@ -15,7 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -51,14 +54,14 @@ fun ScreenHeader(
 	) {
 		if (onBack != null) {
 			Image(
-				imageVector = Icons.Filled.ArrowBackIos,
+				imageVector = Icons.Default.ArrowBackIosNew,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
 					.clickable(onClick = onBack)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 					.align(Alignment.CenterVertically)
 			)
 		} else {
@@ -81,14 +84,14 @@ fun ScreenHeader(
 		//end
 		if (onMenu != null) {
 			Image(
-				imageVector = Icons.Filled.MoreHoriz,
+				imageVector = Icons.Default.MoreHoriz,
 				contentDescription = stringResource(R.string.description_menu_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
 					.clickable(onClick = onMenu)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 					.align(Alignment.CenterVertically)
 			)
 		} else {
@@ -111,14 +114,14 @@ fun ScreenHeaderClose(
 			.defaultMinSize(minHeight = 56.dp)
 	) {
 		Image(
-			imageVector = Icons.Filled.Close,
+			imageVector = Icons.Default.Close,
 			contentDescription = stringResource(R.string.description_back_button),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
 				.padding(horizontal = 8.dp)
 				.clickable(onClick = onClose)
-				.padding(8.dp)
-				.size(24.dp)
+				.padding(4.dp)
+				.size(32.dp)
 				.align(Alignment.CenterVertically)
 		)
 		//center
@@ -153,8 +156,8 @@ fun ScreenHeaderClose(
 				modifier = Modifier
 					.padding(horizontal = 8.dp)
 					.clickable(onClick = onMenu)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 					.align(Alignment.CenterVertically)
 			)
 		} else {
@@ -186,14 +189,14 @@ fun ScreenHeaderWithButton(
 	) {
 		if (backNotClose) {
 			Image(
-				imageVector = Icons.Filled.ArrowBackIos,
+				imageVector = Icons.Default.ArrowBackIosNew,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(end = 8.dp)
 					.clickable(onClick = onClose)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 			)
 		} else {
 			Image(
@@ -203,8 +206,8 @@ fun ScreenHeaderWithButton(
 				modifier = Modifier
 					.padding(end = 8.dp)
 					.clickable(onClick = onClose)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 					.align(Alignment.CenterVertically)
 			)
 		}
@@ -269,25 +272,25 @@ fun ScreenHeaderProgressWithButton(
 	) {
 		if (backNotClose) {
 			Image(
-				imageVector = Icons.Filled.ArrowBackIos,
+				imageVector = Icons.Default.ArrowBackIosNew,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(end = 8.dp)
 					.clickable(onClick = onClose)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 			)
 		} else {
 			Image(
-				imageVector = Icons.Filled.Close,
+				imageVector = Icons.Default.Close,
 				contentDescription = stringResource(R.string.description_back_button),
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 				modifier = Modifier
 					.padding(end = 8.dp)
 					.clickable(onClick = onClose)
-					.padding(8.dp)
-					.size(24.dp)
+					.padding(4.dp)
+					.size(32.dp)
 					.align(Alignment.CenterVertically)
 			)
 		}
