@@ -31,5 +31,6 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<property android:name="REQUIRE_SECURE_ENV" android:value="1" />
 	</application>
 </manifest>
