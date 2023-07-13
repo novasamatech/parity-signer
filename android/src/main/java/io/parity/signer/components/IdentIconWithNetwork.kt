@@ -41,8 +41,9 @@ fun IdentIconWithNetwork(
 		Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 			val cutoutSize = size / 2
 			IdentIcon(
-				identicon = identicon, size = size,
-				modifier = Modifier.clip(SubIconCutShape(cutoutSize))
+				identIcon = identicon,
+				modifier = Modifier.clip(SubIconCutShape(cutoutSize)),
+				size = size
 			)
 
 			NetworkIcon(networkLogoName = networkLogoName, size = cutoutSize)
@@ -109,7 +110,7 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 @Composable
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
-		val iconPng = PreviewData.exampleIdenticonPng
+		val iconPng = PreviewData.Identicon.exampleIdenticonPng
 		val network = NetworkModel.createStub().logo
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -135,7 +136,7 @@ private fun PreviewNetworkIconSizes() {
 )
 @Composable
 private fun PreviewNetworkIconUnknownIcons() {
-	val icon = PreviewData.exampleIdenticonPng
+	val icon = PreviewData.Identicon.exampleIdenticonPng
 	val network = NetworkModel.createStub()
 	val network2 = NetworkModel.createStub("Some")
 

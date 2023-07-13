@@ -9,11 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,24 +19,25 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import io.parity.signer.R
-import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.SignerImage
 
 /**
- * Just draw a standard identicon used everywhere, with standard size
+ * Just draw a standard IdentIcon used everywhere, with standard size
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 @Composable
-fun IdentIcon(identicon: ImageContent,
-							size: Dp = 28.dp,
-							modifier: Modifier = Modifier) {
-	when (identicon) {
+fun IdentIcon(
+	identIcon: ImageContent,
+	modifier: Modifier = Modifier,
+	size: Dp = 28.dp
+) {
+	when (identIcon) {
 		is ImageContent.Png -> {
 			Image(
-				bitmap = identicon.image.intoImageBitmap(),
+				bitmap = identIcon.image.intoImageBitmap(),
 				contentDescription = stringResource(R.string.description_identicon),
 				modifier = modifier
 					.size(size)
@@ -47,13 +45,12 @@ fun IdentIcon(identicon: ImageContent,
 			)
 		}
 		is ImageContent.Svg -> {
-			//todo dmitry svg
-			//todo #1457 implementSvg
-			val ctx = LocalContext.current
+			//todo #1457 implementSvg 			//todo dmitry svg
+			val context = LocalContext.current
 			val painter = rememberAsyncImagePainter(
-				model = ImageRequest.Builder(ctx)
+				model = ImageRequest.Builder(context)
 					.decoderFactory(SvgDecoder.Factory())
-					.data(identicon.image)
+					.data(identIcon.toByteArray())
 					.size(Size.ORIGINAL) // Set the target size to load the image at.
 					.build()
 			)
@@ -66,7 +63,11 @@ fun IdentIcon(identicon: ImageContent,
 			)
 		}
 	}
+}
 
+@OptIn(ExperimentalUnsignedTypes::class)
+private fun ImageContent.Svg.toByteArray(): ByteArray {
+	return this.image.toUByteArray().asByteArray()
 }
 
 /**
@@ -100,18 +101,18 @@ fun SignerImage.toImageContent(): ImageContent {
 @Composable
 private fun PreviewIdentIcon() {
 	SignerNewTheme {
-		val iconPng = PreviewData.exampleIdenticonPng
-		val iconSvg = PreviewData.exampleIdenticonPng //todo dmitry sample
+		val iconPng = PreviewData.Identicon.exampleIdenticonPng
+		val iconSvg = PreviewData.Identicon.exampleIdenticonSvg
 
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			IdentIcon(iconPng)
-			IdentIcon(iconPng)
+			IdentIcon(iconSvg)
 			IdentIcon(iconPng, size = 18.dp)
-			IdentIcon(iconPng, size = 18.dp)
+			IdentIcon(iconSvg, size = 18.dp)
 			IdentIcon(iconPng, size = 56.dp)
-			IdentIcon(iconPng, size = 56.dp)
+			IdentIcon(iconSvg, size = 56.dp)
 		}
 	}
 }

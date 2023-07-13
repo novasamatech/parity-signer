@@ -38,7 +38,7 @@ data class NetworkDetailsModel(
 			currentVerifier = VerifierModel(
 				"custom",
 				"vwvsWqqBYFK",
-				PreviewData.exampleIdenticonPng,
+				PreviewData.Identicon.exampleIdenticonPng,
 				"sr25519"
 			),
 			meta = listOf(MetadataModel.createStub(), MetadataModel.createStub())
