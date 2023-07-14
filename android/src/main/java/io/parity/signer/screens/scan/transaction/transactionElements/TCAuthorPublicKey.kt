@@ -15,7 +15,7 @@ import io.parity.signer.uniffi.MVerifierDetails
 @Composable
 fun TCAuthorPublicKey(key: MVerifierDetails) {
 	Row {
-		IdentIcon(identicon = key.identicon.toImageContent())
+		IdentIcon(identIcon = key.identicon.toImageContent())
 		Column {
 			Text(
 				stringResource(R.string.transaction_field_signed_with, key.encryption),

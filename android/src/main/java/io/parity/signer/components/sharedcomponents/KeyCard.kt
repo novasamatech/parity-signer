@@ -301,7 +301,7 @@ data class KeyCardModelBase(
 		fun createStub() = KeyCardModelBase(
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			path = "//polkadot//path",
-			identIcon = PreviewData.exampleIdenticonPng,
+			identIcon = PreviewData.Identicon.exampleIdenticonPng,
 			seedName = "Seed Name",
 			networkLogo = "kusama",
 			hasPassword = false,

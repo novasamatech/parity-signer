@@ -275,7 +275,7 @@ fun HistoryCardExtended(
 				Text("Signed by:")
 				Row {
 					IdentIcon(
-						identicon = signedBy?.address?.identicon?.toImageContent() ?: ImageContent.Png(listOf())
+                        identIcon = signedBy?.address?.identicon?.toImageContent() ?: ImageContent.Png(listOf())
 					)
 					Column {
 						Text(verifierDetails?.publicKey ?: "")

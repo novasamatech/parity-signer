@@ -10,7 +10,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.IdentIcon
 import io.parity.signer.domain.KeySetModel
-import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 
 @Composable
@@ -39,13 +37,13 @@ fun KeySetItemMultiselect(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IdentIcon(
-				identicon = model.identicon, size = 36.dp,
-				modifier = Modifier.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
+                identIcon = model.identicon, modifier = Modifier.padding(
+                    top = 16.dp,
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 12.dp
+                ),
+                size = 36.dp
 			)
 			Column(Modifier.weight(1f)) {
 				Text(
