@@ -78,7 +78,7 @@ object UnifiiStubs {
 							0.toUInt(), 0.toUInt(), Card.VerifierCard(
 								f = MVerifierDetails(
 									publicKey = "b04b58ffedd058a81a625819d437d7a35485c63cfac9fc9f0907c16b3e3e9d6c",
-									identicon = SignerImage.Png((PreviewData.exampleIdenticonPng as ImageContent.Png).image),
+									identicon = SignerImage.Png((PreviewData.Identicon.exampleIdenticonPng as ImageContent.Png).image),
 									encryption = Encryption.SR25519.toString(),
 								)
 							)
@@ -163,7 +163,7 @@ object UnifiiStubs {
 							0.toUInt(), 0.toUInt(), Card.VerifierCard(
 								f = MVerifierDetails(
 									publicKey = "16d5a6266345874d8f5b7f88a6619711b2829b52b2865826b1ecefb62beef34f",
-									identicon = SignerImage.Png((PreviewData.exampleIdenticonPng as ImageContent.Png).image),
+									identicon = SignerImage.Png((PreviewData.Identicon.exampleIdenticonPng as ImageContent.Png).image),
 									encryption = Encryption.SR25519.toString(),
 								)
 							)

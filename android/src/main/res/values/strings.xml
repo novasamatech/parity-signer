@@ -419,6 +419,7 @@
 	<string name="dynamic_derivation_path_label">Imported from Omni Wallet</string>
 	<string name="generic_clear_selection">Clear</string>
 	<string name="network_filters_header">Filter keys by network</string>
+	<string name="public_key_bottom_sheet_label">Public key</string>
 
 </resources>
 

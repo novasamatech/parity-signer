@@ -74,7 +74,7 @@ data class KeyModel(
 		fun createStub() = KeyModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			identicon = PreviewData.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.exampleIdenticonPng,
 			hasPwd = true,
 			path = "//polkadot//path2",
 			secretExposed = false,
@@ -141,7 +141,7 @@ data class KeySetModel(
 		fun createStub(name: String? = null, number: Int? = null) =
 			KeySetModel(
 				name ?: "first seed name",
-				PreviewData.exampleIdenticonPng,
+				PreviewData.Identicon.exampleIdenticonPng,
 				listOf("westend", "some"),
 				number?.toUInt() ?: 1.toUInt()
 			)
@@ -296,7 +296,7 @@ data class VerifierDetailsModels(
 	companion object {
 		fun createStub() = VerifierDetailsModels(
 			publicKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-			identicon = PreviewData.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.exampleIdenticonPng,
 			encryption = "sr25519",
 		)
 	}
