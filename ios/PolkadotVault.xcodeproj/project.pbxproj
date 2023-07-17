@@ -395,6 +395,7 @@
 		6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchMediator.swift; sourceTree = "<group>"; };
 		6D0677AD29BB0D0000D76D90 /* WarningStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningStateMediator.swift; sourceTree = "<group>"; };
 		6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryView.swift; sourceTree = "<group>"; };
+		6D0AE5572A6129100042282A /* Blockies */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Blockies; sourceTree = "<group>"; };
 		6D0BF95129F2BBF500F5B569 /* NetworkIconCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkIconCapsuleView.swift; sourceTree = "<group>"; };
 		6D0E188A291B82D000B59875 /* ProgressSnackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSnackbar.swift; sourceTree = "<group>"; };
 		6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExportMultipleKeysModal+ViewModel.swift"; sourceTree = "<group>"; };
@@ -802,6 +803,7 @@
 			isa = PBXGroup;
 			children = (
 				2D75EF9C280EC3B000C48FAF /* PolkadotVault-Bridging-Header.h */,
+				6D0AE5532A6128F00042282A /* Packages */,
 				2DE72BC026A588C7002BB752 /* PolkadotVault */,
 				2DE72BD226A588C9002BB752 /* PolkadotVaultTests */,
 				2DE72BBF26A588C7002BB752 /* Products */,
@@ -916,6 +918,14 @@
 				6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */,
 			);
 			path = Navigation;
+			sourceTree = "<group>";
+		};
+		6D0AE5532A6128F00042282A /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6D0AE5572A6129100042282A /* Blockies */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 		6D14F976293480A000F8EF44 /* Text */ = {
@@ -1520,7 +1530,6 @@
 		6DB39AA22A4579CF004B8FAA /* DynamicDerivations */ = {
 			isa = PBXGroup;
 			children = (
-				6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */,
 			);
 			path = DynamicDerivations;
 			sourceTree = "<group>";
