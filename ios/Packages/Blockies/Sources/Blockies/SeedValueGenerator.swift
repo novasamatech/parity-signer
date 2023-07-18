@@ -1,6 +1,6 @@
 //
 //  SeedValueGenerator.swift
-//  
+//
 //
 //  Created by Krzysztof Rodak on 14/07/2023.
 //
@@ -8,8 +8,7 @@
 import Foundation
 
 public struct SeedValueGenerator {
-
-    public init() { }
+    public init() {}
     /// Creates an array of seeds based on the input string.
     ///
     /// The function computes seeds by cycling through each character of the input string,
@@ -26,7 +25,8 @@ public struct SeedValueGenerator {
             let asciiValue = UInt32(character.asciiValue ?? 0)
             let seedArrayPosition = index % seedArraySize
 
-            seedArray[seedArrayPosition] = ((seedArray[seedArrayPosition] &* bitShiftEquivalentMultiplier) &- seedArray[seedArrayPosition])
+            seedArray[seedArrayPosition] =
+                ((seedArray[seedArrayPosition] &* bitShiftEquivalentMultiplier) &- seedArray[seedArrayPosition])
             seedArray[seedArrayPosition] = seedArray[seedArrayPosition] &+ asciiValue
         }
 
