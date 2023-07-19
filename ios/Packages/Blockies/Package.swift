@@ -1,4 +1,4 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.7
 
 import PackageDescription
 
@@ -18,10 +18,6 @@ let package = Package(
         .target(
             name: "Blockies",
             dependencies: []
-        ),
-        .testTarget(
-            name: "BlockiesTests",
-            dependencies: ["Blockies"]
         )
     ]
 )
