@@ -17,7 +17,7 @@ import Foundation
 
 public extension PlatformColor {
     /// Initializes Color with the given HSL color values.
-    /// 
+    ///
     /// - parameter h: The hue value, a number between 0 and 360.
     /// - parameter s: The saturation value, a number between 0 and 1.
     /// - parameter l: The lightness value, a number between 0 and 1.
