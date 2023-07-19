@@ -10,9 +10,6 @@ use sp_core::{
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
-#[cfg(target_os = "ios")]
-use plot_icon::generate_svg;
-
 use crate::crypto::Encryption;
 use crate::error::Error;
 use crate::error::Result;
