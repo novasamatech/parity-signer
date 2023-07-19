@@ -17,9 +17,9 @@ public struct BlockiesConfiguration {
 
     public init(
         seed: String?,
-        color: PlatformColor?,
-        bgcolor: PlatformColor?,
-        spotcolor: PlatformColor?,
+        color: PlatformColor? = nil,
+        bgcolor: PlatformColor? = nil,
+        spotcolor: PlatformColor? = nil,
         size: Int = 8,
         scale: Int = 4
     ) {

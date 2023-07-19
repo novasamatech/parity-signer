@@ -1,5 +1,5 @@
 //
-//  IdenticonGenerator.swift
+//  BlockiesIdenticonGenerator.swift
 //
 //
 //  Created by Krzysztof Rodak on 17/07/2023.
@@ -13,13 +13,16 @@ import Foundation
     import AppKit
 #endif
 
-public final class IdenticonGenerator {
+public final class BlockiesIdenticonGenerator {
     private let configuration: BlockiesConfiguration
     private let randomNumberGenerator: PseudoRandomNumberGenerator
     private let patternGenerator: PatternGenerator
     private let imageRenderer: BlockiesImageRenderer
 
-    public init(configuration: BlockiesConfiguration, randomNumberGenerator: PseudoRandomNumberGenerator) {
+    public init(
+        configuration: BlockiesConfiguration,
+        randomNumberGenerator: PseudoRandomNumberGenerator = PseudoRandomNumberGenerator()
+    ) {
         self.configuration = configuration
         self.randomNumberGenerator = randomNumberGenerator
         patternGenerator = PatternGenerator(randomNumberGenerator: randomNumberGenerator)
