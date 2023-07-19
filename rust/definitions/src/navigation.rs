@@ -637,7 +637,7 @@ pub struct MSCFieldNumber {
 #[derive(Clone, PartialEq, Eq)]
 pub enum Identicon {
     Dots { identity: Vec<u8> },
-    Blockies { identity: Vec<u8> },
+    Blockies { identity: String },
 }
 
 impl std::fmt::Debug for Identicon {

@@ -811,7 +811,7 @@ dictionary MSCFieldNumber {
 [Enum]
 interface Identicon {
     Dots(sequence<u8> identity);
-    Blockies(sequence<u8> identity);
+    Blockies(string identity);
 };
 
 dictionary MSCId {

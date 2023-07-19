@@ -74,24 +74,21 @@ pub fn make_identicon_from_multisigner(
         },
         IdenticonStyle::Blockies => {
             if let MultiSigner::Ecdsa(ref public) = multisigner {
-                use eth_blockies::SeedInput;
-                let account = print_ethereum_address(public);
                 Identicon::Blockies {
-                    identity: account.to_ethaddr_seed().to_vec(),
+                    identity: print_ethereum_address(public),
                 }
             } else {
-                Identicon::Blockies { identity: vec![] }
+                Identicon::Blockies {
+                    identity: "".to_string(),
+                }
             }
         }
     }
 }
 
 pub fn make_identicon_from_id20(id: &[u8; 20]) -> Identicon {
-    use eth_blockies::SeedInput;
     let account = format!("0x{}", hex::encode(id));
-    Identicon::Blockies {
-        identity: account.to_ethaddr_seed().to_vec(),
-    }
+    Identicon::Blockies { identity: account }
 }
 
 pub fn make_identicon_from_account(account: AccountId32) -> Identicon {
