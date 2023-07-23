@@ -667,8 +667,6 @@ fn export_import_addrs() {
 
 #[test]
 #[ignore]
-// Redundant clone clippy warning is a lie; https://github.com/rust-lang/rust-clippy/issues/10870
-#[allow(clippy::redundant_clone)]
 fn flow_test_1() {
     let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
     let db = sled::open(dbname).unwrap();

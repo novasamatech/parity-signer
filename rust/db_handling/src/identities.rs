@@ -540,7 +540,7 @@ pub fn inject_derivations_has_pwd(
     }
 
     for addr in seed_derived_keys.iter_mut() {
-        for mut derived_key in addr.derived_keys.iter_mut() {
+        for derived_key in addr.derived_keys.iter_mut() {
             let path = derived_key.derivation_path.clone().unwrap_or_default();
             let seed_name = match addr.multisigner {
                 MultiSigner::Sr25519(p) => sr25519_signers.get(&p),

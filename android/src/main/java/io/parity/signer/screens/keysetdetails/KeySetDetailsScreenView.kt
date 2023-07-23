@@ -47,6 +47,7 @@ fun KeySetDetailsScreenView(
 	navigator: Navigator,
 	networkState: State<NetworkState?>, //for shield icon
 	onMenu: Callback,
+	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
@@ -68,7 +69,8 @@ fun KeySetDetailsScreenView(
 					model.root?.let {
 						SeedKeyDetails(
 							model = it,
-							Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+							onShowPublicKey = onShowPublicKey,
+							modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
 								.padding(bottom = 16.dp)
 						)
 					}
@@ -92,6 +94,7 @@ fun KeySetDetailsScreenView(
 					model.root?.let {
 						SeedKeyDetails(
 							model = it,
+							onShowPublicKey = onShowPublicKey,
 							Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
 						)
 					}
@@ -263,7 +266,7 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {_,_ ->})
 		}
 	}
 }
@@ -284,7 +287,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, {}, {_,_ ->})
 		}
 	}
 }

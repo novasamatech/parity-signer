@@ -40,7 +40,7 @@ data class SigningTransactionModel(
 					path = "//polkadot//1",
 					seedName = "Parity Keys",
 					base58 = "1219xC79CXV31543DDXoQMjuA",
-					identIcon = PreviewData.exampleIdenticonPng,
+					identIcon = PreviewData.Identicon.exampleIdenticonPng,
 					hasPassword = true,
 					networkLogo = "kusama"
 				)

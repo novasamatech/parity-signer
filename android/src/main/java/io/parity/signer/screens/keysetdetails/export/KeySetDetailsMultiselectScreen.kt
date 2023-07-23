@@ -32,6 +32,7 @@ fun KeySetDetailsMultiselectScreen(
 	onClose: Callback,
 	onExportSelected: Callback,
 	onExportAll: Callback,
+	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		ScreenHeaderClose(
@@ -57,6 +58,7 @@ fun KeySetDetailsMultiselectScreen(
 			model.root?.let {
 				SeedKeyDetails(
 					model = it,
+					onShowPublicKey = onShowPublicKey,
 					Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
 						.padding(bottom = 16.dp)
 				)
@@ -115,7 +117,7 @@ private fun PreviewKeySetDetailsMultiselectScreen() {
 		remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {})
+			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {}, {_,_ ->})
 		}
 	}
 }

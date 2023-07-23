@@ -12,7 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -106,7 +105,7 @@ private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 		verticalArrangement = Arrangement.spacedBy(8.dp),
 	) {
 		Row() {
-			IdentIcon(key.identicon, 16.dp)
+			IdentIcon(key.identicon, size = 16.dp)
 			Spacer(modifier = Modifier.padding(end = 8.dp))
 			KeyPath(path = key.derivationPath, hasPassword = key.hadPwd)
 		}
@@ -272,35 +271,35 @@ data class DerivedKeysSetModel(
 			address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 			keys = listOf(
 				DerivedKeyModel(
-					identicon = PreviewData.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.exampleIdenticonPng,
 					derivationPath = "//kusama",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Kusama",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.exampleIdenticonPng,
 					derivationPath = "//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain/verylongPath2",
 					hadPwd = true,
 					address = "GD5434gFGFD543Dgdf",
 					networkTitle = "Westend",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.exampleIdenticonPng,
 					derivationPath = "//polka",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Polkadot",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.exampleIdenticonPng,
 					derivationPath = "//polkadot//parachains",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = null,
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.exampleIdenticonPng,
 					derivationPath = "//polkadot//staking",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",

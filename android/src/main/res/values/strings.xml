@@ -413,6 +413,7 @@
 	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
 	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
 	<string name="create_derivation_title">Create Derived Key</string>
+	<string name="public_key_bottom_sheet_label">Public key</string>
 
 </resources>
 
