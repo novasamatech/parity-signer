@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 23/07/2023.
 //
 
+import BigInt
 import Foundation
 
 /// Represents a public key in various possible formats.
@@ -32,7 +33,9 @@ public enum PublicKey {
 /// `PublicKeyDecoder` converts public keys from various formats to byte arrays.
 public final class PublicKeyDecoder {
     private enum Constants {
-        static let base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+        static let base58Alphabet = [UInt8]("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".utf8)
+        static let zero = BigUInt(0)
+        static let radix = BigUInt(Constants.base58Alphabet.count)
     }
 
     public init() {}
@@ -74,20 +77,25 @@ private extension PublicKeyDecoder {
     /// - Parameter base58: The base58 string to convert.
     /// - Returns: The byte array.
     func base58ToBytes(base58: String) -> [UInt8] {
-        var bytes = [UInt8](repeating: 0, count: base58.count)
-        for (i, c) in base58.enumerated() {
-            if let charIndex = Constants.base58Alphabet.firstIndex(of: c) {
-                var carry = Constants.base58Alphabet.distance(from: Constants.base58Alphabet.startIndex, to: charIndex)
-                var j = base58.count - 1 - i
-                while j >= 0, carry != 0 {
-                    carry += 58 * Int(bytes[j])
-                    bytes[j] = UInt8(carry % 256)
-                    carry /= 256
-                    j -= 1
-                }
+        var currentRadixPower = BigUInt(1)
+        let base58Bytes: [UInt8] = Array(base58.utf8)
+
+        // Convert base58 characters to their corresponding numeric values
+        let base58NumericValue = base58Bytes.reversed()
+            .enumerated()
+            .reduce(into: Constants.zero) { result, indexedCharacter in
+                guard let base58CharacterIndex = Constants.base58Alphabet.firstIndex(of: indexedCharacter.element)
+                else { return }
+                result += (currentRadixPower * BigUInt(base58CharacterIndex))
+                currentRadixPower *= Constants.radix
             }
-        }
-        let firstNonZero = bytes.firstIndex(where: { $0 != 0 }) ?? bytes.endIndex
-        return Array(bytes[firstNonZero...])
+
+        let decodedBytes = base58NumericValue.serialize()
+
+        var result = Array(base58Bytes.prefix { $0 == Constants.base58Alphabet[0] }) + decodedBytes
+        // Drop 42 substrate prefix and last 2 elements
+        result = Array(result.dropFirst().dropLast(2))
+
+        return result
     }
 }
