@@ -330,7 +330,7 @@ fn full_address_to_multisigner(
     multisigner_result
 }
 
-/// Return seed_name for the given root key multisigner
+/// Return seed name for the given key
 fn find_seed_name_for_multisigner(
     database: &sled::Db,
     multisigner: &MultiSigner,
