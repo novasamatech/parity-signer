@@ -11,6 +11,7 @@ buildscript {
 		google()
 		mavenCentral()
 		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url 'https://jitpack.io' } //for Svalinn
 	}
 	dependencies {
 		classpath 'com.android.tools.build:gradle:8.0.2'
