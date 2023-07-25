@@ -684,9 +684,8 @@ pub struct MSCNetworkInfo {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DDPreview {
     pub qr: Vec<QrData>,
-    pub key_sets: Vec<DDKeySet>,
+    pub key_set: DDKeySet,
     pub is_some_already_imported: bool,
-    pub is_some_keyset_missing: bool,
     pub is_some_network_missing: bool,
 }
 

@@ -33,7 +33,9 @@ use definitions::{
     users::AddressDetails,
 };
 
-use db_handling::identities::{create_key_set, dd_response, import_dynamic_addrs};
+use db_handling::identities::{
+    create_key_set, dynamic_derivations_response, process_dynamic_derivations_v1,
+};
 use db_handling::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, signer_init_no_cert, signer_init_with_cert,
@@ -2091,7 +2093,7 @@ fn test_dynamic_derivations() {
         .find(|(_q, path)| path.is_empty())
         .unwrap();
     let request = DynamicDerivationsAddressRequestV1 {
-        addrs: vec![DynamicDerivationsRequestInfo {
+        addr: DynamicDerivationsRequestInfo {
             multisigner: seed_multisigner.clone(),
             dynamic_derivations: vec![
                 DynamicDerivationRequestInfo {
@@ -2105,19 +2107,15 @@ fn test_dynamic_derivations() {
                     genesis_hash: H256::zero(),
                 },
             ],
-        }],
+        },
     };
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
-    let result = import_dynamic_addrs(&db, seeds.clone(), request.clone()).unwrap();
-    assert_eq!(result.key_sets.len(), 1);
-    let key_set = result
-        .key_sets
-        .get(0)
-        .expect("key set is missing from result");
-    assert_eq!(key_set.seed_name, "Alice");
-    assert_eq!(key_set.derivations.len(), 1);
-    let derivation = key_set
+    let result = process_dynamic_derivations_v1(&db, seeds.clone(), request.clone()).unwrap();
+    assert_eq!(result.key_set.seed_name, "Alice");
+    assert_eq!(result.key_set.derivations.len(), 1);
+    let derivation = result
+        .key_set
         .derivations
         .get(0)
         .expect("dynamic derivations is missing from result");
@@ -2127,11 +2125,10 @@ fn test_dynamic_derivations() {
         "14fiUi4zizXAAWP3HkMuS3qoCSP51owPoGaYhUmwuJZKTHwS"
     );
 
-    let response = dd_response(seeds, &request).unwrap();
+    let response = dynamic_derivations_response(&request, ALICE_SEED_PHRASE).unwrap();
     match response {
         DynamicDerivationsAddressResponse::V1(r) => {
-            assert_eq!(r.addrs.len(), 1);
-            let key_set = r.addrs.get(0).unwrap();
+            let key_set = r.addr;
             assert_eq!(key_set.dynamic_derivations.len(), 2);
             let derivation_1 = key_set.dynamic_derivations.get(0).unwrap();
             assert_eq!(derivation_1.derivation_path, "//dd");
