@@ -255,6 +255,7 @@ struct CameraView: View {
     func addDerivedKeysView() -> AddDerivedKeysView.ViewModel {
         .init(
             dataModel: .init(viewModel.dynamicDerivationsPreview),
+            dynamicDerivationsPreview: viewModel.dynamicDerivationsPreview,
             isPresented: $viewModel.isPresentingAddDerivedKeys,
             onCompletion: viewModel.onAddDerivedKeyCompletion(_:)
         )

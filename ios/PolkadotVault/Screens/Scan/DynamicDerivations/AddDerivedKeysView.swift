@@ -168,20 +168,23 @@ extension AddDerivedKeysView {
     }
 
     final class ViewModel: ObservableObject {
-        let dataModel: AddDerivedKeysData
         private let onCompletion: (OnCompletionAction) -> Void
-        var onErrorDismiss: (() -> Void)?
-
+        private let dynamicDerivationsPreview: DdPreview
+        private let derivedKeysService: CreateDerivedKeyService
+        let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
         @Published var isPresentingDerivationPath: Bool = false
-        @Published var keySets: [MmNetwork] = []
 
         init(
             dataModel: AddDerivedKeysData,
+            dynamicDerivationsPreview: DdPreview,
+            derivedKeysService: CreateDerivedKeyService = CreateDerivedKeyService(),
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.dataModel = dataModel
+            self.dynamicDerivationsPreview = dynamicDerivationsPreview
+            self.derivedKeysService = derivedKeysService
             _isPresented = isPresented
             self.onCompletion = onCompletion
         }
@@ -204,6 +207,7 @@ extension AddDerivedKeysView {
             AddDerivedKeysView(
                 viewModel: .init(
                     dataModel: .stub,
+                    dynamicDerivationsPreview: .stub,
                     isPresented: .constant(true),
                     onCompletion: { _ in }
                 )
@@ -211,6 +215,7 @@ extension AddDerivedKeysView {
             AddDerivedKeysView(
                 viewModel: .init(
                     dataModel: .stubWithErrors,
+                    dynamicDerivationsPreview: .stub,
                     isPresented: .constant(true),
                     onCompletion: { _ in }
                 )
@@ -266,12 +271,6 @@ extension AddDerivedKeysData {
 
     static let stubWithErrors: AddDerivedKeysData = .init(
         errors: [
-            .init(
-                errorMessage: """
-                Some keys can not be imported until their key sets are recovered. \
-                Please recover the missing Key Sets.
-                """
-            ),
             .init(
                 errorMessage: """
                 Some keys can not be imported until their networks are added. \

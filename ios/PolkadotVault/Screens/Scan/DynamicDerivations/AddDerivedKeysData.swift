@@ -9,12 +9,9 @@ import Foundation
 
 extension AddDerivedKeysData {
     init(_ preview: DdPreview) {
-        keySets = preview.keySets.map(AddDerivedKeyKeySetData.init)
+        keySets = [AddDerivedKeyKeySetData(preview.keySet)]
         qrPayload = preview.qr.map(\.payload)
         var errors = [AddDerivedKeysError]()
-        if preview.isSomeKeysetMissing {
-            errors.append(.init(errorMessage: Localizable.AddDerivedKeys.Error.keySetMissing.string))
-        }
         if preview.isSomeNetworkMissing {
             errors.append(.init(errorMessage: Localizable.AddDerivedKeys.Error.networkMissing.string))
         }

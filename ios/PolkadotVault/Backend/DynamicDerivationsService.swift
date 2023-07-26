@@ -30,7 +30,7 @@ final class DynamicDerivationsService {
         callQueue.async {
             let result: Result<DdPreview, ServiceError>
             do {
-                let preview: DdPreview = try importDynamicDerivations(seeds: seedPhrases, payload: payload)
+                let preview: DdPreview = try previewDynamicDerivations(seeds: seedPhrases, payload: payload)
                 result = .success(preview)
             } catch {
                 result = .failure(.init(message: error.localizedDescription))
