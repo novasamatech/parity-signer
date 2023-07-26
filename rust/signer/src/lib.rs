@@ -35,6 +35,7 @@ use std::{
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::dynamic_derivations::process_dynamic_derivations;
 use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
 
@@ -302,6 +303,13 @@ fn populate_derivations_has_pwd(
     seed_derived_keys: Vec<SeedKeysPreview>,
 ) -> Result<Vec<SeedKeysPreview>, anyhow::Error> {
     inject_derivations_has_pwd(seed_derived_keys, seeds).map_err(Into::into)
+}
+
+fn preview_dynamic_derivations(
+    seeds: HashMap<String, String>,
+    payload: String,
+) -> Result<DDPreview, ErrorDisplayed> {
+    process_dynamic_derivations(&get_db()?, seeds, &payload).map_err(|e| e.to_string().into())
 }
 
 /// Checks derivation path for validity and collisions
