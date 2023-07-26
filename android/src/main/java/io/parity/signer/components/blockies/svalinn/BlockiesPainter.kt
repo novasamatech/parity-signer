@@ -20,19 +20,8 @@ internal object BlockiesPainter {
 		val dimen = Math.min(width, height)
 		val offsetX = width - dimen
 		val offsetY = height - dimen
-		val path = Path()
-
-		path.reset()
-		path.addOval(
-			Rect(
-				Offset(offsetX + (dimen / 2), offsetY + (dimen / 2)),
-				dimen / 2,
-			)
-		)
-		path.close()
 
 		canvas.save()
-		canvas.clipPath(path)
 		canvasPaint.color = Color(blockies.backgroundColor)
 		canvas.drawRect(
 			offsetX, offsetY, offsetX + dimen, offsetY + dimen,

@@ -4,9 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,13 +24,17 @@ fun BlockiesIcon(
 ) {
 	val blockies: Blockies = Blockies.fromSeed(seed)
 // Layout
-	Canvas(modifier = modifier.size(preferedSize)) {
-			BlockiesPainter.draw(
-				blockies = blockies,
-				canvas = drawContext.canvas,
-				width = size.width,
-				height = size.height
-			)
+	Canvas(
+		modifier = modifier
+            .size(preferedSize)
+            .clip(CircleShape)
+	) {
+		BlockiesPainter.draw(
+			blockies = blockies,
+			canvas = drawContext.canvas,
+			width = size.width,
+			height = size.height
+		)
 	}
 }
 
