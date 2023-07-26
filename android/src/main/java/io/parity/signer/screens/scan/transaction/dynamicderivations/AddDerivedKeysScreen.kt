@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.ImageContent
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
@@ -94,20 +95,8 @@ fun AddDerivedKeysScreen(
 					.padding(horizontal = 16.dp),
 			)
 		}
-		if (model.isSomeKeysetMissing) {
-			NotificationFrameTextImportant(
-				message = stringResource(R.string.dymanic_derivation_error_some_keyst_missing),
-				withBorder = false,
-				textColor = MaterialTheme.colors.primary,
-				modifier = Modifier
-					.padding(bottom = 8.dp)
-					.padding(horizontal = 16.dp),
-			)
-		}
 
-		model.keySets.forEach { keyset ->
-			KeysetItemDerivedItem(keyset)
-		}
+		KeysetItemDerivedItem(model.keySet)
 
 		Text(
 			text = stringResource(R.string.add_derived_keys_screen_scan_qr_code),
@@ -180,27 +169,31 @@ private fun DdDetail.toKeyModel() = KeyModel(
 	wasImported = null
 )
 
-private fun DdPreviewcreateStub(): DdPreview = DdPreview(
+private fun ddPreviewcreateStub(): DdPreview = DdPreview(
 	qr = listOf(
 		QrData.Regular(PreviewData.exampleQRData),
 	),
 	keySet = DdKeySet(
 		seedName = "My special keyset",
 		derivations = listOf(
-			DdDetailcreateStub(),
-			DdDetailcreateStub(),
+			ddDetailcreateStub(),
+			ddDetailcreateStub(),
 		),
 	),
 	isSomeAlreadyImported = false,
 	isSomeNetworkMissing = true,
 )
 
-private fun DdDetailcreateStub(): DdDetail = DdDetail(
+@OptIn(ExperimentalUnsignedTypes::class)
+private fun ddDetailcreateStub(): DdDetail = DdDetail(
 	base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 	path = "//polkadot//path2",
 	networkLogo = "westend",
 	networkSpecsKey = "sdfsdfgdfg",
-	identicon = SignerImage.Png(PreviewData.Identicon.exampleIdenticonPng.toBytes()),
+	identicon = SignerImage.Png(
+		(PreviewData.Identicon.exampleIdenticonPng as ImageContent.Png)
+			.image.toUByteArray().toList()
+	),
 )
 
 
@@ -217,7 +210,7 @@ private fun DdDetailcreateStub(): DdDetail = DdDetail(
 private fun PreviewAddDerivedKeysScreen() {
 	SignerNewTheme {
 		AddDerivedKeysScreen(
-			model = DdPreviewcreateStub(),
+			model = ddPreviewcreateStub(),
 			onBack = {},
 		)
 	}
