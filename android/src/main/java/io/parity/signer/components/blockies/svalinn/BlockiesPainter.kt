@@ -1,35 +1,27 @@
-package io.parity.signer.components.blockies
+package io.parity.signer.components.blockies.svalinn
 
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.painter.Painter
-import io.parity.signer.components.blockies.svalinn.Blockies
 
 /**
- * Based on svalinn-kotlin project which is MIT licensed.
+ * Based on svalinn-kotlin project.
  * Reimplemented for compose
  */
-class BlockiesPainter() {
+internal object BlockiesPainter {
 
-	private val canvasPaint = Paint().apply { style = PaintingStyle.Fill }
-	private var dimen = 0.0f
-	private var offsetX = 0.0f
-	private var offsetY = 0.0f
-	private val path = Path()
+	fun draw(blockies: Blockies, canvas: Canvas, width: Float, height: Float) {
+		val canvasPaint = Paint().apply { style = PaintingStyle.Fill }
+		val dimen = Math.min(width, height)
+		val offsetX = width - dimen
+		val offsetY = height - dimen
+		val path = Path()
 
-	fun setDimensions(width: Float, height: Float) {
-		dimen = Math.min(width, height)
-		offsetX = width - dimen
-		offsetY = height - dimen
 		path.reset()
 		path.addOval(
 			Rect(
@@ -38,9 +30,7 @@ class BlockiesPainter() {
 			)
 		)
 		path.close()
-	}
 
-	fun draw(blockies: Blockies, canvas: Canvas) {
 		canvas.save()
 		canvas.clipPath(path)
 		canvasPaint.color = Color(blockies.backgroundColor)

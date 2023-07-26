@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.blockies.svalinn.Blockies
+import io.parity.signer.components.blockies.svalinn.BlockiesPainter
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
@@ -22,11 +23,12 @@ fun BlockiesIcon(
 	val blockies: Blockies = Blockies.fromSeed(seed)
 // Layout
 	Canvas(modifier = modifier.size(preferedSize)) {
-		val painter = BlockiesPainter()
-		painter.setDimensions(width = size.width, height = size.height)
-		with(drawContext) {
-			painter.draw(blockies, canvas)
-		}
+			BlockiesPainter.draw(
+				blockies = blockies,
+				canvas = drawContext.canvas,
+				width = size.width,
+				height = size.height
+			)
 	}
 }
 
