@@ -416,6 +416,7 @@ extension DdDetail {
         base58: "5FeSzkpTHV9N86kj61QLVaYU7pndHuCD7Cjj3zyzUhxxKZ5i",
         path: "//polkadot",
         networkLogo: "polkadot",
+        networkSpecsKey: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
         identicon: .stubIdenticon
     )
 }

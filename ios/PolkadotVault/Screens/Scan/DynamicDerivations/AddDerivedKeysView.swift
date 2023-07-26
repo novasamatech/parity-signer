@@ -44,6 +44,15 @@ struct AddDerivedKeysView: View {
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 
     @ViewBuilder
@@ -171,27 +180,44 @@ extension AddDerivedKeysView {
         private let onCompletion: (OnCompletionAction) -> Void
         private let dynamicDerivationsPreview: DdPreview
         private let derivedKeysService: CreateDerivedKeyService
+        private let seedsMediator: SeedsMediating
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
         @Published var isPresentingDerivationPath: Bool = false
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
 
         init(
             dataModel: AddDerivedKeysData,
             dynamicDerivationsPreview: DdPreview,
             derivedKeysService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.dataModel = dataModel
             self.dynamicDerivationsPreview = dynamicDerivationsPreview
             self.derivedKeysService = derivedKeysService
+            self.seedsMediator = seedsMediator
             _isPresented = isPresented
             self.onCompletion = onCompletion
         }
 
         func onDoneTap() {
-            isPresented = false
-            onCompletion(.onDone)
+            derivedKeysService.createDerivedKeys(
+                dynamicDerivationsPreview.keySet.seedName,
+                seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
+                keysToImport: dynamicDerivationsPreview.keySet.derivations
+            ) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.isPresented = false
+                    self?.onCompletion(.onDone)
+                case let .failure(error):
+                    self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
+                    self?.isPresentingError = true
+                }
+            }
         }
 
         func onBackTap() {

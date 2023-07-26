@@ -55,7 +55,7 @@ enum ImportDerivedKeyError: Error {
             return errorInfo.reduce(into: "") {
                 $0 += (
                     Localizable.AddDerivedKeys.Error
-                        .derivedKeyForNetwork($1.key, $1.error) + "\n"
+                        .DerivedKeyForNetwork.content($1.key, $1.error) + "\n"
                 )
             }
         case let .noKeysImported(errors):
