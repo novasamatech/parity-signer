@@ -204,10 +204,10 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun importDynamicDerivations(seeds: Map<String, String>, payload: String): UniffiResult<DdPreview> =
+	suspend fun previewDynamicDerivations(seeds: Map<String, String>, payload: String): UniffiResult<DdPreview> =
 		withContext(Dispatchers.IO) {
 			try {
-				val validationResult = io.parity.signer.uniffi.importDynamicDerivations(seeds, payload)
+				val validationResult = io.parity.signer.uniffi.previewDynamicDerivations(seeds, payload)
 				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

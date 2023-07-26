@@ -28,7 +28,6 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
-import io.parity.signer.components.toBytes
 import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyModel
@@ -185,23 +184,14 @@ private fun DdPreviewcreateStub(): DdPreview = DdPreview(
 	qr = listOf(
 		QrData.Regular(PreviewData.exampleQRData),
 	),
-	keySets = listOf(
-		DdKeySet(
-			seedName = "My special keyset",
-			derivations = listOf(
-				DdDetailcreateStub(),
-				DdDetailcreateStub(),
-			),
+	keySet = DdKeySet(
+		seedName = "My special keyset",
+		derivations = listOf(
+			DdDetailcreateStub(),
+			DdDetailcreateStub(),
 		),
-		DdKeySet(
-			seedName = "My special keyset2",
-			derivations = listOf(
-				DdDetailcreateStub(),
-			),
-		)
 	),
 	isSomeAlreadyImported = false,
-	isSomeKeysetMissing = true,
 	isSomeNetworkMissing = true,
 )
 
@@ -209,7 +199,8 @@ private fun DdDetailcreateStub(): DdDetail = DdDetail(
 	base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 	path = "//polkadot//path2",
 	networkLogo = "westend",
-	identicon = SignerImage.Png(PreviewData.exampleIdenticonPng.toBytes()),
+	networkSpecsKey = "sdfsdfgdfg",
+	identicon = SignerImage.Png(PreviewData.Identicon.exampleIdenticonPng.toBytes()),
 )
 
 

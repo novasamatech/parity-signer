@@ -218,7 +218,7 @@ class ScanViewModel : ViewModel() {
 			}
 			is RepoResult.Success -> {
 				val result =
-					uniffiInteractor.importDynamicDerivations(phrases.result, payload)
+					uniffiInteractor.previewDynamicDerivations(phrases.result, payload)
 						.mapError()
 				dynamicDerivations.value = result
 			}

@@ -76,6 +76,7 @@ fun KeySetDetailsScreenView(
 	fullModelWasEmpty: Boolean,
 	onFilterClicked: Callback,
 	onMenu: Callback,
+	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
@@ -92,7 +93,7 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model)
+					SeedKeyItemElement(model, onShowPublicKey)
 
 					FilterRow(onFilterClicked)
 
@@ -111,14 +112,14 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model)
+					SeedKeyItemElement(model, onShowPublicKey)
 					KeySetDetailsEmptyList(onAdd = {
 						navigator.navigate(Action.NEW_KEY, "") //new derived key
 					})
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model)
+					SeedKeyItemElement(model, onShowPublicKey)
 					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
@@ -145,10 +146,13 @@ fun KeySetDetailsScreenView(
 }
 
 @Composable
-private fun SeedKeyItemElement(model: KeySetDetailsModel) {
+private fun SeedKeyItemElement(model: KeySetDetailsModel,
+															 onShowPublicKey: (title: String, key: String) -> Unit,
+) {
 	model.root?.let {
 		SeedKeyDetails(
 			model = it,
+			onShowPublicKey = onShowPublicKey,
 			Modifier
 				.padding(horizontal = 24.dp, vertical = 8.dp)
 				.padding(bottom = 16.dp)
@@ -329,7 +333,7 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {}, {_,_ ->})
 		}
 	}
 }
@@ -350,7 +354,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, true, {}, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, true, {}, {}, {_,_ ->})
 		}
 	}
 }
@@ -371,7 +375,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {})
+			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {}, {_,_ ->})
 		}
 	}
 }

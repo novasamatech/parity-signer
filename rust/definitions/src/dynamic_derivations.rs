@@ -13,7 +13,7 @@ pub enum DynamicDerivationsRequest {
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct DynamicDerivationsAddressRequestV1 {
-    pub addrs: Vec<DynamicDerivationsRequestInfo>,
+    pub addr: DynamicDerivationsRequestInfo,
 }
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
@@ -25,7 +25,7 @@ pub struct DynamicDerivationsRequestInfo {
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct DynamicDerivationRequestInfo {
-    /// Dynamic derivation derivation path
+    /// Dynamic derivation path
     pub derivation_path: String,
     /// The type of encryption in the network
     pub encryption: Encryption,
@@ -40,7 +40,7 @@ pub enum DynamicDerivationsAddressResponse {
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct DynamicDerivationsAddressResponseV1 {
-    pub addrs: Vec<DynamicDerivationsResponseInfo>,
+    pub addr: DynamicDerivationsResponseInfo,
 }
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
@@ -52,7 +52,7 @@ pub struct DynamicDerivationsResponseInfo {
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct DynamicDerivationResponseInfo {
-    /// Public key of the root key
+    /// Dynamic derivation path
     pub derivation_path: String,
     /// The type of encryption in the network
     pub encryption: Encryption,

@@ -8,9 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
@@ -20,6 +23,7 @@ import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
@@ -43,6 +47,9 @@ fun KeySetDetailsScreenSubgraph(
 			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
+			},
+			onShowPublicKey = { title: String, key: String ->
+				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
@@ -91,6 +98,32 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
+		composable(
+			route = "${KeySetDetailsMenuSubgraph.keys_public_key}/{$ARGUMENT_PUBLIC_KEY_TITLE}/{$ARGUMENT_PUBLIC_KEY_VALUE}",
+			arguments = listOf(
+				navArgument(ARGUMENT_PUBLIC_KEY_TITLE) { type = NavType.StringType },
+				navArgument(ARGUMENT_PUBLIC_KEY_VALUE) { type = NavType.StringType }
+			)
+		) { backStackEntry ->
+			val keyName =
+				backStackEntry.arguments?.getString(ARGUMENT_PUBLIC_KEY_TITLE) ?: run {
+					submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
+					""
+				}
+			val keyValue =
+				backStackEntry.arguments?.getString(ARGUMENT_PUBLIC_KEY_VALUE) ?: run {
+					submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
+					""
+				}
+
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				PublicKeyBottomSheetView(
+					name = keyName,
+					key = keyValue,
+					onClose = closeAction,
+				)
+			}
+		}
 		composable(KeySetDetailsMenuSubgraph.network_filter) {
 			val initialSelection =
 				keySetViewModel.filters.collectAsStateWithLifecycle()
@@ -134,5 +167,8 @@ private object KeySetDetailsMenuSubgraph {
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
 	const val network_filter = "keys_network_filters"
 	const val backup = "keyset_details_backup"
+	const val keys_public_key = "keys_public_key"
 }
 
+private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
+private const val ARGUMENT_PUBLIC_KEY_VALUE = "ARGUMENT_PUBLIC_KEY_VALUE"

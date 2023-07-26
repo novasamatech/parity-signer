@@ -371,9 +371,8 @@ interface DerivedKeyStatus {
 
 dictionary DDPreview {
     sequence<QrData> qr;
-    sequence<DDKeySet> key_sets;
+    DDKeySet key_set;
     boolean is_some_already_imported;
-    boolean is_some_keyset_missing;
     boolean is_some_network_missing;
 };
 
@@ -386,6 +385,7 @@ dictionary DDDetail {
     string base58;
     string path;
     string network_logo;
+    string network_specs_key;
     SignerImage identicon;
 };
 
@@ -599,7 +599,7 @@ namespace signer {
     void import_derivations(sequence<SeedKeysPreview> seed_derived_keys);
 
     [Throws=ErrorDisplayed]
-    DDPreview import_dynamic_derivations(record<string, string> seeds, string payload);
+    DDPreview preview_dynamic_derivations(record<string, string> seeds, string payload);
 
     [Throws=ErrorDisplayed]
     sequence<SeedKeysPreview> populate_derivations_has_pwd(record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);

@@ -110,16 +110,18 @@ dependencies {
 	implementation 'androidx.camera:camera-view:1.2.0'
 	implementation 'androidx.camera:camera-camera2:1.2.0'
 	implementation 'com.google.mlkit:barcode-scanning:17.1.0'
-	implementation 'com.halilibo.compose-richtext:richtext-commonmark-android:0.16.0'
-	implementation 'com.halilibo.compose-richtext:richtext-ui-material-android:0.16.0'
+	implementation 'com.halilibo.compose-richtext:richtext-commonmark-android:0.17.0'
+	implementation 'com.halilibo.compose-richtext:richtext-ui-material-android:0.17.0'
 	implementation 'androidx.core:core-ktx:1.10.1'
 	implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5"
 	implementation "net.java.dev.jna:jna:5.13.0@aar"
+	implementation "io.coil-kt:coil-compose:$coilVersion"
+	implementation "io.coil-kt:coil-svg:$coilVersion"
 	testImplementation 'junit:junit:4.13.2'
 	testImplementation "org.mockito:mockito-core:5.4.0"
 	testImplementation "androidx.test:core:1.5.0"
 	testImplementation "androidx.test.ext:junit:1.1.5"
-	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2'
+	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
 	testImplementation 'junit:junit:4.13.2'
 	androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
