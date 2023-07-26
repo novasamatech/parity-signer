@@ -160,6 +160,8 @@ private extension CameraService {
                     // Nothing else can happen here
                     ()
                 }
+            case .dynamicDerivations:
+                ()
             case let .other(s: payload):
                 callbackQueue.async {
                     self.payload = payload

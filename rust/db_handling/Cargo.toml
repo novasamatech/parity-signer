@@ -10,6 +10,7 @@ anyhow = "1.0.72"
 constants = {path = "../constants"}
 defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
+qrcode_rtx = {path = "../qrcode_rtx", default-features = false}
 hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.6.4", features = ["derive"]}

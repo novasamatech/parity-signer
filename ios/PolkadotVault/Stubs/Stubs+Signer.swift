@@ -22,7 +22,8 @@ extension MKeysCard {
         address: .stub,
         addressKey: "",
         base58: "",
-        swiped: false
+        swiped: false,
+        wasImported: false
     )
 }
 
@@ -64,7 +65,8 @@ extension MKeyDetails {
         pubkey: "",
         networkInfo: .stub,
         address: .stub,
-        base58: ""
+        base58: "",
+        wasImported: false
     )
 }
 

@@ -819,6 +819,7 @@ dependencies = [
  "parity-scale-codec",
  "plot_icon",
  "pretty_assertions",
+ "qrcode_rtx",
  "regex",
  "sled",
  "sp-core",
@@ -2863,6 +2864,7 @@ dependencies = [
  "nom",
  "raptorq",
  "thiserror",
+ "transaction_parsing",
 ]
 
 [[package]]
