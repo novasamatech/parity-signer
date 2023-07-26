@@ -204,19 +204,26 @@ extension AddDerivedKeysView {
         }
 
         func onDoneTap() {
-            derivedKeysService.createDerivedKeys(
-                dynamicDerivationsPreview.keySet.seedName,
-                seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
-                keysToImport: dynamicDerivationsPreview.keySet.derivations
-            ) { [weak self] result in
-                switch result {
-                case .success:
+            let success = { [weak self] in
                     self?.isPresented = false
                     self?.onCompletion(.onDone)
-                case let .failure(error):
-                    self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
-                    self?.isPresentingError = true
+            }
+            if dynamicDerivationsPreview.keySet.derivations.count > 0 {
+                derivedKeysService.createDerivedKeys(
+                    dynamicDerivationsPreview.keySet.seedName,
+                    seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
+                    keysToImport: dynamicDerivationsPreview.keySet.derivations
+                ) { [weak self] result in
+                    switch result {
+                    case .success:
+                        success()
+                    case let .failure(error):
+                        self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
+                        self?.isPresentingError = true
+                    }
                 }
+            } else {
+                success()
             }
         }
 
