@@ -385,6 +385,7 @@ dictionary DDDetail {
     string base58;
     string path;
     string network_logo;
+    string network_specs_key;
     SignerImage identicon;
 };
 

@@ -700,6 +700,7 @@ pub struct DDDetail {
     pub base58: String,
     pub path: String,
     pub network_logo: String,
+    pub network_specs_key: String,
     pub identicon: SignerImage,
 }
 

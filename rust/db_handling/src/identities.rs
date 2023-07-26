@@ -408,6 +408,7 @@ pub fn process_dynamic_derivations_v1(
             ),
             path: derivation_request.derivation_path.clone(),
             network_logo: network_specs.specs.logo,
+            network_specs_key: hex::encode(network_specs_key.key()),
             identicon: make_identicon_from_multisigner(multisigner, encryption.identicon_style()),
         })
     }
