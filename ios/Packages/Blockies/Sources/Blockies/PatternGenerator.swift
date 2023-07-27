@@ -19,7 +19,7 @@ public class PatternGenerator {
     /// - Parameters:
     ///   - randomNumberGenerator: A pseudo random number generator used for creating the pattern.
     public init(
-        randomNumberGenerator: PseudoRandomNumberGenerator = PseudoRandomNumberGenerator()
+        randomNumberGenerator: PseudoRandomNumberGenerator
     ) {
         self.randomNumberGenerator = randomNumberGenerator
     }
