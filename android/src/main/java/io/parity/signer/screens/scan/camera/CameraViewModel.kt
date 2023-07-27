@@ -117,7 +117,10 @@ class CameraViewModel() : ViewModel() {
 					resetScanValues()
 					addPendingTransaction(actualPayload)
 				}
-				//todo dmitry new option for dynamic derivation
+
+				is DecodeSequenceResult.DynamicDerivations -> {
+					//todo dmitry new option for dynamic derivation
+				}
 			}
 
 		} catch (e: Exception) {

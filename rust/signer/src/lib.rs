@@ -35,6 +35,7 @@ use std::{
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::dynamic_derivations::process_dynamic_derivations;
 use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
 
@@ -304,6 +305,13 @@ fn populate_derivations_has_pwd(
     inject_derivations_has_pwd(seed_derived_keys, seeds).map_err(Into::into)
 }
 
+fn preview_dynamic_derivations(
+    seeds: HashMap<String, String>,
+    payload: String,
+) -> Result<DDPreview, ErrorDisplayed> {
+    process_dynamic_derivations(&get_db()?, seeds, &payload).map_err(|e| e.to_string().into())
+}
+
 /// Checks derivation path for validity and collisions
 ///
 /// Returns struct that has information on collisions, presence of password and validity of path;
@@ -332,6 +340,23 @@ fn try_create_address(
     let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
     db_handling::identities::try_create_address(&get_db()?, seed_name, seed_phrase, path, &network)
         .map_err(|e| e.to_string().into())
+}
+
+fn try_create_imported_address(
+    seed_name: &str,
+    seed_phrase: &str,
+    path: &str,
+    network: &str,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
+    db_handling::identities::try_create_imported_address(
+        &get_db()?,
+        seed_name,
+        seed_phrase,
+        path,
+        &network,
+    )
+    .map_err(|e| e.to_string().into())
 }
 
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old

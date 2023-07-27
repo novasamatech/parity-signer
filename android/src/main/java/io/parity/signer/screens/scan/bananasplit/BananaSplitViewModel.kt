@@ -30,7 +30,7 @@ class BananaSplitViewModel() : ViewModel() {
 	val isSuccessTerminal = _isSuccessTerminal.asStateFlow()
 
 	//storing seed phrase between screens while user selecting networks
-	private val _seedPhrase =  MutableStateFlow<String?>(null)
+	private val _seedPhrase = MutableStateFlow<String?>(null)
 	val isBananaRestorable = _seedPhrase.mapState(viewModelScope) { it != null }
 
 	//ongoing events
@@ -83,7 +83,10 @@ class BananaSplitViewModel() : ViewModel() {
 		_seedPhrase.value = null
 	}
 
-	suspend fun onFinishWithNetworks(context: Context, networksKeys: Set<String>) {
+	suspend fun onFinishWithNetworks(
+		context: Context,
+		networksKeys: Set<String>
+	) {
 		val seedName = seedName.value
 		val seedPhrase = _seedPhrase.value!!
 		val isSaved = createKeySetUseCase.createKeySetWithNetworks(
@@ -97,6 +100,7 @@ class BananaSplitViewModel() : ViewModel() {
 		}
 		_isSuccessTerminal.value = seedName
 	}
+
 	suspend fun onBananaDoneTry(context: Context) {
 		val password = password.value
 
@@ -113,6 +117,7 @@ class BananaSplitViewModel() : ViewModel() {
 							}
 							_seedPhrase.value = seedPhraseResult.s
 						}
+
 						BananaSplitRecoveryResult.RequestPassword -> {
 							submitErrorState("We passed password but recieved password request again, should be unreacheble ")
 						}
@@ -120,6 +125,10 @@ class BananaSplitViewModel() : ViewModel() {
 				}
 
 				is DecodeSequenceResult.Other -> {
+					submitErrorState("already processing banana split, but other qr code data happened to be here, submit it!, $qrResult")
+				}
+
+				is DecodeSequenceResult.DynamicDerivations -> {
 					submitErrorState("already processing banana split, but other qr code data happened to be here, submit it!, $qrResult")
 				}
 			}
