@@ -24,29 +24,31 @@ public class BlockiesImageRenderer {
     /// - Parameters:
     ///   - randomNumberGenerator: A pseudo random number generator used for generating fallback color values.
     public init(
-        randomNumberGenerator: PseudoRandomNumberGenerator = PseudoRandomNumberGenerator()
+        randomNumberGenerator: PseudoRandomNumberGenerator
     ) {
         self.randomNumberGenerator = randomNumberGenerator
     }
 
     /// Renders an image based on the given data and colors.
     ///
-    /// - parameter data: The data that describes the blocks in the blockies.
-    /// - parameter primaryColor: The primary color for the blockies.
-    /// - parameter backgroundColor: The background color for the blockies.
-    /// - parameter spotColor: The spot color for the blockies.
-    /// - parameter scalingFactor: The scaling factor for the size of the blocks.
+    /// - Parameters:
+    ///   - data: The data that describes the blocks in the blockies.
+    ///   - configuration: The Blockies configuration containing size and scale for the image.
+    ///   - colors: The `ColorsConfiguration` object containing the primary, background, and spot color for the
+    /// blockies.
+    ///   - scalingFactor: The scaling factor for the size of the blocks.
     ///
     /// - returns: The rendered image, or `nil` if the image could not be created.
     public func renderImage(
         from data: [Double],
         configuration: BlockiesConfiguration,
+        colors: ColorsConfiguration,
         scalingFactor: Int
     ) -> PlatformImage? {
         let finalSize = configuration.size * configuration.scale * scalingFactor
-        let primaryColor = configuration.color ?? createColor()
-        let backgroundColor = configuration.bgcolor ?? createColor()
-        let spotColor = configuration.spotcolor ?? createColor()
+        let primaryColor = colors.color
+        let backgroundColor = colors.bgcolor
+        let spotColor = colors.spotcolor
 
         #if os(iOS) || os(tvOS) || os(watchOS)
             let renderer = UIGraphicsImageRenderer(size: CGSize(width: finalSize, height: finalSize))
@@ -139,16 +141,5 @@ public class BlockiesImageRenderer {
                 height: CGFloat(scale * scalingFactor)
             ))
         }
-    }
-
-    private func createColor() -> PlatformColor {
-        let h = randomNumberGenerator.nextValue() * 360
-        let s = ((randomNumberGenerator.nextValue() * 60) + 40) / 100
-        let l = (
-            randomNumberGenerator.nextValue() + randomNumberGenerator.nextValue() + randomNumberGenerator
-                .nextValue() + randomNumberGenerator.nextValue()
-        ) * 25 / 100
-
-        return PlatformColor(hue: h, saturation: s, lightness: l) ?? PlatformColor.black
     }
 }
