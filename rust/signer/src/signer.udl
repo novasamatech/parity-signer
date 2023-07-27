@@ -611,6 +611,9 @@ namespace signer {
     void try_create_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
 
     [Throws=ErrorDisplayed]
+    void try_create_imported_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
+
+    [Throws=ErrorDisplayed]
     void history_init_history_with_cert();
 
     [Throws=ErrorDisplayed]
