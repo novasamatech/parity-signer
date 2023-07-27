@@ -51,10 +51,8 @@ fun BlockiesIcon(
 private fun PreviewBlockiesIcon() {
 	SignerNewTheme {
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
-			BlockiesIcon("0xc0ffee254729296a45a3885639AC7E10F9d54979", 64.dp)
-			BlockiesIcon("0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E", 32.dp)
-			BlockiesIcon("0xD2AAD5732c980AaddDe38CEAD950dBa91Cd2C726", 18.dp)
-			BlockiesIcon("0x1524d026FCAa9F1ceeE3540dEeeE3359BAD6bfF9", 64.dp)
+			BlockiesIcon("0xb00adb8980766d75518dfa8efa139fe0d7bb5e4e", 48.dp)
+			BlockiesIcon("0x7204ddf9dc5f672b64ca6692da7b8f13b4d408e7", 32.dp)
 		}
 	}
 }
