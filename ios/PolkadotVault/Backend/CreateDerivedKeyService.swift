@@ -200,7 +200,7 @@ final class CreateDerivedKeyService {
             let result: Result<Void, ImportDerivedKeyError>
             keysToImport.forEach {
                 do {
-                    try tryCreateAddress(
+                    try tryCreateImportedAddress(
                         seedName: seedName,
                         seedPhrase: seedPhrase,
                         path: $0.path,

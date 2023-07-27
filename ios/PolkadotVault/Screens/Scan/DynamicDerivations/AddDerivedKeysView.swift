@@ -205,10 +205,10 @@ extension AddDerivedKeysView {
 
         func onDoneTap() {
             let success = { [weak self] in
-                    self?.isPresented = false
-                    self?.onCompletion(.onDone)
+                self?.isPresented = false
+                self?.onCompletion(.onDone)
             }
-            if dynamicDerivationsPreview.keySet.derivations.count > 0 {
+            if !dynamicDerivationsPreview.keySet.derivations.isEmpty {
                 derivedKeysService.createDerivedKeys(
                     dynamicDerivationsPreview.keySet.seedName,
                     seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
