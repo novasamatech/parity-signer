@@ -49,6 +49,7 @@ fun AddDerivedKeysScreen(
 	model: DdPreview,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
+	onDone: Callback,
 ) {
 	BackHandler(onBack = onBack)
 
@@ -124,7 +125,7 @@ fun AddDerivedKeysScreen(
 			label = stringResource(R.string.transaction_action_done),
 			withBackground = true,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
-			onClicked = onBack,
+			onClicked = onDone,
 		)
 	}
 }
@@ -212,6 +213,7 @@ private fun PreviewAddDerivedKeysScreen() {
 		AddDerivedKeysScreen(
 			model = ddPreviewcreateStub(),
 			onBack = {},
+			onDone = {},
 		)
 	}
 }

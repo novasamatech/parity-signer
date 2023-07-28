@@ -110,6 +110,7 @@ fun ScanNavSubgraph(
 			model = dynamicDerivationsData,
 			modifier = Modifier.statusBarsPadding(),
 			onBack = scanViewModel::clearState,
+			onDone = { scanViewModel.createDynamicDerivations(dynamicDerivationsData.keySet) },
 		)
 	} else if (transactionsValue == null || showingModals) {
 

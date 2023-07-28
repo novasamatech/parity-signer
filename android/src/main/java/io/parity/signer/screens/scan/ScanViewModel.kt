@@ -255,6 +255,12 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
+	fun createDynamicDerivations(toImport: DdKeySet) {
+
+		//todo dmitry as ios/PolkadotVault/Screens/Scan/DynamicDerivations/AddDerivedKeysView.swift:205
+		clearState()
+	}
+
 	private fun areSeedKeysTheSameButUpdated(
 		originalKey: SeedKeysPreview,
 		resultKey: SeedKeysPreview
