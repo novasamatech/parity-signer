@@ -51,7 +51,6 @@ android {
 			pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/x86/libc++_shared.so', 'lib/x86_64/libc++_shared.so']
 		}
 	}
-	buildToolsVersion '31.0.0'
 	compileSdk 33
 	ndkVersion '24.0.8215888'
     namespace 'io.parity.signer'
