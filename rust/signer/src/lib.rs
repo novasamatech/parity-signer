@@ -359,6 +359,13 @@ fn try_create_imported_address(
     .map_err(|e| e.to_string().into())
 }
 
+fn sign_dd_transaction(
+    payload: &str,
+    seeds: HashMap<String, String>,
+) -> Result<MSignedTransaction, ErrorDisplayed> {
+    navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())
+}
+
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
 fn history_init_history_with_cert() -> anyhow::Result<(), ErrorDisplayed> {

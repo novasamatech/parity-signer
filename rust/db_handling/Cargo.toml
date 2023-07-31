@@ -29,7 +29,7 @@ pretty_assertions = { version = "1.4" }
 tempfile = { version = "3.7" }
 
 [features]
-default = []
+default = ["active"]
 active = ["defaults/active", "definitions/active", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
 
 [lib]

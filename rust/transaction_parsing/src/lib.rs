@@ -23,7 +23,7 @@ mod load_types;
 use load_types::load_types;
 mod message;
 use message::process_message;
-mod parse_transaction;
+pub mod parse_transaction;
 pub use parse_transaction::entry_to_transactions_with_decoding;
 use parse_transaction::parse_transaction;
 pub mod dynamic_derivations;
@@ -58,7 +58,7 @@ fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<Transactio
     }
 
     match &data_hex[4..6] {
-        "00" | "02" => parse_transaction(database, data_hex, false),
+        "00" | "02" => parse_transaction(database, data_hex),
         "03" => process_message(database, data_hex),
         "04" => parse_transaction_bulk(database, data_hex),
         "80" => load_metadata(database, data_hex),
@@ -88,6 +88,9 @@ pub fn decode_payload(payload: &str) -> Result<DecodeSequenceResult> {
     }
 
     match &data_hex[4..6] {
+        "05" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
+            s: data_hex.to_string(),
+        }),
         "df" => decode_dynamic_derivations(data_hex),
         _ => Ok(DecodeSequenceResult::Other {
             s: payload.to_string(),
@@ -108,7 +111,7 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
-                let action = parse_transaction(database, &encoded, true)?;
+                let action = parse_transaction(database, &encoded)?;
                 match action {
                     TransactionAction::Sign {
                         actions: a,

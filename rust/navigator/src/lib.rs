@@ -9,10 +9,11 @@ use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1
 use lazy_static::lazy_static;
 use sp_runtime::MultiSignature;
 use std::{collections::HashMap, sync::Mutex};
-use transaction_signing::SignatureType;
+use transaction_signing::{create_signature, SignatureType};
 
 use definitions::navigation::{
-    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, QrData,
+    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, MSignedTransaction,
+    MTransaction, QrData, TransactionAction, TransactionType,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -26,6 +27,8 @@ pub mod modals;
 mod navstate;
 mod states;
 use navstate::State;
+use transaction_parsing::parse_transaction::parse_dd_transaction;
+
 pub mod screens;
 #[cfg(test)]
 mod tests;
@@ -121,6 +124,45 @@ pub fn export_signatures_bulk(
     };
 
     Ok(MSignatureReady { signatures })
+}
+
+pub fn sign_dd_transaction(
+    database: &sled::Db,
+    payload: &str,
+    seeds: HashMap<String, String>,
+) -> Result<MSignedTransaction> {
+    let transaction = parse_dd_transaction(database, payload, &seeds)?;
+    let (actions, checksum) = match transaction {
+        TransactionAction::Sign { actions, checksum } => (actions, checksum),
+        _ => return Err(Error::TxActionNotSign),
+    };
+    let action = actions.get(0).ok_or(Error::NoTransactionsToSign)?;
+
+    let seed_phrase = seeds
+        .get(&action.author_info.address.seed_name)
+        .ok_or(Error::NoSeedPhrase)?;
+
+    let signature = create_signature(
+        database,
+        seed_phrase,
+        "",
+        "",
+        checksum,
+        0,
+        action.network_info.specs.encryption,
+    )?;
+
+    Ok(MSignedTransaction {
+        transaction: MTransaction {
+            content: action.content.clone(),
+            ttype: TransactionType::Sign,
+            author_info: Some(action.author_info.clone()),
+            network_info: Some(action.network_info.clone().into()),
+        },
+        signature: export_signatures_bulk(
+            vec![(signature.signature().to_owned(), signature.signature_type())].as_slice(),
+        )?,
+    })
 }
 
 /// Get keys by seed name
