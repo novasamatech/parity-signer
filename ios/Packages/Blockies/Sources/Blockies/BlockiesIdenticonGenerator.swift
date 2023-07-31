@@ -26,7 +26,7 @@ public final class BlockiesIdenticonGenerator {
     private let patternGenerator: PatternGenerator
     private let imageRenderer: BlockiesImageRenderer
     private let colorGenerator: PseudoRandomColorGenerator
-    
+
     /// Initializes a new `BlockiesIdenticonGenerator` instance.
     ///
     /// - Parameters:
@@ -42,7 +42,7 @@ public final class BlockiesIdenticonGenerator {
         imageRenderer = BlockiesImageRenderer(randomNumberGenerator: randomNumberGenerator)
         colorGenerator = PseudoRandomColorGenerator(randomNumberGenerator: randomNumberGenerator)
     }
-    
+
     /// Creates a block-style identicon image from a seed string.
     ///
     /// - Parameters:
@@ -50,7 +50,7 @@ public final class BlockiesIdenticonGenerator {
     ///   - customScale: An optional scaling factor for the size of the blocks.
     ///
     /// - Returns: The generated block-style identicon image.
-    
+
     public func createImage(seed: String, customScale: Int = 1) -> PlatformImage? {
         randomNumberGenerator.loadSeed(from: seed)
         let colors = colorGenerator.generateColors()

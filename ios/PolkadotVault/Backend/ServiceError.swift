@@ -14,4 +14,8 @@ struct ServiceError: Error, CustomStringConvertible {
         [Localizable.Error.Service.Label.prefix.string, message, Localizable.Error.Service.Label.suffix.string]
             .joined(separator: "\n")
     }
+
+    var localizedDescription: String {
+        description
+    }
 }

@@ -45,6 +45,25 @@ enum CreateDerivedKeyForKeySetsError: Error {
     }
 }
 
+enum ImportDerivedKeyError: Error {
+    case noKeysImported(errors: [String])
+    case keyNotImported([(key: String, error: String)])
+
+    var localizedDescription: String {
+        switch self {
+        case let .keyNotImported(errorInfo):
+            return errorInfo.reduce(into: "") {
+                $0 += (
+                    Localizable.AddDerivedKeys.Error
+                        .DerivedKeyForNetwork.content($1.key, $1.error) + "\n"
+                )
+            }
+        case let .noKeysImported(errors):
+            return errors.reduce(into: "") { $0 += ($1 + "\n") }
+        }
+    }
+}
+
 final class CreateDerivedKeyService {
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
@@ -170,6 +189,40 @@ final class CreateDerivedKeyService {
         }
     }
 
+    func createDerivedKeys(
+        _ seedName: String,
+        _ seedPhrase: String,
+        keysToImport: [DdDetail],
+        completion: @escaping (Result<Void, ImportDerivedKeyError>) -> Void
+    ) {
+        var occuredErrors: [(key: String, error: String)] = []
+        callQueue.async {
+            let result: Result<Void, ImportDerivedKeyError>
+            keysToImport.forEach {
+                do {
+                    try tryCreateImportedAddress(
+                        seedName: seedName,
+                        seedPhrase: seedPhrase,
+                        path: $0.path,
+                        network: $0.networkSpecsKey
+                    )
+                } catch {
+                    occuredErrors.append((key: $0.path, error: error.backendDisplayError))
+                }
+            }
+            if occuredErrors.isEmpty {
+                result = .success(())
+            } else if occuredErrors.count == keysToImport.count {
+                result = .failure(.noKeysImported(errors: occuredErrors.map(\.error)))
+            } else {
+                result = .failure(.keyNotImported(occuredErrors))
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
     func checkForCollision(
         _ seedName: String,
         _ path: String,
@@ -178,7 +231,7 @@ final class CreateDerivedKeyService {
         do {
             return try .success(substratePathCheck(seedName: seedName, path: path, network: network))
         } catch {
-            return .failure(.init(message: error.localizedDescription))
+            return .failure(.init(message: error.backendDisplayError))
         }
     }
 
