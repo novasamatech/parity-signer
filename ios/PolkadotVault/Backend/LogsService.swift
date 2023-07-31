@@ -47,7 +47,7 @@ final class LogsService {
                 let logDetails: MLogDetails = try PolkadotVault.getLogDetails(order: logIndex)
                 result = .success(logDetails)
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)
@@ -64,7 +64,7 @@ final class LogsService {
                 try PolkadotVault.clearLogHistory()
                 result = .success(())
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)
@@ -79,10 +79,10 @@ final class LogsService {
         callQueue.async {
             let result: Result<Void, ServiceError>
             do {
-                try PolkadotVault.handleLogComment(userInput: userComment)
+                try handleLogComment(userInput: userComment)
                 result = .success(())
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)

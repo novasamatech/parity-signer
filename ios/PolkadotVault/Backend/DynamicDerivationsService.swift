@@ -33,7 +33,7 @@ final class DynamicDerivationsService {
                 let preview: DdPreview = try previewDynamicDerivations(seeds: seedPhrases, payload: payload)
                 result = .success(preview)
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)

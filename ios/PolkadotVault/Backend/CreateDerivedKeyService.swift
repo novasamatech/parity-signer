@@ -206,10 +206,8 @@ final class CreateDerivedKeyService {
                         path: $0.path,
                         network: $0.networkSpecsKey
                     )
-                } catch let displayedError as ErrorDisplayed {
-                    occuredErrors.append((key: $0.path, error: displayedError.localizedDescription))
                 } catch {
-                    occuredErrors.append((key: $0.path, error: error.localizedDescription))
+                    occuredErrors.append((key: $0.path, error: error.backendDisplayError))
                 }
             }
             if occuredErrors.isEmpty {
@@ -233,7 +231,7 @@ final class CreateDerivedKeyService {
         do {
             return try .success(substratePathCheck(seedName: seedName, path: path, network: network))
         } catch {
-            return .failure(.init(message: error.localizedDescription))
+            return .failure(.init(message: error.backendDisplayError))
         }
     }
 
