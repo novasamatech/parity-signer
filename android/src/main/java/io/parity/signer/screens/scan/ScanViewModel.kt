@@ -35,7 +35,7 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
-	private val importKeysService: ImportDerivedKeysRepository by lazy {
+	private val importKeysRepository: ImportDerivedKeysRepository by lazy {
 		ImportDerivedKeysRepository(seedRepository)
 	}
 
@@ -163,7 +163,7 @@ class ScanViewModel : ViewModel() {
 									}
 
 									when (val result =
-										importKeysService.updateWithSeed(importDerivedKeys)) {
+										importKeysRepository.updateWithSeed(importDerivedKeys)) {
 										is RepoResult.Success -> {
 											val updatedKeys = result.result
 											val newTransactionsState =
@@ -257,6 +257,9 @@ class ScanViewModel : ViewModel() {
 
 	fun createDynamicDerivations(toImport: DdKeySet) {
 
+		if (toImport.derivations.isNotEmpty()) {
+			toImport.derivations
+		}
 		//todo dmitry as ios/PolkadotVault/Screens/Scan/DynamicDerivations/AddDerivedKeysView.swift:205
 		clearState()
 	}
@@ -273,7 +276,7 @@ class ScanViewModel : ViewModel() {
 		val importableKeys =
 			transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
-		val importResult = importKeysService.importDerivedKeys(importableKeys)
+		val importResult = importKeysRepository.importDerivedKeys(importableKeys)
 		val derivedKeysCount = importableKeys.sumOf { it.derivedKeys.size }
 
 		when (importResult) {

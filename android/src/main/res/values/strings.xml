@@ -423,6 +423,12 @@
 	<string name="key_set_details_all_filtered_keys_title">Key Set has no Keys on Selected Network</string>
 	<string name="dymanic_derivation_error_some_already_imported">Some are hidden from the list because they have already been imported.</string>
 	<string name="dymanic_derivation_error_some_network_missing">"Some keys can not be imported until their networks are added. Please add missing networks and their metadata. "</string>
+	<string name="dymanic_derivation_error_custom_message">Derived key %1$s could not be created: %2$s</string>
 
 </resources>
 
+<!--
+"AddDerivedKeys.Error.DerivedKeyForNetwork.Content" = "Derived key %@ could not be created: %@";
+"AddDerivedKeys.Error.DerivedKeyForNetwork.Title" = "There was an issue importing keys.";
+todo dmitry see what we have in ios
+-->
