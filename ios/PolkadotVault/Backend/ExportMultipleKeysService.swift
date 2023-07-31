@@ -56,7 +56,7 @@ final class ExportMultipleKeysService {
                 ).frames
                 result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload)))
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)

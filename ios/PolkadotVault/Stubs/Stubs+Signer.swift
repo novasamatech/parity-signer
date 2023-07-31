@@ -410,3 +410,26 @@ extension MscTxSpecPlain {
         txVersion: "tx9230"
     )
 }
+
+extension DdDetail {
+    static let stub: DdDetail = .init(
+        base58: "5FeSzkpTHV9N86kj61QLVaYU7pndHuCD7Cjj3zyzUhxxKZ5i",
+        path: "//polkadot",
+        networkLogo: "polkadot",
+        networkSpecsKey: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
+        identicon: .stubIdenticon
+    )
+}
+
+extension DdKeySet {
+    static let stub: DdKeySet = .init(seedName: "seed name", derivations: [.stub])
+}
+
+extension DdPreview {
+    static let stub: DdPreview = .init(
+        qr: [.stubRegular],
+        keySet: .stub,
+        isSomeAlreadyImported: true,
+        isSomeNetworkMissing: true
+    )
+}
