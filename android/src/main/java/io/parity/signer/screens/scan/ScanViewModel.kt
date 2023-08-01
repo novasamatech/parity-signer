@@ -266,13 +266,14 @@ class ScanViewModel : ViewModel() {
 		toImport: DdKeySet,
 		context: Context
 	) {
-		clearState()
 		viewModelScope.launch {
 			if (toImport.derivations.isNotEmpty()) {
 				val result = importKeysRepository.createDynamicDerivationKeys(
 					seedName = toImport.seedName,
 					keysToImport = toImport.derivations
 				)
+
+				clearState()
 				when (result) {
 					is OperationResult.Err -> {
 						val errorMessage = when (result.error) {
@@ -299,7 +300,11 @@ class ScanViewModel : ViewModel() {
 					}
 
 					is OperationResult.Ok -> {
-						//do nothing, state cleared
+						clearState()
+						Toast.makeText(
+							context, context.getString(R.string.create_derivations_success),
+							Toast.LENGTH_SHORT
+						).show()
 					}
 				}
 			}
