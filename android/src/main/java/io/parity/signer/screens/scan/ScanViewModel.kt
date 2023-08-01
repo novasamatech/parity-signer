@@ -11,6 +11,7 @@ import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
@@ -24,7 +25,18 @@ import io.parity.signer.screens.scan.importderivations.hasImportableKeys
 import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ActionResult
+import io.parity.signer.uniffi.Card
+import io.parity.signer.uniffi.DdKeySet
+import io.parity.signer.uniffi.DdPreview
+import io.parity.signer.uniffi.DerivedKeyError
+import io.parity.signer.uniffi.MSignatureReady
+import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.SeedKeysPreview
+import io.parity.signer.uniffi.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -224,10 +236,21 @@ class ScanViewModel : ViewModel() {
 			}
 
 			is RepoResult.Success -> {
-				val result =
+				val previewDynDerivations =
 					uniffiInteractor.previewDynamicDerivations(phrases.result, payload)
-						.mapError()
-				dynamicDerivations.value = result
+
+				when (previewDynDerivations) {
+					is UniffiResult.Error -> {
+						transactionError.value = TransactionErrorModel(
+							title = context.getString(R.string.dymanic_derivation_error_custom_title),
+							subtitle = previewDynDerivations.error.message ?: "",
+						)
+					}
+
+					is UniffiResult.Success -> {
+						dynamicDerivations.value = previewDynDerivations.result
+					}
+				}
 			}
 		}
 	}

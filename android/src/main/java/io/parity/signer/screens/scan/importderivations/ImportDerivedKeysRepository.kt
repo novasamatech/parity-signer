@@ -1,7 +1,7 @@
 package io.parity.signer.screens.scan.importderivations
 
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.getDetailedDescriptionString
+import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
@@ -66,7 +66,7 @@ class ImportDerivedKeysRepository(
 				occuredErrors.add(
 					PathToError(
 						key.path,
-						e.getDetailedDescriptionString()
+						e.message ?: ""
 					)
 				)
 			} catch (e: Error) {
