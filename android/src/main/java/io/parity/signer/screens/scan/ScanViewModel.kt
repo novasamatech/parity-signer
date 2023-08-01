@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
@@ -16,6 +17,7 @@ import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.errors.toBottomSheetModel
 import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
+import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository.ImportDerivedKeyError
 import io.parity.signer.screens.scan.importderivations.allImportDerivedKeys
 import io.parity.signer.screens.scan.importderivations.dominantImportError
 import io.parity.signer.screens.scan.importderivations.hasImportableKeys
@@ -24,6 +26,7 @@ import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 
 private const val TAG = "ScanViewModelTag"
@@ -214,8 +217,12 @@ class ScanViewModel : ViewModel() {
 	) {
 		when (val phrases = seedRepository.getAllSeeds()) {
 			is RepoResult.Failure -> {
-				Log.e(TAG, "cannot get seeds to show import dynamic derivations ${phrases.error}")
+				Log.e(
+					TAG,
+					"cannot get seeds to show import dynamic derivations ${phrases.error}"
+				)
 			}
+
 			is RepoResult.Success -> {
 				val result =
 					uniffiInteractor.previewDynamicDerivations(phrases.result, payload)
@@ -255,13 +262,48 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun createDynamicDerivations(toImport: DdKeySet) {
-
-		if (toImport.derivations.isNotEmpty()) {
-			toImport.derivations
-		}
-		//todo dmitry as ios/PolkadotVault/Screens/Scan/DynamicDerivations/AddDerivedKeysView.swift:205
+	fun createDynamicDerivations(
+		toImport: DdKeySet,
+		context: Context
+	) {
 		clearState()
+		viewModelScope.launch {
+			if (toImport.derivations.isNotEmpty()) {
+				val result = importKeysRepository.createDynamicDerivationKeys(
+					seedName = toImport.seedName,
+					keysToImport = toImport.derivations
+				)
+				when (result) {
+					is OperationResult.Err -> {
+						val errorMessage = when (result.error) {
+							is ImportDerivedKeyError.KeyNotImported ->
+								result.error.keyToError.joinToString(separator = "\n") {
+									context.getString(
+										R.string.dymanic_derivation_error_custom_message,
+										it.path,
+										it.errorLocalized
+									)
+								}
+
+							is ImportDerivedKeyError.NoKeysImported ->
+								result.error.errors.joinToString(separator = "\n")
+
+							ImportDerivedKeyError.AuthFailed -> {
+								context.getString(R.string.auth_failed_message)
+							}
+						}
+						transactionError.value = TransactionErrorModel(
+							title = context.getString(R.string.dymanic_derivation_error_custom_title),
+							subtitle = errorMessage,
+						)
+					}
+
+					is OperationResult.Ok -> {
+						//do nothing, state cleared
+					}
+				}
+			}
+		}
 	}
 
 	private fun areSeedKeysTheSameButUpdated(
