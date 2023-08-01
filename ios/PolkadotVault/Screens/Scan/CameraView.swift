@@ -333,6 +333,8 @@ extension CameraView {
                 startDynamicDerivationsFlow(payload.payload)
             case .transaction:
                 startTransactionSigningFlow(payload.payload)
+            case .dynamicDerivationsTransaction:
+                startDynamicDerivationsTransactionFlow(payload.payload)
             }
         }
 
@@ -541,6 +543,12 @@ private extension CameraView.ViewModel {
             signature = value
             continueWithSignature()
         }
+    }
+}
+
+private extension CameraView.ViewModel {
+    func startDynamicDerivationsTransactionFlow(_: String) {
+        // Implement
     }
 }
 

@@ -12,6 +12,7 @@ import UIKit
 enum DecodedPayloadType: Equatable {
     case transaction
     case dynamicDerivations
+    case dynamicDerivationsTransaction
 }
 
 struct DecodedPayload: Equatable {
@@ -173,6 +174,9 @@ private extension CameraService {
                     self.shutdown()
                 case let .other(s: payload):
                     self.payload = .init(payload: payload, type: .transaction)
+                    self.shutdown()
+                case let .dynamicDerivationTransaction(s: payload):
+                    self.payload = .init(payload: payload, type: .dynamicDerivationsTransaction)
                     self.shutdown()
                 }
             }
