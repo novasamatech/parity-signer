@@ -40,7 +40,7 @@ final class ImportDerivedKeysService {
                 try importDerivations(seedDerivedKeys: seedPreviewsToImport)
                 result = .success(())
             } catch {
-                result = .failure(.init(message: error.localizedDescription))
+                result = .failure(.init(message: error.backendDisplayError))
             }
             self.callbackQueue.async {
                 completion(result)
@@ -61,7 +61,7 @@ final class ImportDerivedKeysService {
             )
             result = .success(filledInSeedPreviews)
         } catch {
-            result = .failure(.init(message: error.localizedDescription))
+            result = .failure(.init(message: error.backendDisplayError))
         }
         callbackQueue.async {
             completion(result)

@@ -26,6 +26,7 @@ struct DerivedKeyRowViewModel: Equatable {
     let path: String
     let hasPassword: Bool
     let base58: String
+    let isImported: Bool
     // for Keys Export
     let rootKeyName: String
 
@@ -36,6 +37,7 @@ struct DerivedKeyRowViewModel: Equatable {
         network = key.network.networkLogo
         hasPassword = key.key.address.hasPwd
         base58 = key.key.base58
+        isImported = key.key.wasImported
         rootKeyName = key.key.address.seedName
     }
 }
@@ -48,6 +50,7 @@ extension DerivedKeyRowViewModel {
         path: String,
         hasPassword: Bool,
         base58: String,
+        isImported: Bool,
         rootKeyName: String = ""
     ) {
         self.addressKey = addressKey
@@ -56,6 +59,7 @@ extension DerivedKeyRowViewModel {
         self.path = path
         self.hasPassword = hasPassword
         self.base58 = base58
+        self.isImported = isImported
         self.rootKeyName = rootKeyName
     }
 }

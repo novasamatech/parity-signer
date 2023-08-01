@@ -19,8 +19,9 @@ struct CameraView: View {
             // Full screen camera preview
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
+                    guard let payload else { return }
                     DispatchQueue.main.async {
-                        viewModel.checkForTransactionNavigation(payload)
+                        viewModel.didUpdatePayload(payload)
                     }
                 }
                 .onChange(of: model.total) { total in
@@ -198,6 +199,14 @@ struct CameraView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddDerivedKeys
+        ) {
+            AddDerivedKeysView(
+                viewModel: addDerivedKeysView()
+            )
+            .clearModalBackground()
+        }
         .bottomSnackbar(
             viewModel.snackbarViewModel,
             isPresented: $viewModel.isSnackbarPresented
@@ -242,6 +251,15 @@ struct CameraView: View {
             onCompletion: viewModel.onSelectKeySetsForNetworkCompletion(_:)
         )
     }
+
+    func addDerivedKeysView() -> AddDerivedKeysView.ViewModel {
+        .init(
+            dataModel: .init(viewModel.dynamicDerivationsPreview),
+            dynamicDerivationsPreview: viewModel.dynamicDerivationsPreview,
+            isPresented: $viewModel.isPresentingAddDerivedKeys,
+            onCompletion: viewModel.onAddDerivedKeyCompletion(_:)
+        )
+    }
 }
 
 extension CameraView {
@@ -268,16 +286,21 @@ extension CameraView {
         @Published var isPresentingKeySetSelection: Bool = false
         var networkName: String!
 
+        // Dynamic Derived Keys
+        @Published var isPresentingAddDerivedKeys: Bool = false
+
         // Data models for modals
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
+        @Published var dynamicDerivationsPreview: DdPreview!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
 
         @Binding var isPresented: Bool
         private let scanService: ScanTabService
+        private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
 
         private weak var cameraModel: CameraService?
@@ -285,11 +308,13 @@ extension CameraView {
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            scanService: ScanTabService = ScanTabService()
+            scanService: ScanTabService = ScanTabService(),
+            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService()
         ) {
             _isPresented = isPresented
             self.seedsMediator = seedsMediator
             self.scanService = scanService
+            self.dynamicDerivationsService = dynamicDerivationsService
         }
 
         func onAppear() {
@@ -300,39 +325,14 @@ extension CameraView {
             self.cameraModel = cameraModel
         }
 
-        func checkForTransactionNavigation(_ payload: String?) {
-            guard let payload = payload, !isInTransactionProgress else { return }
+        func didUpdatePayload(_ payload: DecodedPayload) {
+            guard !isInTransactionProgress else { return }
             isInTransactionProgress = true
-            switch scanService.performTransaction(with: payload) {
-            case let .success(actionResult):
-                // Handle transactions with just error payload
-                guard case let .transaction(transactions) = actionResult.screenData else { return }
-                if transactions.allSatisfy(\.isDisplayingErrorOnly) {
-                    presentableError = .transactionSigningError(
-                        message: transactions
-                            .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
-                    )
-                    isPresentingError = true
-                    scanService.resetNavigationState()
-                    return
-                }
-                // Handle rest of transactions with optional error payload
-                // Type is assumed based on first error
-                let firstTransaction = transactions.first
-                switch firstTransaction?.ttype {
-                case .sign:
-                    continueTransactionSignature(transactions)
-                case .importDerivations:
-                    continueImportDerivedKeys(transactions)
-                default:
-                    // Transaction with error
-                    // Transaction that does not require signing (i.e. adding network or metadata)
-                    self.transactions = transactions
-                    isPresentingTransactionPreview = true
-                }
-            case let .failure(error):
-                presentableError = ErrorBottomModalViewModel.transactionError(for: error)
-                isPresentingError = true
+            switch payload.type {
+            case .dynamicDerivations:
+                startDynamicDerivationsFlow(payload.payload)
+            case .transaction:
+                startTransactionSigningFlow(payload.payload)
             }
         }
 
@@ -478,12 +478,56 @@ extension CameraView {
             cameraModel?.start()
             clearTransactionState()
         }
+
+        func onAddDerivedKeyCompletion(_ onComplete: AddDerivedKeysView.OnCompletionAction) {
+            switch onComplete {
+            case .onCancel:
+                ()
+            case .onDone:
+                ()
+            }
+            resumeCamera()
+        }
     }
 }
 
 // MARK: - Transaction Signature
 
-extension CameraView.ViewModel {
+private extension CameraView.ViewModel {
+    func startTransactionSigningFlow(_ payload: String) {
+        switch scanService.performTransaction(with: payload) {
+        case let .success(actionResult):
+            // Handle transactions with just error payload
+            guard case let .transaction(transactions) = actionResult.screenData else { return }
+            if transactions.allSatisfy(\.isDisplayingErrorOnly) {
+                presentableError = .transactionSigningError(
+                    message: transactions
+                        .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
+                )
+                isPresentingError = true
+                scanService.resetNavigationState()
+                return
+            }
+            // Handle rest of transactions with optional error payload
+            // Type is assumed based on first error
+            let firstTransaction = transactions.first
+            switch firstTransaction?.ttype {
+            case .sign:
+                continueTransactionSignature(transactions)
+            case .importDerivations:
+                continueImportDerivedKeys(transactions)
+            default:
+                // Transaction with error
+                // Transaction that does not require signing (i.e. adding network or metadata)
+                self.transactions = transactions
+                isPresentingTransactionPreview = true
+            }
+        case let .failure(error):
+            presentableError = ErrorBottomModalViewModel.transactionError(for: error)
+            isPresentingError = true
+        }
+    }
+
     func continueTransactionSignature(_ transactions: [MTransaction]) {
         let actionResult = sign(transactions: transactions)
         self.transactions = transactions
@@ -521,6 +565,25 @@ extension CameraView.ViewModel {
         } else {
             self.transactions = transactions
             isPresentingTransactionPreview = true
+        }
+    }
+}
+
+// MARK: - Dynamic Derivations
+
+private extension CameraView.ViewModel {
+    func startDynamicDerivationsFlow(_ payload: String) {
+        let seedPhrases = seedsMediator.getAllSeeds()
+        dynamicDerivationsService.getDynamicDerivationsPreview(for: seedPhrases, payload: payload) { result in
+            switch result {
+            case let .success(preview):
+                self.dynamicDerivationsPreview = preview
+                self.isPresentingAddDerivedKeys = true
+                ()
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
         }
     }
 }
