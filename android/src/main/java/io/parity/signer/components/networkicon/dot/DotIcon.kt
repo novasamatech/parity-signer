@@ -17,7 +17,7 @@ fun DotIcon(
 	preferedSize: Dp,
 	modifier: Modifier = Modifier
 ) {
-
+//todo dmitry lib.rs:353
 }
 
 
