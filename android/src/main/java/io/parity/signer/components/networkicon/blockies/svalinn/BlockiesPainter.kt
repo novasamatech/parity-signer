@@ -1,4 +1,4 @@
-package io.parity.signer.components.blockies.svalinn
+package io.parity.signer.components.networkicon.blockies.svalinn
 
 
 import androidx.compose.ui.geometry.Offset
