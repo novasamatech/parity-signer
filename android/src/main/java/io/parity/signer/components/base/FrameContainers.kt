@@ -70,6 +70,7 @@ fun NotificationFrameText(
 fun NotificationFrameTextImportant(
 	message: String,
 	withBorder: Boolean = true,
+	textColor: Color = MaterialTheme.colors.pink300,
 	modifier: Modifier = Modifier,
 ) {
 	val BACKGROUND = Color(0x14F272B6)
@@ -88,7 +89,7 @@ fun NotificationFrameTextImportant(
 	) {
 		Text(
 			text = message,
-			color = MaterialTheme.colors.pink300,
+			color = textColor,
 			style = SignerTypeface.CaptionM,
 			modifier = Modifier
 				.weight(1f)

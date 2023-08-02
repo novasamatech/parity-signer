@@ -4,22 +4,41 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
-import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.backend.mapError
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
+import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiResult
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.errors.toBottomSheetModel
-import io.parity.signer.screens.scan.importderivations.*
+import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
+import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository.ImportDerivedKeyError
+import io.parity.signer.screens.scan.importderivations.allImportDerivedKeys
+import io.parity.signer.screens.scan.importderivations.dominantImportError
+import io.parity.signer.screens.scan.importderivations.hasImportableKeys
+import io.parity.signer.screens.scan.importderivations.importableSeedKeysPreviews
 import io.parity.signer.screens.scan.transaction.isDisplayingErrorOnly
 import io.parity.signer.screens.scan.transaction.transactionIssues
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ActionResult
+import io.parity.signer.uniffi.Card
+import io.parity.signer.uniffi.DdKeySet
+import io.parity.signer.uniffi.DdPreview
+import io.parity.signer.uniffi.DerivedKeyError
+import io.parity.signer.uniffi.MSignatureReady
+import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.SeedKeysPreview
+import io.parity.signer.uniffi.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 
 private const val TAG = "ScanViewModelTag"
@@ -31,7 +50,7 @@ class ScanViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
-	private val importKeysService: ImportDerivedKeysRepository by lazy {
+	private val importKeysRepository: ImportDerivedKeysRepository by lazy {
 		ImportDerivedKeysRepository(seedRepository)
 	}
 
@@ -43,6 +62,8 @@ class ScanViewModel : ViewModel() {
 		MutableStateFlow(null)
 	var bananaSplitPassword: MutableStateFlow<List<String>?> =
 		MutableStateFlow(null)
+	var dynamicDerivations: MutableStateFlow<DdPreview?> =
+		MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
 	val transactionError: MutableStateFlow<TransactionErrorModel?> =
@@ -51,7 +72,7 @@ class ScanViewModel : ViewModel() {
 
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
-	suspend fun performPayload(payload: String, context: Context) {
+	suspend fun performTransactionPayload(payload: String, context: Context) {
 		val fakeNavigator = FakeNavigator()
 		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
@@ -63,8 +84,10 @@ class ScanViewModel : ViewModel() {
 
 		when (navigateResponse) {
 			is OperationResult.Err -> {
-				transactionError.value = navigateResponse.error.toBottomSheetModel(context)
+				transactionError.value =
+					navigateResponse.error.toBottomSheetModel(context)
 			}
+
 			is OperationResult.Ok -> {
 				val screenData = navigateResponse.result.screenData
 				val transactions: List<MTransaction> =
@@ -101,6 +124,7 @@ class ScanViewModel : ViewModel() {
 								passwordModel.value =
 									modalData.f.toEnterPasswordModel(withShowError = false)
 							}
+
 							is ModalData.SignatureReady -> {
 								signature.value = modalData.f
 							}
@@ -112,6 +136,7 @@ class ScanViewModel : ViewModel() {
 						}
 						this.transactions.value = TransactionsState(transactions)
 					}
+
 					TransactionType.IMPORT_DERIVATIONS -> {
 						// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
 						fakeNavigator.navigate(Action.GO_BACK)
@@ -124,6 +149,7 @@ class ScanViewModel : ViewModel() {
 								clearState()
 								return
 							}
+
 							DerivedKeyError.KeySetMissing -> {
 								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
@@ -132,6 +158,7 @@ class ScanViewModel : ViewModel() {
 								clearState()
 								return
 							}
+
 							DerivedKeyError.NetworkMissing -> {
 								transactionError.value = TransactionErrorModel(
 									title = context.getString(R.string.scan_screen_error_missing_network_title),
@@ -140,6 +167,7 @@ class ScanViewModel : ViewModel() {
 								clearState()
 								return
 							}
+
 							null -> {
 								//proceed, all good, now check if we need to update for derivations keys
 								if (transactions.hasImportableKeys()) {
@@ -150,7 +178,7 @@ class ScanViewModel : ViewModel() {
 									}
 
 									when (val result =
-										importKeysService.updateWithSeed(importDerivedKeys)) {
+										importKeysRepository.updateWithSeed(importDerivedKeys)) {
 										is RepoResult.Success -> {
 											val updatedKeys = result.result
 											val newTransactionsState =
@@ -161,6 +189,7 @@ class ScanViewModel : ViewModel() {
 											this.transactions.value =
 												TransactionsState(newTransactionsState)
 										}
+
 										is RepoResult.Failure -> {
 											Toast.makeText(
 												/* context = */ context,
@@ -181,6 +210,7 @@ class ScanViewModel : ViewModel() {
 							}
 						}
 					}
+
 					else -> {
 						// Transaction with error OR
 						// Transaction that does not require signing (i.e. adding network or metadata)
@@ -188,6 +218,38 @@ class ScanViewModel : ViewModel() {
 						this.transactions.value = TransactionsState(transactions)
 					}
 					//handle alert error rust/navigator/src/navstate.rs:396
+				}
+			}
+		}
+	}
+
+	suspend fun performDynamicDerivationPayload(
+		payload: String,
+		context: Context
+	) {
+		when (val phrases = seedRepository.getAllSeeds()) {
+			is RepoResult.Failure -> {
+				Log.e(
+					TAG,
+					"cannot get seeds to show import dynamic derivations ${phrases.error}"
+				)
+			}
+
+			is RepoResult.Success -> {
+				val previewDynDerivations =
+					uniffiInteractor.previewDynamicDerivations(phrases.result, payload)
+
+				when (previewDynDerivations) {
+					is UniffiResult.Error -> {
+						transactionError.value = TransactionErrorModel(
+							title = context.getString(R.string.dymanic_derivation_error_custom_title),
+							subtitle = previewDynDerivations.error.message ?: "",
+						)
+					}
+
+					is UniffiResult.Success -> {
+						dynamicDerivations.value = previewDynDerivations.result
+					}
 				}
 			}
 		}
@@ -209,6 +271,7 @@ class ScanViewModel : ViewModel() {
 									} ?: originalKey
 								})
 							}
+
 							else -> {
 								card
 								//don't update
@@ -219,6 +282,55 @@ class ScanViewModel : ViewModel() {
 			transaction
 		} else {
 			transaction
+		}
+	}
+
+	fun createDynamicDerivations(
+		toImport: DdKeySet,
+		context: Context
+	) {
+		viewModelScope.launch {
+			if (toImport.derivations.isNotEmpty()) {
+				val result = importKeysRepository.createDynamicDerivationKeys(
+					seedName = toImport.seedName,
+					keysToImport = toImport.derivations
+				)
+
+				clearState()
+				when (result) {
+					is OperationResult.Err -> {
+						val errorMessage = when (result.error) {
+							is ImportDerivedKeyError.KeyNotImported ->
+								result.error.keyToError.joinToString(separator = "\n") {
+									context.getString(
+										R.string.dymanic_derivation_error_custom_message,
+										it.path,
+										it.errorLocalized
+									)
+								}
+
+							is ImportDerivedKeyError.NoKeysImported ->
+								result.error.errors.joinToString(separator = "\n")
+
+							ImportDerivedKeyError.AuthFailed -> {
+								context.getString(R.string.auth_failed_message)
+							}
+						}
+						transactionError.value = TransactionErrorModel(
+							title = context.getString(R.string.dymanic_derivation_error_custom_title),
+							subtitle = errorMessage,
+						)
+					}
+
+					is OperationResult.Ok -> {
+						clearState()
+						Toast.makeText(
+							context, context.getString(R.string.create_derivations_success),
+							Toast.LENGTH_SHORT
+						).show()
+					}
+				}
+			}
 		}
 	}
 
@@ -234,7 +346,7 @@ class ScanViewModel : ViewModel() {
 		val importableKeys =
 			transactions.transactions.flatMap { it.importableSeedKeysPreviews() }
 
-		val importResult = importKeysService.importDerivedKeys(importableKeys)
+		val importResult = importKeysRepository.importDerivedKeys(importableKeys)
 		val derivedKeysCount = importableKeys.sumOf { it.derivedKeys.size }
 
 		when (importResult) {
@@ -248,6 +360,7 @@ class ScanViewModel : ViewModel() {
 					), /* duration = */ Toast.LENGTH_LONG
 				).show()
 			}
+
 			is RepoResult.Failure -> {
 				Toast.makeText(
 					/* context = */ context,
@@ -272,6 +385,7 @@ class ScanViewModel : ViewModel() {
 			|| transactionIsInProgress.value
 			|| errorWrongPassword.value
 			|| bananaSplitPassword.value != null
+			|| dynamicDerivations.value != null
 		) {
 			clearState()
 			true
@@ -285,6 +399,7 @@ class ScanViewModel : ViewModel() {
 		signature.value = null
 		passwordModel.value = null
 		bananaSplitPassword.value = null
+		dynamicDerivations.value = null
 		transactionError.value = null
 		transactionIsInProgress.value = false
 		errorWrongPassword.value = false
@@ -299,6 +414,7 @@ class ScanViewModel : ViewModel() {
 				Log.w(TAG, "signature transactions failure ${phrases.error}")
 				null
 			}
+
 			is RepoResult.Success -> {
 				uniffiInteractor.navigate(
 					Action.GO_FORWARD,

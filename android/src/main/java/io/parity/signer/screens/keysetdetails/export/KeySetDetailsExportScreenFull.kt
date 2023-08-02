@@ -18,7 +18,6 @@ import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun KeySetDetailsExportScreenFull(
 	model: KeySetDetailsModel,

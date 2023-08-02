@@ -11,7 +11,7 @@ import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.findActivity
-import io.parity.signer.domain.getDetailedDescriptionString
+import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.uniffi.MLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +36,7 @@ class LogsViewModel() : ViewModel() {
 		when (val result =
 			withContext(Dispatchers.IO) { uniffiInteractor.getLogs() }) {
 			is UniffiResult.Error -> {
-				val error = result.error.getDetailedDescriptionString()
+				val error = result.error.getDebugDetailedDescriptionString()
 				Log.e(TAG, "Unexpected error getLogs, $error")
 				_logsState.value = CompletableResult.Err(error)
 			}
@@ -50,7 +50,7 @@ class LogsViewModel() : ViewModel() {
 		return when (val result =
 			withContext(Dispatchers.IO) { uniffiInteractor.addCommentToLogs(logNote) }) {
 			is UniffiResult.Error -> {
-				val error = result.error.getDetailedDescriptionString()
+				val error = result.error.getDebugDetailedDescriptionString()
 				Log.e(TAG, "Unexpected error addNote, $error")
 				OperationResult.Err(error)
 			}
@@ -80,7 +80,7 @@ class LogsViewModel() : ViewModel() {
 		return when (val result =
 			withContext(Dispatchers.IO) { uniffiInteractor.clearLogHistory() }) {
 			is UniffiResult.Error -> {
-				val error = result.error.getDetailedDescriptionString()
+				val error = result.error.getDebugDetailedDescriptionString()
 				Log.e(TAG, "Unexpected error clear logs, $error")
 				OperationResult.Err(error)
 			}

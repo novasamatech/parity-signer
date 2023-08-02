@@ -251,7 +251,6 @@ class SeedRepository(
 					val result = storage.checkIfSeedNameAlreadyExists(seedPhrase)
 					result
 				}
-
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {

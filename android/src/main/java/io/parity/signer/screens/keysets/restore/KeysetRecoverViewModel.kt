@@ -33,21 +33,6 @@ class KeysetRecoverViewModel : ViewModel() {
 		_recoverState.value = null
 	}
 
-	fun addSeed(
-		seedName: String,
-		seedPhrase: String,
-		navigator: Navigator,
-	) {
-		viewModelScope.launch {
-			val repository = ServiceLocator.activityScope!!.seedRepository
-			repository.addSeed(
-				seedName = seedName,
-				seedPhrase = seedPhrase,
-				navigator = navigator,
-				isOptionalAuth = false
-			)
-		}
-	}
 
 	fun onTextEntry(newText: String) {
 		val uniffiInteractor = ServiceLocator.uniffiInteractor
