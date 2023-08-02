@@ -3,7 +3,13 @@ package io.parity.signer.screens.keysetdetails.items
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -25,36 +31,49 @@ import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.components.sharedcomponents.NetworkLabel
-import io.parity.signer.domain.*
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeyAndNetworkModel
+import io.parity.signer.domain.KeyModel
+import io.parity.signer.domain.NetworkInfoModel
+import io.parity.signer.domain.abbreviateString
+import io.parity.signer.domain.conditional
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun KeyDerivedItem(
 	model: KeyModel,
-	network: String,
-	onClick: () -> Unit = {},
+	networkLogo: String,
+	onClick: Callback? = {},
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = Color.Transparent,
-		modifier = Modifier.clickable(onClick = onClick),
+		modifier = Modifier.conditional(onClick != null) {
+			clickable(onClick = onClick ?: {})
+		},
 	) {
 		Row(
+			modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IdentIconWithNetwork(
-				identicon = model.identicon, networkLogoName = network,
-				size = 36.dp, modifier = Modifier.padding(
-					top = 16.dp,
-					bottom = 16.dp,
-					start = 16.dp,
-					end = 12.dp
-				)
+				identicon = model.identicon,
+				networkLogoName = networkLogo,
+				size = 36.dp,
+				modifier = Modifier.padding(end = 12.dp),
 			)
 			Column(Modifier.weight(1f)) {
+				if (model.wasImported == true) {
+					Text(
+						text = stringResource(R.string.dynamic_derivation_path_label),
+						style = SignerTypeface.CaptionM,
+						color = MaterialTheme.colors.textTertiary,
+						modifier = Modifier.padding(bottom = 4.dp)
+					)
+				}
 				if (model.path.isNotEmpty() || model.hasPwd) {
 					KeyPath(
 						path = model.path,
@@ -72,15 +91,17 @@ fun KeyDerivedItem(
 					style = SignerTypeface.BodyL,
 				)
 			}
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-				modifier = Modifier
-					.padding(2.dp)// because it's 28 not 32pd
-					.padding(end = 16.dp)
-					.size(28.dp)
-			)
+			if (onClick != null) {
+				Image(
+					imageVector = Icons.Filled.ChevronRight,
+					contentDescription = null,
+					colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
+					modifier = Modifier
+						.padding(2.dp)// because it's 28 not 32pd
+						.padding(start = 12.dp)
+						.size(28.dp)
+				)
+			}
 		}
 	}
 }
@@ -138,10 +159,16 @@ fun SlimKeyItem(model: KeyAndNetworkModel) {
 @Composable
 private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
-		KeyDerivedItem(
-			KeyModel.createStub(),
-			"kusama"
-		)
+		Column {
+			KeyDerivedItem(
+				KeyModel.createStub(wasImported = false),
+				"kusama"
+			)
+			KeyDerivedItem(
+				KeyModel.createStub(wasImported = true),
+				"kusama",
+			)
+		}
 	}
 }
 
