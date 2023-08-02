@@ -144,14 +144,14 @@ pub struct ExportAddrsV1 {
 
 #[derive(Clone, Encode, Decode, Debug, Eq, PartialEq)]
 pub struct ExportAddrsV2 {
-    pub addrs: Vec<SeedInfo>,
+    pub addr: SeedInfo,
     features: Vec<VaultFeatures>,
 }
 
 impl ExportAddrsV2 {
-    pub fn new(addrs: Vec<SeedInfo>) -> Self {
+    pub fn new(addr: SeedInfo) -> Self {
         Self {
-            addrs,
+            addr,
             features: vec![
                 VaultFeatures::BulkOperations,
                 VaultFeatures::DynamicDerivations,
@@ -162,7 +162,9 @@ impl ExportAddrsV2 {
 
 impl From<ExportAddrsV2> for ExportAddrsV1 {
     fn from(val: ExportAddrsV2) -> Self {
-        ExportAddrsV1 { addrs: val.addrs }
+        ExportAddrsV1 {
+            addrs: vec![val.addr],
+        }
     }
 }
 
@@ -203,89 +205,75 @@ pub struct AddrInfo {
     pub genesis_hash: H256,
 }
 
-/// Export all info about keys and their addresses known to Vault
-pub fn export_all_addrs(
+/// Export info about keys and their addresses known to Vault
+pub fn export_key_set_addrs(
     database: &sled::Db,
-    selected_keys: HashMap<String, ExportedSet>,
+    seed_name: &str,
+    exported_set: ExportedSet,
 ) -> Result<ExportAddrs> {
-    let mut keys: HashMap<String, Vec<(MultiSigner, AddressDetails)>> = HashMap::new();
-    let mut addrs = vec![];
+    let keys = get_addresses_by_seed_name(database, seed_name)?;
+    let root_multisigner = keys
+        .iter()
+        .find(|(_, a)| a.is_root())
+        .map(|(m, _)| m.to_owned())
+        .ok_or(Error::NoRootKeyForSeed(seed_name.to_owned()))?;
 
-    for (m, a) in get_all_addresses(database)?.into_iter() {
-        if selected_keys.contains_key(&a.seed_name) {
-            keys.entry(a.seed_name.clone()).or_default().push((m, a));
+    let mut derived_keys = vec![];
+
+    for key in keys {
+        if key.1.is_root() {
+            continue;
         }
-    }
 
-    for (name, keys) in &keys {
-        let mut derived_keys = vec![];
+        let mut selected = false;
 
-        let multisigner = keys
-            .iter()
-            .find(|(_, a)| a.is_root())
-            .map(|(m, _)| m.to_owned())
-            .ok_or(Error::NoRootKeyForSeed(name.to_owned()))?;
-
-        for key in keys {
-            if key.1.is_root() {
-                continue;
-            }
-
-            if let Some(selected_derivations) = selected_keys.get(name) {
-                let mut selected = false;
-
-                match selected_derivations {
-                    ExportedSet::All => selected = true,
-                    ExportedSet::Selected {
-                        s: selected_derivations,
-                    } => {
-                        for selected_derivation in selected_derivations {
-                            if let Some(id) = &key.1.network_id {
-                                if selected_derivation.derivation == key.1.path
-                                    && selected_derivation.network_specs_key
-                                        == hex::encode(id.key())
-                                {
-                                    selected = true;
-                                    break;
-                                }
-                            }
+        match &exported_set {
+            ExportedSet::All => selected = true,
+            ExportedSet::Selected {
+                s: selected_derivations,
+            } => {
+                for selected_derivation in selected_derivations {
+                    if let Some(id) = &key.1.network_id {
+                        if selected_derivation.derivation == key.1.path
+                            && selected_derivation.network_specs_key == hex::encode(id.key())
+                        {
+                            selected = true;
+                            break;
                         }
                     }
                 }
-
-                if !selected {
-                    continue;
-                }
-            }
-
-            if let Some(id) = &key.1.network_id {
-                let specs = get_network_specs(database, id)?;
-                let address = print_multisigner_as_base58_or_eth(
-                    &key.0,
-                    Some(specs.specs.base58prefix),
-                    key.1.encryption,
-                );
-                derived_keys.push(AddrInfo {
-                    address: address.clone(),
-                    derivation_path: if key.1.path.is_empty() {
-                        None
-                    } else {
-                        Some(key.1.path.to_owned())
-                    },
-                    encryption: key.1.encryption,
-                    genesis_hash: specs.specs.genesis_hash,
-                });
             }
         }
 
-        addrs.push(SeedInfo {
-            name: name.to_string(),
-            multisigner,
-            derived_keys,
-        });
+        if !selected {
+            continue;
+        }
+
+        if let Some(id) = &key.1.network_id {
+            let specs = get_network_specs(database, id)?;
+            let address = print_multisigner_as_base58_or_eth(
+                &key.0,
+                Some(specs.specs.base58prefix),
+                key.1.encryption,
+            );
+            derived_keys.push(AddrInfo {
+                address: address.clone(),
+                derivation_path: if key.1.path.is_empty() {
+                    None
+                } else {
+                    Some(key.1.path.to_owned())
+                },
+                encryption: key.1.encryption,
+                genesis_hash: specs.specs.genesis_hash,
+            });
+        }
     }
 
-    Ok(ExportAddrs::V2(ExportAddrsV2::new(addrs)))
+    Ok(ExportAddrs::V2(ExportAddrsV2::new(SeedInfo {
+        name: seed_name.to_owned(),
+        multisigner: root_multisigner,
+        derived_keys,
+    })))
 }
 
 pub fn import_all_addrs(
