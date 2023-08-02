@@ -45,7 +45,7 @@ internal fun HowAddNetworks(
 				.padding(16.dp)
 		) {
 			Text(
-				text = stringResource(R.string.networks_help_screen_1),
+				text = stringResource(R.string.screen_step_1_2),
 				style = SignerTypeface.CaptionM,
 				color = MaterialTheme.colors.textSecondary,
 				modifier = Modifier.padding(horizontal = 8.dp),

@@ -250,7 +250,7 @@ private fun VerifierContent(verifier: VerifierModel) {
 					color = MaterialTheme.colors.textTertiary
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				IdentIcon(identicon = verifier.identicon)
+				IdentIcon(identIcon = verifier.identicon)
 			}
 			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(

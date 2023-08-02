@@ -25,6 +25,8 @@ enum PrimaryFont {
     case labelS
     /// Medium, 13pt
     case labelXS
+    /// Semibold, 12pt
+    case labelXXS
     /// Regular, 16pt
     case bodyL
     /// Regular, 14pt
@@ -54,6 +56,8 @@ extension PrimaryFont {
             return FontFamily.Inter.semiBold.swiftUIFont(size: 14)
         case .labelXS:
             return FontFamily.Inter.medium.swiftUIFont(size: 13)
+        case .labelXXS:
+            return FontFamily.Inter.semiBold.swiftUIFont(size: 12)
         case .bodyL:
             return FontFamily.Inter.regular.swiftUIFont(size: 16)
         case .bodyM:

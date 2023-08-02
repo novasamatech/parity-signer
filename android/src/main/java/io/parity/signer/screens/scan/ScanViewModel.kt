@@ -52,6 +52,7 @@ class ScanViewModel : ViewModel() {
 	private val transactionIsInProgress = MutableStateFlow<Boolean>(false)
 
 	suspend fun performPayload(payload: String, context: Context) {
+		val fakeNavigator = FakeNavigator()
 		if (transactionIsInProgress.value) {
 			Log.e(TAG, "started transaction while it was in progress, ignoring")
 			return
@@ -82,7 +83,7 @@ class ScanViewModel : ViewModel() {
 						context = context,
 						details = transactions.joinToString("\n") { it.transactionIssues() }
 					)
-					FakeNavigator().navigate(Action.GO_BACK) //fake call
+					fakeNavigator.navigate(Action.GO_BACK) //fake call
 					clearState()
 					return
 				}
@@ -112,7 +113,6 @@ class ScanViewModel : ViewModel() {
 						this.transactions.value = TransactionsState(transactions)
 					}
 					TransactionType.IMPORT_DERIVATIONS -> {
-						val fakeNavigator = FakeNavigator()
 						// We always need to `.goBack` as even if camera is dismissed without import, navigation "forward" already happened
 						fakeNavigator.navigate(Action.GO_BACK)
 						when (transactions.dominantImportError()) {

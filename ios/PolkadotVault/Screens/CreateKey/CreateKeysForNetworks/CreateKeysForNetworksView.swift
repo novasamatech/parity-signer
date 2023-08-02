@@ -84,7 +84,7 @@ struct CreateKeysForNetworksView: View {
 
     @ViewBuilder
     func footer() -> some View {
-        InfoBoxView(text: Localizable.CreateKeysForNetwork.Label.footer.string)
+        TransparentHelpBox(text: Localizable.CreateKeysForNetwork.Label.footer.string)
             .padding(.horizontal, Spacing.medium)
     }
 

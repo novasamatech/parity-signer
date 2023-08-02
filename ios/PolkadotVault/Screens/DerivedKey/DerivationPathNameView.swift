@@ -357,7 +357,7 @@ private extension DerivationPathNameView.ViewModel {
                 derivationPathError = nil
             }
         case let .failure(error):
-            presentableInfoModal = .alertError(message: error.localizedDescription)
+            presentableInfoModal = .alertError(message: error.backendDisplayError)
             isPresentingInfoModal = true
         }
     }

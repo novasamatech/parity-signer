@@ -16,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
-import kotlinx.coroutines.Dispatchers
+import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowScreen
 
 
 @Composable
@@ -33,9 +33,7 @@ fun NewKeysetRecoverSecondStepSubgraph(
 	)
 
 	val viewModel: KeysetRecoverViewModel = viewModel()
-	//Dispatchers.Main.immediate because it used in TextField to workaround bug
-	//https://issuetracker.google.com/issues/160257648
-	val state = viewModel.recoverState.collectAsState(Dispatchers.Main.immediate)
+	val model = viewModel.recoverState.collectAsState()
 
 	DisposableEffect(key1 = Unit) {
 		viewModel.initValue(initialRecoverSeedPhrase)
@@ -48,7 +46,7 @@ fun NewKeysetRecoverSecondStepSubgraph(
 		startDestination = KeysetRecoverSubgraph.KeysetRecoverSeed,
 	) {
 		composable(KeysetRecoverSubgraph.KeysetRecoverSeed) {
-			state.value?.let { stateModel ->
+			model.value?.let { stateModel ->
 				KeysetRecoverPhraseScreen(
 					model = stateModel,
 					backAction = rootNavigator::backAction,
@@ -66,9 +64,9 @@ fun NewKeysetRecoverSecondStepSubgraph(
 			BackHandler(onBack = rootNavigator::backAction)
 		}
 		composable(KeysetRecoverSubgraph.KeysetRecoverNetworks) {
-			RecoverKeysetSelectNetworkScreen(
-				seedName = state.value!!.seedName,
-				seedPhrase = state.value!!.readySeed!!,
+			RecoverKeysetSelectNetworkRestoreFlowScreen(
+				seedName = model.value!!.seedName,
+				seedPhrase = model.value!!.readySeed!!,
 				rootNavigator = rootNavigator,
 				onBack = navController::popBackStack,
 			)

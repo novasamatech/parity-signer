@@ -4,17 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
-import io.parity.signer.domain.usecases.CreateKeySetViaStateMachineUseCase
+import io.parity.signer.domain.usecases.CreateKeySetUseCase
 import kotlinx.coroutines.launch
 
 
 class NewKeySetNetworksViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
-	private val createKeySetUseCase = CreateKeySetViaStateMachineUseCase()
+	private val createKeySetUseCase = CreateKeySetUseCase()
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
@@ -23,16 +22,15 @@ class NewKeySetNetworksViewModel : ViewModel() {
 
 	fun createKeySetWithNetworks(
 		seedName: String, seedPhrase: String,
-		networksForKeys: Set<NetworkModel>,
-		navigator: Navigator,
-		onAfterFinishCleanup: Callback = {},
+		networkForKeys: Set<NetworkModel>,
+		onAfterCreate: Callback = {},
 	): Unit {
 		viewModelScope.launch {
 			createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,
-				networksForKeys, navigator
+				networkForKeys.map { it.key },
 			)
-			onAfterFinishCleanup()
+			onAfterCreate()
 		}
 	}
 }

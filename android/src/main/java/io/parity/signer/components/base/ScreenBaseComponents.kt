@@ -168,11 +168,12 @@ fun ScreenHeaderClose(
 fun ScreenHeaderWithButton(
 	canProceed: Boolean,
 	title: String = "",
+	subtitle: String? = null,
 	btnText: String? = null,
 	backNotClose: Boolean = false,
 	modifier: Modifier = Modifier,
 	onClose: Callback,
-	onDone: Callback,
+	onDone: Callback?,
 ) {
 	Row(
 		modifier = modifier.padding(
@@ -207,9 +208,10 @@ fun ScreenHeaderWithButton(
 					.align(Alignment.CenterVertically)
 			)
 		}
-		Box(
-			modifier = Modifier.weight(1f),
-			contentAlignment = Alignment.Center,
+		Column(
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.weight(1f)
 		) {
 			Text(
 				text = title,
@@ -218,16 +220,26 @@ fun ScreenHeaderWithButton(
 				textAlign = TextAlign.Center,
 				modifier = Modifier.fillMaxWidth(1f)
 			)
+			if (subtitle != null) {
+				Text(
+					text = subtitle,
+					color = MaterialTheme.colors.textTertiary,
+					style = SignerTypeface.CaptionM,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth(1f),
+				)
+			}
 		}
 		Box(
 			contentAlignment = Alignment.CenterEnd,
 		) {
 			PrimaryButtonGreyDisabled(
+				modifier = Modifier.alpha(if (onDone == null) 0f else 1f),
 				label = btnText ?: stringResource(R.string.generic_done),
 				isEnabled = canProceed,
 			) {
 				if (canProceed) {
-					onDone()
+					onDone?.invoke()
 				}
 			}
 		}
@@ -353,9 +365,12 @@ private fun PreviewScreenBaseComponent() {
 				onClose = {},
 				onMenu = {},
 			)
-			ScreenHeaderWithButton(true, "Derivation", null, true, Modifier, {}, {})
-			ScreenHeaderWithButton(true, "Derivation", null, false, Modifier, {}, {})
-			ScreenHeaderWithButton(false, "Derivation", null, false, Modifier, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, null, true, Modifier, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", null, null, false, Modifier, {}, {})
+			ScreenHeaderWithButton(false, "Derivation", null, null, false, Modifier, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", "subtitle", null, true, Modifier, {}, {})
+			ScreenHeaderWithButton(true, "Derivation", "subtitle", null, true, Modifier, {}, null)
+
 			ScreenHeaderClose(
 				stringResource(id = R.string.key_sets_screem_title),
 				onClose = {},

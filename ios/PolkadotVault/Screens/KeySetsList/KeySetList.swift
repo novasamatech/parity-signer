@@ -258,7 +258,9 @@ extension KeySetList {
         }
 
         func updateData() {
-            dataModel = keyListService.getKeyList()
+            if let keyList = keyListService.getKeyList() {
+                dataModel = keyList
+            }
             updateView(dataModel)
         }
 

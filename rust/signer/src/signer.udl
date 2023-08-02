@@ -278,6 +278,7 @@ dictionary MKeysCard {
     string address_key;
     string base58;
     boolean swiped;
+    boolean was_imported;
 };
 
 dictionary MSettings {
@@ -368,6 +369,26 @@ interface DerivedKeyStatus {
     Invalid(sequence<DerivedKeyError> errors);
 };
 
+dictionary DDPreview {
+    sequence<QrData> qr;
+    DDKeySet key_set;
+    boolean is_some_already_imported;
+    boolean is_some_network_missing;
+};
+
+dictionary DDKeySet {
+    string seed_name;
+    sequence<DDDetail> derivations;
+};
+
+dictionary DDDetail {
+    string base58;
+    string path;
+    string network_logo;
+    string network_specs_key;
+    SignerImage identicon;
+};
+
 [Enum]
 interface DerivedKeyError {
     NetworkMissing();
@@ -398,6 +419,7 @@ dictionary MKeyDetails {
     MSCNetworkInfo network_info;
     Address address;
     string base58;
+    boolean was_imported;
 };
 
 dictionary MNewSeed {
@@ -525,6 +547,7 @@ interface BananaSplitRecoveryResult {
 [Enum]
 interface DecodeSequenceResult {
     BBananaSplitRecoveryResult(BananaSplitRecoveryResult b);
+    DynamicDerivations(string s);
     Other(string s);
 };
 
@@ -576,6 +599,9 @@ namespace signer {
     void import_derivations(sequence<SeedKeysPreview> seed_derived_keys);
 
     [Throws=ErrorDisplayed]
+    DDPreview preview_dynamic_derivations(record<string, string> seeds, string payload);
+
+    [Throws=ErrorDisplayed]
     sequence<SeedKeysPreview> populate_derivations_has_pwd(record<string, string> seeds, sequence<SeedKeysPreview> seed_derived_keys);
 
     [Throws=ErrorDisplayed]
@@ -583,6 +609,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void try_create_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
+
+    [Throws=ErrorDisplayed]
+    void try_create_imported_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
 
     [Throws=ErrorDisplayed]
     void history_init_history_with_cert();
