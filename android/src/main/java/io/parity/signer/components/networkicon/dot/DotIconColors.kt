@@ -21,16 +21,17 @@ internal object DotIconColors {
 	 *
 	 * As colors.rs:140 in polkadot-identicon-rust
 	 */
+	@OptIn(ExperimentalUnsignedTypes::class)
 	fun getColors(seed: String): List<DotIconColor> {
 		val seedInBytes = seed.toByteArray()
 		val black2b = Algorithm.Blake2b(64).createDigest()
 
-		val zeros: ByteArray = black2b.digest(ByteArray(32) { 0.toByte() })
+		val zeros: ByteArray = black2b.digest(ByteArray(32) { 0u.toByte() })
 		val idPrep: ByteArray = black2b.digest(seedInBytes)
 
-		val id: ByteArray = idPrep
-			.mapIndexed { index, byte -> (byte - zeros[index]).toByte() }
-			.toByteArray()
+		val id: UByteArray = idPrep
+			.mapIndexed { index, byte -> (byte.toUByte() - zeros[index].toUByte()).toUByte() }
+			.toUByteArray()
 
 
 		// this comment from Rust code
@@ -43,31 +44,29 @@ internal object DotIconColors {
 		// overflowing 1.00, and produces some kind of resulting color.
 		// Need to find out what should have happened if the sat values are above 100.
 
-		val sat = (((id[29].toShort() * 70 / 256 + 26) % 80) + 30).toByte();
+		val sat = (((id[29].toUShort() * 70u / 256u + 26u) % 80u) + 30u).toUByte();
 		val sat_component: Double = (sat.toDouble()) / 100;
 
 		// calculating palette: set of 32 RGBA colors to be used in drawing
 		// only id vector is used for this calculation
 
-		val myPalette = id.mapIndexed { index: Int, byte: Byte ->
-			val b = (byte + ((index.toByte() % 28) * 58)).toByte()
-			val newColor = when (b) {
-				0.toByte() -> DotIconColor(
-					red = 4,
-					green = 4,
-					blue = 4,
-					alpha = 255.toByte(),
-				)
-
-				255.toByte() -> DotIconColor(
-					red = 4,
-					green = 4,
-					blue = 4,
-					alpha = 255.toByte(),
-				)
-
-				else -> DotIconColor.derive(b, sat_component)
-			}
+		val myPalette = id.mapIndexed { index: Int, byte: UByte ->
+			val newColor =
+				when (val b = (byte + ((index.toUByte() % 28u) * 58u)).toUByte()) {
+					0u.toUByte() -> DotIconColor(
+						red = 4u,
+						green = 4u,
+						blue = 4u,
+						alpha = 255u,
+					)
+					255u.toUByte() -> DotIconColor(
+						red = 4u,
+						green = 4u,
+						blue = 4u,
+						alpha = 255u,
+					)
+					else -> DotIconColor.derive(b, sat_component)
+				}
 			newColor
 		}
 
@@ -86,7 +85,7 @@ internal object DotIconColors {
 		val myScheme = chooseScheme(schemes, d)
 
 		// calculating rotation for the coloring scheme
-		val rot: Byte = (id[28] % 6 * 3).toByte()
+		val rot: Byte = (id[28] % 6u * 3u).toByte()
 
 		// picking colors from palette using coloring scheme with rotation applied
 		val myColors: List<DotIconColor> = List(19) { i ->
@@ -120,29 +119,29 @@ internal object DotIconColors {
 
 
 	/// Struct to store default coloring schemes
-	internal data class SchemeElement(val freq: Byte, val colors: List<Byte>)
+	internal data class SchemeElement(val freq: UByte, val colors: List<UByte>)
 
 	internal data class DotIconColor(
-		val red: Byte,
-		val green: Byte,
-		val blue: Byte,
-		val alpha: Byte,
+		val red: UByte,
+		val green: UByte,
+		val blue: UByte,
+		val alpha: UByte,
 	) {
 		companion object {
 			val background
 				get() = DotIconColor(
-					red = 255.toByte(),
-					green = 255.toByte(),
-					blue = 2255.toByte(),
-					alpha = 0.toByte(),
+					red = 255u,
+					green = 255u,
+					blue = 255u,
+					alpha = 0u,
 				)
 
 			val foreground
 				get() = DotIconColor(
-					red = 238.toByte(),
-					green = 238.toByte(),
-					blue = 238.toByte(),
-					alpha = 255.toByte(),
+					red = 238u,
+					green = 238u,
+					blue = 238u,
+					alpha = 255u,
 				)
 
 			/**
@@ -151,7 +150,7 @@ internal object DotIconColors {
 			 * is accessible and used only for `u8` numbers other than 0 and 255;
 			 * no check here is done for b value;
 			 */
-			fun derive(b: Byte, set_component: Double): DotIconColor {
+			fun derive(b: UByte, set_component: Double): DotIconColor {
 				//todo dmitry as colors.rs:99
 				return DotIconColor.foreground //todo dmitry remove
 			}
