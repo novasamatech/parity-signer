@@ -71,9 +71,9 @@ checksum = "27f0fc03f560e1aebde41c2398b691cb98b5ea5996a6184a7a67bbbb77448969"
 
 [[package]]
 name = "android_logger"
-version = "0.13.1"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fa490e751f3878eb9accb9f18988eca52c2337ce000a8bf31ef50d4c723ca9e"
+checksum = "c494134f746c14dc653a35a4ea5aca24ac368529da5370ecf41fe0341c35772f"
 dependencies = [
  "android_log-sys",
  "env_logger",
@@ -2386,9 +2386,9 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
 name = "opencv"
-version = "0.84.2"
+version = "0.84.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23750200eea7128e9cbd9385e39a164979c94bd042aa4552f5914fcca3fa421c"
+checksum = "a481f80995863875793f475d8fc1cabbf648e312bf359d05d415f3ffd38bfe6e"
 dependencies = [
  "cc",
  "dunce",
@@ -2405,9 +2405,9 @@ dependencies = [
 
 [[package]]
 name = "opencv-binding-generator"
-version = "0.70.0"
+version = "0.71.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b52ac35fe2be82cad8b559c0a6db566420c06745bc13de1983c58fbbb68bb825"
+checksum = "6aaaa0844329835a9f2fa2851754f0881a64d2a44142d7a6d27362c2f8a449ea"
 dependencies = [
  "clang",
  "clang-sys",
