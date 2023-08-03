@@ -12,7 +12,7 @@ use definitions::{
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
 use sp_core::H256;
-use sp_runtime::MultiSigner;
+use sp_runtime::{MultiSigner};
 use std::collections::HashMap;
 
 use crate::cards::{make_author_info, Card, Warning};

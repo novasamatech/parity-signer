@@ -50,11 +50,11 @@ use db_handling::cold_default::populate_cold;
 use db_handling::identities::inject_derivations_has_pwd;
 use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::Card::DerivationsCard;
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{DecodeSequenceResult, MAddressCard};
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
 use tempfile::tempdir;
-use transaction_parsing::prepare_derivations_preview;
+use transaction_parsing::{decode_payload, prepare_derivations_preview};
 
 use crate::{
     keys_by_seed_name,
@@ -6189,17 +6189,70 @@ fn test_sign_dd_transaction() {
     let derivation_path = hex::encode("//Alice".encode());
     let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
     let payload = format!("530105{alice_public_root}{derivation_path}a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+    let transaction = match decode_payload(&payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
 
-    let transaction = sign_dd_transaction(&db, &payload, seeds);
-    assert!(transaction.is_ok());
-    let result = transaction.expect("transaction is ok");
-    assert_eq!(result.signature.signatures.len(), 1);
+    let result = sign_dd_transaction(&db, &transaction, seeds);
+    assert!(result.is_ok());
+    let transaction = result.expect("transaction is ok");
+    assert_eq!(transaction.signature.signatures.len(), 1);
 
+    // identical non-dynamic derivation transaction
     let tx = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     assert!(signature_is_good(
         tx,
-        &String::from_utf8(result.signature.signatures[0].data().to_vec()).unwrap()
+        &String::from_utf8(transaction.signature.signatures[0].data().to_vec()).unwrap()
     ));
+}
+
+#[test]
+fn test_bulk_dd_signing() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    let derivation_path = hex::encode("//westend".encode());
+    let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+    let tx = "0105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
+
+    let encoded_transactions = vec![hex::decode(&tx).unwrap(), hex::decode(&tx).unwrap()];
+
+    // Another bulk in format that is digestible by verification
+    // utilities function.
+    let encoded_transactions_prefixed: Vec<_> = encoded_transactions
+        .iter()
+        .map(|tx| "53".to_string() + &hex::encode(tx))
+        .collect();
+    let bulk = TransactionBulk::V1(TransactionBulkV1 {
+        encoded_transactions,
+    });
+    let bulk_payload = hex::encode([&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat());
+    let transactions = match decode_payload(&bulk_payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
+
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    populate_cold_nav_test(&db).unwrap();
+
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    let signed_transaction = sign_dd_transaction(&db, &transactions, seeds).expect("signing is ok");
+    assert_eq!(signed_transaction.signature.signatures.len(), 2);
+
+    for (tx, signature) in encoded_transactions_prefixed
+        .iter()
+        .zip(signed_transaction.signature.signatures.iter())
+    {
+        assert!(signature_is_good(
+            tx,
+            &hex::encode(signature.data())
+        ));
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
 }

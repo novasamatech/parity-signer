@@ -128,40 +128,50 @@ pub fn export_signatures_bulk(
 
 pub fn sign_dd_transaction(
     database: &sled::Db,
-    payload: &str,
+    payload_set: &[String],
     seeds: HashMap<String, String>,
 ) -> Result<MSignedTransaction> {
-    let transaction = parse_dd_transaction(database, payload, &seeds)?;
-    let (actions, checksum) = match transaction {
-        TransactionAction::Sign { actions, checksum } => (actions, checksum),
-        _ => return Err(Error::TxActionNotSign),
-    };
-    let action = actions.get(0).ok_or(Error::NoTransactionsToSign)?;
+    let mut signatures = vec![];
+    let mut transactions = vec![];
 
-    let seed_phrase = seeds
-        .get(&action.author_info.address.seed_name)
-        .ok_or(Error::NoSeedPhrase)?;
+    let actions = payload_set
+        .iter()
+        .map(|payload| parse_dd_transaction(database, payload, &seeds).map_err(Error::from))
+        .collect::<Result<Vec<_>>>()?;
 
-    let signature = create_signature(
-        database,
-        seed_phrase,
-        "",
-        "",
-        checksum,
-        0,
-        action.network_info.specs.encryption,
-    )?;
+    for (idx, transaction) in actions.into_iter().enumerate() {
+        let (sign_actions, checksum) = match transaction {
+            TransactionAction::Sign { actions, checksum } => (actions, checksum),
+            _ => return Err(Error::TxActionNotSign),
+        };
+        let action = sign_actions.get(0).ok_or(Error::NoTransactionsToSign)?;
 
-    Ok(MSignedTransaction {
-        transaction: MTransaction {
+        let seed_phrase = seeds
+            .get(&action.author_info.address.seed_name)
+            .ok_or(Error::NoSeedPhrase)?;
+
+        let signature = create_signature(
+            database,
+            seed_phrase,
+            "",
+            "",
+            checksum,
+            idx,
+            action.network_info.specs.encryption,
+        )?;
+
+        signatures.push((signature.signature().to_owned(), signature.signature_type()));
+        transactions.push(MTransaction {
             content: action.content.clone(),
             ttype: TransactionType::Sign,
             author_info: Some(action.author_info.clone()),
             network_info: Some(action.network_info.clone().into()),
-        },
-        signature: export_signatures_bulk(
-            vec![(signature.signature().to_owned(), signature.signature_type())].as_slice(),
-        )?,
+        })
+    }
+
+    Ok(MSignedTransaction {
+        transaction: transactions,
+        signature: export_signatures_bulk(&signatures)?,
     })
 }
 

@@ -2801,7 +2801,7 @@ fn parse_dd_transaction_1() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, data, &seeds).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,
@@ -3140,7 +3140,7 @@ fn parse_dd_transaction_2() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &action {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, data, &seeds).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,
@@ -3318,7 +3318,7 @@ fn parse_dd_transaction_3() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, data, &seeds).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,

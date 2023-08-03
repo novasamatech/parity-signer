@@ -360,7 +360,7 @@ fn try_create_imported_address(
 }
 
 fn sign_dd_transaction(
-    payload: &str,
+    payload: &[String],
     seeds: HashMap<String, String>,
 ) -> Result<MSignedTransaction, ErrorDisplayed> {
     navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())

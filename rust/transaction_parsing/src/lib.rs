@@ -88,8 +88,9 @@ pub fn decode_payload(payload: &str) -> Result<DecodeSequenceResult> {
     }
 
     match &data_hex[4..6] {
+        "04" => decode_transaction_bulk(data_hex),
         "05" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
-            s: data_hex.to_string(),
+            s: vec![data_hex.to_string()],
         }),
         "df" => decode_dynamic_derivations(data_hex),
         _ => Ok(DecodeSequenceResult::Other {
@@ -125,6 +126,34 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
             }
 
             Ok(TransactionAction::Sign { actions, checksum })
+        }
+    }
+}
+
+fn decode_transaction_bulk(payload: &str) -> Result<DecodeSequenceResult> {
+    let decoded_data = unhex(payload)?;
+
+    let bulk = TransactionBulk::decode(&mut &decoded_data[3..])?;
+
+    match bulk {
+        TransactionBulk::V1(b) => {
+            let mut transactions = vec![];
+            for t in &b.encoded_transactions {
+                let encoded = hex::encode(t);
+                let encoded = "53".to_string() + &encoded;
+                match decode_payload(&encoded)? {
+                    DecodeSequenceResult::DynamicDerivationTransaction { s } => {
+                        transactions.extend(s);
+                    }
+                    // Do not attempt to handle non-dynamic derivation transactions here. Should be handled by handle_scanner_input
+                    _ => {
+                        return Ok(DecodeSequenceResult::Other {
+                            s: payload.to_string(),
+                        })
+                    }
+                }
+            }
+            Ok(DecodeSequenceResult::DynamicDerivationTransaction { s: transactions })
         }
     }
 }
