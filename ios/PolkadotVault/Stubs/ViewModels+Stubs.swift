@@ -133,7 +133,8 @@ extension SettingsBackupViewModel {
 
 extension ExportMultipleKeysModalViewModel {
     static let stub: ExportMultipleKeysModalViewModel = .init(
-        selectedItems: .keySets(KeySetViewModel.stubs),
+        key: .stub,
+        derivedKeys: [],
         count: 3
     )
 }
