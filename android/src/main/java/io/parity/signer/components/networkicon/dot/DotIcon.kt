@@ -17,6 +17,8 @@ fun DotIcon(
 	preferedSize: Dp,
 	modifier: Modifier = Modifier
 ) {
+	val colors = DotIconColors.getColors(seed = seed)
+
 //todo dmitry lib.rs:353
 }
 

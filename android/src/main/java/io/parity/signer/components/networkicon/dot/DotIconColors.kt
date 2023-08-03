@@ -34,6 +34,7 @@ internal object DotIconColors {
 			.toUByteArray()
 
 
+		//todo dmitry check if below make sense to kotlin
 		// this comment from Rust code
 		// Since `id[29]` is u8, `sat` could range from 30 to 109, i.e. it always fits into u8.
 		// Transformation of id[29] into u16 is to avoid overflow in multiplication
