@@ -91,7 +91,7 @@ internal object DotIconColors {
 		val rot: Byte = (id[28] % 6u * 3u).toByte()
 
 		// picking colors from palette using coloring scheme with rotation applied
-		val myColors: List<DotIconColorHls> = List(19) { i ->
+		val myColors: List<DotIconColorRgb> = List(19) { i ->
 			val numColor = if (i < 19) (i + rot) % 18 else 18
 			val numPalette = myScheme.colors[numColor].toInt()
 			val color = myPalette[numPalette]
@@ -163,7 +163,7 @@ internal object DotIconColors {
 			 * is accessible and used only for `u8` numbers other than 0 and 255;
 			 * no check here is done for b value;
 			 */
-			fun derive(b: UByte, saturation: Double): DotIconColorHls {
+			fun derive(b: UByte, saturation: Double): DotIconColorRgb {
 				// HSL color hue in degrees
 				val hueModulus = 64u
 				val hue = b.toUShort() % hueModulus * 360u / hueModulus
@@ -180,13 +180,14 @@ internal object DotIconColors {
 				return hslToRgb(hue, saturation.toFloat(), l_component.toFloat())
 			}
 
-			/// Converts HSL color space values to RGB color space values.
-			///
-			/// - Parameters:
-			///   - hue: The hue value of the HSL color, specified as a degree between 0 and 360.
-			///   - saturation: The saturation value of the HSL color, specified as a double between 0 and 1.
-			///   - lightness: The lightness value of the HSL color, specified as a double between 0 and 1.
-			/// - Returns: A tuple representing the RGB color values, each a UInt8 between 0 and 255.
+			/**
+			 * Converts HSL color space values to RGB color space values.
+			 *
+			 * @param hue: The hue value of the HSL color, specified as a degree between 0 and 360.
+			 * @param saturation: The saturation value of the HSL color, specified as a double between 0 and 1.
+			 * @param lightness: The lightness value of the HSL color, specified as a double between 0 and 1.
+			 * @return Returns: A tuple representing the RGB color values, each a UInt8 between 0 and 255.
+			 */
 			private fun hslToRgb(
 				hue: Float,
 				saturation: Float,
@@ -261,5 +262,4 @@ internal object DotIconColors {
 			}
 		}
 	}
-}
 }
