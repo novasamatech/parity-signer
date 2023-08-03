@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
@@ -25,6 +26,7 @@ import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
 import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
+import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDerivedKeysScreen
 import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
@@ -40,13 +42,18 @@ fun ScanNavSubgraph(
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
 
-	val transactions = scanViewModel.transactions.collectAsState()
-	val signature = scanViewModel.signature.collectAsState()
-	val bananaSplitPassword = scanViewModel.bananaSplitPassword.collectAsState()
+	val transactions = scanViewModel.transactions.collectAsStateWithLifecycle()
+	val signature = scanViewModel.signature.collectAsStateWithLifecycle()
+	val bananaSplitPassword =
+		scanViewModel.bananaSplitPassword.collectAsStateWithLifecycle()
+	val dynamicDerivations =
+		scanViewModel.dynamicDerivations.collectAsStateWithLifecycle()
 
-	val transactionError = scanViewModel.transactionError.collectAsState()
-	val passwordModel = scanViewModel.passwordModel.collectAsState()
-	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
+	val transactionError =
+		scanViewModel.transactionError.collectAsStateWithLifecycle()
+	val passwordModel = scanViewModel.passwordModel.collectAsStateWithLifecycle()
+	val errorWrongPassword =
+		scanViewModel.errorWrongPassword.collectAsStateWithLifecycle()
 
 	val addedNetworkName: MutableState<String?> =
 		remember { mutableStateOf(null) }
@@ -69,6 +76,7 @@ fun ScanNavSubgraph(
 	//Full screens
 	val transactionsValue = transactions.value
 	val bananaQrData = bananaSplitPassword.value
+	val dynamicDerivationsData = dynamicDerivations.value
 	if (bananaQrData != null) {
 		BananaSplitSubgraph(
 			qrData = bananaQrData,
@@ -97,15 +105,25 @@ fun ScanNavSubgraph(
 				scanViewModel.bananaSplitPassword.value = null
 			},
 		)
+	} else if (dynamicDerivationsData != null) {
+		AddDerivedKeysScreen(
+			model = dynamicDerivationsData,
+			modifier = Modifier.statusBarsPadding(),
+			onBack = scanViewModel::clearState,
+			onDone = { scanViewModel.createDynamicDerivations(dynamicDerivationsData.keySet, context) },
+		)
 	} else if (transactionsValue == null || showingModals) {
 
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scanViewModel.performPayload(payloads, context)
+				scanViewModel.performTransactionPayload(payloads, context)
 			},
 			onBananaSplit = { payloads ->
 				scanViewModel.bananaSplitPassword.value = payloads
+			},
+			onDynamicDerivations = { payload ->
+				scanViewModel.performDynamicDerivationPayload(payload, context)
 			}
 		)
 	} else {

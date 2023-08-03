@@ -150,6 +150,7 @@ pub struct MKeysCard {
     pub address_key: String,
     pub base58: String,
     pub swiped: bool,
+    pub was_imported: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -229,6 +230,7 @@ pub enum BananaSplitRecoveryResult {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DecodeSequenceResult {
     BBananaSplitRecoveryResult { b: BananaSplitRecoveryResult },
+    DynamicDerivations { s: String },
     Other { s: String },
 }
 
@@ -275,6 +277,7 @@ pub struct MKeyDetails {
     pub network_info: MSCNetworkInfo,
     pub base58: String,
     pub address: Address,
+    pub was_imported: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -674,6 +677,30 @@ pub struct MSCNetworkInfo {
     pub network_title: String,
     pub network_logo: String,
     pub network_specs_key: String,
+}
+
+/// Dynamic deprivations model
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DDPreview {
+    pub qr: Vec<QrData>,
+    pub key_set: DDKeySet,
+    pub is_some_already_imported: bool,
+    pub is_some_network_missing: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DDKeySet {
+    pub seed_name: String,
+    pub derivations: Vec<DDDetail>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DDDetail {
+    pub base58: String,
+    pub path: String,
+    pub network_logo: String,
+    pub network_specs_key: String,
+    pub identicon: Identicon,
 }
 
 impl From<OrderedNetworkSpecs> for MSCNetworkInfo {

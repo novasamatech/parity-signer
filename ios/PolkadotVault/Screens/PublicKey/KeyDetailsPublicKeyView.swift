@@ -54,6 +54,18 @@ struct KeyDetailsPublicKeyView: View {
                                 viewModel: viewModel.renderable.footer,
                                 backgroundColor: Asset.fill6Solid.swiftUIColor
                             )
+                            if viewModel.keyDetails.wasImported {
+                                Divider()
+                                    .padding(.horizontal, Spacing.medium)
+                                HStack(spacing: 0) {
+                                    Spacer()
+                                    Localizable.PublicKeyDetails.Label.importedKey.text
+                                        .font(PrimaryFont.captionM.font)
+                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                        .padding(.vertical, Spacing.small)
+                                    Spacer()
+                                }
+                            }
                         }
                         .strokeContainerBackground()
                         // Key data
@@ -212,7 +224,7 @@ extension KeyDetailsPublicKeyView {
     }
 
     final class ViewModel: ObservableObject {
-        private let keyDetails: MKeyDetails
+        let keyDetails: MKeyDetails
         private let publicKeyDetails: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
