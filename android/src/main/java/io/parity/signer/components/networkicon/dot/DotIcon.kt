@@ -1,10 +1,17 @@
 package io.parity.signer.components.networkicon.dot
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -14,14 +21,43 @@ import io.parity.signer.ui.theme.SignerNewTheme
 @Composable
 fun DotIcon(
 	seed: String,
-	preferedSize: Dp,
+	size: Dp,
 	modifier: Modifier = Modifier
 ) {
 	val colors = DotIconColors.getColors(seed = seed)
-
-//todo dmitry lib.rs:353
+	val foreground = DotIconColors.DotIconColorRgb.foreground.toCompose()
+	val circleSize = size / 32 * 5
+	Box(
+		modifier = modifier
+			.size(size)
+			.background(foreground, CircleShape)
+	) {
+		//todo dmitry positions as in circles.rs:36
+		Circle(
+			x = 0.4f,
+			y = 0.3f,
+			color = colors[4].toCompose(),
+			size = circleSize,
+		)
+	}
 }
 
+@Composable
+private fun Circle(x: Float, y: Float, color: Color, size: Dp) {
+	Row {
+		Spacer(modifier = Modifier.weight(x))
+		Column {
+			Spacer(modifier = Modifier.weight(y))
+			Box(
+				modifier = Modifier
+					.size(size)
+					.background(color, CircleShape)
+			)
+			Spacer(modifier = Modifier.weight(1f - y))
+		}
+		Spacer(modifier = Modifier.weight(1f - x))
+	}
+}
 
 
 @Preview(

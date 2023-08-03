@@ -1,10 +1,14 @@
 package io.parity.signer.components.networkicon.dot
 
+import androidx.compose.ui.graphics.Color
 import com.appmattus.crypto.Algorithm
+import java.lang.Math.max
+import kotlin.math.floor
 
 
 internal object DotIconColors {
 
+	//todo dmitry remove?
 	private object Constants {
 		val byteHashLength = 64
 		val arrayZeroBytesLength = 32
@@ -22,9 +26,10 @@ internal object DotIconColors {
 	 * As colors.rs:140 in polkadot-identicon-rust
 	 */
 	@OptIn(ExperimentalUnsignedTypes::class)
-	fun getColors(seed: String): List<DotIconColor> {
+	fun getColors(seed: String): List<DotIconColorRgb> {
 		val seedInBytes = seed.toByteArray()
-		val black2b = Algorithm.Blake2b(64).createDigest()
+		val byte = 8
+		val black2b = Algorithm.Blake2b(64 * byte).createDigest()
 
 		val zeros: ByteArray = black2b.digest(ByteArray(32) { 0u.toByte() })
 		val idPrep: ByteArray = black2b.digest(seedInBytes)
@@ -54,19 +59,16 @@ internal object DotIconColors {
 		val myPalette = id.mapIndexed { index: Int, byte: UByte ->
 			val newColor =
 				when (val b = (byte + ((index.toUByte() % 28u) * 58u)).toUByte()) {
-					0u.toUByte() -> DotIconColor(
+					0u.toUByte() -> DotIconColorRgb(
 						red = 4u,
 						green = 4u,
 						blue = 4u,
 						alpha = 255u,
 					)
-					255u.toUByte() -> DotIconColor(
-						red = 4u,
-						green = 4u,
-						blue = 4u,
-						alpha = 255u,
-					)
-					else -> DotIconColor.derive(b, sat_component)
+
+					255u.toUByte() -> DotIconColorRgb.foreground
+
+					else -> DotIconColorRgb.derive(b, sat_component)
 				}
 			newColor
 		}
@@ -89,7 +91,7 @@ internal object DotIconColors {
 		val rot: Byte = (id[28] % 6u * 3u).toByte()
 
 		// picking colors from palette using coloring scheme with rotation applied
-		val myColors: List<DotIconColor> = List(19) { i ->
+		val myColors: List<DotIconColorHls> = List(19) { i ->
 			val numColor = if (i < 19) (i + rot) % 18 else 18
 			val numPalette = myScheme.colors[numColor].toInt()
 			val color = myPalette[numPalette]
@@ -122,15 +124,25 @@ internal object DotIconColors {
 	/// Struct to store default coloring schemes
 	internal data class SchemeElement(val freq: UByte, val colors: List<UByte>)
 
-	internal data class DotIconColor(
+	/**
+	 * ARGB representation
+	 */
+	internal data class DotIconColorRgb(
 		val red: UByte,
 		val green: UByte,
 		val blue: UByte,
 		val alpha: UByte,
 	) {
+		fun toCompose(): Color = Color(
+			this.red.toInt(),
+			this.green.toInt(),
+			this.blue.toInt(),
+			this.alpha.toInt(),
+		)
+
 		companion object {
 			val background
-				get() = DotIconColor(
+				get() = DotIconColorRgb(
 					red = 255u,
 					green = 255u,
 					blue = 255u,
@@ -138,7 +150,7 @@ internal object DotIconColors {
 				)
 
 			val foreground
-				get() = DotIconColor(
+				get() = DotIconColorRgb(
 					red = 238u,
 					green = 238u,
 					blue = 238u,
@@ -151,10 +163,103 @@ internal object DotIconColors {
 			 * is accessible and used only for `u8` numbers other than 0 and 255;
 			 * no check here is done for b value;
 			 */
-			fun derive(b: UByte, set_component: Double): DotIconColor {
-				//todo dmitry as colors.rs:99
-				return DotIconColor.foreground //todo dmitry remove
+			fun derive(b: UByte, saturation: Double): DotIconColorHls {
+				// HSL color hue in degrees
+				val hueModulus = 64u
+				val hue = b.toUShort() % hueModulus * 360u / hueModulus
+
+				// HSL lightness in percents
+				val l: UByte = when (b / 64u) {
+					0u -> 53u
+					1u -> 15u
+					2u -> 35u
+					else -> 75u
+				}
+				// recalculated in HSL lightness component (component range is 0.00 to 1.00)
+				val l_component = (l.toDouble()) / 100;
+				return hslToRgb(hue, saturation.toFloat(), l_component.toFloat())
+			}
+
+			/// Converts HSL color space values to RGB color space values.
+			///
+			/// - Parameters:
+			///   - hue: The hue value of the HSL color, specified as a degree between 0 and 360.
+			///   - saturation: The saturation value of the HSL color, specified as a double between 0 and 1.
+			///   - lightness: The lightness value of the HSL color, specified as a double between 0 and 1.
+			/// - Returns: A tuple representing the RGB color values, each a UInt8 between 0 and 255.
+			private fun hslToRgb(
+				hue: Float,
+				saturation: Float,
+				lightness: Float
+			): DotIconColorRgb {
+				var redComponent: Float = 0f
+				var greenComponent: Float = 0f
+				var blueComponent: Float = 0f
+
+				val normalizedHue = hue / 360f
+
+				if (saturation.equals(0f)) {
+					// Achromatic color (gray scale)
+					redComponent = lightness
+					greenComponent = lightness
+					blueComponent = lightness
+				} else {
+					val qValue = if (lightness < 0.5) {
+						lightness * (1 + saturation)
+					} else {
+						lightness + saturation - lightness * saturation
+					}
+					val pValue = 2 * lightness - qValue
+
+					redComponent =
+						convertHueToRgbComponent(pValue, qValue, normalizedHue + 1f / 3f)
+					greenComponent =
+						convertHueToRgbComponent(pValue, qValue, normalizedHue)
+					blueComponent =
+						convertHueToRgbComponent(pValue, qValue, normalizedHue - 1f / 3f)
+				}
+
+				return DotIconColorRgb(
+					red = floor(redComponent.toDouble() * 256).toInt()
+						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
+					green = floor(greenComponent.toDouble() * 256).toInt()
+						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
+					blue = floor(blueComponent.toDouble() * 256).toInt()
+						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
+					alpha = 255u
+				)
+			}
+
+
+			/**
+			 * Calculates a single RGB color component from HSL values.
+			 *
+			 * @param p: The first helper value derived from the lightness value of the HSL color.
+			 * @param q: The second helper value derived from the lightness and saturation values of the HSL color.
+			 * @param hueShift: The hue value of the HSL color, shifted by a certain amount.
+			 * @return  A double representing the calculated RGB color component.
+			 */
+			private fun convertHueToRgbComponent(
+				p: Float,
+				q: Float,
+				hueShift: Float
+			): Float {
+				var shiftedHue = hueShift
+
+				if (shiftedHue < 0f) {
+					shiftedHue += 1f
+				}
+				if (shiftedHue > 1f) {
+					shiftedHue -= 1f
+				}
+				return when {
+					shiftedHue < (1 / 6f) -> p + (q - p) * 6 * shiftedHue
+					shiftedHue < (1 / 2f) -> q
+					shiftedHue < (2 / 3f) -> p + (q - p) * (2 / 3 - shiftedHue) * 6
+					else -> p
+				}
 			}
 		}
 	}
+}
 }
