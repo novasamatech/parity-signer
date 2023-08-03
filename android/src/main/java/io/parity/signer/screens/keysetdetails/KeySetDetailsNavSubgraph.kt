@@ -28,8 +28,8 @@ fun KeySetDetailsNavSubgraph(
 	) {
 
 		composable(KeySetDetailsNavSubgraph.home) {
-			KeySetDetailsScreenFull(
-				model = model,
+			KeySetDetailsScreenSubgraph(
+				fullModel = model,
 				navigator = rootNavigator,
 				navController = navController,
 				networkState = networkState,
@@ -50,37 +50,10 @@ fun KeySetDetailsNavSubgraph(
 				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
 			)
 		}
-		composable(KeySetDetailsNavSubgraph.backup) {
-			//preconditions
-			val backupModel = model.toSeedBackupModel()
-			if (backupModel == null) {
-				submitErrorState("navigated to backup model but without root in KeySet " +
-					"it's impossible to backup")
-				navController.navigate(KeySetDetailsNavSubgraph.home)
-			} else {
-				//background
-				Box(Modifier.statusBarsPadding()) {
-					KeySetDetailsScreenView(
-						model = model,
-						navigator = EmptyNavigator(),
-						networkState = networkState,
-						onShowPublicKey = {_,_ ->},
-						onMenu = {},
-					)
-				}
-				//content
-				KeySetBackupFullOverlayBottomSheet(
-					model = backupModel,
-					getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
-					onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-				)
-			}
-		}
 	}
 }
 
 internal object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
 	const val multiselect = "keyset_details_multiselect"
-	const val backup = "keyset_details_backup"
 }

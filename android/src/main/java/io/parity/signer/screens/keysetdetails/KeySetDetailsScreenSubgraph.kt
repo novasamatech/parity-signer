@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,12 +18,17 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.getSeedPhraseForBackup
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
+import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
+import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
-fun KeySetDetailsScreenFull(
-	model: KeySetDetailsModel,
+fun KeySetDetailsScreenSubgraph(
+	fullModel: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
 	networkState: State<NetworkState?>, //for shield icon
@@ -29,17 +36,24 @@ fun KeySetDetailsScreenFull(
 ) {
 	val menuNavController = rememberNavController()
 
+	val keySetViewModel: KeySetDetailsViewModel = viewModel()
+	val filteredModel = keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
+
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
-			model = model,
+			model = filteredModel.value,
 			navigator = navigator,
 			networkState = networkState,
+			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 			},
 			onShowPublicKey = { title: String, key: String ->
 				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
 			},
+			onFilterClicked = {
+				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
+			}
 		)
 	}
 
@@ -61,8 +75,9 @@ fun KeySetDetailsScreenFull(
 						navController.navigate(KeySetDetailsNavSubgraph.multiselect)
 					},
 					onBackupClicked = {
-						menuNavController.popBackStack()
-						navController.navigate(KeySetDetailsNavSubgraph.backup)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
+						}
 					},
 					onCancel = {
 						menuNavController.popBackStack()
@@ -71,7 +86,7 @@ fun KeySetDetailsScreenFull(
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
 							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
-					}
+					},
 				)
 			}
 		}
@@ -109,6 +124,39 @@ fun KeySetDetailsScreenFull(
 				)
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.network_filter) {
+			val initialSelection =
+				keySetViewModel.filters.collectAsStateWithLifecycle()
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				NetworkFilterMenu(
+					networks = keySetViewModel.getAllNetworks(),
+					initialSelection = initialSelection.value,
+					onConfirm = {
+						keySetViewModel.setFilters(it)
+						closeAction()
+					},
+					onCancel = closeAction,
+				)
+			}
+		}
+		composable(KeySetDetailsMenuSubgraph.backup) {
+			//preconditions
+			val backupModel = fullModel.toSeedBackupModel()
+			if (backupModel == null) {
+				submitErrorState(
+					"navigated to backup model but without root in KeySet " +
+						"it's impossible to backup"
+				)
+				closeAction()
+			} else {
+				//content
+				KeySetBackupFullOverlayBottomSheet(
+					model = backupModel,
+					getSeedPhraseForBackup = ::getSeedPhraseForBackup,
+					onClose = closeAction,
+				)
+			}
+		}
 	}
 }
 
@@ -117,6 +165,8 @@ private object KeySetDetailsMenuSubgraph {
 	const val empty = "keys_menu_empty"
 	const val keys_menu = "keys_menu"
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
+	const val network_filter = "keys_network_filters"
+	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
 }
 

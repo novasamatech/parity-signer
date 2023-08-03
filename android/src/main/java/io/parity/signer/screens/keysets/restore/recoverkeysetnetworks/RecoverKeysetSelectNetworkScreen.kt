@@ -28,9 +28,9 @@ import io.parity.signer.components.base.NotificationFrameText
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.items.NetworkItemMultiselect
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
-import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselect
 import io.parity.signer.screens.keysets.create.backupstepscreens.NetworkItemMultiselectAll
 import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
