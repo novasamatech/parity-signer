@@ -26,8 +26,8 @@ internal object DotIconColors {
 	 * As colors.rs:140 in polkadot-identicon-rust
 	 */
 	@OptIn(ExperimentalUnsignedTypes::class)
-	fun getColors(seed: String): List<DotIconColorRgb> {
-		val seedInBytes = seed.toByteArray()
+	fun getColors(seed: List<UByte>): List<DotIconColorRgb> {
+		val seedInBytes = seed.toUByteArray().toByteArray()
 		val byte = 8
 		val black2b = Algorithm.Blake2b(64 * byte).createDigest()
 

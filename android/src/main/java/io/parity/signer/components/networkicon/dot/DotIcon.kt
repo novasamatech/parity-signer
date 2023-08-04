@@ -19,7 +19,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
 fun DotIcon(
-	seed: String,
+	seed: List<UByte>,
 	size: Dp,
 	modifier: Modifier = Modifier
 ) {
@@ -67,9 +67,10 @@ private fun Circle(offset: DotIconCircleOffset, color: Color, size: Dp) {
 @Composable
 private fun PreviewDotIcon() {
 	SignerNewTheme {
+		val alice = DotIconConstants.previewAlice
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
-			DotIcon("0xb00adb8980766d75518dfa8efa139fe0d7bb5e4e", 48.dp)
-//			DotIcon("0x7204ddf9dc5f672b64ca6692da7b8f13b4d408e7", 32.dp)
+			DotIcon(alice, 48.dp)
+			DotIcon(alice, 32.dp)
 		}
 	}
 }
