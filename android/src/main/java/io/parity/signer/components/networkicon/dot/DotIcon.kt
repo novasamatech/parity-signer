@@ -25,25 +25,28 @@ fun DotIcon(
 	modifier: Modifier = Modifier
 ) {
 	val colors = DotIconColors.getColors(seed = seed)
+
 	val foreground = DotIconColors.DotIconColorRgb.foreground.toCompose()
 	val circleSize = size / 32 * 5
+
+	val positions = DotIconPositions.calculatePositionsCircleSet(size)
 	Box(
 		modifier = modifier
 			.size(size)
 			.background(foreground, CircleShape)
 	) {
-		//todo dmitry positions as in circles.rs:36
-		Circle(
-			x = 0.4f,
-			y = 0.3f,
-			color = colors[4].toCompose(),
-			size = circleSize,
-		)
+		repeat(19) { i ->
+			Circle(
+				paddings = positions[i],
+				color = colors[i].toCompose(),
+				size = circleSize,
+			)
+		}
 	}
 }
 
 @Composable
-private fun Circle(x: Float, y: Float, color: Color, size: Dp) {
+private fun Circle(paddings: DotIconCirclePosition, color: Color, size: Dp) {
 	Row {
 		Spacer(modifier = Modifier.weight(x))
 		Column {

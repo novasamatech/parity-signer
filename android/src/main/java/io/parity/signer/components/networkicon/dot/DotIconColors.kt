@@ -166,7 +166,7 @@ internal object DotIconColors {
 			fun derive(b: UByte, saturation: Double): DotIconColorRgb {
 				// HSL color hue in degrees
 				val hueModulus = 64u
-				val hue = b.toUShort() % hueModulus * 360u / hueModulus
+				val hue: Float= (b.toUShort() % hueModulus * 360u) / hueModulus
 
 				// HSL lightness in percents
 				val l: UByte = when (b / 64u) {
