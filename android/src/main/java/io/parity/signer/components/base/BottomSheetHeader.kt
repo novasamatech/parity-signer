@@ -21,8 +21,8 @@ import io.parity.signer.ui.theme.textSecondary
 @Composable
 fun BottomSheetHeader(
 	title: String,
-	subtitile: String? = null,
 	modifier: Modifier = Modifier,
+	subtitile: String? = null,
 	onCloseClicked: Callback?
 ) {
 	Row(
@@ -86,11 +86,11 @@ fun BottomSheetSubtitle(
 private fun PreviewHeaderWithClose() {
 	SignerNewTheme {
 		Column() {
-			BottomSheetHeader(title = "Title") {}
+			BottomSheetHeader(title = "Title", onCloseClicked = {})
 			Divider()
 			BottomSheetHeader(title = "Very very very very long title Very very very very long title") {}
 			Divider()
-			BottomSheetHeader(title = "Title", subtitile = "With subtitle") {}
+			BottomSheetHeader(title = "Title", subtitile = "With subtitle", onCloseClicked = {})
 			Divider()
 			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
 		}
