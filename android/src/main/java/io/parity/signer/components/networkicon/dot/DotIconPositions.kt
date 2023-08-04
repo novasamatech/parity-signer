@@ -33,36 +33,37 @@ internal object DotIconPositions {
 	 *
 	 *                              9
 	 */
-	fun calculatePositionsCircleSet(full: Dp): List<DotIconCirclePosition> {
-		val centerToCenter = full / 8 * 3
+	fun calculatePositionsCircleSet(fullSize: Dp): List<DotIconCircleOffset> {
+		val bigCircleRadius = fullSize / 2
+		val centerToCenter = bigCircleRadius / 8 * 3
 		val a = centerToCenter;
 		val b = centerToCenter * sqrt(3f) / 2f;
 
 		return listOf(
-			DotIconCirclePosition(x = 0.dp, y = a * -2),
-			DotIconCirclePosition(x = 0.dp, y = -a),
-			DotIconCirclePosition(x = -b, y = a * -3 / 2),
-			DotIconCirclePosition(x = b * -2, y = -a),
-			DotIconCirclePosition(x = -b, y = -a / 2),
-			DotIconCirclePosition(x = b * -2, y = 0.dp),
-			DotIconCirclePosition(x = b * -2, y = a),
-			DotIconCirclePosition(x = -b, y = a / 2),
-			DotIconCirclePosition(x = -b, y = a * 3 / 2),
-			DotIconCirclePosition(x = 0, y = a * 2),
-			DotIconCirclePosition(x = 0, y = a),
-			DotIconCirclePosition(x = b, y = a * 3 / 2),
-			DotIconCirclePosition(x = b * 2, y = a),
-			DotIconCirclePosition(x = b, y = a / 2),
-			DotIconCirclePosition(x = b * 2, y = 0),
-			DotIconCirclePosition(x = b * 2, y = -a),
-			DotIconCirclePosition(x = b, y = -a / 2),
-			DotIconCirclePosition(x = b, y = a * -3 / 2),
-			DotIconCirclePosition(x = 0.dp, y = 0.dp),
+			DotIconCircleOffset(x = 0.dp, y = a * -2),
+			DotIconCircleOffset(x = 0.dp, y = -a),
+			DotIconCircleOffset(x = -b, y = a * -3 / 2),
+			DotIconCircleOffset(x = b * -2, y = -a),
+			DotIconCircleOffset(x = -b, y = -a / 2),
+			DotIconCircleOffset(x = b * -2, y = 0.dp),
+			DotIconCircleOffset(x = b * -2, y = a),
+			DotIconCircleOffset(x = -b, y = a / 2),
+			DotIconCircleOffset(x = -b, y = a * 3 / 2),
+			DotIconCircleOffset(x = 0.dp, y = a * 2),
+			DotIconCircleOffset(x = 0.dp, y = a),
+			DotIconCircleOffset(x = b, y = a * 3 / 2),
+			DotIconCircleOffset(x = b * 2, y = a),
+			DotIconCircleOffset(x = b, y = a / 2),
+			DotIconCircleOffset(x = b * 2, y = 0.dp),
+			DotIconCircleOffset(x = b * 2, y = -a),
+			DotIconCircleOffset(x = b, y = -a / 2),
+			DotIconCircleOffset(x = b, y = a * -3 / 2),
+			DotIconCircleOffset(x = 0.dp, y = 0.dp),
 		)
 	}
 }
 
 /**
- * Paddings from center
+ * offsets from center
  */
-internal data class DotIconCirclePosition(val x: Dp, val y: Dp)
+internal data class DotIconCircleOffset(val x: Dp, val y: Dp)

@@ -4,8 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -33,11 +32,12 @@ fun DotIcon(
 	Box(
 		modifier = modifier
 			.size(size)
-			.background(foreground, CircleShape)
+			.background(foreground, CircleShape),
+		contentAlignment = Alignment.Center,
 	) {
 		repeat(19) { i ->
 			Circle(
-				paddings = positions[i],
+				offset = positions[i],
 				color = colors[i].toCompose(),
 				size = circleSize,
 			)
@@ -46,20 +46,13 @@ fun DotIcon(
 }
 
 @Composable
-private fun Circle(paddings: DotIconCirclePosition, color: Color, size: Dp) {
-	Row {
-		Spacer(modifier = Modifier.weight(x))
-		Column {
-			Spacer(modifier = Modifier.weight(y))
-			Box(
-				modifier = Modifier
-					.size(size)
-					.background(color, CircleShape)
-			)
-			Spacer(modifier = Modifier.weight(1f - y))
-		}
-		Spacer(modifier = Modifier.weight(1f - x))
-	}
+private fun Circle(offset: DotIconCircleOffset, color: Color, size: Dp) {
+	Box(
+		modifier = Modifier
+			.size(size)
+			.offset(x = offset.x, y = offset.y)
+			.background(color, CircleShape)
+	)
 }
 
 
@@ -76,7 +69,7 @@ private fun PreviewDotIcon() {
 	SignerNewTheme {
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
 			DotIcon("0xb00adb8980766d75518dfa8efa139fe0d7bb5e4e", 48.dp)
-			DotIcon("0x7204ddf9dc5f672b64ca6692da7b8f13b4d408e7", 32.dp)
+//			DotIcon("0x7204ddf9dc5f672b64ca6692da7b8f13b4d408e7", 32.dp)
 		}
 	}
 }
