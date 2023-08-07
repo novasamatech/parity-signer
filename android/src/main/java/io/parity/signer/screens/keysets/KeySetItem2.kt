@@ -116,7 +116,7 @@ private fun PreviewKeySetItem() {
 		KeySetItem2(
 			KeySetModel(
 				"My special key set",
-				PreviewData.Identicon.exampleIdenticonPng,
+				PreviewData.Identicon.dotIcon,
 				listOf("westend", "some", "polkadot", "www", "kusama"),
 				2.toUInt()
 			)
@@ -138,7 +138,7 @@ private fun PreviewKeySetItemEmpty() {
 		KeySetItem2(
 			KeySetModel(
 				"My special key set",
-				PreviewData.Identicon.exampleIdenticonPng,
+				PreviewData.Identicon.dotIcon,
 				emptyList(),
 				0.toUInt(),
 			)

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.theme.*
 
@@ -36,7 +36,7 @@ fun KeySetItem(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			IdentIcon(
+			IdentIconImage(
                 identIcon = model.identicon, modifier = Modifier.padding(
                     top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
                 ), size = 36.dp

@@ -1,8 +1,6 @@
 package io.parity.signer.domain
 
-import io.parity.signer.components.ImageContent
 import io.parity.signer.components.sharedcomponents.KeyCardModel
-import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 import java.util.*
@@ -62,7 +60,7 @@ fun MKeyAndNetworkCard.toKeyAndNetworkModel() = KeyAndNetworkModel(
  * Local copy of shared [MKeysCard] class
  */
 data class KeyModel(
-	val identicon: ImageContent,
+	val identicon: Identicon,
 	val addressKey: String,
 	val seedName: String,
 	val base58: String,
@@ -75,7 +73,7 @@ data class KeyModel(
 		fun createStub(wasImported: Boolean = false) = KeyModel(
 			addressKey = "address key",
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			identicon = PreviewData.Identicon.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.dotIcon,
 			hasPwd = true,
 			path = "//polkadot//path2",
 			secretExposed = false,
@@ -88,7 +86,7 @@ data class KeyModel(
 fun MAddressCard.toKeysModel() = KeyModel(
 	addressKey = addressKey,
 	base58 = base58,
-	identicon = address.identicon.toImageContent(),
+	identicon = address.identicon,
 	hasPwd = address.hasPwd,
 	path = address.path,
 	secretExposed = address.secretExposed,
@@ -102,7 +100,7 @@ fun MAddressCard.toKeysModel() = KeyModel(
 fun MKeysCard.toKeyModel() = KeyModel(
 	addressKey = addressKey,
 	base58 = base58,
-	identicon = address.identicon.toImageContent(),
+	identicon = address.identicon,
 	hasPwd = address.hasPwd,
 	path = address.path,
 	secretExposed = address.secretExposed,
@@ -137,7 +135,7 @@ fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
  */
 data class KeySetModel(
 	val seedName: String,
-	val identicon: ImageContent,
+	val identicon: Identicon,
 	val usedInNetworks: List<String>,
 	val derivedKeysCount: UInt,
 ) {
@@ -145,7 +143,7 @@ data class KeySetModel(
 		fun createStub(name: String? = null, number: Int? = null) =
 			KeySetModel(
 				name ?: "first seed name",
-				PreviewData.Identicon.exampleIdenticonPng,
+				PreviewData.Identicon.dotIcon,
 				listOf("westend", "some"),
 				number?.toUInt() ?: 1.toUInt()
 			)
@@ -156,7 +154,7 @@ data class KeySetModel(
 fun SeedNameCard.toSeedModel() =
 	KeySetModel(
 		seedName,
-		identicon.toImageContent(),
+		identicon,
 		usedInNetworks,
 		derivedKeysCount
 	)
@@ -298,13 +296,13 @@ fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 
 data class VerifierDetailsModels(
 	val publicKey: String,
-	val identicon: ImageContent,
+	val identicon: Identicon,
 	val encryption: String,
 ) {
 	companion object {
 		fun createStub() = VerifierDetailsModels(
 			publicKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-			identicon = PreviewData.Identicon.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.dotIcon,
 			encryption = "sr25519",
 		)
 	}
@@ -312,7 +310,7 @@ data class VerifierDetailsModels(
 
 fun MVerifierDetails.toVerifierDetailsModels() = VerifierDetailsModels(
 	publicKey = publicKey,
-	identicon = identicon.toImageContent(),
+	identicon = identicon,
 	encryption = encryption,
 )
 

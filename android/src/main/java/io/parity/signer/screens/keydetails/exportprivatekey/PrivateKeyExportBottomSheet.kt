@@ -19,11 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIconWithNetwork
+import io.parity.signer.components.networkicon.IdentIconWithNetwork
 import io.parity.signer.components.NetworkCardModel
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.sharedcomponents.*
-import io.parity.signer.components.toImageContent
 import io.parity.signer.components.toNetworkCardModel
 import io.parity.signer.domain.*
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel.Companion.SHOW_PRIVATE_KEY_TIMEOUT
@@ -145,7 +144,7 @@ fun MKeyDetails.toPrivateKeyExportModel(): PrivateKeyExportModel {
 				if (it.isLowerCase()) it.titlecase() else it.toString()
 			},
 			cardBase = KeyCardModelBase(
-				identIcon = address.identicon.toImageContent(),
+				identIcon = address.identicon,
 				seedName = address.seedName,
 				hasPassword = address.hasPwd,
 				networkLogo = networkInfo.networkLogo,

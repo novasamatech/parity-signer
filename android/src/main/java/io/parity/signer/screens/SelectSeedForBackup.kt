@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
-import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
@@ -48,7 +47,7 @@ fun SelectSeedForBackup(
 				) {
 					SeedCard(
 						seedName = cards[item].seedName,
-						identicon = cards[item].identicon.toImageContent(),
+						identicon = cards[item].identicon,
 					)
 				}
 			}

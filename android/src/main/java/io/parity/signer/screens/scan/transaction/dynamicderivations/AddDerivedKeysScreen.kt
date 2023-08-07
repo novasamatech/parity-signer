@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.ImageContent
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SecondaryButtonWide
@@ -29,7 +28,6 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.qrcode.EmptyQrCodeProvider
-import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.getData
@@ -42,7 +40,6 @@ import io.parity.signer.uniffi.DdDetail
 import io.parity.signer.uniffi.DdKeySet
 import io.parity.signer.uniffi.DdPreview
 import io.parity.signer.uniffi.QrData
-import io.parity.signer.uniffi.SignerImage
 
 @Composable
 fun AddDerivedKeysScreen(
@@ -160,7 +157,7 @@ private fun KeysetItemDerivedItem(model: DdKeySet) {
 
 
 private fun DdDetail.toKeyModel() = KeyModel(
-	identicon = identicon.toImageContent(),
+	identicon = identicon,
 	addressKey = "",
 	seedName = "",
 	base58 = base58,
@@ -191,10 +188,7 @@ private fun ddDetailcreateStub(): DdDetail = DdDetail(
 	path = "//polkadot//path2",
 	networkLogo = "westend",
 	networkSpecsKey = "sdfsdfgdfg",
-	identicon = SignerImage.Png(
-		(PreviewData.Identicon.exampleIdenticonPng as ImageContent.Png)
-			.image.toUByteArray().toList()
-	),
+	identicon = PreviewData.Identicon.dotIcon,
 )
 
 
