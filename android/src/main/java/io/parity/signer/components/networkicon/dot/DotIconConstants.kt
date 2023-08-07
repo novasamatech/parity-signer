@@ -51,4 +51,8 @@ internal object DotIconConstants {
 		)
 
 	internal val previewAliceSeed = listOf(212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125).map { it.toUByte() }
+
+	internal val previewBobSeed = listOf(142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147,
+		201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72,).map { it.toUByte() }
+
 }

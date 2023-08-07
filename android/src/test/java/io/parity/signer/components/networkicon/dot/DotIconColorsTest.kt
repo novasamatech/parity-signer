@@ -29,10 +29,17 @@ class DotIconColorsTest {
 	}
 
 	@Test
-	fun checkColorsFull() {
+	fun checkColorsAlice() {
 		val seed = DotIconConstants.previewAliceSeed
 		val colors = DotIconColors.getColors(seed)
 		Assert.assertEquals(aliceColor, colors)
+	}
+
+	@Test
+	fun checkColorsBob() {
+		val seed = DotIconConstants.previewBobSeed
+		val colors = DotIconColors.getColors(seed)
+		Assert.assertEquals(bobColor, colors)
 	}
 
 	//taken from rust samples
@@ -152,6 +159,29 @@ class DotIconColorsTest {
 				blue = 139u,
 				alpha = 255u
 			),
+		)
+
+	private val bobColor
+		get() = listOf(
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 61u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 200u, green = 214u, blue = 169u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 214u, green = 169u, blue = 182u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 36u, green = 52u, blue = 25u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 127u, green = 93u, blue = 177u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 214u, green = 169u, blue = 182u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 61u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 200u, green = 214u, blue = 169u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 52u, green = 25u, blue = 30u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 113u, green = 177u, blue = 93u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 114u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 108u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 118u, green = 93u, blue = 177u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 25u, green = 52u, blue = 39u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 108u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 113u, green = 177u, blue = 93u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 58u, green = 120u, blue = 114u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 52u, green = 25u, blue = 30u, alpha = 255u),
+			DotIconColors.DotIconColorRgb(red = 33u, green = 25u, blue = 52u, alpha = 255u),
 		)
 }
 

@@ -6,17 +6,6 @@ import com.appmattus.crypto.Algorithm
 
 internal object DotIconColors {
 
-	//todo dmitry remove?
-	private object Constants {
-		val byteHashLength = 64
-		val arrayZeroBytesLength = 32
-		val derivedIDRotationFactorMultiplier: Int = 6
-		val derivedIDRotationFactorModulo: Int = 3
-		val hueDegrees = 360
-		val colorArrayLength = 19
-		val lightnessPercentages = listOf(53, 15, 35, 75)
-	}
-
 	/**
 	 * Function to calculate identicon colors from `&[u8]` input slice.
 	 * Total 19 colors are always produced.
@@ -36,8 +25,6 @@ internal object DotIconColors {
 			.mapIndexed { index, byte -> (byte - zeros[index]).toUByte() }
 			.toUByteArray()
 
-
-		//todo dmitry check if below make sense to kotlin
 		// this comment from Rust code
 		// Since `id[29]` is u8, `sat` could range from 30 to 109, i.e. it always fits into u8.
 		// Transformation of id[29] into u16 is to avoid overflow in multiplication
@@ -90,7 +77,7 @@ internal object DotIconColors {
 
 		// picking colors from palette using coloring scheme with rotation applied
 		val myColors: List<DotIconColorRgb> = List(19) { i ->
-			val numColor = if (i < 19) (i + rot) % 18 else 18
+			val numColor = if (i < 18) (i + rot) % 18 else 18
 			val numPalette = myScheme.colors[numColor].toInt()
 			val color = myPalette[numPalette]
 			color
