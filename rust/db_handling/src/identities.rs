@@ -478,7 +478,8 @@ pub fn derive_single_key(
     seeds: &HashMap<String, String>,
     derivation_path: &str,
     root_multisigner: &MultiSigner,
-) -> Result<MultiSigner> {
+    network_key: NetworkSpecsKey,
+) -> Result<(MultiSigner, AddressDetails)> {
     let seed_name =
         find_seed_name_for_multisigner(database, root_multisigner)?.ok_or_else(|| {
             Error::NoSeedFound {
@@ -493,7 +494,19 @@ pub fn derive_single_key(
     full_address.push_str(seed_phrase);
     full_address.push_str(derivation_path);
 
-    full_address_to_multisigner(full_address, multisigner_to_encryption(root_multisigner))
+    let encryption = multisigner_to_encryption(root_multisigner);
+    let multi_signer = full_address_to_multisigner(full_address, encryption)?;
+
+    let address_details = AddressDetails {
+        seed_name,
+        path: derivation_path.to_string(),
+        has_pwd: false,
+        network_id: Some(network_key),
+        encryption,
+        secret_exposed: false,
+        was_imported: true,
+    };
+    Ok((multi_signer, address_details))
 }
 
 pub fn inject_derivations_has_pwd(

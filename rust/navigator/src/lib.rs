@@ -9,11 +9,11 @@ use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1
 use lazy_static::lazy_static;
 use sp_runtime::MultiSignature;
 use std::{collections::HashMap, sync::Mutex};
-use transaction_signing::{create_signature, SignatureType};
+use transaction_signing::{create_signature, SignatureAndChecksum, SignatureType};
 
 use definitions::navigation::{
     ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, MSignedTransaction,
-    MTransaction, QrData, TransactionAction, TransactionType,
+    MTransaction, QrData, TransactionAction, TransactionSignAction, TransactionType,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -131,48 +131,62 @@ pub fn sign_dd_transaction(
     payload_set: &[String],
     seeds: HashMap<String, String>,
 ) -> Result<MSignedTransaction> {
-    let mut signatures = vec![];
     let mut transactions = vec![];
+    let mut signatures = vec![];
+    for (a, signature) in handle_dd_sign(database, payload_set, seeds)? {
+        transactions.push(MTransaction {
+            content: a.content.clone(),
+            ttype: TransactionType::Sign,
+            author_info: Some(a.author_info.clone()),
+            network_info: Some(a.network_info.clone().into()),
+        });
+        signatures.push((signature.signature().to_owned(), signature.signature_type()));
+    }
+    Ok(MSignedTransaction {
+        transaction: transactions,
+        signature: export_signatures_bulk(&signatures)?,
+    })
+}
 
-    let actions = payload_set
-        .iter()
-        .map(|payload| parse_dd_transaction(database, payload, &seeds).map_err(Error::from))
-        .collect::<Result<Vec<_>>>()?;
+pub(crate) fn handle_dd_sign(
+    database: &sled::Db,
+    payload_set: &[String],
+    seeds: HashMap<String, String>,
+) -> Result<Vec<(TransactionSignAction, SignatureAndChecksum)>> {
+    let mut signed_transactions = vec![];
 
-    for (idx, transaction) in actions.into_iter().enumerate() {
-        let (sign_actions, checksum) = match transaction {
-            TransactionAction::Sign { actions, checksum } => (actions, checksum),
+    let mut actions = vec![];
+    let mut checksum = 0;
+    for t in payload_set.iter() {
+        match parse_dd_transaction(database, t, &seeds) {
+            Ok(TransactionAction::Sign {
+                actions: a,
+                checksum: c,
+            }) => {
+                actions.extend(a);
+                checksum = c;
+            }
             _ => return Err(Error::TxActionNotSign),
         };
-        let action = sign_actions.get(0).ok_or(Error::NoTransactionsToSign)?;
-
+    }
+    for (idx, sign_action) in actions.into_iter().enumerate() {
         let seed_phrase = seeds
-            .get(&action.author_info.address.seed_name)
+            .get(&sign_action.author_info.address.seed_name)
             .ok_or(Error::NoSeedPhrase)?;
 
-        let signature = create_signature(
+        let signature_and_checksum = create_signature(
             database,
             seed_phrase,
             "",
             "",
             checksum,
             idx,
-            action.network_info.specs.encryption,
+            sign_action.network_info.specs.encryption,
         )?;
-
-        signatures.push((signature.signature().to_owned(), signature.signature_type()));
-        transactions.push(MTransaction {
-            content: action.content.clone(),
-            ttype: TransactionType::Sign,
-            author_info: Some(action.author_info.clone()),
-            network_info: Some(action.network_info.clone().into()),
-        })
+        checksum = signature_and_checksum.new_checksum();
+        signed_transactions.push((sign_action, signature_and_checksum));
     }
-
-    Ok(MSignedTransaction {
-        transaction: transactions,
-        signature: export_signatures_bulk(&signatures)?,
-    })
+    Ok(signed_transactions)
 }
 
 /// Get keys by seed name
