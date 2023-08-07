@@ -7,10 +7,17 @@ import org.junit.Test
 class DotIconColorsTest {
 
 	@Test
-	fun checkColors() {
-		val seed = DotIconConstants.previewAlice
+	fun checkColor2() {
+		val seed = DotIconConstants.previewAliceSeed
 		val colors = DotIconColors.getColors(seed)
-		assert(colors[2].red.toString() == "214")
+		Assert.assertEquals("184", colors[2].red.toString())
+	}
+
+	@Test
+	fun checkColorLast() {
+		val seed = DotIconConstants.previewAliceSeed
+		val colors = DotIconColors.getColors(seed)
+		Assert.assertEquals("61", colors.last().red.toString())
 	}
 
 	@Test
@@ -23,7 +30,7 @@ class DotIconColorsTest {
 
 	@Test
 	fun checkColorsFull() {
-		val seed = DotIconConstants.previewAlice
+		val seed = DotIconConstants.previewAliceSeed
 		val colors = DotIconColors.getColors(seed)
 		Assert.assertEquals(aliceColor, colors)
 	}

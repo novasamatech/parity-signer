@@ -2,8 +2,6 @@ package io.parity.signer.components.networkicon.dot
 
 import androidx.compose.ui.graphics.Color
 import com.appmattus.crypto.Algorithm
-import java.lang.Math.max
-import kotlin.math.floor
 
 
 internal object DotIconColors {
@@ -183,6 +181,8 @@ internal object DotIconColors {
 			/**
 			 * Converts HSL color space values to RGB color space values.
 			 *
+			 * Implementation of /androidx/core/graphics/ColorUtils.java:318 - HSLToColor()
+			 *
 			 * @param hue: The hue value of the HSL color, specified as a degree between 0 and 360.
 			 * @param saturation: The saturation value of the HSL color, specified as a double between 0 and 1.
 			 * @param lightness: The lightness value of the HSL color, specified as a double between 0 and 1.
@@ -193,40 +193,53 @@ internal object DotIconColors {
 				saturation: Float,
 				lightness: Float
 			): DotIconColorRgb {
-				var redComponent: Float = 0f
-				var greenComponent: Float = 0f
-				var blueComponent: Float = 0f
 
-				val normalizedHue = hue / 360f
+				val c = (1f - Math.abs(2 * lightness - 1f)) * saturation
+				val m = lightness - 0.5f * c
+				val x = c * (1f - Math.abs(hue / 60f % 2f - 1f))
 
-				if (saturation.equals(0f)) {
-					// Achromatic color (gray scale)
-					redComponent = lightness
-					greenComponent = lightness
-					blueComponent = lightness
-				} else {
-					val qValue = if (lightness < 0.5) {
-						lightness * (1 + saturation)
-					} else {
-						lightness + saturation - lightness * saturation
+				val hueSegment = hue.toInt() / 60
+
+				var r = 0
+				var g = 0
+				var b = 0
+
+				when (hueSegment) {
+					0 -> {
+						r = Math.round(255 * (c + m))
+						g = Math.round(255 * (x + m))
+						b = Math.round(255 * m)
 					}
-					val pValue = 2 * lightness - qValue
-
-					redComponent =
-						convertHueToRgbComponent(pValue, qValue, normalizedHue + 1f / 3f)
-					greenComponent =
-						convertHueToRgbComponent(pValue, qValue, normalizedHue)
-					blueComponent =
-						convertHueToRgbComponent(pValue, qValue, normalizedHue - 1f / 3f)
+					1 -> {
+						r = Math.round(255 * (x + m))
+						g = Math.round(255 * (c + m))
+						b = Math.round(255 * m)
+					}
+					2 -> {
+						r = Math.round(255 * m)
+						g = Math.round(255 * (c + m))
+						b = Math.round(255 * (x + m))
+					}
+					3 -> {
+						r = Math.round(255 * m)
+						g = Math.round(255 * (x + m))
+						b = Math.round(255 * (c + m))
+					}
+					4 -> {
+						r = Math.round(255 * (x + m))
+						g = Math.round(255 * m)
+						b = Math.round(255 * (c + m))
+					}
+					5, 6 -> {
+						r = Math.round(255 * (c + m))
+						g = Math.round(255 * m)
+						b = Math.round(255 * (x + m))
+					}
 				}
-
 				return DotIconColorRgb(
-					red = floor(redComponent.toDouble() * 256).toInt()
-						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
-					green = floor(greenComponent.toDouble() * 256).toInt()
-						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
-					blue = floor(blueComponent.toDouble() * 256).toInt()
-						.coerceAtMost(255).coerceAtLeast(0).toUByte(),
+					red = r.toUByte(),
+					green = g.toUByte(),
+					blue = b.toUByte(),
 					alpha = 255u
 				)
 			}

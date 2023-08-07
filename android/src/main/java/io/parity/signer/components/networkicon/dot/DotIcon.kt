@@ -67,7 +67,7 @@ private fun Circle(offset: DotIconCircleOffset, color: Color, size: Dp) {
 @Composable
 private fun PreviewDotIcon() {
 	SignerNewTheme {
-		val alice = DotIconConstants.previewAlice
+		val alice = DotIconConstants.previewAliceSeed
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
 			DotIcon(alice, 48.dp)
 			DotIcon(alice, 32.dp)
