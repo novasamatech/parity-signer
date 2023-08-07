@@ -31,11 +31,11 @@ internal object DotIconColors {
 		val byte = 8
 		val black2b = Algorithm.Blake2b(64 * byte).createDigest()
 
-		val zeros: ByteArray = black2b.digest(ByteArray(32) { 0u.toByte() })
-		val idPrep: ByteArray = black2b.digest(seedInBytes)
+		val zeros: UByteArray = black2b.digest(ByteArray(32) { 0u.toByte() }).toUByteArray()
+		val idPrep: UByteArray = black2b.digest(seedInBytes).toUByteArray()
 
 		val id: UByteArray = idPrep
-			.mapIndexed { index, byte -> (byte.toUByte() - zeros[index].toUByte()).toUByte() }
+			.mapIndexed { index, byte -> (byte - zeros[index]).toUByte() }
 			.toUByteArray()
 
 
@@ -166,7 +166,7 @@ internal object DotIconColors {
 			fun derive(b: UByte, saturation: Double): DotIconColorRgb {
 				// HSL color hue in degrees
 				val hueModulus = 64u
-				val hue: Float = (b.toUShort() % hueModulus * 360u).toFloat() / hueModulus.toFloat()
+				val hue: Float = ((b.toUShort() % hueModulus * 360u) / hueModulus).toFloat()
 
 				// HSL lightness in percents
 				val l: UByte = when (b / 64u) {

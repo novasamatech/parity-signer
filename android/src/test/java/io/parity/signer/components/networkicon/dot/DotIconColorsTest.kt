@@ -10,7 +10,15 @@ class DotIconColorsTest {
 	fun checkColors() {
 		val seed = DotIconConstants.previewAlice
 		val colors = DotIconColors.getColors(seed)
-		assert(colors[2].red == 214.toUByte())
+		assert(colors[2].red.toString() == "214")
+	}
+
+	@Test
+	fun checkColorDerivation() {
+		val b = 212u.toUByte()
+		val sat = 0.56
+		val color = DotIconColors.DotIconColorRgb.derive(b, sat)
+		Assert.assertEquals(DotIconColors.DotIconColorRgb(165u, 227u, 156u, 255u), color)
 	}
 
 	@Test
