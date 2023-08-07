@@ -1,4 +1,4 @@
-package io.parity.signer.components.blockies
+package io.parity.signer.components.networkicon.blockies
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
@@ -12,8 +12,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.blockies.svalinn.Blockies
-import io.parity.signer.components.blockies.svalinn.BlockiesPainter
+import io.parity.signer.components.networkicon.blockies.svalinn.Blockies
+import io.parity.signer.components.networkicon.blockies.svalinn.BlockiesPainter
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
