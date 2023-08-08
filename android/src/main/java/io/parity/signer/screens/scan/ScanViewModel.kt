@@ -274,7 +274,7 @@ class ScanViewModel : ViewModel() {
 				when (dynDerivations) {
 					is UniffiResult.Error -> {
 						transactionError.value = TransactionErrorModel(
-							title = context.getString(R.string.dymanic_derivation_error_custom_title),
+							title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 							subtitle = dynDerivations.error.message ?: "",
 						)
 					}
