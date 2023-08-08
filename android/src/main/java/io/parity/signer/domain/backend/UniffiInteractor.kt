@@ -213,6 +213,19 @@ class UniffiInteractor(val appContext: Context) {
 				UniffiResult.Error(e)
 			}
 		}
+
+	suspend fun signDynamicDerivationsTransactions(
+		seeds: Map<String, String>,
+		payload: List<String>
+	): UniffiResult<MSignedTransaction> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.signDdTransaction(payload, seeds)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
 }
 
 sealed class UniffiResult<T> {
