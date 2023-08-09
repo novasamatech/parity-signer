@@ -91,7 +91,7 @@ fun KeySetDetailsMultiselectScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			ClickableLabel(
 				stringId = R.string.key_set_export_selected_label,
-				isEnabled = selected.value.isNotEmpty(),
+				isEnabled = true,
 				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 				onClick = onExportSelected,
 			)
@@ -110,7 +110,6 @@ fun KeySetDetailsMultiselectScreen(
 )
 @Composable
 private fun PreviewKeySetDetailsMultiselectScreen() {
-
 	val stabModel = KeySetDetailsModel.createStub()
 	val state =
 		remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
