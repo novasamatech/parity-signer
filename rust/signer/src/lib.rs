@@ -359,6 +359,7 @@ fn try_create_imported_address(
     .map_err(|e| e.to_string().into())
 }
 
+/// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
 fn sign_dd_transaction(
     payload: &[String],
     seeds: HashMap<String, String>,

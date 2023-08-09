@@ -126,6 +126,7 @@ pub fn export_signatures_bulk(
     Ok(MSignatureReady { signatures })
 }
 
+/// Sign dynamic derivation transaction and return data for mobile
 pub fn sign_dd_transaction(
     database: &sled::Db,
     payload_set: &[String],
@@ -148,6 +149,7 @@ pub fn sign_dd_transaction(
     })
 }
 
+/// Parse and sign dynamic derivation transaction
 pub(crate) fn handle_dd_sign(
     database: &sled::Db,
     payload_set: &[String],
@@ -166,7 +168,8 @@ pub(crate) fn handle_dd_sign(
                 actions.extend(a);
                 checksum = c;
             }
-            _ => return Err(Error::TxActionNotSign),
+            Ok(_) => return Err(Error::TxActionNotSign),
+            Err(e) => return Err(e.into()),
         };
     }
     for (idx, sign_action) in actions.into_iter().enumerate() {

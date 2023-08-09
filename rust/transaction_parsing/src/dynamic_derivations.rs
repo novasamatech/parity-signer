@@ -12,6 +12,7 @@ use sp_core::H256;
 
 use crate::error::Result;
 
+/// Parses the payload to make sure it is a dynamic derivation request
 pub(crate) fn decode_dynamic_derivations(data_hex: &str) -> Result<DecodeSequenceResult> {
     let data = unhex(data_hex)?;
     let _ = <DynamicDerivationsRequest>::decode(&mut &data[3..])?;
@@ -20,6 +21,7 @@ pub(crate) fn decode_dynamic_derivations(data_hex: &str) -> Result<DecodeSequenc
     })
 }
 
+/// Parses dynamic derivation request and returns preview of the result
 pub fn process_dynamic_derivations(
     database: &sled::Db,
     seeds: HashMap<String, String>,
@@ -31,6 +33,7 @@ pub fn process_dynamic_derivations(
     }
 }
 
+/// Partially parses dynamic derivation transaction to make it compatible with `multisigner_msg_genesis_encryption`
 pub fn dd_transaction_msg_genesis_encryption(
     data_hex: &str,
 ) -> Result<(DynamicDerivationTransaction, Vec<u8>, H256, Encryption)> {
