@@ -17,8 +17,7 @@ use constants::{
 use db_handling::{
     cold_default::{init_db, populate_cold_nav_test},
     identities::{
-        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, TransactionBulk,
-        TransactionBulkV1,
+        import_all_addrs, try_create_address, try_create_seed, TransactionBulk, TransactionBulkV1,
     },
 };
 use definitions::{
@@ -46,7 +45,7 @@ use definitions::{
 use constants::test_values::{
     alice_sr_0, alice_sr_1, alice_sr_alice_westend, alice_sr_secret_abracadabra,
 };
-use db_handling::identities::inject_derivations_has_pwd;
+use db_handling::identities::{export_key_set_addrs, inject_derivations_has_pwd};
 use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::Card::DerivationsCard;
 use definitions::navigation::MAddressCard;
@@ -597,8 +596,7 @@ fn export_import_addrs() {
     let mut alice_seeds = HashMap::new();
     alice_seeds.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
 
-    let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
-    let addrs = export_all_addrs(&db_from, selected.clone()).unwrap();
+    let addrs = export_key_set_addrs(&db_from, "Alice", ExportedSet::All).unwrap();
     let addrs = prepare_derivations_preview(&db_from, addrs).unwrap();
     let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
 
@@ -625,23 +623,19 @@ fn export_import_addrs() {
 
     assert_eq!(addrs, addrs_expected);
 
-    let mut selected_hashmap = HashMap::new();
     let polkadot_genesis =
         H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
             .unwrap();
 
     let network_specs_key = NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519);
 
-    selected_hashmap.insert(
-        "Alice".to_owned(),
-        ExportedSet::Selected {
-            s: vec![PathAndNetwork {
-                derivation: "".to_owned(),
-                network_specs_key: hex::encode(network_specs_key.key()),
-            }],
-        },
-    );
-    let addrs_filtered = export_all_addrs(&db_from, selected_hashmap).unwrap();
+    let exported_set = ExportedSet::Selected {
+        s: vec![PathAndNetwork {
+            derivation: "".to_owned(),
+            network_specs_key: hex::encode(network_specs_key.key()),
+        }],
+    };
+    let addrs_filtered = export_key_set_addrs(&db_from, "Alice", exported_set).unwrap();
     let addrs_filtered = prepare_derivations_preview(&db_from, addrs_filtered).unwrap();
     let addrs_filtered = inject_derivations_has_pwd(addrs_filtered, alice_seeds.clone()).unwrap();
 
@@ -659,7 +653,7 @@ fn export_import_addrs() {
 
     import_all_addrs(&db_to, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(&db_to, selected).unwrap();
+    let addrs_new = export_key_set_addrs(&db_to, "Alice", ExportedSet::All).unwrap();
     let addrs_new = prepare_derivations_preview(&db_from, addrs_new).unwrap();
     let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
     assert_eq!(addrs_new, addrs_expected);

@@ -12,8 +12,11 @@ extension KeyDetailsView {
         VStack {
             // Top overlay
             HStack {
-                NavbarButton(action: { viewModel.isPresentingSelectionOverlay.toggle() }, icon: Image(.xmark))
-                    .padding(.leading, Spacing.extraSmall)
+                NavbarButton(
+                    action: viewModel.toggleSelectKeysOverlay,
+                    icon: Image(.xmark)
+                )
+                .padding(.leading, Spacing.extraSmall)
                 Spacer()
                 Text(selectionTitle)
                     .font(PrimaryFont.titleS.font)
@@ -35,16 +38,12 @@ extension KeyDetailsView {
                 .padding(.leading, Spacing.medium)
                 Spacer()
                 // Export
-                Button(action: { viewModel.isShowingKeysExportModal.toggle() }) {
+                Button(action: viewModel.exportSelectedKeys) {
                     Localizable.KeyDetails.Overlay.Action.export.text
-                        .foregroundColor(
-                            viewModel.selectedKeys.isEmpty ? Asset.textAndIconsDisabled.swiftUIColor : Asset
-                                .accentPink300.swiftUIColor
-                        )
+                        .foregroundColor(Asset.accentPink300.swiftUIColor)
                         .font(PrimaryFont.labelL.font)
                 }
                 .padding(.trailing, Spacing.medium)
-                .disabled(viewModel.selectedKeys.isEmpty)
             }
             .frame(height: Heights.tabbarHeight)
             .background(Asset.backgroundSecondary.swiftUIColor)
@@ -54,8 +53,16 @@ extension KeyDetailsView {
     var selectionTitle: String {
         let localizable = Localizable.KeyDetails.Overlay.Label.self
         let itemsCount = viewModel.selectedKeys.count
-        let keyString = itemsCount == 1 ? localizable.Key.single.string : localizable.Key.plural.string
-        return localizable.title(String(itemsCount), keyString)
+        let result: String
+        switch itemsCount {
+        case 0:
+            result = localizable.Title.empty.string
+        case 1:
+            result = localizable.title(String(itemsCount), localizable.Key.single.string)
+        default:
+            result = localizable.title(String(itemsCount), localizable.Key.plural.string)
+        }
+        return result
     }
 
     func selectAll() {

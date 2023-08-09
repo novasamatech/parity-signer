@@ -1,5 +1,5 @@
 //
-//  ExportMultipleKeysService.swift
+//  ExportKeySetService.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 18/10/2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class ExportMultipleKeysService {
+final class ExportKeySetService {
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
     private let callbackQueue: Dispatching
 
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        callQueue: Dispatching = DispatchQueue(label: "ExportMultipleKeysService", qos: .userInitiated),
+        callQueue: Dispatching = DispatchQueue(label: "ExportKeySetService", qos: .userInitiated),
         callbackQueue: Dispatching = DispatchQueue.main
     ) {
         self.databaseMediator = databaseMediator
@@ -22,38 +22,24 @@ final class ExportMultipleKeysService {
         self.callbackQueue = callbackQueue
     }
 
-    func exportMultipleKeySets(
-        seedNames: [String],
-        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
-    ) {
-        let selectedItems: [String: ExportedSet] = Dictionary(
-            uniqueKeysWithValues: seedNames
-                .map { ($0, ExportedSet.all) }
-        )
-        export(selectedItems: selectedItems, completion)
-    }
-
     func exportRootWithDerivedKeys(
         seedName: String,
         keys: [MKeyAndNetworkCard],
         _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
     ) {
-        let selectedItems: [String: ExportedSet] = [
-            seedName: .selected(s: keys.map(\.asPathAndNetwork))
-        ]
-        export(selectedItems: selectedItems, completion)
+        let selectedItems: ExportedSet = .selected(s: keys.map(\.asPathAndNetwork))
+        export(seedName: seedName, selectedItems: selectedItems, completion)
     }
 
     private func export(
-        selectedItems: [String: ExportedSet],
+        seedName: String,
+        selectedItems: ExportedSet,
         _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
     ) {
         callQueue.async {
             let result: Result<AnimatedQRCodeViewModel, ServiceError>
             do {
-                let qrCodes = try exportKeyInfo(
-                    selectedNames: selectedItems
-                ).frames
+                let qrCodes = try exportKeyInfo(seedName: seedName, exportedSet: selectedItems).frames
                 result = .success(AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload)))
             } catch {
                 result = .failure(.init(message: error.backendDisplayError))

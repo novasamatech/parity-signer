@@ -1,4 +1,6 @@
-use db_handling::identities::{get_all_addresses, is_passworded, ExportAddrs, ExportAddrsV1};
+use db_handling::identities::{
+    get_all_addresses, is_passworded, ExportAddrs, ExportAddrsV1, ExportAddrsV2,
+};
 
 use definitions::derivations::{
     DerivedKeyError, DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview,
@@ -34,6 +36,7 @@ pub fn prepare_derivations_preview(
 ) -> Result<Vec<SeedKeysPreview>> {
     match export_info {
         ExportAddrs::V1(v1) => prepare_derivations_v1(database, v1),
+        ExportAddrs::V2(v2) => prepare_derivations_v2(database, v2),
     }
 }
 
@@ -93,6 +96,13 @@ fn prepare_derivations_v1(
         }
     }
     Ok(result)
+}
+
+fn prepare_derivations_v2(
+    database: &sled::Db,
+    export_info: ExportAddrsV2,
+) -> Result<Vec<SeedKeysPreview>> {
+    prepare_derivations_v1(database, export_info.into())
 }
 
 fn get_derivation_status(
