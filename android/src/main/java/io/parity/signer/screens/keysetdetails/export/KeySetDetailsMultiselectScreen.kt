@@ -6,18 +6,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.ClickableLabel
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.domain.*
 import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandableMultiselect
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
-import io.parity.signer.screens.keysets.export.ClickableLabel
 import io.parity.signer.ui.theme.*
 
 /**
