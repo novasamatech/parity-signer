@@ -4,7 +4,7 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use db_handling::identities::{export_all_addrs, SignaturesBulk, SignaturesBulkV1};
+use db_handling::identities::{export_key_set_addrs, SignaturesBulk, SignaturesBulkV1};
 //do we support mutex?
 use lazy_static::lazy_static;
 use sp_runtime::MultiSignature;
@@ -84,9 +84,10 @@ pub fn update_seed_names(seed_names: Vec<String>) -> Result<()> {
 /// Export key info with derivations.
 pub fn export_key_info(
     database: &sled::Db,
-    selected_names: HashMap<String, ExportedSet>,
+    seed_name: &str,
+    exported_set: ExportedSet,
 ) -> Result<MKeysInfoExport> {
-    let export_all_addrs = export_all_addrs(database, selected_names)?;
+    let export_all_addrs = export_key_set_addrs(database, seed_name, exported_set)?;
 
     let data = [&[0x53, 0xff, 0xde], export_all_addrs.encode().as_slice()].concat();
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;

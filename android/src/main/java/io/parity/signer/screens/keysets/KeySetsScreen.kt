@@ -45,11 +45,7 @@ fun KeySetsScreen(
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
 		ScreenHeader(
 			stringResource(R.string.key_sets_screem_title),
-			onMenu = if (model.keys.isNotEmpty()) {
-				{ localNavigator.navigate(KeySetsNavSubgraph.homeMenu) }
-			} else {
-				null
-			}
+			onMenu = null,
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			if (model.keys.isNotEmpty()) {

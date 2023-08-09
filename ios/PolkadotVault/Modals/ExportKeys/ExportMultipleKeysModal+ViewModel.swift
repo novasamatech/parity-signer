@@ -9,7 +9,7 @@ import SwiftUI
 
 extension ExportMultipleKeysModal {
     final class ViewModel: ObservableObject {
-        private let keysExportService: ExportMultipleKeysService
+        private let keyExportService: ExportKeySetService
         let viewModel: ExportMultipleKeysModalViewModel
 
         @Published var qrCode: AnimatedQRCodeViewModel = .init(qrCodes: [])
@@ -20,11 +20,11 @@ extension ExportMultipleKeysModal {
 
         init(
             viewModel: ExportMultipleKeysModalViewModel,
-            keysExportService: ExportMultipleKeysService = ExportMultipleKeysService(),
+            keyExportService: ExportKeySetService = ExportKeySetService(),
             isPresented: Binding<Bool>
         ) {
             self.viewModel = viewModel
-            self.keysExportService = keysExportService
+            self.keyExportService = keyExportService
             _isPresented = isPresented
         }
 
@@ -32,16 +32,11 @@ extension ExportMultipleKeysModal {
             let completion: (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void = { result in
                 self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
             }
-            switch viewModel.selectedItems {
-            case let .keySets(keySets):
-                keysExportService.exportMultipleKeySets(seedNames: keySets.map(\.seed.seedName), completion)
-            case let .keys(key, derivedKeys):
-                keysExportService.exportRootWithDerivedKeys(
-                    seedName: key.keyName,
-                    keys: derivedKeys.map(\.keyData),
-                    completion
-                )
-            }
+            keyExportService.exportRootWithDerivedKeys(
+                seedName: viewModel.key.keyName,
+                keys: viewModel.derivedKeys.map(\.keyData),
+                completion
+            )
         }
     }
 }

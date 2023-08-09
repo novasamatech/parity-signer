@@ -413,9 +413,11 @@ fn history_seed_name_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDispl
 }
 
 fn export_key_info(
-    selected_names: HashMap<String, ExportedSet>,
+    seed_name: &str,
+    exported_set: ExportedSet,
 ) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
-    navigator::export_key_info(&get_db()?, selected_names).map_err(|e| e.to_string().into())
+    navigator::export_key_info(&get_db()?, seed_name, exported_set)
+        .map_err(|e| e.to_string().into())
 }
 
 fn keys_by_seed_name(seed_name: &str) -> anyhow::Result<MKeysNew, ErrorDisplayed> {
