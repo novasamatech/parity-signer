@@ -317,6 +317,11 @@ dictionary MTransaction {
     MSCNetworkInfo? network_info;
 };
 
+dictionary MSignedTransaction {
+    sequence<MTransaction> transaction;
+    MSignatureReady signature;
+};
+
 enum TransactionType {
     "Sign",
     "Stub",
@@ -548,6 +553,7 @@ interface BananaSplitRecoveryResult {
 interface DecodeSequenceResult {
     BBananaSplitRecoveryResult(BananaSplitRecoveryResult b);
     DynamicDerivations(string s);
+    DynamicDerivationTransaction(sequence<string> s);
     Other(string s);
 };
 
@@ -612,6 +618,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     void try_create_imported_address([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string path, [ByRef] string network);
+
+    [Throws=ErrorDisplayed]
+    MSignedTransaction sign_dd_transaction([ByRef] sequence<string> payload, record<string, string> seeds);
 
     [Throws=ErrorDisplayed]
     void history_init_history_with_cert();

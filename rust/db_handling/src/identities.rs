@@ -57,8 +57,8 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
     DynamicDerivationsResponseInfo,
 };
-use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
+use definitions::helpers::{base58_or_eth_to_multisigner, multisigner_to_encryption};
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
@@ -119,6 +119,12 @@ impl From<&[MultiSignature]> for SignaturesBulkV1 {
             signatures: signatures.to_owned(),
         }
     }
+}
+
+#[derive(Clone, Encode, Decode)]
+pub struct DynamicDerivationTransaction {
+    pub root_multisigner: MultiSigner,
+    pub derivation_path: String,
 }
 
 #[derive(Clone, Encode, Decode)]
@@ -483,6 +489,43 @@ pub fn dynamic_derivations_response(
     Ok(DynamicDerivationsAddressResponse::V1(
         DynamicDerivationsAddressResponseV1 { addr },
     ))
+}
+
+/// Helper function to get public key from seed phrase and derivation path
+pub fn derive_single_key(
+    database: &sled::Db,
+    seeds: &HashMap<String, String>,
+    derivation_path: &str,
+    root_multisigner: &MultiSigner,
+    network_key: NetworkSpecsKey,
+) -> Result<(MultiSigner, AddressDetails)> {
+    let seed_name =
+        find_seed_name_for_multisigner(database, root_multisigner)?.ok_or_else(|| {
+            Error::NoSeedFound {
+                multisigner: root_multisigner.clone(),
+            }
+        })?;
+    let seed_phrase = seeds.get(&seed_name).ok_or_else(|| Error::NoSeedFound {
+        multisigner: root_multisigner.clone(),
+    })?;
+    // create fixed-length string to avoid reallocations
+    let mut full_address = String::with_capacity(seed_phrase.len() + derivation_path.len());
+    full_address.push_str(seed_phrase);
+    full_address.push_str(derivation_path);
+
+    let encryption = multisigner_to_encryption(root_multisigner);
+    let multi_signer = full_address_to_multisigner(full_address, encryption)?;
+
+    let address_details = AddressDetails {
+        seed_name,
+        path: derivation_path.to_string(),
+        has_pwd: false,
+        network_id: Some(network_key),
+        encryption,
+        secret_exposed: false,
+        was_imported: true,
+    };
+    Ok((multi_signer, address_details))
 }
 
 pub fn inject_derivations_has_pwd(

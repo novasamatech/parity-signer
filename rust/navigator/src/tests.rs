@@ -48,15 +48,16 @@ use constants::test_values::{
 use db_handling::identities::{export_key_set_addrs, inject_derivations_has_pwd};
 use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::Card::DerivationsCard;
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{DecodeSequenceResult, MAddressCard};
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
 use tempfile::tempdir;
-use transaction_parsing::prepare_derivations_preview;
+use transaction_parsing::{decode_payload, prepare_derivations_preview};
 
 use crate::{
-    keys_by_seed_name,
+    handle_dd_sign, keys_by_seed_name,
     navstate::State,
+    sign_dd_transaction,
     states::{SignResult, TransactionState},
     Action,
 };
@@ -6170,4 +6171,90 @@ fn flow_test_1() {
     );
 
     std::fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn test_sign_dd_transaction() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+
+    let derivation_path = hex::encode("//westend".encode());
+    let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+    let payload =
+        "530105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
+
+    let transaction = match decode_payload(&payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+
+    let result = sign_dd_transaction(&db, &transaction, seeds);
+    let transaction = result.expect("transaction is ok");
+    assert_eq!(transaction.signature.signatures.len(), 1);
+
+    // identical non-dynamic derivation transaction
+    let alice_westend_public =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let non_dynamic_transaction =
+        "530102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
+    assert!(signature_is_good(
+        &non_dynamic_transaction,
+        &String::from_utf8(transaction.signature.signatures[0].data().to_vec()).unwrap()
+    ));
+}
+
+#[test]
+fn test_bulk_dd_signing() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    let derivation_path = hex::encode("//westend".encode());
+    let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+    let payload = "0105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
+
+    let encoded_transactions = vec![
+        hex::decode(&payload).unwrap(),
+        hex::decode(&payload).unwrap(),
+    ];
+
+    // Another bulk in format that is digestible by verification
+    // utilities function.
+    let _encoded_transactions_prefixed: Vec<_> = encoded_transactions
+        .iter()
+        .map(|tx| "53".to_string() + &hex::encode(tx))
+        .collect();
+    let bulk = TransactionBulk::V1(TransactionBulkV1 {
+        encoded_transactions,
+    });
+    let bulk_payload = hex::encode([&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat());
+    let transactions = match decode_payload(&bulk_payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
+
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    populate_cold_nav_test(&db).unwrap();
+
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    let signed_transaction = handle_dd_sign(&db, &transactions, seeds).expect("signing is ok");
+
+    // Identical non-dynamic derivation transaction
+    let alice_westend_public =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let identical_tx = "530102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
+
+    for (_, sig) in signed_transaction.iter() {
+        let signature = hex::encode(sig.signature().encode());
+        assert!(signature_is_good(&identical_tx, &signature));
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
 }

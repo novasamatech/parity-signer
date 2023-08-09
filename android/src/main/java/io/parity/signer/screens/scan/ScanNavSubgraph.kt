@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -110,7 +109,12 @@ fun ScanNavSubgraph(
 			model = dynamicDerivationsData,
 			modifier = Modifier.statusBarsPadding(),
 			onBack = scanViewModel::clearState,
-			onDone = { scanViewModel.createDynamicDerivations(dynamicDerivationsData.keySet, context) },
+			onDone = {
+				scanViewModel.createDynamicDerivations(
+					dynamicDerivationsData.keySet,
+					context
+				)
+			},
 		)
 	} else if (transactionsValue == null || showingModals) {
 
@@ -124,7 +128,10 @@ fun ScanNavSubgraph(
 			},
 			onDynamicDerivations = { payload ->
 				scanViewModel.performDynamicDerivationPayload(payload, context)
-			}
+			},
+			onDynamicDerivationsTransactions = { payload ->
+				scanViewModel.performDynamicDerivationTransaction(payload, context)
+			},
 		)
 	} else {
 
