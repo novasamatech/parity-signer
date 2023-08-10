@@ -33,7 +33,7 @@ import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
 import io.parity.signer.ui.theme.textDisabled
 
-
+//todo dmitry remove this file
 @Composable
 fun NetworkKeysExpandableMultiselect(
 	network: NetworkModel,
@@ -98,8 +98,7 @@ private fun NetworkKeysExpandableMultiselectPrivate(
 						end = 16.dp,
 						start = 12.dp
 					)
-					.background(MaterialTheme.colors.fill6, CircleShape)
-				,
+					.background(MaterialTheme.colors.fill6, CircleShape),
 				contentAlignment = Alignment.Center,
 			) {
 				Image(
@@ -124,7 +123,8 @@ private fun NetworkKeysExpandableMultiselectPrivate(
 					model = key,
 					networkLogo = network.logo,
 					isSelected = selectedKeysAdr.contains(key.addressKey),
-					onClick = { isSelected, address -> onKeyClick(isSelected, address) })
+					onClick = { isSelected, address -> onKeyClick(isSelected, address) },
+				)
 				first = false
 			}
 		}

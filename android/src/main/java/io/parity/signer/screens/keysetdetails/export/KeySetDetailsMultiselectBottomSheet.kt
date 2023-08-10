@@ -1,20 +1,30 @@
 package io.parity.signer.screens.keysetdetails.export
 
+import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.parity.signer.R
+import io.parity.signer.components.IdentIconWithNetwork
+import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.ClickableLabel
 import io.parity.signer.components.base.ScreenHeaderClose
+import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.domain.*
+import io.parity.signer.screens.keysetdetails.items.KeyDerivedItemMultiselect
 import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandableMultiselect
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
 import io.parity.signer.ui.theme.*
@@ -25,51 +35,44 @@ import io.parity.signer.ui.theme.*
  * For multiselec screen KeyManager is still used
  */
 @Composable
-fun KeySetDetailsMultiselectScreen(
+fun KeySetDetailsMultiselectBottomSheet(
 	model: KeySetDetailsModel,
 	selected: MutableState<Set<String>>,
 	onClose: Callback,
 	onExportSelected: Callback,
 	onExportAll: Callback,
-	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
-		ScreenHeaderClose(
-				pluralStringResource(
-					id = R.plurals.key_export_title,
-					count = selected.value.size,
-					selected.value.size,
-				),
-			onClose = onClose,
+		val keysToExport = selected.value.size + 1 // + root key
+		BottomSheetHeader(
+			pluralStringResource(
+				id = R.plurals.key_export_title,
+				count = keysToExport,
+				keysToExport,
+			),
+			onCloseClicked = onClose,
 		)
+		SignerDivider(sidePadding = 24.dp)
 		Column(
 			modifier = Modifier
 				.weight(1f)
 				.padding(horizontal = 8.dp)
 				.verticalScroll(rememberScrollState()),
 			verticalArrangement = Arrangement.spacedBy(4.dp),
-			) {
+		) {
 			//seed - key set
 			model.root?.let {
-				SeedKeyDetails(
-					model = it,
-					onShowPublicKey = onShowPublicKey,
-					Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-						.padding(bottom = 16.dp)
-				)
+				DisabledSelectedKey(it.base58)
 			}
-
-			val models = model.keysAndNetwork.groupBy { it.network }
-			for (networkAndKeys in models.entries) {
-				NetworkKeysExpandableMultiselect(
-					network = networkAndKeys.key.toNetworkModel(),
-					keys = networkAndKeys.value
-						.map { it.key }
-						.sortedBy { it.path },
-					selectedKeysAdr = selected.value,
-				) { isSelected, keyAdr ->
-					if (isSelected) selected.value += keyAdr else selected.value -= keyAdr
-				}
+			for (item in model.keysAndNetwork) {
+				KeyDerivedItemMultiselect(
+					model = item.key,
+					networkLogo = item.network.networkLogo,
+					isSelected = selected.value.contains(item.key.addressKey),
+					onClick = { isSelected, address ->
+						if (isSelected) selected.value += address else selected.value -= address
+					},
+				)
 			}
 		}
 		Row(
@@ -95,6 +98,33 @@ fun KeySetDetailsMultiselectScreen(
 	}
 }
 
+@Composable
+private fun DisabledSelectedKey(base58: String) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.padding(vertical = 16.dp)
+	) {
+		Column(Modifier.weight(1f)) {
+			Text(
+				text = base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+				color = MaterialTheme.colors.textDisabled,
+				style = SignerTypeface.BodyL,
+				modifier = Modifier.padding(horizontal = 16.dp),
+			)
+		}
+		SignerCheckbox(
+			isChecked = true,
+			checkedColor = MaterialTheme.colors.textDisabled,
+			modifier = Modifier
+				.padding(8.dp)
+				.padding(horizontal = 8.dp)
+		) {
+			//no react on click
+		}
+	}
+}
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -111,7 +141,13 @@ private fun PreviewKeySetDetailsMultiselectScreen() {
 		remember { mutableStateOf(setOf(stabModel.keysAndNetwork[1].key.addressKey)) }
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsMultiselectScreen(stabModel, state, {}, {}, {}, {_,_ ->})
+			KeySetDetailsMultiselectBottomSheet(
+				stabModel,
+				state,
+				{},
+				{},
+				{},
+			)
 		}
 	}
 }
