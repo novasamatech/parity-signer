@@ -88,17 +88,18 @@ class UniffiInteractor(val appContext: Context) {
 		}
 	}
 
-	suspend fun exportSeedKeyInfos(seedsToExport: List<String>): UniffiResult<MKeysInfoExport> =
-		withContext(Dispatchers.IO) {
-			try {
-				val keyInfo = exportKeyInfo(
-					selectedNames = seedsToExport.associateWith { ExportedSet.All },
-				)
-                UniffiResult.Success(keyInfo)
-			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
-			}
-		}
+//	todo dmitry remove?
+//	suspend fun exportSeedKeyInfos(seedsToExport: List<String>): UniffiResult<MKeysInfoExport> =
+//		withContext(Dispatchers.IO) {
+//			try {
+//				val keyInfo = exportKeyInfo(
+//					selectedNames = seedsToExport.associateWith { ExportedSet.All },
+//				)
+//                UniffiResult.Success(keyInfo)
+//			} catch (e: ErrorDisplayed) {
+//                UniffiResult.Error(e)
+//			}
+//		}
 
 	suspend fun exportSeedWithKeys(
 		seed: String, derivedKeyAddr: List<String>
@@ -111,9 +112,9 @@ class UniffiInteractor(val appContext: Context) {
 					key.key.address.path, key.network.networkSpecsKey
 				)
 			}
-			val keyInfo = exportKeyInfo(
-
-				selectedNames = mapOf(seed to ExportedSet.Selected(pathAndNetworks)),
+			val keyInfo = io.parity.signer.uniffi.exportKeyInfo(
+				seedName = seed,
+				exportedSet= ExportedSet.Selected(pathAndNetworks),
 			)
             UniffiResult.Success(keyInfo)
 		} catch (e: ErrorDisplayed) {
@@ -126,7 +127,7 @@ class UniffiInteractor(val appContext: Context) {
 			try {
 				val images = binaryData.map {
 					async(Dispatchers.IO) {
-						encodeToQr(it, false)
+						io.parity.signer.uniffi.encodeToQr(it, false)
 					}
 				}.map { it.await() }
                 UniffiResult.Success(images)
@@ -209,6 +210,19 @@ class UniffiInteractor(val appContext: Context) {
 			try {
 				val validationResult = io.parity.signer.uniffi.previewDynamicDerivations(seeds, payload)
 				UniffiResult.Success(validationResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun signDynamicDerivationsTransactions(
+		seeds: Map<String, String>,
+		payload: List<String>
+	): UniffiResult<MSignedTransaction> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.signDdTransaction(payload, seeds)
+				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
 			}

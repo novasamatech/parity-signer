@@ -40,4 +40,25 @@ final class DynamicDerivationsService {
             }
         }
     }
+
+    func signDynamicDerivationsTransaction(
+        for seedPhrases: [String: String],
+        payload: [String],
+        completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<MSignedTransaction, TransactionError>
+            do {
+                let transaction: MSignedTransaction = try signDdTransaction(payload: payload, seeds: seedPhrases)
+                result = .success(transaction)
+            } catch let errorDisplayed as ErrorDisplayed {
+                result = .failure(errorDisplayed.transactionError)
+            } catch {
+                result = .failure(.generic(error.backendDisplayError))
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
 }

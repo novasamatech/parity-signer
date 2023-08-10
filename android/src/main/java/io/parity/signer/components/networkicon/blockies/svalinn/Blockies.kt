@@ -1,4 +1,4 @@
-package io.parity.signer.components.blockies.svalinn
+package io.parity.signer.components.networkicon.blockies.svalinn
 
 /**
  * Based on svalinn-kotlin project.
@@ -39,11 +39,11 @@ internal class Blockies(
             return seed
         }
 
-        private fun colorFromSeed(seed: LongArray): Blockies.HSL {
+        private fun colorFromSeed(seed: LongArray): HSL {
             val h = Math.floor(nextFromSeed(seed) * 360.0)
             val s = nextFromSeed(seed) * 60.0 + 40.0
             val l = (nextFromSeed(seed) + nextFromSeed(seed) + nextFromSeed(seed) + nextFromSeed(seed)) * 25.0
-            return Blockies.HSL(h, s, l)
+            return HSL(h, s, l)
         }
 
         private fun nextFromSeed(seed: LongArray): Double {

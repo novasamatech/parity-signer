@@ -20,14 +20,6 @@ struct KeySetList: View {
                     NavigationBarView(
                         viewModel: NavigationBarViewModel(
                             title: .title(Localizable.KeySets.title.string),
-                            leftButtons: [.init(
-                                type: viewModel.isExportKeysSelected ? .xmark : .empty,
-                                action: viewModel.onCancelExportTap
-                            )],
-                            rightButtons: [.init(
-                                type: viewModel.isExportKeysSelected ? .empty : .more,
-                                action: viewModel.onShowMoreTap
-                            )],
                             backgroundColor: Asset.backgroundSystem.swiftUIColor
                         )
                     )
@@ -46,24 +38,18 @@ struct KeySetList: View {
                 .navigationViewStyle(StackNavigationViewStyle())
                 .navigationBarHidden(true)
                 VStack {
-                    // Add Key Set
-                    if !viewModel.isExportKeysSelected {
-                        VStack(spacing: 0) {
-                            ConnectivityAlertOverlay(viewModel: .init())
-                            PrimaryButton(
-                                action: viewModel.onAddKeySetTap,
-                                text: Localizable.KeySets.Action.add.key
-                            )
-                            .padding(.horizontal, Spacing.large)
-                            .padding(.bottom, Spacing.large)
-                        }
+                    VStack(spacing: 0) {
+                        ConnectivityAlertOverlay(viewModel: .init())
+                        PrimaryButton(
+                            action: viewModel.onAddKeySetTap,
+                            text: Localizable.KeySets.Action.add.key
+                        )
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.bottom, Spacing.large)
                     }
                     TabBarView(
                         viewModel: viewModel.tabBarViewModel
                     )
-                }
-                if viewModel.isExportKeysSelected {
-                    exportKeysOverlay
                 }
                 // Navigation Links
                 NavigationLink(
@@ -115,33 +101,6 @@ struct KeySetList: View {
                 )
             )
         }
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingMoreMenu
-        ) {
-            KeyListMoreMenuModal(
-                isPresented: $viewModel.isShowingMoreMenu,
-                isExportKeysSelected: $viewModel.isExportKeysSelected
-            )
-            .clearModalBackground()
-        }
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingKeysExportModal
-        ) {
-            ExportMultipleKeysModal(
-                viewModel: .init(
-                    viewModel: ExportMultipleKeysModalViewModel(
-                        selectedItems: .keySets(viewModel.selectedItems),
-                        count: viewModel.selectedItems.count
-                    ),
-                    isPresented: $viewModel.isShowingKeysExportModal
-                )
-            )
-            .clearModalBackground()
-            .onAppear {
-                viewModel.selectedItems.removeAll()
-                viewModel.isExportKeysSelected.toggle()
-            }
-        }
         .bottomSnackbar(
             viewModel.snackbarViewModel,
             isPresented: $viewModel.isSnackbarPresented
@@ -168,39 +127,11 @@ struct KeySetList: View {
 
     func keyItem(_ keySetViewModel: KeySetViewModel) -> some View {
         KeySetRow(
-            viewModel: keySetViewModel,
-            selectedItems: $viewModel.selectedItems,
-            isExportKeysSelected: $viewModel.isExportKeysSelected
+            viewModel: keySetViewModel
         )
         .onTapGesture {
             viewModel.onKeyTap(keySetViewModel)
         }
-    }
-
-    var exportKeysOverlay: some View {
-        HStack {
-            Button(action: viewModel.onExportAllTap) {
-                Localizable.KeySets.More.Action.exportAll.text
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
-                    .font(PrimaryFont.labelL.font)
-            }
-            .padding(.leading, Spacing.medium)
-            Spacer()
-            Button(action: viewModel.onExportSelectedTap) {
-                Localizable.KeySets.More.Action.exportSelected.text
-                    .foregroundColor(
-                        viewModel.selectedItems.isEmpty ?
-                            Asset.textAndIconsDisabled.swiftUIColor :
-                            Asset.accentPink300
-                            .swiftUIColor
-                    )
-                    .font(PrimaryFont.labelL.font)
-            }
-            .disabled(viewModel.selectedItems.isEmpty)
-            .padding(.trailing, Spacing.medium)
-        }
-        .frame(height: Heights.tabbarHeight)
-        .background(Asset.backgroundSecondary.swiftUIColor)
     }
 }
 
@@ -215,19 +146,15 @@ extension KeySetList {
         private weak var appState: AppState!
         @Published var dataModel: MSeeds = .init(seedNameCards: [])
         @Published var listViewModel: KeySetListViewModel = .init(list: [])
-        @Published var selectedItems: [KeySetViewModel] = []
         @Published var detailsToPresent: MKeysNew?
         @Published var detailsKeyName: String = ""
 
         @Published var isShowingRecoverKeySet = false
 
-        @Published var isShowingKeysExportModal = false
         @Published var isSnackbarPresented: Bool = false
         @Published var isShowingKeyDetails = false
         @Published var isShowingNewSeedMenu = false
         @Published var isShowingCreateKeySet = false
-        @Published var isShowingMoreMenu = false
-        @Published var isExportKeysSelected = false
         @Published var shouldShowCreateKeySet = false
         @Published var shouldShowRecoverKeySet = false
         @Published var isShowingDetails = false
@@ -284,23 +211,15 @@ extension KeySetList {
         }
 
         func onKeyTap(_ viewModel: KeySetViewModel) {
-            if isExportKeysSelected {
-                if selectedItems.contains(viewModel) {
-                    selectedItems.removeAll { $0 == viewModel }
-                } else {
-                    selectedItems.append(viewModel)
-                }
-            } else {
-                loadKeysInformation(for: viewModel.keyName) { result in
-                    switch result {
-                    case let .success(keysData):
-                        self.detailsToPresent = keysData
-                        self.detailsKeyName = viewModel.keyName
-                        self.isShowingDetails = true
-                    case .failure:
-                        self.detailsToPresent = nil
-                        self.detailsKeyName = ""
-                    }
+            loadKeysInformation(for: viewModel.keyName) { result in
+                switch result {
+                case let .success(keysData):
+                    self.detailsToPresent = keysData
+                    self.detailsKeyName = viewModel.keyName
+                    self.isShowingDetails = true
+                case .failure:
+                    self.detailsToPresent = nil
+                    self.detailsKeyName = ""
                 }
             }
         }
@@ -331,26 +250,8 @@ extension KeySetList {
             }
         }
 
-        func onExportAllTap() {
-            selectedItems = listViewModel.list
-            isShowingKeysExportModal = true
-        }
-
-        func onExportSelectedTap() {
-            isShowingKeysExportModal = true
-        }
-
         func onAddKeySetTap() {
             isShowingNewSeedMenu = true
-        }
-
-        func onCancelExportTap() {
-            isExportKeysSelected = false
-            selectedItems.removeAll()
-        }
-
-        func onShowMoreTap() {
-            isShowingMoreMenu.toggle()
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {

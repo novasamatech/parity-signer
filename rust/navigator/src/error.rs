@@ -37,4 +37,10 @@ pub enum Error {
 
     #[error("Unsupported transaction action")]
     TransactionActionUnsupported,
+
+    #[error("No transactions to sign")]
+    NoTransactionsToSign,
+
+    #[error("No seed phrase")]
+    NoSeedPhrase,
 }

@@ -195,6 +195,17 @@ extension KeyDetailsView {
                 onCompletion: onAddDerivedKeyCompletion(_:)
             )
         }
+
+        func toggleSelectKeysOverlay() {
+            isPresentingSelectionOverlay.toggle()
+            if !isPresentingSelectionOverlay {
+                selectedKeys = []
+            }
+        }
+
+        func exportSelectedKeys() {
+            isShowingKeysExportModal = true
+        }
     }
 }
 
@@ -281,10 +292,8 @@ extension KeyDetailsView.ViewModel {
             DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
         }
         return ExportMultipleKeysModalViewModel(
-            selectedItems: .keys(
-                key: keySummary,
-                derivedKeys: derivedKeys
-            ),
+            key: keySummary,
+            derivedKeys: derivedKeys,
             count: selectedKeys.count
         )
     }

@@ -105,9 +105,6 @@
 "KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
 "KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
-"KeySets.More.Action.Export" = "Export Key Sets";
-"KeySets.More.Action.ExportAll" = "Export All";
-"KeySets.More.Action.ExportSelected" = "Export Selected";
 "KeySetsModal.Action.Export" = "Export Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
 "KeySetsModal.Action.Backup" = "Backup Key Set";
@@ -131,6 +128,7 @@
 
 "KeyDetails.Action.Create" = "Create Derived key";
 "KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
+"KeyDetails.Overlay.Label.Title.Empty" = "Root key selected";
 "KeyDetails.Overlay.Label.Key.Single" = "key";
 "KeyDetails.Overlay.Label.Key.Plural" = "keys";
 "KeyDetails.Overlay.Action.Delete" = "Delete";
@@ -199,8 +197,8 @@
 "Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
-"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
-"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Key Sets";
+"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key";
+"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Keys";
 "KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";

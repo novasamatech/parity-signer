@@ -330,9 +330,11 @@ extension CameraView {
             isInTransactionProgress = true
             switch payload.type {
             case .dynamicDerivations:
-                startDynamicDerivationsFlow(payload.payload)
+                startDynamicDerivationsFlow(payload.payload.first ?? "")
             case .transaction:
-                startTransactionSigningFlow(payload.payload)
+                startTransactionSigningFlow(payload.payload.first ?? "")
+            case .dynamicDerivationsTransaction:
+                startDynamicDerivationsTransactionFlow(payload.payload)
             }
         }
 
@@ -540,6 +542,34 @@ private extension CameraView.ViewModel {
         if case let .signatureReady(value) = actionResult?.modalData {
             signature = value
             continueWithSignature()
+        }
+    }
+}
+
+private extension CameraView.ViewModel {
+    func startDynamicDerivationsTransactionFlow(_ payload: [String]) {
+        let seedPhrases = seedsMediator.getAllSeeds()
+        dynamicDerivationsService.signDynamicDerivationsTransaction(for: seedPhrases, payload: payload) { result in
+            switch result {
+            case let .success(signedTransaction):
+                if signedTransaction.transaction.allSatisfy(\.isDisplayingErrorOnly) {
+                    self.presentableError = .transactionSigningError(
+                        message: signedTransaction.transaction
+                            .reduce("") {
+                                $0 + $1.transactionIssues() + ($1 == signedTransaction.transaction.last ? "\n" : "")
+                            }
+                    )
+                    self.isPresentingError = true
+                    self.scanService.resetNavigationState()
+                    return
+                }
+                self.transactions = signedTransaction.transaction
+                self.signature = signedTransaction.signature
+                self.isPresentingTransactionPreview = true
+            case let .failure(error):
+                self.presentableError = .transactionError(for: error)
+                self.isPresentingError = true
+            }
         }
     }
 }
