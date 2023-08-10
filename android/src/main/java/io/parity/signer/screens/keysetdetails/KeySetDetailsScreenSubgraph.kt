@@ -168,6 +168,8 @@ private object KeySetDetailsMenuSubgraph {
 	const val network_filter = "keys_network_filters"
 	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
+	const val export_multiselect = "export_multiselect"
+	const val export_result = "export_result"
 }
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"

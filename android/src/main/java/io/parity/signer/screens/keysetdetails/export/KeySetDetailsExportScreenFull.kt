@@ -18,6 +18,7 @@ import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
+//todo dmitry remove this file as it's part of
 @Composable
 fun KeySetDetailsExportScreenFull(
 	model: KeySetDetailsModel,

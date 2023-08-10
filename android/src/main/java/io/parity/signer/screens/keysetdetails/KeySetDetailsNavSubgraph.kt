@@ -44,16 +44,16 @@ fun KeySetDetailsNavSubgraph(
 				},
 			)
 		}
-		composable(KeySetDetailsNavSubgraph.multiselect) {
-			KeySetDetailsExportScreenFull(
-				model = model,
-				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-			)
-		}
+		//todo dmitry
+//		composable(KeySetDetailsNavSubgraph.multiselect) {
+//			KeySetDetailsExportScreenFull(
+//				model = model,
+//				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
+//			)
+//		}
 	}
 }
 
 internal object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
-	const val multiselect = "keyset_details_multiselect"
 }

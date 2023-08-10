@@ -23,6 +23,8 @@ import io.parity.signer.ui.theme.*
  * Single Seed/Key set is selected is it's details
  * For non-multiselect state,
  * For multiselec screen KeyManager is still used
+ *
+ * todo dmitry remove this file
  */
 @Composable
 fun KeySetDetailsMultiselectScreen(

@@ -55,7 +55,6 @@ fun KeySetDetailsMultiselectBottomSheet(
 		SignerDivider(sidePadding = 24.dp)
 		Column(
 			modifier = Modifier
-				.weight(1f)
 				.padding(horizontal = 8.dp)
 				.verticalScroll(rememberScrollState()),
 			verticalArrangement = Arrangement.spacedBy(4.dp),
