@@ -850,6 +850,7 @@ dictionary MSCFieldNumber {
 interface Identicon {
     Dots(sequence<u8> identity);
     Blockies(string identity);
+    Jdenticon(string identity);
 };
 
 dictionary MSCId {
