@@ -1,4 +1,4 @@
-use crate::{error, produce_output, Error, StubNav};
+use crate::{decode_payload, error, produce_output, Error, StubNav};
 use constants::test_values::{
     alice_sr_alice, alice_sr_westend_0, bob, ed, id_01, id_02, types_known, types_unknown,
     westend_9070,
@@ -8,7 +8,9 @@ use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
     manage_history::get_history,
 };
-use definitions::navigation::{Identicon, MAddressCard, TransactionSignAction};
+use definitions::navigation::{
+    DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction,
+};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event},
@@ -25,11 +27,16 @@ use definitions::{
     error_signer::GeneralVerifierForContent,
 };
 
+use crate::parse_transaction::parse_dd_transaction;
+use constants::ALICE_SEED_PHRASE;
+use parity_scale_codec::Encode;
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
+use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::string::ToString;
 use std::{fs, str::FromStr};
 use tempfile::tempdir;
 
@@ -37,6 +44,8 @@ const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
     76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125,
 ];
+
+const ALICE_ROOT_PUBLIC: &str = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
 
 fn verifier_alice_sr25519() -> Verifier {
     Verifier {
@@ -2608,4 +2617,769 @@ fn import_derivations() {
         panic!("Wrong action {:?}", action)
     }
     fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn parse_dd_transaction_1() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let derivation_path = hex::encode("//Alice".encode());
+    let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Balances".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "transfer_keep_alive".to_string(),
+                        docs: " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::VarNameCard {
+                    f: "dest".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: Identicon::Dots { identity: bob().to_vec() },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 2,
+                card: Card::VarNameCard {
+                    f: "value".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 3,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "100.000000000".to_string(),
+                        units: "mWND".to_string(),
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 7,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "27".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "46".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "0".to_string(),
+                        units: "pWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "9010".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 0,
+                card: Card::TxSpecCard { f: "5".to_string() },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+    let network_info_known = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 42,
+            color: "#660D35".to_string(),
+            decimals: 12,
+            encryption: Encryption::Sr25519,
+            genesis_hash: H256::from_str(
+                "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+            )
+            .unwrap(),
+            logo: "westend".to_string(),
+            name: "westend".to_string(),
+            path_id: "//westend".to_string(),
+            secondary_color: "#262626".to_string(),
+            title: "Westend".to_string(),
+            unit: "WND".to_string(),
+        },
+        order: 2,
+    };
+    let output = decode_payload(&line).unwrap();
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
+        if let TransactionAction::Sign { actions, .. } =
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
+        {
+            let TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            } = &actions[0];
+
+            assert_eq!(actions.len(), 1);
+            assert_eq!(content, &content_known);
+            assert_eq!(author_info, &author_info_known);
+            assert_eq!(network_info, &network_info_known);
+            assert_eq!(*has_pwd, false)
+        } else {
+            panic!("Wrong action {:?}", output)
+        }
+    } else {
+        panic!("Wrong DecodeSequenceResult {:?}", output)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn parse_dd_transaction_2() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    let derivation_path = hex::encode("//Alice".encode());
+    let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}550210020c060000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700b864d9450006050800aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d0608008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48f501b4003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e314e9f9aef4e836a54bdd109aba380106e05e2ea83fbc490206b476840cd68e3e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+    let docs1 = " Send a batch of dispatch calls and atomically execute them.\n The whole transaction will rollback and fail if any of the calls failed.\n\n May be called from any origin.\n\n - `calls`: The calls to be dispatched from the same origin.\n\n If origin is root then call are dispatch without checking origin filter. (This includes\n bypassing `frame_system::Config::BaseCallFilter`).\n\n # <weight>\n - Complexity: O(C) where C is the number of calls to be batched.\n # </weight>".to_string();
+
+    let docs2 = " Take the origin account as a stash and lock up `value` of its balance. `controller` will\n be the account that controls it.\n\n `value` must be more than the `minimum_balance` specified by `T::Currency`.\n\n The dispatch origin for this call must be _Signed_ by the stash account.\n\n Emits `Bonded`.\n\n # <weight>\n - Independent of the arguments. Moderate complexity.\n - O(1).\n - Three extra DB entries.\n\n NOTE: Two of the storage writes (`Self::bonded`, `Self::payee`) are _never_ cleaned\n unless the `origin` falls below _existential deposit_ and gets removed as dust.\n ------------------\n Weight: O(1)\n DB Weight:\n - Read: Bonded, Ledger, [Origin Account], Current Era, History Depth, Locks\n - Write: Bonded, Payee, [Origin Account], Locks, Ledger\n # </weight>".to_string();
+
+    let docs3 = " Declare the desire to nominate `targets` for the origin controller.\n\n Effects will be felt at the beginning of the next era. This can only be called when\n [`EraElectionStatus`] is `Closed`.\n\n The dispatch origin for this call must be _Signed_ by the controller, not the stash.\n And, it can be only called when [`EraElectionStatus`] is `Closed`.\n\n # <weight>\n - The transaction's complexity is proportional to the size of `targets` (N)\n which is capped at CompactAssignments::LIMIT (MAX_NOMINATIONS).\n - Both the reads and writes follow a similar pattern.\n ---------\n Weight: O(N)\n where N is the number of targets\n DB Weight:\n - Reads: Era Election Status, Ledger, Current Era\n - Writes: Validators, Nominators\n # </weight>".to_string();
+
+    let docs4 = " (Re-)set the controller of a stash.\n\n Effects will be felt at the beginning of the next era.\n\n The dispatch origin for this call must be _Signed_ by the stash, not the controller.\n\n # <weight>\n - Independent of the arguments. Insignificant complexity.\n - Contains a limited number of reads.\n - Writes are limited to the `origin` account key.\n ----------\n Weight: O(1)\n DB Weight:\n - Read: Bonded, Ledger New Controller, Ledger Old Controller\n - Write: Bonded, Ledger New Controller, Ledger Old Controller\n # </weight>".to_string();
+
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Utility".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "batch_all".to_string(),
+                        docs: docs1,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::VarNameCard {
+                    f: "calls".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::PalletCard {
+                    f: "Staking".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "bond".to_string(),
+                        docs: docs2,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 5,
+                card: Card::VarNameCard {
+                    f: "controller".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: "".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 7,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice().to_vec(),
+                        },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 5,
+                card: Card::VarNameCard {
+                    f: "value".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 6,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "300.000000000".to_string(),
+                        units: "mWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 5,
+                card: Card::VarNameCard {
+                    f: "payee".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Staked".to_string(),
+                        docs_enum_variant: "".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 3,
+                card: Card::PalletCard {
+                    f: "Staking".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 13,
+                indent: 4,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "nominate".to_string(),
+                        docs: docs3,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 14,
+                indent: 5,
+                card: Card::VarNameCard {
+                    f: "targets".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 15,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 16,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
+                        identicon: Identicon::Dots {
+                            identity: id_01().to_vec(),
+                        },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 17,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 18,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
+                        identicon: Identicon::Dots {
+                            identity: id_02().to_vec(),
+                        },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 19,
+                indent: 3,
+                card: Card::PalletCard {
+                    f: "Staking".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 20,
+                indent: 4,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "set_controller".to_string(),
+                        docs: docs4,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 21,
+                indent: 5,
+                card: Card::VarNameCard {
+                    f: "controller".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 22,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 23,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: Identicon::Dots {
+                            identity: bob().to_vec(),
+                        },
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 24,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "31".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 25,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "45".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 26,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "0".to_string(),
+                        units: "pWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 27,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "9010".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 28,
+                indent: 0,
+                card: Card::TxSpecCard { f: "5".to_string() },
+            },
+            TransactionCard {
+                index: 29,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "314e9f9aef4e836a54bdd109aba380106e05e2ea83fbc490206b476840cd68e3"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+    let network_info_known = westend_spec();
+
+    let action = decode_payload(&line).unwrap();
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &action {
+        if let TransactionAction::Sign { actions, .. } =
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
+        {
+            let TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            } = &actions[0];
+
+            assert_eq!(actions.len(), 1);
+            assert_eq!(content, &content_known);
+            assert_eq!(author_info, &author_info_known);
+            assert_eq!(network_info, &network_info_known);
+            assert!(!has_pwd, "Expected no password");
+        } else {
+            panic!("Wrong action {:?}", action)
+        }
+    } else {
+        panic!("Wrong DecodeSequenceResult {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn parse_dd_transaction_3() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    let derivation_path = hex::encode("//Alice".encode());
+    let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}ac0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480f00c06e31d91001750365010f00c06e31d910013223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ea8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cde143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+
+    let docs1 = " Same as the [`transfer`] call, but with a check that the transfer will not kill the\n origin account.\n\n 99% of the time you want [`transfer`] instead.\n\n [`transfer`]: struct.Pallet.html#method.transfer\n # <weight>\n - Cheaper than transfer because account cannot be killed.\n - Base Weight: 51.4 µs\n - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)\n #</weight>".to_string();
+
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Balances".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "transfer_keep_alive".to_string(),
+                        docs: docs1,
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::VarNameCard {
+                    f: "dest".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: Identicon::Dots {
+                            identity: bob().to_vec(),
+                        },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 2,
+                card: Card::VarNameCard {
+                    f: "value".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 3,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "300.000000000000".to_string(),
+                        units: "WND".to_string(),
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 7,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "55".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "89".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "300.000000000000".to_string(),
+                        units: "WND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "9010".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 0,
+                card: Card::TxSpecCard { f: "5".to_string() },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+    let network_info_known = westend_spec();
+    let output = decode_payload(&line).unwrap();
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
+        if let TransactionAction::Sign { actions, .. } =
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
+        {
+            let TransactionSignAction {
+                content,
+                has_pwd,
+                author_info,
+                network_info,
+            } = &actions[0];
+
+            assert_eq!(actions.len(), 1);
+            assert_eq!(content, &content_known);
+            assert_eq!(author_info, &author_info_known);
+            assert!(!has_pwd, "Expected no password");
+            assert_eq!(network_info, &network_info_known);
+        } else {
+            panic!("Wrong action {:?}", output)
+        }
+    } else {
+        panic!("Wrong DecodeSequenceResult {:?}", output)
+    }
+}
+
+#[test]
+fn parse_dd_transaction_no_ket_set() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    let derivation_path = hex::encode("//Alice".encode());
+    let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}ac0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480f00c06e31d91001750365010f00c06e31d910013223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ea8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cde143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+    let output = decode_payload(&line).unwrap();
+    let no_seeds = HashMap::new();
+    if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
+        let result = parse_dd_transaction(&db, &data[0], &no_seeds);
+        assert!(matches!(
+            result,
+            Err(Error::DbError(db_handling::Error::NoSeedFound { .. }))
+        ));
+    } else {
+        panic!("Wrong DecodeSequenceResult {:?}", output)
+    }
+}
+
+#[test]
+fn parse_dd_transaction_wrong_metadata() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let derivation_path = hex::encode("//Alice".encode());
+    let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+    let output = decode_payload(&line).unwrap();
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
+        let result = parse_dd_transaction(&db, &data[0], &seeds);
+        if let Err(Error::AllExtensionsParsingFailed {
+            network_name,
+            errors,
+        }) = result
+        {
+            assert_eq!(network_name, "westend");
+            assert_eq!(errors.len(), 2);
+            assert!(matches!(
+                errors[0],
+                (9010, parser::Error::WrongNetworkVersion { .. })
+            ));
+            assert!(matches!(
+                errors[1],
+                (9000, parser::Error::WrongNetworkVersion { .. })
+            ));
+        } else {
+            panic!("Wrong error {:?}", output)
+        }
+    } else {
+        panic!("Wrong DecodeSequenceResult {:?}", output)
+    }
 }

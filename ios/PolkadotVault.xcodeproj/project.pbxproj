@@ -293,9 +293,8 @@
 		6DEB18EA2A0B8EEC0013995E /* Stubs+Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEB18E92A0B8EEC0013995E /* Stubs+Signer.swift */; };
 		6DED2AB52A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DED2AB42A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift */; };
 		6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA87D28AFBF5D00371ECA /* libsigner.a */; };
-		6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */; };
 		6DEFB52F28FEDA9B00762219 /* AnimatedQRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */; };
-		6DEFB53228FEE42D00762219 /* ExportMultipleKeysService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */; };
+		6DEFB53228FEE42D00762219 /* ExportKeySetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DEFB53128FEE42D00762219 /* ExportKeySetService.swift */; };
 		6DF07ADE29C1062300C01DE8 /* SetUpNetworksIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF07ADD29C1062300C01DE8 /* SetUpNetworksIntroView.swift */; };
 		6DF07AE229C1140500C01DE8 /* SetUpNetworksStepOneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF07AE129C1140500C01DE8 /* SetUpNetworksStepOneView.swift */; };
 		6DF07AE429C1141000C01DE8 /* SetUpNetworksStepTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF07AE329C1141000C01DE8 /* SetUpNetworksStepTwoView.swift */; };
@@ -646,9 +645,8 @@
 		6DEB18E92A0B8EEC0013995E /* Stubs+Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stubs+Signer.swift"; sourceTree = "<group>"; };
 		6DED2AB42A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectKeySetsForNetworkKeyView.swift; sourceTree = "<group>"; };
 		6DEEA87D28AFBF5D00371ECA /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
-		6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyListMoreMenuModal.swift; sourceTree = "<group>"; };
 		6DEFB52E28FEDA9B00762219 /* AnimatedQRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedQRCodeView.swift; sourceTree = "<group>"; };
-		6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysService.swift; sourceTree = "<group>"; };
+		6DEFB53128FEE42D00762219 /* ExportKeySetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeySetService.swift; sourceTree = "<group>"; };
 		6DF07ADD29C1062300C01DE8 /* SetUpNetworksIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUpNetworksIntroView.swift; sourceTree = "<group>"; };
 		6DF07AE129C1140500C01DE8 /* SetUpNetworksStepOneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUpNetworksStepOneView.swift; sourceTree = "<group>"; };
 		6DF07AE329C1141000C01DE8 /* SetUpNetworksStepTwoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUpNetworksStepTwoView.swift; sourceTree = "<group>"; };
@@ -1024,7 +1022,7 @@
 				6D57DC49289D614100005C63 /* Adapters */,
 				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
 				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
-				6DEFB53128FEE42D00762219 /* ExportMultipleKeysService.swift */,
+				6DEFB53128FEE42D00762219 /* ExportKeySetService.swift */,
 				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
 				6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */,
 				6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */,
@@ -1895,7 +1893,6 @@
 		6DF7751C28B39F590040012E /* KeySetsList */ = {
 			isa = PBXGroup;
 			children = (
-				6DEFB52728FEA1C200762219 /* KeyListMoreMenuModal.swift */,
 				6DC5642D28B652DE003D540B /* AddKeySetModal.swift */,
 				6DF7751D28B39F630040012E /* KeySetRow.swift */,
 				6DBE12D728B3A80A005F3CCC /* KeySetList.swift */,
@@ -2227,7 +2224,7 @@
 				6D01997E289D238700F4C317 /* Localizable.swift in Sources */,
 				6DC5643B28B8D189003D540B /* KeychainAccessAdapter.swift in Sources */,
 				6D10EACD297114550063FB71 /* DerivationPathComponents.swift in Sources */,
-				6DEFB53228FEE42D00762219 /* ExportMultipleKeysService.swift in Sources */,
+				6DEFB53228FEE42D00762219 /* ExportKeySetService.swift in Sources */,
 				6DEB18E62A0B8AF20013995E /* QrData+Stubs.swift in Sources */,
 				6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */,
 				6DA08B9029B68AF90027CFCB /* NavigationInitialisationService.swift in Sources */,
@@ -2401,7 +2398,6 @@
 				6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				6D25E6B129FFAD1000376AB9 /* BananaSplitRecoveryService.swift in Sources */,
-				6DEFB52828FEA1C200762219 /* KeyListMoreMenuModal.swift in Sources */,
 				6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */,
 				6DF5E7A22923A08A00F2B5B4 /* AttributedString+Markdown.swift in Sources */,
 				6DA08B8A29B614C20027CFCB /* RecoverKeySetSeedPhraseView.swift in Sources */,

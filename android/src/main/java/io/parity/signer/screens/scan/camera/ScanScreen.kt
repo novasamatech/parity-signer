@@ -36,6 +36,7 @@ fun ScanScreen(
 	performPayloads: suspend (String) -> Unit,
 	onBananaSplit: (List<String>) -> Unit,
 	onDynamicDerivations: suspend (String) -> Unit,
+	onDynamicDerivationsTransactions: suspend (List<String>) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
@@ -72,6 +73,15 @@ fun ScanScreen(
 				.filter { it.isNotEmpty() }
 				.collect { qrData ->
 					onDynamicDerivations(qrData)
+				}
+		}
+
+		launch {
+			viewModel.dynamicDerivationTransactionPayload
+				.filterNotNull()
+				.filter { it.isNotEmpty() }
+				.collect { qrData ->
+					onDynamicDerivationsTransactions(qrData)
 				}
 		}
 	}
@@ -203,7 +213,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 private fun PreviewScanScreen() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen({}, { _ -> }, { _ -> }, { _ -> })
+			ScanScreen({}, { _ -> }, { _ -> }, { _ -> }, { _ -> })
 		}
 	}
 }

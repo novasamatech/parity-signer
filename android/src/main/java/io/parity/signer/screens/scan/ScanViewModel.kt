@@ -255,6 +255,39 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
+	suspend fun performDynamicDerivationTransaction(
+		payload: List<String>,
+		context: Context
+	) {
+		when (val phrases = seedRepository.getAllSeeds()) {
+			is RepoResult.Failure -> {
+				Log.e(
+					TAG,
+					"cannot get seeds to show import dynamic derivations ${phrases.error}"
+				)
+			}
+
+			is RepoResult.Success -> {
+				val dynDerivations =
+					uniffiInteractor.signDynamicDerivationsTransactions(phrases.result, payload)
+
+				when (dynDerivations) {
+					is UniffiResult.Error -> {
+						transactionError.value = TransactionErrorModel(
+							title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
+							subtitle = dynDerivations.error.message ?: "",
+						)
+					}
+
+					is UniffiResult.Success -> {
+						signature.value = dynDerivations.result.signature
+						transactions.value = TransactionsState(dynDerivations.result.transaction)
+					}
+				}
+			}
+		}
+	}
+
 	private fun updateTransactionsWithImportDerivations(
 		transactions: List<MTransaction>,
 		updatedKeys: List<SeedKeysPreview>

@@ -359,6 +359,14 @@ fn try_create_imported_address(
     .map_err(|e| e.to_string().into())
 }
 
+/// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
+fn sign_dd_transaction(
+    payload: &[String],
+    seeds: HashMap<String, String>,
+) -> Result<MSignedTransaction, ErrorDisplayed> {
+    navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())
+}
+
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
 /// data being already removed
 fn history_init_history_with_cert() -> anyhow::Result<(), ErrorDisplayed> {
@@ -405,9 +413,11 @@ fn history_seed_name_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDispl
 }
 
 fn export_key_info(
-    selected_names: HashMap<String, ExportedSet>,
+    seed_name: &str,
+    exported_set: ExportedSet,
 ) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
-    navigator::export_key_info(&get_db()?, selected_names).map_err(|e| e.to_string().into())
+    navigator::export_key_info(&get_db()?, seed_name, exported_set)
+        .map_err(|e| e.to_string().into())
 }
 
 fn keys_by_seed_name(seed_name: &str) -> anyhow::Result<MKeysNew, ErrorDisplayed> {

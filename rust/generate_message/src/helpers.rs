@@ -1,6 +1,6 @@
 //! Helpers
 use db_handling::identities::{
-    AddrInfo, ExportAddrs, ExportAddrsV1, SeedInfo, TransactionBulk, TransactionBulkV1,
+    AddrInfo, ExportAddrs, ExportAddrsV2, SeedInfo, TransactionBulk, TransactionBulkV1,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::transform_into_qr_apng;
@@ -636,10 +636,8 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
         multisigner,
         derived_keys,
     };
-    let export_addrs_v1 = ExportAddrsV1 {
-        addrs: vec![seed_info],
-    };
-    let export_addrs = ExportAddrs::V1(export_addrs_v1);
+    let export_addrs_v2 = ExportAddrsV2::new(seed_info);
+    let export_addrs = ExportAddrs::V2(export_addrs_v2);
 
     let export_addrs_encoded = [&[0x53, 0xff, 0xde], export_addrs.encode().as_slice()].concat();
 

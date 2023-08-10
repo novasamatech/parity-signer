@@ -231,6 +231,7 @@ pub enum BananaSplitRecoveryResult {
 pub enum DecodeSequenceResult {
     BBananaSplitRecoveryResult { b: BananaSplitRecoveryResult },
     DynamicDerivations { s: String },
+    DynamicDerivationTransaction { s: Vec<String> },
     Other { s: String },
 }
 
@@ -255,6 +256,12 @@ pub struct MTransaction {
     pub ttype: TransactionType,
     pub author_info: Option<MAddressCard>,
     pub network_info: Option<MSCNetworkInfo>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MSignedTransaction {
+    pub transaction: Vec<MTransaction>,
+    pub signature: MSignatureReady,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
