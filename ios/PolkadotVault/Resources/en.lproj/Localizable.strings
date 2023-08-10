@@ -622,3 +622,7 @@
 "AddDerivedKeys.Error.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Content" = "Derived key %@ could not be created: %@";
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Title" = "There was an issue importing keys.";
+"AddDerivedKeys.Modal.Label.Title" = "Please confirm derived key import with the PIN code";
+"AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
+"AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
+"AddDerivedKeys.Modal.Action.Cancel" = "Cancel";

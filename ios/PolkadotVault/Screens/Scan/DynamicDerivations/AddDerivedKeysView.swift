@@ -53,6 +53,16 @@ struct AddDerivedKeysView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddKeysConfirmation
+        ) {
+            VerticalActionsBottomModal(
+                viewModel: .confirmDerivedKeysCreation,
+                mainAction: viewModel.onConfirmTap(),
+                isShowingBottomAlert: $viewModel.isPresentingAddKeysConfirmation
+            )
+            .clearModalBackground()
+        }
     }
 
     @ViewBuilder
@@ -183,6 +193,7 @@ extension AddDerivedKeysView {
         private let seedsMediator: SeedsMediating
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
+        @Published var isPresentingAddKeysConfirmation: Bool = false
         @Published var isPresentingDerivationPath: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
@@ -204,32 +215,37 @@ extension AddDerivedKeysView {
         }
 
         func onDoneTap() {
-            let success = { [weak self] in
-                self?.isPresented = false
-                self?.onCompletion(.onDone)
-            }
             if !dynamicDerivationsPreview.keySet.derivations.isEmpty {
-                derivedKeysService.createDerivedKeys(
-                    dynamicDerivationsPreview.keySet.seedName,
-                    seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
-                    keysToImport: dynamicDerivationsPreview.keySet.derivations
-                ) { [weak self] result in
-                    switch result {
-                    case .success:
-                        success()
-                    case let .failure(error):
-                        self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
-                        self?.isPresentingError = true
-                    }
-                }
+                isPresentingAddKeysConfirmation = true
             } else {
-                success()
+                onSuccess()
+            }
+        }
+
+        func onConfirmTap() {
+            derivedKeysService.createDerivedKeys(
+                dynamicDerivationsPreview.keySet.seedName,
+                seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
+                keysToImport: dynamicDerivationsPreview.keySet.derivations
+            ) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.onSuccess()
+                case let .failure(error):
+                    self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
+                    self?.isPresentingError = true
+                }
             }
         }
 
         func onBackTap() {
             isPresented = false
             onCompletion(.onCancel)
+        }
+
+        private func onSuccess() {
+            isPresented = false
+            onCompletion(.onDone)
         }
     }
 }
