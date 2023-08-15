@@ -163,7 +163,6 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
-		//todo dmitry
 		composable(KeySetDetailsMenuSubgraph.export_multiselect) {
 			val selected = remember { mutableStateOf(setOf<String>()) }
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
@@ -172,19 +171,17 @@ fun KeySetDetailsScreenSubgraph(
 					selected = selected,
 					onClose = closeAction,
 					onExportSelected = {
-//						menuNavController.navigate(KeySetDetailsExportMenuSubgraph.export_result)
-					}, //todo dmitry
+						menuNavController.navigate("${KeySetDetailsMenuSubgraph.export_result}/${selected.value}")
+					},
 					onExportAll = {
-						//todo dmitry
-//						selected.value = model.keysAndNetwork.map { it.key.addressKey }.toSet()
-//						menuNavController.navigate(KeySetDetailsExportMenuSubgraph.export_result)
+						selected.value = fullModel.keysAndNetwork.map { it.key.addressKey }.toSet()
+						menuNavController.navigate("${KeySetDetailsMenuSubgraph.export_result}/${selected.value}")
 					},
 				)
 			}
 		}
 		composable(
-			//todo dmitry pass as in io/parity/signer/screens/keysetdetails/export/KeySetDetailsExportScreenFull.kt:67
-			route = KeySetDetailsMenuSubgraph.export_result,
+			route = "${KeySetDetailsMenuSubgraph.export_result}/{$ARGUMENT_SELECTED_KEYS}",
 			arguments = listOf(
 				navArgument(ARGUMENT_SELECTED_KEYS) {
 					type = NavType.StringArrayType
