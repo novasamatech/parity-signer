@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,6 +26,9 @@ import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBott
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportMenuSubgraph
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
@@ -37,7 +42,8 @@ fun KeySetDetailsScreenSubgraph(
 	val menuNavController = rememberNavController()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
-	val filteredModel = keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
+	val filteredModel =
+		keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
 
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
@@ -72,7 +78,7 @@ fun KeySetDetailsScreenSubgraph(
 					networkState = networkState,
 					onSelectKeysClicked = {
 						menuNavController.popBackStack()
-						navController.navigate(KeySetDetailsNavSubgraph.multiselect)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.export_multiselect)
 					},
 					onBackupClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
@@ -157,6 +163,48 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
+		//todo dmitry
+		composable(KeySetDetailsMenuSubgraph.export_multiselect) {
+			val selected = remember { mutableStateOf(setOf<String>()) }
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeySetDetailsMultiselectBottomSheet(
+					model = fullModel,
+					selected = selected,
+					onClose = closeAction,
+					onExportSelected = {
+//						menuNavController.navigate(KeySetDetailsExportMenuSubgraph.export_result)
+					}, //todo dmitry
+					onExportAll = {
+						//todo dmitry
+//						selected.value = model.keysAndNetwork.map { it.key.addressKey }.toSet()
+//						menuNavController.navigate(KeySetDetailsExportMenuSubgraph.export_result)
+					},
+				)
+			}
+		}
+		composable(
+			//todo dmitry pass as in io/parity/signer/screens/keysetdetails/export/KeySetDetailsExportScreenFull.kt:67
+			route = KeySetDetailsMenuSubgraph.export_result,
+			arguments = listOf(
+				navArgument(ARGUMENT_SELECTED_KEYS) {
+					type = NavType.StringArrayType
+				},
+			),
+		) { backStackEntry ->
+			val selected: Set<String> =
+				backStackEntry.arguments?.getStringArrayList(ARGUMENT_SELECTED_KEYS)
+					?.toSet() ?: run {
+					submitErrorState("mandatory parameter missing for KeySetDetailsExportMenuSubgraph")
+					emptySet()
+				}
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeySetDetailsExportResultBottomSheet(
+					model = fullModel,
+					selectedKeys = selected,
+					onClose = closeAction,
+				)
+			}
+		}
 	}
 }
 
@@ -174,3 +222,5 @@ private object KeySetDetailsMenuSubgraph {
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
 private const val ARGUMENT_PUBLIC_KEY_VALUE = "ARGUMENT_PUBLIC_KEY_VALUE"
+
+private const val ARGUMENT_SELECTED_KEYS = "ARGUMENT_SELECTED_KEYS"
