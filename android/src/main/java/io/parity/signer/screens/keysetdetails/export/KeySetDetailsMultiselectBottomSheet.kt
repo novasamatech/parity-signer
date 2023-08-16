@@ -2,8 +2,6 @@ package io.parity.signer.screens.keysetdetails.export
 
 import SignerCheckbox
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +33,6 @@ import io.parity.signer.domain.abbreviateString
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItemMultiselect
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.backgroundSecondary
 import io.parity.signer.ui.theme.textDisabled
 
 /**
@@ -66,7 +63,6 @@ fun KeySetDetailsMultiselectBottomSheet(
 			modifier = Modifier
 				.padding(horizontal = 8.dp)
 				.verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(4.dp),
 		) {
 			//seed - key set
 			model.root?.let {
@@ -85,8 +81,7 @@ fun KeySetDetailsMultiselectBottomSheet(
 		}
 		Row(
 			modifier = Modifier
-				.height(48.dp)
-				.background(MaterialTheme.colors.backgroundSecondary),
+				.height(48.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			ClickableLabel(
@@ -111,14 +106,14 @@ private fun DisabledSelectedKey(base58: String) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
-			.padding(vertical = 16.dp)
+			.padding(vertical = 8.dp)
 	) {
 		Column(Modifier.weight(1f)) {
 			Text(
 				text = base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
 				color = MaterialTheme.colors.textDisabled,
 				style = SignerTypeface.BodyL,
-				modifier = Modifier.padding(horizontal = 16.dp),
+				modifier = Modifier.padding(start = 24.dp, end = 8.dp),
 			)
 		}
 		SignerCheckbox(
@@ -157,5 +152,22 @@ private fun PreviewKeySetDetailsMultiselectScreen() {
 				{},
 			)
 		}
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewDisabledSelectedKey() {
+	SignerNewTheme {
+		DisabledSelectedKey("sdfsdfsdfsdfsdfsdf")
 	}
 }

@@ -41,7 +41,7 @@ fun KeyDerivedItemMultiselect(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = Color.Transparent,
 		modifier = Modifier
-			.padding(vertical = 16.dp)
+			.padding(vertical = 8.dp)
 			.clickable { onClick(!isSelected, model.addressKey) }
 	) {
 		Row(
