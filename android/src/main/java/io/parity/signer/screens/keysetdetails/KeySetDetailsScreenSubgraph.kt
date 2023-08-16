@@ -24,11 +24,9 @@ import io.parity.signer.domain.getSeedPhraseForBackup
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
-import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
-import io.parity.signer.domain.submitErrorState
-import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportMenuSubgraph
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
+import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
@@ -78,7 +76,7 @@ fun KeySetDetailsScreenSubgraph(
 					networkState = networkState,
 					onSelectKeysClicked = {
 						menuNavController.popBackStack()
-						menuNavController.navigate(KeySetDetailsMenuSubgraph.export_multiselect)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.export)
 					},
 					onBackupClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
@@ -163,43 +161,34 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
-		composable(KeySetDetailsMenuSubgraph.export_multiselect) {
+		composable(KeySetDetailsMenuSubgraph.export) {
 			val selected = remember { mutableStateOf(setOf<String>()) }
-			BottomSheetWrapperRoot(onClosedAction = closeAction) {
-				KeySetDetailsMultiselectBottomSheet(
-					model = fullModel,
-					selected = selected,
-					onClose = closeAction,
-					onExportSelected = {
-						menuNavController.navigate("${KeySetDetailsMenuSubgraph.export_result}/${selected.value}")
-					},
-					onExportAll = {
-						selected.value = fullModel.keysAndNetwork.map { it.key.addressKey }.toSet()
-						menuNavController.navigate("${KeySetDetailsMenuSubgraph.export_result}/${selected.value}")
-					},
-				)
-			}
-		}
-		composable(
-			route = "${KeySetDetailsMenuSubgraph.export_result}/{$ARGUMENT_SELECTED_KEYS}",
-			arguments = listOf(
-				navArgument(ARGUMENT_SELECTED_KEYS) {
-					type = NavType.StringArrayType
-				},
-			),
-		) { backStackEntry ->
-			val selected: Set<String> =
-				backStackEntry.arguments?.getStringArrayList(ARGUMENT_SELECTED_KEYS)
-					?.toSet() ?: run {
-					submitErrorState("mandatory parameter missing for KeySetDetailsExportMenuSubgraph")
-					emptySet()
+			val isResultState = remember { mutableStateOf(false) }
+
+			if (!isResultState.value) {
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					KeySetDetailsMultiselectBottomSheet(
+						model = fullModel,
+						selected = selected,
+						onClose = closeAction,
+						onExportSelected = {
+							isResultState.value = true
+						},
+						onExportAll = {
+							selected.value =
+								fullModel.keysAndNetwork.map { it.key.addressKey }.toSet()
+							isResultState.value = true
+						},
+					)
 				}
-			BottomSheetWrapperRoot(onClosedAction = closeAction) {
-				KeySetDetailsExportResultBottomSheet(
-					model = fullModel,
-					selectedKeys = selected,
-					onClose = closeAction,
-				)
+			} else {
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					KeySetDetailsExportResultBottomSheet(
+						model = fullModel,
+						selectedKeys = selected.value,
+						onClose = closeAction,
+					)
+				}
 			}
 		}
 	}
@@ -213,11 +202,9 @@ private object KeySetDetailsMenuSubgraph {
 	const val network_filter = "keys_network_filters"
 	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
-	const val export_multiselect = "export_multiselect"
-	const val export_result = "export_result"
+	const val export = "export_multiselect"
 }
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
 private const val ARGUMENT_PUBLIC_KEY_VALUE = "ARGUMENT_PUBLIC_KEY_VALUE"
 
-private const val ARGUMENT_SELECTED_KEYS = "ARGUMENT_SELECTED_KEYS"
