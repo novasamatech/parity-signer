@@ -88,19 +88,6 @@ class UniffiInteractor(val appContext: Context) {
 		}
 	}
 
-//	todo dmitry remove?
-//	suspend fun exportSeedKeyInfos(seedsToExport: List<String>): UniffiResult<MKeysInfoExport> =
-//		withContext(Dispatchers.IO) {
-//			try {
-//				val keyInfo = exportKeyInfo(
-//					selectedNames = seedsToExport.associateWith { ExportedSet.All },
-//				)
-//                UniffiResult.Success(keyInfo)
-//			} catch (e: ErrorDisplayed) {
-//                UniffiResult.Error(e)
-//			}
-//		}
-
 	suspend fun exportSeedWithKeys(
 		seed: String, derivedKeyAddr: List<String>
 	): UniffiResult<MKeysInfoExport> = withContext(Dispatchers.IO) {

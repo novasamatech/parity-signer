@@ -1,18 +1,16 @@
 package io.parity.signer.screens.keysetdetails
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.domain.*
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
-import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
-import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
-import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
+import io.parity.signer.domain.submitErrorState
 
 @Composable
 fun KeySetDetailsNavSubgraph(
@@ -44,13 +42,6 @@ fun KeySetDetailsNavSubgraph(
 				},
 			)
 		}
-		//todo dmitry
-//		composable(KeySetDetailsNavSubgraph.multiselect) {
-//			KeySetDetailsExportScreenFull(
-//				model = model,
-//				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-//			)
-//		}
 	}
 }
 

@@ -2,32 +2,41 @@ package io.parity.signer.screens.keysetdetails.export
 
 import SignerCheckbox
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIconWithNetwork
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.ClickableLabel
-import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.sharedcomponents.KeyPath
-import io.parity.signer.domain.*
+import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.abbreviateString
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItemMultiselect
-import io.parity.signer.screens.keysetdetails.items.NetworkKeysExpandableMultiselect
-import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.backgroundSecondary
+import io.parity.signer.ui.theme.textDisabled
 
 /**
  * Single Seed/Key set is selected is it's details
