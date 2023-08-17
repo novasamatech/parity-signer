@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,8 +24,9 @@ import io.parity.signer.domain.getSeedPhraseForBackup
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
-import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
@@ -37,7 +40,8 @@ fun KeySetDetailsScreenSubgraph(
 	val menuNavController = rememberNavController()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
-	val filteredModel = keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
+	val filteredModel =
+		keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
 
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
@@ -72,7 +76,7 @@ fun KeySetDetailsScreenSubgraph(
 					networkState = networkState,
 					onSelectKeysClicked = {
 						menuNavController.popBackStack()
-						navController.navigate(KeySetDetailsNavSubgraph.multiselect)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.export)
 					},
 					onBackupClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
@@ -157,6 +161,36 @@ fun KeySetDetailsScreenSubgraph(
 				)
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.export) {
+			val selected = remember { mutableStateOf(setOf<String>()) }
+			val isResultState = remember { mutableStateOf(false) }
+
+			if (!isResultState.value) {
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					KeySetDetailsMultiselectBottomSheet(
+						model = fullModel,
+						selected = selected,
+						onClose = closeAction,
+						onExportSelected = {
+							isResultState.value = true
+						},
+						onExportAll = {
+							selected.value =
+								fullModel.keysAndNetwork.map { it.key.addressKey }.toSet()
+							isResultState.value = true
+						},
+					)
+				}
+			} else {
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					KeySetDetailsExportResultBottomSheet(
+						model = fullModel,
+						selectedKeys = selected.value,
+						onClose = closeAction,
+					)
+				}
+			}
+		}
 	}
 }
 
@@ -168,7 +202,9 @@ private object KeySetDetailsMenuSubgraph {
 	const val network_filter = "keys_network_filters"
 	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
+	const val export = "export_multiselect"
 }
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
 private const val ARGUMENT_PUBLIC_KEY_VALUE = "ARGUMENT_PUBLIC_KEY_VALUE"
+
