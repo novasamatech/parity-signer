@@ -2,7 +2,6 @@ package io.parity.signer.screens.scan.transaction.dynamicderivations
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -18,13 +17,12 @@ import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
-fun ConfirmExportPrivateKeyMenu(
+internal fun AddDDConfirmBottomSheet(
 	onCancel: Callback,
 	onConfirm: Callback,
 ) {
@@ -79,6 +77,6 @@ fun ConfirmExportPrivateKeyMenu(
 @Composable
 private fun PreviewConfirmExportPrivateKeyMenu() {
 	SignerNewTheme {
-		ConfirmExportPrivateKeyMenu({}, {})
+		AddDDConfirmBottomSheet({}, {})
 	}
 }
