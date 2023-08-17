@@ -23,8 +23,8 @@ import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 internal fun AddDDConfirmBottomSheet(
-	onCancel: Callback,
 	onConfirm: Callback,
+	onCancel: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(

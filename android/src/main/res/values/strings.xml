@@ -272,6 +272,7 @@
 	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
+	<string name="create_derivations_empty">All derived keys already added</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
 	<string name="unlock_screen_title">Please Unlock the App</string>
 	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Polkadot Vault</string>

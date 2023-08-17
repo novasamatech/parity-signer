@@ -29,8 +29,8 @@ fun AddDynamicDerivationScreenFull(
 	if (confirmState.value) {
 		BottomSheetWrapperRoot(onClosedAction = { confirmState.value = false }) {
 			AddDDConfirmBottomSheet(
-				onCancel = { confirmState.value = false },
 				onConfirm = onDone,
+				onCancel = { confirmState.value = false },
 			)
 		}
 	}

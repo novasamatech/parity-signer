@@ -356,13 +356,19 @@ class ScanViewModel : ViewModel() {
 					}
 
 					is OperationResult.Ok -> {
-						clearState()
 						Toast.makeText(
 							context, context.getString(R.string.create_derivations_success),
 							Toast.LENGTH_SHORT
 						).show()
 					}
 				}
+			} else {
+				//list of derivations is empty
+				clearState()
+				Toast.makeText(
+					context, context.getString(R.string.create_derivations_empty),
+					Toast.LENGTH_SHORT
+				).show()
 			}
 		}
 	}
