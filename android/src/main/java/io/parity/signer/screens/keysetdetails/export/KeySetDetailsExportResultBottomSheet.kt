@@ -51,11 +51,12 @@ fun KeySetDetailsExportResultBottomSheet(
 		onClose()
 	} else {
 		Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
+			val keysToExport = selectedKeys.size + 1 // + root key
 			BottomSheetHeader(
 				title = pluralStringResource(
 					id = R.plurals.key_export_title,
-					count = selectedKeys.size,
-					selectedKeys.size,
+					count = keysToExport,
+					keysToExport,
 				),
 				onCloseClicked = onClose
 			)

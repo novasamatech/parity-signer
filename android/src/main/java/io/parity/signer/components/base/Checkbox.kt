@@ -42,6 +42,7 @@ fun SignerCheckbox(
 		Crossfade(
 			targetState = isChecked,
 			animationSpec = tween(durationMillis = 150),
+			label = "checkbox crossfade",
 		) { isChecked ->
 			Image(
 				painter = painterResource(
