@@ -17,7 +17,7 @@ fun Jdenticon(
 	size: Dp,
 	modifier: Modifier = Modifier
 ) {
-
+//val svg = Jdenticon.toSvg(hash: String, size: Int, padding: Float?)
 }
 
 
