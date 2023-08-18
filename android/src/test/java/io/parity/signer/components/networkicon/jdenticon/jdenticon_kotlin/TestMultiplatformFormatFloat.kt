@@ -1,6 +1,5 @@
 package io.parity.signer.components.networkicon.jdenticon.jdenticon_kotlin
 
-import io.parity.signer.components.networkicon.jdenticon.jdenticon_kotlin.format
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.math.PI

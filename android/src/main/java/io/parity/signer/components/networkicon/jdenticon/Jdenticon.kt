@@ -1,13 +1,25 @@
 package io.parity.signer.components.networkicon.jdenticon
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import io.parity.signer.R
+import io.parity.signer.components.networkicon.jdenticon.jdenticon_kotlin.Jdenticon
 import io.parity.signer.ui.theme.SignerNewTheme
 
 
@@ -17,13 +29,33 @@ fun Jdenticon(
 	size: Dp,
 	modifier: Modifier = Modifier
 ) {
-//val svg = Jdenticon.toSvg(hash: String, size: Int, padding: Float?)
+	val svg = Jdenticon.toSvg(seed, size.value.toInt(),)
+
+	val context = LocalContext.current
+	val painter = rememberAsyncImagePainter(
+		model = ImageRequest.Builder(context)
+			.decoderFactory(SvgDecoder.Factory())
+			.data(svg.toByteArray())
+			.size(Size.ORIGINAL) // Set the target size to load the image at.
+			.build(),
+	)
+	Image(
+		painter = painter,
+		contentDescription = stringResource(R.string.description_identicon),
+		modifier = modifier
+			.size(size)
+			.clip(CircleShape)
+	)
 }
 
 
 
 
-
+/**
+ * As svg parsed async and in preview Dispatchers.IO is not working
+ * run preview on device to see it.
+ * Consider creating custom coil.ImageLoader with main ui fetch and parse dispatchers. Maybe for preview only.
+ */
 @Preview(
 	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
