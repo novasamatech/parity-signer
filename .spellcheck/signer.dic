@@ -62,6 +62,7 @@ identicon/S
 init
 invariants
 io
+jcenter
 js
 json/S
 jvm
