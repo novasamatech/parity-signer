@@ -26,6 +26,7 @@ import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
 import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDerivedKeysScreen
+import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDynamicDerivationScreenFull
 import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
@@ -105,9 +106,8 @@ fun ScanNavSubgraph(
 			},
 		)
 	} else if (dynamicDerivationsData != null) {
-		AddDerivedKeysScreen(
+		AddDynamicDerivationScreenFull(
 			model = dynamicDerivationsData,
-			modifier = Modifier.statusBarsPadding(),
 			onBack = scanViewModel::clearState,
 			onDone = {
 				scanViewModel.createDynamicDerivations(
