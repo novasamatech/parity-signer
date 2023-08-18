@@ -44,7 +44,7 @@ fun Jdenticon(
 		contentDescription = stringResource(R.string.description_identicon),
 		modifier = modifier
 			.size(size)
-			.clip(CircleShape)
+//			.clip(CircleShape)
 	)
 }
 
