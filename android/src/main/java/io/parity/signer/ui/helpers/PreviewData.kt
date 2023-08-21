@@ -9,6 +9,7 @@ object PreviewData {
 	object Identicon {
 		val dotIcon = io.parity.signer.uniffi.Identicon.Dots(identity = DotIconConstants.previewAliceSeed)
 		val blockiesIcon = io.parity.signer.uniffi.Identicon.Blockies(identity = "0x7204ddf9dc5f672b64ca6692da7b8f13b4d408e7")
+		val jdenticonIcon = io.parity.signer.uniffi.Identicon.Jdenticon(identity = "8PegJD6VsjWwinrP6AfgNqejWYdJ8KqF4xutpyq7AdFJ3W5")
 	}
 
 	///Bytes to be encoded to qr code to show it
