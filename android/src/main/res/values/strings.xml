@@ -37,7 +37,6 @@
 	<string name="bottom_bar_label_scanner">Scanner</string>
 	<string name="bottom_bar_label_settings">Settings</string>
 	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
-	<string name="key_set_details_multiselect_title_none_selected">Select Keys</string>
 	<string name="key_set_export_all_label">Export All</string>
 	<string name="key_set_export_selected_label">Export Selected</string>
 	<string name="key_set_export_description_content">By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below</string>
@@ -272,6 +271,7 @@
 	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
+	<string name="create_derivations_empty">All derived keys already added</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
 	<string name="unlock_screen_title">Please Unlock the App</string>
 	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Polkadot Vault</string>
@@ -425,6 +425,9 @@
 	<string name="dymanic_derivation_error_some_network_missing">"Some keys can not be imported until their networks are added. Please add missing networks and their metadata. "</string>
 	<string name="dymanic_derivation_error_custom_message">Derived key %1$s could not be created: %2$s</string>
 	<string name="dymanic_derivation_error_custom_title">There was an issue importing keys.</string>
+	<string name="confirm_dynamic_derivation_header">Please confirm derived key import with authorisation</string>
+	<string name="confirm_dynamic_derivation_message">Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.</string>
+	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
 
 
 </resources>
