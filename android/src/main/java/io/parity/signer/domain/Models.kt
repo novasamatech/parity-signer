@@ -21,15 +21,15 @@ data class KeySetDetailsModel(
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
 			keysAndNetwork = listOf(
 				KeyAndNetworkModel(
-					key = KeyModel.createStub(),
+					key = KeyModel.createStub(addressKey = "address key"),
 					network = NetworkInfoModel.createStub()
 				),
 				KeyAndNetworkModel(
-					key = KeyModel.createStub(),
+					key = KeyModel.createStub(addressKey = "address key2"),
 					network = NetworkInfoModel.createStub(networkName = "Some")
 				),
 				KeyAndNetworkModel(
-					key = KeyModel.createStub()
+					key = KeyModel.createStub(addressKey = "address key3")
 						.copy(path = "//polkadot//path3"),
 					network = NetworkInfoModel.createStub()
 				),
@@ -45,9 +45,13 @@ fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
 	root = root?.toKeysModel(),
 )
 
-data class KeyAndNetworkModel(val key: KeyModel, val network: NetworkInfoModel) {
+data class KeyAndNetworkModel(
+	val key: KeyModel,
+	val network: NetworkInfoModel
+) {
 	companion object {
-		fun createStub() = KeyAndNetworkModel(KeyModel.createStub(), NetworkInfoModel.createStub())
+		fun createStub() =
+			KeyAndNetworkModel(KeyModel.createStub(), NetworkInfoModel.createStub())
 	}
 }
 
@@ -70,8 +74,11 @@ data class KeyModel(
 	val wasImported: Boolean?,
 ) {
 	companion object {
-		fun createStub(wasImported: Boolean = false) = KeyModel(
-			addressKey = "address key",
+		fun createStub(
+			addressKey: String = "address key",
+			wasImported: Boolean = false
+		) = KeyModel(
+			addressKey = addressKey,
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			identicon = PreviewData.Identicon.dotIcon,
 			hasPwd = true,

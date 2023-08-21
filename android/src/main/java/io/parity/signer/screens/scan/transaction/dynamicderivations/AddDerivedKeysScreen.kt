@@ -42,14 +42,13 @@ import io.parity.signer.uniffi.DdPreview
 import io.parity.signer.uniffi.QrData
 
 @Composable
-fun AddDerivedKeysScreen(
+internal fun AddDerivedKeysScreen(
 	model: DdPreview,
 	modifier: Modifier = Modifier,
 	onBack: Callback,
 	onDone: Callback,
 ) {
 	BackHandler(onBack = onBack)
-
 	Column(
 		modifier = modifier.verticalScroll(rememberScrollState()),
 	) {
