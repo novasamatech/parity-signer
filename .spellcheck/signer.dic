@@ -62,6 +62,7 @@ identicon/S
 init
 invariants
 io
+jcenter
 js
 json/S
 jvm
@@ -117,7 +118,7 @@ util/S
 verifier/S
 versa
 virtualization
-visualizeable
+visualizable
 websocket
 westend
 wifi

@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,63 +24,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun BananaSplitPasswordScreen(
-	qrData: List<String>,
 	onClose: Callback,
-	onSuccess: (newSeed: String) -> Unit,
-	onErrorWrongPassword: Callback,
-	onCustomError: (errorText: String) -> Unit,
+	onDone: Callback,
+	bananaViewModel: BananaSplitViewModel,
 	modifier: Modifier = Modifier,
 ) {
-
-	val bananaViewModel: BananaSplitViewModel = viewModel()
 
 	val name = bananaViewModel.seedName.collectAsState()
 	val password = bananaViewModel.password.collectAsState()
 	val nameCollision = bananaViewModel.seedCollision.collectAsState()
 	val wrongPassword = bananaViewModel.wrongPasswordCurrent.collectAsState()
 
-	LaunchedEffect(Unit) {
-		bananaViewModel.initState(qrData)
 
-		launch {
-			bananaViewModel.isWrongPasswordTerminal.collect {
-				if (it) {
-					onErrorWrongPassword()
-					bananaViewModel.cleanState()
-				}
-			}
-		}
-		launch {
-			bananaViewModel.isCustomErrorTerminal
-				.filterNotNull()
-				.collect {
-					onCustomError(it)
-					bananaViewModel.cleanState()
-				}
-		}
-		launch {
-			bananaViewModel.isSuccessTerminal
-				.filterNotNull()
-				.collect {
-					onSuccess(it)
-					bananaViewModel.cleanState()
-				}
-		}
-	}
-
-	val context = LocalContext.current
 	BananaSplitPasswordInternal(
 		onClose = onClose,
 		name = name,
@@ -90,9 +52,7 @@ fun BananaSplitPasswordScreen(
 		wrongPassword = wrongPassword,
 		onChangePassword = bananaViewModel::updatePassword,
 		onChangeSeedName = bananaViewModel::updateSeedName,
-		onDoneTap = {
-			runBlocking { bananaViewModel.onDoneTap(context) }
-		},
+		onDoneTap = onDone,
 		modifier = modifier,
 	)
 }

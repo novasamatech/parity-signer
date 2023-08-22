@@ -45,14 +45,12 @@ struct TCVerifier: View {
     }
 }
 
-struct TCVerifier_Previews: PreviewProvider {
-    static var previews: some View {
-        TCVerifier(
-            value: MVerifierDetails(
-                publicKey: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-                identicon: .svg(image: PreviewData.exampleIdenticon),
-                encryption: "sr25519"
+#if DEBUG
+    struct TCVerifier_Previews: PreviewProvider {
+        static var previews: some View {
+            TCVerifier(
+                value: .stub
             )
-        )
+        }
     }
-}
+#endif

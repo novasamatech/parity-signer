@@ -4,9 +4,12 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
@@ -14,13 +17,16 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.scan.bananasplit.BananaSplitPasswordScreen
+import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
+import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
 import io.parity.signer.screens.scan.errors.TransactionErrorModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
+import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDerivedKeysScreen
+import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDynamicDerivationScreenFull
 import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
@@ -36,13 +42,21 @@ fun ScanNavSubgraph(
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
 
-	val transactions = scanViewModel.transactions.collectAsState()
-	val signature = scanViewModel.signature.collectAsState()
-	val bananaSplitPassword = scanViewModel.bananaSplitPassword.collectAsState()
+	val transactions = scanViewModel.transactions.collectAsStateWithLifecycle()
+	val signature = scanViewModel.signature.collectAsStateWithLifecycle()
+	val bananaSplitPassword =
+		scanViewModel.bananaSplitPassword.collectAsStateWithLifecycle()
+	val dynamicDerivations =
+		scanViewModel.dynamicDerivations.collectAsStateWithLifecycle()
 
-	val transactionError = scanViewModel.transactionError.collectAsState()
-	val passwordModel = scanViewModel.passwordModel.collectAsState()
-	val errorWrongPassword = scanViewModel.errorWrongPassword.collectAsState()
+	val transactionError =
+		scanViewModel.transactionError.collectAsStateWithLifecycle()
+	val passwordModel = scanViewModel.passwordModel.collectAsStateWithLifecycle()
+	val errorWrongPassword =
+		scanViewModel.errorWrongPassword.collectAsStateWithLifecycle()
+
+	val addedNetworkName: MutableState<String?> =
+		remember { mutableStateOf(null) }
 
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
@@ -62,13 +76,22 @@ fun ScanNavSubgraph(
 	//Full screens
 	val transactionsValue = transactions.value
 	val bananaQrData = bananaSplitPassword.value
+	val dynamicDerivationsData = dynamicDerivations.value
 	if (bananaQrData != null) {
-		BananaSplitPasswordScreen(
+		BananaSplitSubgraph(
 			qrData = bananaQrData,
 			onClose = {
 				backAction()
 			},
 			onSuccess = { seedName ->
+				Toast.makeText(
+					context,
+					context.getString(
+						R.string.key_set_has_been_recovered_toast,
+						seedName
+					),
+					Toast.LENGTH_LONG
+				).show()
 				scanViewModel.clearState()
 				rootNavigator.navigate(Action.SELECT_SEED, seedName)
 			},
@@ -81,18 +104,34 @@ fun ScanNavSubgraph(
 				scanViewModel.errorWrongPassword.value = true
 				scanViewModel.bananaSplitPassword.value = null
 			},
-			modifier = Modifier.statusBarsPadding(),
+		)
+	} else if (dynamicDerivationsData != null) {
+		AddDynamicDerivationScreenFull(
+			model = dynamicDerivationsData,
+			onBack = scanViewModel::clearState,
+			onDone = {
+				scanViewModel.createDynamicDerivations(
+					dynamicDerivationsData.keySet,
+					context
+				)
+			},
 		)
 	} else if (transactionsValue == null || showingModals) {
 
 		ScanScreen(
 			onClose = { navigateToPrevious() },
 			performPayloads = { payloads ->
-				scanViewModel.performPayload(payloads, context)
+				scanViewModel.performTransactionPayload(payloads, context)
 			},
 			onBananaSplit = { payloads ->
 				scanViewModel.bananaSplitPassword.value = payloads
-			}
+			},
+			onDynamicDerivations = { payload ->
+				scanViewModel.performDynamicDerivationPayload(payload, context)
+			},
+			onDynamicDerivationsTransactions = { payload ->
+				scanViewModel.performDynamicDerivationTransaction(payload, context)
+			},
 		)
 	} else {
 
@@ -116,7 +155,9 @@ fun ScanNavSubgraph(
 							),
 							Toast.LENGTH_LONG
 						).show()
+						addedNetworkName.value = previewType.network
 					}
+
 					is TransactionPreviewType.Metadata -> {
 						Toast.makeText(
 							context,
@@ -128,12 +169,17 @@ fun ScanNavSubgraph(
 							Toast.LENGTH_LONG
 						).show()
 					}
+
 					else -> {
 						//nothing
 					}
 				}
+				//finally clear transaction state and stay in scan screen
 				scanViewModel.clearState()
-				rootNavigator.navigate(Action.GO_FORWARD)
+				val fakeNavigator = FakeNavigator()
+				fakeNavigator.navigate(Action.GO_FORWARD)
+				fakeNavigator.navigate(Action.START)
+				fakeNavigator.navigate(Action.NAVBAR_SCAN)
 			},
 			onImportKeys = {
 				scanViewModel.onImportKeysTap(transactionsValue, context)
@@ -166,6 +212,13 @@ fun ScanNavSubgraph(
 				},
 			)
 		}
+	} ?: addedNetworkName.value?.let { addedNetwork ->
+		AddedNetworkSheetsSubgraph(
+			networkNameAdded = addedNetwork,
+			onClose = {
+				addedNetworkName.value = null
+			}
+		)
 	} ?: if (errorWrongPassword.value) {
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
 			WrongPasswordBottomSheet(

@@ -86,10 +86,19 @@ fun DerivationPathScreen(
 
 	Column(modifier = modifier) {
 		ScreenHeaderWithButton(
-			title = stringResource(R.string.derivation_path_screen_title),
 			canProceed = canProceed,
+			title = stringResource(R.string.create_derivation_title),
+			subtitle = stringResource(R.string.screen_step_2_2),
+			backNotClose = true,
 			onClose = onClose,
 			onDone = onDoneLocal,
+		)
+		Text(
+			text = stringResource(R.string.derivation_path_screen_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyL,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
 		)
 		Spacer(modifier = Modifier.padding(top = 16.dp))
 		OutlinedTextField(
@@ -123,7 +132,6 @@ fun DerivationPathScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
-		Spacer(modifier = Modifier.padding(top = 8.dp))
 		val errorForPath = when (pathValidity) {
 			DerivationCreateViewModel.DerivationPathValidity.ALL_GOOD -> null
 			DerivationCreateViewModel.DerivationPathValidity.WRONG_PATH -> stringResource(
@@ -146,6 +154,7 @@ fun DerivationPathScreen(
 				style = SignerTypeface.CaptionM,
 				modifier = Modifier
 					.padding(horizontal = 24.dp)
+					.padding(top = 8.dp)
 			)
 		}
 
@@ -224,7 +233,6 @@ fun DerivationPathScreen(
 				.padding(horizontal = 24.dp)
 				.padding(vertical = 8.dp)
 		)
-		Spacer(modifier = Modifier.padding(top = 8.dp))
 
 		if (hasPassword) {
 			Text(

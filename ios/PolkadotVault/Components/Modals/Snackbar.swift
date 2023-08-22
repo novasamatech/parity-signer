@@ -81,7 +81,7 @@ struct Snackbar: View {
         .background(viewModel.style.tintColor)
         .cornerRadius(CornerRadius.small)
         .padding([.top, .bottom])
-        .padding([.leading, .trailing], Spacing.extraSmall)
+        .padding(.horizontal, Spacing.extraSmall)
     }
 }
 
@@ -131,12 +131,14 @@ struct SnackbarDemo: View {
     }
 }
 
-struct Snackbar_Previews: PreviewProvider {
-    @State private var showOverlay = false
+#if DEBUG
+    struct Snackbar_Previews: PreviewProvider {
+        @State private var showOverlay = false
 
-    static var previews: some View {
-        SnackbarDemo()
-            .preferredColorScheme(.light)
-            .previewDevice(PreviewDevice(rawValue: "iPod Touch (7th generation)"))
+        static var previews: some View {
+            SnackbarDemo()
+                .preferredColorScheme(.light)
+                .previewDevice(PreviewDevice(rawValue: "iPod Touch (7th generation)"))
+        }
     }
-}
+#endif

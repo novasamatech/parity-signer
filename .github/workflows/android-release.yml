@@ -14,7 +14,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.5.2
+        uses:           actions/checkout@v3.5.3
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -45,13 +45,13 @@ jobs:
         uses:           actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: 11
+          java-version: 17
 
       - name:           Install NDK
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
+        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
         with:
           workspaces:   rust -> rust/target
 
@@ -80,7 +80,7 @@ jobs:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.5.2
+        uses:           actions/checkout@v3.5.3
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -111,13 +111,13 @@ jobs:
         uses:           actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: 11
+          java-version: 17
 
       - name:           Install NDK
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
+        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
         with:
           workspaces:   rust -> rust/target
 

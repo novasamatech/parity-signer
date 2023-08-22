@@ -9,12 +9,6 @@ import SwiftUI
 
 struct KeySetRow: View {
     let viewModel: KeySetViewModel
-    @Binding var selectedItems: [KeySetViewModel]
-    @Binding var isExportKeysSelected: Bool
-
-    private var isItemSelected: Bool {
-        selectedItems.contains(viewModel)
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -32,15 +26,11 @@ struct KeySetRow: View {
                     .lineSpacing(Spacing.extraExtraSmall)
                     .padding(.trailing, Spacing.medium)
                 Spacer()
-                if isExportKeysSelected {
-                    isItemSelected ? Asset.checkmarkChecked.swiftUIImage : Asset.checkmarkUnchecked.swiftUIImage
-                } else {
-                    Asset.chevronRight.swiftUIImage
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: Heights.chevronRightInList)
-                        .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
-                }
+                Asset.chevronRight.swiftUIImage
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: Heights.chevronRightInList)
+                    .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
             }
             if !viewModel.networks.isEmpty {
                 networksRow()
@@ -105,70 +95,7 @@ struct KeySetRow: View {
         static var previews: some View {
             VStack(spacing: 0) {
                 KeySetRow(
-                    viewModel: KeySetViewModel(
-                        seed: PreviewData.seedNameCard,
-                        keyName: "Main Polkadot",
-                        derivedKeys: "5 Derived Key",
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
-                        networks: ["polkadot", "kusama", "astar", "westend", "phala"]
-                    ),
-                    selectedItems: Binding<[KeySetViewModel]>.constant([]),
-                    isExportKeysSelected: Binding<Bool>.constant(true)
-                )
-                KeySetRow(
-                    viewModel: KeySetViewModel(
-                        seed: PreviewData.seedNameCard,
-                        keyName: "Kusama",
-                        derivedKeys: nil,
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
-                        networks: []
-                    ),
-                    selectedItems: Binding<[KeySetViewModel]>.constant([]),
-                    isExportKeysSelected: Binding<Bool>.constant(false)
-                )
-                KeySetRow(
-                    viewModel: KeySetViewModel(
-                        seed: PreviewData.seedNameCard,
-                        keyName: "Dotsama crowdloans with very long title",
-                        derivedKeys: "435 Derived Keys",
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
-                        networks: [
-                            "polkadot",
-                            "kusama",
-                            "astar",
-                            "manta",
-                            "karura",
-                            "westend",
-                            "phala",
-                            "calamari",
-                            "crab",
-                            "basilisk",
-                            "efiniti",
-                            "composable",
-                            "parallel",
-                            "sora",
-                            "shiden"
-                        ]
-                    ),
-                    selectedItems: Binding<[KeySetViewModel]>.constant([]),
-                    isExportKeysSelected: Binding<Bool>.constant(false)
-                )
-                KeySetRow(
-                    viewModel: KeySetViewModel(
-                        seed: PreviewData.seedNameCard,
-                        keyName: "Dotsama crowdloans with very long title",
-                        derivedKeys: "3 Derived Keys",
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
-                        networks: ["polkadot", "kusama", "astar", "westend", "phala"]
-                    ),
-                    selectedItems: Binding<[KeySetViewModel]>.constant([KeySetViewModel(
-                        seed: PreviewData.seedNameCard,
-                        keyName: "Dotsama crowdloans",
-                        derivedKeys: "3 Derived Keys",
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
-                        networks: ["polkadot", "kusama", "astar", "westend", "phala"]
-                    )]),
-                    isExportKeysSelected: Binding<Bool>.constant(true)
+                    viewModel: .stub
                 )
             }
             .preferredColorScheme(.dark)

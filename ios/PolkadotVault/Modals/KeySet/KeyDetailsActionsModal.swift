@@ -40,12 +40,12 @@ struct KeyDetailsActionsModal: View {
                         style: .destructive
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
                 .padding(.bottom, Spacing.medium)
             }
@@ -62,25 +62,3 @@ struct KeyDetailsActionsModal: View {
         )
     }
 }
-
-// struct KeyDetailsActionsModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        KeyDetailsActionsModal(
-//            isShowingActionSheet: Binding<Bool>.constant(true),
-//            removeSeed: {}
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            KeyDetailsActionsModal(
-//                isShowingActionSheet: Binding<Bool>.constant(true),
-//                removeSeed: {}
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

@@ -15,7 +15,7 @@ struct NetworkCapsuleView: View {
             .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             .font(PrimaryFont.captionM.font)
             .padding([.top, .bottom], Spacing.extraExtraSmall)
-            .padding([.leading, .trailing], Spacing.extraSmall)
+            .padding(.horizontal, Spacing.extraSmall)
             .background(Asset.fill12.swiftUIColor)
             .clipShape(Capsule())
     }

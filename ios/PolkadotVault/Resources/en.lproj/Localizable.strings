@@ -77,9 +77,9 @@
 "Seed" = "Seed";
 "seed_name" = "Enter Key Set Name";
 "SEED PHRASE" = "Secret Recovery Phrase";
-"RecoverSeedPhrase.Action.Done" = "Done";
-"RecoverSeedPhrase.Label.Title" = "Recover Key Set";
-"RecoverSeedPhrase.Label.Header" = "Secret Recovery Phrase";
+"RecoverSeedPhrase.Action.Next" = "Next";
+"RecoverSeedPhrase.Label.Title" = "Enter a Secret Recovery Phrase";
+"RecoverSeedPhrase.Label.Header" = "Enter a 24-word phrase you were given when you created your key set";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
@@ -105,9 +105,6 @@
 "KeySets.Label.Empty.Title" = "You Don't Have\nAny Key Sets";
 "KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
-"KeySets.More.Action.Export" = "Export Key Sets";
-"KeySets.More.Action.ExportAll" = "Export All";
-"KeySets.More.Action.ExportSelected" = "Export Selected";
 "KeySetsModal.Action.Export" = "Export Keys";
 "KeySetsModal.Action.Derive" = "Derive from Key";
 "KeySetsModal.Action.Backup" = "Backup Key Set";
@@ -125,11 +122,13 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
+"KeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
 "KeyDetails.Action.Create" = "Create Derived key";
 "KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
+"KeyDetails.Overlay.Label.Title.Empty" = "Root key selected";
 "KeyDetails.Overlay.Label.Key.Single" = "key";
 "KeyDetails.Overlay.Label.Key.Plural" = "keys";
 "KeyDetails.Overlay.Action.Delete" = "Delete";
@@ -142,6 +141,7 @@
 
 "PublicKeyDetails.Label.Title" = "Public Key";
 "PublicKeyDetails.Label.Subtitle" = "Derived Key";
+"PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
 "PublicKeyDetails.Label.Network" = "Network";
@@ -197,8 +197,8 @@
 "Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
-"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key Set";
-"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Key Sets";
+"KeysExport.KeySets.Label.Header.Suffix.Single" = "Key";
+"KeysExport.KeySets.Label.Header.Suffix.Plural" = "Keys";
 "KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
@@ -441,28 +441,33 @@
 "NetworkFilter.Action.Reset" = "Reset";
 "NetworkFilter.Action.Done" = "Done";
 
-"EnterBananaSplitPasswordModal.Label.Title" = "Banana Split Recovery";
-"EnterBananaSplitPasswordModal.Label.EnterName" = "Enter display name for recovered key set";
-"EnterBananaSplitPasswordModal.Label.EnterPassword" = "Enter Banana split password";
-"EnterBananaSplitPasswordModal.Placeholder.EnterName" = "Display name";
-"EnterBananaSplitPasswordModal.Placeholder.EnterPassword" = "Password";
-"EnterBananaSplitPasswordModal.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
-"EnterBananaSplitPasswordModal.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
-"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
-"EnterBananaSplitPasswordModal.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
-"EnterBananaSplitPasswordModal.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
+"EnterBananaSplitPasswordView.Label.Title" = "Banana Split Recovery";
+"EnterBananaSplitPasswordView.Label.EnterName" = "Enter display name for recovered key set";
+"EnterBananaSplitPasswordView.Label.EnterPassword" = "Enter Banana split password";
+"EnterBananaSplitPasswordView.Placeholder.EnterName" = "Display name";
+"EnterBananaSplitPasswordView.Placeholder.EnterPassword" = "Password";
+"EnterBananaSplitPasswordView.Error.Label.InvalidPassword" = "The password you entered is incorrect.\nPlease try again.";
+"EnterBananaSplitPasswordView.Error.Label.InvalidSeedName" = "Given display name already exists.\nPlease try again.";
+"EnterBananaSplitPasswordView.Error.SeedPhraseExists.Title" = "Seed phrase already exists";
+"EnterBananaSplitPasswordView.Error.SeedPhraseExists.Message" = "Seed phrase that you are trying to recover already exists in the app.";
+"EnterBananaSplitPasswordView.Error.LocalRestoreFailed.Message" = "Given combination of seed phrase and seed name couldn't be saved.";
+"EnterBananaSplitPasswordView.Action.Next" = "Next";
 
-"CreateDerivedKey.Label.Title" = "Select Network";
-"CreateDerivedKey.Label.Footer.Network" = "Learn more about How to Set up networks";
+"CreateDerivedKey.Label.Title" = "Create Derived Key";
+"CreateDerivedKey.Label.Subtitle" = "Step 1 / 2";
+"CreateDerivedKey.Label.Header" = "Select Network";
+"CreateDerivedKey.Label.Footer.Network" = "Haven’t found a network needed?\nLearn more about how to set up networks";
 "CreateDerivedKey.Label.Network.Title" = "Choose Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
 
-"CreateDerivedKey.Modal.Path.Title" = "Derivation Path Name";
+"CreateDerivedKey.Modal.Path.Title" = "Create Derived Key";
+"CreateDerivedKey.Modal.Path.Subtitle" = "Step 2 / 2";
+"CreateDerivedKey.Modal.Path.Header" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
 "CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
 "CreateDerivedKey.Modal.Path.Action.HardPath" = "//";
 "CreateDerivedKey.Modal.Path.Action.PasswordedPath" = "///Password";
-"CreateDerivedKey.Modal.Path.Footer.Path" = "Path name example //network//1";
+"CreateDerivedKey.Modal.Path.Footer.Path" = "Proceed with default or enter custom.\nPath name example: //<network>//0. ";
 "CreateDerivedKey.Modal.Path.Suggestion.Path" = "Enter path name";
 "CreateDerivedKey.Modal.Path.Header.Password" = "Confirm Password";
 "CreateDerivedKey.Modal.Path.Placeholder.Password" = "Confirm Password";
@@ -568,7 +573,7 @@
 "NewSeed.Name.Label.Footer" = "Name examples: Main account, My validator, Dotsama crowdloans, etc";
 "NewSeed.Name.Action.Next" = "Next";
 "NewSeed.Backup.Label.Header" = "Write down your Secret\nRecovery Phrase";
-"NewSeed.Backup.Action.Create" = "Create Key Set";
+"NewSeed.Backup.Action.Create" = "Next";
 "NewSeed.Backup.Label.Info" = "Write it down on a piece of paper and keep it in a safe place. You can also use Banana Split for maximum security";
 "NewSeed.Backup.Label.Info.Underline" = "Banana Split";
 "NewSeed.Backup.Label.Confirmation" = "I’ve written down my secret\nrecovery phrase";
@@ -576,3 +581,48 @@
 "NewSeed.Backup.BananaSplit.Label.Content" = "Banana Split is a self-contained HTML page, which makes your paper backups more resilient and secure using Shamir's secret sharing scheme. You can encrypt and split particularly sensitive information so that it's not physically stored in one place — your master password, seed phrase, etc.\n\nFor more details visit\nhttps://bs.parity.io";
 "NewSeed.Backup.BananaSplit.Label.Content.Highlight.1" = "Shamir's secret sharing scheme.";
 "NewSeed.Backup.BananaSplit.Label.Content.Highlight.2" = "https://bs.parity.io";
+
+"CreateKeysForNetwork.Label.Title.Create" = "Create Keys";
+"CreateKeysForNetwork.Label.Header.Create" = "Choose networks for the keys to be created";
+"CreateKeysForNetwork.Label.Title.Recover" = "Recover Keys";
+"CreateKeysForNetwork.Label.Header.Recover" = "Choose networks for the keys to be recovered";
+"CreateKeysForNetwork.Label.Title.BananaSplit" = "Recover Keys";
+"CreateKeysForNetwork.Label.Header.BananaSplit" = "Choose networks for the keys to be recovered";
+"CreateKeysForNetwork.Label.Footer" = "Please note that keys with custom named derivation path name can be created from the key set screen separately.";
+"CreateKeysForNetwork.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
+"CreateKeysForNetwork.Action.SelectAll" = "Select All";
+"CreateKeysForNetwork.Action.Create" = "Done";
+"CreateKeysForNetwork.Modal.Title" = "Proceed with the Empty Key Set?";
+"CreateKeysForNetwork.Modal.Content" = "Since you haven't selected any keys, you key set will be empty. Are you sure?";
+"CreateKeysForNetwork.Modal.Cancel" = "Cancel";
+"CreateKeysForNetwork.Modal.Done" = "Done";
+"CreateKeysForNetwork.Snackbar.KeySetCreated" = " %@ Key Set Has Been Added";
+"CreateKeysForNetwork.Snackbar.KeySetRecovered" = "%@ Key Set Has Been Recovered";
+
+"AddKeysForNetworkModal.Label.Title" = "Create Key for the %@ Network?";
+"AddKeysForNetworkModal.Action.Accept" = "Create Key";
+"AddKeysForNetworkModal.Action.Cancel" = "Cancel";
+"SelectKeySetsForNetworkKey.Label.Title" = "Create key for the %@ Network";
+"SelectKeySetsForNetworkKey.Label.Content" = "Select Key Set for the derived key to be created";
+"SelectKeySetsForNetworkKey.Action.SelectAll" = "Select All";
+"SelectKeySetsForNetworkKey.Action.Cancel" = "Cancel";
+"SelectKeySetsForNetworkKey.Action.Create" = "Create Key";
+"SelectKeySetsForNetworkKey.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
+"SelectKeySetsForNetworkKey.Error.NoNetwork" = "Network could not be retrieved";
+"SelectKeySetsForNetworkKey.Snackbar.KeysCreated" = "Derived Keys have been created";
+
+"ErrorDisplayed.DbNotInitialized" = "Database not initialized";
+"ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";
+
+"AddDerivedKeys.Label.Title" = "Add Derived Keys";
+"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
+"AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
+"AddDerivedKeys.Action.Done" = "Done";
+"AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
+"AddDerivedKeys.Error.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
+"AddDerivedKeys.Error.DerivedKeyForNetwork.Content" = "Derived key %@ could not be created: %@";
+"AddDerivedKeys.Error.DerivedKeyForNetwork.Title" = "There was an issue importing keys.";
+"AddDerivedKeys.Modal.Label.Title" = "Please confirm derived key import with the PIN code";
+"AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
+"AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
+"AddDerivedKeys.Modal.Action.Cancel" = "Cancel";

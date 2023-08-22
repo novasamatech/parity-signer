@@ -18,6 +18,13 @@ enum NavigationButton {
     case questionmark
 }
 
+enum NavigationBarTitle {
+    case empty
+    case title(String)
+    case subtitle(title: String, subtitle: String)
+    case progress(current: Int, upTo: Int)
+}
+
 struct NavigationButtonModel: Identifiable {
     let id = UUID()
     let type: NavigationButton
@@ -33,21 +40,18 @@ struct NavigationButtonModel: Identifiable {
 }
 
 struct NavigationBarViewModel {
-    let title: String?
-    let subtitle: String?
+    let title: NavigationBarTitle
     let leftButtons: [NavigationButtonModel]
     let rightButtons: [NavigationButtonModel]
     let backgroundColor: Color
 
     init(
-        title: String? = nil,
-        subtitle: String? = nil,
+        title: NavigationBarTitle = .empty,
         leftButtons: [NavigationButtonModel] = [],
         rightButtons: [NavigationButtonModel] = [],
         backgroundColor: Color = Asset.backgroundPrimary.swiftUIColor
     ) {
         self.title = title
-        self.subtitle = subtitle
         self.leftButtons = leftButtons
         self.rightButtons = rightButtons
         self.backgroundColor = backgroundColor
@@ -78,23 +82,8 @@ struct NavigationBarView: View {
                         buttonView($0)
                     }
                 }
-                .padding([.leading, .trailing], Spacing.extraExtraSmall)
-                HStack(alignment: .center, spacing: 0) {
-                    Spacer()
-                    VStack {
-                        if let title = viewModel.title {
-                            Text(title)
-                                .font(PrimaryFont.titleS.font)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
-                        }
-                        if let subtitle = viewModel.subtitle {
-                            Text(subtitle)
-                                .font(PrimaryFont.captionM.font)
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                        }
-                    }
-                    Spacer()
-                }
+                .padding(.horizontal, Spacing.extraExtraSmall)
+                titleView(viewModel.title)
             }
             .frame(maxWidth: .infinity)
             .frame(height: Heights.navigationBarHeight)
@@ -145,6 +134,52 @@ struct NavigationBarView: View {
             )
         }
     }
+
+    @ViewBuilder
+    func titleView(_ title: NavigationBarTitle) -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Spacer()
+            switch title {
+            case .empty:
+                EmptyView()
+            case let .title(title):
+                VStack {
+                    Text(title)
+                        .font(PrimaryFont.titleS.font)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                }
+            case let .subtitle(title, subtitle):
+                VStack {
+                    Text(title)
+                        .font(PrimaryFont.titleS.font)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                    Text(subtitle)
+                        .font(PrimaryFont.captionM.font)
+                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                }
+            case let .progress(current, upTo):
+                progressView(current, upTo: upTo)
+            }
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    func progressView(_ current: Int, upTo: Int) -> some View {
+        ForEach(Array(0 ..< upTo).indices, id: \.self) { index in
+            progressViewElement(isActive: index < current)
+                .padding(.leading, index != 0 ? Spacing.extraExtraSmall : 0)
+        }
+    }
+
+    @ViewBuilder
+    func progressViewElement(isActive: Bool) -> some View {
+        RoundedRectangle(cornerRadius: CornerRadius.extraLarge)
+            .frame(width: Heights.navigationBarProgressViewWidth, height: Heights.navigationBarProgressViewHeight)
+            .foregroundColor(
+                isActive ? Asset.pink500.swiftUIColor : Asset.fill12.swiftUIColor
+            )
+    }
 }
 
 #if DEBUG
@@ -153,43 +188,42 @@ struct NavigationBarView: View {
             VStack {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Key Sets",
+                        title: .title("Key Sets"),
                         leftButtons: [.init(type: .empty)],
                         rightButtons: [.init(type: .empty)]
                     )
                 )
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Key Sets",
+                        title: .title("Key Sets"),
                         leftButtons: [.init(type: .arrow)],
                         rightButtons: [.init(type: .more)]
                     )
                 )
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Key Sets",
+                        title: .title("Key Sets"),
                         leftButtons: [.init(type: .arrow)],
                         rightButtons: [.init(type: .empty)]
                     )
                 )
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Key Sets",
+                        title: .title("Key Sets"),
                         leftButtons: [.init(type: .empty)],
                         rightButtons: [.init(type: .more)]
                     )
                 )
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Public Key",
-                        subtitle: "Derived Key",
+                        title: .subtitle(title: "Key Sets", subtitle: "Derived Key"),
                         leftButtons: [.init(type: .xmark)],
                         rightButtons: [.init(type: .plus), .init(type: .more)]
                     )
                 )
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: "Create Derived Key",
+                        title: .title("Create Derived Key"),
                         leftButtons: [.init(type: .xmark)],
                         rightButtons: [.init(type: .action("Done"))]
                     )

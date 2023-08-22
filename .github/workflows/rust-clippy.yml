@@ -18,7 +18,7 @@ jobs:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.5.2
+        uses:                 actions/checkout@v3.5.3
         with:
           fetch-depth:        50
           submodules:         'recursive'
@@ -43,7 +43,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # v2.2.1
+        uses:                 Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
         with:
           workspaces:         rust -> rust/target
 

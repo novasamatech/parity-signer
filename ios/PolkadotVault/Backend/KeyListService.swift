@@ -16,7 +16,7 @@ final class KeyListService {
         self.navigation = navigation
     }
 
-    func getKeyList() -> MSeeds! {
+    func getKeyList() -> MSeeds? {
         navigation.performFake(navigation: .init(action: .start))
         guard case let .seedSelector(value) = navigation
             .performFake(navigation: .init(action: .navbarKeys))?.screenData else { return nil }

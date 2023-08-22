@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.backend.CompletableResult
+import io.parity.signer.domain.backend.CompletableResult
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.initial.WaitingScreen

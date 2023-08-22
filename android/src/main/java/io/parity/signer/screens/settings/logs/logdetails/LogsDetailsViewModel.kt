@@ -2,10 +2,10 @@ package io.parity.signer.screens.settings.logs.logdetails
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import io.parity.signer.backend.CompletableResult
-import io.parity.signer.backend.UniffiResult
+import io.parity.signer.domain.backend.CompletableResult
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.getDetailedDescriptionString
+import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.uniffi.MLogDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,7 @@ class LogsDetailsViewModel(): ViewModel() {
 			uniffiInteractor.getLogDetails(index)
 		}) {
 			is UniffiResult.Error -> {
-				val error = result.error.getDetailedDescriptionString()
+				val error = result.error.getDebugDetailedDescriptionString()
                 Log.e(TAG, "Unexpected error getLogs, $error")
 				_logsState.value = CompletableResult.Err(error)
 			}

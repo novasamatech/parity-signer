@@ -9,7 +9,7 @@ import AVFoundation
 import SwiftUI
 
 struct CameraView: View {
-    @StateObject var model = CameraService()
+    @StateObject var model: CameraService = CameraService()
     @StateObject var viewModel: ViewModel
     @StateObject var progressViewModel: ProgressSnackbarViewModel = ProgressSnackbarViewModel()
     @Environment(\.safeAreaInsets) private var safeAreaInsets
@@ -19,8 +19,9 @@ struct CameraView: View {
             // Full screen camera preview
             CameraPreview(session: model.session)
                 .onReceive(model.$payload) { payload in
+                    guard let payload else { return }
                     DispatchQueue.main.async {
-                        viewModel.checkForTransactionNavigation(payload)
+                        viewModel.didUpdatePayload(payload)
                     }
                 }
                 .onChange(of: model.total) { total in
@@ -57,7 +58,7 @@ struct CameraView: View {
                                 isPressed: $model.isTorchOn
                             )
                         }
-                        .padding([.leading, .trailing], Spacing.medium)
+                        .padding(.horizontal, Spacing.medium)
                         .padding(.top, Spacing.medium + safeAreaInsets.top)
                         Spacer()
                         // Camera cutout
@@ -71,7 +72,7 @@ struct CameraView: View {
                                         .padding(-Spacing.extraExtraSmall)
                                 )
                         }
-                        .padding([.leading, .trailing], Spacing.medium)
+                        .padding(.horizontal, Spacing.medium)
                         Spacer()
                         // Text description
                         VStack(alignment: .center, spacing: Spacing.small) {
@@ -97,6 +98,7 @@ struct CameraView: View {
                 .compositingGroup()
             }
             .onAppear {
+                viewModel.use(cameraModel: model)
                 progressViewModel.title = Localizable.Scanner.Label.multipart.string
                 progressViewModel.cancelActionTitle = Localizable.Scanner.Action.cancel.string
                 progressViewModel.cancelAction = {
@@ -116,18 +118,13 @@ struct CameraView: View {
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingTransactionPreview,
-            onDismiss: {
-                model.multipleTransactions = []
-                model.start()
-                viewModel.clearTransactionState()
-            }
+            isPresented: $viewModel.isPresentingTransactionPreview
         ) {
             TransactionPreview(
                 viewModel: .init(
-                    isPresented: $viewModel.isPresentingTransactionPreview,
                     content: viewModel.transactions,
-                    signature: viewModel.signature
+                    signature: viewModel.signature,
+                    onCompletion: viewModel.onTransactionPreviewCompletion(_:)
                 )
             )
         }
@@ -135,59 +132,26 @@ struct CameraView: View {
             isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
             onDismiss: {
                 model.start()
-
-                // User entered invalid password too many times, present error
-                if viewModel.shouldPresentError {
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.isPresentingError = true }
-                    return
-                }
                 viewModel.clearTransactionState()
-
-                // User proceeded successfully with key recovery, dismiss camera
-                if viewModel.wasBananaSplitKeyRecovered {
-                    viewModel.dismissView()
-                    viewModel.onBananaSplitComplete()
-                }
             }
         ) {
-            EnterBananaSplitPasswordModal(
+            EnterBananaSplitPasswordView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
-                    isKeyRecovered: $viewModel.wasBananaSplitKeyRecovered,
-                    isErrorPresented: $viewModel.shouldPresentError,
-                    presentableError: $viewModel.presentableError,
                     qrCodeData: $model.bucket,
-                    onComplete: $viewModel.onBananaSplitComplete
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
                 )
             )
         }
         .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword,
             onDismiss: {
-                // Clear password modal state no matter what
-                defer { viewModel.enterPassword = nil }
-
-                // User forgot password
-                if viewModel.shouldPresentError {
-                    viewModel.presentableError = .signingForgotPassword()
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.isPresentingError = true }
-                    return
+                viewModel.onEnterPasswordDismissal()
+                if !viewModel.shouldPresentError, viewModel.signature == nil {
+                    // Dismissed by user
+                    model.payload = nil
+                    model.start()
                 }
-                // User entered valid password, signature is ready
-                if viewModel.signature != nil {
-                    // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
-                    // async
-                    DispatchQueue.main.async { viewModel.continueWithSignature() }
-                    return
-                }
-                // Dismissed by user
-                model.payload = nil
-                model.start()
-                viewModel.clearTransactionState()
             }
         ) {
             EnterPasswordModal(
@@ -214,6 +178,39 @@ struct CameraView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddKeysForNetwork,
+            onDismiss: viewModel.onAddKeysDismissal
+        ) {
+            AddKeysForNetworkModal(
+                viewModel: .init(
+                    networkName: viewModel.networkName,
+                    isPresented: $viewModel.isPresentingAddKeysForNetwork,
+                    onCompletion: viewModel.onAddKeysCompletion(_:)
+                )
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingKeySetSelection
+        ) {
+            SelectKeySetsForNetworkKeyView(
+                viewModel: selectKeySetsForNetworkViewModel()
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingAddDerivedKeys
+        ) {
+            AddDerivedKeysView(
+                viewModel: addDerivedKeysView()
+            )
+            .clearModalBackground()
+        }
+        .bottomSnackbar(
+            viewModel.snackbarViewModel,
+            isPresented: $viewModel.isSnackbarPresented
+        )
     }
 
     var multipleTransactionOverlay: some View {
@@ -246,6 +243,23 @@ struct CameraView: View {
         ).string
         return key.signMultiple(model.multipleTransactions.count, suffix)
     }
+
+    func selectKeySetsForNetworkViewModel() -> SelectKeySetsForNetworkKeyView.ViewModel {
+        .init(
+            networkName: viewModel.networkName,
+            isPresented: $viewModel.isPresentingKeySetSelection,
+            onCompletion: viewModel.onSelectKeySetsForNetworkCompletion(_:)
+        )
+    }
+
+    func addDerivedKeysView() -> AddDerivedKeysView.ViewModel {
+        .init(
+            dataModel: .init(viewModel.dynamicDerivationsPreview),
+            dynamicDerivationsPreview: viewModel.dynamicDerivationsPreview,
+            isPresented: $viewModel.isPresentingAddDerivedKeys,
+            onCompletion: viewModel.onAddDerivedKeyCompletion(_:)
+        )
+    }
 }
 
 extension CameraView {
@@ -265,69 +279,62 @@ extension CameraView {
 
         // Banana split flow
         @Published var isPresentingEnterBananaSplitPassword: Bool = false
-        @Published var wasBananaSplitKeyRecovered: Bool = false
-        @Published var onBananaSplitComplete: () -> Void = {}
+
+        // Create Keys for network
+        @Published var isPresentingAddKeysForNetwork: Bool = false
+        @Published var shouldPresentKeySetSelection: Bool = false
+        @Published var isPresentingKeySetSelection: Bool = false
+        var networkName: String!
+
+        // Dynamic Derived Keys
+        @Published var isPresentingAddDerivedKeys: Bool = false
 
         // Data models for modals
         @Published var transactions: [MTransaction] = []
         @Published var signature: MSignatureReady?
         @Published var enterPassword: MEnterPassword!
+        @Published var dynamicDerivationsPreview: DdPreview!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         @Binding var isPresented: Bool
-        @Binding var onComplete: () -> Void
         private let scanService: ScanTabService
+        private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
+
+        private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
-            onComplete: Binding<() -> Void> = .constant {},
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            scanService: ScanTabService = ScanTabService()
+            scanService: ScanTabService = ScanTabService(),
+            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService()
         ) {
             _isPresented = isPresented
-            _onComplete = onComplete
             self.seedsMediator = seedsMediator
             self.scanService = scanService
+            self.dynamicDerivationsService = dynamicDerivationsService
         }
 
         func onAppear() {
             scanService.startQRScan()
         }
 
-        func checkForTransactionNavigation(_ payload: String?) {
-            guard let payload = payload, !isInTransactionProgress else { return }
+        func use(cameraModel: CameraService) {
+            self.cameraModel = cameraModel
+        }
+
+        func didUpdatePayload(_ payload: DecodedPayload) {
+            guard !isInTransactionProgress else { return }
             isInTransactionProgress = true
-            switch scanService.performTransaction(with: payload) {
-            case let .success(actionResult):
-                // Handle transactions with just error payload
-                guard case let .transaction(transactions) = actionResult.screenData else { return }
-                if transactions.allSatisfy(\.isDisplayingErrorOnly) {
-                    presentableError = .transactionSigningError(
-                        message: transactions
-                            .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
-                    )
-                    isPresentingError = true
-                    scanService.resetNavigationState()
-                    return
-                }
-                // Handle rest of transactions with optional error payload
-                // Type is assumed based on first error
-                let firstTransaction = transactions.first
-                switch firstTransaction?.ttype {
-                case .sign:
-                    continueTransactionSignature(transactions)
-                case .importDerivations:
-                    continueImportDerivedKeys(transactions)
-                default:
-                    // Transaction with error
-                    // Transaction that does not require signing (i.e. adding network or metadata)
-                    self.transactions = transactions
-                    isPresentingTransactionPreview = true
-                }
-            case let .failure(error):
-                presentableError = ErrorBottomModalViewModel.transactionError(for: error)
-                isPresentingError = true
+            switch payload.type {
+            case .dynamicDerivations:
+                startDynamicDerivationsFlow(payload.payload.first ?? "")
+            case .transaction:
+                startTransactionSigningFlow(payload.payload.first ?? "")
+            case .dynamicDerivationsTransaction:
+                startDynamicDerivationsTransactionFlow(payload.payload)
             }
         }
 
@@ -345,18 +352,184 @@ extension CameraView {
         }
 
         func presentBananaSplitPassword() {
+            isPresentingProgressSnackbar = false
             isPresentingEnterBananaSplitPassword = true
         }
 
         func dismissView() {
             isPresented = false
         }
+
+        func onTransactionPreviewCompletion(_ completionAction: TransactionPreview.OnCompletionAction) {
+            isPresentingTransactionPreview = false
+            switch completionAction {
+            case .onImportKeysFailure:
+                resumeCamera()
+                snackbarViewModel = .init(
+                    title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
+                    style: .warning
+                )
+            case let .onNetworkAdded(network):
+                snackbarViewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
+                    style: .info
+                )
+                isSnackbarPresented = true
+                networkName = network
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.isPresentingAddKeysForNetwork = true
+                }
+            case let .onNetworkMetadataAdded(network, metadataVersion):
+                resumeCamera()
+                snackbarViewModel = .init(
+                    title: Localizable.TransactionSign.Snackbar.metadata(network, metadataVersion),
+                    style: .info
+                )
+                isSnackbarPresented = true
+            case let .onDerivedKeysImport(derivedKeysCount):
+                resumeCamera()
+                if derivedKeysCount == 1 {
+                    snackbarViewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
+                } else {
+                    snackbarViewModel = .init(
+                        title: Localizable.ImportKeys.Snackbar.Success
+                            .multiple(derivedKeysCount)
+                    )
+                }
+                isSnackbarPresented = true
+            case .onDone:
+                resumeCamera()
+            case .onDismissal:
+                resumeCamera()
+            }
+        }
+
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            let message: String
+            switch completionAction {
+            case let .createKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName),
+                 let .bananaSplitRecovery(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+            }
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
+        }
+
+        func onEnterPasswordDismissal() {
+            // User forgot password
+            if shouldPresentError {
+                presentableError = .signingForgotPassword()
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                // async
+                DispatchQueue.main.async { self.isPresentingError = true }
+                return
+            }
+            // User entered valid password, signature is ready
+            if signature != nil {
+                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this
+                // async
+                DispatchQueue.main.async { self.continueWithSignature() }
+                return
+            }
+            // Dismissed by user
+            clearTransactionState()
+            enterPassword = nil
+        }
+
+        func onAddKeysCompletion(_ onCompletion: AddKeysForNetworkModal.OnCompletionAction) {
+            switch onCompletion {
+            case .cancel:
+                shouldPresentKeySetSelection = false
+                networkName = nil
+                resumeCamera()
+            case .create:
+                shouldPresentKeySetSelection = true
+            }
+        }
+
+        func onAddKeysDismissal() {
+            if shouldPresentKeySetSelection {
+                isPresentingKeySetSelection = true
+            } else {
+                resumeCamera()
+            }
+        }
+
+        func onSelectKeySetsForNetworkCompletion(_ onComplete: SelectKeySetsForNetworkKeyView.OnCompletionAction) {
+            switch onComplete {
+            case .onDerivedKeysCreated:
+                snackbarViewModel = .init(
+                    title: Localizable.SelectKeySetsForNetworkKey.Snackbar.keysCreated.string,
+                    style: .info
+                )
+                isSnackbarPresented = true
+                networkName = nil
+            case .onCancel:
+                ()
+            }
+            resumeCamera()
+        }
+
+        private func resumeCamera() {
+            cameraModel?.multipleTransactions = []
+            cameraModel?.start()
+            clearTransactionState()
+        }
+
+        func onAddDerivedKeyCompletion(_ onComplete: AddDerivedKeysView.OnCompletionAction) {
+            switch onComplete {
+            case .onCancel:
+                ()
+            case .onDone:
+                ()
+            }
+            resumeCamera()
+        }
     }
 }
 
 // MARK: - Transaction Signature
 
-extension CameraView.ViewModel {
+private extension CameraView.ViewModel {
+    func startTransactionSigningFlow(_ payload: String) {
+        switch scanService.performTransaction(with: payload) {
+        case let .success(actionResult):
+            // Handle transactions with just error payload
+            guard case let .transaction(transactions) = actionResult.screenData else { return }
+            if transactions.allSatisfy(\.isDisplayingErrorOnly) {
+                presentableError = .transactionSigningError(
+                    message: transactions
+                        .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
+                )
+                isPresentingError = true
+                scanService.resetNavigationState()
+                return
+            }
+            // Handle rest of transactions with optional error payload
+            // Type is assumed based on first error
+            let firstTransaction = transactions.first
+            switch firstTransaction?.ttype {
+            case .sign:
+                continueTransactionSignature(transactions)
+            case .importDerivations:
+                continueImportDerivedKeys(transactions)
+            default:
+                // Transaction with error
+                // Transaction that does not require signing (i.e. adding network or metadata)
+                self.transactions = transactions
+                isPresentingTransactionPreview = true
+            }
+        case let .failure(error):
+            presentableError = ErrorBottomModalViewModel.transactionError(for: error)
+            isPresentingError = true
+        }
+    }
+
     func continueTransactionSignature(_ transactions: [MTransaction]) {
         let actionResult = sign(transactions: transactions)
         self.transactions = transactions
@@ -369,6 +542,34 @@ extension CameraView.ViewModel {
         if case let .signatureReady(value) = actionResult?.modalData {
             signature = value
             continueWithSignature()
+        }
+    }
+}
+
+private extension CameraView.ViewModel {
+    func startDynamicDerivationsTransactionFlow(_ payload: [String]) {
+        let seedPhrases = seedsMediator.getAllSeeds()
+        dynamicDerivationsService.signDynamicDerivationsTransaction(for: seedPhrases, payload: payload) { result in
+            switch result {
+            case let .success(signedTransaction):
+                if signedTransaction.transaction.allSatisfy(\.isDisplayingErrorOnly) {
+                    self.presentableError = .transactionSigningError(
+                        message: signedTransaction.transaction
+                            .reduce("") {
+                                $0 + $1.transactionIssues() + ($1 == signedTransaction.transaction.last ? "\n" : "")
+                            }
+                    )
+                    self.isPresentingError = true
+                    self.scanService.resetNavigationState()
+                    return
+                }
+                self.transactions = signedTransaction.transaction
+                self.signature = signedTransaction.signature
+                self.isPresentingTransactionPreview = true
+            case let .failure(error):
+                self.presentableError = .transactionError(for: error)
+                self.isPresentingError = true
+            }
         }
     }
 }
@@ -394,6 +595,25 @@ extension CameraView.ViewModel {
         } else {
             self.transactions = transactions
             isPresentingTransactionPreview = true
+        }
+    }
+}
+
+// MARK: - Dynamic Derivations
+
+private extension CameraView.ViewModel {
+    func startDynamicDerivationsFlow(_ payload: String) {
+        let seedPhrases = seedsMediator.getAllSeeds()
+        dynamicDerivationsService.getDynamicDerivationsPreview(for: seedPhrases, payload: payload) { result in
+            switch result {
+            case let .success(preview):
+                self.dynamicDerivationsPreview = preview
+                self.isPresentingAddDerivedKeys = true
+                ()
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
         }
     }
 }

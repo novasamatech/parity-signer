@@ -41,13 +41,11 @@ struct ExportPrivateKeyWarningModal: View {
                         text: Localizable.KeyExportWarning.Action.export.key
                     )
                     EmptyButton(
-                        action: {
-                            animateDismissal()
-                        },
+                        action: animateDismissal(),
                         text: Localizable.KeyExportWarning.Action.cancel.key
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.medium)
             }
         )
@@ -61,16 +59,18 @@ struct ExportPrivateKeyWarningModal: View {
     }
 }
 
-struct ExportPrivateKeyWarningModal_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            ExportPrivateKeyWarningModal(
-                isPresentingExportKeysWarningModal: Binding<Bool>.constant(true),
-                shouldPresentExportKeysModal: Binding<Bool>.constant(false)
-            )
+#if DEBUG
+    struct ExportPrivateKeyWarningModal_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack {
+                ExportPrivateKeyWarningModal(
+                    isPresentingExportKeysWarningModal: Binding<Bool>.constant(true),
+                    shouldPresentExportKeysModal: Binding<Bool>.constant(false)
+                )
+            }
+            .background(.red)
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .background(.red)
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

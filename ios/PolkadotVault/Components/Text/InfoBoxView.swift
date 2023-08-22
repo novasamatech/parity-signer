@@ -14,6 +14,7 @@ struct InfoBoxView: View {
         HStack {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             Spacer().frame(maxWidth: Spacing.medium)
             Asset.infoIconBold.swiftUIImage

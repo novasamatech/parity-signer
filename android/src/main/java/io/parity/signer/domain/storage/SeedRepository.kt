@@ -7,9 +7,11 @@ import androidx.fragment.app.FragmentActivity
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.Navigator
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.updateSeedNames
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ErrorDisplayed
+import io.parity.signer.uniffi.createKeySet
+import io.parity.signer.uniffi.updateSeedNames
 
 
 class SeedRepository(
@@ -18,7 +20,7 @@ class SeedRepository(
 	private val activity: FragmentActivity,
 ) {
 
-	fun containSeedName(seedName: String) : Boolean {
+	fun containSeedName(seedName: String): Boolean {
 		return storage.lastKnownSeedNames.value.contains(seedName)
 	}
 
@@ -33,6 +35,7 @@ class SeedRepository(
 					.associateWith { seedName -> storage.getSeed(seedName, false) }
 				RepoResult.Success(result)
 			}
+
 			AuthResult.AuthError,
 			AuthResult.AuthFailed,
 			AuthResult.AuthUnavailable -> {
@@ -54,6 +57,7 @@ class SeedRepository(
 					AuthResult.AuthSuccess -> {
 						getSeedPhrasesDangerous(seedNames)
 					}
+
 					AuthResult.AuthError,
 					AuthResult.AuthFailed,
 					AuthResult.AuthUnavailable -> {
@@ -77,6 +81,7 @@ class SeedRepository(
 			AuthResult.AuthSuccess -> {
 				getSeedPhrasesDangerous(listOf(seed))
 			}
+
 			AuthResult.AuthError,
 			AuthResult.AuthFailed,
 			AuthResult.AuthUnavailable -> {
@@ -85,12 +90,37 @@ class SeedRepository(
 		}
 	}
 
+	suspend fun fillSeedToPhrasesAuth(seedNames: List<String>): RepoResult<List<Pair<String, String>>> {
+		return try {
+				when (val authResult =
+					authentication.authenticate(activity)) {
+					AuthResult.AuthSuccess -> {
+						val result = seedNames.map { it to storage.getSeed(it) }
+						return if (result.any { it.second.isEmpty() }) {
+							RepoResult.Failure(IllegalStateException("phrase some are empty - broken storage?"))
+						} else {
+							RepoResult.Success(result)
+						}
+					}
+					AuthResult.AuthError,
+					AuthResult.AuthFailed,
+					AuthResult.AuthUnavailable -> {
+						RepoResult.Failure(RuntimeException("auth error - $authResult"))
+					}
+				}
+		} catch (e: java.lang.Exception) {
+			Log.d("get seed failure", e.toString())
+			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
+			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
+		}
+	}
 
 	/**
 	 * Add seed, encrypt it, and create default accounts
 	 *
 	 * @return if was successfully added
 	 */
+	@Deprecated("use the one without navigator below")
 	suspend fun addSeed(
 		seedName: String,
 		seedPhrase: String,
@@ -115,6 +145,7 @@ class SeedRepository(
 					addSeedDangerous(seedName, seedPhrase, navigator)
 					true
 				}
+
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
@@ -135,12 +166,60 @@ class SeedRepository(
 	) {
 		storage.addSeed(seedName, seedPhrase)
 		tellRustSeedNames()
+		//createRoots is fake and should always be true. It's added for educational reasons
 		val alwaysCreateRoots = "true"
 		navigator.navigate(
 			action = Action.GO_FORWARD,
 			details = alwaysCreateRoots,
 			seedPhrase = seedPhrase
 		)
+	}
+
+	suspend fun addSeed(
+		seedName: String,
+		seedPhrase: String,
+		networksKeys: List<String>
+	): Boolean {
+		// Check if seed name already exists
+		if (isSeedPhraseCollision(seedPhrase)) {
+			return false
+		}
+
+		try {
+			addSeedDangerous(seedName, seedPhrase, networksKeys)
+			return true
+		} catch (e: UserNotAuthenticatedException) {
+			return when (val authResult = authentication.authenticate(activity)) {
+				AuthResult.AuthSuccess -> {
+					addSeedDangerous(seedName, seedPhrase, networksKeys)
+					true
+				}
+
+				AuthResult.AuthError,
+				AuthResult.AuthFailed,
+				AuthResult.AuthUnavailable -> {
+					Log.e(TAG, "auth error - $authResult")
+					false
+				}
+			}
+		} catch (e: java.lang.Exception) {
+			Log.e(TAG, e.toString())
+			return false
+		}
+	}
+
+	private fun addSeedDangerous(
+		seedName: String,
+		seedPhrase: String,
+		networks: List<String>,
+	) {
+		storage.addSeed(seedName, seedPhrase)
+		try {
+			tellRustSeedNames()
+			createKeySet(seedName, seedPhrase, networks)
+		} catch (e: ErrorDisplayed) {
+			submitErrorState("error in add seed $e")
+		}
 	}
 
 	internal fun tellRustSeedNames() {
@@ -190,12 +269,14 @@ sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()
 	data class Failure<T>(val error: Throwable = UnknownError()) : RepoResult<T>()
 }
+
 fun <T> RepoResult<T>.mapError(): T? {
 	return when (this) {
 		is RepoResult.Failure -> {
 			submitErrorState("uniffi interaction exception $error")
 			null
 		}
+
 		is RepoResult.Success -> {
 			result
 		}

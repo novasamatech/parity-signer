@@ -45,11 +45,7 @@ fun KeySetsScreen(
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
 		ScreenHeader(
 			stringResource(R.string.key_sets_screem_title),
-			onMenu = if (model.keys.isNotEmpty()) {
-				{ localNavigator.navigate(KeySetsNavSubgraph.homeMenu) }
-			} else {
-				null
-			}
+			onMenu = null,
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			if (model.keys.isNotEmpty()) {
@@ -106,13 +102,13 @@ private fun PreviewKeySetsSelectScreenFull() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticonPng,
+			PreviewData.Identicon.exampleIdenticonPng,
 			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticonPng,
+			PreviewData.Identicon.exampleIdenticonPng,
 			listOf("westend", "some"),
 			3.toUInt()
 		),
@@ -121,7 +117,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 		keys.add(
 			KeySetModel(
 				"second seed name",
-				PreviewData.exampleIdenticonPng,
+				PreviewData.Identicon.exampleIdenticonPng,
 				listOf("westend", "some"),
 				3.toUInt()
 			)
@@ -178,13 +174,13 @@ private fun PreviewKeySetsSelectScreenFew() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.exampleIdenticonPng,
+			PreviewData.Identicon.exampleIdenticonPng,
 			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.exampleIdenticonPng,
+			PreviewData.Identicon.exampleIdenticonPng,
 			listOf("kusama", "some"),
 			3.toUInt()
 		),

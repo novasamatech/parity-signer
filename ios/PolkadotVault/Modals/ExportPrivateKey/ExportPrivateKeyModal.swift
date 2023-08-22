@@ -61,7 +61,7 @@ struct ExportPrivateKeyModal: View {
                     )
                     .fixedSize(horizontal: false, vertical: true)
                     .strokeContainerBackground()
-                    .padding([.leading, .trailing], Spacing.large)
+                    .padding(.horizontal, Spacing.large)
                     // Bottom "Hide" container
                     ExportPrivateKeyAddressFooter(hideAction: animateDismissal)
                         .padding(.horizontal, Spacing.extraSmall)
@@ -104,41 +104,43 @@ private struct ExportPrivateKeyAddressFooter: View {
                 )
             )
         }
-        .padding([.leading, .trailing], Spacing.large)
+        .padding(.horizontal, Spacing.large)
         .padding([.top, .bottom], Spacing.extraSmall)
     }
 }
 
-struct ExportPrivateKeyModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                ExportPrivateKeyModal(
-                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
-                )
+#if DEBUG
+    struct ExportPrivateKeyModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VStack {
+                    ExportPrivateKeyModal(
+                        isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                        viewModel: .stub
+                    )
+                }
+                .previewDevice("iPhone 11 Pro")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    ExportPrivateKeyModal(
+                        isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                        viewModel: .stub
+                    )
+                }
+                .previewDevice("iPod touch (7th generation)")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    ExportPrivateKeyModal(
+                        isPresentingExportKeysModal: Binding<Bool>.constant(true),
+                        viewModel: .stub
+                    )
+                }
+                .previewDevice("iPhone 8")
+                .background(.gray)
+                .preferredColorScheme(.dark)
             }
-            .previewDevice("iPhone 11 Pro")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                ExportPrivateKeyModal(
-                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
-                )
-            }
-            .previewDevice("iPod touch (7th generation)")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                ExportPrivateKeyModal(
-                    isPresentingExportKeysModal: Binding<Bool>.constant(true),
-                    viewModel: PreviewData.exampleExportPrivateKey
-                )
-            }
-            .previewDevice("iPhone 8")
-            .background(.gray)
-            .preferredColorScheme(.dark)
         }
     }
-}
+#endif

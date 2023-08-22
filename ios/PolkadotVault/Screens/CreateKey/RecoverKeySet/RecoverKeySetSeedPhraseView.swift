@@ -16,11 +16,11 @@ struct RecoverKeySetSeedPhraseView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: .init(
-                    title: Localizable.RecoverSeedPhrase.Label.title.string,
+                    title: .progress(current: 2, upTo: 3),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                     rightButtons: [.init(
                         type: .activeAction(
-                            Localizable.RecoverSeedPhrase.Action.done.key,
+                            Localizable.RecoverSeedPhrase.Action.next.key,
                             .constant(viewModel.content.readySeed == nil)
                         ),
                         action: viewModel.onDoneTap
@@ -29,12 +29,22 @@ struct RecoverKeySetSeedPhraseView: View {
             )
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
+                    Localizable.RecoverSeedPhrase.Label.title.text
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.titleL.font)
+                        .padding(.top, Spacing.extraSmall)
                     Localizable.RecoverSeedPhrase.Label.header.text
                         .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                         .font(PrimaryFont.bodyL.font)
-                        .padding(.leading, Spacing.large)
-                        .padding(.top, Spacing.large)
-                        .padding(.bottom, Spacing.small)
+                        .padding(.vertical, Spacing.extraSmall)
+                    HStack {
+                        Spacer()
+                    }
+                }
+                .padding(.top, Spacing.extraExtraSmall)
+                .padding(.bottom, Spacing.medium)
+                .padding(.horizontal, Spacing.large)
+                VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .leading, spacing: 0) {
                         WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
                             switch gridElement {
@@ -70,6 +80,7 @@ struct RecoverKeySetSeedPhraseView: View {
             .onAppear {
                 focus = true
             }
+            .background(Asset.backgroundPrimary.swiftUIColor)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
@@ -79,6 +90,14 @@ struct RecoverKeySetSeedPhraseView: View {
                 )
                 .clearModalBackground()
             }
+            NavigationLink(
+                destination:
+                CreateKeysForNetworksView(
+                    viewModel: viewModel.createDerivedKeys()
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingDetails
+            ) { EmptyView() }
         }
     }
 
@@ -128,7 +147,7 @@ struct RecoverKeySetSeedPhraseView: View {
             .foregroundColor(Asset.accentPink300.swiftUIColor)
             .font(PrimaryFont.labelS.font)
             .padding([.top, .bottom], Spacing.extraSmall)
-            .padding([.leading, .trailing], Spacing.small)
+            .padding(.horizontal, Spacing.small)
             .background(Asset.accentPink12.swiftUIColor)
             .clipShape(Capsule())
             .onTapGesture {
@@ -170,7 +189,9 @@ extension RecoverKeySetSeedPhraseView {
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
         private let service: RecoverKeySetService
+        private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
         @Binding var isPresented: Bool
+        @Published var isPresentingDetails: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = " "
         @Published var previousUserInput: String = " "
@@ -189,11 +210,13 @@ extension RecoverKeySetSeedPhraseView {
             content: MRecoverSeedPhrase,
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: RecoverKeySetService = RecoverKeySetService()
+            service: RecoverKeySetService = RecoverKeySetService(),
+            onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.content = content
             self.seedsMediator = seedsMediator
             self.service = service
+            self.onCompletion = onCompletion
             _isPresented = isPresented
             regenerateGrid()
         }
@@ -221,31 +244,31 @@ extension RecoverKeySetSeedPhraseView {
         }
 
         func onDoneTap() {
-            let seedPhrase = content.readySeed ?? ""
-            if seedsMediator.checkSeedPhraseCollision(seedPhrase: seedPhrase) {
-                presentableError = .seedPhraseAlreadyExists()
-                isPresentingError = true
-                return
-            }
-            seedsMediator.createSeed(
+            isPresentingDetails = true
+        }
+
+        func createDerivedKeys() -> CreateKeysForNetworksView.ViewModel {
+            .init(
                 seedName: content.seedName,
-                seedPhrase: seedPhrase,
-                shouldCheckForCollision: false
+                seedPhrase: content.readySeed ?? "",
+                mode: .recoverKeySet,
+                isPresented: $isPresented,
+                onCompletion: onCompletion
             )
-            service.finishKeySetRecover(seedPhrase)
-            isPresented = false
         }
+    }
+}
 
-        private func regenerateGrid() {
-            var updatedGrid: [GridElement] = content.draft.enumerated()
-                .map { .seedPhraseElement(.init(position: String($0.offset + 1), word: $0.element)) }
-            updatedGrid.append(.input(textInput))
-            seedPhraseGrid = updatedGrid
-        }
+private extension RecoverKeySetSeedPhraseView.ViewModel {
+    func regenerateGrid() {
+        var updatedGrid: [RecoverKeySetSeedPhraseView.GridElement] = content.draft.enumerated()
+            .map { .seedPhraseElement(.init(position: String($0.offset + 1), word: $0.element)) }
+        updatedGrid.append(.input(textInput))
+        seedPhraseGrid = updatedGrid
+    }
 
-        private func shouldPresentError() {
-            isPresentingError = content.draft.count == 24 && (content.readySeed?.isEmpty ?? true)
-        }
+    func shouldPresentError() {
+        isPresentingError = content.draft.count == 24 && (content.readySeed?.isEmpty ?? true)
     }
 }
 

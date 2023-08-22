@@ -23,15 +23,15 @@ data class KeySetDetailsModel(
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
 			keysAndNetwork = listOf(
 				KeyAndNetworkModel(
-					key = KeyModel.createStub(),
+					key = KeyModel.createStub(addressKey = "address key"),
 					network = NetworkInfoModel.createStub()
 				),
 				KeyAndNetworkModel(
-					key = KeyModel.createStub(),
+					key = KeyModel.createStub(addressKey = "address key2"),
 					network = NetworkInfoModel.createStub(networkName = "Some")
 				),
 				KeyAndNetworkModel(
-					key = KeyModel.createStub()
+					key = KeyModel.createStub(addressKey = "address key3")
 						.copy(path = "//polkadot//path3"),
 					network = NetworkInfoModel.createStub()
 				),
@@ -47,7 +47,15 @@ fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
 	root = root?.toKeysModel(),
 )
 
-data class KeyAndNetworkModel(val key: KeyModel, val network: NetworkInfoModel)
+data class KeyAndNetworkModel(
+	val key: KeyModel,
+	val network: NetworkInfoModel
+) {
+	companion object {
+		fun createStub() =
+			KeyAndNetworkModel(KeyModel.createStub(), NetworkInfoModel.createStub())
+	}
+}
 
 fun MKeyAndNetworkCard.toKeyAndNetworkModel() = KeyAndNetworkModel(
 	key = key.toKeyModel(),
@@ -64,17 +72,22 @@ data class KeyModel(
 	val base58: String,
 	val hasPwd: Boolean,
 	val path: String,
-	val secretExposed: Boolean
+	val secretExposed: Boolean,
+	val wasImported: Boolean?,
 ) {
 	companion object {
-		fun createStub() = KeyModel(
-			addressKey = "address key",
+		fun createStub(
+			addressKey: String = "address key",
+			wasImported: Boolean = false
+		) = KeyModel(
+			addressKey = addressKey,
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
-			identicon = PreviewData.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.exampleIdenticonPng,
 			hasPwd = true,
 			path = "//polkadot//path2",
 			secretExposed = false,
 			seedName = "sdsdsd",
+			wasImported = wasImported,
 		)
 	}
 }
@@ -87,6 +100,7 @@ fun MAddressCard.toKeysModel() = KeyModel(
 	path = address.path,
 	secretExposed = address.secretExposed,
 	seedName = address.seedName,
+	wasImported = null,
 )
 
 /**
@@ -100,6 +114,7 @@ fun MKeysCard.toKeyModel() = KeyModel(
 	path = address.path,
 	secretExposed = address.secretExposed,
 	seedName = address.seedName,
+	wasImported = wasImported,
 )
 
 /**
@@ -137,7 +152,7 @@ data class KeySetModel(
 		fun createStub(name: String? = null, number: Int? = null) =
 			KeySetModel(
 				name ?: "first seed name",
-				PreviewData.exampleIdenticonPng,
+				PreviewData.Identicon.exampleIdenticonPng,
 				listOf("westend", "some"),
 				number?.toUInt() ?: 1.toUInt()
 			)
@@ -163,6 +178,7 @@ data class KeyDetailsModel(
 	val address: KeyCardModel,
 	val base58: String,
 	val secretExposed: Boolean,
+	val wasImported: Boolean,
 ) {
 	val isRootKey = address.cardBase.path.isEmpty()
 
@@ -179,6 +195,7 @@ data class KeyDetailsModel(
 				address = keyCard,
 				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
+				wasImported = false,
 			)
 		}
 
@@ -196,6 +213,7 @@ data class KeyDetailsModel(
 				),
 				base58 = keyCard.cardBase.base58,
 				secretExposed = true,
+				wasImported = false,
 			)
 		}
 	}
@@ -213,6 +231,7 @@ fun MKeyDetails.toKeyDetailsModel() =
 		),
 		base58 = base58,
 		secretExposed = address.secretExposed,
+		wasImported = wasImported,
 	)
 
 
@@ -252,13 +271,15 @@ fun QrData.getData(): List<UByte> =
 data class NetworkModel(
 	val key: String,
 	val logo: String,
-	val title: String
+	val title: String,
+	val pathId: String, //default path for this network
 ) {
 	companion object {
 		fun createStub(networkName: String? = null): NetworkModel = NetworkModel(
 			key = "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
 			logo = networkName ?: "polkadot",
 			title = networkName?.lowercase() ?: "Polkadot",
+			pathId = "polkadot"
 		)
 	}
 }
@@ -269,14 +290,7 @@ fun NetworkInfoModel.toNetworkModel(): NetworkModel = NetworkModel(
 	title = networkTitle.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
-)
-
-fun Network.toNetworkModel(): NetworkModel = NetworkModel(
-	key = key,
-	logo = logo,
-	title = title.replaceFirstChar {
-		if (it.isLowerCase()) it.titlecase() else it.toString()
-	},
+	pathId = "//${networkTitle.toLowerCase()}",
 )
 
 fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
@@ -285,6 +299,7 @@ fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 	title = title.replaceFirstChar {
 		if (it.isLowerCase()) it.titlecase() else it.toString()
 	},
+	pathId = pathId,
 )
 
 
@@ -296,7 +311,7 @@ data class VerifierDetailsModels(
 	companion object {
 		fun createStub() = VerifierDetailsModels(
 			publicKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-			identicon = PreviewData.exampleIdenticonPng,
+			identicon = PreviewData.Identicon.exampleIdenticonPng,
 			encryption = "sr25519",
 		)
 	}

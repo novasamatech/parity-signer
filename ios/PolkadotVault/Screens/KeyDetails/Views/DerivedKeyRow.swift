@@ -26,12 +26,16 @@ struct DerivedKeyRow: View {
             )
             .padding(.top, Spacing.extraExtraSmall)
             .padding(.leading, Spacing.medium)
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                if viewModel.isImported {
+                    Localizable.KeyDetails.Label.importedKey.text
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.labelXXS.font)
+                }
                 if !isRoot {
                     fullPath
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                         .font(PrimaryFont.captionM.font)
-                    Spacer().frame(height: Spacing.extraExtraSmall)
                 }
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Text(viewModel.base58.truncateMiddle())
@@ -82,11 +86,12 @@ struct DerivedKeyRow: View {
             VStack {
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         network: "polkadot",
                         path: "//polkadot",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A",
+                        isImported: true,
                         rootKeyName: ""
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
@@ -94,44 +99,48 @@ struct DerivedKeyRow: View {
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         network: "kusama",
                         path: "",
                         hasPassword: false,
-                        base58: "15Gsc678654FDSG0HA04H0A"
+                        base58: "15Gsc678654FDSG0HA04H0A",
+                        isImported: false
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(true)
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         network: "astar",
                         path: "//astar",
                         hasPassword: false,
-                        base58: "15Gsc678654FDSG0HA04H0A"
+                        base58: "15Gsc678654FDSG0HA04H0A",
+                        isImported: false
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(true)
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         network: "kusama",
                         path: "//kusama",
                         hasPassword: true,
-                        base58: "15Gsc678654FDSG0HA04H0A"
+                        base58: "15Gsc678654FDSG0HA04H0A",
+                        isImported: true
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(false)
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
-                        identicon: .svg(image: PreviewData.exampleIdenticon),
+                        identicon: .stubIdenticon,
                         network: "kusama",
                         path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                         hasPassword: true,
-                        base58: "15Gsc678654FDSG0HA04H0A"
+                        base58: "15Gsc678654FDSG0HA04H0A",
+                        isImported: false
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(false)

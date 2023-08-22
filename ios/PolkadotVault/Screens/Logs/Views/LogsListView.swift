@@ -22,7 +22,7 @@ struct LogsListView: View {
             VStack(spacing: 0) {
                 NavigationBarView(
                     viewModel: NavigationBarViewModel(
-                        title: Localizable.LogsList.Label.title.string,
+                        title: .title(Localizable.LogsList.Label.title.string),
                         leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
                         backgroundColor: Asset.backgroundPrimary.swiftUIColor
@@ -74,6 +74,15 @@ struct LogsListView: View {
             LogNoteModal(viewModel: .init(isPresented: $viewModel.isPresentingAddNoteModal))
                 .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -88,17 +97,16 @@ extension LogsListView {
         @Published var isPresentingAddNoteModal = false
         @Published var selectedDetails: MLogDetails!
         @Published var isPresentingDetails = false
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
         private let logsService: LogsService
-        private let snackBarPresentation: BottomSnackbarPresentation
         private let renderableBuilder: LogEntryRenderableBuilder
 
         init(
             logsService: LogsService = LogsService(),
-            snackBarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
         ) {
             self.logsService = logsService
-            self.snackBarPresentation = snackBarPresentation
             self.renderableBuilder = renderableBuilder
         }
 
@@ -110,8 +118,8 @@ extension LogsListView {
                     self.logs = logs
                     self.renderables = self.renderableBuilder.build(logs)
                 case let .failure(error):
-                    self.snackBarPresentation.viewModel = .init(title: error.description)
-                    self.snackBarPresentation.isSnackbarPresented = true
+                    self.presentableError = .init(title: error.description)
+                    self.isPresentingError = true
                 }
             }
         }
@@ -141,8 +149,8 @@ extension LogsListView {
                     self.isPresentingDetails = true
                 case let .failure(error):
                     self.selectedDetails = nil
-                    self.snackBarPresentation.viewModel = .init(title: error.description)
-                    self.snackBarPresentation.isSnackbarPresented = true
+                    self.presentableError = .init(title: error.description)
+                    self.isPresentingError = true
                 }
             }
         }
@@ -158,8 +166,8 @@ extension LogsListView {
                 case .success:
                     self.loadData()
                 case let .failure(error):
-                    self.snackBarPresentation.viewModel = .init(title: error.description)
-                    self.snackBarPresentation.isSnackbarPresented = true
+                    self.presentableError = .init(title: error.description)
+                    self.isPresentingError = true
                 }
             }
         }

@@ -51,7 +51,7 @@ struct Identicon: View {
         static var previews: some View {
             VStack(alignment: .center, spacing: 10) {
                 Identicon(
-                    identicon: .svg(image: PreviewData.exampleIdenticon)
+                    identicon: .stubIdenticon
                 )
                 Identicon(
                     identicon: .svg(

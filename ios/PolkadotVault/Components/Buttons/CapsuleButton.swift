@@ -47,27 +47,29 @@ struct CapsuleButton: View {
     }
 }
 
-struct CapsuleButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: Spacing.medium) {
-            Spacer()
-            CapsuleButton(
-                action: {},
-                icon: Asset.arrowForward.swiftUIImage,
-                title: Localizable.Scanner.Action.sign.string
-            )
-            CapsuleButton(
-                action: {},
-                icon: Asset.arrowForward.swiftUIImage,
-                title: Localizable.Scanner.Action.sign.string,
-                isDisabled: .constant(true)
-            )
-            CapsuleButton(
-                action: {},
-                title: Localizable.Scanner.Action.sign.string
-            )
-            Spacer()
+#if DEBUG
+    struct CapsuleButton_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading, spacing: Spacing.medium) {
+                Spacer()
+                CapsuleButton(
+                    action: {},
+                    icon: Asset.arrowForward.swiftUIImage,
+                    title: Localizable.Scanner.Action.sign.string
+                )
+                CapsuleButton(
+                    action: {},
+                    icon: Asset.arrowForward.swiftUIImage,
+                    title: Localizable.Scanner.Action.sign.string,
+                    isDisabled: .constant(true)
+                )
+                CapsuleButton(
+                    action: {},
+                    title: Localizable.Scanner.Action.sign.string
+                )
+                Spacer()
+            }
+            .background(.black)
         }
-        .background(.black)
     }
-}
+#endif

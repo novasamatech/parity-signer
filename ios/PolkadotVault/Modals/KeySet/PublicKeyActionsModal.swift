@@ -50,12 +50,12 @@ struct PublicKeyActionsModal: View {
                         style: .destructive
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
                 .padding(.bottom, Spacing.medium)
             }
@@ -73,24 +73,26 @@ struct PublicKeyActionsModal: View {
     }
 }
 
-struct PublicKeyActionsModal_Previews: PreviewProvider {
-    static var previews: some View {
-        PublicKeyActionsModal(
-            isShowingActionSheet: Binding<Bool>.constant(true),
-            isExportKeyAvailable: true
-        )
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
-        VStack {
+#if DEBUG
+    struct PublicKeyActionsModal_Previews: PreviewProvider {
+        static var previews: some View {
             PublicKeyActionsModal(
                 isShowingActionSheet: Binding<Bool>.constant(true),
-                isExportKeyAvailable: false
+                isExportKeyAvailable: true
             )
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
+            VStack {
+                PublicKeyActionsModal(
+                    isShowingActionSheet: Binding<Bool>.constant(true),
+                    isExportKeyAvailable: false
+                )
+                .preferredColorScheme(.light)
+                .previewLayout(.sizeThatFits)
+            }
+            .background(.black)
             .preferredColorScheme(.light)
             .previewLayout(.sizeThatFits)
         }
-        .background(.black)
-        .preferredColorScheme(.light)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TCAuthorPublicKey: View {
     var value: MVerifierDetails
+
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)
@@ -25,15 +26,12 @@ struct TCAuthorPublicKey: View {
     }
 }
 
-struct TCAuthorPublicKey_Previews: PreviewProvider {
-    static var previews: some View {
-        TCAuthorPublicKey(
-            value:
-            MVerifierDetails(
-                publicKey: PreviewData.publicKey,
-                identicon: .svg(image: PreviewData.exampleIdenticon),
-                encryption: "sh29919"
+#if DEBUG
+    struct TCAuthorPublicKey_Previews: PreviewProvider {
+        static var previews: some View {
+            TCAuthorPublicKey(
+                value: .stub
             )
-        )
+        }
     }
-}
+#endif

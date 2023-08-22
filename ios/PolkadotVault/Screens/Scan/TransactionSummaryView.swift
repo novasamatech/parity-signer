@@ -116,8 +116,8 @@ struct TransactionSummaryView: View {
         static var previews: some View {
             TransactionSummaryView(
                 renderable: .init(
-                    summary: PreviewData.transactionSummary,
-                    signature: PreviewData.transactionSignature
+                    summary: .stub,
+                    signature: .stub
                 ),
                 onTransactionDetailsTap: {}
             )

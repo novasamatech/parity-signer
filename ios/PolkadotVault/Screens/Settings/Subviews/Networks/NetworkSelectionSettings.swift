@@ -15,7 +15,7 @@ struct NetworkSelectionSettings: View {
         VStack(spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: Localizable.Settings.Networks.Label.title.string,
+                    title: .title(Localizable.Settings.Networks.Label.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }
@@ -50,7 +50,11 @@ struct NetworkSelectionSettings: View {
             }
             NavigationLink(
                 destination: NetworkSettingsDetails(
-                    viewModel: .init(networkKey: viewModel.selectedDetails)
+                    viewModel: .init(
+                        networkKey: viewModel.selectedDetailsKey,
+                        networkDetails: viewModel.selectedDetails,
+                        onCompletion: viewModel.onNetworkDetailsCompletion(_:)
+                    )
                 )
                 .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDetails
@@ -67,6 +71,10 @@ struct NetworkSelectionSettings: View {
                 )
             )
         }
+        .bottomSnackbar(
+            viewModel.snackbarViewModel,
+            isPresented: $viewModel.isSnackbarPresented
+        )
     }
 
     @ViewBuilder
@@ -95,21 +103,28 @@ extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let service: ManageNetworksService
+        private let networkDetailsService: ManageNetworkDetailsService
         @Published var networks: [MmNetwork] = []
-        @Published var selectedDetails: String!
+        @Published var selectedDetailsKey: String!
+        @Published var selectedDetails: MNetworkDetails!
         @Published var isPresentingDetails = false
         @Published var isShowingQRScanner: Bool = false
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         init(
-            service: ManageNetworksService = ManageNetworksService()
+            service: ManageNetworksService = ManageNetworksService(),
+            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.service = service
+            self.networkDetailsService = networkDetailsService
             updateNetworks()
             onDetailsDismiss()
         }
 
         func onTap(_ network: MmNetwork) {
-            selectedDetails = network.key
+            selectedDetailsKey = network.key
+            selectedDetails = networkDetailsService.refreshCurrentNavigationState(network.key)
             isPresentingDetails = true
         }
 
@@ -119,6 +134,18 @@ extension NetworkSelectionSettings {
 
         func onQRScannerDismiss() {
             updateNetworks()
+        }
+
+        func onNetworkDetailsCompletion(_ completionAction: NetworkSettingsDetails.OnCompletionAction) {
+            switch completionAction {
+            case let .networkDeleted(networkTitle):
+                snackbarViewModel = .init(
+                    title: Localizable.Settings.NetworkDetails.DeleteNetwork.Label
+                        .confirmation(networkTitle),
+                    style: .warning
+                )
+                isSnackbarPresented = true
+            }
         }
     }
 }
@@ -136,10 +163,12 @@ private extension NetworkSelectionSettings.ViewModel {
     }
 }
 
-struct NetworkSelectionSettings_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
+#if DEBUG
+    struct NetworkSelectionSettings_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

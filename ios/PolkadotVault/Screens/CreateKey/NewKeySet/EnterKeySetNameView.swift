@@ -16,7 +16,7 @@ struct EnterKeySetNameView: View {
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBarView(
                     viewModel: .init(
-                        title: nil,
+                        title: .progress(current: 1, upTo: 3),
                         leftButtons: [.init(
                             type: .xmark,
                             action: viewModel.onBackTap
@@ -39,7 +39,8 @@ struct EnterKeySetNameView: View {
                     CreateKeySetSeedPhraseView(
                         viewModel: .init(
                             dataModel: viewModel.detailsContent,
-                            isPresented: $viewModel.isPresented
+                            isPresented: $viewModel.isPresented,
+                            onCompletion: viewModel.onCompletion
                         )
                     )
                     .navigationBarHidden(true),
@@ -49,6 +50,15 @@ struct EnterKeySetNameView: View {
             .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
+            .fullScreenModal(
+                isPresented: $viewModel.isPresentingError
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.presentableError,
+                    isShowingBottomAlert: $viewModel.isPresentingError
+                )
+                .clearModalBackground()
+            }
         }
     }
 
@@ -92,7 +102,10 @@ extension EnterKeySetNameView {
         @Published var seedName: String = ""
         @Published var isPresentingDetails: Bool = false
         @Published var detailsContent: MNewSeedBackup!
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel!
         @Binding var isPresented: Bool
+        let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         private let seedsMediator: SeedsMediating
         private let service: CreateKeySetService
@@ -100,10 +113,12 @@ extension EnterKeySetNameView {
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             service: CreateKeySetService = CreateKeySetService(),
-            isPresented: Binding<Bool>
+            isPresented: Binding<Bool>,
+            onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.seedsMediator = seedsMediator
             self.service = service
+            self.onCompletion = onCompletion
             _isPresented = isPresented
         }
 
@@ -112,8 +127,16 @@ extension EnterKeySetNameView {
         }
 
         func onNextTap() {
-            detailsContent = service.createKeySet(seedsMediator.seedNames.isEmpty, seedName: seedName)
-            isPresentingDetails = true
+            service.createKeySet(seedName: seedName) { result in
+                switch result {
+                case let .success(seedBackup):
+                    self.detailsContent = seedBackup
+                    self.isPresentingDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func isActionAvailable() -> Bool {
@@ -131,7 +154,10 @@ extension EnterKeySetNameView {
     struct EnterKeySetNameView_Previews: PreviewProvider {
         static var previews: some View {
             EnterKeySetNameView(
-                viewModel: .init(isPresented: .constant(true))
+                viewModel: .init(
+                    isPresented: .constant(true),
+                    onCompletion: { _ in }
+                )
             )
             .previewLayout(.sizeThatFits)
         }

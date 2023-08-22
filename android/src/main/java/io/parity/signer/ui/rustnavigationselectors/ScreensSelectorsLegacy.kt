@@ -5,10 +5,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
-import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.bottomsheets.*
+import io.parity.signer.components.exposesecurity.ShieldAlert
 import io.parity.signer.domain.*
-import io.parity.signer.domain.storage.addSeed
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
 import io.parity.signer.ui.theme.SignerOldTheme
@@ -20,24 +19,21 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
     screenData: ScreenData,
-    networkState: State<NetworkState?>,
     navigate: (Action, String, String) -> Unit,
     sharedViewModel: SharedViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
-	val seedNames =
-		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
 
 	when (screenData) {
-		is ScreenData.DeriveKey -> {} // migrated
-		ScreenData.Documents -> {
-			submitErrorState(
-				"This screen was called from settings but we don't call it anymore.\n" +
-					"While I cannot guarantee that rust won't make this state for whatever reason."
-			)
-		}
-		is ScreenData.KeyDetails -> {}//migrated
+		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
+			screenData.f,
+			button2
+		)
+		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
+			screenData.f,
+			sharedViewModel::signSufficientCrypto
+		)
 		is ScreenData.KeyDetailsMulti -> {
 			//migrated, now part of KeySetDetails subgraph and old data used
 			submitErrorState(
@@ -45,34 +41,26 @@ fun ScreenSelector(
 					"get to Key Details Multi $screenData"
 			)
 		}
+		ScreenData.Documents -> {
+			submitErrorState(
+				"This screen was called from settings but we don't call it anymore.\n" +
+					"While I cannot guarantee that rust won't make this state for whatever reason."
+			)
+		}
+		is ScreenData.DeriveKey -> {} // migrated
+		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.Keys -> {} //migrated to new selector
 		is ScreenData.Log -> {} //migrated to new selector
 		is ScreenData.LogDetails -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.ManageNetworks -> {} //migrated to new selector
 		is ScreenData.NNetworkDetails -> {} // migrated to new selector
 		is ScreenData.NewSeed -> {} // new selector
-		is ScreenData.RecoverSeedName -> RecoverSeedName(
-			screenData.f,
-			sharedViewModel::navigate,
-			seedNames.value
-		)
-		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
-			recoverSeedPhrase = screenData.f,
-			button = sharedViewModel::navigate,
-			addSeed = sharedViewModel::addSeed
-		)
+		is ScreenData.RecoverSeedName -> {}//new selector
+		is ScreenData.RecoverSeedPhrase -> {}//new selector
 		ScreenData.Scan -> {} //in new selector
 		is ScreenData.Transaction -> {} //in new selector
 		is ScreenData.SeedSelector -> {} //shown in new selector
-		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
-			screenData.f,
-			button2
-		)
 		is ScreenData.Settings -> {} //new selector
-		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
-			screenData.f,
-			sharedViewModel::signSufficientCrypto
-		)
 		is ScreenData.VVerifier -> {} //new selector
 	}
 }
@@ -81,12 +69,8 @@ fun ScreenSelector(
 fun ModalSelector(
     modalData: ModalData?,
     localNavAction: LocalNavAction?,
-    networkState: State<NetworkState?>,
-    navigate: (Action, String, String) -> Unit,
     sharedViewModel: SharedViewModel
 ) {
-	val button2: (Action, String) -> Unit =
-		{ action, details -> navigate(action, details, "") }
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
 			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector

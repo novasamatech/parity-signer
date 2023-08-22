@@ -43,7 +43,7 @@ fun DerivationCreateSubgraph(
 	) {
 		composable(DerivationCreateSubgraph.select_network) {
 			DeriveKeyNetworkSelectScreen(
-				networks = deriveViewModel.allNetworks,
+				networks = deriveViewModel.getAllNetworks(),
 				onClose = {
 					deriveViewModel.resetState()
 					rootNavigator.backAction()

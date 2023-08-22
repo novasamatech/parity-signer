@@ -23,12 +23,8 @@ extension QRCodeAddressFooterViewModel {
 }
 
 struct ExportMultipleKeysModalViewModel: Equatable {
-    enum SelectedItems: Equatable {
-        case keySets([KeySetViewModel])
-        case keys(key: KeySummaryViewModel, derivedKeys: [DerivedKeyExportModel])
-    }
-
-    let selectedItems: SelectedItems
+    let key: KeySummaryViewModel
+    let derivedKeys: [DerivedKeyExportModel]
     let count: Int
 }
 
@@ -66,7 +62,7 @@ struct ExportMultipleKeysModal: View {
                     }
                     .padding(Spacing.extraSmall)
                     .strokeContainerBackground()
-                    .padding([.leading, .trailing], Spacing.medium)
+                    .padding(.horizontal, Spacing.medium)
                 }
                 .padding(.bottom, Spacing.medium)
             }
@@ -78,23 +74,17 @@ struct ExportMultipleKeysModal: View {
 
     var keyList: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
-            switch viewModel.viewModel.selectedItems {
-            case let .keySets(keySets):
-                ForEach(
-                    keySets.sorted(by: { $0.keyName < $1.keyName }),
-                    id: \.id
-                ) { keyItem($0, isLast: $0 == keySets.last) }
-            case let .keys(key, derivedKeys):
-                QRCodeRootFooterView(viewModel: .init(key))
+            QRCodeRootFooterView(viewModel: .init(viewModel.viewModel.key))
+            if !viewModel.viewModel.derivedKeys.isEmpty {
                 Divider()
-                ForEach(
-                    derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
-                    id: \.id
-                ) {
-                    QRCodeAddressFooterView(viewModel: .init($0), backgroundColor: Asset.fill6Solid.swiftUIColor)
-                    if $0 != derivedKeys.last {
-                        Divider()
-                    }
+            }
+            ForEach(
+                viewModel.viewModel.derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
+                id: \.id
+            ) {
+                QRCodeAddressFooterView(viewModel: .init($0), backgroundColor: Asset.fill6Solid.swiftUIColor)
+                if $0 != viewModel.viewModel.derivedKeys.last {
+                    Divider()
                 }
             }
         }
@@ -132,7 +122,7 @@ private extension ExportMultipleKeysModal {
             }
         }
         .frame(height: Heights.actionSheetButton)
-        .padding([.leading, .trailing], Spacing.extraSmall)
+        .padding(.horizontal, Spacing.extraSmall)
         .background(Color.clear)
     }
 }
@@ -162,7 +152,7 @@ private struct ExportPrivateKeyAddressFooter: View {
                 )
             )
         }
-        .padding([.leading, .trailing], Spacing.large)
+        .padding(.horizontal, Spacing.large)
         .padding([.top, .bottom], Spacing.extraSmall)
     }
 }
@@ -191,7 +181,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -202,7 +192,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )
@@ -213,7 +203,7 @@ private extension ExportMultipleKeysModal {
                 VStack {
                     ExportMultipleKeysModal(
                         viewModel: .init(
-                            viewModel: PreviewData.exampleExportMultipleKeysModal,
+                            viewModel: .stub,
                             isPresented: Binding<Bool>.constant(true)
                         )
                     )

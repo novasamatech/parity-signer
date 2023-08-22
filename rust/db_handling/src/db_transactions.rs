@@ -762,7 +762,7 @@ impl TrDbColdSign {
     ///
     /// Function requires an optional correct checksum to make sure
     /// the signable transaction is still the one that was shown to
-    /// the user previously, and no changes to the database have occured.
+    /// the user previously, and no changes to the database have occurred.
     /// While parsing a bulk no checksum is provided and no checks are done.
     ///
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed

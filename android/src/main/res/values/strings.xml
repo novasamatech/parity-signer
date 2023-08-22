@@ -37,7 +37,6 @@
 	<string name="bottom_bar_label_scanner">Scanner</string>
 	<string name="bottom_bar_label_settings">Settings</string>
 	<string name="key_set_multiselect_title_none_selected">Select Key Set</string>
-	<string name="key_set_details_multiselect_title_none_selected">Select Keys</string>
 	<string name="key_set_export_all_label">Export All</string>
 	<string name="key_set_export_selected_label">Export Selected</string>
 	<string name="key_set_export_description_content">By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below</string>
@@ -140,11 +139,10 @@
 	<string name="settings_hardware_key">Hardware seed protection: %1$s</string>
 	<string name="settings_version">Polkadot Vault version: %1$s</string>
 	<string name="button_next">Next</string>
-	<string name="new_key_set_backup_title">Recovery Phrase</string>
 	<string name="new_key_set_backup_subtitle">Write down your Secret Recovery Phrase</string>
 	<string name="new_key_set_backup_warning_message">Write it down on a paper and keep  it in a safe place. </string>
 	<string name="new_key_set_backup_cta">Create Key Set</string>
-	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have you written down your secret recovery phrase</string>
+	<string name="new_key_set_backup_bottomsheet_title">Please confirm that you have written down your secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_written">I’ve written down my secret recovery phrase</string>
 	<string name="new_key_set_backup_bottomsheet_checkbox_keep_careful">I understand that if I lose my secret phrase, my funds will be lost forever</string>
 	<string name="transaction_field_from">From</string>
@@ -237,20 +235,20 @@
 	<string name="derivation_help_keys_message1">If you would like to create and manage several accounts on the network using the same secret recovery phrase, you can use derived keys. </string>
 	<string name="derivation_help_keys_message2">We can think of the derived accounts as child accounts of the root account created using the original mnemonic seed phrase.</string>
 	<string name="derivation_help_keys_message3">The main reason to use derived keys is how easy it is to backup (and restore from a backup) a derivation path compared to seed phrase.</string>
-	<string name="new_derivation_conformation_title">Write Down Your Derivation Path</string>
-	<string name="new_derivation_conformation_message">Keep the path name written legebly and stored securely. Derived key can be backed up only by entering derivation path.</string>
+	<string name="new_derivation_conformation_title">Write Down Your Derivation Path Name</string>
+	<string name="new_derivation_conformation_message">Keep the path name written legibly and stored securely. Derived key can be backed up only by entering derivation path.</string>
 	<string name="new_derivation_conformation_path_headline">Derivation Path Name</string>
 	<string name="new_derivation_conformation_checkbox_wrote_down">I have written down my derivation path name</string>
 	<string name="derivation_path_screen_title">Derivation Path Name</string>
 	<string name="derivation_path_screen_help_tile_message_highlited_part">/soft, //hard, ///password</string>
 	<string name="derivation_path_screen_help_tile_message">Learn more about /soft, //hard, ///password derivation methods</string>
-	<string name="derivation_path_screen_subinput_hint">Path name example //network//1</string>
+	<string name="derivation_path_screen_subinput_hint">Proceed with default or enter custom. \nPath name example: //&lt;network&gt;//0.</string>
 	<string name="derivation_path_screen_password_input_button">/// Password</string>
 	<string name="derivation_path_hint_create_password">Create a Password</string>
 	<string name="derivation_path_hint_enter_path_name">Enter Path Name</string>
 	<string name="derivation_path_hint_it_is_root">Empty path = creating root</string>
 	<string name="enter_password_input_label">Enter password</string>
-  <string name="derivation_screen_derivation_button_create">Create Derived Key</string>
+	<string name="derivation_screen_derivation_button_create">Create Derived Key</string>
 	<string name="derivation_path_screen_error_wrong_path">Derivation path is wrong</string>
 	<string name="derivation_path_screen_error_collision_path">Key with this Derivation path name already exists</string>
 	<string name="derivation_path_screen_error_password_empty">Password is empty</string>
@@ -268,11 +266,12 @@
 	<string name="import_derivations_error_key_missing">Some keys can not be imported until their key sets are recovered. Please recover the missing Key Sets.</string>
 	<string name="import_derivations_error_network_missing">Some keys can not be imported until their networks are added. Please add missing networks and their metadata. </string>
 	<string name="import_derivations_error_path_bad_format">Path bad format. Key already added or wrong data.</string>
-<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
+	<!--	<string name="import_derivations_error_path_bad_format">Some are hidden from the list because they have already been imported.</string> -->
 	<string name="import_derivations_error_keys_already_exist">Some are hidden from the list because they have already been imported.</string>
 	<string name="import_derivations_failure_toast">Import Keys Has Failed</string>
 	<string name="import_derivations_failure_update_toast">Import Keys Has Failed. Update keys failed.</string>
 	<string name="create_derivations_success">Derived key successfully created.</string>
+	<string name="create_derivations_empty">All derived keys already added</string>
 	<string name="create_derivations_failure">Derivation key failure: %1$s</string>
 	<string name="unlock_screen_title">Please Unlock the App</string>
 	<string name="unlock_screen_description">The device has been locked because of failed authentication, please unlock the device to keep using the Polkadot Vault</string>
@@ -282,7 +281,7 @@
 	<string name="screen_lock_title">Set Up Screen Lock</string>
 	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin, pattern or fingerprint. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
 	<string name="screen_lock_open_settings_button">Go to Settings</string>
-  <string name="documents_terms_of_service">Terms of service</string>
+	<string name="documents_terms_of_service">Terms of service</string>
 	<string name="documents_privacy_policy">Privacy policy</string>
 	<string name="documents_accepted_checkmark">I’ve read and accept the Terms of Service and Privacy Policy</string>
 	<string name="documents_accept_cta_button">I Agree</string>
@@ -291,7 +290,7 @@
 	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
 	<string name="airgap_onboarding_disconnect_cable_header">Disconnect all cables</string>
 	<string name="airgap_onboarding_title">Set Up Air Gap Mode</string>
-	<string name="airgap_onboarding_subtitle">Please Follow this steps to enable Air Gap mode and keep it enabled all the time</string>
+	<string name="airgap_onboarding_subtitle">Please Follow these steps to enable Air Gap mode and keep it enabled all the time</string>
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
@@ -359,16 +358,16 @@
 	<string name="confirm_factory_reset_title">Wipe All Data</string>
 	<string name="confirm_factory_reset_message">Reset the Vault app to factory settings.\nThis operation cannot be reversed!</string>
 	<string name="logs_add_comment_title">Add Note</string>
-  <string name="add_log_note_placeholder">Enter log note</string>
-  <string name="key_details_public_label_network">Network</string>
+	<string name="add_log_note_placeholder">Enter log note</string>
+	<string name="key_details_public_label_network">Network</string>
 	<string name="key_details_public_label_path">Derivation Path</string>
 	<string name="key_details_public_label_keyset">Key Set Name</string>
 	<string name="derivation_network_select_title">Select Network</string>
-  <string name="derive_key_network_all">Allow use on any network</string>
-	<string name="derivation_create_help_network_setup_label">Learn more about How to Set up networks</string>
+	<string name="derive_key_network_all">Allow use on any network</string>
+	<string name="derivation_create_help_network_setup_label">Haven’t found a network needed?\nLearn more about how to set up networks</string>
 	<string name="networks_screen_add_net_network">Add new network</string>
-	<string name="networks_help_screen_1">Step 1/2</string>
-	<string name="networks_help_screen_2">Step 2/2</string>
+	<string name="screen_step_1_2">Step 1/2</string>
+	<string name="screen_step_2_2">Step 2/2</string>
 	<string name="networks_help_title_add_networks">How to Add Networks</string>
 	<string name="networks_help_title_add_metadata">How to Update Network’s Metadata</string>
 	<string name="step_number_1">1</string>
@@ -384,13 +383,53 @@
 	<string name="network_help_metadata_choose_networks">Choose the Network you need</string>
 	<string name="network_help_metadata_go_scan">Go to “Update Metadata” Tab and Scan the Metadata Animated QR Code</string>
 	<string name="network_help_metadata_scan_cta">Scan Metadata</string>
-    <string name="onboarding_skip">Skip</string>
+	<string name="onboarding_skip">Skip</string>
 	<string name="onboarding_welcome">Welcome to Polkadot Vault</string>
 	<string name="onboarding_header_1">Turn Your Smartphone Into a Hardware Wallet</string>
 	<string name="onboarding_header_2">Generate and Store Multiple Private Keys</string>
 	<string name="onboarding_header_3">Sign Transactions While Keeping Your Private Keys Offline</string>
 	<string name="onboarding_header_4">Add New Networks and Update Them Without Breaking the Air Gap</string>
-    <string name="onboarding_cta_continue">Continue</string>
+	<string name="onboarding_cta_continue">Continue</string>
+	<string name="recovert_key_set_title">Key Set Name</string>
+	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
+	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
+	<string name="recover_key_set_phrase_title">Enter a Secret Recovery Phrase</string>
+	<string name="recover_key_set_phrase_subtitle">Enter a 24-word phrase you were given when you created your key set</string>
+	<string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
+	<string name="key_set_has_been_recovered_toast">"%1$s Key Set Has Been Recovered"</string>
+	<string name="key_set_has_been_created_toast">"%1$s Key Set Has Been Created"</string>
+	<string name="keyset_create_keys_title">Create Keys</string>
+	<string name="keyset_create_keys_subtitle">Choose networks for the keys to be created</string>
+	<string name="keyset_create_keys_notification_text">Please note that keys with customly named derivation path name can be created from the key set screen separatley.</string>
+	<string name="keyset_create_keys_select_all">Select All</string>
+	<string name="keyset_recover_keys_title">Recover Keys</string>
+	<string name="keyset_recover_keys_subtitle">"Choose networks for the keys to be recovered "</string>
+	<string name="keyset_recover_keys_notification_text">Please note that only root keys will be added on this step. If you key set has keys with customly added derivation path name, please restore them separately from the recovered key set screen.</string>
+	<string name="key_set_no_networks_title">Proceed with the Empty Key Set?</string>
+	<string name="key_set_no_networks_subtitle">"Since you haven't selected any keys, you key set will be empty. Are you sure? "</string>
+	<string name="add_network_add_keys_title">Create Key for the %1$s Network?</string>
+	<string name="add_network_add_keys_cta">Create Key</string>
+	<string name="add_network_add_keys_list_title">Create Key for the %1$s Network</string>
+	<string name="add_network_add_keys_list_subtitle">Select Key Set for the derived key to be created</string>
+	<string name="add_network_add_keys_success_message">Derived Keys have been created</string>
+	<string name="create_derivation_title">Create Derived Key</string>
+	<string name="public_key_bottom_sheet_label">Public key</string>
+	<string name="add_derived_keys_screen_title">Add Derived Keys</string>
+	<string name="add_derived_keys_screen_subtitle">Сheck the keys and scan QR code into Omni Wallet app</string>
+	<string name="add_derived_keys_screen_scan_qr_code">Scan QR code to add the keys</string>
+	<string name="dynamic_derivation_path_label">Imported from Omni Wallet</string>
+	<string name="generic_clear_selection">Clear</string>
+	<string name="network_filters_header">Filter keys by network</string>
+	<string name="key_set_details_all_filtered_keys_title">Key Set has no Keys on Selected Network</string>
+	<string name="dymanic_derivation_error_some_already_imported">Some are hidden from the list because they have already been imported.</string>
+	<string name="dymanic_derivation_error_some_network_missing">"Some keys can not be imported until their networks are added. Please add missing networks and their metadata. "</string>
+	<string name="dymanic_derivation_error_custom_message">Derived key %1$s could not be created: %2$s</string>
+	<string name="dymanic_derivation_error_custom_title">There was an issue importing keys.</string>
+	<string name="confirm_dynamic_derivation_header">Please confirm derived key import with authorisation</string>
+	<string name="confirm_dynamic_derivation_message">Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.</string>
+	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
+
 
 </resources>
+
 

@@ -90,7 +90,6 @@ fun TransactionErrorBottomSheet(
 							modifier = Modifier.padding(end = 16.dp)
 						)
 
-						val uriHandler = LocalUriHandler.current
 						val context = LocalContext.current
 						val layoutResult = remember {
 							mutableStateOf<TextLayoutResult?>(null)

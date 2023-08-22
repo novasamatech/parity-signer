@@ -8,33 +8,56 @@
 import Foundation
 
 final class CreateKeySetService {
-    private let navigation: NavigationCoordinator
+    private let callQueue: Dispatching
+    private let callbackQueue: Dispatching
 
     init(
-        navigation: NavigationCoordinator = NavigationCoordinator()
+        callQueue: Dispatching = DispatchQueue(label: "CreateKeySetService", qos: .userInitiated),
+        callbackQueue: Dispatching = DispatchQueue.main
     ) {
-        self.navigation = navigation
+        self.callQueue = callQueue
+        self.callbackQueue = callbackQueue
     }
 
-    func createKeySet(_ isFirstKeySet: Bool, seedName: String) -> MNewSeedBackup! {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        // We need to call this conditionally, as if there are no seeds,
-        // Rust does not expect `rightButtonAction` called before `addSeed` / `recoverSeed`
-        if !isFirstKeySet {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
+    func createKeySet(
+        seedName: String,
+        _ completion: @escaping (Result<MNewSeedBackup, Error>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<MNewSeedBackup, Error>
+            do {
+                let seedBackup = try printNewSeed(newSeedName: seedName)
+                result = .success(seedBackup)
+            } catch {
+                result = .failure(error)
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
         }
-        navigation.performFake(navigation: .init(action: .newSeed))
-        guard case let .newSeedBackup(value) = navigation
-            .performFake(navigation: .init(action: .goForward, details: seedName))?.modalData else { return nil }
-        return value
     }
 
-    func confirmKeySetCreation(_ seedPhrase: String) {
-        navigation.performFake(navigation: .init(
-            action: .goForward,
-            details: BackendConstants.true,
-            seedPhrase: seedPhrase
-        ))
+    func confirmKeySetCreation(
+        seedName: String,
+        seedPhrase: String,
+        networks: [MmNetwork],
+        _ completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        callQueue.async {
+            let result: Result<Void, Error>
+            do {
+                try PolkadotVault.createKeySet(
+                    seedName: seedName,
+                    seedPhrase: seedPhrase,
+                    networks: networks.map(\.key)
+                )
+                result = .success(())
+            } catch {
+                result = .failure(error)
+            }
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
     }
 }

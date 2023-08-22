@@ -173,15 +173,15 @@ struct KeyDetailsView: View {
             onDismiss: viewModel.refreshData
         ) {
             NavigationView {
-                CreateKeyNetworkSelectionView(viewModel: .init(
-                    seedName: viewModel.keysData?.root?.address
-                        .seedName ?? "",
-                    keyName: viewModel.keyName
-                ))
-                .navigationViewStyle(StackNavigationViewStyle())
-                .navigationBarHidden(true)
+                CreateKeyNetworkSelectionView(viewModel: viewModel.createDerivedKeyViewModel())
+                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationBarHidden(true)
             }
         }
+        .bottomSnackbar(
+            viewModel.snackbarViewModel,
+            isPresented: $viewModel.isSnackbarPresented
+        )
     }
 
     var mainList: some View {
@@ -206,7 +206,7 @@ struct KeyDetailsView: View {
                         viewModel: .init(
                             keyDetails: viewModel.presentedKeyDetails,
                             publicKeyDetails: viewModel.presentedPublicKeyDetails,
-                            onCompletion: viewModel.refreshData
+                            onCompletion: viewModel.onPublicKeyCompletion(_:)
                         )
                     )
                     .navigationBarHidden(true),

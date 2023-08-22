@@ -45,24 +45,26 @@ struct CameraButton: View {
     }
 }
 
-struct CameraButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            CameraButton(
-                action: {},
-                icon: Asset.xmarkButton.swiftUIImage
-            )
-            CameraButton(
-                action: {},
-                icon: Asset.torchOff.swiftUIImage
-            )
-            CameraButton(
-                action: {},
-                icon: Asset.torchOff.swiftUIImage,
-                isPressed: Binding<Bool>.constant(true)
-            )
+#if DEBUG
+    struct CameraButton_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                CameraButton(
+                    action: {},
+                    icon: Asset.xmarkButton.swiftUIImage
+                )
+                CameraButton(
+                    action: {},
+                    icon: Asset.torchOff.swiftUIImage
+                )
+                CameraButton(
+                    action: {},
+                    icon: Asset.torchOff.swiftUIImage,
+                    isPressed: Binding<Bool>.constant(true)
+                )
+            }
+            .preferredColorScheme(.dark)
+            .previewLayout(.sizeThatFits)
         }
-        .preferredColorScheme(.dark)
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

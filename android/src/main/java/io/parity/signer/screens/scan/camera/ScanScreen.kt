@@ -25,6 +25,7 @@ import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.scan.camera.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.uniffi.DecodeSequenceResult
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -34,6 +35,8 @@ fun ScanScreen(
 	onClose: Callback,
 	performPayloads: suspend (String) -> Unit,
 	onBananaSplit: (List<String>) -> Unit,
+	onDynamicDerivations: suspend (String) -> Unit,
+	onDynamicDerivationsTransactions: suspend (List<String>) -> Unit,
 ) {
 	val viewModel: CameraViewModel = viewModel()
 
@@ -61,6 +64,24 @@ fun ScanScreen(
 				.filter { it.isNotEmpty() }
 				.collect { qrData ->
 					onBananaSplit(qrData)
+				}
+		}
+
+		launch {
+			viewModel.dynamicDerivationPayload
+				.filterNotNull()
+				.filter { it.isNotEmpty() }
+				.collect { qrData ->
+					onDynamicDerivations(qrData)
+				}
+		}
+
+		launch {
+			viewModel.dynamicDerivationTransactionPayload
+				.filterNotNull()
+				.filter { it.isNotEmpty() }
+				.collect { qrData ->
+					onDynamicDerivationsTransactions(qrData)
 				}
 		}
 	}
@@ -192,7 +213,7 @@ private fun CameraViewPermission(viewModel: CameraViewModel) {
 private fun PreviewScanScreen() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			ScanScreen({}, { _ -> }, { _ -> })
+			ScanScreen({}, { _ -> }, { _ -> }, { _ -> }, { _ -> })
 		}
 	}
 }

@@ -12,12 +12,23 @@ struct VerticalActionsBottomModalViewModel {
     let content: String?
     let dismissActionLabel: LocalizedStringKey
     let mainActionLabel: LocalizedStringKey
+    var mainActionStyle: ActionButtonStyle = .primaryDestructive()
+    var contentAlignment: TextAlignment = .center
 
     static let removeGeneralVerifier = VerticalActionsBottomModalViewModel(
         title: Localizable.Settings.Modal.GeneralVerifier.Label.title.string,
         content: Localizable.Settings.Modal.GeneralVerifier.Label.content.string,
         dismissActionLabel: Localizable.Settings.Modal.GeneralVerifier.Action.cancel.key,
         mainActionLabel: Localizable.Settings.Modal.GeneralVerifier.Action.remove.key
+    )
+
+    static let confirmDerivedKeysCreation = VerticalActionsBottomModalViewModel(
+        title: Localizable.AddDerivedKeys.Modal.Label.title.string,
+        content: Localizable.AddDerivedKeys.Modal.Label.content.string,
+        dismissActionLabel: Localizable.AddDerivedKeys.Modal.Action.cancel.key,
+        mainActionLabel: Localizable.AddDerivedKeys.Modal.Action.confirm.key,
+        mainActionStyle: .primary(),
+        contentAlignment: .center
     )
 }
 
@@ -48,19 +59,20 @@ struct VerticalActionsBottomModal: View {
             content: {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     Text(viewModel.title)
+                        .multilineTextAlignment(viewModel.contentAlignment)
                         .font(PrimaryFont.titleL.font)
                     if let content = viewModel.content {
                         Text(content)
                             .font(PrimaryFont.bodyL.font)
                             .lineSpacing(Spacing.extraExtraSmall)
-                            .multilineTextAlignment(.leading)
+                            .multilineTextAlignment(viewModel.contentAlignment)
                             .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
                     }
                     VStack {
                         PrimaryButton(
                             action: { animateDismissal(mainAction()) },
                             text: viewModel.mainActionLabel,
-                            style: .primaryDestructive()
+                            style: viewModel.mainActionStyle
                         )
                         SecondaryButton(
                             action: animateDismissal(dismissAction()),
@@ -69,7 +81,7 @@ struct VerticalActionsBottomModal: View {
                     }
                     .padding(.top, Spacing.extraSmall)
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall + Spacing.medium)
             }
@@ -87,15 +99,17 @@ struct VerticalActionsBottomModal: View {
     }
 }
 
-struct VerticalActionsBottomModal_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VerticalActionsBottomModal(
-                viewModel: .removeGeneralVerifier,
-                mainAction: {}(),
-                isShowingBottomAlert: Binding<Bool>.constant(true)
-            )
+#if DEBUG
+    struct VerticalActionsBottomModal_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VerticalActionsBottomModal(
+                    viewModel: .removeGeneralVerifier,
+                    mainAction: {}(),
+                    isShowingBottomAlert: Binding<Bool>.constant(true)
+                )
+            }
+            .previewLayout(.sizeThatFits)
         }
-        .previewLayout(.sizeThatFits)
     }
-}
+#endif

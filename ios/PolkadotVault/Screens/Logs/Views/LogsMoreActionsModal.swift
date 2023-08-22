@@ -33,12 +33,12 @@ struct LogsMoreActionsModal: View {
                         style: .destructive
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.LogsList.More.Action.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, -Spacing.extraSmall)
                 .padding(.bottom, Spacing.medium)
             }
@@ -55,27 +55,3 @@ struct LogsMoreActionsModal: View {
         )
     }
 }
-
-// struct KeyDetailsActionsModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        KeyDetailsActionsModal(
-//            isShowingActionSheet: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator(),
-//            removeSeed: {}
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack {
-//            KeyDetailsActionsModal(
-//                isShowingActionSheet: Binding<Bool>.constant(true),
-//                navigation: NavigationCoordinator(),
-//                removeSeed: {}
-//            )
-//            .preferredColorScheme(.light)
-//            .previewLayout(.sizeThatFits)
-//        }
-//        .background(.black)
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

@@ -1,18 +1,16 @@
 package io.parity.signer.screens.keysetdetails
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.parity.signer.domain.*
+import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
-import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
-import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
-import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportScreenFull
+import io.parity.signer.domain.submitErrorState
 
 @Composable
 fun KeySetDetailsNavSubgraph(
@@ -28,8 +26,8 @@ fun KeySetDetailsNavSubgraph(
 	) {
 
 		composable(KeySetDetailsNavSubgraph.home) {
-			KeySetDetailsScreenFull(
-				model = model,
+			KeySetDetailsScreenSubgraph(
+				fullModel = model,
 				navigator = rootNavigator,
 				navController = navController,
 				networkState = networkState,
@@ -44,42 +42,9 @@ fun KeySetDetailsNavSubgraph(
 				},
 			)
 		}
-		composable(KeySetDetailsNavSubgraph.multiselect) {
-			KeySetDetailsExportScreenFull(
-				model = model,
-				onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-			)
-		}
-		composable(KeySetDetailsNavSubgraph.backup) {
-			//preconditions
-			val backupModel = model.toSeedBackupModel()
-			if (backupModel == null) {
-				submitErrorState("navigated to backup model but without root in KeySet " +
-					"it's impossible to backup")
-				navController.navigate(KeySetDetailsNavSubgraph.home)
-			} else {
-				//background
-				Box(Modifier.statusBarsPadding()) {
-					KeySetDetailsScreenView(
-						model = model,
-						navigator = EmptyNavigator(),
-						networkState = networkState,
-						onMenu = {},
-					)
-				}
-				//content
-				KeySetBackupFullOverlayBottomSheet(
-					model = backupModel,
-					getSeedPhraseForBackup = singleton::getSeedPhraseForBackup,
-					onClose = { navController.navigate(KeySetDetailsNavSubgraph.home) },
-				)
-			}
-		}
 	}
 }
 
 internal object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
-	const val multiselect = "keyset_details_multiselect"
-	const val backup = "keyset_details_backup"
 }

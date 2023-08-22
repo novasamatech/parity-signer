@@ -27,6 +27,16 @@ class CameraViewModel() : ViewModel() {
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
 		_pendingTransactionPayloads.asStateFlow()
 
+	private val _dynamicDerivationPayload =
+		MutableStateFlow<String?>(null)
+	val dynamicDerivationPayload: StateFlow<String?> =
+		_dynamicDerivationPayload.asStateFlow()
+
+	private val _dynamicDerivationTransactionPayload =
+		MutableStateFlow<List<String>?>(null)
+	val dynamicDerivationTransactionPayload: StateFlow<List<String>?> =
+		_dynamicDerivationTransactionPayload.asStateFlow()
+
 	private val _total = MutableStateFlow<Int?>(null)
 	private val _captured = MutableStateFlow<Int?>(null)
 
@@ -117,6 +127,17 @@ class CameraViewModel() : ViewModel() {
 					resetScanValues()
 					addPendingTransaction(actualPayload)
 				}
+
+				is DecodeSequenceResult.DynamicDerivations -> {
+					resetScanValues()
+					_dynamicDerivationPayload.value = payload.s
+				}
+
+				is DecodeSequenceResult.DynamicDerivationTransaction -> {
+					resetScanValues()
+					_dynamicDerivationTransactionPayload.value = payload.s
+
+				}
 			}
 
 		} catch (e: Exception) {
@@ -140,6 +161,8 @@ class CameraViewModel() : ViewModel() {
 	fun resetPendingTransactions() {
 		_pendingTransactionPayloads.value = emptySet()
 		_bananaSplitPayload.value = null
+		_dynamicDerivationPayload.value = null
+		_dynamicDerivationTransactionPayload.value = null
 		resetScanValues()
 	}
 }

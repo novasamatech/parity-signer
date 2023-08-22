@@ -259,6 +259,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
                 base58,
                 address_key,
                 swiped: false,
+                was_imported: address_details.was_imported,
             };
             let network_specs_key = NetworkSpecsKey::from_parts(
                 &network_specs.specs.genesis_hash,
@@ -326,6 +327,7 @@ pub fn show_all_networks(database: &sled::Db) -> Result<Vec<MMNetwork>> {
             title: n.specs.name,
             logo: n.specs.logo,
             order: n.order,
+            path_id: n.specs.path_id,
         })
         .collect::<Vec<_>>();
     networks.sort_by(|a, b| a.order.cmp(&b.order));
@@ -435,6 +437,7 @@ pub fn export_key(
         network_info,
         base58,
         address,
+        was_imported: address_details.was_imported,
     })
 }
 

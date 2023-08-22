@@ -19,8 +19,7 @@ struct KeyDetailsPublicKeyView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        title: Localizable.PublicKeyDetails.Label.title.string,
-                        subtitle: viewModel.navigationSubtitle(),
+                        title: viewModel.navigationTitle(),
                         leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreButtonTap)]
                     )
@@ -55,13 +54,25 @@ struct KeyDetailsPublicKeyView: View {
                                 viewModel: viewModel.renderable.footer,
                                 backgroundColor: Asset.fill6Solid.swiftUIColor
                             )
+                            if viewModel.keyDetails.wasImported {
+                                Divider()
+                                    .padding(.horizontal, Spacing.medium)
+                                HStack(spacing: 0) {
+                                    Spacer()
+                                    Localizable.PublicKeyDetails.Label.importedKey.text
+                                        .font(PrimaryFont.captionM.font)
+                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                        .padding(.vertical, Spacing.small)
+                                    Spacer()
+                                }
+                            }
                         }
                         .strokeContainerBackground()
                         // Key data
                         keyDetails()
                             .padding(.bottom, Spacing.extraExtraLarge)
                     }
-                    .padding([.leading, .trailing], Spacing.large)
+                    .padding(.horizontal, Spacing.large)
                     .padding(.top, Spacing.extraSmall)
                 }
             }
@@ -208,13 +219,16 @@ private extension KeyDetailsPublicKeyView {
 }
 
 extension KeyDetailsPublicKeyView {
+    enum OnCompletionAction: Equatable {
+        case derivedKeyDeleted
+    }
+
     final class ViewModel: ObservableObject {
-        private let keyDetails: MKeyDetails
+        let keyDetails: MKeyDetails
         private let publicKeyDetails: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
-        private let snackbarPresentation: BottomSnackbarPresentation
 
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
@@ -235,7 +249,7 @@ extension KeyDetailsPublicKeyView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: () -> Void
+        private let onCompletion: (OnCompletionAction) -> Void
 
         init(
             keyDetails: MKeyDetails,
@@ -243,15 +257,13 @@ extension KeyDetailsPublicKeyView {
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            onCompletion: @escaping () -> Void
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.keyDetails = keyDetails
             self.publicKeyDetails = publicKeyDetails
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
-            self.snackbarPresentation = snackbarPresentation
             self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
         }
@@ -260,8 +272,12 @@ extension KeyDetailsPublicKeyView {
             isShowingActionSheet.toggle()
         }
 
-        func navigationSubtitle() -> String? {
-            renderable.isRootKey ? nil : Localizable.PublicKeyDetails.Label.subtitle.string
+        func navigationTitle() -> NavigationBarTitle {
+            renderable.isRootKey ? .title(Localizable.PublicKeyDetails.Label.title.string) :
+                .subtitle(
+                    title: Localizable.PublicKeyDetails.Label.title.string,
+                    subtitle: Localizable.PublicKeyDetails.Label.subtitle.string
+                )
         }
 
         func checkForActionsPresentation() {
@@ -297,30 +313,27 @@ extension KeyDetailsPublicKeyView {
 
         func onRemoveKeyTap() {
             publicKeyDetailsService.forgetSingleKey(keyDetails.address.seedName)
-            snackbarPresentation.viewModel = .init(
-                title: Localizable.PublicKeyDetailsModal.Confirmation.snackbar.string,
-                style: .warning
-            )
-            snackbarPresentation.isSnackbarPresented = true
-            onCompletion()
+            onCompletion(.derivedKeyDeleted)
             dismissRequest.send()
         }
     }
 }
 
-struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            KeyDetailsPublicKeyView(
-                viewModel: .init(
-                    keyDetails: PreviewData.mkeyDetails,
-                    publicKeyDetails: "publicKeyDetails",
-                    onCompletion: {}
+#if DEBUG
+    struct KeyDetailsPublicKeyView_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                KeyDetailsPublicKeyView(
+                    viewModel: .init(
+                        keyDetails: .stub,
+                        publicKeyDetails: "publicKeyDetails",
+                        onCompletion: { _ in }
+                    )
                 )
-            )
+            }
+            .previewLayout(.sizeThatFits)
+            .preferredColorScheme(.dark)
+            .environmentObject(ConnectivityMediator())
         }
-        .previewLayout(.sizeThatFits)
-        .preferredColorScheme(.dark)
-        .environmentObject(ConnectivityMediator())
     }
-}
+#endif

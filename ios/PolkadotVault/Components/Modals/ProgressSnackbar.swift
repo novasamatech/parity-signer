@@ -55,7 +55,7 @@ struct ProgressSnackbar: View {
             .background(Asset.fill12Solid.swiftUIColor)
             .cornerRadius(CornerRadius.medium)
         }
-        .padding([.leading, .trailing], Spacing.medium)
+        .padding(.horizontal, Spacing.medium)
         .padding(.bottom, Spacing.large + safeAreaInsets.bottom)
     }
 }
@@ -93,11 +93,14 @@ struct ProgressSnackbarDemo: View {
     }
 }
 
-struct ProgressSnackbar_Previews: PreviewProvider {
-    static var previews: some View {
-        ProgressSnackbarDemo(
-            viewModel: ProgressSnackbarViewModel()
-        )
-        .preferredColorScheme(.light)
+#if DEBUG
+    struct ProgressSnackbar_Previews: PreviewProvider {
+        static var previews: some View {
+            ProgressSnackbarDemo(
+                viewModel: ProgressSnackbarViewModel()
+            )
+            .preferredColorScheme(.light)
+        }
     }
-}
+
+#endif

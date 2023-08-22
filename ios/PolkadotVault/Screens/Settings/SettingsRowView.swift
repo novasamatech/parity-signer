@@ -38,21 +38,23 @@ struct SettingsRowRenderable: Equatable, Identifiable {
     let hasDetails: Bool
 }
 
-struct SettingsRowView_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 0) {
-            SettingsRowView(renderable: .init(
-                item: .networks,
-                title: "Networks",
-                isDestructive: false,
-                hasDetails: true
-            ))
-            SettingsRowView(renderable: .init(
-                item: .wipe,
-                title: "Wipe All data",
-                isDestructive: true,
-                hasDetails: false
-            ))
+#if DEBUG
+    struct SettingsRowView_Previews: PreviewProvider {
+        static var previews: some View {
+            VStack(spacing: 0) {
+                SettingsRowView(renderable: .init(
+                    item: .networks,
+                    title: "Networks",
+                    isDestructive: false,
+                    hasDetails: true
+                ))
+                SettingsRowView(renderable: .init(
+                    item: .wipe,
+                    title: "Wipe All data",
+                    isDestructive: true,
+                    hasDetails: false
+                ))
+            }
         }
     }
-}
+#endif

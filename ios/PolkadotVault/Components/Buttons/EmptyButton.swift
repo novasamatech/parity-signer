@@ -13,7 +13,7 @@ struct EmptyButton: View {
     private let style: ActionButtonStyle
 
     init(
-        action: @escaping () -> Void,
+        action: @escaping @autoclosure () -> Void,
         text: LocalizedStringKey,
         style: ActionButtonStyle = .emptyPrimary()
     ) {
@@ -30,65 +30,3 @@ struct EmptyButton: View {
         )
     }
 }
-
-//
-// struct EmptyButton_Previews: PreviewProvider {
-//    static var previews: some View {
-//        VStack(alignment: .center, spacing: 10) {
-//            Text("<< Enabled >>")
-//            EmptyButton(
-//                action: {},
-//                text: "Short Title"
-//            )
-//            .padding(10)
-//            EmptyButton(
-//                action: {},
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-//            )
-//            .padding(10)
-//            Text("<< Disabled >>")
-//            EmptyButton(
-//                action: {},
-//                text: "Short Title",
-//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
-//            )
-//            .padding(10)
-//            EmptyButton(
-//                action: {},
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
-//            )
-//            .padding(10)
-//        }
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//        VStack(alignment: .center, spacing: 10) {
-//            Text("<< Enabled >>")
-//            EmptyButton(
-//                action: {},
-//                text: "Short Title"
-//            )
-//            .padding(10)
-//            EmptyButton(
-//                action: {},
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-//            )
-//            .padding(10)
-//            Text("<< Disabled >>")
-//            EmptyButton(
-//                action: {},
-//                text: "Short Title",
-//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
-//            )
-//            .padding(10)
-//            EmptyButton(
-//                action: {},
-//                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//                style: .emptyPrimary(isDisabled: Binding<Bool>.constant(true))
-//            )
-//            .padding(10)
-//        }
-//        .preferredColorScheme(.light)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

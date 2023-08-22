@@ -43,12 +43,12 @@ struct AddKeySetModal: View {
                         text: Localizable.AddKeySet.Button.recover.key
                     )
                     EmptyButton(
-                        action: { animateDismissal() },
+                        action: animateDismissal(),
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )
                 }
-                .padding([.leading, .trailing], Spacing.large)
+                .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.small + Spacing.medium)
             }
         )
@@ -64,14 +64,3 @@ struct AddKeySetModal: View {
         )
     }
 }
-
-// struct AddKeySetModal_Previews: PreviewProvider {
-//    static var previews: some View {
-//        AddKeySetModal(
-//            isShowingNewSeedMenu: Binding<Bool>.constant(true),
-//            navigation: NavigationCoordinator()
-//        )
-//        .preferredColorScheme(.dark)
-//        .previewLayout(.sizeThatFits)
-//    }
-// }

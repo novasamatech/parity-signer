@@ -27,7 +27,6 @@ mod ffi_types;
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
 use definitions::keyring::AddressKey;
-use ffi_support::ErrorCode;
 use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
 use sled::Db;
@@ -37,6 +36,7 @@ use std::{
     str::FromStr,
     sync::{Arc, RwLock},
 };
+use transaction_parsing::dynamic_derivations::process_dynamic_derivations;
 use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
 
@@ -306,6 +306,13 @@ fn populate_derivations_has_pwd(
     inject_derivations_has_pwd(seed_derived_keys, seeds).map_err(Into::into)
 }
 
+fn preview_dynamic_derivations(
+    seeds: HashMap<String, String>,
+    payload: String,
+) -> Result<DDPreview, ErrorDisplayed> {
+    process_dynamic_derivations(&get_db()?, seeds, &payload).map_err(|e| e.to_string().into())
+}
+
 /// Checks derivation path for validity and collisions
 ///
 /// Returns struct that has information on collisions, presence of password and validity of path;
@@ -334,6 +341,31 @@ fn try_create_address(
     let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
     db_handling::identities::try_create_address(&get_db()?, seed_name, seed_phrase, path, &network)
         .map_err(|e| e.to_string().into())
+}
+
+fn try_create_imported_address(
+    seed_name: &str,
+    seed_phrase: &str,
+    path: &str,
+    network: &str,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
+    db_handling::identities::try_create_imported_address(
+        &get_db()?,
+        seed_name,
+        seed_phrase,
+        path,
+        &network,
+    )
+    .map_err(|e| e.to_string().into())
+}
+
+/// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
+fn sign_dd_transaction(
+    payload: &[String],
+    seeds: HashMap<String, String>,
+) -> Result<MSignedTransaction, ErrorDisplayed> {
+    navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())
 }
 
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old
@@ -382,9 +414,11 @@ fn history_seed_name_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDispl
 }
 
 fn export_key_info(
-    selected_names: HashMap<String, ExportedSet>,
+    seed_name: &str,
+    exported_set: ExportedSet,
 ) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
-    navigator::export_key_info(&get_db()?, selected_names).map_err(|e| e.to_string().into())
+    navigator::export_key_info(&get_db()?, seed_name, exported_set)
+        .map_err(|e| e.to_string().into())
 }
 
 fn keys_by_seed_name(seed_name: &str) -> anyhow::Result<MKeysNew, ErrorDisplayed> {
@@ -567,6 +601,19 @@ fn seed_phrase_guess_words(user_input: &str) -> Result<Vec<String>, ErrorDisplay
 
 fn recover_seed_phrase(seed_name: &str, seed_phrase: &str) -> anyhow::Result<(), ErrorDisplayed> {
     todo!()
+}
+fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDisplayed> {
+    db_handling::interface_signer::print_new_seed(new_seed_name)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn create_key_set(
+    seed_name: &str,
+    seed_phrase: &str,
+    networks: Vec<String>,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::identities::create_key_set(&get_db()?, seed_name, seed_phrase, networks)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
 /// Must be called once to initialize logging from Rust in development mode.

@@ -24,10 +24,10 @@ struct TransactionPreview: View {
         VStack {
             NavigationBarView(
                 viewModel: .init(
-                    title: title(
+                    title: .title(title(
                         viewModel.dataModel.count,
                         previewType: viewModel.dataModel.first?.content.previewType
-                    ),
+                    )),
                     leftButtons: [.init(type: .xmark, action: viewModel.onBackButtonTap)],
                     rightButtons: [.init(type: .empty)]
                 )
@@ -168,7 +168,7 @@ struct TransactionPreview: View {
             }
             if ![.done, .sign, .read].contains(transactionType) {
                 EmptyButton(
-                    action: viewModel.onCancelTap,
+                    action: viewModel.onCancelTap(),
                     text: Localizable.TransactionPreview.Action.cancel.key
                 )
             }
@@ -229,36 +229,42 @@ struct TransactionPreview: View {
 }
 
 extension TransactionPreview {
+    enum OnCompletionAction: Equatable {
+        case onDismissal
+        case onDone
+        case onImportKeysFailure
+        case onNetworkAdded(String)
+        case onNetworkMetadataAdded(network: String, metadataVersion: String)
+        case onDerivedKeysImport(count: Int)
+    }
+
     final class ViewModel: ObservableObject {
-        @Binding var isPresented: Bool
         @Published var isDetailsPresented: Bool = false
         @Published var selectedDetails: MTransaction!
         @Published var dataModel: [TransactionWrapper]
         private let scanService: ScanTabService
         private let seedsMediator: SeedsMediating
-        private let snackbarPresentation: BottomSnackbarPresentation
         private let importKeysService: ImportDerivedKeysService
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
         private let dismissRequest = PassthroughSubject<Void, Never>()
+        private let onCompletion: (OnCompletionAction) -> Void
 
         let signature: MSignatureReady?
 
         init(
-            isPresented: Binding<Bool>,
             content: [MTransaction],
             signature: MSignatureReady?,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
             importKeysService: ImportDerivedKeysService = ImportDerivedKeysService(),
-            scanService: ScanTabService = ScanTabService()
+            scanService: ScanTabService = ScanTabService(),
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
-            _isPresented = isPresented
             dataModel = content.map { TransactionWrapper(content: $0) }
             self.signature = signature
             self.seedsMediator = seedsMediator
-            self.snackbarPresentation = snackbarPresentation
             self.importKeysService = importKeysService
             self.scanService = scanService
+            self.onCompletion = onCompletion
         }
 
         func onAppear() {
@@ -275,12 +281,8 @@ extension TransactionPreview {
                 case let .success(updatedSeeds):
                     self.updateImportDerivationsData(updatedSeeds)
                 case .failure:
-                    self.snackbarPresentation.viewModel = .init(
-                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
-                        style: .warning
-                    )
-                    self.snackbarPresentation.isSnackbarPresented = true
-                    self.isPresented = false
+                    self.onCompletion(.onImportKeysFailure)
+                    self.dismissRequest.send()
                 }
             }
         }
@@ -300,35 +302,30 @@ extension TransactionPreview {
         func onBackButtonTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDismissal)
         }
 
         func onDoneTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDone)
         }
 
         func onCancelTap() {
             scanService.resetNavigationState()
             dismissRequest.send()
+            onCompletion(.onDismissal)
         }
 
         func onApproveTap() {
             scanService.onTransactionApprove()
             switch dataModel.first?.content.previewType {
             case let .addNetwork(network):
-                snackbarPresentation.viewModel = .init(
-                    title: Localizable.TransactionSign.Snackbar.networkAdded(network),
-                    style: .info
-                )
-                snackbarPresentation.isSnackbarPresented = true
+                onCompletion(.onNetworkAdded(network))
             case let .metadata(network, version):
-                snackbarPresentation.viewModel = .init(
-                    title: Localizable.TransactionSign.Snackbar.metadata(network, version),
-                    style: .info
-                )
-                snackbarPresentation.isSnackbarPresented = true
+                onCompletion(.onNetworkMetadataAdded(network: network, metadataVersion: version))
             default:
-                ()
+                onCompletion(.onDone)
             }
             dismissRequest.send()
         }
@@ -340,25 +337,11 @@ extension TransactionPreview {
                 let derivedKeysCount = self.dataModel.map(\.content).importableKeysCount
                 switch result {
                 case .success:
-                    if derivedKeysCount == 1 {
-                        self.snackbarPresentation
-                            .viewModel = .init(title: Localizable.ImportKeys.Snackbar.Success.single.string)
-                    } else {
-                        self.snackbarPresentation
-                            .viewModel = .init(
-                                title: Localizable.ImportKeys.Snackbar.Success
-                                    .multiple(derivedKeysCount)
-                            )
-                    }
+                    self.onCompletion(.onDerivedKeysImport(count: derivedKeysCount))
                 case .failure:
-                    self.snackbarPresentation.viewModel = .init(
-                        title: Localizable.ImportKeys.Snackbar.Failure.unknown.string,
-                        style: .warning
-                    )
+                    self.onCompletion(.onImportKeysFailure)
                 }
-
-                self.snackbarPresentation.isSnackbarPresented = true
-                self.isPresented = false
+                self.dismissRequest.send()
             }
         }
 
@@ -374,18 +357,17 @@ extension TransactionPreview {
         static var previews: some View {
             // Single transaction
             TransactionPreview(viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub],
+                signature: .stub,
+                onCompletion: { _ in }
             ))
             .preferredColorScheme(.dark)
             // Multi transaction (i.e. different QR code design)
             TransactionPreview(viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                content: [PreviewData.signTransaction, PreviewData.signTransaction],
-                signature: MSignatureReady(signatures: [.regular(data: PreviewData.exampleQRCode)])
+                content: [.stub, .stub],
+                signature: .stub,
+                onCompletion: { _ in }
             ))
-//        .preferredColorScheme(.dark)
         }
     }
 #endif

@@ -16,7 +16,7 @@ struct RecoverKeySetNameView: View {
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBarView(
                     viewModel: .init(
-                        title: nil,
+                        title: .progress(current: 1, upTo: 3),
                         leftButtons: [.init(
                             type: .xmark,
                             action: viewModel.onBackTap
@@ -39,7 +39,8 @@ struct RecoverKeySetNameView: View {
                     RecoverKeySetSeedPhraseView(
                         viewModel: .init(
                             content: viewModel.detailsContent,
-                            isPresented: $viewModel.isPresented
+                            isPresented: $viewModel.isPresented,
+                            onCompletion: viewModel.onCompletion
                         )
                     )
                     .navigationBarHidden(true),
@@ -48,6 +49,7 @@ struct RecoverKeySetNameView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .navigationBarHidden(true)
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
     }
 
@@ -92,6 +94,7 @@ extension RecoverKeySetNameView {
         @Published var seedName: String = ""
         private let service: RecoverKeySetService
         private let seedsMediator: SeedsMediating
+        let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
         @Binding var isPresented: Bool
         @Published var isPresentingDetails: Bool = false
         @Published var detailsContent: MRecoverSeedPhrase!
@@ -99,15 +102,17 @@ extension RecoverKeySetNameView {
         init(
             service: RecoverKeySetService = RecoverKeySetService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            isPresented: Binding<Bool>
+            isPresented: Binding<Bool>,
+            onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.service = service
             self.seedsMediator = seedsMediator
+            self.onCompletion = onCompletion
             _isPresented = isPresented
         }
 
         func onAppear() {
-            seedName = service.recoverKeySetStart(seedsMediator.seedNames.isEmpty).seedName
+            seedName = service.recoverKeySetStart().seedName
         }
 
         func onBackTap() {

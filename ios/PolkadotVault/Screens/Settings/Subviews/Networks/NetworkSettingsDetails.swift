@@ -143,6 +143,10 @@ struct NetworkSettingsDetails: View {
                     )
                 )
             }
+            .bottomSnackbar(
+                viewModel.snackbarViewModel,
+                isPresented: $viewModel.isSnackbarPresented
+            )
             .navigationBarHidden(true)
         }
     }
@@ -308,16 +312,19 @@ private extension NetworkSettingsDetails {
 }
 
 extension NetworkSettingsDetails {
+    enum OnCompletionAction: Equatable {
+        case networkDeleted(String)
+    }
+
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let snackbarPresentation: BottomSnackbarPresentation
         private let networkDetailsService: ManageNetworkDetailsService
         let networkKey: String
         private var metadataToDelete: MMetadataRecord?
 
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
         private let dismissRequest = PassthroughSubject<Void, Never>()
-
+        private let onCompletion: (OnCompletionAction) -> Void
         @Published var isPresentingRemoveMetadataConfirmation = false
         @Published var networkDetails: MNetworkDetails
         @Published var shouldSignSpecs = false
@@ -328,16 +335,19 @@ extension NetworkSettingsDetails {
         @Published var signSpecList: MSignSufficientCrypto!
         @Published var isPresentingSignSpecList: Bool = false
         @Published var isShowingQRScanner: Bool = false
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var isSnackbarPresented: Bool = false
 
         init(
             networkKey: String,
-            snackbarPresentation: BottomSnackbarPresentation = ServiceLocator.bottomSnackbarPresentation,
-            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
+            networkDetails: MNetworkDetails,
+            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService(),
+            onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.networkKey = networkKey
-            self.snackbarPresentation = snackbarPresentation
             self.networkDetailsService = networkDetailsService
-            _networkDetails = .init(initialValue: networkDetailsService.refreshCurrentNavigationState(networkKey))
+            self.onCompletion = onCompletion
+            _networkDetails = .init(initialValue: networkDetails)
             listenToNavigationUpdates()
         }
 
@@ -347,12 +357,12 @@ extension NetworkSettingsDetails {
                 networkKey,
                 metadataToDelete?.specsVersion ?? ""
             )
-            snackbarPresentation.viewModel = .init(
+            snackbarViewModel = .init(
                 title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
                     .confirmation(metadataToDelete?.specsVersion ?? ""),
                 style: .warning
             )
-            snackbarPresentation.isSnackbarPresented = true
+            isSnackbarPresented = true
             metadataToDelete = nil
         }
 
@@ -396,14 +406,9 @@ extension NetworkSettingsDetails {
         }
 
         func removeNetwork() {
-            snackbarPresentation.viewModel = .init(
-                title: Localizable.Settings.NetworkDetails.DeleteNetwork.Label
-                    .confirmation(networkDetails.title),
-                style: .warning
-            )
-            snackbarPresentation.isSnackbarPresented = true
             networkDetailsService.deleteNetwork(networkKey)
             dismissRequest.send()
+            onCompletion(.networkDeleted(networkDetails.title))
         }
 
         func cancelNetworkRemoval() {
@@ -411,10 +416,13 @@ extension NetworkSettingsDetails {
         }
 
         private func updateView() {
-            networkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
+            guard let updatedNetworkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
+            else { return }
+            networkDetails = updatedNetworkDetails
         }
 
         private func listenToNavigationUpdates() {
+            guard cancelBag.subscriptions.isEmpty else { return }
             $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
                 guard let self = self, !isPresentingSignSpecList else { return }
                 self.signSpecList = nil
@@ -424,10 +432,12 @@ extension NetworkSettingsDetails {
     }
 }
 
-struct NetworkSettingsDetails_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkSelectionSettings(
-            viewModel: .init()
-        )
+#if DEBUG
+    struct NetworkSettingsDetails_Previews: PreviewProvider {
+        static var previews: some View {
+            NetworkSelectionSettings(
+                viewModel: .init()
+            )
+        }
     }
-}
+#endif

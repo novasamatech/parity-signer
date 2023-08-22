@@ -17,8 +17,7 @@ use constants::{
 use db_handling::{
     cold_default::{init_db, populate_cold_nav_test},
     identities::{
-        export_all_addrs, import_all_addrs, try_create_address, try_create_seed, TransactionBulk,
-        TransactionBulkV1,
+        import_all_addrs, try_create_address, try_create_seed, TransactionBulk, TransactionBulkV1,
     },
 };
 use definitions::{
@@ -46,18 +45,19 @@ use definitions::{
 use constants::test_values::{
     alice_sr_0, alice_sr_1, alice_sr_alice_westend, alice_sr_secret_abracadabra,
 };
-use db_handling::identities::inject_derivations_has_pwd;
+use db_handling::identities::{export_key_set_addrs, inject_derivations_has_pwd};
 use definitions::derivations::{DerivedKeyPreview, DerivedKeyStatus, SeedKeysPreview};
 use definitions::navigation::Card::DerivationsCard;
-use definitions::navigation::MAddressCard;
+use definitions::navigation::{DecodeSequenceResult, MAddressCard};
 use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
 use tempfile::tempdir;
-use transaction_parsing::prepare_derivations_preview;
+use transaction_parsing::{decode_payload, prepare_derivations_preview};
 
 use crate::{
-    keys_by_seed_name,
+    handle_dd_sign, keys_by_seed_name,
     navstate::State,
+    sign_dd_transaction,
     states::{SignResult, TransactionState},
     Action,
 };
@@ -597,8 +597,7 @@ fn export_import_addrs() {
     let mut alice_seeds = HashMap::new();
     alice_seeds.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
 
-    let selected = HashMap::from([("Alice".to_owned(), ExportedSet::All)]);
-    let addrs = export_all_addrs(&db_from, selected.clone()).unwrap();
+    let addrs = export_key_set_addrs(&db_from, "Alice", ExportedSet::All).unwrap();
     let addrs = prepare_derivations_preview(&db_from, addrs).unwrap();
     let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
 
@@ -609,86 +608,35 @@ fn export_import_addrs() {
             .0
             .public()
             .into(),
-        derived_keys: vec![
-            DerivedKeyPreview {
-                address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Polkadot".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
+        derived_keys: vec![DerivedKeyPreview {
+            address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+            derivation_path: Some("//secret".to_owned()),
+            encryption: Encryption::Sr25519,
+            genesis_hash: westend_genesis,
+            identicon: SignerImage::Png {
+                image: alice_sr_secret_abracadabra().to_vec(),
             },
-            DerivedKeyPreview {
-                address: "EBJwHkVtAcF6nCKHd3h4H75NzgvMJxMS1X3WWd8a2DjaQx9".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Kusama".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_owned(),
-                derivation_path: None,
-                encryption: Encryption::Sr25519,
-                genesis_hash: H256::from_str(
-                    "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                )
-                .unwrap(),
-                identicon: SignerImage::Png {
-                    image: alice_sr_root().to_vec(),
-                },
-                has_pwd: Some(false),
-                network_title: Some("Westend".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-            DerivedKeyPreview {
-                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
-                derivation_path: Some("//secret".to_owned()),
-                encryption: Encryption::Sr25519,
-                genesis_hash: westend_genesis,
-                identicon: SignerImage::Png {
-                    image: alice_sr_secret_abracadabra().to_vec(),
-                },
-                has_pwd: Some(true),
-                network_title: Some("Westend".to_string()),
-                status: DerivedKeyStatus::AlreadyExists,
-            },
-        ],
+            has_pwd: Some(true),
+            network_title: Some("Westend".to_string()),
+            status: DerivedKeyStatus::AlreadyExists,
+        }],
     }];
 
     assert_eq!(addrs, addrs_expected);
 
-    let mut selected_hashmap = HashMap::new();
     let polkadot_genesis =
         H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
             .unwrap();
 
     let network_specs_key = NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519);
 
-    selected_hashmap.insert(
-        "Alice".to_owned(),
-        ExportedSet::Selected {
-            s: vec![PathAndNetwork {
-                derivation: "".to_owned(),
-                network_specs_key: hex::encode(network_specs_key.key()),
-            }],
-        },
-    );
-    let addrs_filtered = export_all_addrs(&db_from, selected_hashmap).unwrap();
+    let exported_set = ExportedSet::Selected {
+        s: vec![PathAndNetwork {
+            derivation: "".to_owned(),
+            network_specs_key: hex::encode(network_specs_key.key()),
+        }],
+    };
+    let addrs_filtered = export_key_set_addrs(&db_from, "Alice", exported_set).unwrap();
     let addrs_filtered = prepare_derivations_preview(&db_from, addrs_filtered).unwrap();
     let addrs_filtered = inject_derivations_has_pwd(addrs_filtered, alice_seeds.clone()).unwrap();
 
@@ -699,25 +647,14 @@ fn export_import_addrs() {
             .0
             .public()
             .into(),
-        derived_keys: vec![DerivedKeyPreview {
-            address: "12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU".to_owned(),
-            derivation_path: None,
-            encryption: Encryption::Sr25519,
-            genesis_hash: polkadot_genesis,
-            identicon: SignerImage::Png {
-                image: alice_sr_root().to_vec(),
-            },
-            has_pwd: Some(false),
-            network_title: Some("Polkadot".to_string()),
-            status: DerivedKeyStatus::AlreadyExists,
-        }],
+        derived_keys: vec![],
     }];
 
     assert_eq!(addrs_filtered, addrs_expected_filtered);
 
     import_all_addrs(&db_to, addrs).unwrap();
 
-    let addrs_new = export_all_addrs(&db_to, selected).unwrap();
+    let addrs_new = export_key_set_addrs(&db_to, "Alice", ExportedSet::All).unwrap();
     let addrs_new = prepare_derivations_preview(&db_from, addrs_new).unwrap();
     let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
     assert_eq!(addrs_new, addrs_expected);
@@ -1115,6 +1052,7 @@ fn flow_test_1() {
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
+                        path_id: "//polkadot".to_string(),
                     },
                     MMNetwork {
                         key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
@@ -1122,6 +1060,7 @@ fn flow_test_1() {
                         title: "Kusama".to_string(),
                         logo: "kusama".to_string(),
                         order: 1,
+                        path_id: "//kusama".to_string(),
                     },
                     MMNetwork {
                         key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
@@ -1129,6 +1068,7 @@ fn flow_test_1() {
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
                         order: 2,
+                        path_id: "//westend".to_string(),
                     },
                 ],
             },
@@ -1367,6 +1307,7 @@ fn flow_test_1() {
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
+                        path_id: "//polkadot".to_string(),
                     },
                     MMNetwork {
                         key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
@@ -1374,6 +1315,7 @@ fn flow_test_1() {
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
                         order: 1,
+                        path_id: "//westend".to_string(),
                     },
                 ],
             },
@@ -1744,6 +1686,7 @@ fn flow_test_1() {
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
+                        path_id: "//polkadot".to_string(),
                     },
                     MMNetwork {
                         key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
@@ -1751,6 +1694,7 @@ fn flow_test_1() {
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
                         order: 1,
+                        path_id: "//westend".to_string(),
                     },
                     MMNetwork {
                         key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
@@ -1758,6 +1702,7 @@ fn flow_test_1() {
                         title: "Kusama".to_string(),
                         logo: "kusama".to_string(),
                         order: 2,
+                        path_id: "//kusama".to_string(),
                     },
                 ],
             },
@@ -3150,6 +3095,7 @@ fn flow_test_1() {
                         "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                             .to_string(),
                 },
+                was_imported: false,
             }),
         },
         modal_data: None,
@@ -6225,4 +6171,90 @@ fn flow_test_1() {
     );
 
     std::fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn test_sign_dd_transaction() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+
+    let derivation_path = hex::encode("//westend".encode());
+    let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+    let payload =
+        "530105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
+
+    let transaction = match decode_payload(&payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+
+    let result = sign_dd_transaction(&db, &transaction, seeds);
+    let transaction = result.expect("transaction is ok");
+    assert_eq!(transaction.signature.signatures.len(), 1);
+
+    // identical non-dynamic derivation transaction
+    let alice_westend_public =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let non_dynamic_transaction =
+        "530102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
+    assert!(signature_is_good(
+        &non_dynamic_transaction,
+        &String::from_utf8(transaction.signature.signatures[0].data().to_vec()).unwrap()
+    ));
+}
+
+#[test]
+fn test_bulk_dd_signing() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    let derivation_path = hex::encode("//westend".encode());
+    let alice_public_root = "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a";
+    let tx = "a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+    let payload = "0105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
+
+    let encoded_transactions = vec![
+        hex::decode(&payload).unwrap(),
+        hex::decode(&payload).unwrap(),
+    ];
+
+    // Another bulk in format that is digestible by verification
+    // utilities function.
+    let _encoded_transactions_prefixed: Vec<_> = encoded_transactions
+        .iter()
+        .map(|tx| "53".to_string() + &hex::encode(tx))
+        .collect();
+    let bulk = TransactionBulk::V1(TransactionBulkV1 {
+        encoded_transactions,
+    });
+    let bulk_payload = hex::encode([&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat());
+    let transactions = match decode_payload(&bulk_payload).expect("decode payload") {
+        DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
+        _ => panic!("Unexpected payload type"),
+    };
+
+    let mut seeds = HashMap::new();
+    seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
+    populate_cold_nav_test(&db).unwrap();
+
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    let signed_transaction = handle_dd_sign(&db, &transactions, seeds).expect("signing is ok");
+
+    // Identical non-dynamic derivation transaction
+    let alice_westend_public =
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34".to_string();
+    let identical_tx = "530102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
+
+    for (_, sig) in signed_transaction.iter() {
+        let signature = hex::encode(sig.signature().encode());
+        assert!(signature_is_good(&identical_tx, &signature));
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
 }

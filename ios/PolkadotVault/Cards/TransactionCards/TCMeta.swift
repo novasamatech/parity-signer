@@ -37,13 +37,10 @@ struct TCMeta: View {
     }
 }
 
-struct TCMeta_Previews: PreviewProvider {
-    static var previews: some View {
-        TCMeta(value: MMetadataRecord(
-            specname: "Westend",
-            specsVersion: "9230",
-            metaHash: "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
-            metaIdPic: .svg(image: PreviewData.exampleIdenticon)
-        ))
+#if DEBUG
+    struct TCMeta_Previews: PreviewProvider {
+        static var previews: some View {
+            TCMeta(value: .stub)
+        }
     }
-}
+#endif

@@ -181,35 +181,17 @@ extension SignSpecEnterPasswordModal {
     }
 }
 
-struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
-    static var previews: some View {
-        SignSpecEnterPasswordModal(
-            viewModel: .init(
-                isPresented: Binding<Bool>.constant(true),
-                shouldPresentError: Binding<Bool>.constant(false),
-                dataModel: Binding<MEnterPassword>.constant(
-                    .init(
-                        authorInfo: .init(
-                            base58: PreviewData.base58,
-                            addressKey: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-                            address: .init(
-                                path: "//polkadot",
-                                hasPwd: true,
-                                identicon: .svg(image: PreviewData.exampleIdenticon),
-                                seedName: "Parity Keys",
-                                secretExposed: true
-                            )
-                        ),
-                        networkInfo: MscNetworkInfo(
-                            networkTitle: "Polkadot",
-                            networkLogo: "polkadot",
-                            networkSpecsKey: "sr25519"
-                        ),
-                        counter: 2
-                    )
-                ),
-                detailsContent: .constant(nil)
+#if DEBUG
+    struct SignSpecEnterPasswordModal_Previews: PreviewProvider {
+        static var previews: some View {
+            SignSpecEnterPasswordModal(
+                viewModel: .init(
+                    isPresented: Binding<Bool>.constant(true),
+                    shouldPresentError: Binding<Bool>.constant(false),
+                    dataModel: Binding<MEnterPassword>.constant(.stub),
+                    detailsContent: .constant(nil)
+                )
             )
-        )
+        }
     }
-}
+#endif

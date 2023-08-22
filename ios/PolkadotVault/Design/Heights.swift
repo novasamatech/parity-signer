@@ -31,6 +31,7 @@ enum Heights {
     static let identiconInCell: CGFloat = 36
     /// Height for `Identicon` when used as inline icon
     static let identiconSmall: CGFloat = 16
+    static let identiconInAddDerivedKey: CGFloat = 40
     static let tabbarHeight: CGFloat = 49
     static let textFieldHeight: CGFloat = 48
     static let seedPhraseCapsuleHeight: CGFloat = 32
@@ -50,6 +51,7 @@ enum Heights {
     static let networkLogoOverlay: CGFloat = 18
     /// Height for `Network Logo` when used in list collections, 36 pt
     static let networkLogoInCell: CGFloat = 36
+    static let networkLogoInModal: CGFloat = 80
     static let networkLogoInList: CGFloat = 32
     static let networkLogoInHeader: CGFloat = 56
     /// Height for `Network Logo` when used in small capsule view, 24 pt
@@ -70,6 +72,11 @@ enum Heights {
     static let signSpecsListRowHeight: CGFloat = 96
 
     static let createKeyNetworkItemHeight: CGFloat = 64
+    static let createKeysForNetworkItemHeight: CGFloat = 64
+    static let selectKeySetsForNetworkKeyItemHeight: CGFloat = 64
+
+    static let navigationBarProgressViewHeight: CGFloat = 6
+    static let navigationBarProgressViewWidth: CGFloat = 40
 }
 
 enum Sizes {

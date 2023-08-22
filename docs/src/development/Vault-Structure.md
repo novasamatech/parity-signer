@@ -83,7 +83,7 @@ Now suppose this struct is changed by adding and removing some fields:
 ```
 
 After this change on a Rust-side the developer would have to _remember_ to
-reflect these changes on the `Kotlin` and `Swift` sides and if that is no done
+reflect these changes on the `Kotlin` and `Swift` sides and if that is not done
 there is a chance that it will not be caught in build-time by CI. It is quite
 hard to remember everything and having a guarantee that such things would be
 caught at compile time is much better than not having this sort of guarantee.
@@ -264,7 +264,7 @@ patterns ("transaction cards") with some types having special visualizations
 (`balance` formatted with proper decimals and units, identicons added to
 identities, etc.). Each card is assigned `order` and `indent` that allow the
 cards to be shown in a lazy view environment. Thus, any networks that have
-minimal metadata requirements should be decodable and visualizeable.
+minimal metadata requirements should be decodable and visualizable.
 
 Some cards also include documentation entries fetched from metadata. Those could
 be expanded in UI on touch.

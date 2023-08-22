@@ -386,8 +386,16 @@ pub enum Error {
     )]
     NoSeedForKeyPair { multisigner: MultiSigner },
 
+    #[error("No seed is found for {} root key",
+    hex::encode(multisigner_to_public(.multisigner)),
+    )]
+    NoSeedFound { multisigner: MultiSigner },
+
     #[error("No root derivation for seed {0}")]
     NoRootKeyForSeed(String),
+
+    #[error("Data packing error: {0}")]
+    DataPacking(String),
 }
 
 /// DB handling result.

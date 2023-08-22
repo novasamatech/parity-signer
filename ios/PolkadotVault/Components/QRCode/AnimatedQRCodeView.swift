@@ -100,33 +100,35 @@ struct AnimatedQRCodeView: View {
     }
 }
 
-struct AnimatedQRCodeView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            VStack {
-                AnimatedQRCodeView(
-                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
-                )
+#if DEBUG
+    struct AnimatedQRCodeView_Previews: PreviewProvider {
+        static var previews: some View {
+            Group {
+                VStack {
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(.stub)
+                    )
+                }
+                .previewDevice("iPhone 11 Pro")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(.stub)
+                    )
+                }
+                .previewDevice("iPod touch (7th generation)")
+                .background(.gray)
+                .preferredColorScheme(.dark)
+                VStack {
+                    AnimatedQRCodeView(
+                        viewModel: Binding<AnimatedQRCodeViewModel>.constant(.stub)
+                    )
+                }
+                .previewDevice("iPhone 8")
+                .background(.gray)
+                .preferredColorScheme(.dark)
             }
-            .previewDevice("iPhone 11 Pro")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                AnimatedQRCodeView(
-                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
-                )
-            }
-            .previewDevice("iPod touch (7th generation)")
-            .background(.gray)
-            .preferredColorScheme(.dark)
-            VStack {
-                AnimatedQRCodeView(
-                    viewModel: Binding<AnimatedQRCodeViewModel>.constant(PreviewData.animatedQrCodeViewModel)
-                )
-            }
-            .previewDevice("iPhone 8")
-            .background(.gray)
-            .preferredColorScheme(.dark)
         }
     }
-}
+#endif

@@ -1,7 +1,9 @@
+use db_handling::identities::derive_single_key;
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
+use definitions::crypto::Encryption;
 use definitions::{
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
@@ -10,8 +12,12 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
+use sp_core::H256;
+use sp_runtime::MultiSigner;
+use std::collections::HashMap;
 
 use crate::cards::{make_author_info, Card, Warning};
+use crate::dynamic_derivations::dd_transaction_msg_genesis_encryption;
 use crate::error::{Error, Result};
 use crate::helpers::{
     bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name,
@@ -39,13 +45,55 @@ enum CardsPrep<'a> {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub(crate) fn parse_transaction(
+pub(crate) fn parse_transaction(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
+    let (author_multi_signer, call_data, genesis_hash, encryption) =
+        multisigner_msg_genesis_encryption(database, data_hex)?;
+
+    let author_address_key = AddressKey::new(author_multi_signer.clone(), Some(genesis_hash));
+    let address_details = try_get_address_details(database, &author_address_key)?;
+    do_parse_transaction(
+        database,
+        author_multi_signer,
+        &call_data,
+        genesis_hash,
+        encryption,
+        address_details,
+    )
+}
+
+pub fn parse_dd_transaction(
     database: &sled::Db,
     data_hex: &str,
-    _in_bulk: bool,
+    seeds: &HashMap<String, String>,
 ) -> Result<TransactionAction> {
-    let (author_multi_signer, parser_data, genesis_hash, encryption) =
-        multisigner_msg_genesis_encryption(database, data_hex)?;
+    let (transaction, call_data, genesis_hash, encryption) =
+        dd_transaction_msg_genesis_encryption(data_hex)?;
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
+    let (author_multi_signer, address_details) = derive_single_key(
+        database,
+        seeds,
+        &transaction.derivation_path,
+        &transaction.root_multisigner,
+        network_specs_key,
+    )?;
+    do_parse_transaction(
+        database,
+        author_multi_signer,
+        &call_data,
+        genesis_hash,
+        encryption,
+        Some(address_details),
+    )
+}
+
+fn do_parse_transaction(
+    database: &sled::Db,
+    author_multi_signer: MultiSigner,
+    call_data: &[u8],
+    genesis_hash: H256,
+    encryption: Encryption,
+    address_details: Option<AddressDetails>,
+) -> Result<TransactionAction> {
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.
@@ -61,13 +109,9 @@ pub(crate) fn parse_transaction(
 
     match try_get_network_specs(database, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::new(
-                author_multi_signer.clone(),
-                Some(network_specs.specs.genesis_hash),
-            );
             let mut history: Vec<Event> = Vec::new();
 
-            let mut cards_prep = match try_get_address_details(database, &address_key)? {
+            let mut cards_prep = match address_details {
                 Some(address_details) => {
                     if address_details.network_id.as_ref() == Some(&network_specs_key) {
                         CardsPrep::SignProceed(address_details, None)
@@ -96,7 +140,7 @@ pub(crate) fn parse_transaction(
             };
 
             let short_specs = network_specs.specs.short();
-            let (method_data, extensions_data) = cut_method_extensions(&parser_data)?;
+            let (method_data, extensions_data) = cut_method_extensions(call_data)?;
 
             let meta_set = find_meta_set(database, &short_specs)?;
             if meta_set.is_empty() {

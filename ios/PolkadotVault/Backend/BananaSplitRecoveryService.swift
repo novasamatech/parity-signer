@@ -16,17 +16,10 @@ final class BananaSplitRecoveryService {
         self.navigation = navigation
     }
 
-    func startBananaSplitRecover(_ seedName: String, isFirstSeed: Bool) {
+    func startBananaSplitRecover(_ seedName: String) {
         navigation.performFake(navigation: .init(action: .start))
         navigation.performFake(navigation: .init(action: .navbarKeys))
-        // Key Set List state has different "modalData" state depending on whether user has at least one key
-        // or not
-        // So we need to check whether we should actually "pretend" to open "more" navigation bar menu by
-        // calling
-        // .rightButtonAction
-        if !isFirstSeed {
-            navigation.performFake(navigation: .init(action: .rightButtonAction))
-        }
+        navigation.performFake(navigation: .init(action: .rightButtonAction))
         navigation.performFake(navigation: .init(action: .recoverSeed))
         navigation.performFake(navigation: .init(action: .goForward, details: seedName))
     }
