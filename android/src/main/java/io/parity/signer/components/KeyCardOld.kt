@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.theme.*
@@ -27,7 +28,7 @@ fun KeyCardOld(identity: MAddressCard, multiselectMode: Boolean = false) {
 			.padding(8.dp)
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
-			IdentIcon(identity.address.identicon.toImageContent())
+			IdentIconImage(identity.address.identicon)
 		}
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {

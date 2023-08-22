@@ -272,7 +272,6 @@
 //! The balance should be therefore represented as `10 uWND`.  
 
 use parity_scale_codec::{Decode, Encode};
-use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
@@ -280,7 +279,7 @@ use sp_runtime::MultiSigner;
 use crate::{
     error::{Error, Result},
     helpers::IdenticonStyle,
-    navigation::SignerImage,
+    navigation::Identicon,
 };
 
 use crate::helpers::{
@@ -510,9 +509,7 @@ impl Verifier {
             Some(a) => a.show_card(),
             None => MVerifierDetails {
                 public_key: String::new(),
-                identicon: SignerImage::Png {
-                    image: EMPTY_PNG.to_vec(),
-                },
+                identicon: Identicon::default(),
                 encryption: String::new(),
             },
         }

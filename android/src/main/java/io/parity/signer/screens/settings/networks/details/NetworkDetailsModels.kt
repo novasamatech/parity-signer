@@ -1,11 +1,10 @@
 package io.parity.signer.screens.settings.networks.details
 
-import io.parity.signer.components.ImageContent
-import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.screens.scan.transaction.transactionElements.MetadataModel
 import io.parity.signer.screens.scan.transaction.transactionElements.toMetadataModel
 import io.parity.signer.ui.helpers.PreviewData
+import io.parity.signer.uniffi.Identicon
 import io.parity.signer.uniffi.MNetworkDetails
 import io.parity.signer.uniffi.MVerifier
 
@@ -38,7 +37,7 @@ data class NetworkDetailsModel(
 			currentVerifier = VerifierModel(
 				"custom",
 				"vwvsWqqBYFK",
-				PreviewData.Identicon.exampleIdenticonPng,
+				PreviewData.Identicon.dotIcon,
 				"sr25519"
 			),
 			meta = listOf(MetadataModel.createStub(), MetadataModel.createStub())
@@ -61,13 +60,13 @@ fun MNetworkDetails.toNetworkDetailsModel() = NetworkDetailsModel(
 data class VerifierModel(
 	val ttype: String,
 	val publicKey: String,
-	val identicon: ImageContent,
+	val identicon: Identicon,
 	val encryption: String
 )
 
 fun MVerifier.toVerifierModel() = VerifierModel(
 	ttype = ttype,
 	publicKey = details.publicKey,
-	identicon = details.identicon.toImageContent(),
+	identicon = details.identicon,
 	encryption = details.encryption,
 )

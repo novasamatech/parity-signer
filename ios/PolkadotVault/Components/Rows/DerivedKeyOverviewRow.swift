@@ -9,14 +9,14 @@ import SwiftUI
 
 struct DerivedKeyOverviewViewModel: Equatable, Identifiable {
     let id = UUID()
-    let identicon: SignerImage
+    let identicon: Identicon
     let path: String
     let hasPassword: Bool
     let network: String
     let networkLogo: String
 
     init(
-        identicon: SignerImage,
+        identicon: Identicon,
         path: String,
         hasPassword: Bool,
         network: String,
