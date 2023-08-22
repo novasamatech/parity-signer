@@ -76,14 +76,14 @@ fun KeySetDetailsScreenView(
 	fullModelWasEmpty: Boolean,
 	onFilterClicked: Callback,
 	onMenu: Callback,
+	onAddNewKey: Callback,
+	onBack: Callback,
 	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
-			onAddKey = {
-				navigator.navigate(Action.NEW_KEY) //new derived key
-			},
-			onBack = { navigator.backAction() },
+			onAddKey = onAddNewKey,
+			onBack = onBack,
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)
 		Box(modifier = Modifier.weight(1f)) {
@@ -113,9 +113,7 @@ fun KeySetDetailsScreenView(
 				Column() {
 					//seed
 					SeedKeyItemElement(model, onShowPublicKey)
-					KeySetDetailsEmptyList(onAdd = {
-						navigator.navigate(Action.NEW_KEY, "") //new derived key
-					})
+					KeySetDetailsEmptyList(onAdd = onAddNewKey)
 				}
 			} else {
 				Column() {
@@ -333,7 +331,16 @@ private fun PreviewKeySetDetailsScreen() {
 	val mockModel = KeySetDetailsModel.createStub()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {}, {_,_ ->})
+			KeySetDetailsScreenView(
+				model = mockModel,
+				navigator = EmptyNavigator(),
+				networkState = state,
+				fullModelWasEmpty = false,
+				onFilterClicked = {},
+				onMenu = {},
+				onAddNewKey = {},
+				onBack = {},
+				onShowPublicKey = { _, _ ->})
 		}
 	}
 }
@@ -354,7 +361,16 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, true, {}, {}, {_,_ ->})
+			KeySetDetailsScreenView(
+				model = mockModel,
+				navigator = EmptyNavigator(),
+				networkState = state,
+				fullModelWasEmpty = true,
+				onFilterClicked = {},
+				onMenu = {},
+				onAddNewKey = {},
+				onBack = {},
+				onShowPublicKey = { _, _ ->})
 		}
 	}
 }
@@ -375,7 +391,16 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetDetailsScreenView(mockModel, EmptyNavigator(), state, false, {}, {}, {_,_ ->})
+			KeySetDetailsScreenView(
+				model = mockModel,
+				navigator = EmptyNavigator(),
+				networkState = state,
+				fullModelWasEmpty = false,
+				onFilterClicked = {},
+				onMenu = {},
+				onAddNewKey = {},
+				onBack = {},
+				onShowPublicKey = { _, _ ->})
 		}
 	}
 }
