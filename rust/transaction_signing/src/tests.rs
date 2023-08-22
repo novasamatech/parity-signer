@@ -19,7 +19,7 @@ use db_handling::{
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::{get_history, get_history_entry_by_order},
 };
-use definitions::navigation::{MAddressCard, SignerImage, TransactionSignAction};
+use definitions::navigation::{Identicon, MAddressCard, TransactionSignAction};
 use definitions::{
     crypto::Encryption,
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
@@ -75,13 +75,16 @@ fn sign_action_test(
     .map(|r| r.to_string())
 }
 
-fn identicon_to_str(identicon: &SignerImage) -> &str {
-    if let SignerImage::Png { image: identicon } = identicon {
-        if identicon == ed() {
+fn identicon_to_str(identicon: &Identicon) -> &str {
+    if let Identicon::Dots {
+        identity: identicon,
+    } = identicon
+    {
+        if identicon == &ed() {
             "<ed>"
-        } else if identicon == alice_sr_alice() {
-            "<alice_sr25519_//Alice>"
-        } else if identicon == empty_png() {
+        } else if identicon == &alice_sr_alice() {
+            "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+        } else if identicon == &empty_png() {
             "<empty>"
         } else {
             "<unknown>"
@@ -279,9 +282,7 @@ fn can_sign_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: bob() },
                     },
                 },
             },
@@ -366,8 +367,8 @@ fn can_sign_transaction_1() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -514,9 +515,7 @@ fn can_sign_transaction_1() {
                     card: Card::IdCard {
                         f: MSCId {
                             base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                            identicon: SignerImage::Png {
-                                image: bob().to_vec(),
-                            },
+                            identicon: Identicon::Dots { identity: bob() },
                         },
                     },
                 },
@@ -632,8 +631,8 @@ fn can_sign_message_1() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -813,7 +812,7 @@ fn add_specs_westend_no_network_info_not_signed() {
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
@@ -887,7 +886,7 @@ fn add_specs_westend_ed25519_not_signed() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -914,7 +913,7 @@ Identities:
         assert_eq!(print_before, expected_print_before);
 
         handle_stub(&db, checksum).unwrap();
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -961,7 +960,7 @@ Identities:
             ),
         )
         .unwrap();
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -989,7 +988,7 @@ Identities:
         assert_eq!(print_after, expected_print_after);
 
         remove_seed(&db, "Alice").unwrap();
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1010,7 +1009,7 @@ Identities:"#;
         assert_eq!(print_after, expected_print_after);
 
         try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1061,8 +1060,8 @@ fn load_westend9070() {
                     specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: westend_9070().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: westend_9070(),
                     },
                 },
             },
@@ -1086,7 +1085,7 @@ fn load_westend9070() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1110,7 +1109,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1159,8 +1158,8 @@ fn load_known_types_upd_general_verifier() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -1188,8 +1187,8 @@ fn load_known_types_upd_general_verifier() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(SignerImage::Png {
-                        image: types_known().to_vec(),
+                    types_id_pic: Some(Identicon::Dots {
+                        identity: types_known(),
                     }),
                 },
             },
@@ -1208,7 +1207,7 @@ fn load_known_types_upd_general_verifier() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1232,15 +1231,14 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1269,8 +1267,8 @@ fn load_new_types_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -1293,8 +1291,8 @@ fn load_new_types_verified() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(SignerImage::Png {
-                        image: types_unknown().to_vec(),
+                    types_id_pic: Some(Identicon::Dots {
+                        identity: types_unknown(),
                     }),
                 },
             },
@@ -1313,8 +1311,7 @@ fn load_new_types_verified() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1326,9 +1323,9 @@ Network Specs:
     0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1338,8 +1335,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1351,9 +1347,9 @@ Network Specs:
     0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1426,7 +1422,7 @@ fn dock_adventures_1() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1450,7 +1446,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1498,8 +1494,8 @@ Identities:
                     specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: dock_31().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: dock_31(),
                     },
                 },
             },
@@ -1525,7 +1521,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     dock-pos-main-runtime31
@@ -1569,8 +1565,8 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -1637,17 +1633,16 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
-    6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1721,8 +1716,7 @@ fn dock_adventures_2() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1734,9 +1728,9 @@ Network Specs:
     0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1746,9 +1740,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
-            .replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1762,9 +1754,9 @@ Network Specs:
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
     6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1796,8 +1788,8 @@ Identities:
                     specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: dock_31().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: dock_31(),
                     },
                 },
             },
@@ -1823,9 +1815,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
-            .replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     dock-pos-main-runtime31
@@ -1840,9 +1830,9 @@ Network Specs:
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
     6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1869,9 +1859,7 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: ed().to_vec(),
-                    },
+                    identicon: Identicon::Dots { identity: ed() },
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1933,9 +1921,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
-            .replace(&hex::encode(ed()), r#"<ed>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1949,9 +1935,9 @@ Network Specs:
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
     6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -1976,8 +1962,8 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -2039,8 +2025,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db)
-            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -2053,10 +2038,10 @@ Network Specs:
     01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
-    6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -2095,8 +2080,8 @@ fn can_parse_westend_with_v14() {
                     specs_version: "9111".to_string(),
                     meta_hash: "207956815bc7b3234fa8827ef40df5fd2879e93f18a680e22bc6801bca27312d"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: westend_9111().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: westend_9111(),
                     },
                 },
             },
@@ -2121,7 +2106,7 @@ fn can_parse_westend_with_v14() {
         assert_eq!(*reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_before = print_db_content(&db);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -2145,7 +2130,7 @@ Identities:
 
         handle_stub(&db, checksum).unwrap();
 
-        let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+        let print_after = print_db_content(&db);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -2222,9 +2207,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: bob() },
                     },
                 },
             },
@@ -2315,8 +2298,8 @@ Identities:
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -2434,8 +2417,8 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_root().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_root(),
                         },
                     },
                 },
@@ -2529,9 +2512,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_04().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_04() },
                     },
                 },
             },
@@ -2551,9 +2532,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_01().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_01() },
                     },
                 },
             },
@@ -2573,9 +2552,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_02().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_02() },
                     },
                 },
             },
@@ -2642,8 +2619,8 @@ Identities:
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -2733,8 +2710,8 @@ fn parse_transaction_alice_remarks_westend9122() {
                     specs_version: "9122".to_string(),
                     meta_hash: "d656951f4c58c9fdbe029be33b02a7095abc3007586656be7ff68fd0550d6ced"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: westend_9122().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: westend_9122(),
                     },
                 },
             },
@@ -2867,8 +2844,8 @@ fn parse_transaction_alice_remarks_westend9122() {
 "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
             .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -2931,8 +2908,8 @@ fn proper_hold_display() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -2960,8 +2937,8 @@ fn proper_hold_display() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(SignerImage::Png {
-                        image: types_known().to_vec(),
+                    types_id_pic: Some(Identicon::Dots {
+                        identity: types_known(),
                     }),
                 },
             },
@@ -3001,8 +2978,10 @@ fn delete_westend_try_load_metadata() {
         ),
     )
     .unwrap();
-    let print_before =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print_before = print_db_content(&db).replace(
+        &hex::encode(alice_sr_alice()),
+        r#"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"#,
+    );
     let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -3011,9 +2990,9 @@ Network Specs:
     01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
     0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:"#;
@@ -3077,9 +3056,7 @@ fn dock_adventures_3() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print_before = print_db_content(&db)
-        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
-        .replace(&hex::encode(ed()), r#"<ed>"#);
+    let print_before = print_db_content(&db);
     let expected_print_before = r#"Database contents:
 Metadata:
     dock-pos-main-runtime34
@@ -3094,9 +3071,9 @@ Network Specs:
     016bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
     6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -3114,8 +3091,7 @@ Identities:
     )
     .unwrap();
 
-    let print_after =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print_after = print_db_content(&db);
     let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -3128,9 +3104,9 @@ Network Specs:
     01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
     6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: network inactivated
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:
     public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks:
@@ -3179,7 +3155,7 @@ fn acala_adventures() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print_after = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+    let print_after = print_db_content(&db);
     let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3219,9 +3195,7 @@ Identities:"#;
             card: Card::AuthorPlainCard {
                 f: MSCId {
                     base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                    identicon: SignerImage::Png {
-                        image: id_05().to_vec(),
-                    },
+                    identicon: Identicon::Dots { identity: id_05() },
                 },
             },
         }]),
@@ -3278,9 +3252,7 @@ Identities:"#;
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_05().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_05() },
                     },
                 },
             },
@@ -3418,8 +3390,8 @@ fn shell_no_token_warning_on_metadata() {
                     specs_version: "200".to_string(),
                     meta_hash: "65f0d394de10396c6c1800092f9a95c48ec1365d9302dbf5df736c5e0c54fde3"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: shell_200().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: shell_200(),
                     },
                 },
             },
@@ -3485,7 +3457,7 @@ fn rococo_and_verifiers_1() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print = print_db_content(&db).replace(&hex::encode(ed()), r#"<ed>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3542,14 +3514,13 @@ fn rococo_and_verifiers_2() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
     0127b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
 Verifiers:
-    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:"#;
     assert_eq!(print, expected_print);
@@ -3565,13 +3536,12 @@ Identities:"#;
     )
     .unwrap();
 
-    let print =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
 Verifiers:
-    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:"#;
     assert_eq!(print, expected_print);
@@ -3600,7 +3570,7 @@ fn rococo_and_verifiers_3() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3622,7 +3592,7 @@ Identities:"#;
     )
     .unwrap();
 
-    let print = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3656,7 +3626,7 @@ fn rococo_and_verifiers_4() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print = print_db_content(&db).replace(&hex::encode(empty_png()), r#"<empty>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3681,14 +3651,13 @@ Identities:"#;
         panic!("Wrong action: {output:?}")
     }
 
-    let print =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
     0127b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
 Verifiers:
-    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:"#;
     assert_eq!(print, expected_print);
@@ -3717,7 +3686,7 @@ fn rococo_and_verifiers_5() {
         panic!("Wrong action: {output:?}")
     }
 
-    let print = print_db_content(&db).replace(&hex::encode(ed()), r#"<ed>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3742,14 +3711,13 @@ Identities:"#;
         panic!("Wrong action: {output:?}")
     }
 
-    let print =
-        print_db_content(&db).replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(&db);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
     0127b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
 Verifiers:
-    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+    27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities:"#;
     assert_eq!(print, expected_print);

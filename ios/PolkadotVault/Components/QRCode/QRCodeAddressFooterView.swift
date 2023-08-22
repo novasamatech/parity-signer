@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct QRCodeAddressFooterViewModel: Equatable {
-    let identicon: SignerImage
+    let identicon: Identicon
     let networkLogo: String
     let base58: String
 }

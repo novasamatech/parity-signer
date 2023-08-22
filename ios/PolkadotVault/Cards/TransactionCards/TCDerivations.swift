@@ -10,7 +10,7 @@ import SwiftUI
 struct DerivedKeysSetRenderable: Equatable, Identifiable {
     struct DerivedKeyRenderable: Equatable, Identifiable {
         let id = UUID()
-        let identicon: SignerImage
+        let identicon: Identicon
         let derivationPath: String
         let isPassworded: Bool
         let address: String

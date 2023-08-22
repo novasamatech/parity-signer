@@ -1,5 +1,5 @@
 use crate::crypto::Encryption;
-use crate::navigation::SignerImage;
+use crate::navigation::Identicon;
 use sp_core::H256;
 
 use sp_runtime::MultiSigner;
@@ -33,7 +33,7 @@ pub struct DerivedKeyPreview {
     /// Genesis hash
     pub genesis_hash: H256,
 
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
 
     /// Has to be calculated using `inject_derivations_has_pwd`. Otherwise, `None`
     pub has_pwd: Option<bool>,

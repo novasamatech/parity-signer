@@ -32,7 +32,7 @@ extension AddDerivedKeyKeySetData {
 struct AddDerivedKeyDerivedKeyData: Equatable {
     let path: String
     let base58: String
-    let identicon: SignerImage
+    let identicon: Identicon
     let network: String
 }
 

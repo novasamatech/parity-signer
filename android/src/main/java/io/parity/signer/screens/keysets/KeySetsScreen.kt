@@ -102,13 +102,13 @@ private fun PreviewKeySetsSelectScreenFull() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.Identicon.exampleIdenticonPng,
+			PreviewData.Identicon.dotIcon,
 			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.Identicon.exampleIdenticonPng,
+			PreviewData.Identicon.dotIcon,
 			listOf("westend", "some"),
 			3.toUInt()
 		),
@@ -117,7 +117,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 		keys.add(
 			KeySetModel(
 				"second seed name",
-				PreviewData.Identicon.exampleIdenticonPng,
+				PreviewData.Identicon.dotIcon,
 				listOf("westend", "some"),
 				3.toUInt()
 			)
@@ -174,13 +174,13 @@ private fun PreviewKeySetsSelectScreenFew() {
 	val keys = mutableListOf(
 		KeySetModel(
 			"first seed name",
-			PreviewData.Identicon.exampleIdenticonPng,
+			PreviewData.Identicon.dotIcon,
 			listOf("westend", "some"),
 			1.toUInt()
 		),
 		KeySetModel(
 			"second seed name",
-			PreviewData.Identicon.exampleIdenticonPng,
+			PreviewData.Identicon.dotIcon,
 			listOf("kusama", "some"),
 			3.toUInt()
 		),

@@ -9,7 +9,7 @@ use db_handling::{
     manage_history::get_history,
 };
 use definitions::navigation::{
-    DecodeSequenceResult, MAddressCard, SignerImage, TransactionSignAction,
+    DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction,
 };
 use definitions::{
     crypto::Encryption,
@@ -279,8 +279,8 @@ fn load_types_known_alice_signed() {
                 types_hash: Some(
                     "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
                 ),
-                types_id_pic: Some(SignerImage::Png {
-                    image: types_known().to_vec(),
+                types_id_pic: Some(Identicon::Dots {
+                    identity: types_known(),
                 }),
             },
         },
@@ -294,8 +294,8 @@ fn load_types_known_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -379,7 +379,7 @@ fn load_types_known_alice_signed_metadata_hold() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
+                    identicon: Identicon::Dots{ identity: alice_sr_alice() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -401,7 +401,7 @@ fn load_types_known_alice_signed_metadata_hold() {
             card: Card::TypesInfoCard { f: MTypesInfo {
                 types_on_file: false,
                 types_hash: Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string()),
-                types_id_pic: Some(SignerImage::Png{ image: types_known().to_vec() }),
+                types_id_pic: Some(Identicon::Dots{ identity: types_known() }),
             }
             }
         }]),
@@ -451,8 +451,8 @@ fn load_types_unknown_not_signed() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(SignerImage::Png {
-                        image: types_unknown().to_vec(),
+                    types_id_pic: Some(Identicon::Dots {
+                        identity: types_unknown(),
                     }),
                 },
             },
@@ -484,7 +484,7 @@ fn load_types_unknown_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
+                    identicon: Identicon::Dots{ identity: alice_sr_alice() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -505,7 +505,7 @@ fn load_types_unknown_alice_signed() {
                 f: MTypesInfo {
                     types_on_file: false,
                     types_hash: Some("d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574".to_string()),
-                    types_id_pic: Some(SignerImage::Png{ image: types_unknown().to_vec() }),
+                    types_id_pic: Some(Identicon::Dots{ identity: types_unknown() }),
                 }
             }
         }]),
@@ -618,7 +618,7 @@ fn parse_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png { image: bob().to_vec() },
+                        identicon: Identicon::Dots { identity: bob() },
                     },
                 },
             },
@@ -704,8 +704,8 @@ fn parse_transaction_1() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -832,8 +832,8 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice(),
                         },
                     },
                 },
@@ -912,9 +912,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_01().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_01() },
                     },
                 },
             },
@@ -934,9 +932,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_02().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: id_02() },
                     },
                 },
             },
@@ -980,9 +976,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: bob() },
                     },
                 },
             },
@@ -1051,8 +1045,8 @@ fn parse_transaction_2() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -1133,9 +1127,7 @@ fn parse_transaction_3() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
-                        },
+                        identicon: Identicon::Dots { identity: bob() },
                     },
                 },
             },
@@ -1221,8 +1213,8 @@ fn parse_transaction_3() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -1274,8 +1266,8 @@ fn load_westend9070_not_signed() {
                     specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: SignerImage::Png {
-                        image: westend_9070().to_vec(),
+                    meta_id_pic: Identicon::Dots {
+                        identity: westend_9070(),
                     },
                 },
             },
@@ -1497,7 +1489,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png{ image: alice_sr_alice().to_vec() },
+                    identicon: Identicon::Dots{ identity: alice_sr_alice() },
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1620,8 +1612,8 @@ fn add_specs_dock_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -1685,9 +1677,7 @@ fn add_specs_dock_both_verified_different() {
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: ed().to_vec(),
-                    },
+                    identicon: Identicon::Dots { identity: ed() },
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1832,8 +1822,8 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -1928,8 +1918,8 @@ fn add_specs_westend_ed25519_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: SignerImage::Png {
-                        image: alice_sr_alice().to_vec(),
+                    identicon: Identicon::Dots {
+                        identity: alice_sr_alice(),
                     },
                     encryption: "sr25519".to_string(),
                 },
@@ -2026,9 +2016,7 @@ fn parse_transaction_4_unknown_author() {
             card: Card::AuthorPlainCard {
                 f: MSCId {
                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                    identicon: SignerImage::Png {
-                        image: bob().to_vec(),
-                    },
+                    identicon: Identicon::Dots { identity: bob() },
                 },
             },
         }]),
@@ -2080,8 +2068,8 @@ fn parse_transaction_4_unknown_author() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice(),
                         },
                     },
                 },
@@ -2215,8 +2203,8 @@ fn parse_transaction_6_error_on_parsing() {
                     .to_string(),
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     address: Address {
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice(),
                         },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
@@ -2318,8 +2306,8 @@ fn parse_transaction_7_error_on_parsing() {
                     )
                     .to_string(),
                     address: Address {
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice(),
                         },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
@@ -2422,8 +2410,8 @@ fn parse_transaction_8_error_on_parsing() {
                     )
                     .to_string(),
                     address: Address {
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice(),
                         },
                         seed_name: "Alice".to_string(),
                         path: "//Alice".to_string(),
@@ -2529,8 +2517,8 @@ fn parse_msg_1() {
         .to_string(),
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -2609,8 +2597,8 @@ fn import_derivations() {
                             "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                                 .parse()
                                 .unwrap(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_westend_0().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_westend_0(),
                         },
                         has_pwd: None,
                         network_title: Some("Westend".to_string()),
@@ -2682,7 +2670,7 @@ fn parse_dd_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png { image: bob().to_vec() },
+                        identicon: Identicon::Dots { identity: bob().to_vec() },
                     },
                 },
             },
@@ -2768,8 +2756,8 @@ fn parse_dd_transaction_1() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -2905,8 +2893,8 @@ fn parse_dd_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: SignerImage::Png {
-                            image: alice_sr_alice().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_alice().to_vec(),
                         },
                     },
                 },
@@ -2985,8 +2973,8 @@ fn parse_dd_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_01().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: id_01().to_vec(),
                         },
                     },
                 },
@@ -3007,8 +2995,8 @@ fn parse_dd_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: SignerImage::Png {
-                            image: id_02().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: id_02().to_vec(),
                         },
                     },
                 },
@@ -3053,8 +3041,8 @@ fn parse_dd_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: bob().to_vec(),
                         },
                     },
                 },
@@ -3124,8 +3112,8 @@ fn parse_dd_transaction_2() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
@@ -3215,8 +3203,8 @@ fn parse_dd_transaction_3() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: SignerImage::Png {
-                            image: bob().to_vec(),
+                        identicon: Identicon::Dots {
+                            identity: bob().to_vec(),
                         },
                     },
                 },
@@ -3303,8 +3291,8 @@ fn parse_dd_transaction_3() {
         )
         .to_string(),
         address: Address {
-            identicon: SignerImage::Png {
-                image: alice_sr_alice().to_vec(),
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice().to_vec(),
             },
             seed_name: "Alice".to_string(),
             path: "//Alice".to_string(),
