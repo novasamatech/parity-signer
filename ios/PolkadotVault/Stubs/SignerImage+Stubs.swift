@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension SignerImage {
-    static let stubIdenticon: SignerImage = .svg(image: Stubs.stubIdenticon)
-    static let stubQRCode: SignerImage = .svg(image: Stubs.stubQRCode)
+extension Identicon {
+    static let stubIdenticon: Identicon = .dots(identity: Stubs.stubIdenticon)
+    static let stubBlockiesIdenticon: Identicon = .blockies(identity: "0xb00adb8980766d75518dfa8efa139fe0d7bb5e4e")
 }
