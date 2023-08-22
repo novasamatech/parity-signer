@@ -34,9 +34,6 @@ class SharedViewModel() : ViewModel() {
 	// Current key details, after rust API will migrate to REST-like should not store this value here.
 	internal var lastOpenedKeyDetails: MKeyDetails? = null
 
-	// Transaction
-	internal var action = JSONObject()
-
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
 	private val databaseAssetsInteractor: DatabaseAssetsInteractor =
 		ServiceLocator.databaseAssetsInteractor
