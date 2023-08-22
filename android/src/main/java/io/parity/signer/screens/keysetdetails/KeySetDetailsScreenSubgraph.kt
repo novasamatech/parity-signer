@@ -34,6 +34,7 @@ fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
+	onBack: Callback,
 	networkState: State<NetworkState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
@@ -46,7 +47,7 @@ fun KeySetDetailsScreenSubgraph(
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
 			model = filteredModel.value,
-			navigator = navigator,
+			navigator= navigator,
 			networkState = networkState,
 			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onMenu = {
@@ -54,6 +55,11 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onShowPublicKey = { title: String, key: String ->
 				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
+			},
+			onBack = onBack,
+			onAddNewKey =
+			{//todo dmitry
+//				navigator.navigate(Action.NEW_KEY) //new derived key
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
@@ -72,7 +78,6 @@ fun KeySetDetailsScreenSubgraph(
 		composable(KeySetDetailsMenuSubgraph.keys_menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeyDetailsMenuGeneral(
-					navigator = navigator,
 					networkState = networkState,
 					onSelectKeysClicked = {
 						menuNavController.popBackStack()
@@ -91,6 +96,10 @@ fun KeySetDetailsScreenSubgraph(
 							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
 					},
+					exposeConfirmAction = {
+//						todo dmitry
+//						navigator.navigate(Action.SHIELD)
+					}
 				)
 			}
 		}
