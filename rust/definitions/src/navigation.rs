@@ -1,4 +1,3 @@
-use plot_icon::EMPTY_PNG;
 use sp_core::H256;
 
 use crate::derivations::SeedKeysPreview;
@@ -12,7 +11,7 @@ pub use crate::network_specs::NetworkSpecs;
 #[derive(PartialEq, Eq, Clone)]
 pub struct SeedNameWithIdenticon {
     pub seed_name: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
 }
 
 /// A single transaction signing action.
@@ -175,7 +174,7 @@ pub struct MNetworkCard {
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct MSettings {
     pub public_key: Option<String>,
-    pub identicon: Option<SignerImage>,
+    pub identicon: Option<Identicon>,
     pub encryption: Option<String>,
     pub error: Option<String>,
 }
@@ -268,7 +267,7 @@ pub struct MSignedTransaction {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SeedNameCard {
     pub seed_name: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
     pub used_in_networks: Vec<String>,
     pub derived_keys_count: u32,
 }
@@ -321,7 +320,7 @@ pub struct DerivationCheck {
 pub struct Address {
     pub path: String,
     pub has_pwd: bool,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
     pub seed_name: String,
     pub secret_exposed: bool,
 }
@@ -347,7 +346,7 @@ pub struct MDeriveKey {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MVerifierDetails {
     pub public_key: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
     pub encryption: String,
 }
 
@@ -362,7 +361,7 @@ pub struct MMetadataRecord {
     pub specname: String,
     pub specs_version: String,
     pub meta_hash: String,
-    pub meta_id_pic: SignerImage,
+    pub meta_id_pic: Identicon,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -431,7 +430,7 @@ pub struct PathAndNetwork {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MSCContent {
-    LoadTypes { types: String, pic: SignerImage },
+    LoadTypes { types: String, pic: Identicon },
     LoadMetadata { name: String, version: u32 },
     AddSpecs { f: MSCNetworkInfo },
 }
@@ -502,7 +501,7 @@ pub struct MSeedMenu {
 pub struct MNewSeedBackup {
     pub seed: String,
     pub seed_phrase: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -573,7 +572,7 @@ pub struct MManageMetadata {
     pub name: String,
     pub version: String,
     pub meta_hash: String,
-    pub meta_id_pic: SignerImage,
+    pub meta_id_pic: Identicon,
     pub networks: Vec<MMMNetwork>,
 }
 
@@ -581,7 +580,7 @@ pub struct MManageMetadata {
 pub struct MTypesInfo {
     pub types_on_file: bool,
     pub types_hash: Option<String>,
-    pub types_id_pic: Option<SignerImage>,
+    pub types_id_pic: Option<Identicon>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -646,32 +645,32 @@ pub struct MSCFieldNumber {
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub enum SignerImage {
-    Svg { image: Vec<u8> },
-    Png { image: Vec<u8> },
+pub enum Identicon {
+    Dots { identity: Vec<u8> },
+    Blockies { identity: String },
 }
 
-impl std::fmt::Debug for SignerImage {
+impl std::fmt::Debug for Identicon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SignerImage::Svg { image } => write!(f, "SVG {}", hex::encode(&image[..32])),
-            SignerImage::Png { image } => write!(f, "PNG {}", hex::encode(&image[..32])),
+            Identicon::Dots { identity } => write!(f, "Dots {}", hex::encode(&identity[..32])),
+            Identicon::Blockies { identity } => {
+                write!(f, "Blockies {}", hex::encode(&identity[..32]))
+            }
         }
     }
 }
 
-impl Default for SignerImage {
+impl Default for Identicon {
     fn default() -> Self {
-        Self::Png {
-            image: EMPTY_PNG.to_vec(),
-        }
+        Self::Dots { identity: vec![] }
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MSCId {
     pub base58: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -708,7 +707,7 @@ pub struct DDDetail {
     pub path: String,
     pub network_logo: String,
     pub network_specs_key: String,
-    pub identicon: SignerImage,
+    pub identicon: Identicon,
 }
 
 impl From<OrderedNetworkSpecs> for MSCNetworkInfo {

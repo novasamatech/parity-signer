@@ -31,7 +31,7 @@ use crate::network_specs::NetworkSpecs;
 use crate::types::TypeEntry;
 use sp_core::H256;
 
-use crate::navigation::SignerImage;
+use crate::navigation::Identicon;
 
 /// `load_metadata` QR code content  
 ///
@@ -231,7 +231,7 @@ impl ContentLoadTypes {
     ///
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
-    pub fn show(&self) -> (String, SignerImage) {
+    pub fn show(&self) -> (String, Identicon) {
         use sp_core::blake2_256;
 
         let types_hash = blake2_256(&self.store()).as_ref().to_vec();

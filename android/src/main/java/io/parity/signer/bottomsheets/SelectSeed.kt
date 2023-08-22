@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.SeedCard
-import io.parity.signer.components.toImageContent
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.getSeed
@@ -59,7 +58,7 @@ fun SelectSeed(seeds: MSeeds, sharedViewModel: SharedViewModel) {
 					) {
 						SeedCard(
 							seedName = cards[item].seedName,
-							identicon = cards[item].identicon.toImageContent()
+							identicon = cards[item].identicon
 						)
 					}
 				}

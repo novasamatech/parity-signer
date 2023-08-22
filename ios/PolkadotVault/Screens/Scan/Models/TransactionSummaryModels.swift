@@ -101,7 +101,7 @@ struct TransactionSignatureRenderable: Equatable {
     let name: String
     let network: String?
     let base58: String
-    let identicon: SignerImage
+    let identicon: Identicon
     let hasPassword: Bool
 
     init(
@@ -109,7 +109,7 @@ struct TransactionSignatureRenderable: Equatable {
         name: String = "",
         network: String? = nil,
         base58: String = "",
-        identicon: SignerImage = .svg(image: []),
+        identicon: Identicon,
         hasPassword: Bool = false
     ) {
         self.path = path

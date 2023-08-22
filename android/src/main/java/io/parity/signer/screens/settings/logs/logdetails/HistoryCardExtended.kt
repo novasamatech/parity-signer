@@ -7,13 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
-import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.ImageContent
-import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
-import io.parity.signer.components.toImageContent
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.encodeHex
+import io.parity.signer.screens.scan.transaction.components.TransactionPreviewField
 import io.parity.signer.uniffi.*
 
 /**
@@ -274,9 +272,9 @@ fun HistoryCardExtended(
 				}
 				Text("Signed by:")
 				Row {
-					IdentIcon(
-                        identIcon = signedBy?.address?.identicon?.toImageContent() ?: ImageContent.Png(listOf())
-					)
+					signedBy?.address?.identicon?.let { identicon ->
+						IdentIconImage(identIcon = identicon)
+					}
 					Column {
 						Text(verifierDetails?.publicKey ?: "")
 						Text(

@@ -1,11 +1,9 @@
 package io.parity.signer.screens.scan.transaction.components
 
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
-import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.MTransaction
 
@@ -40,7 +38,7 @@ data class SigningTransactionModel(
 					path = "//polkadot//1",
 					seedName = "Parity Keys",
 					base58 = "1219xC79CXV31543DDXoQMjuA",
-					identIcon = PreviewData.Identicon.exampleIdenticonPng,
+					identIcon = PreviewData.Identicon.dotIcon,
 					hasPassword = true,
 					networkLogo = "kusama"
 				)
@@ -105,8 +103,8 @@ private fun IndexedValue<MTransaction>.toSigningTransactionModel(): SigningTrans
 				seedName = author.address.seedName,
 				base58 = author.base58,
 				networkLogo = value.networkInfo?.networkLogo,
-				identIcon = author.address.identicon.toImageContent(),//.svgPayload, on iOS
-				hasPassword = author.address.hasPwd
+				identIcon = author.address.identicon,
+				hasPassword = author.address.hasPwd,
 			)
 		}
 	)

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.NetworkIcon
@@ -250,7 +250,7 @@ private fun VerifierContent(verifier: VerifierModel) {
 					color = MaterialTheme.colors.textTertiary
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				IdentIcon(identIcon = verifier.identicon)
+				IdentIconImage(identIcon = verifier.identicon)
 			}
 			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(

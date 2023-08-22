@@ -12,15 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.theme.*
+import io.parity.signer.uniffi.Identicon
 
 @Deprecated("Use new KeySetItem for new screens")
 @Composable
 fun SeedCard(
 	seedName: String,
-	identicon: ImageContent,
+	identicon: Identicon,
 	base58: String = "",
 	showAddress: Boolean = false,
 	multiselectMode: Boolean = false,
@@ -38,7 +40,7 @@ fun SeedCard(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Box(contentAlignment = Alignment.BottomEnd) {
-				IdentIcon(identicon)
+				IdentIconImage(identicon)
 				if (multiselectMode) {
 					if(selected) {
 						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
