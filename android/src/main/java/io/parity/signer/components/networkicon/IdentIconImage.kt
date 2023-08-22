@@ -10,7 +10,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.networkicon.blockies.BlockiesIcon
 import io.parity.signer.components.networkicon.dot.DotIcon
+<<<<<<< HEAD
 import io.parity.signer.components.networkicon.jdenticon.Jdenticon
+=======
+>>>>>>> master
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Identicon
@@ -34,6 +37,7 @@ fun IdentIconImage(
 		}
 
 		is Identicon.Dots -> {
+<<<<<<< HEAD
 			DotIcon(
 				seed = identIcon.identity,
 				size = size,
@@ -43,6 +47,30 @@ fun IdentIconImage(
 		is Identicon.Jdenticon -> {
 			Jdenticon(seed = identIcon.identity, size = size, modifier = modifier)
 		}
+=======
+			DotIcon(seed = identIcon.identity,
+				size = size,
+				modifier = modifier,
+				)
+		}
+//		is ImageContent.Svg -> {//will be used for another type of icons
+//			val context = LocalContext.current
+//			val painter = rememberAsyncImagePainter(
+//				model = ImageRequest.Builder(context)
+//					.decoderFactory(SvgDecoder.Factory())
+//					.data(identIcon.toByteArray())
+//					.size(Size.ORIGINAL) // Set the target size to load the image at.
+//					.build(),
+//			)
+//			Image(
+//				painter = painter,
+//				contentDescription = stringResource(R.string.description_identicon),
+//				modifier = modifier
+//					.size(size)
+//					.clip(CircleShape)
+//			)
+//		}
+>>>>>>> master
 	}
 }
 
@@ -64,13 +92,17 @@ private fun PreviewIdentIcon() {
 	SignerNewTheme {
 		val iconDot = PreviewData.Identicon.dotIcon
 		val iconBlockies = PreviewData.Identicon.blockiesIcon
+<<<<<<< HEAD
 		val iconJdenticon = PreviewData.Identicon.jdenticonIcon
+=======
+>>>>>>> master
 
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			IdentIconImage(iconDot)
 			IdentIconImage(iconBlockies)
+<<<<<<< HEAD
 			//jdenticon preview works if you run it, not in default preview and svg showing async
 			IdentIconImage(iconJdenticon)
 			IdentIconImage(iconDot, size = 18.dp)
@@ -79,6 +111,12 @@ private fun PreviewIdentIcon() {
 			IdentIconImage(iconDot, size = 56.dp)
 			IdentIconImage(iconBlockies, size = 56.dp)
 			IdentIconImage(iconJdenticon, size = 56.dp)
+=======
+			IdentIconImage(iconDot, size = 18.dp)
+			IdentIconImage(iconBlockies, size = 18.dp)
+			IdentIconImage(iconDot, size = 56.dp)
+			IdentIconImage(iconBlockies, size = 56.dp)
+>>>>>>> master
 		}
 	}
 }

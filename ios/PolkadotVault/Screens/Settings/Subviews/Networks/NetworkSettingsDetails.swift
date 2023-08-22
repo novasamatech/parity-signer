@@ -296,7 +296,7 @@ private extension NetworkSettingsDetails {
             Localizable.Settings.NetworkDetails.Label.Verifier.identicon.text
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
             Spacer()
-            Identicon(identicon: verifier.details.identicon)
+            IdenticonView(identicon: verifier.details.identicon)
         }
         Divider()
         verticalRowWrapper(

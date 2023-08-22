@@ -20,7 +20,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys: String? = nil
-        let identicon = SignerImage.svg(image: [123])
+        let identicon = Identicon.stubIdenticon
         let seedNameCard = SeedNameCard(
             seedName: name,
             identicon: identicon,
@@ -42,7 +42,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys = "1 Key"
-        let identicon = SignerImage.svg(image: [123])
+        let identicon = Identicon.stubIdenticon
         let seedNameCard = SeedNameCard(
             seedName: name,
             identicon: identicon,
@@ -64,7 +64,7 @@ final class KeySetListViewModelBuilderTests: XCTestCase {
         // Given
         let name = "name"
         let derivedKeys = "3 Keys"
-        let identicon = SignerImage.svg(image: [123])
+        let identicon = Identicon.stubIdenticon
         let seedNameCard = SeedNameCard(
             seedName: name,
             identicon: identicon,
