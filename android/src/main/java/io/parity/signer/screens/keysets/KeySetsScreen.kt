@@ -69,7 +69,8 @@ fun KeySetsScreen(
 			}
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
-					networkState = networkState, navigator = rootNavigator,
+					networkState = networkState,
+					onClick = { rootNavigator.navigate(Action.SHIELD) },
 					Modifier
 						.align(Alignment.End)
 						.padding(end = 16.dp)
