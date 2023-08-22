@@ -31,10 +31,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIconWithNetwork
-import io.parity.signer.components.ImageContent
+import io.parity.signer.components.networkicon.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.toImageContent
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.NetworkInfoModel
@@ -42,6 +40,7 @@ import io.parity.signer.domain.abbreviateString
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.Identicon
 import io.parity.signer.uniffi.MAddressCard
 import java.util.*
 
@@ -250,7 +249,7 @@ data class KeyCardModel(
 data class KeyCardModelBase(
 	val base58: String,
 	val path: String,
-	val identIcon: ImageContent,
+	val identIcon: Identicon,
 	val networkLogo: String?,
 	val seedName: String,
 	val hasPassword: Boolean = false,
@@ -278,7 +277,7 @@ data class KeyCardModelBase(
 				base58 = address_card.base58,
 				path = address_card.address.path,
 				hasPassword = address_card.address.hasPwd,
-				identIcon = address_card.address.identicon.toImageContent(),
+				identIcon = address_card.address.identicon,
 				seedName = address_card.address.seedName,
 				networkLogo = networkLogo,
 			)
@@ -292,7 +291,7 @@ data class KeyCardModelBase(
 				base58 = base58,
 				path = address.path,
 				hasPassword = address.hasPwd,
-				identIcon = address.identicon.toImageContent(),
+				identIcon = address.identicon,
 				seedName = address.seedName,
 				networkLogo = networkLogo,
 				multiselect = false,
@@ -301,7 +300,7 @@ data class KeyCardModelBase(
 		fun createStub() = KeyCardModelBase(
 			base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 			path = "//polkadot//path",
-			identIcon = PreviewData.Identicon.exampleIdenticonPng,
+			identIcon = PreviewData.Identicon.dotIcon,
 			seedName = "Seed Name",
 			networkLogo = "kusama",
 			hasPassword = false,

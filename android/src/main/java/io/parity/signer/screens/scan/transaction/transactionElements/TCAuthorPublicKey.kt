@@ -7,15 +7,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.toImageContent
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.MVerifierDetails
 
 @Composable
 fun TCAuthorPublicKey(key: MVerifierDetails) {
 	Row {
-		IdentIcon(identIcon = key.identicon.toImageContent())
+		IdentIconImage(identIcon = key.identicon)
 		Column {
 			Text(
 				stringResource(R.string.transaction_field_signed_with, key.encryption),

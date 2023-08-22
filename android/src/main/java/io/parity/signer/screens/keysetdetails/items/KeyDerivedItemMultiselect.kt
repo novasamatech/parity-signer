@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIconWithNetwork
+import io.parity.signer.components.networkicon.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.KeyPath
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE

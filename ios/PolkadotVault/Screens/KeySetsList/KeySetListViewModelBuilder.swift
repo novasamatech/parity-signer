@@ -18,14 +18,14 @@ struct KeySetViewModel: Equatable, Identifiable {
     let seed: SeedNameCard
     let keyName: String
     let derivedKeys: String?
-    let identicon: SignerImage
+    let identicon: Identicon
     let networks: [String]
 
     init(
         seed: SeedNameCard,
         keyName: String,
         derivedKeys: String?,
-        identicon: SignerImage,
+        identicon: Identicon,
         networks: [String]
     ) {
         self.seed = seed

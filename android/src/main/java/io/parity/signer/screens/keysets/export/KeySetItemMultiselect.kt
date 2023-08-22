@@ -1,19 +1,16 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysets.export
 
+import SignerCheckbox
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,28 +21,35 @@ import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.theme.*
 
 @Composable
-fun KeySetItem(
+fun KeySetItemMultiselect(
 	model: KeySetModel,
-	onClick: () -> Unit = {},
+	isSelected: Boolean = false,
+	onClick: (Boolean, KeySetModel) -> Unit,
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
 		color = MaterialTheme.colors.backgroundSecondary,
-		modifier = Modifier.clickable(onClick = onClick),
+		modifier = Modifier.clickable(onClick = {
+			onClick(!isSelected, model)
+		}),
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IdentIconImage(
                 identIcon = model.identicon, modifier = Modifier.padding(
-                    top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
-                ), size = 36.dp
+                    top = 16.dp,
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 12.dp
+                ),
+                size = 36.dp
 			)
 			Column(Modifier.weight(1f)) {
 				Text(
 					text = model.seedName,
 					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.TitleS,
+					style = SignerTypeface.LabelM,
 				)
 				if (model.derivedKeysCount > 0.toUInt()) {
 					Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -60,15 +64,13 @@ fun KeySetItem(
 					)
 				}
 			}
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
+			SignerCheckbox(
+				isChecked = isSelected,
 				modifier = Modifier
 					.padding(end = 8.dp)
-					.size(28.dp)
-
-			)
+			) {
+				onClick(!isSelected, model)
+			}
 		}
 	}
 }
@@ -83,10 +85,13 @@ fun KeySetItem(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewKeySetItem() {
+private fun PreviewKeySetItemMultiselect() {
 	SignerNewTheme {
-		KeySetItem(
-			KeySetModel.createStub("My special key set", 2)
+		val model = KeySetModel.createStub(
+			"My special key set", 2
 		)
+		KeySetItemMultiselect(
+			model,
+		) { _, _ -> }
 	}
 }

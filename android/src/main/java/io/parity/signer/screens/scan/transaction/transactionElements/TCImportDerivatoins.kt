@@ -24,17 +24,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.ImageContent
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.KeyPath
-import io.parity.signer.components.toImageContent
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Card
 import io.parity.signer.uniffi.DerivedKeyError
 import io.parity.signer.uniffi.DerivedKeyStatus
+import io.parity.signer.uniffi.Identicon
 import io.parity.signer.uniffi.SeedKeysPreview
 
 @Composable
@@ -105,7 +104,7 @@ private fun SingleKeyElement(key: DerivedKeysSetModel.DerivedKeyModel) {
 		verticalArrangement = Arrangement.spacedBy(8.dp),
 	) {
 		Row() {
-			IdentIcon(key.identicon, size = 16.dp)
+			IdentIconImage(key.identicon, size = 16.dp)
 			Spacer(modifier = Modifier.padding(end = 8.dp))
 			KeyPath(path = key.derivationPath, hasPassword = key.hadPwd)
 		}
@@ -258,7 +257,7 @@ data class DerivedKeysSetModel(
 ) {
 
 	data class DerivedKeyModel(
-		val identicon: ImageContent,
+		val identicon: Identicon,
 		val derivationPath: String,
 		val hadPwd: Boolean,
 		val address: String,
@@ -271,35 +270,35 @@ data class DerivedKeysSetModel(
 			address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 			keys = listOf(
 				DerivedKeyModel(
-					identicon = PreviewData.Identicon.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.dotIcon,
 					derivationPath = "//kusama",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Kusama",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.Identicon.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.dotIcon,
 					derivationPath = "//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain//westendMain/verylongPath2",
 					hadPwd = true,
 					address = "GD5434gFGFD543Dgdf",
 					networkTitle = "Westend",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.Identicon.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.dotIcon,
 					derivationPath = "//polka",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = "Polkadot",
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.Identicon.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.dotIcon,
 					derivationPath = "//polkadot//parachains",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
 					networkTitle = null,
 				),
 				DerivedKeyModel(
-					identicon = PreviewData.Identicon.exampleIdenticonPng,
+					identicon = PreviewData.Identicon.dotIcon,
 					derivationPath = "//polkadot//staking",
 					hadPwd = false,
 					address = "12955s5CP8Fuo1yk2YkJVUKDnZvXD9PKck3nzLZ4A51TT75",
@@ -316,7 +315,7 @@ fun SeedKeysPreview.toDerivedKeysSetModel(): DerivedKeysSetModel =
 		keys = derivedKeys.filter { it.status == DerivedKeyStatus.Importable }
 			.filter { it.hasPwd != null }.map {
 				DerivedKeysSetModel.DerivedKeyModel(
-					identicon = it.identicon.toImageContent(),
+					identicon = it.identicon,
 					derivationPath = it.derivationPath ?: "",
 					hadPwd = it.hasPwd == true,
 					address = it.address,
