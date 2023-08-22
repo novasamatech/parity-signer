@@ -478,8 +478,6 @@ fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplay
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
-pub struct TransactionSigningResult {}
-
 fn get_seeds(names_phone_knows: &[String]) -> anyhow::Result<MSeeds, ErrorDisplayed> {
     let seed_name_cards = db_handling::interface_signer::get_all_seed_names_with_identicons(
         &get_db()?,
@@ -513,95 +511,49 @@ fn get_key_set_public_key(
 }
 
 fn remove_derived_key(
-    address_key: &str,
-    path: &str,
+    address: &str,
     network_specs_key: &str,
 ) -> anyhow::Result<(), ErrorDisplayed> {
-    todo!()
+    let address_key =
+        AddressKey::from_hex(address).map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    db_handling::identities::remove_key(&get_db()?, address_key.multi_signer(), &network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
-fn remove_key_set(address_key: &str) -> anyhow::Result<(), ErrorDisplayed> {
-    todo!()
-}
-
-fn get_verifier_details() -> anyhow::Result<MVerifierDetails, ErrorDisplayed> {
-    todo!()
-}
-
-fn get_managed_networks() -> anyhow::Result<MManageNetworks, ErrorDisplayed> {
-    todo!()
+fn remove_key_set(seed_name: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::identities::remove_seed(&get_db()?, seed_name)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
 fn get_managed_network_details(
     network_key: &str,
 ) -> anyhow::Result<MNetworkDetails, ErrorDisplayed> {
-    todo!()
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    db_handling::interface_signer::network_details_by_key(&get_db()?, &network_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
 fn remove_metadata_on_managed_network(
     network_key: &str,
     metadata_specs_version: &str,
-) -> anyhow::Result<MNetworkDetails, ErrorDisplayed> {
-    todo!()
+) -> anyhow::Result<(), ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    let version = metadata_specs_version
+        .parse::<u32>()
+        .map_err(|e| format!("{e}"))?;
+    db_handling::helpers::remove_metadata(&get_db()?, &network_key, version)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
-fn get_keys_for_signing(
-    network_key: &str,
-    metadata_specs_version: &str,
-) -> anyhow::Result<MSignSufficientCrypto, ErrorDisplayed> {
-    todo!()
+fn seed_phrase_guess_words(user_input: &str) -> Vec<String> {
+    db_handling::interface_signer::guess(user_input)
+        .into_iter()
+        .map(|s| s.to_owned())
+        .collect()
 }
 
-fn sign_metadata_with_key(
-    network_key: &str,
-    metadata_specs_version: &str,
-    signing_address_key: &str,
-    seed_phrase: &str,
-) -> anyhow::Result<MSufficientCryptoReady, ErrorDisplayed> {
-    todo!()
-}
-
-fn sign_network_spec_with_key(
-    network_key: &str,
-    signing_address_key: &str,
-    seed_phrase: &str,
-) -> anyhow::Result<MSufficientCryptoReady, ErrorDisplayed> {
-    todo!()
-}
-
-fn get_transactions(qr_payload: &str) -> anyhow::Result<Vec<MTransaction>, ErrorDisplayed> {
-    todo!()
-}
-
-fn sign_transaction(
-    transaction_id: &str,
-    seed_phrase_payload: &str,
-) -> anyhow::Result<TransactionSigningResult, ErrorDisplayed> {
-    todo!()
-}
-
-fn sign_with_password(
-    transaction_id: &str,
-    password: &str,
-) -> anyhow::Result<TransactionSigningResult, ErrorDisplayed> {
-    todo!()
-}
-
-fn approve(transaction_id: &str) -> anyhow::Result<(), ErrorDisplayed> {
-    todo!()
-}
-
-fn reject(transaction_id: &str) -> anyhow::Result<(), ErrorDisplayed> {
-    todo!()
-}
-
-fn seed_phrase_guess_words(user_input: &str) -> Result<Vec<String>, ErrorDisplayed> {
-    todo!()
-}
-
-fn recover_seed_phrase(seed_name: &str, seed_phrase: &str) -> anyhow::Result<(), ErrorDisplayed> {
-    todo!()
-}
 fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDisplayed> {
     db_handling::interface_signer::print_new_seed(new_seed_name)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))

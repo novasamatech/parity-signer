@@ -676,61 +676,24 @@ namespace signer {
     MKeyDetails get_key_set_public_key([ByRef] string address, [ByRef] string network_specs_key);
 
     [Throws=ErrorDisplayed]
-    void remove_derived_key([ByRef] string address_key, [ByRef] string path, [ByRef] string network_specs_key);
+    void remove_derived_key([ByRef] string address, [ByRef] string network_specs_key);
 
     [Throws=ErrorDisplayed]
     void remove_key_set([ByRef] string address_key);
 
     [Throws=ErrorDisplayed]
-    MVerifierDetails get_verifier_details();
-
-    [Throws=ErrorDisplayed]
-    MManageNetworks get_managed_networks();
-
-    [Throws=ErrorDisplayed]
     MNetworkDetails get_managed_network_details([ByRef] string network_key);
 
     [Throws=ErrorDisplayed]
-    MNetworkDetails remove_metadata_on_managed_network([ByRef] string network_key, [ByRef] string metadata_specs_version);
+    void remove_metadata_on_managed_network([ByRef] string network_key, [ByRef] string metadata_specs_version);
 
-    [Throws=ErrorDisplayed]
-    MSignSufficientCrypto get_keys_for_signing([ByRef] string network_key,[ByRef] string metadata_specs_version);
-
-    [Throws=ErrorDisplayed]
-    MSufficientCryptoReady sign_metadata_with_key([ByRef] string network_key, [ByRef] string metadata_specs_version, [ByRef] string signing_address_key, [ByRef] string seed_phrase);
-
-    [Throws=ErrorDisplayed]
-    MSufficientCryptoReady sign_network_spec_with_key([ByRef] string network_key, [ByRef] string signing_address_key, [ByRef] string seed_phrase);
-
-    [Throws=ErrorDisplayed]
-    sequence<MTransaction> get_transactions([ByRef] string qr_payload);
-
-    [Throws=ErrorDisplayed]
-    TransactionSigningResult sign_transaction([ByRef] string transaction_id, [ByRef] string seed_phrase_payload);
-
-    [Throws=ErrorDisplayed]
-    TransactionSigningResult sign_with_password([ByRef] string transaction_id, [ByRef] string password);
-
-    [Throws=ErrorDisplayed]
-    void approve([ByRef] string transaction_id);
-
-    [Throws=ErrorDisplayed]
-    void reject([ByRef] string transaction_id);
-
-    [Throws=ErrorDisplayed]
     sequence<string> seed_phrase_guess_words([ByRef] string user_input);
-
-    [Throws=ErrorDisplayed]
-    void recover_seed_phrase([ByRef] string seed_name, [ByRef] string seed_phrase);
 
     [Throws=ErrorDisplayed]
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
 
     [Throws=ErrorDisplayed]
     void create_key_set([ByRef] string seed_name, [ByRef] string seed_phrase, sequence<string> networks);
-};
-
-dictionary TransactionSigningResult {
 };
 
 dictionary MKeysNew {
