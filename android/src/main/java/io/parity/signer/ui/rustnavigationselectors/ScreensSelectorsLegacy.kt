@@ -2,11 +2,10 @@ package io.parity.signer.ui.rustnavigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.bottomsheets.*
-import io.parity.signer.components.exposesecurity.ShieldAlert
+import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.*
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.screens.*
@@ -132,8 +131,7 @@ fun AlertSelector(
 				error = alert.f,
 				button = button1
 			)
-			is AlertData.Shield -> ShieldAlert(
-				// alert.f,
+			is AlertData.Shield -> ExposedAlert(
 				networkState = networkState,
 				navigateBack = { button1(Action.GO_BACK) },
 				acknowledgeWarning = acknowledgeWarning
