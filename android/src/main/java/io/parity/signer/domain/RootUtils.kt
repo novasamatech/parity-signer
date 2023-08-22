@@ -8,7 +8,12 @@ import java.io.InputStreamReader
 
 object RootUtils {
 	fun isDeviceRooted(): Boolean {
-		return checkRootMethod1() || checkRootMethod2() || checkRootMethod3()
+		return if (FeatureFlags.isEnabled(FeatureOption.SKIP_ROOTED_CHECK_EMULATOR)) {
+			false
+		}
+		else {
+			checkRootMethod1() || checkRootMethod2() || checkRootMethod3()
+		}
 	}
 
 	private fun checkRootMethod1(): Boolean {
