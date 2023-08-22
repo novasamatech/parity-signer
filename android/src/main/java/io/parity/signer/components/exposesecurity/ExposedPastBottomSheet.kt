@@ -24,7 +24,7 @@ import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
-fun ExposedPastBottomSheet(
+internal fun ExposedPastBottomSheet(
 	close: Callback,
 	acknowledgeWarning: Callback
 ) {

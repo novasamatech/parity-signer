@@ -9,8 +9,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
-fun ShieldAlert(
-	// shieldAlert: ShieldAlert, // TODO: use this instead of alertstate
+fun ExposedAlert(
 	networkState: State<NetworkState?>,
 	navigateBack: Callback,
 	acknowledgeWarning: Callback,
