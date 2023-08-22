@@ -133,7 +133,8 @@ fun KeySetDetailsScreenView(
 			}
 
 			ExposedIcon(
-				networkState = networkState, navigator = navigator,
+				networkState = networkState,
+				onClick = { navigator.navigate(Action.SHIELD) },
 				Modifier
 					.align(Alignment.BottomEnd)
 					.padding(end = 16.dp, bottom = 24.dp)
