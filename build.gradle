@@ -3,7 +3,8 @@ buildscript {
 	ext {
 		kotlin_version = '1.8.22'
 		compose_compiler_version = "1.4.8"
-		compose_libs_version = "1.4.3"
+		compose_libs_version = "1.5.0"
+		androidx_camera_version = "1.2.3"
 		accompanist_version = "0.28.0"
 		coilVersion = "2.4.0"
 	}
@@ -13,7 +14,7 @@ buildscript {
 		maven { url "https://plugins.gradle.org/m2/" }
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:8.1.0'
+		classpath 'com.android.tools.build:gradle:8.1.1'
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 		classpath "org.mozilla.rust-android-gradle:plugin:0.9.3"
 		// uniffi wants some build-time specific info from JNA
