@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -68,9 +69,9 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 @Composable
 fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 
-	val actionResultState = sharedViewModel.actionResult.collectAsState()
-	val shieldNetworkState = sharedViewModel.networkState.collectAsState()
-	val localNavAction = sharedViewModel.localNavAction.collectAsState()
+	val actionResultState = sharedViewModel.actionResult.collectAsStateWithLifecycle()
+	val shieldNetworkState = sharedViewModel.networkState.collectAsStateWithLifecycle()
+	val localNavAction = sharedViewModel.localNavAction.collectAsStateWithLifecycle()
 
 	val actionResult = actionResultState.value
 
