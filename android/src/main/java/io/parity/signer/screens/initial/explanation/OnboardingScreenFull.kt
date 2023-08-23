@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -23,7 +24,10 @@ fun OnboardingExplanationScreenFull(navigateNext: Callback) {
 			.statusBarsPadding()
 	) {
 		ForceDarkTheme()
-		HorizontalPager(pageCount = 4) {
+		val pagerState = rememberPagerState(pageCount = {
+			4
+		})
+		HorizontalPager(state = pagerState) {
 			when (it) {
 				0 -> OnboardingScreen1(navigateNext)
 				1 -> OnboardingScreen2(navigateNext)
