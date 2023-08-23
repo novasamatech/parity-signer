@@ -4,11 +4,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
-import io.parity.signer.bottomsheets.*
+import io.parity.signer.bottomsheets.SelectSeed
+import io.parity.signer.bottomsheets.SufficientCryptoReady
 import io.parity.signer.components.exposesecurity.ExposedAlert
-import io.parity.signer.domain.*
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.LocalNavAction
+import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.signSufficientCrypto
-import io.parity.signer.screens.*
+import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.SelectSeedForBackup
+import io.parity.signer.screens.SignSufficientCrypto
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -17,9 +24,9 @@ import io.parity.signer.uniffi.ScreenData
 
 @Composable
 fun ScreenSelector(
-    screenData: ScreenData,
-    navigate: (Action, String, String) -> Unit,
-    sharedViewModel: SharedViewModel
+	screenData: ScreenData,
+	navigate: (Action, String, String) -> Unit,
+	sharedViewModel: SharedViewModel
 ) {
 	val button2: (Action, String) -> Unit =
 		{ action, details -> navigate(action, details, "") }
@@ -29,10 +36,12 @@ fun ScreenSelector(
 			screenData.f,
 			button2
 		)
+
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
 			sharedViewModel::signSufficientCrypto
 		)
+
 		is ScreenData.KeyDetailsMulti -> {
 			//migrated, now part of KeySetDetails subgraph and old data used
 			submitErrorState(
@@ -40,12 +49,14 @@ fun ScreenSelector(
 					"get to Key Details Multi $screenData"
 			)
 		}
+
 		ScreenData.Documents -> {
 			submitErrorState(
 				"This screen was called from settings but we don't call it anymore.\n" +
 					"While I cannot guarantee that rust won't make this state for whatever reason."
 			)
 		}
+
 		is ScreenData.DeriveKey -> {} // migrated
 		is ScreenData.KeyDetails -> {}//migrated
 		is ScreenData.Keys -> {} //migrated to new selector
@@ -66,9 +77,9 @@ fun ScreenSelector(
 
 @Composable
 fun ModalSelector(
-    modalData: ModalData?,
-    localNavAction: LocalNavAction?,
-    sharedViewModel: SharedViewModel
+	modalData: ModalData?,
+	localNavAction: LocalNavAction?,
+	sharedViewModel: SharedViewModel
 ) {
 	if (localNavAction != null && localNavAction != LocalNavAction.None) {
 		when (localNavAction) {
@@ -86,6 +97,7 @@ fun ModalSelector(
 						"key set details and never called now $modalData"
 				)
 			}
+
 			is ModalData.Backup -> {} //new screen is part of key details subgraph
 			is ModalData.PasswordConfirm -> {
 				//this is part of Derivation flow and should never called here
@@ -95,6 +107,7 @@ fun ModalSelector(
 						"called now $modalData"
 				)
 			}
+
 			is ModalData.SignatureReady -> {} //in new selector
 			is ModalData.EnterPassword -> {} //in new selector
 			is ModalData.LogRight -> {} //migrated to bottom sheet
@@ -103,6 +116,7 @@ fun ModalSelector(
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
 			)
+
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
 			is ModalData.TypesInfo -> {} // this functionality removed after redesign
 			is ModalData.NewSeedBackup -> {}//moved to new selector
@@ -111,6 +125,7 @@ fun ModalSelector(
 				submitErrorState("This is part of refactored screen and not shown separately")
 				SelectSeed(modalData.f, sharedViewModel = sharedViewModel)
 			}
+
 			null -> {}
 		}
 	}
@@ -120,22 +135,23 @@ fun ModalSelector(
 fun AlertSelector(
 	alert: AlertData?,
 	networkState: State<NetworkState?>,
-	navigate: (Action, String, String) -> Unit,
+	navigator: Navigator,
 	acknowledgeWarning: Callback
 ) {
-	val button1: (Action) -> Unit = { action -> navigate(action, "", "") }
 	SignerOldTheme() {
 		when (alert) {
-			AlertData.Confirm -> Confirm(button = button1)
+			AlertData.Confirm -> Confirm(button = { navigator.navigate(it) })
 			is AlertData.ErrorData -> ErrorModal(
 				error = alert.f,
-				button = button1
+				button = { action -> navigator.navigate(action) }
 			)
+
 			is AlertData.Shield -> ExposedAlert(
 				networkState = networkState,
-				navigateBack = { button1(Action.GO_BACK) },
+				navigateBack = { navigator.navigate(Action.GO_BACK) },
 				acknowledgeWarning = acknowledgeWarning
 			)
+
 			null -> {}
 		}
 	}
