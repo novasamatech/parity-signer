@@ -33,7 +33,6 @@ use definitions::{
 
 use db_handling::identities::{
     create_key_set, dynamic_derivations_response, process_dynamic_derivations_v1,
-    try_create_imported_address,
 };
 use db_handling::{
     cold_default::{
@@ -2076,41 +2075,6 @@ fn test_create_key_set_generate_default_addresses() {
     )
     .unwrap();
     assert!(identities.contains_key(test_key.key()).unwrap());
-}
-
-#[test]
-fn test_created_imported_address() {
-    let dbname = tempdir().unwrap();
-    let db = sled::open(&dbname).unwrap();
-
-    populate_cold(&db, Verifier { v: None }).unwrap();
-    let ordered_specs = default_chainspecs();
-    let spec = ordered_specs
-        .into_iter()
-        .find(|spec| spec.specs.name == "westend")
-        .unwrap()
-        .specs;
-    let network_id = NetworkSpecsKey::from_parts(&spec.genesis_hash, &spec.encryption);
-    let seed_name = "Alice";
-
-    let derivation_path = "//imported";
-    try_create_imported_address(
-        &db,
-        seed_name,
-        ALICE_SEED_PHRASE,
-        derivation_path,
-        &network_id,
-    )
-    .unwrap();
-    let identities: Vec<(MultiSigner, AddressDetails)> =
-        get_addresses_by_seed_name(&db, seed_name).unwrap();
-
-    let (_, address_details) = identities
-        .iter()
-        .find(|(_, a)| a.path == derivation_path)
-        .unwrap();
-
-    assert!(address_details.was_imported);
 }
 
 #[test]

@@ -1426,42 +1426,6 @@ pub fn try_create_address(
     path: &str,
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<()> {
-    do_try_create_address(
-        database,
-        seed_name,
-        seed_phrase,
-        path,
-        network_specs_key,
-        false,
-    )
-}
-
-/// Create a new address in the Vault database and mark it as imported.
-pub fn try_create_imported_address(
-    database: &sled::Db,
-    seed_name: &str,
-    seed_phrase: &str,
-    path: &str,
-    network_specs_key: &NetworkSpecsKey,
-) -> Result<()> {
-    do_try_create_address(
-        database,
-        seed_name,
-        seed_phrase,
-        path,
-        network_specs_key,
-        true,
-    )
-}
-
-fn do_try_create_address(
-    database: &sled::Db,
-    seed_name: &str,
-    seed_phrase: &str,
-    path: &str,
-    network_specs_key: &NetworkSpecsKey,
-    mark_as_imported: bool,
-) -> Result<()> {
     match derivation_check(database, seed_name, path, network_specs_key)? {
         // UI should prevent user from getting into `try_create_address` if
         // derivation has a bad format
@@ -1492,7 +1456,7 @@ fn do_try_create_address(
                 Some(&network_specs.specs),
                 seed_name,
                 seed_phrase,
-                mark_as_imported,
+                false,
             )?;
             let id_batch = upd_id_batch(Batch::default(), prep_data.address_prep);
             TrDbCold::new()
