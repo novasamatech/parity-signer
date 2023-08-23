@@ -58,6 +58,9 @@ pub enum IdenticonStyle {
 
     /// Blockies style used in Ethereum networks.
     Blockies,
+
+    /// Jdenticon style used to identify key sets.
+    Jdenticon,
 }
 
 use crate::navigation::Identicon;
@@ -83,6 +86,13 @@ pub fn make_identicon_from_multisigner(
                 }
             }
         }
+        IdenticonStyle::Jdenticon => Identicon::Jdenticon {
+            identity: print_multisigner_as_base58_or_eth(
+                multisigner,
+                None,
+                multisigner_to_encryption(multisigner),
+            ),
+        },
     }
 }
 

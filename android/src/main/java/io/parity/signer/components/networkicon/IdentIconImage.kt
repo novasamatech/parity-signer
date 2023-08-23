@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.networkicon.blockies.BlockiesIcon
 import io.parity.signer.components.networkicon.dot.DotIcon
+import io.parity.signer.components.networkicon.jdenticon.Jdenticon
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Identicon
@@ -33,28 +34,15 @@ fun IdentIconImage(
 		}
 
 		is Identicon.Dots -> {
-			DotIcon(seed = identIcon.identity,
+			DotIcon(
+				seed = identIcon.identity,
 				size = size,
 				modifier = modifier,
-				)
+			)
 		}
-//		is ImageContent.Svg -> {//will be used for another type of icons
-//			val context = LocalContext.current
-//			val painter = rememberAsyncImagePainter(
-//				model = ImageRequest.Builder(context)
-//					.decoderFactory(SvgDecoder.Factory())
-//					.data(identIcon.toByteArray())
-//					.size(Size.ORIGINAL) // Set the target size to load the image at.
-//					.build(),
-//			)
-//			Image(
-//				painter = painter,
-//				contentDescription = stringResource(R.string.description_identicon),
-//				modifier = modifier
-//					.size(size)
-//					.clip(CircleShape)
-//			)
-//		}
+		is Identicon.Jdenticon -> {
+			Jdenticon(seed = identIcon.identity, size = size, modifier = modifier)
+		}
 	}
 }
 
@@ -76,16 +64,21 @@ private fun PreviewIdentIcon() {
 	SignerNewTheme {
 		val iconDot = PreviewData.Identicon.dotIcon
 		val iconBlockies = PreviewData.Identicon.blockiesIcon
+		val iconJdenticon = PreviewData.Identicon.jdenticonIcon
 
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			IdentIconImage(iconDot)
 			IdentIconImage(iconBlockies)
+			//jdenticon preview works if you run it, not in default preview and svg showing async
+			IdentIconImage(iconJdenticon)
 			IdentIconImage(iconDot, size = 18.dp)
 			IdentIconImage(iconBlockies, size = 18.dp)
+			IdentIconImage(iconJdenticon, size = 18.dp)
 			IdentIconImage(iconDot, size = 56.dp)
 			IdentIconImage(iconBlockies, size = 56.dp)
+			IdentIconImage(iconJdenticon, size = 56.dp)
 		}
 	}
 }
