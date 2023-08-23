@@ -64,7 +64,7 @@ private val DarkColorPaletteNew = darkColors(
 	onSecondary = Color(0xFFFEFEFE),
 	onBackground = Color(0xFFFEFEFE),
 	onSurface = Color(0xFFFEFEFE),
-	onError = Color(0xFFFF3B30)
+	onError = Color(0xFFFF3B30),
 )
 
 private val LightColorPaletteNew = lightColors(
@@ -79,7 +79,7 @@ private val LightColorPaletteNew = lightColors(
 	onSecondary = Color(0xFFFFFFFF),
 	onBackground = Color(0xFF000000),
 	onSurface = Color(0xFF000000),
-	onError = Color(0xFFFF3B30)
+	onError = Color(0xFFFF3B30),
 )
 
 @Composable
