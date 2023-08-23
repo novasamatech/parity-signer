@@ -10,10 +10,11 @@ import io.parity.signer.ui.theme.SignerNewTheme
 
 @Composable
 fun ExposedAlert(
-	networkState: State<NetworkState?>,
 	navigateBack: Callback,
 	acknowledgeWarning: Callback,
 ) {
+
+	val networkState: State<NetworkState?>
 	when (networkState.value) {
 		NetworkState.Active -> {
 			SignerNewTheme() {

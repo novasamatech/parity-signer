@@ -69,7 +69,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 
 	val actionResultState = sharedViewModel.actionResult.collectAsState()
-	val shieldAlert = sharedViewModel.networkState.collectAsState()
+	val shieldNetworkState = sharedViewModel.networkState.collectAsState()
 	val localNavAction = sharedViewModel.localNavAction.collectAsState()
 
 	val actionResult = actionResultState.value
@@ -95,7 +95,7 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 						TopBar(
 							sharedViewModel = sharedViewModel,
 							actionResult = actionResult,
-							networkState = shieldAlert,
+							networkState = shieldNetworkState,
 						)
 					}
 				},
@@ -122,19 +122,18 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 				CombinedScreensSelector(
 					screenData = actionResult.screenData,
 					localNavAction = localNavAction.value,
-					networkState = shieldAlert,
+					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
 					localNavAction = localNavAction.value,
-					networkState = shieldAlert,
+					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel,
 					navigator = navigator,
 				)
 				AlertSelector(
 					alert = actionResult.alertData,
-					networkState = shieldAlert,
 					navigator = navigator,
 					acknowledgeWarning = sharedViewModel::acknowledgeWarning
 				)
