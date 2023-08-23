@@ -2,30 +2,27 @@
 //  JdenticonView.swift
 //
 //
-//  Created by Krzysztof Rodak on 21/08/2023.
+//  Created by Krzysztof Rodak on 23/08/2023.
 //
 
+import SVGView
 import SwiftUI
 
 public struct JdenticonView: View {
-    let generator: JdenticonGenerator
-    let hash: Data
-    let size: CGFloat
+    private enum Constants {
+        static let svgSize = 1_024
+    }
 
-    public init(generator: JdenticonGenerator = JdenticonGenerator(), hash: Data, size: CGFloat) {
-        self.generator = generator
-        self.hash = hash
+    private let size: CGFloat
+    private let svgContent: String
+
+    public init(hash: String, size: CGFloat) {
+        svgContent = Jdenticon().toSvg(hashOrValue: hash, size: Constants.svgSize)
         self.size = size
     }
 
     public var body: some View {
-        Image(uiImage: createIdenticonImage())
-            .resizable()
+        SVGView(string: svgContent)
             .frame(width: size, height: size)
-            .aspectRatio(contentMode: .fit)
-    }
-
-    private func createIdenticonImage() -> UIImage {
-        generator.render(size: size, hash: hash)
     }
 }
