@@ -648,6 +648,7 @@ pub struct MSCFieldNumber {
 pub enum Identicon {
     Dots { identity: Vec<u8> },
     Blockies { identity: String },
+    Jdenticon { identity: String },
 }
 
 impl std::fmt::Debug for Identicon {
@@ -655,7 +656,10 @@ impl std::fmt::Debug for Identicon {
         match self {
             Identicon::Dots { identity } => write!(f, "Dots {}", hex::encode(&identity[..32])),
             Identicon::Blockies { identity } => {
-                write!(f, "Blockies {}", hex::encode(&identity[..32]))
+                write!(f, "Blockies {identity}")
+            }
+            Identicon::Jdenticon { identity } => {
+                write!(f, "Jdenticon {identity}")
             }
         }
     }

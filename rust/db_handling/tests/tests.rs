@@ -7,9 +7,7 @@ use std::collections::HashMap;
 use std::{convert::TryInto, str::FromStr};
 
 use constants::{
-    test_values::{
-        alice_sr_alice, alice_sr_root, empty_png, types_known, westend_9000, westend_9010,
-    },
+    test_values::{alice_sr_alice, empty_png, types_known, westend_9000, westend_9010},
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
 use db_handling::Error;
@@ -88,8 +86,8 @@ fn print_seed_names() {
     let cards = get_all_seed_names_with_identicons(&db, &[String::from("Alice")]).unwrap();
     let expected_cards = vec![SeedNameCard {
         seed_name: "Alice".to_string(),
-        identicon: Identicon::Dots {
-            identity: alice_sr_root(),
+        identicon: Identicon::Jdenticon {
+            identity: "8PegJD6VsjWwinrP6AfgNqejWYdJ8KqF4xutpyq7AdFJ3W5".to_string(),
         },
         used_in_networks: vec!["westend".to_string()],
         derived_keys_count: 1, // "//Alice"
@@ -110,8 +108,8 @@ fn print_seed_names_with_orphan() {
     let expected_cards = vec![
         SeedNameCard {
             seed_name: "Alice".to_string(),
-            identicon: Identicon::Dots {
-                identity: alice_sr_root(),
+            identicon: Identicon::Jdenticon {
+                identity: "8PegJD6VsjWwinrP6AfgNqejWYdJ8KqF4xutpyq7AdFJ3W5".to_string(),
             },
             used_in_networks: vec!["westend".to_string()],
             derived_keys_count: 1,

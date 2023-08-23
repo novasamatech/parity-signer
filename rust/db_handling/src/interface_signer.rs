@@ -57,24 +57,16 @@ pub fn get_all_seed_names_with_identicons(
     database: &sled::Db,
     names_phone_knows: &[String],
 ) -> Result<Vec<SeedNameCard>> {
-    let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
+    let mut data_set: HashMap<String, Identicon> = HashMap::new();
     let mut derivation_count: HashMap<String, u32> = HashMap::new();
     let mut used_in_networks: HashMap<String, HashSet<String>> = HashMap::new();
     let mut network_names_cache: HashMap<NetworkSpecsKey, String> = HashMap::new();
 
     for (multisigner, address_details) in get_all_addresses(database)?.into_iter() {
         if address_details.is_root() {
-            // found a seed key; could be any of the supported encryptions;
-            match data_set.get(&address_details.seed_name) {
-                Some(root_set) => {
-                    let mut new_root_set = root_set.to_vec();
-                    new_root_set.push(multisigner);
-                    data_set.insert(address_details.seed_name.to_string(), new_root_set);
-                }
-                None => {
-                    data_set.insert(address_details.seed_name.to_string(), vec![multisigner]);
-                }
-            }
+            let identicon =
+                make_identicon_from_multisigner(&multisigner, address_details.identicon_style());
+            data_set.insert(address_details.seed_name.to_string(), identicon);
         } else {
             if let Some(network) = address_details.network_id {
                 if !network_names_cache.contains_key(&network) {
@@ -94,18 +86,18 @@ pub fn get_all_seed_names_with_identicons(
                 .and_modify(|e| *e += 1)
                 .or_insert(1);
             if data_set.get(&address_details.seed_name).is_none() {
-                data_set.insert(address_details.seed_name.to_string(), Vec::new());
+                data_set.insert(address_details.seed_name.to_string(), Identicon::default());
             }
         }
     }
     for x in names_phone_knows.iter() {
         if data_set.get(x).is_none() {
-            data_set.insert(x.to_string(), Vec::new());
+            data_set.insert(x.to_string(), Identicon::default());
         }
     }
     let mut res: Vec<_> = data_set
         .into_iter()
-        .map(|(seed_name, multisigner_set)| {
+        .map(|(seed_name, identicon)| {
             let mut used_in_networks = used_in_networks
                 .get(&seed_name)
                 .cloned()
@@ -114,7 +106,7 @@ pub fn get_all_seed_names_with_identicons(
             used_in_networks.sort();
             SeedNameCard {
                 seed_name: seed_name.clone(),
-                identicon: preferred_multisigner_identicon(&multisigner_set),
+                identicon,
                 derived_keys_count: *derivation_count.get(&seed_name).unwrap_or(&0),
                 used_in_networks,
             }
@@ -122,41 +114,6 @@ pub fn get_all_seed_names_with_identicons(
         .collect();
     res.sort_by(|a, b| a.seed_name.cmp(&b.seed_name));
     Ok(res)
-}
-
-/// Create a `PNG` identicon data, for preferred encryption if
-/// multiple encryption algorithms are supported.
-///
-/// Output is:
-///
-/// - empty `PNG` if no seed key is available
-/// - the available seed key if there is only one
-/// - preferred seed key, if there are more than one; order of preference:
-/// `Sr25519`, `Ed25519`, `Ecdsa`
-fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Identicon {
-    if multisigner_set.is_empty() {
-        Identicon::default()
-    } else {
-        let mut got_sr25519 = None;
-        let mut got_ed25519 = None;
-        let mut got_ecdsa = None;
-        for x in multisigner_set.iter() {
-            match x {
-                MultiSigner::Ed25519(_) => got_ed25519 = Some(x.to_owned()),
-                MultiSigner::Sr25519(_) => got_sr25519 = Some(x.to_owned()),
-                MultiSigner::Ecdsa(_) => got_ecdsa = Some(x.to_owned()),
-            }
-        }
-        if let Some(a) = got_sr25519 {
-            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
-        } else if let Some(a) = got_ed25519 {
-            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
-        } else if let Some(a) = got_ecdsa {
-            make_identicon_from_multisigner(&a, IdenticonStyle::Dots)
-        } else {
-            Identicon::default()
-        }
-    }
 }
 
 /// Return a `Vec` with address-associated public data for all addresses from the
@@ -179,7 +136,7 @@ pub fn print_all_identities(database: &sled::Db) -> Result<Vec<MRawKey>> {
                         Some(network_specs.specs.genesis_hash),
                     ); // to click
                     let public_key = multisigner_to_public(&multisigner); // to display
-                    let style = address_details.encryption.identicon_style();
+                    let style = address_details.identicon_style();
                     let identicon = make_identicon_from_multisigner(&multisigner, style);
                     Some(MRawKey {
                         address: Address {
@@ -210,10 +167,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
             has_pwd: false,
             path: String::new(),
             seed_name: seed_name.to_string(),
-            identicon: make_identicon_from_multisigner(
-                &root.0,
-                root.1.encryption.identicon_style(),
-            ),
+            identicon: make_identicon_from_multisigner(&root.0, root.1.identicon_style()),
             secret_exposed: root.1.secret_exposed,
         };
         // TODO: root always prefix 42 for substrate.
@@ -230,10 +184,8 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
         if let Some(id) = &address_details.network_id {
             let network_specs = get_network_specs(database, id)?;
 
-            let identicon = make_identicon_from_multisigner(
-                &multisigner,
-                network_specs.specs.encryption.identicon_style(),
-            );
+            let identicon =
+                make_identicon_from_multisigner(&multisigner, address_details.identicon_style());
             let base58 = print_multisigner_as_base58_or_eth(
                 &multisigner,
                 Some(network_specs.specs.base58prefix),
@@ -386,8 +338,7 @@ pub fn export_key(
     );
 
     let public_key = multisigner_to_public(multisigner);
-    let identicon =
-        make_identicon_from_multisigner(multisigner, network_specs.encryption.identicon_style());
+    let identicon = make_identicon_from_multisigner(multisigner, address_details.identicon_style());
     let qr = {
         if address_details.network_id.as_ref() == Some(network_specs_key) {
             let prefix = if network_specs.encryption == Encryption::Ethereum {
@@ -559,7 +510,7 @@ fn dynamic_path_check_unhexed(
                     );
                     let identicon = make_identicon_from_multisigner(
                         &multisigner,
-                        address_details.encryption.identicon_style(),
+                        address_details.identicon_style(),
                     );
                     let address_key = hex::encode(
                         AddressKey::new(
