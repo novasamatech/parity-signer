@@ -66,14 +66,6 @@ fun KeyDerivedItem(
 				modifier = Modifier.padding(end = 12.dp),
 			)
 			Column(Modifier.weight(1f)) {
-				if (model.wasImported == true) {
-					Text(
-						text = stringResource(R.string.dynamic_derivation_path_label),
-						style = SignerTypeface.CaptionM,
-						color = MaterialTheme.colors.textTertiary,
-						modifier = Modifier.padding(bottom = 4.dp)
-					)
-				}
 				if (model.path.isNotEmpty() || model.hasPwd) {
 					KeyPath(
 						path = model.path,
@@ -161,11 +153,11 @@ private fun PreviewKeyDerivedItem() {
 	SignerNewTheme {
 		Column {
 			KeyDerivedItem(
-				KeyModel.createStub(wasImported = false),
+				KeyModel.createStub(),
 				"kusama"
 			)
 			KeyDerivedItem(
-				KeyModel.createStub(wasImported = true),
+				KeyModel.createStub(),
 				"kusama",
 			)
 		}
