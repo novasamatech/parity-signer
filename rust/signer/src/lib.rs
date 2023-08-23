@@ -26,6 +26,7 @@ mod ffi_types;
 
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use definitions::keyring::AddressKey;
 use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
 use sled::Db;
@@ -475,6 +476,82 @@ fn clear_log_history() -> anyhow::Result<(), ErrorDisplayed> {
 fn handle_log_comment(string_from_user: &str) -> anyhow::Result<(), ErrorDisplayed> {
     db_handling::manage_history::history_entry_user(&get_db()?, string_from_user)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn get_seeds(names_phone_knows: &[String]) -> anyhow::Result<MSeeds, ErrorDisplayed> {
+    let seed_name_cards = db_handling::interface_signer::get_all_seed_names_with_identicons(
+        &get_db()?,
+        names_phone_knows,
+    )
+    .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    Ok(MSeeds { seed_name_cards })
+}
+
+fn get_key_set_public_key(
+    address: &str,
+    network_specs_key: &str,
+) -> anyhow::Result<MKeyDetails, ErrorDisplayed> {
+    let address_key =
+        AddressKey::from_hex(address).map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    let address_details = db_handling::helpers::get_address_details(&get_db()?, &address_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+
+    db_handling::interface_signer::export_key(
+        &get_db()?,
+        address_key.multi_signer(),
+        &address_details.seed_name,
+        &network_specs_key,
+    )
+    .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn remove_derived_key(
+    address: &str,
+    network_specs_key: &str,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    let address_key =
+        AddressKey::from_hex(address).map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    db_handling::identities::remove_key(&get_db()?, address_key.multi_signer(), &network_specs_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn remove_key_set(seed_name: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::identities::remove_seed(&get_db()?, seed_name)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn get_managed_network_details(
+    network_key: &str,
+) -> anyhow::Result<MNetworkDetails, ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    db_handling::interface_signer::network_details_by_key(&get_db()?, &network_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn remove_metadata_on_managed_network(
+    network_key: &str,
+    metadata_specs_version: &str,
+) -> anyhow::Result<(), ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    let version = metadata_specs_version
+        .parse::<u32>()
+        .map_err(|e| format!("{e}"))?;
+    db_handling::helpers::remove_metadata(&get_db()?, &network_key, version)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn seed_phrase_guess_words(user_input: &str) -> Vec<String> {
+    db_handling::interface_signer::guess(user_input)
+        .into_iter()
+        .map(|s| s.to_owned())
+        .collect()
 }
 
 fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDisplayed> {
