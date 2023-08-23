@@ -44,7 +44,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		}
 
 		if (authenticated.value) {
-			SignerMainSubgraph(sharedViewModel)
+			MainUnlockedSubgraphVault(sharedViewModel)
 		} else {
 			val currentActivity =
 				LocalContext.current.findActivity() as FragmentActivity
@@ -66,7 +66,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 
 
 @Composable
-fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
+fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 
 	val actionResultState = sharedViewModel.actionResult.collectAsState()
 	val shieldAlert = sharedViewModel.networkState.collectAsState()
@@ -103,8 +103,8 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 				Box(modifier = Modifier.padding(innerPadding)) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
-						navigate = navigator::navigate,
-						sharedViewModel = sharedViewModel
+						navigator = navigator,
+						sharedViewModel = sharedViewModel,
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
