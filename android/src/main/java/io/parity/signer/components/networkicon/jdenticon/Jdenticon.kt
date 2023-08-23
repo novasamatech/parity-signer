@@ -2,13 +2,15 @@ package io.parity.signer.components.networkicon.jdenticon
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +23,8 @@ import coil.size.Size
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.jdenticon.jdenticon_kotlin.Jdenticon
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.iconsBackground
+import kotlin.math.sqrt
 
 
 @Composable
@@ -29,7 +33,7 @@ fun Jdenticon(
 	size: Dp,
 	modifier: Modifier = Modifier
 ) {
-	val svg = Jdenticon.toSvg(seed, size.value.toInt(),)
+	val svg = Jdenticon.toSvg(seed, size.value.toInt())
 
 	val context = LocalContext.current
 	val painter = rememberAsyncImagePainter(
@@ -39,16 +43,21 @@ fun Jdenticon(
 			.size(Size.ORIGINAL) // Set the target size to load the image at.
 			.build(),
 	)
-	Image(
-		painter = painter,
-		contentDescription = stringResource(R.string.description_identicon),
+	Box(
 		modifier = modifier
 			.size(size)
-//			.clip(CircleShape)
+			.background(MaterialTheme.colors.iconsBackground, CircleShape),
+		contentAlignment = Alignment.Center
 	)
+	{
+		Image(
+			painter = painter,
+			contentDescription = stringResource(R.string.description_identicon),
+			modifier = modifier
+				.size(size.div(sqrt(2f)))
+		)
+	}
 }
-
-
 
 
 /**
