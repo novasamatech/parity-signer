@@ -1,7 +1,6 @@
 package io.parity.signer.ui.rustnavigationselectors
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.bottomsheets.SelectSeed
@@ -10,7 +9,6 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.domain.submitErrorState
@@ -145,7 +143,6 @@ fun AlertSelector(
 
 			is AlertData.Shield -> ExposedAlert(
 				navigateBack = { navigator.navigate(Action.GO_BACK) },
-				acknowledgeWarning = acknowledgeWarning
 			)
 
 			null -> {}
