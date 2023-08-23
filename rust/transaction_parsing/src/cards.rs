@@ -301,10 +301,7 @@ pub(crate) fn make_author_info(
         base58,
         address_key,
         address: Address {
-            identicon: make_identicon_from_multisigner(
-                author,
-                address_details.encryption.identicon_style(),
-            ),
+            identicon: make_identicon_from_multisigner(author, address_details.identicon_style()),
             seed_name: address_details.seed_name.clone(),
             path: address_details.path.clone(),
             has_pwd: address_details.has_pwd,

@@ -114,3 +114,6 @@ val Colors.primaryButtonDisabledBackground: Color
 
 val Colors.primaryButtonDisabledText: Color
 	get() = if (isLight) Color(0xFFFBD2E7) else Color(0xFF543747)
+
+val Colors.iconsBackground: Color
+	get() = if (isLight) Color(0xFFEEEEEE) else Color(0xFFEEEEEE)
