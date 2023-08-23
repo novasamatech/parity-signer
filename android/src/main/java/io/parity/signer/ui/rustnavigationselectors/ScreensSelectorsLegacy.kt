@@ -132,7 +132,6 @@ fun ModalSelector(
 @Composable
 fun AlertSelector(
 	alert: AlertData?,
-	networkState: State<NetworkState?>,
 	navigator: Navigator,
 	acknowledgeWarning: Callback
 ) {
@@ -145,7 +144,6 @@ fun AlertSelector(
 			)
 
 			is AlertData.Shield -> ExposedAlert(
-				networkState = networkState,
 				navigateBack = { navigator.navigate(Action.GO_BACK) },
 				acknowledgeWarning = acknowledgeWarning
 			)
