@@ -104,9 +104,7 @@ class Authentication {
 							Toast.makeText(
 								context, context.getString(R.string.auth_failed_message),
 								Toast.LENGTH_SHORT
-							)
-								.show()
-							_auth.value = false
+							).show()
 						}
 					})
 
@@ -192,7 +190,6 @@ class Authentication {
 									context.getString(R.string.auth_error_message, errString),
 									Toast.LENGTH_SHORT
 								).show()
-
 								_auth.value = false
 								continuation.resumeWith(Result.success(AuthResult.AuthError))
 							}
@@ -210,12 +207,10 @@ class Authentication {
 								Toast.makeText(
 									context, context.getString(R.string.auth_failed_message),
 									Toast.LENGTH_SHORT
-								)
-									.show()
-								_auth.value = false
-								continuation.resumeWith(Result.success(AuthResult.AuthFailed))
+								).show()
 							}
-						})
+						}
+					)
 					biometricPrompt.authenticate(promptInfo)
 				}
 				BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
