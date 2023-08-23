@@ -13,15 +13,13 @@ let package = Package(
             targets: ["Jdenticon"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/exyte/SVGView.git", branch: "main")
+    ],
     targets: [
         .target(
             name: "Jdenticon",
-            dependencies: []
-        ),
-        .testTarget(
-            name: "JdenticonTests",
-            dependencies: ["Jdenticon"]
+            dependencies: ["SVGView"]
         )
     ]
 )
