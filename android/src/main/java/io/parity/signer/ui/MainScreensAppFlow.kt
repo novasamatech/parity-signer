@@ -2,7 +2,11 @@ package io.parity.signer.ui
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.captionBarPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,11 +21,16 @@ import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
+import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.UnlockAppAuthScreen
 import io.parity.signer.screens.initial.WaitingScreen
-import io.parity.signer.ui.rustnavigationselectors.*
+import io.parity.signer.ui.rustnavigationselectors.AlertSelector
+import io.parity.signer.ui.rustnavigationselectors.BottomSheetSelector
+import io.parity.signer.ui.rustnavigationselectors.CombinedScreensSelector
+import io.parity.signer.ui.rustnavigationselectors.ModalSelector
+import io.parity.signer.ui.rustnavigationselectors.ScreenSelector
 
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
@@ -37,7 +46,8 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		if (authenticated.value) {
 			SignerMainSubgraph(sharedViewModel)
 		} else {
-			val currentActivity = LocalContext.current.findActivity() as FragmentActivity
+			val currentActivity =
+				LocalContext.current.findActivity() as FragmentActivity
 			UnlockAppAuthScreen {
 				val authentication = ServiceLocator.authentication
 				authentication.authenticate(currentActivity) {
@@ -70,6 +80,7 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 		// Structure to contain all app
 		Box {
 			//screens before redesign
+			val navigator: Navigator = sharedViewModel.navigator
 			Scaffold(
 				modifier = Modifier
 					.navigationBarsPadding()
@@ -92,7 +103,7 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 				Box(modifier = Modifier.padding(innerPadding)) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
-						navigate = sharedViewModel.navigator::navigate,
+						navigate = navigator::navigate,
 						sharedViewModel = sharedViewModel
 					)
 					ModalSelector(
@@ -119,12 +130,12 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 					localNavAction = localNavAction.value,
 					networkState = shieldAlert,
 					sharedViewModel = sharedViewModel,
-					navigator = sharedViewModel.navigator,
+					navigator = navigator,
 				)
 				AlertSelector(
 					alert = actionResult.alertData,
 					networkState = shieldAlert,
-					navigate = sharedViewModel.navigator::navigate,
+					navigator = navigator,
 					acknowledgeWarning = sharedViewModel::acknowledgeWarning
 				)
 			}
