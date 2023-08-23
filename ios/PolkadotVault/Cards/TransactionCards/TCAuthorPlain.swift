@@ -11,7 +11,7 @@ struct TCAuthorPlain: View {
     var value: MscId
     var body: some View {
         HStack {
-            Identicon(identicon: value.identicon)
+            IdenticonView(identicon: value.identicon)
             TCNamedValueCard(name: Localizable.TCName.from.string, value: value.base58)
         }
     }

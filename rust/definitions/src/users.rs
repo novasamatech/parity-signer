@@ -12,6 +12,7 @@ use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
 use sp_runtime::MultiSigner;
 
+use crate::helpers::IdenticonStyle;
 use crate::{
     crypto::Encryption,
     error::{Error, Result},
@@ -112,5 +113,16 @@ impl AddressDetails {
     /// Address key in this case is called root key or seed key.  
     pub fn is_root(&self) -> bool {
         self.path.is_empty() && !self.has_pwd && self.network_id.is_none()
+    }
+
+    /// The style to use for identicons.
+    ///
+    /// Jdenticon for root key.
+    /// Otherwise, the style is taken from the encryption algorithm.
+    pub fn identicon_style(&self) -> IdenticonStyle {
+        if self.is_root() {
+            return IdenticonStyle::Jdenticon;
+        }
+        self.encryption.identicon_style()
     }
 }

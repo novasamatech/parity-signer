@@ -4,15 +4,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
-import io.parity.signer.components.IdentIcon
-import io.parity.signer.components.toImageContent
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
 fun TCTypesInfo(types: MTypesInfo) {
 	Row {
 		types.typesIdPic?.let {
-			IdentIcon(identIcon = it.toImageContent())
+			IdentIconImage(identIcon = it)
 		}
 		TCNameValueElement(
 			name = stringResource(R.string.transaction_types_info_hash),

@@ -1,4 +1,4 @@
-package io.parity.signer.components
+package io.parity.signer.components.networkicon
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -23,15 +23,15 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.uniffi.Identicon
 
 
 @Composable
 fun IdentIconWithNetwork(
-	identicon: ImageContent,
+	identicon: Identicon,
 	networkLogoName: String,
 	size: Dp = 28.dp,
 	modifier: Modifier = Modifier,
@@ -40,7 +40,7 @@ fun IdentIconWithNetwork(
 	CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 		Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 			val cutoutSize = size / 2
-			IdentIcon(
+			IdentIconImage(
 				identIcon = identicon,
 				modifier = Modifier.clip(SubIconCutShape(cutoutSize)),
 				size = size
@@ -110,7 +110,7 @@ class SubIconCutShape(val innerIconSize: Dp) : Shape {
 @Composable
 private fun PreviewNetworkIconSizes() {
 	SignerNewTheme {
-		val iconPng = PreviewData.Identicon.exampleIdenticonPng
+		val iconPng = PreviewData.Identicon.dotIcon
 		val network = NetworkModel.createStub().logo
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,7 +136,7 @@ private fun PreviewNetworkIconSizes() {
 )
 @Composable
 private fun PreviewNetworkIconUnknownIcons() {
-	val icon = PreviewData.Identicon.exampleIdenticonPng
+	val icon = PreviewData.Identicon.dotIcon
 	val network = NetworkModel.createStub()
 	val network2 = NetworkModel.createStub("Some")
 

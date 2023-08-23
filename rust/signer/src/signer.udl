@@ -283,7 +283,7 @@ dictionary MKeysCard {
 
 dictionary MSettings {
     string? public_key;
-    SignerImage? identicon;
+    Identicon? identicon;
     string? encryption;
     string? error;
 };
@@ -361,7 +361,7 @@ dictionary DerivedKeyPreview {
     string? derivation_path;
     Encryption encryption;
     H256 genesis_hash;
-    SignerImage identicon;
+    Identicon identicon;
     boolean? has_pwd;
     string? network_title;
     DerivedKeyStatus status;
@@ -391,7 +391,7 @@ dictionary DDDetail {
     string path;
     string network_logo;
     string network_specs_key;
-    SignerImage identicon;
+    Identicon identicon;
 };
 
 [Enum]
@@ -403,7 +403,7 @@ interface DerivedKeyError {
 
 dictionary SeedNameCard {
     string seed_name;
-    SignerImage identicon;
+    Identicon identicon;
     sequence<string> used_in_networks;
     u32 derived_keys_count;
 };
@@ -459,7 +459,7 @@ dictionary DerivationCheck {
 dictionary Address {
     string path;
     boolean has_pwd;
-    SignerImage identicon;
+    Identicon identicon;
     string seed_name;
     boolean secret_exposed;
 };
@@ -477,7 +477,7 @@ enum DerivationDestination {
 
 dictionary MVerifierDetails {
     string public_key;
-    SignerImage identicon;
+    Identicon identicon;
     string encryption;
 };
 
@@ -507,7 +507,7 @@ dictionary MMetadataRecord {
     string specname;
     string specs_version;
     string meta_hash;
-    SignerImage meta_id_pic;
+    Identicon meta_id_pic;
 };
 
 dictionary MRawKey {
@@ -670,6 +670,26 @@ namespace signer {
     void handle_log_comment([ByRef] string user_input);
 
     [Throws=ErrorDisplayed]
+    MSeeds get_seeds([ByRef] sequence<string> names_phone_knows);
+
+    [Throws=ErrorDisplayed]
+    MKeyDetails get_key_set_public_key([ByRef] string address, [ByRef] string network_specs_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_derived_key([ByRef] string address, [ByRef] string network_specs_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_key_set([ByRef] string address_key);
+
+    [Throws=ErrorDisplayed]
+    MNetworkDetails get_managed_network_details([ByRef] string network_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_metadata_on_managed_network([ByRef] string network_key, [ByRef] string metadata_specs_version);
+
+    sequence<string> seed_phrase_guess_words([ByRef] string user_input);
+
+    [Throws=ErrorDisplayed]
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
 
     [Throws=ErrorDisplayed]
@@ -699,7 +719,7 @@ interface ExportedSet {
 
 [Enum]
 interface MSCContent {
-    LoadTypes(string types, SignerImage pic);
+    LoadTypes(string types, Identicon pic);
     LoadMetadata(string name, u32 version);
     AddSpecs(MSCNetworkInfo f);
 };
@@ -735,7 +755,7 @@ dictionary MSeedMenu {
 dictionary MNewSeedBackup {
     string seed;
     string seed_phrase;
-    SignerImage identicon;
+    Identicon identicon;
 };
 
 dictionary Network {
@@ -781,14 +801,14 @@ dictionary MManageMetadata {
     string name;
     string version;
     string meta_hash;
-    SignerImage meta_id_pic;
+    Identicon meta_id_pic;
     sequence<MMMNetwork> networks;
 };
 
 dictionary MTypesInfo {
     boolean types_on_file;
     string? types_hash;
-    SignerImage? types_id_pic;
+    Identicon? types_id_pic;
 };
 
 [Enum]
@@ -847,14 +867,15 @@ dictionary MSCFieldNumber {
 };
 
 [Enum]
-interface SignerImage {
-    Svg(sequence<u8> image);
-    Png(sequence<u8> image);
+interface Identicon {
+    Dots(sequence<u8> identity);
+    Blockies(string identity);
+    Jdenticon(string identity);
 };
 
 dictionary MSCId {
     string base58;
-    SignerImage identicon;
+    Identicon identicon;
 };
 
 dictionary MSCNameVersion {

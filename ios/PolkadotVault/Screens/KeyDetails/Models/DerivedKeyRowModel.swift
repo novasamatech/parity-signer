@@ -21,7 +21,7 @@ struct DerivedKeyActionModel: Equatable {
 
 struct DerivedKeyRowViewModel: Equatable {
     let addressKey: String
-    let identicon: SignerImage
+    let identicon: Identicon
     let network: String
     let path: String
     let hasPassword: Bool
@@ -45,7 +45,7 @@ struct DerivedKeyRowViewModel: Equatable {
 extension DerivedKeyRowViewModel {
     init(
         addressKey: String = "",
-        identicon: SignerImage,
+        identicon: Identicon,
         network: String,
         path: String,
         hasPassword: Bool,
