@@ -25,16 +25,14 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
 	screenData: ScreenData,
-	navigate: (Action, String, String) -> Unit,
+	navigator: Navigator,
 	sharedViewModel: SharedViewModel
 ) {
-	val button2: (Action, String) -> Unit =
-		{ action, details -> navigate(action, details, "") }
 
 	when (screenData) {
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
-			button2
+			navigator,
 		)
 
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
