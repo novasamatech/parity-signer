@@ -37,6 +37,9 @@ struct IdenticonView: View {
             )
             .frame(width: rowHeight, height: rowHeight)
             .clipShape(Circle())
+        case let .jdenticon(identity):
+            Spacer()
+                .frame(width: rowHeight, height: rowHeight)
         }
     }
 }
