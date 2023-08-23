@@ -2,7 +2,7 @@
 //!
 //! Vault database has a tree `ADDRTREE` with [`AddressKey`] in key form
 //! as a key and encoded [`AddressDetails`] as a value.
-//! [`AddressDetails`] contains non-secret information associated with address key.  
+//! [`AddressDetails`] contains non-secret information associated with address key.
 //!
 //! `ADDRTREE` is operated mainly from within the Vault.
 //!
@@ -22,37 +22,34 @@ use crate::{
 
 /// Address key associated non-secret information stored in Vault database
 ///
-/// Info that should be available for any address key.  
-/// No secrets are stored there.  
+/// Info that should be available for any address key.
+/// No secrets are stored there.
 #[derive(Decode, PartialEq, Eq, Encode, Debug, Clone)]
 pub struct AddressDetails {
     /// seed name (as it is known to the Vault device)
     pub seed_name: String,
 
-    /// derivation path, only with soft (`/`) and hard (`//`) junctions (i.e. no password)  
+    /// derivation path, only with soft (`/`) and hard (`//`) junctions (i.e. no password)
     pub path: String,
 
-    /// whether the address key has an associated password  
+    /// whether the address key has an associated password
     pub has_pwd: bool,
 
     /// set of networks, identified through [`NetworkSpecsKey`], that are available
-    /// to work with this address key  
+    /// to work with this address key
     pub network_id: Option<NetworkSpecsKey>,
 
-    /// encryption algorithm associated with the address key and all its associated networks  
+    /// encryption algorithm associated with the address key and all its associated networks
     pub encryption: Encryption,
 
     /// address, or its parent address, had or could have secret exposed
     pub secret_exposed: bool,
-
-    /// whether the address key is imported from the external source (e.g. Nova Wallet)
-    pub was_imported: bool,
 }
 
 impl AddressDetails {
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
     /// [`AddressDetails`]) tuple from [`AddressKey`] and associated value from
-    /// database tree `ADDRTREE`.  
+    /// database tree `ADDRTREE`.
     ///
     /// Checks that there is no encryption mismatch.
     pub fn process_entry_with_key_checked(
@@ -84,7 +81,7 @@ impl AddressDetails {
     }
 
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
-    /// [`AddressDetails`]) tuple from database tree `ADDRTREE` (key, value) entry.  
+    /// [`AddressDetails`]) tuple from database tree `ADDRTREE` (key, value) entry.
     ///
     /// Checks that there is no encryption mismatch.
     pub fn process_entry_checked(
@@ -95,7 +92,7 @@ impl AddressDetails {
     }
 
     /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from
-    /// database tree `ADDRTREE`.  
+    /// database tree `ADDRTREE`.
     ///
     /// Checks that there is no encryption mismatch.
     pub fn from_entry_with_key_checked(
@@ -108,9 +105,9 @@ impl AddressDetails {
     }
 
     /// Checks if the [`AddressDetails`] have empty derivation path (i.e.
-    /// derivation path is empty and there is no password).  
+    /// derivation path is empty and there is no password).
     ///
-    /// Address key in this case is called root key or seed key.  
+    /// Address key in this case is called root key or seed key.
     pub fn is_root(&self) -> bool {
         self.path.is_empty() && !self.has_pwd && self.network_id.is_none()
     }

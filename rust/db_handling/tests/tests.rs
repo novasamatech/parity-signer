@@ -293,7 +293,6 @@ fn export_alice_westend() {
             network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 .to_string(),
         },
-        was_imported: false,
     };
     assert_eq!(key, expected_key);
 }
@@ -2061,7 +2060,6 @@ fn test_create_key_set_generate_default_addresses() {
             )),
             encryption: Encryption::Sr25519,
             secret_exposed: false,
-            was_imported: false,
         },
     )];
 
