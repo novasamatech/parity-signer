@@ -3,7 +3,8 @@ buildscript {
 	ext {
 		kotlin_version = '1.8.22'
 		compose_compiler_version = "1.4.8"
-		compose_libs_version = "1.4.3"
+		compose_libs_version = "1.5.0"
+		androidx_camera_version = "1.2.3"
 		accompanist_version = "0.28.0"
 		coilVersion = "2.4.0"
 	}
