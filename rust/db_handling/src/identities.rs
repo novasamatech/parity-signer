@@ -1708,7 +1708,7 @@ pub fn export_secret_key(
     }
     let public_key = multisigner_to_public(multisigner);
 
-    let style = address_details.encryption.identicon_style();
+    let style = address_details.identicon_style();
     let address = Address {
         path: address_details.path.to_string(),
         has_pwd: address_details.has_pwd,

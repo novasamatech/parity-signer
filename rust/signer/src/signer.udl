@@ -670,6 +670,26 @@ namespace signer {
     void handle_log_comment([ByRef] string user_input);
 
     [Throws=ErrorDisplayed]
+    MSeeds get_seeds([ByRef] sequence<string> names_phone_knows);
+
+    [Throws=ErrorDisplayed]
+    MKeyDetails get_key_set_public_key([ByRef] string address, [ByRef] string network_specs_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_derived_key([ByRef] string address, [ByRef] string network_specs_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_key_set([ByRef] string address_key);
+
+    [Throws=ErrorDisplayed]
+    MNetworkDetails get_managed_network_details([ByRef] string network_key);
+
+    [Throws=ErrorDisplayed]
+    void remove_metadata_on_managed_network([ByRef] string network_key, [ByRef] string metadata_specs_version);
+
+    sequence<string> seed_phrase_guess_words([ByRef] string user_input);
+
+    [Throws=ErrorDisplayed]
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
 
     [Throws=ErrorDisplayed]
@@ -850,6 +870,7 @@ dictionary MSCFieldNumber {
 interface Identicon {
     Dots(sequence<u8> identity);
     Blockies(string identity);
+    Jdenticon(string identity);
 };
 
 dictionary MSCId {
