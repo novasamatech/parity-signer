@@ -131,7 +131,6 @@ fun ModalSelector(
 fun AlertSelector(
 	alert: AlertData?,
 	navigator: Navigator,
-	acknowledgeWarning: Callback
 ) {
 	SignerOldTheme() {
 		when (alert) {
