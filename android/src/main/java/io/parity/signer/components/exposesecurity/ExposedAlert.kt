@@ -22,7 +22,7 @@ fun ExposedAlert(
 	when (networkState.value) {
 		NetworkState.Active -> {
 			SignerNewTheme() {
-				BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
+				BottomSheetWrapperRoot(onClosedAction = navigateBack) {
 					ExposedNowBottomSheet(close = navigateBack)
 				}
 			}
@@ -30,7 +30,7 @@ fun ExposedAlert(
 
 		NetworkState.Past -> {
 			SignerNewTheme() {
-				BottomSheetWrapperRoot(onClosedAction = { navigateBack() }) {
+				BottomSheetWrapperRoot(onClosedAction = navigateBack) {
 					ExposedPastBottomSheet(
 						close = navigateBack,
 						acknowledgeWarning = { vm.acknowledgeWarning() }
