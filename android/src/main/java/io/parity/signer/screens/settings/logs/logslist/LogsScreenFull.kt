@@ -58,7 +58,7 @@ fun LogsScreenFull(
 				)
 			}
 		}
-		LaunchedEffect(Unit) {
+		LaunchedEffect(viewModel) {
 			viewModel.updateLogsData()
 		}
 	}
