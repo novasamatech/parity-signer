@@ -5,7 +5,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.scan.elements.CameraCloseIcon
@@ -122,7 +122,7 @@ internal fun ScanHeader(
 	onClose: Callback,
 ) {
 	val viewModel: CameraViewModel = viewModel()
-	val torchEnabled by viewModel.isTorchEnabled.collectAsState()
+	val torchEnabled by viewModel.isTorchEnabled.collectAsStateWithLifecycle()
 	Row(
 		modifier
 			.fillMaxWidth(1f)
