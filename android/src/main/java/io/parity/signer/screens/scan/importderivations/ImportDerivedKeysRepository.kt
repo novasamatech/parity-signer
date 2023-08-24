@@ -1,7 +1,6 @@
 package io.parity.signer.screens.scan.importderivations
 
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
@@ -11,7 +10,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.SeedKeysPreview
 import io.parity.signer.uniffi.importDerivations
 import io.parity.signer.uniffi.populateDerivationsHasPwd
-import io.parity.signer.uniffi.tryCreateImportedAddress
+import io.parity.signer.uniffi.tryCreateAddress
 
 
 class ImportDerivedKeysRepository(
@@ -56,7 +55,7 @@ class ImportDerivedKeysRepository(
 		val occuredErrors = mutableListOf<PathToError>()
 		keysToImport.forEach { key ->
 			try {
-				tryCreateImportedAddress(
+				tryCreateAddress(
 					seedName = seedName,
 					seedPhrase = seedPhrase,
 					path = key.path,

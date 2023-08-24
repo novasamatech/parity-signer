@@ -163,7 +163,6 @@ private fun DdDetail.toKeyModel() = KeyModel(
 	hasPwd = false,
 	path = path,
 	secretExposed = false,
-	wasImported = null
 )
 
 private fun ddPreviewcreateStub(): DdPreview = DdPreview(
@@ -181,7 +180,6 @@ private fun ddPreviewcreateStub(): DdPreview = DdPreview(
 	isSomeNetworkMissing = true,
 )
 
-@OptIn(ExperimentalUnsignedTypes::class)
 private fun ddDetailcreateStub(): DdDetail = DdDetail(
 	base58 = "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX",
 	path = "//polkadot//path2",

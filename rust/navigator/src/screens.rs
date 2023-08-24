@@ -594,7 +594,6 @@ mod tests {
             network_id: Some(NetworkSpecsKey::from_hex("").unwrap()),
             encryption: Encryption::Sr25519,
             secret_exposed: false,
-            was_imported: false,
         }
     }
 
