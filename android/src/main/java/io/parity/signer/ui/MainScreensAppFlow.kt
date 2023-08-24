@@ -136,7 +136,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 				AlertSelector(
 					alert = actionResult.alertData,
 					navigator = navigator,
-					acknowledgeWarning = sharedViewModel::acknowledgeWarning
 				)
 			}
 		}
