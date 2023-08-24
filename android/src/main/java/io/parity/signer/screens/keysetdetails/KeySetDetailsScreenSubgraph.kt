@@ -60,7 +60,7 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onBack = onBack,
 			onAddNewKey =
-			{//todo dmitry
+			{//todo dmitry extend nav graph instead of rust
 				navigator.navigate(Action.NEW_KEY) //new derived key
 			},
 			onFilterClicked = {
