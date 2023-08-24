@@ -141,18 +141,6 @@ fun KeyDetailsPublicKeyScreen(
 							modifier = Modifier.padding(start = 8.dp)
 						)
 					}
-					if (model.wasImported) {
-						SignerDivider()
-						Text(
-							text = stringResource(R.string.dynamic_derivation_path_label),
-							style = SignerTypeface.CaptionM,
-							color = MaterialTheme.colors.textTertiary,
-							modifier = Modifier
-								.fillMaxWidth(1f)
-								.padding(vertical = 12.dp, horizontal = 8.dp),
-							textAlign = TextAlign.Center,
-						)
-					}
 				}
 				BottomKeyPlate(plateShape, model)
 			}

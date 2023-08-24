@@ -343,23 +343,6 @@ fn try_create_address(
         .map_err(|e| e.to_string().into())
 }
 
-fn try_create_imported_address(
-    seed_name: &str,
-    seed_phrase: &str,
-    path: &str,
-    network: &str,
-) -> anyhow::Result<(), ErrorDisplayed> {
-    let network = NetworkSpecsKey::from_hex(network).map_err(|e| format!("{e}"))?;
-    db_handling::identities::try_create_imported_address(
-        &get_db()?,
-        seed_name,
-        seed_phrase,
-        path,
-        &network,
-    )
-    .map_err(|e| e.to_string().into())
-}
-
 /// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
 fn sign_dd_transaction(
     payload: &[String],

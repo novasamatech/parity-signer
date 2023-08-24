@@ -27,11 +27,6 @@ struct DerivedKeyRow: View {
             .padding(.top, Spacing.extraExtraSmall)
             .padding(.leading, Spacing.medium)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                if viewModel.isImported {
-                    Localizable.KeyDetails.Label.importedKey.text
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(PrimaryFont.labelXXS.font)
-                }
                 if !isRoot {
                     fullPath
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -91,7 +86,6 @@ struct DerivedKeyRow: View {
                         path: "//polkadot",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A",
-                        isImported: true,
                         rootKeyName: ""
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
@@ -103,8 +97,7 @@ struct DerivedKeyRow: View {
                         network: "kusama",
                         path: "",
                         hasPassword: false,
-                        base58: "15Gsc678654FDSG0HA04H0A",
-                        isImported: false
+                        base58: "15Gsc678654FDSG0HA04H0A"
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(true)
@@ -115,8 +108,7 @@ struct DerivedKeyRow: View {
                         network: "astar",
                         path: "//astar",
                         hasPassword: false,
-                        base58: "15Gsc678654FDSG0HA04H0A",
-                        isImported: false
+                        base58: "15Gsc678654FDSG0HA04H0A"
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(true)
@@ -127,8 +119,7 @@ struct DerivedKeyRow: View {
                         network: "kusama",
                         path: "//kusama",
                         hasPassword: true,
-                        base58: "15Gsc678654FDSG0HA04H0A",
-                        isImported: true
+                        base58: "15Gsc678654FDSG0HA04H0A"
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(false)
@@ -139,8 +130,7 @@ struct DerivedKeyRow: View {
                         network: "kusama",
                         path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                         hasPassword: true,
-                        base58: "15Gsc678654FDSG0HA04H0A",
-                        isImported: false
+                        base58: "15Gsc678654FDSG0HA04H0A"
                     ),
                     selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
                     isPresentingSelectionOverlay: Binding<Bool>.constant(false)
