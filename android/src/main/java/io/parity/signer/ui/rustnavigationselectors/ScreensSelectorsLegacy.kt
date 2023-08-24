@@ -84,6 +84,9 @@ fun ModalSelector(
 		}
 	} else {
 		when (modalData) {
+			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
+				modalData.f,
+			)
 			is ModalData.NewSeedMenu -> {} //new bottom sheet
 			is ModalData.SeedMenu -> {} //migrated
 			is ModalData.NetworkSelector -> {
@@ -109,10 +112,6 @@ fun ModalSelector(
 			is ModalData.LogRight -> {} //migrated to bottom sheet
 			is ModalData.NetworkDetailsMenu -> {} // migrated to network details screen
 			is ModalData.ManageMetadata -> {} // those actions now right in network details screen
-			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
-				modalData.f,
-			)
-
 			is ModalData.KeyDetailsAction -> {} //migrated to bottom sheet
 			is ModalData.TypesInfo -> {} // this functionality removed after redesign
 			is ModalData.NewSeedBackup -> {}//moved to new selector
