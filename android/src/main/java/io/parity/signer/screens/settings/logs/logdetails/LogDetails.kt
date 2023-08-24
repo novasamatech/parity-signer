@@ -10,10 +10,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.parity.signer.R
@@ -28,7 +28,7 @@ fun LogDetailsScreen(navController: NavController, logDetailsId: UInt) {
 	val viewModel: LogsDetailsViewModel = viewModel()
 	val context = LocalContext.current
 
-	val logsState = viewModel.logsState.collectAsState()
+	val logsState = viewModel.logsState.collectAsStateWithLifecycle()
 	val logsCurrentValue = logsState.value
 
 	Box(Modifier.statusBarsPadding()) {

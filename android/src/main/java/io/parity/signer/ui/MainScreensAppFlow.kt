@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
@@ -38,7 +37,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.mainScreenRoute) {
 		val sharedViewModel: SharedViewModel = viewModel()
 
-		val authenticated = sharedViewModel.authenticated.collectAsState()
+		val authenticated = sharedViewModel.authenticated.collectAsStateWithLifecycle()
 
 		BackHandler {
 			sharedViewModel.navigator.backAction()
