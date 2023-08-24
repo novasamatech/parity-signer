@@ -96,7 +96,7 @@ private fun KeySetBackupBottomSheet(
 		}
 	}
 
-	LaunchedEffect(Unit) {
+	LaunchedEffect(model.seedName) {
 		val phrase = getSeedPhraseForBackup(model.seedName)
 		if (phrase != null) {
 			seedPhrase = phrase

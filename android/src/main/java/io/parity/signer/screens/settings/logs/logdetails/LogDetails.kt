@@ -50,10 +50,10 @@ fun LogDetailsScreen(navController: NavController, logDetailsId: UInt) {
 				)
 			}
 		}
-		LaunchedEffect(Unit) {
+		LaunchedEffect(logDetailsId) {
 			viewModel.updateLogDetails(logDetailsId)
 		}
-		DisposableEffect(Unit) {
+		DisposableEffect(logDetailsId) {
 			onDispose { viewModel.resetValues() }
 		}
 	}

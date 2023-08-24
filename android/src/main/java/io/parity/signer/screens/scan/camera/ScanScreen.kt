@@ -25,7 +25,6 @@ import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.screens.scan.camera.*
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.uniffi.DecodeSequenceResult
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -43,8 +42,13 @@ fun ScanScreen(
 	val captured by viewModel.captured.collectAsState()
 	val total by viewModel.total.collectAsState()
 
-
-	LaunchedEffect(Unit) {
+	val currentPerformPayloads by rememberUpdatedState(performPayloads)
+	val currentOnBananaSplit by rememberUpdatedState(onBananaSplit)
+	val currentOnDynamicDerivations by rememberUpdatedState(onDynamicDerivations)
+	val currentOnDynamicDerivationsTransactions by rememberUpdatedState(
+		onDynamicDerivationsTransactions
+	)
+	LaunchedEffect(viewModel) {
 		//there can be data from last time camera was open since it's scanning during transition to a new screen
 		viewModel.resetPendingTransactions()
 
@@ -53,7 +57,7 @@ fun ScanScreen(
 				.filter { it.isNotEmpty() }
 				.collect {
 					//scanned qr codes is signer transaction qr code
-					performPayloads(it.joinToString(separator = ""))
+					currentPerformPayloads(it.joinToString(separator = ""))
 					viewModel.resetPendingTransactions()
 				}
 		}
@@ -63,7 +67,7 @@ fun ScanScreen(
 				.filterNotNull()
 				.filter { it.isNotEmpty() }
 				.collect { qrData ->
-					onBananaSplit(qrData)
+					currentOnBananaSplit(qrData)
 				}
 		}
 
@@ -72,7 +76,7 @@ fun ScanScreen(
 				.filterNotNull()
 				.filter { it.isNotEmpty() }
 				.collect { qrData ->
-					onDynamicDerivations(qrData)
+					currentOnDynamicDerivations(qrData)
 				}
 		}
 
@@ -81,7 +85,7 @@ fun ScanScreen(
 				.filterNotNull()
 				.filter { it.isNotEmpty() }
 				.collect { qrData ->
-					onDynamicDerivationsTransactions(qrData)
+					currentOnDynamicDerivationsTransactions(qrData)
 				}
 		}
 	}

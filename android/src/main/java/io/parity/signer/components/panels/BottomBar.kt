@@ -13,6 +13,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -40,9 +42,10 @@ fun BottomBar(
 	onBeforeActionWhenClicked: Callback? = null,
 ) {
 	if (!skipRememberCameraParent) {
+		val currentState by rememberUpdatedState(state)
 		LaunchedEffect(key1 = Unit) {
 			CameraParentSingleton.lastPossibleParent =
-				CameraParentScreen.BottomBarScreen(state)
+				CameraParentScreen.BottomBarScreen(currentState)
 		}
 	}
 	BottomAppBar(
