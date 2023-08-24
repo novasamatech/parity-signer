@@ -6,6 +6,7 @@
 //
 
 import Blockies
+import Jdenticon
 import PolkadotIdenticon
 import SwiftUI
 
@@ -30,16 +31,23 @@ struct IdenticonView: View {
             .frame(width: rowHeight, height: rowHeight)
             .clipShape(Circle())
         case let .blockies(identity):
-            BlockiesIdenticonView(
-                seed: identity,
-                width: rowHeight,
-                height: rowHeight
-            )
-            .frame(width: rowHeight, height: rowHeight)
-            .clipShape(Circle())
+            ZStack {
+                Circle()
+                    .fill(Asset.backgroundIdenticon.swiftUIColor)
+                    .frame(width: rowHeight, height: rowHeight)
+                BlockiesIdenticonView(
+                    seed: identity,
+                    width: rowHeight / sqrt(2.0),
+                    height: rowHeight / sqrt(2.0)
+                )
+            }
         case let .jdenticon(identity):
-            Spacer()
-                .frame(width: rowHeight, height: rowHeight)
+            ZStack {
+                Circle()
+                    .fill(Asset.backgroundIdenticon.swiftUIColor)
+                    .frame(width: rowHeight, height: rowHeight)
+                JdenticonView(hash: identity, size: rowHeight / sqrt(2.0))
+            }
         }
     }
 }
@@ -50,17 +58,18 @@ struct IdenticonView: View {
         static var previews: some View {
             VStack(alignment: .center, spacing: 10) {
                 IdenticonView(
-                    identicon: .stubIdenticon
+                    identicon: .stubIdenticon,
+                    rowHeight: 100
                 )
-            }
-            .preferredColorScheme(.dark)
-            .previewLayout(.sizeThatFits)
-            VStack(alignment: .center, spacing: 10) {
                 IdenticonView(
-                    identicon: .stubBlockiesIdenticon
+                    identicon: .stubBlockiesIdenticon,
+                    rowHeight: 100
+                )
+                IdenticonView(
+                    identicon: .stubJdenticon,
+                    rowHeight: 100
                 )
             }
-            .frame(maxWidth: 150)
             .preferredColorScheme(.dark)
             .previewLayout(.sizeThatFits)
         }

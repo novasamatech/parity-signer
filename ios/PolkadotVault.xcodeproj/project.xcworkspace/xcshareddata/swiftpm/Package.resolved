@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "svgview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/SVGView.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b2f2b2a7b576604ad17c11b3af33c27992bc5bcf"
+      }
+    },
+    {
       "identity" : "swift-qrcode-generator",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dagronf/swift-qrcode-generator",
