@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
+import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
@@ -28,6 +29,7 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
@@ -47,7 +49,7 @@ fun KeySetDetailsScreenSubgraph(
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
 			model = filteredModel.value,
-			navigator= navigator,
+			navigator = navigator,
 			networkState = networkState,
 			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onMenu = {
@@ -59,7 +61,7 @@ fun KeySetDetailsScreenSubgraph(
 			onBack = onBack,
 			onAddNewKey =
 			{//todo dmitry
-//				navigator.navigate(Action.NEW_KEY) //new derived key
+				navigator.navigate(Action.NEW_KEY) //new derived key
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
@@ -97,8 +99,9 @@ fun KeySetDetailsScreenSubgraph(
 						}
 					},
 					exposeConfirmAction = {
-//						todo dmitry
-//						navigator.navigate(Action.SHIELD)
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
+						}
 					}
 				)
 			}
@@ -200,6 +203,9 @@ fun KeySetDetailsScreenSubgraph(
 				}
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+			ExposedAlert(navigateBack = { menuNavController.popBackStack() })
+		}
 	}
 }
 
@@ -212,6 +218,7 @@ private object KeySetDetailsMenuSubgraph {
 	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
 	const val export = "export_multiselect"
+	const val exposed_shield_alert = "keys_exposed_shield_alert"
 }
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"

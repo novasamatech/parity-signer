@@ -13,7 +13,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 @Composable
 fun ExposedAlert(
 	navigateBack: Callback,
-) {
+	) {
 
 	val vm = viewModel<ExposedViewModel>()
 	val networkState: State<NetworkState?> =
