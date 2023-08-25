@@ -31,21 +31,21 @@ struct IdenticonView: View {
             .frame(width: rowHeight, height: rowHeight)
             .clipShape(Circle())
         case let .blockies(identity):
-            ZStack {
-                Circle()
-                    .fill(Asset.backgroundIdenticon.swiftUIColor)
-                    .frame(width: rowHeight, height: rowHeight)
-                BlockiesIdenticonView(
-                    seed: identity,
-                    width: rowHeight / sqrt(2.0),
-                    height: rowHeight / sqrt(2.0)
-                )
-            }
+            BlockiesIdenticonView(
+                seed: identity,
+                width: rowHeight,
+                height: rowHeight
+            )
+            .clipShape(Circle())
         case let .jdenticon(identity):
             ZStack {
                 Circle()
-                    .fill(Asset.backgroundIdenticon.swiftUIColor)
+                    .stroke(Asset.appliedStroke.swiftUIColor, lineWidth: 2)
                     .frame(width: rowHeight, height: rowHeight)
+                    .overlay(
+                        Circle()
+                            .fill(Asset.backgroundSystemLightOnly.swiftUIColor)
+                    )
                 JdenticonView(hash: identity, size: rowHeight / sqrt(2.0))
             }
         }
