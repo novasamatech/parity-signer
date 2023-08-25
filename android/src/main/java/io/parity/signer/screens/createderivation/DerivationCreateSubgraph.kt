@@ -3,9 +3,9 @@ package io.parity.signer.screens.createderivation
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -34,7 +34,7 @@ fun DerivationCreateSubgraph(
 	val deriveViewModel: DerivationCreateViewModel = viewModel()
 	deriveViewModel.setInitValues(seedName, rootNavigator)
 	val context = LocalContext.current
-	val path = deriveViewModel.path.collectAsState()
+	val path = deriveViewModel.path.collectAsStateWithLifecycle()
 
 	val navController = rememberNavController()
 	NavHost(

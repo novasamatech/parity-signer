@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,7 +33,7 @@ fun NewKeysetRecoverSecondStepSubgraph(
 	)
 
 	val viewModel: KeysetRecoverViewModel = viewModel()
-	val model = viewModel.recoverState.collectAsState()
+	val model = viewModel.recoverState.collectAsStateWithLifecycle()
 
 	DisposableEffect(key1 = Unit) {
 		viewModel.initValue(initialRecoverSeedPhrase)

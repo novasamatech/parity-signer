@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
@@ -59,7 +59,7 @@ fun CombinedScreensSelector(
 ) {
 	val rootNavigator = sharedViewModel.navigator
 	val seedNames =
-		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsState()
+		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsStateWithLifecycle()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {

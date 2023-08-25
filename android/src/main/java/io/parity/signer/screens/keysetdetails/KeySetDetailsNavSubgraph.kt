@@ -14,10 +14,10 @@ import io.parity.signer.domain.submitErrorState
 
 @Composable
 fun KeySetDetailsNavSubgraph(
-    model: KeySetDetailsModel,
-    rootNavigator: Navigator,
-    networkState: State<NetworkState?>, //for shield icon
-    singleton: SharedViewModel,
+	model: KeySetDetailsModel,
+	rootNavigator: Navigator,
+	networkState: State<NetworkState?>, //for shield icon
+	singleton: SharedViewModel,
 ) {
 	val navController = rememberNavController()
 	NavHost(
@@ -31,6 +31,7 @@ fun KeySetDetailsNavSubgraph(
 				navigator = rootNavigator,
 				navController = navController,
 				networkState = networkState,
+				onBack = { rootNavigator.backAction() },
 				onRemoveKeySet = {
 					val root = model.root
 					if (root != null) {
