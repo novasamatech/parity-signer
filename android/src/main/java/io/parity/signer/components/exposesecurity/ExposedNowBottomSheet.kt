@@ -3,7 +3,11 @@ package io.parity.signer.components.exposesecurity
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +27,7 @@ import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
-fun ExposedNowBottomSheet(
+internal fun ExposedNowBottomSheet(
 	close: Callback,
 ) {
 	Column(

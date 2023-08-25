@@ -20,22 +20,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkState
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
-import io.parity.signer.uniffi.Action
 
 @Composable
 fun ExposedIcon(
 	networkState: State<NetworkState?>,
-	navigator: Navigator,
+	onClick: Callback,
 	modifier: Modifier = Modifier,
 ) {
 	when (networkState.value) {
-		NetworkState.Active -> ExposedIconActive(navigator, modifier)
-		NetworkState.Past -> ExposedIconPast(navigator, modifier)
+		NetworkState.Active -> ExposedIconActive(
+			modifier = modifier,
+			onClick = onClick,
+		)
+
+		NetworkState.Past -> ExposedIconPast(
+			modifier = modifier,
+			onClick = onClick,
+		)
+
 		NetworkState.None, null -> {
 			//emty view
 		}
@@ -44,14 +50,14 @@ fun ExposedIcon(
 
 @Composable
 private fun ExposedIconActive(
-	navigator: Navigator,
 	modifier: Modifier,
+	onClick: Callback,
 ) {
 	Box(
 		modifier = modifier
 			.size(56.dp)
 			.background(MaterialTheme.colors.red400, CircleShape)
-			.clickable { navigator.navigate(Action.SHIELD) },
+			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center
 	) {
 		Image(
@@ -65,13 +71,15 @@ private fun ExposedIconActive(
 
 
 @Composable
-private fun ExposedIconPast(navigator: Navigator,
-														modifier: Modifier,) {
+private fun ExposedIconPast(
+	modifier: Modifier,
+	onClick: Callback,
+) {
 	Box(
 		modifier = modifier
 			.size(56.dp)
 			.background(MaterialTheme.colors.red400, CircleShape)
-			.clickable { navigator.navigate(Action.SHIELD) },
+			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center
 	) {
 		Image(
@@ -99,8 +107,8 @@ private fun PreviewExposedIcon() {
 		Column(
 			modifier = Modifier.size(300.dp),
 		) {
-			ExposedIconActive(EmptyNavigator(), Modifier,)
-			ExposedIconPast(EmptyNavigator(), Modifier,)
+			ExposedIconActive(Modifier, {})
+			ExposedIconPast(Modifier, {})
 		}
 	}
 }

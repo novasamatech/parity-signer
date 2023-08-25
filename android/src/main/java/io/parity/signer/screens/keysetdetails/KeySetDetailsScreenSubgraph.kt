@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
+import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
@@ -28,12 +29,14 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
 	navigator: Navigator,
 	navController: NavController,
+	onBack: Callback,
 	networkState: State<NetworkState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
@@ -55,6 +58,11 @@ fun KeySetDetailsScreenSubgraph(
 			onShowPublicKey = { title: String, key: String ->
 				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
 			},
+			onBack = onBack,
+			onAddNewKey =
+			{//todo dmitry extend nav graph instead of rust
+				navigator.navigate(Action.NEW_KEY) //new derived key
+			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 			}
@@ -72,7 +80,6 @@ fun KeySetDetailsScreenSubgraph(
 		composable(KeySetDetailsMenuSubgraph.keys_menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeyDetailsMenuGeneral(
-					navigator = navigator,
 					networkState = networkState,
 					onSelectKeysClicked = {
 						menuNavController.popBackStack()
@@ -91,6 +98,11 @@ fun KeySetDetailsScreenSubgraph(
 							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
 					},
+					exposeConfirmAction = {
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
+						}
+					}
 				)
 			}
 		}
@@ -191,6 +203,9 @@ fun KeySetDetailsScreenSubgraph(
 				}
 			}
 		}
+		composable(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+			ExposedAlert(navigateBack = { menuNavController.popBackStack() })
+		}
 	}
 }
 
@@ -203,6 +218,7 @@ private object KeySetDetailsMenuSubgraph {
 	const val backup = "keyset_details_backup"
 	const val keys_public_key = "keys_public_key"
 	const val export = "export_multiselect"
+	const val exposed_shield_alert = "keys_exposed_shield_alert"
 }
 
 private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
