@@ -929,7 +929,6 @@ impl State {
                                 let _ = write!(&mut errorline, "{e}");
                             }
                         }
-                    } else {
                     }
                 }
                 SpecialtyKeysState::None => println!("RemoveKey does nothing here"),

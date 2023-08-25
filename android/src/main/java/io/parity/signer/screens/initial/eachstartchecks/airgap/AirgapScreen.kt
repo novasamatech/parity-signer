@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +29,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.CheckboxIcon
@@ -43,7 +43,7 @@ fun AirgapScreen(
 	onCta: Callback,
 ) {
 	val viewModel = viewModel<AirGapViewModel>()
-	val state = viewModel.state.collectAsState()
+	val state = viewModel.state.collectAsStateWithLifecycle()
 	DisposableEffect(Unit) {
 		viewModel.init()
 		onDispose {

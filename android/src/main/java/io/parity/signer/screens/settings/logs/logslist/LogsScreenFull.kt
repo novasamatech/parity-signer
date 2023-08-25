@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -33,7 +33,7 @@ fun LogsScreenFull(
 	val viewModel: LogsViewModel = viewModel<LogsViewModel>()
 	val context = LocalContext.current
 
-	val logsState = viewModel.logsState.collectAsState()
+	val logsState = viewModel.logsState.collectAsStateWithLifecycle()
 	val logsCurrentValue = logsState.value
 
 	Box(Modifier.statusBarsPadding()) {
@@ -58,7 +58,7 @@ fun LogsScreenFull(
 				)
 			}
 		}
-		LaunchedEffect(Unit) {
+		LaunchedEffect(viewModel) {
 			viewModel.updateLogsData()
 		}
 	}

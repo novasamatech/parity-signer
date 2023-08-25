@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,12 +41,12 @@ fun <T> AnimatedQrKeysInfo(
 
 	Box(
 		modifier = modifier
-            .fillMaxWidth(1f)
-            .aspectRatio(1.1f)
-            .background(
-                Color.White,
-                RoundedCornerShape(qrRounding)
-            ),
+			.fillMaxWidth(1f)
+			.aspectRatio(1.1f)
+			.background(
+				Color.White,
+				RoundedCornerShape(qrRounding)
+			),
 		contentAlignment = Alignment.Center,
 	) {
 		currentCode.value?.let { currentImage ->
