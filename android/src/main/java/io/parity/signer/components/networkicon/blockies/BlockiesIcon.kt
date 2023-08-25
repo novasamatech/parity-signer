@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -29,25 +30,17 @@ fun BlockiesIcon(
 	modifier: Modifier = Modifier
 ) {
 	val blockies: Blockies = Blockies.fromSeed(seed)
-	Box(
+	Canvas(
 		modifier = modifier
 			.size(preferedSize)
-			.background(Color.White, CircleShape)
-			.border(1.dp, MaterialTheme.colors.appliedStroke, CircleShape),
-		contentAlignment = Alignment.Center
-	)
-	{
-		Canvas(
-			modifier = Modifier
-				.size(preferedSize.div(sqrt(2f)))
-		) {
-			BlockiesPainter.draw(
-				blockies = blockies,
-				canvas = drawContext.canvas,
-				width = size.width,
-				height = size.height
-			)
-		}
+			.clip(CircleShape)
+	) {
+		BlockiesPainter.draw(
+			blockies = blockies,
+			canvas = drawContext.canvas,
+			width = size.width,
+			height = size.height
+		)
 	}
 }
 

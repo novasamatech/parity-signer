@@ -49,7 +49,7 @@ fun Jdenticon(
 		modifier = modifier
 			.size(size)
 			.background(Color.White, CircleShape)
-			.border(1.dp, MaterialTheme.colors.appliedStroke, CircleShape),
+			.border(2.dp, MaterialTheme.colors.appliedStroke, CircleShape),
 		contentAlignment = Alignment.Center
 	)
 	{
