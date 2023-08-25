@@ -8,16 +8,16 @@
 import Foundation
 
 final class DynamicDerivationsService {
-    private let databaseMediator: DatabaseMediating
+    private let backendService: BackendService
     private let callQueue: Dispatching
     private let callbackQueue: Dispatching
 
     init(
-        databaseMediator: DatabaseMediating = DatabaseMediator(),
+        backendService: BackendService = BackendService(),
         callQueue: Dispatching = DispatchQueue(label: "DynamicDerivationsService", qos: .userInitiated),
         callbackQueue: Dispatching = DispatchQueue.main
     ) {
-        self.databaseMediator = databaseMediator
+        self.backendService = backendService
         self.callQueue = callQueue
         self.callbackQueue = callbackQueue
     }
@@ -27,18 +27,9 @@ final class DynamicDerivationsService {
         payload: String,
         completion: @escaping (Result<DdPreview, ServiceError>) -> Void
     ) {
-        callQueue.async {
-            let result: Result<DdPreview, ServiceError>
-            do {
-                let preview: DdPreview = try previewDynamicDerivations(seeds: seedPhrases, payload: payload)
-                result = .success(preview)
-            } catch {
-                result = .failure(.init(message: error.backendDisplayError))
-            }
-            self.callbackQueue.async {
-                completion(result)
-            }
-        }
+        backendService.performCall({
+            try previewDynamicDerivations(seeds: seedPhrases, payload: payload)
+        }, completion: completion)
     }
 
     func signDynamicDerivationsTransaction(
