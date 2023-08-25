@@ -59,6 +59,7 @@ fun CircularCountDownTimer(
 			val animatedProgress by animateFloatAsState(
 				targetValue = progress,
 				animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+				label = "circular countdown animation",
 			)
 			CircularProgressIndicator(
 				progress = animatedProgress,
@@ -72,18 +73,19 @@ fun CircularCountDownTimer(
 		}
 	}
 
+	val currentTimeoutAction by rememberUpdatedState(onTimeOutAction)
 	LaunchedEffect(key1 = Unit) {
 		try {
 			while (timeLeft > 0) {
 				delay(1.seconds)
 				timeLeft -= 1
 				if (timeLeft == 0) {
-					onTimeOutAction()
+					currentTimeoutAction()
 				}
 			}
 		} finally {
 			if (timeLeft > 0) {
-				onTimeOutAction()
+				currentTimeoutAction()
 			}
 		}
 	}
@@ -136,6 +138,7 @@ fun SnackBarCircularCountDownTimer(
 			val animatedProgress by animateFloatAsState(
 				targetValue = progress,
 				animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+				label = "snack bar countdown animation",
 			)
 			CircularProgressIndicator(
 				progress = animatedProgress,
@@ -149,18 +152,19 @@ fun SnackBarCircularCountDownTimer(
 		}
 	}
 
+	val currentTimeoutAction by rememberUpdatedState(onTimeOutAction)
 	LaunchedEffect(key1 = Unit) {
 		try {
 			while (timeLeft > 0) {
 				delay(1.seconds)
 				timeLeft -= 1
 				if (timeLeft == 0) {
-					onTimeOutAction()
+					currentTimeoutAction()
 				}
 			}
 		} finally {
 			if (timeLeft > 0) {
-				onTimeOutAction
+				currentTimeoutAction()
 			}
 		}
 	}

@@ -9,14 +9,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.scan.bananasplit.networks.RecoverKeysetSelectNetworkBananaFlowScreen
 import kotlinx.coroutines.flow.filterNotNull
@@ -64,7 +61,7 @@ fun BananaSplitSubgraph(
 		}
 	}
 
-	val isBananaRestorable = bananaViewModel.isBananaRestorable.collectAsState()
+	val isBananaRestorable = bananaViewModel.isBananaRestorable.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 
 	BackHandler(onBack = {
