@@ -214,6 +214,94 @@ class UniffiInteractor(val appContext: Context) {
 				UniffiResult.Error(e)
 			}
 		}
+
+	suspend fun getSeeds(
+		seedNames: List<String>
+	): UniffiResult<MSeeds> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.getSeeds(seedNames)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun getKeySetPublicKey(
+		address: String,
+		networkSpecsKey: String
+	): UniffiResult<MKeyDetails> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.getKeySetPublicKey(address, networkSpecsKey)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun removeDerivedKey(
+		address: String,
+		networkSpecsKey: String
+	): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.removeDerivedKey(address, networkSpecsKey)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun removeKeySet(
+		addressKey: String
+	): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.removeKeySet(addressKey)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun getManagedNetworkDetails(
+		networkKey: String
+	): UniffiResult<MNetworkDetails> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.getManagedNetworkDetails(networkKey)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun removeMetadataManagedNetwork(
+		networkKey: String,
+		metadataSpecsVersion: String
+	): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.removeMetadataOnManagedNetwork(networkKey, metadataSpecsVersion)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun seedPhraseGuessWords(
+		userInput: String
+	): UniffiResult<List<String>> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.seedPhraseGuessWords(userInput)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 }
 
 sealed class UniffiResult<T> {
