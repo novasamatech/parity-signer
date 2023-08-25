@@ -131,9 +131,5 @@ class SharedViewModel() : ViewModel() {
 			0
 		).versionName
 	}
-
-	fun acknowledgeWarning() {
-		networkExposedStateKeeper.acknowledgeWarning()
-	}
 }
 

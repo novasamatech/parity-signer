@@ -2,6 +2,7 @@ package io.parity.signer.components.networkicon
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +68,7 @@ private fun PreviewIdentIcon() {
 		val iconJdenticon = PreviewData.Identicon.jdenticonIcon
 
 		Column(
+			modifier = Modifier.padding(horizontal = 24.dp),
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			IdentIconImage(iconDot)

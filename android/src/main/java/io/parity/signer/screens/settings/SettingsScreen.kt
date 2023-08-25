@@ -196,7 +196,7 @@ private fun SettingsScreenGeneralView(
 			}
 			ExposedIcon(
 				networkState = networkState,
-				navigator = rootNavigator,
+				onClick = { rootNavigator.navigate(Action.SHIELD) },
 				modifier = Modifier
 					.align(Alignment.BottomEnd)
 					.padding(end = 16.dp, bottom = 16.dp)
