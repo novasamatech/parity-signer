@@ -34,7 +34,7 @@ import io.parity.signer.uniffi.MNewSeedBackup
  */
 @Composable
 internal fun NewKeySetBackupScreen(
-	model: NewSeedBackupModel,
+	seedPhrase: String,
 	onProceed: Callback,
 	onBack: Callback,
 	modifier: Modifier = Modifier,
@@ -62,7 +62,7 @@ internal fun NewKeySetBackupScreen(
 				.padding(horizontal = 24.dp)
 				.padding(bottom = 8.dp),
 		)
-		SeedPhraseBox(seedPhrase = model.seedPhrase)
+		SeedPhraseBox(seedPhrase = seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier
@@ -110,12 +110,8 @@ fun MNewSeedBackup.toNewSeedBackupModel(): NewSeedBackupModel =
 )
 @Composable
 private fun PreviewNewKeySetBackupScreen() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	SignerNewTheme {
-		NewKeySetBackupScreen(model, {}, {})
+		NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 	}
 }
 
@@ -123,13 +119,9 @@ private fun PreviewNewKeySetBackupScreen() {
 @Preview
 @Composable
 private fun PreviewNewKeySetBackupScreenNarrow() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	Box(modifier = Modifier.size(height = 400.dp, width = 150.dp)) {
 		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
+			NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 		}
 	}
 }
@@ -137,13 +129,9 @@ private fun PreviewNewKeySetBackupScreenNarrow() {
 @Preview
 @Composable
 private fun PreviewNewKeySetBackupScreenShort() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	Box(modifier = Modifier.size(height = 400.dp, width = 200.dp)) {
 		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
+			NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 		}
 	}
 }

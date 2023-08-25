@@ -13,11 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewSeedBackupModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.Action
 
@@ -28,13 +26,12 @@ fun NewKeysetStepSubgraph(
 ) {
 
 
-
 	//background
 	Box(//todo remove when rust navigation not in place yet
 		modifier = Modifier
-            .fillMaxSize(1f)
-            .statusBarsPadding()
-            .background(MaterialTheme.colors.background)
+			.fillMaxSize(1f)
+			.statusBarsPadding()
+			.background(MaterialTheme.colors.background)
 	)
 
 
@@ -43,12 +40,6 @@ fun NewKeysetStepSubgraph(
 		navController = navController,
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetBackup,
 	) {
-		val onProceedFromBackupInitial = { //to cache so screen can be taked from caches during navigation
-				navController.navigate(
-					NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
-				)
-			}
-^^ check to test
 
 		composable(NewKeySetBackupStepSubgraph.NewKeySetName) {
 			NewKeySetNameScreen(
@@ -65,7 +56,11 @@ fun NewKeysetStepSubgraph(
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = onProceedFromBackupInitial,
+				onProceed = {
+					navController.navigate(
+						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
+					)
+				},
 				onBack = onExitFlow,
 				modifier = Modifier.statusBarsPadding(),
 			)
@@ -74,7 +69,11 @@ fun NewKeysetStepSubgraph(
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
 				model = model,
-				onProceed = onProceedFromBackupInitial,
+				onProceed = {
+					navController.navigate(
+						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
+					)
+				},
 				onBack = onExitFlow,
 				modifier = Modifier.statusBarsPadding(),
 			)

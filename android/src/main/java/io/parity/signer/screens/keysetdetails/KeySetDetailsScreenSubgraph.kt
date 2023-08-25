@@ -29,7 +29,6 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.uniffi.Action
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
@@ -59,9 +58,8 @@ fun KeySetDetailsScreenSubgraph(
 				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
 			},
 			onBack = onBack,
-			onAddNewKey =
-			{//todo dmitry extend nav graph instead of rust
-				navigator.navigate(Action.NEW_KEY) //new derived key
+			onAddNewKey = {
+				navController.navigate(KeySetDetailsNavSubgraph.newKeySet)
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
