@@ -1,6 +1,5 @@
 package io.parity.signer.ui.rustnavigationselectors
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
@@ -28,10 +28,7 @@ import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
 import io.parity.signer.screens.keysets.KeySetsNavSubgraph
-import io.parity.signer.screens.keysets.create.NewKeySetBackupStepSubgraph
-import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
-import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
 import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
@@ -71,12 +68,15 @@ fun CombinedScreensSelector(
 		}
 
 		is ScreenData.Keys -> {
-			val keys = try {
-				keysBySeedName(screenData.f)
-			} catch (e: ErrorDisplayed) {
-				rootNavigator.backAction()
-				submitErrorState("unexpected error in keysBySeedName $e")
-				null
+			val keys = remember {
+				//todo dmitry pass it inside of this screen?
+				try {
+					keysBySeedName(screenData.f)
+				} catch (e: ErrorDisplayed) {
+					rootNavigator.backAction()
+					submitErrorState("unexpected error in keysBySeedName $e")
+					null
+				}
 			}
 			keys?.let {
 				KeySetDetailsNavSubgraph(
@@ -126,17 +126,9 @@ fun CombinedScreensSelector(
 				rootNavigator,
 			)
 
-		is ScreenData.NewSeed ->
-			Box(
-				modifier = Modifier
-					.statusBarsPadding()
-					.imePadding()
-			) {
-				NewKeySetNameScreen(
-					rootNavigator = rootNavigator,
-					seedNames = seedNames.value,
-				)
-			}
+		is ScreenData.NewSeed -> {
+			submitErrorState("nothing, moved to keyset subgraph")
+		}
 
 		is ScreenData.RecoverSeedName -> {
 			Box(
@@ -170,10 +162,7 @@ fun CombinedScreensSelector(
 		}
 
 		is ScreenData.Transaction -> {
-			Log.e(
-				"Selector",
-				"Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData"
-			)
+			submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
 			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 
@@ -249,10 +238,8 @@ fun BottomSheetSelector(
 					}
 
 				is ModalData.NewSeedBackup -> {
-					NewKeySetBackupStepSubgraph(
-						model = modalData.f.toNewSeedBackupModel(),
-						rootNavigator = navigator,
-					)
+					// it is second step in
+					submitErrorState("nothing, moved to keyset subgraph")
 				}
 
 				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now

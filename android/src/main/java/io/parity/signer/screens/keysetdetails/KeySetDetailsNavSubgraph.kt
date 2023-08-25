@@ -1,7 +1,10 @@
 package io.parity.signer.screens.keysetdetails
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,6 +14,10 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.keysets.create.NewKeysetStepSubgraph
+import io.parity.signer.screens.keysets.create.NewKeySetNameScreen
+import io.parity.signer.screens.keysets.create.backupstepscreens.toNewSeedBackupModel
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun KeySetDetailsNavSubgraph(
@@ -43,9 +50,16 @@ fun KeySetDetailsNavSubgraph(
 				},
 			)
 		}
+		composable(KeySetDetailsNavSubgraph.newKeySet) {
+			NewKeysetStepSubgraph(
+				model = modalData.f.toNewSeedBackupModel(),
+				rootNavigator = navigator,
+			)
+		}
 	}
 }
 
 internal object KeySetDetailsNavSubgraph {
 	const val home = "keyset_details_home"
+	const val newKeySet = "keyset_details_new_keyset"
 }

@@ -28,6 +28,10 @@ import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MNewSeedBackup
 
 
+/**
+ * 2/2 stage to create new key set
+ * first is NewKeySetNameScreen
+ */
 @Composable
 internal fun NewKeySetBackupScreen(
 	model: NewSeedBackupModel,

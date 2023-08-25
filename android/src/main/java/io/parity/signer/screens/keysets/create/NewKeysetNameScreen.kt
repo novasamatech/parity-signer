@@ -26,8 +26,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -41,9 +44,13 @@ import io.parity.signer.uniffi.Action
  */
 @Composable
 fun NewKeySetNameScreen(
-	rootNavigator: Navigator,
-	seedNames: Array<String>
+	onBack: Callback,
+	onNextStep: (keysetName: String) -> Unit,
+	modifier: Modifier,
 ) {
+	val viewModel: NewKeysetNameViewModel = viewModel()
+	val seedNames: Array<String> by viewModel.seedNames.collectAsStateWithLifecycle()
+
 	var keySetName by remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -51,7 +58,7 @@ fun NewKeySetNameScreen(
 	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
 
 	Column(
-		Modifier
+		modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background),
 	) {
@@ -60,10 +67,11 @@ fun NewKeySetNameScreen(
 			currentStep = 1,
 			allSteps = 3,
 			btnText = stringResource(R.string.button_next),
-			onClose = { rootNavigator.backAction() },
+			onClose = onBack,
 			onButton = {
 				if (canProceed) {
-					rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+					onNextStep(keySetName)
+					//todo dmitry check if I need it
 					focusManager.clearFocus(true)
 				}
 			},
@@ -94,7 +102,8 @@ fun NewKeySetNameScreen(
 			keyboardActions = KeyboardActions(
 				onDone = {
 					if (canProceed) {
-						rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+						onNextStep(keySetName)
+//todo dmitry and here as above
 						focusManager.clearFocus(true)
 					}
 				}
@@ -138,6 +147,6 @@ fun NewKeySetNameScreen(
 @Composable
 private fun PreviewNewKeySetScreen() {
 	SignerNewTheme {
-		NewKeySetNameScreen(EmptyNavigator(), arrayOf())
+		NewKeySetNameScreen(EmptyNavigator(), Modifier)
 	}
 }

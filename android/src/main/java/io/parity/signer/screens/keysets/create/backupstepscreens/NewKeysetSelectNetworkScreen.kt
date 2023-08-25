@@ -53,8 +53,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewKeySetSelectNetworkScreen(
 	model: NewSeedBackupModel,
-	navigator: Navigator,
 	onBack: Callback,
+	onSuccess: Callback,
 ) {
 	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
