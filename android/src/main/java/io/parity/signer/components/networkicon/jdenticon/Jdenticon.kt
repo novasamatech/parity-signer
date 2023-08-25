@@ -3,6 +3,7 @@ package io.parity.signer.components.networkicon.jdenticon
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -11,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,7 +25,7 @@ import coil.size.Size
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.jdenticon.jdenticon_kotlin.Jdenticon
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.iconsBackground
+import io.parity.signer.ui.theme.appliedStroke
 import kotlin.math.sqrt
 
 
@@ -46,7 +48,8 @@ fun Jdenticon(
 	Box(
 		modifier = modifier
 			.size(size)
-			.background(MaterialTheme.colors.iconsBackground, CircleShape),
+			.background(Color.White, CircleShape)
+			.border(2.dp, MaterialTheme.colors.appliedStroke, CircleShape),
 		contentAlignment = Alignment.Center
 	)
 	{
