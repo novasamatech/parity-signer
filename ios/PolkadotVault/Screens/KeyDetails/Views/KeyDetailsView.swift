@@ -86,7 +86,6 @@ struct KeyDetailsView: View {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
                 mainAction: viewModel.onRemoveKeySetConfirmationTap(),
-                dismissAction: viewModel.onRemoveKeySetModalDismiss(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
