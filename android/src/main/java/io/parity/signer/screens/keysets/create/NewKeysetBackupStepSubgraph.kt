@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +21,6 @@ import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackup
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.uniffi.Action
 
 
 @Composable
@@ -34,19 +37,27 @@ fun NewKeysetStepSubgraph(
 			.background(MaterialTheme.colors.background)
 	)
 
+	var seedName by rememberSaveable() {
+		mutableStateOf("")
+	}
+	val seedPhrase = rememberSaveable() {
+		"some value" //todo dmitry generate it from view model
+	}
 
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = NewKeySetBackupStepSubgraph.NewKeySetBackup,
+		startDestination = NewKeySetBackupStepSubgraph.NewKeySetName,
 	) {
 
 		composable(NewKeySetBackupStepSubgraph.NewKeySetName) {
 			NewKeySetNameScreen(
 				onBack = { navController.popBackStack() },
 				onNextStep = {
-					//todo dmitry implement
-					rootNavigator.navigate(Action.GO_FORWARD, it)
+					seedName = it   //todo dmitry pass it back as well
+					navController.navigate(
+						NewKeySetBackupStepSubgraph.NewKeySetBackup
+					)
 				},
 				modifier = Modifier
 					.statusBarsPadding()
@@ -55,7 +66,7 @@ fun NewKeysetStepSubgraph(
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
-				model = model,
+				seedPhrase = seedPhrase,
 				onProceed = {
 					navController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
@@ -68,7 +79,7 @@ fun NewKeysetStepSubgraph(
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
-				model = model,
+				seedPhrase = seedPhrase,
 				onProceed = {
 					navController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
@@ -91,7 +102,8 @@ fun NewKeysetStepSubgraph(
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 			NewKeySetSelectNetworkScreen(
-				model = model,
+				seedName = seedName,
+				seedPhrase = seedPhrase,
 				onSuccess = onExitFlow,
 				onBack = navController::popBackStack,
 			)

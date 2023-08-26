@@ -46,13 +46,15 @@ import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.ScreenData
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewKeySetSelectNetworkScreen(
-	model: NewSeedBackupModel,
+	seedName: String,
+	seedPhrase: String,
 	onBack: Callback,
 	onSuccess: Callback,
 ) {
@@ -79,7 +81,7 @@ fun NewKeySetSelectNetworkScreen(
 
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
-			seedName = model.seed, seedPhrase = model.seedPhrase,
+			seedName = seedName, seedPhrase = seedPhrase,
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			navigator = navigator,

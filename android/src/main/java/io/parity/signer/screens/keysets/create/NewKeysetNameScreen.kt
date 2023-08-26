@@ -147,6 +147,6 @@ fun NewKeySetNameScreen(
 @Composable
 private fun PreviewNewKeySetScreen() {
 	SignerNewTheme {
-		NewKeySetNameScreen(EmptyNavigator(), Modifier)
+		NewKeySetNameScreen({}, {}, Modifier)
 	}
 }
