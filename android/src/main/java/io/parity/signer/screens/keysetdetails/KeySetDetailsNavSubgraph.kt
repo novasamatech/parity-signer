@@ -46,12 +46,7 @@ fun KeySetDetailsNavSubgraph(
 		}
 		composable(KeySetDetailsNavSubgraph.newKeySet) {
 			NewKeysetStepSubgraph(
-				onExitFlow = {
-					navController.popBackStack(
-						KeySetDetailsNavSubgraph.home,
-						true
-					)
-				}
+				navController = navController,
 			)
 		}
 	}

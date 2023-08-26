@@ -13,10 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import io.parity.signer.domain.Callback
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
@@ -25,7 +24,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
 fun NewKeysetStepSubgraph(
-	onExitFlow: Callback,
+	navController: NavHostController,
 ) {
 
 	//background
@@ -43,7 +42,6 @@ fun NewKeysetStepSubgraph(
 		"some value" //todo dmitry generate it from view model
 	}
 
-	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetName,
@@ -51,9 +49,10 @@ fun NewKeysetStepSubgraph(
 
 		composable(NewKeySetBackupStepSubgraph.NewKeySetName) {
 			NewKeySetNameScreen(
+				prefilledName = seedName,
 				onBack = { navController.popBackStack() },
 				onNextStep = {
-					seedName = it   //todo dmitry pass it back as well
+					seedName = it
 					navController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackup
 					)
@@ -71,10 +70,9 @@ fun NewKeysetStepSubgraph(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
 					)
 				},
-				onBack = onExitFlow,
+				onBack = { navController.popBackStack() },
 				modifier = Modifier.statusBarsPadding(),
 			)
-			BackHandler(onBack = onExitFlow)
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation) {
 			NewKeySetBackupScreen(
@@ -84,7 +82,7 @@ fun NewKeysetStepSubgraph(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
 					)
 				},
-				onBack = onExitFlow,
+				onBack = { navController.popBackStack() },
 				modifier = Modifier.statusBarsPadding(),
 			)
 			BottomSheetWrapperRoot(onClosedAction = navController::popBackStack) {
@@ -103,7 +101,11 @@ fun NewKeysetStepSubgraph(
 			NewKeySetSelectNetworkScreen(
 				seedName = seedName,
 				seedPhrase = seedPhrase,
-				onSuccess = onExitFlow,
+				onSuccess = {
+					navController.popBackStack(
+						NewKeySetBackupStepSubgraph.NewKeySetName, true
+					)
+				},
 				onBack = navController::popBackStack,
 			)
 		}

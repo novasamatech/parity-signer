@@ -52,7 +52,7 @@ internal fun NewKeySetBackupScreen(
 			btnText = stringResource(R.string.button_next),
 			onClose = onBack,
 			onButton = null,
-			backNotClose = false,
+			backNotClose = true,
 		)
 		Text(
 			text = stringResource(R.string.new_key_set_backup_subtitle),

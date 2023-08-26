@@ -17,6 +17,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -31,12 +32,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
-import io.parity.signer.uniffi.Action
 
 /**
  * 1/2 stage to create new key set
@@ -44,6 +42,7 @@ import io.parity.signer.uniffi.Action
  */
 @Composable
 fun NewKeySetNameScreen(
+	prefilledName: String,
 	onBack: Callback,
 	onNextStep: (keysetName: String) -> Unit,
 	modifier: Modifier,
@@ -51,7 +50,7 @@ fun NewKeySetNameScreen(
 	val viewModel: NewKeysetNameViewModel = viewModel()
 	val seedNames: Array<String> by viewModel.seedNames.collectAsStateWithLifecycle()
 
-	var keySetName by remember { mutableStateOf("") }
+	var keySetName by rememberSaveable { mutableStateOf(prefilledName) }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -147,6 +146,6 @@ fun NewKeySetNameScreen(
 @Composable
 private fun PreviewNewKeySetScreen() {
 	SignerNewTheme {
-		NewKeySetNameScreen({}, {}, Modifier)
+		NewKeySetNameScreen("", {}, {}, Modifier)
 	}
 }
