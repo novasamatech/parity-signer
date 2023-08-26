@@ -58,7 +58,7 @@ fun NewKeySetSelectNetworkScreen(
 	onBack: Callback,
 	onSuccess: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(
@@ -82,16 +82,16 @@ fun NewKeySetSelectNetworkScreen(
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
 			seedName = seedName, seedPhrase = seedPhrase,
-			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
+			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
-			navigator = navigator,
-			onPostReaction = { isSuccess ->
+			onAfterCreate = { isSuccess ->
 				if (isSuccess) {
 					Toast.makeText(
 						context,
-						context.getString(R.string.key_set_has_been_created_toast, model.seed),
+						context.getString(R.string.key_set_has_been_created_toast, seedName),
 						Toast.LENGTH_LONG
 					).show()
+					onSuccess()
 				}
 			}
 		)
