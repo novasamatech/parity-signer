@@ -74,6 +74,7 @@ fun KeySetDetailsScreenView(
 	navigator: Navigator,
 	networkState: State<NetworkState?>, //for shield icon
 	fullModelWasEmpty: Boolean,
+	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
 	onAddNewKey: Callback,
@@ -104,6 +105,7 @@ fun KeySetDetailsScreenView(
 						) {
 							val selectKeyDetails =
 								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
+							//todo dmitry
 							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 						}
 					}
@@ -134,7 +136,7 @@ fun KeySetDetailsScreenView(
 
 			ExposedIcon(
 				networkState = networkState,
-				onClick = { navigator.navigate(Action.SHIELD) },
+				onClick = onExposedClicked,
 				Modifier
 					.align(Alignment.BottomEnd)
 					.padding(end = 16.dp, bottom = 24.dp)
@@ -337,6 +339,7 @@ private fun PreviewKeySetDetailsScreen() {
 				navigator = EmptyNavigator(),
 				networkState = state,
 				fullModelWasEmpty = false,
+				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
 				onAddNewKey = {},
@@ -367,6 +370,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				navigator = EmptyNavigator(),
 				networkState = state,
 				fullModelWasEmpty = true,
+				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
 				onAddNewKey = {},
@@ -397,6 +401,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				navigator = EmptyNavigator(),
 				networkState = state,
 				fullModelWasEmpty = false,
+				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
 				onAddNewKey = {},

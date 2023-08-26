@@ -28,7 +28,6 @@ fun NewKeysetStepSubgraph(
 	onExitFlow: Callback,
 ) {
 
-
 	//background
 	Box(//todo remove when rust navigation not in place yet
 		modifier = Modifier
