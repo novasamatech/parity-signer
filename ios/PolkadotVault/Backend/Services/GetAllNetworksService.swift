@@ -20,7 +20,7 @@ final class GetAllNetworksService {
         _ completion: @escaping (Result<[MmNetwork], ServiceError>) -> Void
     ) {
         backendService.performCall({
-            try getAllNetworks()
+            try getManagedNetworks().networks
         }, completion: completion)
     }
 }

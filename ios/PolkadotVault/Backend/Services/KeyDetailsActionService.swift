@@ -21,7 +21,7 @@ final class KeyDetailsActionService {
         _ completion: @escaping (Result<Void, ServiceError>) -> Void
     ) {
         backendService.performCall({
-            try historySeedNameWasShown(seedName: seedName)
+            try historySeedWasShown(seedName: seedName)
         }, completion: completion)
     }
 

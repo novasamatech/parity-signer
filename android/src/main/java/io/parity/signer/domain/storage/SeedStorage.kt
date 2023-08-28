@@ -10,7 +10,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.domain.FeatureFlags
 import io.parity.signer.domain.FeatureOption
-import io.parity.signer.uniffi.historySeedNameWasShown
+import io.parity.signer.uniffi.historySeedWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -133,7 +133,7 @@ class SeedStorage {
 			""
 		} else {
 			if (showInLogs) {
-				historySeedNameWasShown(seedName)
+				historySeedWasShown(seedName)
 			}
 			seedPhrase
 		}

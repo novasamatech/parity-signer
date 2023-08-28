@@ -159,7 +159,7 @@ final class CreateDerivedKeyService {
             let seeds = self.seedsMediator.getSeeds(seedNames: Set(seedNames))
             var occuredErrors: [(seedName: String, error: String)] = []
 
-            guard let network = try? getAllNetworks()
+            guard let network = try? getManagedNetworks().networks
                 .first(where: { $0.title == networkName }) else {
                 result = .failure(.noNetwork)
                 return
