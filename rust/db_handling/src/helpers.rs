@@ -656,3 +656,7 @@ pub fn get_danger_status(database: &sled::Db) -> Result<bool> {
     let a = settings.get(DANGER)?.ok_or(Error::DangerStatusNotFound)?;
     Ok(DangerRecord::from_ivec(&a).device_was_online()?)
 }
+
+pub fn validate_mnemonic(mnemonic: &str) -> bool {
+    bip39::Mnemonic::validate(mnemonic, bip39::Language::English).is_ok()
+}
