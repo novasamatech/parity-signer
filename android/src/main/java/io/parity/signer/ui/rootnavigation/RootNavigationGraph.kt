@@ -1,4 +1,4 @@
-package io.parity.signer.ui
+package io.parity.signer.ui.rootnavigation
 
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -95,7 +95,9 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 		startDestination = FirstTimeOnboarding.onboardingExplanationRoute,
 	) {
 		composable(route = FirstTimeOnboarding.onboardingExplanationRoute) {
-			OnboardingExplanationScreenFull(navigateNext = {navController.navigate(FirstTimeOnboarding.termsConsentRoute)})
+			OnboardingExplanationScreenFull(navigateNext = {navController.navigate(
+				FirstTimeOnboarding.termsConsentRoute
+			)})
 			LaunchedEffect(Unit) {
 				Log.d(NAVIGATION_TAG, "onboarding explanation opened")
 			}

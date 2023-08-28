@@ -1,4 +1,4 @@
-package io.parity.signer.ui
+package io.parity.signer.ui.rootnavigation
 
 import android.util.Log
 import androidx.activity.compose.BackHandler

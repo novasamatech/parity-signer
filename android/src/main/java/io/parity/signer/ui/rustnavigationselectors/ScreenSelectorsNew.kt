@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
@@ -19,15 +18,13 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
-import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
-import io.parity.signer.screens.keysetdetails.KeySetDetailsNavSubgraph
-import io.parity.signer.screens.keysets.KeySetsNavSubgraph
+import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
@@ -42,10 +39,8 @@ import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
 fun CombinedScreensSelector(
@@ -60,23 +55,17 @@ fun CombinedScreensSelector(
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
-			KeySetsNavSubgraph(
-				screenData.f.toKeySetsSelectModel(),
+			KeySetNavSubgraph(
 				rootNavigator = rootNavigator,
-				networkState = networkState,
+				singleton = sharedViewModel,
 			)
 		}
 
-		is ScreenData.Keys -> {
-				KeySetDetailsNavSubgraph(
-					seedName = screenData.f,
-					rootNavigator = rootNavigator,
-					networkState = networkState,
-					singleton = sharedViewModel,
-				)
+		is ScreenData.Keys -> {//keyset details
+			submitErrorState("key set details clicked for non existing key details content")
 		}
 
-		is ScreenData.KeyDetails ->
+		is ScreenData.KeyDetails -> //todo dmitry remove it here
 			Box(modifier = Modifier.statusBarsPadding()) {
 				screenData.f?.toKeyDetailsModel()?.let { model ->
 					KeyDetailsPublicKeyScreen(

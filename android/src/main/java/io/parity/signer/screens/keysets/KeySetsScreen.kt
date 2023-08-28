@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.createSavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
@@ -35,11 +36,26 @@ import io.parity.signer.uniffi.Action
 /**
  * Default main screen with list Seeds/root keys
  */
+
 @Composable
 fun KeySetsScreen(
+	rootNavigator: Navigator,
+	networkState: State<NetworkState?>
+) {
+	val model = KeySetsSelectModel(emptyList())//todo dmitry get from viewmodel
+	KeySetsScreen(
+		model = model,
+		rootNavigator = rootNavigator,
+		onSelectSeed = {rootNavigator.navigate(Action.SELECT_SEED, it)},
+		networkState = networkState,
+	)
+}
+
+@Composable
+private fun KeySetsScreen(
 	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
-	localNavigator: NavController,
+	onSelectSeed: (seedName: String) -> Unit,//todo dmitry add other callbacks as well
 	networkState: State<NetworkState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
@@ -55,8 +71,8 @@ fun KeySetsScreen(
 				) {
 					val cards = model.keys
 					items(cards.size) { i ->
-						KeySetItem2(model = cards[i]) {
-							rootNavigator.navigate(Action.SELECT_SEED, cards[i].seedName)
+						KeySetItem2(model = cards[i], ) {
+							onSelectSeed(cards[i].seedName)
 						}
 						if (i == cards.lastIndex) {
 							//to put elements under the button
@@ -128,7 +144,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+			KeySetsScreen(mockModel, EmptyNavigator(), {}, state)
 		}
 	}
 }
@@ -190,7 +206,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+			KeySetsScreen(mockModel, EmptyNavigator(), {}, state)
 		}
 	}
 }
@@ -211,7 +227,7 @@ private fun PreviewKeySetsSelectScreenEmpty() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), rememberNavController(), state)
+			KeySetsScreen(mockModel, EmptyNavigator(), {}, state)
 		}
 	}
 }
