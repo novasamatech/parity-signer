@@ -68,24 +68,12 @@ fun CombinedScreensSelector(
 		}
 
 		is ScreenData.Keys -> {
-			val keys = remember {
-				//todo dmitry pass it inside of this screen?
-				try {
-					keysBySeedName(screenData.f)
-				} catch (e: ErrorDisplayed) {
-					rootNavigator.backAction()
-					submitErrorState("unexpected error in keysBySeedName $e")
-					null
-				}
-			}
-			keys?.let {
 				KeySetDetailsNavSubgraph(
-					model = keys.toKeySetDetailsModel(),
+					seedName = screenData.f,
 					rootNavigator = rootNavigator,
 					networkState = networkState,
 					singleton = sharedViewModel,
 				)
-			}
 		}
 
 		is ScreenData.KeyDetails ->
