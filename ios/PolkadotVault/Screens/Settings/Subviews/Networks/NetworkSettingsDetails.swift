@@ -143,6 +143,15 @@ struct NetworkSettingsDetails: View {
                     )
                 )
             }
+            .fullScreenModal(
+                isPresented: $viewModel.isPresentingError
+            ) {
+                ErrorBottomModal(
+                    viewModel: viewModel.presentableError,
+                    isShowingBottomAlert: $viewModel.isPresentingError
+                )
+                .clearModalBackground()
+            }
             .bottomSnackbar(
                 viewModel.snackbarViewModel,
                 isPresented: $viewModel.isSnackbarPresented
@@ -337,6 +346,8 @@ extension NetworkSettingsDetails {
         @Published var isShowingQRScanner: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
 
         init(
             networkKey: String,
@@ -353,17 +364,28 @@ extension NetworkSettingsDetails {
 
         func removeMetadata() {
             isPresentingRemoveMetadataConfirmation = false
-            networkDetails = networkDetailsService.deleteNetworkMetadata(
+            networkDetailsService.deleteNetworkMetadata(
                 networkKey,
                 metadataToDelete?.specsVersion ?? ""
-            )
-            snackbarViewModel = .init(
-                title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
-                    .confirmation(metadataToDelete?.specsVersion ?? ""),
-                style: .warning
-            )
-            isSnackbarPresented = true
-            metadataToDelete = nil
+            ) { result in
+                switch result {
+                case .success:
+                    guard let metadataToDelete = self.metadataToDelete else { return }
+                    self.snackbarViewModel = .init(
+                        title: Localizable.Settings.NetworkDetails.DeleteMetadata.Label
+                            .confirmation(metadataToDelete.specsVersion),
+                        style: .warning
+                    )
+                    self.isSnackbarPresented = true
+                    if let indexOfDeletedMetadata = self.networkDetails.meta.firstIndex(of: metadataToDelete) {
+                        self.networkDetails.meta.remove(at: indexOfDeletedMetadata)
+                    }
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+                self.metadataToDelete = nil
+            }
         }
 
         func onAddTap() {

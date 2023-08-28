@@ -557,6 +557,10 @@ fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDi
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
+fn validate_seed_phrase(seed_phrase: &str) -> bool {
+    db_handling::helpers::validate_mnemonic(seed_phrase)
+}
+
 fn create_key_set(
     seed_name: &str,
     seed_phrase: &str,

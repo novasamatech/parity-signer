@@ -34,7 +34,7 @@ final class OnboardingMediator: ObservableObject {
     func onboard(verifierRemoved: Bool = false) {
         guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
-        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] in
+        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] _ in
             guard let self = self else { return }
             self.seedsMediator.refreshSeeds()
             self.onboardingDone = true
