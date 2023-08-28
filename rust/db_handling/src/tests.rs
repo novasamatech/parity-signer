@@ -3,6 +3,7 @@ use pretty_assertions::assert_eq;
 
 use constants::ALICE_SEED_PHRASE;
 
+use crate::helpers::validate_mnemonic;
 use crate::{
     identities::{check_derivation_set, generate_random_phrase, is_passworded},
     interface_signer::{guess, SeedDraft},
@@ -206,4 +207,16 @@ fn checking_derivation_set() {
     assert!(check_derivation_set(&["//remarkably///ugly".to_string()]).is_ok());
     assert!(check_derivation_set(&["no_path_at_all".to_string()]).is_err());
     assert!(check_derivation_set(&["///".to_string()]).is_err());
+}
+
+#[test]
+fn validate_mnemonic_ok() {
+    let seed = "park remain person kitchen mule spell knee armed position rail grid ankle";
+    assert!(validate_mnemonic(seed));
+}
+
+#[test]
+fn validate_mnemonic_err() {
+    let invalid_seed = "park remain person kitchen mule spell knee armed position rail grid";
+    assert!(!validate_mnemonic(invalid_seed));
 }
