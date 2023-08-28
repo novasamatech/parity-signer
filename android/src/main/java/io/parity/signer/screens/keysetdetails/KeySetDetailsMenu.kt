@@ -45,11 +45,11 @@ fun KeySetDeleteConfirmBottomSheet(
 
 @Composable
 fun KeyDetailsMenuGeneral(
-	navigator: Navigator,
 	networkState: State<NetworkState?>,
 	onSelectKeysClicked: Callback,
 	onBackupClicked: Callback,
 	onDeleteClicked: Callback,
+	exposeConfirmAction: Callback,//also called shield
 	onCancel: Callback,
 ) {
 	val sidePadding = 24.dp
@@ -72,7 +72,7 @@ fun KeyDetailsMenuGeneral(
 				if (networkState.value == NetworkState.None)
 					onBackupClicked()
 				else
-					navigator.navigate(Action.SHIELD)
+					exposeConfirmAction()
 			}
 		)
 
@@ -107,7 +107,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.None) }
 		KeyDetailsMenuGeneral(
-			EmptyNavigator(), state, {}, {}, {}, {},
+		state, {}, {}, {}, {}, {},
 		)
 	}
 }

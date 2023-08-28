@@ -2,14 +2,18 @@ package io.parity.signer.ui
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.captionBarPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -17,27 +21,33 @@ import androidx.navigation.compose.composable
 import io.parity.signer.components.panels.TopBar
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.NavigationMigrations
+import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.UnlockAppAuthScreen
 import io.parity.signer.screens.initial.WaitingScreen
-import io.parity.signer.ui.rustnavigationselectors.*
+import io.parity.signer.ui.rustnavigationselectors.AlertSelector
+import io.parity.signer.ui.rustnavigationselectors.BottomSheetSelector
+import io.parity.signer.ui.rustnavigationselectors.CombinedScreensSelector
+import io.parity.signer.ui.rustnavigationselectors.ModalSelector
+import io.parity.signer.ui.rustnavigationselectors.ScreenSelector
 
 
 fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 	composable(route = MainGraphRoutes.mainScreenRoute) {
 		val sharedViewModel: SharedViewModel = viewModel()
 
-		val authenticated = sharedViewModel.authenticated.collectAsState()
+		val authenticated = sharedViewModel.authenticated.collectAsStateWithLifecycle()
 
 		BackHandler {
 			sharedViewModel.navigator.backAction()
 		}
 
 		if (authenticated.value) {
-			SignerMainSubgraph(sharedViewModel)
+			MainUnlockedSubgraphVault(sharedViewModel)
 		} else {
-			val currentActivity = LocalContext.current.findActivity() as FragmentActivity
+			val currentActivity =
+				LocalContext.current.findActivity() as FragmentActivity
 			UnlockAppAuthScreen {
 				val authentication = ServiceLocator.authentication
 				authentication.authenticate(currentActivity) {
@@ -56,11 +66,11 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 
 
 @Composable
-fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
+fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 
-	val actionResultState = sharedViewModel.actionResult.collectAsState()
-	val shieldAlert = sharedViewModel.networkState.collectAsState()
-	val localNavAction = sharedViewModel.localNavAction.collectAsState()
+	val actionResultState = sharedViewModel.actionResult.collectAsStateWithLifecycle()
+	val shieldNetworkState = sharedViewModel.networkState.collectAsStateWithLifecycle()
+	val localNavAction = sharedViewModel.localNavAction.collectAsStateWithLifecycle()
 
 	val actionResult = actionResultState.value
 
@@ -70,6 +80,7 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 		// Structure to contain all app
 		Box {
 			//screens before redesign
+			val navigator: Navigator = sharedViewModel.navigator
 			Scaffold(
 				modifier = Modifier
 					.navigationBarsPadding()
@@ -84,7 +95,7 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 						TopBar(
 							sharedViewModel = sharedViewModel,
 							actionResult = actionResult,
-							networkState = shieldAlert,
+							networkState = shieldNetworkState,
 						)
 					}
 				},
@@ -92,8 +103,8 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 				Box(modifier = Modifier.padding(innerPadding)) {
 					ScreenSelector(
 						screenData = actionResult.screenData,
-						navigate = sharedViewModel.navigator::navigate,
-						sharedViewModel = sharedViewModel
+						navigator = navigator,
+						sharedViewModel = sharedViewModel,
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
@@ -111,21 +122,19 @@ fun SignerMainSubgraph(sharedViewModel: SharedViewModel) {
 				CombinedScreensSelector(
 					screenData = actionResult.screenData,
 					localNavAction = localNavAction.value,
-					networkState = shieldAlert,
+					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
 					localNavAction = localNavAction.value,
-					networkState = shieldAlert,
+					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel,
-					navigator = sharedViewModel.navigator,
+					navigator = navigator,
 				)
 				AlertSelector(
 					alert = actionResult.alertData,
-					networkState = shieldAlert,
-					navigate = sharedViewModel.navigator::navigate,
-					acknowledgeWarning = sharedViewModel::acknowledgeWarning
+					navigator = navigator,
 				)
 			}
 		}
