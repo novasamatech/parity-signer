@@ -204,7 +204,7 @@ struct KeyDetailsView: View {
                     KeyDetailsPublicKeyView(
                         viewModel: .init(
                             keyDetails: viewModel.presentedKeyDetails,
-                            publicKeyDetails: viewModel.presentedPublicKeyDetails,
+                            addressKey: viewModel.presentedPublicKeyDetails,
                             onCompletion: viewModel.onPublicKeyCompletion(_:)
                         )
                     )

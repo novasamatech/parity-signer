@@ -252,7 +252,7 @@ extension KeyDetailsView.ViewModel {
             ) { result in
                 switch result {
                 case let .success(keyDetails):
-                    self.presentedPublicKeyDetails = deriveKey.publicKeyDetails
+                    self.presentedPublicKeyDetails = deriveKey.addressKey
                     self.presentedKeyDetails = keyDetails
                     self.isPresentingKeyDetails = true
                 case let .failure(error):
@@ -350,7 +350,7 @@ private extension KeyDetailsView.ViewModel {
                 DerivedKeyRowModel(
                     keyData: $0,
                     viewModel: DerivedKeyRowViewModel($0),
-                    publicKeyDetails: $0.publicKeyDetails
+                    addressKey: $0.key.addressKey
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list
