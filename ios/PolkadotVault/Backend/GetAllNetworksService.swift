@@ -28,7 +28,7 @@ final class GetAllNetworksService {
         callQueue.async {
             let result: Result<[MmNetwork], ServiceError>
             do {
-                let networks: [MmNetwork] = try getAllNetworks()
+                let networks: [MmNetwork] = try getManagedNetworks().networks
                 result = .success(networks)
             } catch {
                 result = .failure(.init(message: error.backendDisplayError))

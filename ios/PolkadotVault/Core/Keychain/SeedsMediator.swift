@@ -141,7 +141,7 @@ final class SeedsMediator: SeedsMediating {
         switch result {
         case let .success(resultSeed):
             do {
-                try historySeedNameWasShown(seedName: seedName)
+                try historySeedWasShown(seedName: seedName)
             } catch {
                 do {
                     try historyEntrySystem(
