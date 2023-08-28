@@ -86,7 +86,6 @@ struct KeyDetailsView: View {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
                 mainAction: viewModel.onRemoveKeySetConfirmationTap(),
-                dismissAction: viewModel.onRemoveKeySetModalDismiss(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
@@ -205,7 +204,7 @@ struct KeyDetailsView: View {
                     KeyDetailsPublicKeyView(
                         viewModel: .init(
                             keyDetails: viewModel.presentedKeyDetails,
-                            publicKeyDetails: viewModel.presentedPublicKeyDetails,
+                            addressKey: viewModel.presentedPublicKeyDetails,
                             onCompletion: viewModel.onPublicKeyCompletion(_:)
                         )
                     )

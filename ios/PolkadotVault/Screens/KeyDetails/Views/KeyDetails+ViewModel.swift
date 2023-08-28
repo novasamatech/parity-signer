@@ -153,13 +153,16 @@ extension KeyDetailsView {
         func onRemoveKeySetConfirmationTap() {
             let isRemoved = seedsMediator.removeSeed(seedName: removeSeed)
             guard isRemoved else { return }
-            keyDetailsActionsService.forgetKeySetAction(keyName)
-            dismissRequest.send()
-            onCompletion(.keySetDeleted)
-        }
-
-        func onRemoveKeySetModalDismiss() {
-            keyDetailsActionsService.resetNavigationStateToKeyDetails(keyName)
+            keyDetailsActionsService.forgetKeySet(seedName: keyName) { result in
+                switch result {
+                case .success:
+                    self.dismissRequest.send()
+                    self.onCompletion(.keySetDeleted)
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func onPublicKeyCompletion(_ completionAction: KeyDetailsPublicKeyView.OnCompletionAction) {
@@ -243,11 +246,20 @@ extension KeyDetailsView.ViewModel {
                 selectedKeys.append(deriveKey)
             }
         } else {
-            guard let keyDetails = keyDetailsActionsService.navigateToPublicKey(keyName, deriveKey.publicKeyDetails)
-            else { return }
-            presentedPublicKeyDetails = deriveKey.publicKeyDetails
-            presentedKeyDetails = keyDetails
-            isPresentingKeyDetails = true
+            keyDetailsActionsService.navigateToPublicKey(
+                addressKey: deriveKey.keyData.key.addressKey,
+                networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
+            ) { result in
+                switch result {
+                case let .success(keyDetails):
+                    self.presentedPublicKeyDetails = deriveKey.addressKey
+                    self.presentedKeyDetails = keyDetails
+                    self.isPresentingKeyDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
     }
 
@@ -271,9 +283,16 @@ extension KeyDetailsView.ViewModel {
             if isAlertVisible {
                 isPresentingConnectivityAlert.toggle()
             } else {
-                keyDetailsActionsService.performBackupSeed(keyName)
-                updateBackupModel()
-                isShowingBackupModal = true
+                keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
+                    switch result {
+                    case .success:
+                        self.updateBackupModel()
+                        self.isShowingBackupModal = true
+                    case let .failure(error):
+                        self.presentableError = .alertError(message: error.localizedDescription)
+                        self.isPresentingError = true
+                    }
+                }
             }
         }
         if shouldPresentSelectionOverlay {
@@ -331,7 +350,7 @@ private extension KeyDetailsView.ViewModel {
                 DerivedKeyRowModel(
                     keyData: $0,
                     viewModel: DerivedKeyRowViewModel($0),
-                    publicKeyDetails: $0.publicKeyDetails
+                    addressKey: $0.key.addressKey
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list

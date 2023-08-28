@@ -1,0 +1,30 @@
+//
+//  ExportKeySetService.swift
+//  Polkadot Vault
+//
+//  Created by Krzysztof Rodak on 18/10/2022.
+//
+
+import Foundation
+
+final class ExportKeySetService {
+    private let backendService: BackendService
+
+    init(
+        backendService: BackendService = BackendService()
+    ) {
+        self.backendService = backendService
+    }
+
+    func exportRootWithDerivedKeys(
+        seedName: String,
+        keys: [MKeyAndNetworkCard],
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    ) {
+        let selectedItems: ExportedSet = .selected(s: keys.map(\.asPathAndNetwork))
+        backendService.performCall({
+            let qrCodes = try exportKeyInfo(seedName: seedName, exportedSet: selectedItems).frames
+            return AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload))
+        }, completion: completion)
+    }
+}
