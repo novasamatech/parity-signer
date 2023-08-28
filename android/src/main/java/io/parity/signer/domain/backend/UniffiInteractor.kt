@@ -215,6 +215,17 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
+	suspend fun createNewSeedPhrase(
+	): UniffiResult<String> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult = io.parity.signer.uniffi.printNewSeed("")
+				UniffiResult.Success(transactionResult.seedPhrase)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 	suspend fun getSeeds(
 		seedNames: List<String>
 	): UniffiResult<MSeeds> =

@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,11 +36,15 @@ fun NewKeysetStepSubgraph(
 			.background(MaterialTheme.colors.background)
 	)
 
+	val vm: NewKeysetNameViewModel = viewModel()
 	var seedName by rememberSaveable() {
 		mutableStateOf("")
 	}
 	val seedPhrase = rememberSaveable() {
-		"some value" //todo dmitry generate it from view model
+		vm.createNewSeedPhrase() ?: run {
+			navController.popBackStack()
+			""
+		}
 	}
 
 	NavHost(
