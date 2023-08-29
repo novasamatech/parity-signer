@@ -24,4 +24,13 @@ final class RecoverKeySetService {
             seedPhraseGuessWords(userInput: userInput)
         }, completion: completion)
     }
+
+    func validate(
+        seedPhrase: String,
+        completion: @escaping (Result<Bool, ServiceError>) -> Void
+    ) {
+        backendService.performCall({
+            validateSeedPhrase(seedPhrase: seedPhrase)
+        }, completion: completion)
+    }
 }
