@@ -45,7 +45,6 @@ fun KeySetNavSubgraph(
 			Box(modifier = Modifier.statusBarsPadding()) {
 				KeySetsScreen(
 					rootNavigator = rootNavigator,
-					networkState = networkState,
 				)
 			}
 		}
