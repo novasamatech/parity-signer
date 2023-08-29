@@ -26,7 +26,7 @@ struct KeySetList: View {
                     switch viewModel.listViewModel {
                     case .none:
                         // Loading state, we can ignore it, as we'll transit to new design
-                        EmptyView()
+                        Spacer()
                     case let .some(listModel):
                         // Empty state
                         if listModel.list.isEmpty {

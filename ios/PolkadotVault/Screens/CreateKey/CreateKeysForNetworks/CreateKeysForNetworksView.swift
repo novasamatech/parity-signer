@@ -315,10 +315,9 @@ private extension CreateKeysForNetworksView.ViewModel {
             seedPhrase: seedPhrase,
             shouldCheckForCollision: false
         )
-        recoveryKeySetService.finishKeySetRecover(seedPhrase)
-        createKeyService.createDerivedKeys(
-            seedName,
-            seedPhrase,
+        createKeySetService.confirmKeySetCreation(
+            seedName: seedName,
+            seedPhrase: seedPhrase,
             networks: selectedNetworks
         ) { result in
             switch result {
