@@ -2,9 +2,11 @@ package io.parity.signer.domain.backend
 
 import android.content.Context
 import io.parity.signer.R
+import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.screens.scan.errors.TransactionError
 import io.parity.signer.screens.scan.errors.findErrorDisplayed
@@ -226,12 +228,12 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun getSeeds(
+	suspend fun getKeySets(
 		seedNames: List<String>
-	): UniffiResult<MSeeds> =
+	): UniffiResult<KeySetsSelectModel> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.getSeeds(seedNames)
+				val transactionResult = io.parity.signer.uniffi.getSeeds(seedNames).toKeySetsSelectModel()
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

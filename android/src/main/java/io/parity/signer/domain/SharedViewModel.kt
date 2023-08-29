@@ -11,6 +11,7 @@ import io.parity.signer.domain.storage.SeedStorage
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONObject
 
 
@@ -52,8 +53,8 @@ class SharedViewModel() : ViewModel() {
 	// Observables for screens state
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airGapModeState
-	val actionResult: StateFlow<ActionResult?> = _actionResult
-	val localNavAction: StateFlow<LocalNavAction> = _localNavAction
+	val actionResult: StateFlow<ActionResult?> = _actionResult.asStateFlow()
+	val localNavAction: StateFlow<LocalNavAction> = _localNavAction.asStateFlow()
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
 	// MARK: init boilerplate begin

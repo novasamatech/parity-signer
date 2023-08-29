@@ -16,9 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.createSavedStateHandle
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
@@ -40,13 +39,21 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun KeySetsScreen(
 	rootNavigator: Navigator,
-	networkState: State<NetworkState?>
 ) {
+	val vm: KeySetsViewModel = viewModel()
 	val model = KeySetsSelectModel(emptyList())//todo dmitry get from viewmodel
+
+	val networkState: State<NetworkState?> =
+		vm.networkState.collectAsStateWithLifecycle()
+
 	KeySetsScreen(
 		model = model,
 		rootNavigator = rootNavigator,
-		onSelectSeed = {rootNavigator.navigate(Action.SELECT_SEED, it)},
+		onSelectSeed = { rootNavigator.navigate(Action.SELECT_SEED, it) },
+		onExposedShow = { rootNavigator.navigate(Action.SHIELD) },
+		onNewKeySet = {
+			rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+		},
 		networkState = networkState,
 	)
 }
@@ -55,7 +62,9 @@ fun KeySetsScreen(
 private fun KeySetsScreen(
 	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
-	onSelectSeed: (seedName: String) -> Unit,//todo dmitry add other callbacks as well
+	onSelectSeed: (seedName: String) -> Unit,
+	onExposedShow: Callback,
+	onNewKeySet: Callback,
 	networkState: State<NetworkState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
@@ -71,7 +80,7 @@ private fun KeySetsScreen(
 				) {
 					val cards = model.keys
 					items(cards.size) { i ->
-						KeySetItem2(model = cards[i], ) {
+						KeySetItem2(model = cards[i]) {
 							onSelectSeed(cards[i].seedName)
 						}
 						if (i == cards.lastIndex) {
@@ -86,7 +95,7 @@ private fun KeySetsScreen(
 			Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 				ExposedIcon(
 					networkState = networkState,
-					onClick = { rootNavigator.navigate(Action.SHIELD) },
+					onClick = onExposedShow,
 					Modifier
 						.align(Alignment.End)
 						.padding(end = 16.dp)
@@ -94,10 +103,9 @@ private fun KeySetsScreen(
 				PrimaryButtonWide(
 					label = stringResource(R.string.key_sets_screem_add_key_button),
 					modifier = Modifier
-						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
-				) {
-					rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
-				}
+						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
+					onClicked = onNewKeySet,
+				)
 			}
 		}
 		BottomBar(rootNavigator, BottomBarState.KEYS)
