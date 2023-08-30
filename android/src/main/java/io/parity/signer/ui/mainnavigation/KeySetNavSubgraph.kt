@@ -17,11 +17,9 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toKeySetDetailsModel
-import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
-import io.parity.signer.screens.keysets.KeySetsScreen
+import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetStepSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
@@ -39,26 +37,27 @@ fun KeySetNavSubgraph(
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = KeySetDetailsNavSubgraph.keySetList,
+		startDestination = KeySetNavSubgraph.keySetList,
 	) {
-		composable(KeySetDetailsNavSubgraph.keySetList) {
+		composable(KeySetNavSubgraph.keySetList) {
 			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetsScreen(
+				KeySetsScreenSubgraph(
 					rootNavigator = rootNavigator,
+					navController = navController,
 				)
 			}
 		}
 		composable(
-			route = KeySetDetailsNavSubgraph.KeySetDetails.route,
+			route = KeySetNavSubgraph.KeySetDetails.route,
 			arguments = listOf(
-				navArgument(KeySetDetailsNavSubgraph.KeySetDetails.seedNameArg) {
+				navArgument(KeySetNavSubgraph.KeySetDetails.seedNameArg) {
 					type = NavType.StringType
 					defaultValue = null
 				}
 			)
 		) {
 			val seedName =
-				it.arguments?.getString(KeySetDetailsNavSubgraph.KeySetDetails.seedNameArg)
+				it.arguments?.getString(KeySetNavSubgraph.KeySetDetails.seedNameArg)
 			val model = remember {
 				try {
 					//todo dmitry export this to vm and handle errors - open default for example
@@ -88,15 +87,15 @@ fun KeySetNavSubgraph(
 				)
 			}
 		}
-		composable(KeySetDetailsNavSubgraph.newKeySet) {
+		composable(KeySetNavSubgraph.newKeySet) {
 			NewKeysetStepSubgraph(
 				navController = navController,
 			)
 		}
-		composable(KeySetDetailsNavSubgraph.recoverKeySet) {
+		composable(KeySetNavSubgraph.recoverKeySet) {
 			//todo dmitry implement
 		}
-		composable(KeySetDetailsNavSubgraph.keydetails) {
+		composable(KeySetNavSubgraph.keydetails) {
 			//todo dmitry implement
 			Box(modifier = Modifier.statusBarsPadding()) {
 //			screenData.f?.toKeyDetailsModel()?.let { model ->
@@ -114,7 +113,7 @@ fun KeySetNavSubgraph(
 	}
 }
 
-internal object KeySetDetailsNavSubgraph {
+internal object KeySetNavSubgraph {
 	const val keySetList = "keyset_list"
 	const val newKeySet = "keyset_details_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"

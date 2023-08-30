@@ -29,7 +29,7 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.ui.mainnavigation.KeySetDetailsNavSubgraph
+import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
@@ -65,7 +65,7 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onBack = onBack,
 			onAddNewKey = {
-				navController.navigate(KeySetDetailsNavSubgraph.newKeySet)
+				navController.navigate(KeySetNavSubgraph.newKeySet)
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)

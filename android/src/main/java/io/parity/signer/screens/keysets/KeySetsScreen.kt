@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
@@ -27,6 +28,7 @@ import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.domain.*
 import io.parity.signer.ui.helpers.PreviewData
+import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.backgroundSystem
@@ -38,8 +40,9 @@ import io.parity.signer.uniffi.Action
  */
 
 @Composable
-fun KeySetsScreen(
+fun KeySetsScreenSubgraph(
 	rootNavigator: Navigator,
+	navController: NavController,
 ) {
 	val vm: KeySetsViewModel = viewModel()
 
@@ -53,24 +56,36 @@ fun KeySetsScreen(
 
 	val modelValue = model.value
 	if (modelValue != null) {
-		KeySetsScreen(
+		KeySetsScreenFull(
 			model = modelValue,
 			rootNavigator = rootNavigator,
-			onSelectSeed = { rootNavigator.navigate(Action.SELECT_SEED, it) },
+			onSelectSeed = { seedname ->
+				navController.navigate(
+					KeySetNavSubgraph.KeySetDetails.destination(
+						seedName = seedname
+					)
+				)
+			},
 			onExposedShow = { rootNavigator.navigate(Action.SHIELD) },
 			onNewKeySet = {
-				rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) //new seed for this state
+				navController.navigate(
+					KeySetNavSubgraph.newKeySet
+				)
 			},
 			networkState = networkState,
 		)
 	} else {
 		//todo dmitry handle
 //		go back
+		rootNavigator.backAction()
 	}
+
+
+
 }
 
 @Composable
-private fun KeySetsScreen(
+private fun KeySetsScreenFull(
 	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
 	onSelectSeed: (seedName: String) -> Unit,
@@ -163,7 +178,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), {}, {}, {}, state)
+			KeySetsScreenFull(mockModel, EmptyNavigator(), {}, {}, {}, state)
 		}
 	}
 }
@@ -225,7 +240,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), {}, {}, {}, state)
+			KeySetsScreenFull(mockModel, EmptyNavigator(), {}, {}, {}, state)
 		}
 	}
 }
@@ -246,7 +261,7 @@ private fun PreviewKeySetsSelectScreenEmpty() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreen(mockModel, EmptyNavigator(), {}, {}, {}, state)
+			KeySetsScreenFull(mockModel, EmptyNavigator(), {}, {}, {}, state)
 		}
 	}
 }
