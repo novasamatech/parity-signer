@@ -120,7 +120,6 @@ internal object KeySetNavSubgraph {
 	const val keydetails = "keyset_key_details"
 
 	object KeySetDetails {
-		//todo dmitry as GoogleNavigationRootFragment.kt:228
 		internal const val seedNameArg = "title"
 		private const val baseRoute = "keyset_details_home"
 		const val route = "$baseRoute?{$seedNameArg}"
