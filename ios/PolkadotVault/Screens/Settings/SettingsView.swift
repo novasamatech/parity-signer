@@ -106,18 +106,14 @@ extension SettingsView {
         @Published var detailScreen: SettingsItem?
         private weak var appState: AppState!
         private let onboardingMediator: OnboardingMediator
-        private let settingsService: SettingsTabService
         let tabBarViewModel: TabBarView.ViewModel
 
         init(
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
-            settingsService: SettingsTabService = SettingsTabService(),
             tabBarViewModel: TabBarView.ViewModel
         ) {
             self.onboardingMediator = onboardingMediator
-            self.settingsService = settingsService
             self.tabBarViewModel = tabBarViewModel
-            listenToUpdates()
         }
 
         func use(appState: AppState) {
@@ -126,13 +122,6 @@ extension SettingsView {
 
         func loadData() {
             renderable = SettingsViewRenderable()
-        }
-
-        private func listenToUpdates() {
-            $isDetailsPresented.sink { [weak self] isPresented in
-                guard let self = self, !isPresented else { return }
-                self.settingsService.onSettingsTabDisplay()
-            }.store(in: cancelBag)
         }
 
         func onTapAction(_ item: SettingsItem) {

@@ -28,12 +28,19 @@ final class ManageNetworkDetailsService {
         return value
     }
 
+    func attemptSigning(_ keyRecord: MRawKey, _ seedPhrase: String?) -> ActionResult? {
+        navigation.performFake(
+            navigation: .init(
+                action: .goForward,
+                details: keyRecord.addressKey,
+                seedPhrase: seedPhrase
+            )
+        )
+    }
+
     @discardableResult
     func signSpecList(_ networkKey: String) -> MSignSufficientCrypto! {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarSettings))
-        navigation.performFake(navigation: .init(action: .manageNetworks))
-        navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
+        _ = refreshCurrentNavigationState(networkKey)
         navigation.performFake(navigation: .init(action: .rightButtonAction))
         guard case let .signSufficientCrypto(value) = navigation
             .performFake(navigation: .init(action: .signNetworkSpecs))?.screenData else { return nil }
@@ -41,23 +48,24 @@ final class ManageNetworkDetailsService {
     }
 
     func signMetadataSpecList(_ networkKey: String, _ specsVersion: String) -> MSignSufficientCrypto! {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarSettings))
-        navigation.performFake(navigation: .init(action: .manageNetworks))
-        navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
+        _ = refreshCurrentNavigationState(networkKey)
         navigation.performFake(navigation: .init(action: .manageMetadata, details: specsVersion))
         guard case let .signSufficientCrypto(value) = navigation
             .performFake(navigation: .init(action: .signMetadata))?.screenData else { return nil }
         return value
     }
 
-    func deleteNetwork(_ networkKey: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarSettings))
-        navigation.performFake(navigation: .init(action: .manageNetworks))
-        navigation.performFake(navigation: .init(action: .goForward, details: networkKey))
-        navigation.performFake(navigation: .init(action: .rightButtonAction))
-        navigation.performFake(navigation: .init(action: .removeNetwork))
+    func attemptPassword(_ password: String) -> ActionResult? {
+        navigation.performFake(navigation: .init(action: .goForward, details: password))
+    }
+
+    func deleteNetwork(
+        _ networkKey: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    ) {
+        backendService.performCall({
+            try removeManagedNetwork(networkKey: networkKey)
+        }, completion: completion)
     }
 
     func deleteNetworkMetadata(
