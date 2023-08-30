@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
@@ -40,52 +42,7 @@ import io.parity.signer.uniffi.Action
  */
 
 @Composable
-fun KeySetsScreenSubgraph(
-	rootNavigator: Navigator,
-	navController: NavController,
-) {
-	val vm: KeySetsViewModel = viewModel()
-
-	val model = vm.keySetModel.collectAsStateWithLifecycle()
-	val networkState: State<NetworkState?> =
-		vm.networkState.collectAsStateWithLifecycle()
-
-	LaunchedEffect(Unit) {
-		vm.updateKeySetModel()
-	}
-
-	val modelValue = model.value
-	if (modelValue != null) {
-		KeySetsScreenFull(
-			model = modelValue,
-			rootNavigator = rootNavigator,
-			onSelectSeed = { seedname ->
-				navController.navigate(
-					KeySetNavSubgraph.KeySetDetails.destination(
-						seedName = seedname
-					)
-				)
-			},
-			onExposedShow = { rootNavigator.navigate(Action.SHIELD) },
-			onNewKeySet = {
-				navController.navigate(
-					KeySetNavSubgraph.newKeySet
-				)
-			},
-			networkState = networkState,
-		)
-	} else {
-		//todo dmitry handle
-//		go back
-		rootNavigator.backAction()
-	}
-
-
-
-}
-
-@Composable
-private fun KeySetsScreenFull(
+internal fun KeySetsScreenFull(
 	model: KeySetsSelectModel,
 	rootNavigator: Navigator,
 	onSelectSeed: (seedName: String) -> Unit,
