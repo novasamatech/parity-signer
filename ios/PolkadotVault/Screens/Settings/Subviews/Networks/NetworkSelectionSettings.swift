@@ -75,6 +75,15 @@ struct NetworkSelectionSettings: View {
             viewModel.snackbarViewModel,
             isPresented: $viewModel.isSnackbarPresented
         )
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 
     @ViewBuilder
@@ -102,7 +111,7 @@ struct NetworkSelectionSettings: View {
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let service: ManageNetworksService
+        private let service: GetManagedNetworksService
         private let networkDetailsService: ManageNetworkDetailsService
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetailsKey: String!
@@ -111,9 +120,11 @@ extension NetworkSelectionSettings {
         @Published var isShowingQRScanner: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
 
         init(
-            service: ManageNetworksService = ManageNetworksService(),
+            service: GetManagedNetworksService = GetManagedNetworksService(),
             networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.service = service
@@ -159,7 +170,15 @@ private extension NetworkSelectionSettings.ViewModel {
     }
 
     func updateNetworks() {
-        networks = service.manageNetworks()
+        service.getNetworks { result in
+            switch result {
+            case let .success(networks):
+                self.networks = networks
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
+        }
     }
 }
 

@@ -165,7 +165,7 @@ extension CreateKeysForNetworksView {
         }
 
         private let cancelBag = CancelBag()
-        private let networkService: GetAllNetworksService
+        private let networkService: GetManagedNetworksService
         private let createKeySetService: CreateKeySetService
         private let createKeyService: CreateDerivedKeyService
         private let recoveryKeySetService: RecoverKeySetService
@@ -203,7 +203,7 @@ extension CreateKeysForNetworksView {
             seedName: String,
             seedPhrase: String,
             mode: Mode,
-            networkService: GetAllNetworksService = GetAllNetworksService(),
+            networkService: GetManagedNetworksService = GetManagedNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
             createKeySetService: CreateKeySetService = CreateKeySetService(),
             recoveryKeySetService: RecoverKeySetService = RecoverKeySetService(),

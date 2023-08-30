@@ -122,7 +122,7 @@ struct SignSpecEnterPasswordModal: View {
 
 extension SignSpecEnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private let service: SignSpecService
+        private let service: ManageNetworkDetailsService
         @Binding var isPresented: Bool
         @Binding var shouldPresentError: Bool
         @Binding var dataModel: MEnterPassword
@@ -138,7 +138,7 @@ extension SignSpecEnterPasswordModal {
             shouldPresentError: Binding<Bool>,
             dataModel: Binding<MEnterPassword>,
             detailsContent: Binding<MSufficientCryptoReady?>,
-            service: SignSpecService = SignSpecService()
+            service: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             _isPresented = isPresented
             _shouldPresentError = shouldPresentError
