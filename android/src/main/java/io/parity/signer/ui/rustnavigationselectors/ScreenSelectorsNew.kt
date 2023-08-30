@@ -18,7 +18,6 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
-import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
@@ -134,7 +133,11 @@ fun CombinedScreensSelector(
 
 		is ScreenData.Scan -> {
 			ScanNavSubgraph(
-				rootNavigator = rootNavigator
+				onCloseCamera = {
+					CameraParentSingleton.navigateBackFromCamera(rootNavigator)
+				},
+				openKeySet = { seedName ->
+					rootNavigator.navigate(Action.SELECT_SEED, seedName)}
 			)
 		}
 
