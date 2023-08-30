@@ -10,11 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
-import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
-import io.parity.signer.uniffi.Action
 
 
 @Composable
@@ -46,7 +44,11 @@ fun KeySetsScreenSubgraph(
 					)
 				)
 			},
-			onExposedShow = { rootNavigator.navigate(Action.SHIELD) },
+			onExposedShow = {
+				menuNavController.navigate(KeySetsMenuSubgraph.exposed_shield_alert) {
+					popUpTo(KeySetsMenuSubgraph.empty)
+				}
+			},
 			onNewKeySet = {
 				navController.navigate(
 					KeySetNavSubgraph.newKeySet
