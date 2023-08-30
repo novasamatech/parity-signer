@@ -30,10 +30,6 @@ fun KeySetNavSubgraph(
 	singleton: SharedViewModel,
 ) {
 
-	val networkState: State<NetworkState?> =
-		singleton.networkState.collectAsStateWithLifecycle() //for shield icon
-	//^^ todo dmitry to get in viewmodel?
-
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
@@ -73,7 +69,6 @@ fun KeySetNavSubgraph(
 					fullModel = model,
 					navigator = rootNavigator,
 					navController = navController,
-					networkState = networkState,
 					onBack = { rootNavigator.backAction() },
 					onRemoveKeySet = {
 						val root = model.root

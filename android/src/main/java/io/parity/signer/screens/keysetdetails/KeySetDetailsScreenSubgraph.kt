@@ -37,7 +37,6 @@ fun KeySetDetailsScreenSubgraph(
 	navigator: Navigator,
 	navController: NavController,
 	onBack: Callback,
-	networkState: State<NetworkState?>, //for shield icon
 	onRemoveKeySet: Callback,
 ) {
 	val menuNavController = rememberNavController()
@@ -45,6 +44,8 @@ fun KeySetDetailsScreenSubgraph(
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
 	val filteredModel =
 		keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
+
+	val networkState = keySetViewModel.networkState.collectAsStateWithLifecycle()
 
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
@@ -74,7 +75,10 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
-			}
+			},
+			onOpenKey = { keyAddr: String, keySpecs: String ->
+				//todo dmitry implement
+			},
 		)
 	}
 

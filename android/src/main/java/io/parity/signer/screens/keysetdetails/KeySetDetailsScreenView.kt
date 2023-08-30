@@ -79,6 +79,7 @@ fun KeySetDetailsScreenView(
 	onMenu: Callback,
 	onAddNewKey: Callback,
 	onBack: Callback,
+	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
 	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
@@ -103,10 +104,11 @@ fun KeySetDetailsScreenView(
 							model = networkAndKeys.key,
 							networkLogo = networkAndKeys.network.networkLogo,
 						) {
-							val selectKeyDetails =
-								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
-							//todo dmitry
-							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
+							onOpenKey(networkAndKeys.key.addressKey, networkAndKeys.network.networkSpecsKey)
+//							val selectKeyDetails =
+//								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
+//							todo dmitry remove this
+//							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 						}
 					}
 				}
@@ -344,7 +346,9 @@ private fun PreviewKeySetDetailsScreen() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->})
+				onShowPublicKey = { _, _ ->},
+				onOpenKey ={ _, _ ->},
+			)
 		}
 	}
 }
@@ -375,7 +379,9 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->})
+				onShowPublicKey = { _, _ ->},
+				onOpenKey ={ _, _ ->},
+				)
 		}
 	}
 }
@@ -406,7 +412,9 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->})
+				onShowPublicKey = { _, _ ->},
+				onOpenKey ={ _, _ ->},
+			)
 		}
 	}
 }

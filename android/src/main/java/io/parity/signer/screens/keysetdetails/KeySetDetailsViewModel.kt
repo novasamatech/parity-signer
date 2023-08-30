@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,12 +18,16 @@ class KeySetDetailsViewModel : ViewModel() {
 	private val preferencesRepository = ServiceLocator.preferencesRepository
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
+	private val networkExposedStateKeeper =
+		ServiceLocator.networkExposedStateKeeper
 
 	val filters = preferencesRepository.networksFilter.stateIn(
 		viewModelScope,
 		SharingStarted.WhileSubscribed(5_000),
 		initialValue = emptySet(),
 	)
+	val networkState: StateFlow<NetworkState> =
+		networkExposedStateKeeper.airGapModeState
 
 	fun makeFilteredFlow(original : KeySetDetailsModel): StateFlow<KeySetDetailsModel> {
 		return filters.map { filterInstance ->
