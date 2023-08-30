@@ -1,13 +1,13 @@
 //
-//  GetAllNetworksService.swift
-//  Polkadot Vault
+//  GeneralVerifierService.swift
+//  PolkadotVault
 //
-//  Created by Krzysztof Rodak on 10/01/2023.
+//  Created by Krzysztof Rodak on 08/05/2023.
 //
 
 import Foundation
 
-final class GetAllNetworksService {
+final class GeneralVerifierService {
     private let backendService: BackendService
 
     init(
@@ -16,11 +16,11 @@ final class GetAllNetworksService {
         self.backendService = backendService
     }
 
-    func getNetworks(
-        _ completion: @escaping (Result<[MmNetwork], ServiceError>) -> Void
+    func getGeneralVerifier(
+        _ completion: @escaping (Result<MVerifierDetails, ServiceError>) -> Void
     ) {
         backendService.performCall({
-            try getManagedNetworks().networks
+            try getVerifierDetails()
         }, completion: completion)
     }
 }

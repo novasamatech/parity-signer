@@ -19,11 +19,6 @@ final class ScanTabService {
         self.backendActionPerformer = backendActionPerformer
     }
 
-    func startQRScan() {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarScan))
-    }
-
     func continueTransactionSigning(_ seedNames: [String], _ seedPhrasesDictionary: [String: String]) -> ActionResult? {
         navigation.performFake(
             navigation:
@@ -36,16 +31,20 @@ final class ScanTabService {
     }
 
     func performTransaction(with payload: String) -> Result<ActionResult, TransactionError> {
-        backendActionPerformer.performTransaction(with: payload)
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarScan))
+        return backendActionPerformer.performTransaction(with: payload)
     }
 
     func resetNavigationState() {
-        startQRScan()
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarScan))
     }
 
     func onTransactionApprove() {
         navigation.performFake(navigation: .init(action: .goForward))
-        startQRScan()
+        navigation.performFake(navigation: .init(action: .start))
+        navigation.performFake(navigation: .init(action: .navbarScan))
     }
 
     func attemptPassword(_ password: String) -> ActionResult? {

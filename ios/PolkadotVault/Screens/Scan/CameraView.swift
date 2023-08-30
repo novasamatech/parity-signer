@@ -111,7 +111,6 @@ struct CameraView: View {
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
             model.configure()
-            viewModel.onAppear()
         }
         .onDisappear {
             model.shutdown()
@@ -315,10 +314,6 @@ extension CameraView {
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
-        }
-
-        func onAppear() {
-            scanService.startQRScan()
         }
 
         func use(cameraModel: CameraService) {

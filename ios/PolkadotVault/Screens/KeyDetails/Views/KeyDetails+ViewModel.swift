@@ -21,7 +21,7 @@ extension KeyDetailsView {
 
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
-        private let networksService: GetAllNetworksService
+        private let networksService: GetManagedNetworksService
         private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
 
@@ -80,7 +80,7 @@ extension KeyDetailsView {
             keysData: MKeysNew?,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
-            networksService: GetAllNetworksService = GetAllNetworksService(),
+            networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
