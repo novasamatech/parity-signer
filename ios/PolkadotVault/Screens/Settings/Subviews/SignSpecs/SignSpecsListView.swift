@@ -115,7 +115,7 @@ extension SignSpecsListView {
         private let networkKey: String
         let content: MSignSufficientCrypto
         private let seedsMediator: SeedsMediating
-        private let service: SignSpecService
+        private let service: ManageNetworkDetailsService
         @Published var detailsContent: MSufficientCryptoReady!
         @Published var isPresentingDetails: Bool = false
         @Published var isPresentingEnterPassword: Bool = false
@@ -133,7 +133,7 @@ extension SignSpecsListView {
             networkKey: String,
             content: MSignSufficientCrypto,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: SignSpecService = SignSpecService()
+            service: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.networkKey = networkKey
             self.content = content

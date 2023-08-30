@@ -39,14 +39,12 @@ struct AuthenticatedScreenContainer: View {
         ) {
             ErrorBottomModal(
                 viewModel: .alertError(message: navigation.genericError.errorMessage),
-                dismissAction: viewModel.onDismissErrorTap(),
                 isShowingBottomAlert: $navigation.genericError.isPresented
             )
             .clearModalBackground()
         }
         .onAppear {
             viewModel.use(appState: appState)
-            viewModel.onAppear()
         }
     }
 
@@ -63,23 +61,12 @@ struct AuthenticatedScreenContainer: View {
 extension AuthenticatedScreenContainer {
     final class ViewModel: ObservableObject {
         private weak var appState: AppState!
-        private let initialisationService: AppInitialisationService
 
         @Published var selectedTab: Tab = .keys
         @Published var isShowingQRScanner: Bool = false
 
-        init(
-            initialisationService: AppInitialisationService = AppInitialisationService()
-        ) {
-            self.initialisationService = initialisationService
-        }
-
         func use(appState: AppState) {
             self.appState = appState
-        }
-
-        func onAppear() {
-            initialisationService.initialiseAppSession()
         }
 
         func onQRCodeTap() {
@@ -92,10 +79,6 @@ extension AuthenticatedScreenContainer {
 
         func onSettingsTap() {
             selectedTab = .settings
-        }
-
-        func onDismissErrorTap() {
-            initialisationService.resetNavigationState()
         }
 
         func onQRScannerDismiss() {

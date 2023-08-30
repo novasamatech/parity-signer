@@ -428,9 +428,16 @@ extension NetworkSettingsDetails {
         }
 
         func removeNetwork() {
-            networkDetailsService.deleteNetwork(networkKey)
-            dismissRequest.send()
-            onCompletion(.networkDeleted(networkDetails.title))
+            networkDetailsService.deleteNetwork(networkKey) { result in
+                switch result {
+                case .success:
+                    self.dismissRequest.send()
+                    self.onCompletion(.networkDeleted(self.networkDetails.title))
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func cancelNetworkRemoval() {
