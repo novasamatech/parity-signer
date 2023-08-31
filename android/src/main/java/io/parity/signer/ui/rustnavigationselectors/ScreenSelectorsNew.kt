@@ -121,6 +121,7 @@ fun CombinedScreensSelector(
 		}
 
 		is ScreenData.RecoverSeedPhrase ->
+			//todo dmitry move this
 			Box(
 				modifier = Modifier
 					.statusBarsPadding()

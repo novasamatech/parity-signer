@@ -19,7 +19,7 @@ import kotlinx.coroutines.runBlocking
 fun KeyDetailsScreenSubgraph(
 	navController: NavHostController,
 	keyAddr: String,
-	keySpec: String
+	keySpec: String,
 ) {
 
 	val vm = KeyDetailsScreenViewModel()
@@ -27,19 +27,23 @@ fun KeyDetailsScreenSubgraph(
 	val model = remember {
 		runBlocking {
 			vm.fetchModel(keyAddr, keySpec)
-		}
-	}.mapError()!!.toKeyDetailsModel()
+		}.mapError()!!.toKeyDetailsModel()
+	}
+	val menuNavController = rememberNavController()
 
-	//todo dmitry implement
 	Box(modifier = Modifier.statusBarsPadding()) {
 		KeyDetailsPublicKeyScreen(
 			model = model,
 			onBack = { navController.popBackStack() },
-			onMenu = { KeyPublicDetailsMenuSubgraph.key_menu },
+			onMenu = {
+				menuNavController.navigate(
+					KeyPublicDetailsMenuSubgraph.key_menu
+				)
+			},
 		)
 	}
 
-	val menuNavController = rememberNavController()
+
 
 	NavHost(
 		navController = menuNavController,

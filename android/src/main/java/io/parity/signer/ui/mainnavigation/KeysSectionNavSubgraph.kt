@@ -46,7 +46,6 @@ fun KeysSectionNavSubgraph(
 			arguments = listOf(
 				navArgument(KeySetNavSubgraph.KeySetDetails.seedNameArg) {
 					type = NavType.StringType
-					defaultValue = null
 				}
 			)
 		) {
@@ -92,11 +91,9 @@ fun KeysSectionNavSubgraph(
 			arguments = listOf(
 				navArgument(KeySetNavSubgraph.KeyDetails.argKeyAddr) {
 					type = NavType.StringType
-					defaultValue = null
 				},
 				navArgument(KeySetNavSubgraph.KeyDetails.argKeySpec) {
 					type = NavType.StringType
-					defaultValue = null
 				},
 			)) {
 			val keyAddr =
