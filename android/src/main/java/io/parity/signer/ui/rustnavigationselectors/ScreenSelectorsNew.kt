@@ -64,12 +64,13 @@ fun CombinedScreensSelector(
 			submitErrorState("key set details clicked for non existing key details content")
 		}
 
-		is ScreenData.KeyDetails -> //todo dmitry remove it here
+		is ScreenData.KeyDetails -> {//todo dmitry remove it here
 			Box(modifier = Modifier.statusBarsPadding()) {
 				screenData.f?.toKeyDetailsModel()?.let { model ->
 					KeyDetailsPublicKeyScreen(
 						model = model,
-						rootNavigator = rootNavigator,
+						onBack = { rootNavigator.backAction() },
+						onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
 					)
 				}
 					?: run {
@@ -77,6 +78,7 @@ fun CombinedScreensSelector(
 						rootNavigator.backAction()
 					}
 			}
+		}
 
 		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
 		is ScreenData.Settings ->
@@ -137,7 +139,8 @@ fun CombinedScreensSelector(
 					CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 				},
 				openKeySet = { seedName ->
-					rootNavigator.navigate(Action.SELECT_SEED, seedName)}
+					rootNavigator.navigate(Action.SELECT_SEED, seedName)
+				}
 			)
 		}
 

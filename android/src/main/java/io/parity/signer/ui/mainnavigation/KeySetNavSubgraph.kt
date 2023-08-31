@@ -3,21 +3,20 @@ package io.parity.signer.ui.mainnavigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
+import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
+import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetStepSubgraph
@@ -91,18 +90,21 @@ fun KeySetNavSubgraph(
 			//todo dmitry implement
 		}
 		composable(KeySetNavSubgraph.keydetails) {
+
+			KeyDetailsScreenSubgraph()
+
 			//todo dmitry implement
 			Box(modifier = Modifier.statusBarsPadding()) {
-//			screenData.f?.toKeyDetailsModel()?.let { model ->
-//				KeyDetailsPublicKeyScreen(
-//					model = model,
-//					rootNavigator = rootNavigator,
-//				)
-//			}
-//				?: run {
-//					submitErrorState("key details clicked for non existing key details content")
-//					rootNavigator.backAction()
-//				}
+			screenData.f?.toKeyDetailsModel()?.let { model ->
+				KeyDetailsPublicKeyScreen(
+					model = model,
+					rootNavigator = rootNavigator,
+				)
+			}
+				?: run {
+					submitErrorState("key details clicked for non existing key details content")
+					rootNavigator.backAction()
+				}
 			}
 		}
 	}
