@@ -8,17 +8,14 @@ import io.parity.signer.uniffi.ScreenData
  */
 object NavigationMigrations {
 	fun shouldShowBar(
-		localNavAction: LocalNavAction?,
 		globalNavAction: ActionResult
 	): Boolean {
-		return when (localNavAction) {
-			else -> when (globalNavAction.screenData) {
-				is ScreenData.RecoverSeedName -> true
-				is ScreenData.RecoverSeedPhrase -> true
-				is ScreenData.SelectSeedForBackup -> true
-				is ScreenData.SignSufficientCrypto -> true
-				else -> false
-			}
+		return when (globalNavAction.screenData) {
+			is ScreenData.RecoverSeedName -> true
+			is ScreenData.RecoverSeedPhrase -> true
+			is ScreenData.SelectSeedForBackup -> true
+			is ScreenData.SignSufficientCrypto -> true
+			else -> false
 		}
 	}
 }

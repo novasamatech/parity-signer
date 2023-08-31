@@ -13,8 +13,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,57 +27,13 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.LocalNavRequest
-import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.red400
 import io.parity.signer.ui.theme.textSecondary
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.MKeyDetails
 
 @Composable
-fun KeyDetailsMenuAction(
-	navigator: Navigator,
-	keyDetails: MKeyDetails?
-) {
-	val state = remember {
-		mutableStateOf(KeyDetailsMenuState.GENERAL)
-	}
-	when (state.value) {
-		KeyDetailsMenuState.GENERAL -> KeyDetailsGeneralMenu(
-			closeMenu = {
-				navigator.backAction()
-			},
-			onExportPrivateKey = {
-				state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
-			},
-			onDelete = {
-				state.value = KeyDetailsMenuState.DELETE_CONFIRM
-			},
-		)
-
-		KeyDetailsMenuState.DELETE_CONFIRM -> KeyDetailsDeleteConfirmBottomSheet(
-			onCancel = { navigator.backAction() },
-			onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
-		)
-
-		KeyDetailsMenuState.PRIVATE_KEY_CONFIRM -> ConfirmExportPrivateKeyMenu(
-			onExportPrivate = {
-				//todo dmitry fix
-				navigator.navigate(LocalNavRequest.ShowExportPrivateKey(keyDetails!!.pubkey))
-			},
-				onClose = {
-				navigator.backAction()
-			},
-		)
-	}
-}
-
-@Composable
-private fun KeyDetailsGeneralMenu(
+internal fun KeyDetailsGeneralMenu(
 	closeMenu: Callback,
 	onExportPrivateKey: Callback,
 	onDelete: Callback,
@@ -87,8 +41,8 @@ private fun KeyDetailsGeneralMenu(
 	val sidePadding = 24.dp
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = sidePadding, end = sidePadding, top = 8.dp),
+			.fillMaxWidth()
+			.padding(start = sidePadding, end = sidePadding, top = 8.dp),
 	) {
 
 		MenuItemForBottomSheet(
@@ -164,9 +118,9 @@ private fun MenuItemForBottomSheetInternal(
 ) {
 	Row(
 		modifier = Modifier
-            .clickable(onClick = onclick)
-            .padding(vertical = 8.dp)
-            .fillMaxWidth(),
+			.clickable(onClick = onclick)
+			.padding(vertical = 8.dp)
+			.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Icon(
@@ -186,11 +140,6 @@ private fun MenuItemForBottomSheetInternal(
 }
 
 
-private enum class KeyDetailsMenuState {
-	GENERAL, DELETE_CONFIRM, PRIVATE_KEY_CONFIRM
-}
-
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -203,9 +152,8 @@ private enum class KeyDetailsMenuState {
 @Composable
 private fun PreviewKeyDetailsGeneralMenu() {
 	SignerNewTheme {
-		KeyDetailsMenuAction(
-			EmptyNavigator(),
-			null
+		KeyDetailsGeneralMenu(
+			{},{},{},
 		)
 	}
 }

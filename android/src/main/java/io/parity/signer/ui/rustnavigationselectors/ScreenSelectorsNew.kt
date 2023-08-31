@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
@@ -21,8 +20,6 @@ import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
-import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
-import io.parity.signer.ui.mainnavigation.KeysSectionNavSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
@@ -35,6 +32,7 @@ import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
 import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.mainnavigation.KeysSectionNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
@@ -43,7 +41,6 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun CombinedScreensSelector(
 	screenData: ScreenData,
-	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
 	sharedViewModel: SharedViewModel
 ) {
@@ -173,76 +170,54 @@ fun CombinedScreensSelector(
 @Composable
 fun BottomSheetSelector(
 	modalData: ModalData?,
-	localNavAction: LocalNavAction?,
 	networkState: State<NetworkState?>,
 	sharedViewModel: SharedViewModel,
 	navigator: Navigator,
 ) {
 	SignerNewTheme {
-
-		if (localNavAction != null && localNavAction != LocalNavAction.None) {
-
-			when (localNavAction) {
-				is LocalNavAction.ShowExportPrivateKey -> {
-					//todo dmitry remove
-					BottomSheetWrapperRoot(onClosedAction = {
-//						don't do action here because timer's finally will do back navigation
-//						navigator.backAction()
-					}) {
-						PrivateKeyExportBottomSheet(
-							model = localNavAction.model,
-							navigator = localNavAction.navigator
-						)
-					}
-				}
-
-				else -> {}
+		when (modalData) {
+			is ModalData.KeyDetailsAction -> {
+				submitErrorState("nothing, moved to KeyDetailsScreenSubgraph")
 			}
-		} else {
-			when (modalData) {
-				is ModalData.KeyDetailsAction -> {
-					submitErrorState("nothing, moved to KeyDetailsScreenSubgraph")
-				}
 
-				is ModalData.NewSeedMenu ->
-					//old design
-					BottomSheetWrapperRoot(onClosedAction = {
-						navigator.backAction()
-					}) {
-						NewKeysetMenu(
-							networkState = networkState,
-							navigator = sharedViewModel.navigator,
-						)
-					}
-
-				is ModalData.NewSeedBackup -> {
-					// it is second step in
-					submitErrorState("nothing, moved to keyset subgraph")
-				}
-
-				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
-				is ModalData.EnterPassword ->
-					//todo dmitry check where it should be used
-					BottomSheetWrapperRoot(onClosedAction = {
-						navigator.backAction()
-					}) {
-						EnterPassword(
-							modalData.f.toEnterPasswordModel(),
-							proceed = { password ->
-								navigator.navigate(
-									Action.GO_FORWARD,
-									password
-								)
-							},
-							onClose = { navigator.backAction() },
-						)
-					}
-
-				is ModalData.SignatureReady -> {} //part of camera flow now
+			is ModalData.NewSeedMenu ->
 				//old design
-				is ModalData.LogComment -> {} //moved to logs subgraph, part of settigns now
-				else -> {}
+				BottomSheetWrapperRoot(onClosedAction = {
+					navigator.backAction()
+				}) {
+					NewKeysetMenu(
+						networkState = networkState,
+						navigator = sharedViewModel.navigator,
+					)
+				}
+
+			is ModalData.NewSeedBackup -> {
+				// it is second step in
+				submitErrorState("nothing, moved to keyset subgraph")
 			}
+
+			is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
+			is ModalData.EnterPassword ->
+				//todo dmitry check where it should be used - remove from here when navigation not used
+				BottomSheetWrapperRoot(onClosedAction = {
+					navigator.backAction()
+				}) {
+					EnterPassword(
+						modalData.f.toEnterPasswordModel(),
+						proceed = { password ->
+							navigator.navigate(
+								Action.GO_FORWARD,
+								password
+							)
+						},
+						onClose = { navigator.backAction() },
+					)
+				}
+
+			is ModalData.SignatureReady -> {} //part of camera flow now
+			//old design
+			is ModalData.LogComment -> {} //moved to logs subgraph, part of settigns now
+			else -> {}
 		}
 	}
 }

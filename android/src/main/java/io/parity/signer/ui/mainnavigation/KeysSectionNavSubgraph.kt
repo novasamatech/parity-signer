@@ -87,7 +87,8 @@ fun KeysSectionNavSubgraph(
 		composable(KeySetNavSubgraph.recoverKeySet) {
 			//todo dmitry implement
 		}
-		composable(route = KeySetNavSubgraph.KeyDetails.route,
+		composable(
+			route = KeySetNavSubgraph.KeyDetails.route,
 			arguments = listOf(
 				navArgument(KeySetNavSubgraph.KeyDetails.argKeyAddr) {
 					type = NavType.StringType
@@ -95,7 +96,8 @@ fun KeysSectionNavSubgraph(
 				navArgument(KeySetNavSubgraph.KeyDetails.argKeySpec) {
 					type = NavType.StringType
 				},
-			)) {
+			)
+		) {
 			val keyAddr =
 				it.arguments?.getString(KeySetNavSubgraph.KeyDetails.argKeyAddr)!!
 			val keySpec =
@@ -126,6 +128,7 @@ internal object KeySetNavSubgraph {
 		internal const val argKeySpec = "key_spec"
 		private const val baseRoute = "key_details_home"
 		const val route = "$baseRoute/{$argKeyAddr}/{$argKeySpec}"
-		fun destination(keyAddr: String, keySpec: String) = "$baseRoute/$keyAddr/$keySpec"
+		fun destination(keyAddr: String, keySpec: String) =
+			"$baseRoute/$keyAddr/$keySpec"
 	}
 }

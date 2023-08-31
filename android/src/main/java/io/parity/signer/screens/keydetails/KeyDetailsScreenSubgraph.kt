@@ -9,8 +9,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.toKeyDetailsModel
+import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import kotlinx.coroutines.runBlocking
 
@@ -37,7 +40,7 @@ fun KeyDetailsScreenSubgraph(
 			onBack = { navController.popBackStack() },
 			onMenu = {
 				menuNavController.navigate(
-					KeyPublicDetailsMenuSubgraph.key_menu
+					KeyPublicDetailsMenuSubgraph.keyMenuGeneral
 				)
 			},
 		)
@@ -49,18 +52,53 @@ fun KeyDetailsScreenSubgraph(
 		navController = menuNavController,
 		startDestination = KeyPublicDetailsMenuSubgraph.empty,
 	) {
+		val closeAction: Callback = {
+			menuNavController.popBackStack()
+		}
 		composable(KeyPublicDetailsMenuSubgraph.empty) {}//no menu
-		composable(KeyPublicDetailsMenuSubgraph.key_menu) {
-			BottomSheetWrapperRoot(onClosedAction = {
-//				todo dmitry as in different subgraphs
-//				navigator.backAction()
-			}) {
-				//todo dmitry
-//				KeyDetailsMenuAction(
-//					navigator = navigator,
-//					keyDetails = model
-//				)
+		composable(KeyPublicDetailsMenuSubgraph.keyMenuGeneral) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeyDetailsGeneralMenu(
+					closeMenu = closeAction,
+					onExportPrivateKey = {
+						state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+					},
+					onDelete = {
+						state.value = KeyDetailsMenuState.DELETE_CONFIRM
+					},
+				)
 			}
+		}
+		composable(KeyPublicDetailsMenuSubgraph.keyMenuDelete) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				KeyDetailsDeleteConfirmBottomSheet(
+					onCancel = closeAction,
+					onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
+				)
+			}
+		}
+		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportConfirmation) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				ConfirmExportPrivateKeyMenu(
+					onExportPrivate = {
+						//todo dmitry fix
+						navigator.navigate(LocalNavRequest.ShowExportPrivateKey(keyDetails!!.pubkey))
+					},
+					onClose = closeAction,
+				)
+			}
+		}
+		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				//todo dmitry implement
+				PrivateKeyExportBottomSheet(
+					model = localNavAction.model,
+					navigator = localNavAction.navigator
+				)
+			}
+		}
+		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
+			//todo dmitry handle  keyMenuExportResult
 		}
 	}
 }
@@ -68,5 +106,9 @@ fun KeyDetailsScreenSubgraph(
 
 private object KeyPublicDetailsMenuSubgraph {
 	const val empty = "key_menu_empty"
-	const val key_menu = "key_menu"
+	const val keyMenuGeneral = "key_menu_general"
+	const val keyMenuDelete = "key_menu_delete"
+	const val keyMenuExportConfirmation = "key_menu_export"
+	const val keyMenuExportResult = "key_private_export_result"
+	const val keyMenuPasswordForExport = "key_private_export_password"
 }

@@ -47,15 +47,10 @@ class SharedViewModel() : ViewModel() {
 		null
 	)
 
-	internal val _localNavAction = MutableStateFlow<LocalNavAction>(
-		LocalNavAction.None
-	)
-
 	// Observables for screens state
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airGapModeState
 	val actionResult: StateFlow<ActionResult?> = _actionResult.asStateFlow()
-	val localNavAction: StateFlow<LocalNavAction> = _localNavAction.asStateFlow()
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
 
 	// MARK: init boilerplate begin

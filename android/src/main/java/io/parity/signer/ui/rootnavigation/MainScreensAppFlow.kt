@@ -70,7 +70,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 
 	val actionResultState = sharedViewModel.actionResult.collectAsStateWithLifecycle()
 	val shieldNetworkState = sharedViewModel.networkState.collectAsStateWithLifecycle()
-	val localNavAction = sharedViewModel.localNavAction.collectAsStateWithLifecycle()
 
 	val actionResult = actionResultState.value
 
@@ -88,7 +87,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 					.statusBarsPadding(),
 				topBar = {
 					if (NavigationMigrations.shouldShowBar(
-							localNavAction = localNavAction.value,
 							globalNavAction = actionResult,
 						)
 					) {
@@ -108,7 +106,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 					)
 					ModalSelector(
 						modalData = actionResult.modalData,
-						localNavAction = localNavAction.value,
 						sharedViewModel = sharedViewModel,
 					)
 				}
@@ -121,13 +118,11 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 			) {
 				CombinedScreensSelector(
 					screenData = actionResult.screenData,
-					localNavAction = localNavAction.value,
 					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
-					localNavAction = localNavAction.value,
 					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel,
 					navigator = navigator,

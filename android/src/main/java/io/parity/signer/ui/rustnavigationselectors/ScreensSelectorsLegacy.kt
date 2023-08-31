@@ -6,8 +6,6 @@ import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.bottomsheets.SelectSeed
 import io.parity.signer.bottomsheets.SufficientCryptoReady
 import io.parity.signer.components.exposesecurity.ExposedAlert
-import io.parity.signer.domain.Callback
-import io.parity.signer.domain.LocalNavAction
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.signSufficientCrypto
@@ -74,15 +72,8 @@ fun ScreenSelector(
 @Composable
 fun ModalSelector(
 	modalData: ModalData?,
-	localNavAction: LocalNavAction?,
 	sharedViewModel: SharedViewModel
 ) {
-	if (localNavAction != null && localNavAction != LocalNavAction.None) {
-		when (localNavAction) {
-			is LocalNavAction.ShowExportPrivateKey -> {} //show in new selector
-			else -> {}
-		}
-	} else {
 		when (modalData) {
 			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 				modalData.f,
@@ -123,7 +114,6 @@ fun ModalSelector(
 
 			null -> {}
 		}
-	}
 }
 
 @Composable

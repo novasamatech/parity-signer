@@ -6,7 +6,6 @@ import io.parity.signer.BuildConfig
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.storage.getSeed
-import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.runBlocking
@@ -31,8 +30,6 @@ interface Navigator {
 		seedPhrase: String = ""
 	)
 
-	fun navigate(action: LocalNavRequest)
-
 	fun backAction()
 }
 
@@ -46,10 +43,6 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
-		if (singleton.localNavAction.value != LocalNavAction.None) {
-			//if state machine navigation triggered - remove platform layers on top
-			singleton._localNavAction.value = LocalNavAction.None
-		}
 
 		try {
 			val navigationAction = runBlocking {
@@ -78,6 +71,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 	override fun navigate(action: LocalNavRequest) {
 		when (action) {
 			is LocalNavRequest.ShowExportPrivateKey -> {
+				//todo dmitry prepare data!!!
 				val keyDetails = singleton.lastOpenedKeyDetails
 				if (keyDetails == null || keyDetails.pubkey != action.publicKey) {
 					Toast.makeText(
@@ -88,24 +82,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 					if (BuildConfig.DEBUG) throw RuntimeException("Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}")
 					return
 				}
-				val secretKeyDetailsQR = try {
-					generateSecretKeyQr(
-						publicKey = action.publicKey,
-						expectedSeedName = keyDetails.address.seedName,
-						networkSpecsKey = keyDetails.networkInfo.networkSpecsKey,
-						seedPhrase = singleton.getSeed(keyDetails.address.seedName),
-						keyPassword = null
-					)
-				} catch (e: Exception) {
-					//todo issue #1533
-					Toast.makeText(
-						singleton.context,
-						"For passworded keys not yet supported",
-						Toast.LENGTH_LONG
-					).show()
-					navigate(Action.GO_BACK) // close bottom sheet from rust stack
-					return
-				}
+
 				val model = secretKeyDetailsQR.toPrivateKeyExportModel()
 				navigate(Action.GO_BACK) // close bottom sheet from rust stack
 				singleton._localNavAction.value =
@@ -117,14 +94,6 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 	}
 
 	override fun backAction() {
-		if (singleton.localNavAction.value !is LocalNavAction.None) {
-			singleton._localNavAction.value = LocalNavAction.None
-		} else {
-			backRustNavigation()
-		}
-	}
-
-	private fun backRustNavigation() {
 		val lastRustNavAction = singleton.actionResult.value
 		if (lastRustNavAction == null) {
 			singleton.activity.moveTaskToBack(true)
@@ -150,10 +119,6 @@ class EmptyNavigator : Navigator {
 		//do nothing
 	}
 
-	override fun navigate(action: LocalNavRequest) {
-		//do nothing
-	}
-
 	override fun backAction() {
 	}
 }
@@ -168,26 +133,9 @@ class FakeNavigator : Navigator {
 		//do nothing with result
 	}
 
-	override fun navigate(action: LocalNavRequest) {
-		//do nothing
-	}
-
 	override fun backAction() {
 		navigate(Action.GO_BACK)
 	}
-}
-
-
-sealed class LocalNavAction {
-	object None : LocalNavAction()
-	data class ShowExportPrivateKey( //todo dmitry refactor this to show this screen right on old screen without global navigation
-		val model: PrivateKeyExportModel,
-		val navigator: SignerNavigator
-	) : LocalNavAction()
-}
-
-sealed class LocalNavRequest {
-	data class ShowExportPrivateKey(val publicKey: String) : LocalNavRequest()
 }
 
 data class NavigationError(val message: String)
