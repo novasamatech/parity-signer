@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -89,16 +90,24 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
-			BottomSheetWrapperRoot(onClosedAction = closeAction) {
-				//todo dmitry implement
-				PrivateKeyExportBottomSheet(
-					model = localNavAction.model,
-					onClose = {},
-				)
+			val context = LocalContext.current
+			val privateModel = remember {
+				vm.getPrivateExportKey(model, context)
+			}
+			if (privateModel != null) {
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					PrivateKeyExportBottomSheet(
+						model = privateModel,
+						onClose = closeAction,
+					)
+				}
+			} else {
+				// #1533
+				// navigate to KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
-			//todo dmitry handle  keyMenuExportResult
+			//todo handle  keyMenuExportResult #1533 issue
 		}
 	}
 }

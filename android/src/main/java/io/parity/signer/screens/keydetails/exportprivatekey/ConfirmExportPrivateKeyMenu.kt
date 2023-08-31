@@ -26,8 +26,8 @@ import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 fun ConfirmExportPrivateKeyMenu(
-	onExportPrivate: Callback,
 	onClose: Callback,
+	onExportPrivate: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
