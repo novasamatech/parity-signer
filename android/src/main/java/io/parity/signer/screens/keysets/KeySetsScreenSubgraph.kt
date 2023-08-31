@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
-import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
@@ -39,7 +39,7 @@ fun KeySetsScreenSubgraph(
 			rootNavigator = rootNavigator,
 			onSelectSeed = { seedname ->
 				navController.navigate(
-					KeySetNavSubgraph.KeySetDetails.destination(
+					CoreUnlockedNavSubgraph.KeySetDetails.destination(
 						seedName = seedname
 					)
 				)
@@ -51,7 +51,7 @@ fun KeySetsScreenSubgraph(
 			},
 			onNewKeySet = {
 				navController.navigate(
-					KeySetNavSubgraph.newKeySet
+					CoreUnlockedNavSubgraph.newKeySet
 				)
 			},
 			networkState = networkState,

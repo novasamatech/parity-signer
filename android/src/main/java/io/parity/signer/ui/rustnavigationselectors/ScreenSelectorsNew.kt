@@ -16,10 +16,8 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
-import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
@@ -32,7 +30,7 @@ import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
 import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.ui.mainnavigation.KeysSectionNavSubgraph
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
@@ -50,7 +48,7 @@ fun CombinedScreensSelector(
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
-			KeysSectionNavSubgraph(
+			CoreUnlockedNavSubgraph(
 				rootNavigator = rootNavigator,
 				singleton = sharedViewModel,
 			)
@@ -60,20 +58,8 @@ fun CombinedScreensSelector(
 			submitErrorState("key set details clicked for non existing key details content")
 		}
 
-		is ScreenData.KeyDetails -> {//todo dmitry remove it here
-			Box(modifier = Modifier.statusBarsPadding()) {
-				screenData.f?.toKeyDetailsModel()?.let { model ->
-					KeyDetailsPublicKeyScreen(
-						model = model,
-						onBack = { rootNavigator.backAction() },
-						onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
-					)
-				}
-					?: run {
-						submitErrorState("key details clicked for non existing key details content")
-						rootNavigator.backAction()
-					}
-			}
+		is ScreenData.KeyDetails -> {
+			submitErrorState("key set details clicked for non existing key details content")
 		}
 
 		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
@@ -131,6 +117,7 @@ fun CombinedScreensSelector(
 			}
 
 		is ScreenData.Scan -> {
+			//todo dmitry remove
 			ScanNavSubgraph(
 				onCloseCamera = {
 					CameraParentSingleton.navigateBackFromCamera(rootNavigator)

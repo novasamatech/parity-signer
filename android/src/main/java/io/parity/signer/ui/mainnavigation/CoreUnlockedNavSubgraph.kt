@@ -19,11 +19,12 @@ import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetStepSubgraph
+import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
-fun KeysSectionNavSubgraph(
+fun CoreUnlockedNavSubgraph(
 	rootNavigator: Navigator,
 	singleton: SharedViewModel,
 ) {
@@ -31,9 +32,9 @@ fun KeysSectionNavSubgraph(
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = KeySetNavSubgraph.keySetList,
+		startDestination = CoreUnlockedNavSubgraph.keySetList,
 	) {
-		composable(KeySetNavSubgraph.keySetList) {
+		composable(CoreUnlockedNavSubgraph.keySetList) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				KeySetsScreenSubgraph(
 					rootNavigator = rootNavigator,
@@ -42,15 +43,15 @@ fun KeysSectionNavSubgraph(
 			}
 		}
 		composable(
-			route = KeySetNavSubgraph.KeySetDetails.route,
+			route = CoreUnlockedNavSubgraph.KeySetDetails.route,
 			arguments = listOf(
-				navArgument(KeySetNavSubgraph.KeySetDetails.seedNameArg) {
+				navArgument(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg) {
 					type = NavType.StringType
 				}
 			)
 		) {
 			val seedName =
-				it.arguments?.getString(KeySetNavSubgraph.KeySetDetails.seedNameArg)
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)
 			val model = remember {
 				try {
 					//todo dmitry export this to vm and handle errors - open default for example
@@ -79,42 +80,57 @@ fun KeysSectionNavSubgraph(
 				)
 			}
 		}
-		composable(KeySetNavSubgraph.newKeySet) {
+		composable(CoreUnlockedNavSubgraph.newKeySet) {
 			NewKeysetStepSubgraph(
 				navController = navController,
 			)
 		}
-		composable(KeySetNavSubgraph.recoverKeySet) {
+		composable(CoreUnlockedNavSubgraph.recoverKeySet) {
 			//todo dmitry implement
 		}
 		composable(
-			route = KeySetNavSubgraph.KeyDetails.route,
+			route = CoreUnlockedNavSubgraph.KeyDetails.route,
 			arguments = listOf(
-				navArgument(KeySetNavSubgraph.KeyDetails.argKeyAddr) {
+				navArgument(CoreUnlockedNavSubgraph.KeyDetails.argKeyAddr) {
 					type = NavType.StringType
 				},
-				navArgument(KeySetNavSubgraph.KeyDetails.argKeySpec) {
+				navArgument(CoreUnlockedNavSubgraph.KeyDetails.argKeySpec) {
 					type = NavType.StringType
 				},
 			)
 		) {
 			val keyAddr =
-				it.arguments?.getString(KeySetNavSubgraph.KeyDetails.argKeyAddr)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeyDetails.argKeyAddr)!!
 			val keySpec =
-				it.arguments?.getString(KeySetNavSubgraph.KeyDetails.argKeySpec)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeyDetails.argKeySpec)!!
 			KeyDetailsScreenSubgraph(
 				navController = navController,
 				keyAddr = keyAddr,
 				keySpec = keySpec
 			)
 		}
+		composable(CoreUnlockedNavSubgraph.camera) {
+			ScanNavSubgraph(
+				onCloseCamera = {
+					navController.popBackStack()
+				},
+				openKeySet = { seedName ->
+					navController.navigate(
+						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+							seedName = seedName
+						)
+					)
+				}
+			)
+		}
 	}
 }
 
-internal object KeySetNavSubgraph {
+internal object CoreUnlockedNavSubgraph {
 	const val keySetList = "keyset_list"
 	const val newKeySet = "keyset_details_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
+	const val camera = "unlocked_camera"
 
 	object KeySetDetails {
 		internal const val seedNameArg = "title"

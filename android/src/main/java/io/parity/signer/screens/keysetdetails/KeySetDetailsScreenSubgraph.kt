@@ -27,7 +27,7 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
@@ -69,14 +69,14 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onBack = onBack,
 			onAddNewKey = {
-				navController.navigate(KeySetNavSubgraph.newKeySet)
+				navController.navigate(CoreUnlockedNavSubgraph.newKeySet)
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 			},
 			onOpenKey = { keyAddr: String, keySpecs: String ->
 				navController.navigate(
-					KeySetNavSubgraph.KeyDetails.destination(
+					CoreUnlockedNavSubgraph.KeyDetails.destination(
 						keyAddr = keyAddr,
 						keySpec = keySpecs
 					)
@@ -191,6 +191,7 @@ fun KeySetDetailsScreenSubgraph(
 				//content
 				KeySetBackupFullOverlayBottomSheet(
 					model = backupModel,
+					//todo dmitry move to vm below
 					getSeedPhraseForBackup = ::getSeedPhraseForBackup,
 					onClose = closeAction,
 				)
