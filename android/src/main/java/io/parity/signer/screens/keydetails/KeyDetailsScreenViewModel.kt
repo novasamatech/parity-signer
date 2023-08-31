@@ -1,10 +1,11 @@
 package io.parity.signer.screens.keydetails
 
-import io.parity.signer.domain.usecases.KeyPublicModelUseCase
+import io.parity.signer.dependencygraph.ServiceLocator
 
 
 class KeyDetailsScreenViewModel {
-	private val useCase = KeyPublicModelUseCase()
+	private val uniFfi = ServiceLocator.uniffiInteractor
 
-	suspend fun fetchModel() = useCase.getPublicKeyModel()
+	suspend fun fetchModel(keyAddr: String, networkSpecs: String) =
+		uniFfi.getKeyPublicKey(keyAddr, networkSpecs)
 }

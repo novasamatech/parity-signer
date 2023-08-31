@@ -15,7 +15,6 @@ import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
-import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
@@ -24,7 +23,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
-fun KeySetNavSubgraph(
+fun KeysSectionNavSubgraph(
 	rootNavigator: Navigator,
 	singleton: SharedViewModel,
 ) {
@@ -89,8 +88,26 @@ fun KeySetNavSubgraph(
 		composable(KeySetNavSubgraph.recoverKeySet) {
 			//todo dmitry implement
 		}
-		composable(KeySetNavSubgraph.keydetails) {
-			KeyDetailsScreenSubgraph(navController)
+		composable(route = KeySetNavSubgraph.KeyDetails.route,
+			arguments = listOf(
+				navArgument(KeySetNavSubgraph.KeyDetails.argKeyAddr) {
+					type = NavType.StringType
+					defaultValue = null
+				},
+				navArgument(KeySetNavSubgraph.KeyDetails.argKeySpec) {
+					type = NavType.StringType
+					defaultValue = null
+				},
+			)) {
+			val keyAddr =
+				it.arguments?.getString(KeySetNavSubgraph.KeyDetails.argKeyAddr)!!
+			val keySpec =
+				it.arguments?.getString(KeySetNavSubgraph.KeyDetails.argKeySpec)!!
+			KeyDetailsScreenSubgraph(
+				navController = navController,
+				keyAddr = keyAddr,
+				keySpec = keySpec
+			)
 		}
 	}
 }
@@ -99,19 +116,19 @@ internal object KeySetNavSubgraph {
 	const val keySetList = "keyset_list"
 	const val newKeySet = "keyset_details_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
-	const val keydetails = "keyset_key_details"
 
 	object KeySetDetails {
 		internal const val seedNameArg = "title"
 		private const val baseRoute = "keyset_details_home"
-		const val route = "$baseRoute?{$seedNameArg}"
-		fun destination(seedName: String) = "$baseRoute?${seedName}"
+		const val route = "$baseRoute/{$seedNameArg}"
+		fun destination(seedName: String) = "$baseRoute/${seedName}"
 	}
 
 	object KeyDetails {
-		internal const val seedNameArg = "title"
-		private const val baseRoute = "keyset_details_home"
-		const val route = "$baseRoute?{$seedNameArg}"
-		fun destination(seedName: String) = "$baseRoute?${seedName}"
+		internal const val argKeyAddr = "key_addr"
+		internal const val argKeySpec = "key_spec"
+		private const val baseRoute = "key_details_home"
+		const val route = "$baseRoute/{$argKeyAddr}/{$argKeySpec}"
+		fun destination(keyAddr: String, keySpec: String) = "$baseRoute/$keyAddr/$keySpec"
 	}
 }

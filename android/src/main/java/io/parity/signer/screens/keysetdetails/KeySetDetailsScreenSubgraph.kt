@@ -3,7 +3,6 @@ package io.parity.signer.screens.keysetdetails
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,7 +19,6 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.getSeedPhraseForBackup
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
@@ -77,7 +75,12 @@ fun KeySetDetailsScreenSubgraph(
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 			},
 			onOpenKey = { keyAddr: String, keySpecs: String ->
-				//todo dmitry implement
+				navController.navigate(
+					KeySetNavSubgraph.KeyDetails.destination(
+						keyAddr = keyAddr,
+						keySpec = keySpecs
+					)
+				)
 			},
 		)
 	}

@@ -273,7 +273,7 @@ private fun PreviewKeyDetailsScreenDerived() {
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
+			KeyDetailsPublicKeyScreen(mockModel, {}, {},)
 		}
 	}
 }
@@ -292,7 +292,7 @@ private fun PreviewKeyDetailsScreenRoot() {
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
+			KeyDetailsPublicKeyScreen(mockModel, {}, {},)
 		}
 	}
 }

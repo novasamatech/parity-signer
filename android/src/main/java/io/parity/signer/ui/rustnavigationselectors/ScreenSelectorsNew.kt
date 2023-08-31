@@ -20,10 +20,9 @@ import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.domain.toVerifierDetailsModels
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
-import io.parity.signer.screens.keydetails.KeyDetailsMenuAction
 import io.parity.signer.screens.keydetails.KeyDetailsPublicKeyScreen
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
-import io.parity.signer.ui.mainnavigation.KeySetNavSubgraph
+import io.parity.signer.ui.mainnavigation.KeysSectionNavSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
 import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
@@ -54,7 +53,7 @@ fun CombinedScreensSelector(
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
-			KeySetNavSubgraph(
+			KeysSectionNavSubgraph(
 				rootNavigator = rootNavigator,
 				singleton = sharedViewModel,
 			)

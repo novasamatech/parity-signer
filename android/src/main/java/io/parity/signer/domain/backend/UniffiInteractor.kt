@@ -248,13 +248,13 @@ class UniffiInteractor(val appContext: Context) {
 		}
 
 	suspend fun getKeyPublicKey(
-		address: String,
+		addressKey: String,
 		networkSpecsKey: String
 	): UniffiResult<MKeyDetails> =
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =
-					io.parity.signer.uniffi.getKeySetPublicKey(address, networkSpecsKey)
+					io.parity.signer.uniffi.getKeySetPublicKey(addressKey, networkSpecsKey)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
