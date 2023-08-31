@@ -3,7 +3,6 @@ package io.parity.signer.ui.rustnavigationselectors
 import androidx.compose.runtime.Composable
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
-import io.parity.signer.bottomsheets.SelectSeed
 import io.parity.signer.bottomsheets.SufficientCryptoReady
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Navigator
@@ -109,7 +108,6 @@ fun ModalSelector(
 			is ModalData.LogComment -> {} //moved to new sheet
 			is ModalData.SelectSeed -> {
 				submitErrorState("This is part of refactored screen and not shown separately")
-				SelectSeed(modalData.f, sharedViewModel = sharedViewModel)
 			}
 
 			null -> {}

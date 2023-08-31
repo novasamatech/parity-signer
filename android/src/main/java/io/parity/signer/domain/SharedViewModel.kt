@@ -32,10 +32,6 @@ class SharedViewModel() : ViewModel() {
 
 	val navigator by lazy { SignerNavigator(this) }
 
-	//todo dmitry remove this!!! part of navigation change
-	// Current key details, after rust API will migrate to REST-like should not store this value here.
-	internal var lastOpenedKeyDetails: MKeyDetails? = null
-
 	val seedStorage: SeedStorage = ServiceLocator.seedStorage
 	private val databaseAssetsInteractor: DatabaseAssetsInteractor =
 		ServiceLocator.databaseAssetsInteractor

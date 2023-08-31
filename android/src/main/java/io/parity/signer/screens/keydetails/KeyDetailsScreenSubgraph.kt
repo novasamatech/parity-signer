@@ -93,7 +93,7 @@ fun KeyDetailsScreenSubgraph(
 				//todo dmitry implement
 				PrivateKeyExportBottomSheet(
 					model = localNavAction.model,
-					navigator = localNavAction.navigator
+					onClose = {},
 				)
 			}
 		}

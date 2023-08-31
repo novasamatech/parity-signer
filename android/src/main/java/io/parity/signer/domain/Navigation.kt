@@ -2,11 +2,9 @@ package io.parity.signer.domain
 
 import android.util.Log
 import android.widget.Toast
-import io.parity.signer.BuildConfig
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.storage.getSeed
-import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.runBlocking
 
@@ -56,40 +54,10 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 				}
 			} ?: return
 
-			//Workaround while Rust state machine is keeping state inside as it's needed for exporting private key in different screen
-			if (navigationAction.screenData is ScreenData.KeyDetails) {
-				singleton.lastOpenedKeyDetails =
-					(navigationAction.screenData as ScreenData.KeyDetails).f
-			}
 			singleton._actionResult.value = navigationAction
 		} catch (e: java.lang.Exception) {
 			Log.e("Navigation error", e.toString())
 			Toast.makeText(singleton.context, e.toString(), Toast.LENGTH_SHORT).show()
-		}
-	}
-
-	override fun navigate(action: LocalNavRequest) {
-		when (action) {
-			is LocalNavRequest.ShowExportPrivateKey -> {
-				//todo dmitry prepare data!!!
-				val keyDetails = singleton.lastOpenedKeyDetails
-				if (keyDetails == null || keyDetails.pubkey != action.publicKey) {
-					Toast.makeText(
-						singleton.context,
-						"Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}",
-						Toast.LENGTH_LONG
-					).show()
-					if (BuildConfig.DEBUG) throw RuntimeException("Invalid navigation state - cannot export key. You should never see it. ${keyDetails == null}")
-					return
-				}
-
-				val model = secretKeyDetailsQR.toPrivateKeyExportModel()
-				navigate(Action.GO_BACK) // close bottom sheet from rust stack
-				singleton._localNavAction.value =
-					LocalNavAction.ShowExportPrivateKey(
-						model, singleton.navigator
-					)
-			}
 		}
 	}
 

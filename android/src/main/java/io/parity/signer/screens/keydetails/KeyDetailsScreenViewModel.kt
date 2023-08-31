@@ -17,7 +17,7 @@ class KeyDetailsScreenViewModel {
 		uniFfi.getKeyPublicKey(keyAddr, networkSpecs)
 
 	fun getPrivateExportKey(model: KeyDetailsModel, context: Context): PrivateKeyExportModel? {
-		val seed = singleton.getSeed(keyDetails.address.seedName),
+		val seed = singleton.getSeed(keyDetails.address.seedName)
 
 		val secretKeyDetailsQR = try {
 			generateSecretKeyQr(
