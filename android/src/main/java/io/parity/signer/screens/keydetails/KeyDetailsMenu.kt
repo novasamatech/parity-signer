@@ -74,7 +74,6 @@ fun KeyDetailsMenuAction(
 				onClose = {
 				navigator.backAction()
 			},
-			publicKey = keyDetails!!.pubkey,
 		)
 	}
 }

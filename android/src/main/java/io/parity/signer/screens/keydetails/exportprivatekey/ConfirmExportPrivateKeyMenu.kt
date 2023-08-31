@@ -26,7 +26,6 @@ import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 fun ConfirmExportPrivateKeyMenu(
-	publicKey: String,
 	onExportPrivate: Callback,
 	onClose: Callback,
 ) {
@@ -85,7 +84,7 @@ fun ConfirmExportPrivateKeyMenu(
 private fun PreviewConfirmExportPrivateKeyMenu() {
 	SignerNewTheme {
 		ConfirmExportPrivateKeyMenu(
-			"pubkey", {}, {}
+			{}, {}
 		)
 	}
 }
