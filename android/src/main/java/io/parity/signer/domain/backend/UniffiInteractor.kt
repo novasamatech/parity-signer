@@ -38,40 +38,40 @@ class UniffiInteractor(val appContext: Context) {
 	): OperationResult<ActionResult, NavigationError> =
 		withContext(Dispatchers.IO) {
 			try {
-                OperationResult.Ok(backendAction(action, details, seedPhrase))
+				OperationResult.Ok(backendAction(action, details, seedPhrase))
 			} catch (e: ErrorDisplayed) {
-                OperationResult.Err(
-                    NavigationError(
-                        appContext.getString(
-                            R.string.navigation_error_general_message,
-                            e.findErrorDisplayed()?.message ?: e.message
-                        )
-                    )
-                )
+				OperationResult.Err(
+					NavigationError(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
 			}
 		}
 
 	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
 		withContext(Dispatchers.IO) {
 			try {
-                OperationResult.Ok(
-                    backendAction(
-                        Action.TRANSACTION_FETCHED,
-                        payload,
-                        ""
-                    )
-                )
+				OperationResult.Ok(
+					backendAction(
+						Action.TRANSACTION_FETCHED,
+						payload,
+						""
+					)
+				)
 			} catch (e: ErrorDisplayed) {
-                OperationResult.Err(e.toTransactionError())
+				OperationResult.Err(e.toTransactionError())
 			} catch (e: Throwable) {
-                OperationResult.Err(
-                    TransactionError.Generic(
-                        appContext.getString(
-                            R.string.navigation_error_general_message,
-                            e.findErrorDisplayed()?.message ?: e.message
-                        )
-                    )
-                )
+				OperationResult.Err(
+					TransactionError.Generic(
+						appContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
 			}
 		}
 
@@ -103,11 +103,11 @@ class UniffiInteractor(val appContext: Context) {
 			}
 			val keyInfo = io.parity.signer.uniffi.exportKeyInfo(
 				seedName = seed,
-				exportedSet= ExportedSet.Selected(pathAndNetworks),
+				exportedSet = ExportedSet.Selected(pathAndNetworks),
 			)
-            UniffiResult.Success(keyInfo)
+			UniffiResult.Success(keyInfo)
 		} catch (e: ErrorDisplayed) {
-            UniffiResult.Error(e)
+			UniffiResult.Error(e)
 		}
 	}
 
@@ -119,9 +119,9 @@ class UniffiInteractor(val appContext: Context) {
 						io.parity.signer.uniffi.encodeToQr(it, false)
 					}
 				}.map { it.await() }
-                UniffiResult.Success(images)
+				UniffiResult.Success(images)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
@@ -130,9 +130,9 @@ class UniffiInteractor(val appContext: Context) {
 			try {
 				val networks =
 					io.parity.signer.uniffi.getManagedNetworks().networks.map { it.toNetworkModel() }
-                UniffiResult.Success(networks)
+				UniffiResult.Success(networks)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
@@ -148,29 +148,29 @@ class UniffiInteractor(val appContext: Context) {
 					path = path,
 					network = selectedNetworkSpecs
 				)
-                UniffiResult.Success(validationResult)
+				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
 	suspend fun getLogs(): UniffiResult<MLog> =
-	withContext(Dispatchers.IO) {
-		try {
-			val validationResult = io.parity.signer.uniffi.getLogs()
-            UniffiResult.Success(validationResult)
-		} catch (e: ErrorDisplayed) {
-            UniffiResult.Error(e)
+		withContext(Dispatchers.IO) {
+			try {
+				val validationResult = io.parity.signer.uniffi.getLogs()
+				UniffiResult.Success(validationResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
 		}
-	}
 
 	suspend fun getLogDetails(logIndex: UInt): UniffiResult<MLogDetails> =
 		withContext(Dispatchers.IO) {
 			try {
 				val validationResult = io.parity.signer.uniffi.getLogDetails(logIndex)
-                UniffiResult.Success(validationResult)
+				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
@@ -178,26 +178,31 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val validationResult = io.parity.signer.uniffi.clearLogHistory()
-                UniffiResult.Success(validationResult)
+				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
 	suspend fun addCommentToLogs(userComment: String): UniffiResult<Unit> =
 		withContext(Dispatchers.IO) {
 			try {
-				val validationResult = io.parity.signer.uniffi.handleLogComment(userComment)
-                UniffiResult.Success(validationResult)
+				val validationResult =
+					io.parity.signer.uniffi.handleLogComment(userComment)
+				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
-                UniffiResult.Error(e)
+				UniffiResult.Error(e)
 			}
 		}
 
-	suspend fun previewDynamicDerivations(seeds: Map<String, String>, payload: String): UniffiResult<DdPreview> =
+	suspend fun previewDynamicDerivations(
+		seeds: Map<String, String>,
+		payload: String
+	): UniffiResult<DdPreview> =
 		withContext(Dispatchers.IO) {
 			try {
-				val validationResult = io.parity.signer.uniffi.previewDynamicDerivations(seeds, payload)
+				val validationResult =
+					io.parity.signer.uniffi.previewDynamicDerivations(seeds, payload)
 				UniffiResult.Success(validationResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -210,7 +215,8 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<MSignedTransaction> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.signDdTransaction(payload, seeds)
+				val transactionResult =
+					io.parity.signer.uniffi.signDdTransaction(payload, seeds)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -233,20 +239,22 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<KeySetsSelectModel> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.getSeeds(seedNames).toKeySetsSelectModel()
+				val transactionResult =
+					io.parity.signer.uniffi.getSeeds(seedNames).toKeySetsSelectModel()
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
 			}
 		}
 
-	suspend fun getKeySetPublicKey(
+	suspend fun getKeyPublicKey(
 		address: String,
 		networkSpecsKey: String
 	): UniffiResult<MKeyDetails> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.getKeySetPublicKey(address, networkSpecsKey)
+				val transactionResult =
+					io.parity.signer.uniffi.getKeySetPublicKey(address, networkSpecsKey)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -259,7 +267,8 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<Unit> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.removeDerivedKey(address, networkSpecsKey)
+				val transactionResult =
+					io.parity.signer.uniffi.removeDerivedKey(address, networkSpecsKey)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -283,7 +292,8 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<MNetworkDetails> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.getManagedNetworkDetails(networkKey)
+				val transactionResult =
+					io.parity.signer.uniffi.getManagedNetworkDetails(networkKey)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -296,7 +306,11 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<Unit> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.removeMetadataOnManagedNetwork(networkKey, metadataSpecsVersion)
+				val transactionResult =
+					io.parity.signer.uniffi.removeMetadataOnManagedNetwork(
+						networkKey,
+						metadataSpecsVersion
+					)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -308,7 +322,8 @@ class UniffiInteractor(val appContext: Context) {
 	): UniffiResult<List<String>> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.seedPhraseGuessWords(userInput)
+				val transactionResult =
+					io.parity.signer.uniffi.seedPhraseGuessWords(userInput)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -327,10 +342,10 @@ sealed class OperationResult<out T, out E> {
 	data class Err<out E>(val error: E) : OperationResult<Nothing, E>()
 }
 
-sealed class CompletableResult<out T, out E>{
-	data class Ok<out T>(val result: T): CompletableResult<T, Nothing>()
+sealed class CompletableResult<out T, out E> {
+	data class Ok<out T>(val result: T) : CompletableResult<T, Nothing>()
 	data class Err<out E>(val error: E) : CompletableResult<Nothing, E>()
-	object InProgress: CompletableResult<Nothing, Nothing>()
+	object InProgress : CompletableResult<Nothing, Nothing>()
 }
 
 fun <T> UniffiResult<T>.mapError(): T? {
@@ -339,6 +354,7 @@ fun <T> UniffiResult<T>.mapError(): T? {
 			submitErrorState("uniffi interaction exception $error")
 			null
 		}
+
 		is UniffiResult.Success -> {
 			result
 		}
@@ -352,6 +368,7 @@ fun <T, V> OperationResult<T, V>.mapError(): T? {
 			submitErrorState("uniffi interaction exception $error")
 			null
 		}
+
 		is OperationResult.Ok -> {
 			result
 		}

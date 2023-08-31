@@ -184,6 +184,7 @@ fun BottomSheetSelector(
 
 			when (localNavAction) {
 				is LocalNavAction.ShowExportPrivateKey -> {
+					//todo dmitry remove
 					BottomSheetWrapperRoot(onClosedAction = {
 //						don't do action here because timer's finally will do back navigation
 //						navigator.backAction()
@@ -199,15 +200,9 @@ fun BottomSheetSelector(
 			}
 		} else {
 			when (modalData) {
-				is ModalData.KeyDetailsAction ->
-					BottomSheetWrapperRoot(onClosedAction = {
-						navigator.backAction()
-					}) {
-						KeyDetailsMenuAction(
-							navigator = navigator,
-							keyDetails = sharedViewModel.lastOpenedKeyDetails
-						)
-					}
+				is ModalData.KeyDetailsAction -> {
+					submitErrorState("nothing, moved to KeyDetailsScreenSubgraph")
+				}
 
 				is ModalData.NewSeedMenu ->
 					//old design
@@ -227,6 +222,7 @@ fun BottomSheetSelector(
 
 				is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
 				is ModalData.EnterPassword ->
+					//todo dmitry check where it should be used
 					BottomSheetWrapperRoot(onClosedAction = {
 						navigator.backAction()
 					}) {

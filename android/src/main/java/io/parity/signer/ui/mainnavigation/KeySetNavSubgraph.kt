@@ -90,22 +90,7 @@ fun KeySetNavSubgraph(
 			//todo dmitry implement
 		}
 		composable(KeySetNavSubgraph.keydetails) {
-
-			KeyDetailsScreenSubgraph()
-
-			//todo dmitry implement
-			Box(modifier = Modifier.statusBarsPadding()) {
-			screenData.f?.toKeyDetailsModel()?.let { model ->
-				KeyDetailsPublicKeyScreen(
-					model = model,
-					rootNavigator = rootNavigator,
-				)
-			}
-				?: run {
-					submitErrorState("key details clicked for non existing key details content")
-					rootNavigator.backAction()
-				}
-			}
+			KeyDetailsScreenSubgraph(navController)
 		}
 	}
 }
@@ -117,6 +102,13 @@ internal object KeySetNavSubgraph {
 	const val keydetails = "keyset_key_details"
 
 	object KeySetDetails {
+		internal const val seedNameArg = "title"
+		private const val baseRoute = "keyset_details_home"
+		const val route = "$baseRoute?{$seedNameArg}"
+		fun destination(seedName: String) = "$baseRoute?${seedName}"
+	}
+
+	object KeyDetails {
 		internal const val seedNameArg = "title"
 		private const val baseRoute = "keyset_details_home"
 		const val route = "$baseRoute?{$seedNameArg}"
