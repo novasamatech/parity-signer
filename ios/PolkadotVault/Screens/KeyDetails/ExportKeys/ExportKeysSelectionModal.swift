@@ -63,7 +63,6 @@ struct ExportKeysSelectionModal: View {
                         .padding(.trailing, Spacing.medium)
                     }
                     .frame(height: Heights.tabbarHeight)
-                    .background(Asset.backgroundSecondary.swiftUIColor)
                 }
             }
         )
