@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -16,6 +17,7 @@ import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -48,7 +50,6 @@ fun KeyDetailsScreenSubgraph(
 	}
 
 
-
 	NavHost(
 		navController = menuNavController,
 		startDestination = KeyPublicDetailsMenuSubgraph.empty,
@@ -62,19 +63,29 @@ fun KeyDetailsScreenSubgraph(
 				KeyDetailsGeneralMenu(
 					closeMenu = closeAction,
 					onExportPrivateKey = {
-						state.value = KeyDetailsMenuState.PRIVATE_KEY_CONFIRM
+						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportConfirmation) {
+							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+						}
 					},
 					onDelete = {
-						state.value = KeyDetailsMenuState.DELETE_CONFIRM
+						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuDelete) {
+							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+						}
 					},
 				)
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuDelete) {
+			val context = rememberCoroutineScope()
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeyDetailsDeleteConfirmBottomSheet(
 					onCancel = closeAction,
-					onRemoveKey = { navigator.navigate(Action.REMOVE_KEY) },
+					onRemoveKey = {
+						context.launch {
+							val result = vm.removeDerivedKey(keyAddr, keySpec)
+							//todo dmitry post toast success of not
+						}
+					},
 				)
 			}
 		}
@@ -82,8 +93,9 @@ fun KeyDetailsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmExportPrivateKeyMenu(
 					onExportPrivate = {
-						//todo dmitry fix
-						navigator.navigate(LocalNavRequest.ShowExportPrivateKey(keyDetails!!.pubkey))
+						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
+							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+						}
 					},
 					onClose = closeAction,
 				)
@@ -107,7 +119,7 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
-			//todo handle  keyMenuExportResult #1533 issue
+			//todo handle keyMenuExportResult #1533 issue
 		}
 	}
 }

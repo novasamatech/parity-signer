@@ -330,6 +330,21 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
+	suspend fun removedDerivedKey(
+		addressKey: String,
+		networkSpecsKey: String,
+	): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.removeDerivedKey(addressKey, networkSpecsKey)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+
 }
 
 sealed class UniffiResult<T> {

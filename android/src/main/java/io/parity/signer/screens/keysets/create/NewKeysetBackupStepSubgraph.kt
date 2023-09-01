@@ -29,7 +29,7 @@ fun NewKeysetStepSubgraph(
 ) {
 
 	//background
-	Box(//todo remove when rust navigation not in place yet
+	Box(//todo remove when rust navigation not in place already
 		modifier = Modifier
 			.fillMaxSize(1f)
 			.statusBarsPadding()
@@ -51,7 +51,6 @@ fun NewKeysetStepSubgraph(
 		navController = navController,
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetName,
 	) {
-
 		composable(NewKeySetBackupStepSubgraph.NewKeySetName) {
 			NewKeySetNameScreen(
 				prefilledName = seedName,

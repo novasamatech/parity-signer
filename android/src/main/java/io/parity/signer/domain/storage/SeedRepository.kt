@@ -4,6 +4,7 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.Navigator
@@ -76,8 +77,7 @@ class SeedRepository(
 	 * Force ask for authentication and get seed phrase
 	 */
 	suspend fun getSeedPhraseForceAuth(seed: String): RepoResult<String> {
-		return when (val authResult =
-			authentication.authenticate(activity)) {
+		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
 				getSeedPhrasesDangerous(listOf(seed))
 			}
@@ -92,22 +92,23 @@ class SeedRepository(
 
 	suspend fun fillSeedToPhrasesAuth(seedNames: List<String>): RepoResult<List<Pair<String, String>>> {
 		return try {
-				when (val authResult =
-					authentication.authenticate(activity)) {
-					AuthResult.AuthSuccess -> {
-						val result = seedNames.map { it to storage.getSeed(it) }
-						return if (result.any { it.second.isEmpty() }) {
-							RepoResult.Failure(IllegalStateException("phrase some are empty - broken storage?"))
-						} else {
-							RepoResult.Success(result)
-						}
-					}
-					AuthResult.AuthError,
-					AuthResult.AuthFailed,
-					AuthResult.AuthUnavailable -> {
-						RepoResult.Failure(RuntimeException("auth error - $authResult"))
+			when (val authResult =
+				authentication.authenticate(activity)) {
+				AuthResult.AuthSuccess -> {
+					val result = seedNames.map { it to storage.getSeed(it) }
+					return if (result.any { it.second.isEmpty() }) {
+						RepoResult.Failure(IllegalStateException("phrase some are empty - broken storage?"))
+					} else {
+						RepoResult.Success(result)
 					}
 				}
+
+				AuthResult.AuthError,
+				AuthResult.AuthFailed,
+				AuthResult.AuthUnavailable -> {
+					RepoResult.Failure(RuntimeException("auth error - $authResult"))
+				}
+			}
 		} catch (e: java.lang.Exception) {
 			Log.d("get seed failure", e.toString())
 			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
@@ -251,6 +252,7 @@ class SeedRepository(
 					val result = storage.checkIfSeedNameAlreadyExists(seedPhrase)
 					result
 				}
+
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
