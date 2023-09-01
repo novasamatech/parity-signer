@@ -9,12 +9,6 @@ import SwiftUI
 
 struct DerivedKeyRow: View {
     let viewModel: DerivedKeyRowViewModel
-    @Binding var selectedKeys: [DerivedKeyRowModel]
-    @Binding var isPresentingSelectionOverlay: Bool
-
-    private var isItemSelected: Bool {
-        selectedKeys.map(\.viewModel).contains(viewModel)
-    }
 
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.small) {
@@ -41,17 +35,8 @@ struct DerivedKeyRow: View {
             }
             Spacer()
             VStack(alignment: .center) {
-                if isPresentingSelectionOverlay {
-                    if isItemSelected {
-                        Asset.checkmarkChecked.swiftUIImage
-                    } else {
-                        Asset.checkmarkUnchecked.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    }
-                } else {
-                    Asset.chevronRight.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                }
+                Asset.chevronRight.swiftUIImage
+                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
             }
             .padding(.trailing, Spacing.large)
             .frame(minHeight: .zero, maxHeight: .infinity)
@@ -87,9 +72,7 @@ struct DerivedKeyRow: View {
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A",
                         rootKeyName: ""
-                    ),
-                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                    )
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
@@ -98,9 +81,7 @@ struct DerivedKeyRow: View {
                         path: "",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A"
-                    ),
-                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                    )
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
@@ -109,9 +90,7 @@ struct DerivedKeyRow: View {
                         path: "//astar",
                         hasPassword: false,
                         base58: "15Gsc678654FDSG0HA04H0A"
-                    ),
-                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                    isPresentingSelectionOverlay: Binding<Bool>.constant(true)
+                    )
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
@@ -120,9 +99,7 @@ struct DerivedKeyRow: View {
                         path: "//kusama",
                         hasPassword: true,
                         base58: "15Gsc678654FDSG0HA04H0A"
-                    ),
-                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                    isPresentingSelectionOverlay: Binding<Bool>.constant(false)
+                    )
                 )
                 DerivedKeyRow(
                     viewModel: DerivedKeyRowViewModel(
@@ -131,9 +108,7 @@ struct DerivedKeyRow: View {
                         path: "//kusama//verylongpathsolongitrequirestwolinesoftextormaybeevenmoremaybethree",
                         hasPassword: true,
                         base58: "15Gsc678654FDSG0HA04H0A"
-                    ),
-                    selectedKeys: Binding<[DerivedKeyRowModel]>.constant([]),
-                    isPresentingSelectionOverlay: Binding<Bool>.constant(false)
+                    )
                 )
             }
             .preferredColorScheme(.dark)

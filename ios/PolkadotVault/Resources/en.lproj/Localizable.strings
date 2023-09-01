@@ -127,10 +127,9 @@
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
 "KeyDetails.Action.Create" = "Create Derived key";
-"KeyDetails.Overlay.Label.Title" = "%@ %@ selected";
-"KeyDetails.Overlay.Label.Title.Empty" = "Root key selected";
-"KeyDetails.Overlay.Label.Key.Single" = "key";
-"KeyDetails.Overlay.Label.Key.Plural" = "keys";
+"KeyDetails.Overlay.Label.Title" = "Export %@ %@";
+"KeyDetails.Overlay.Label.Key.Single" = "Key";
+"KeyDetails.Overlay.Label.Key.Plural" = "Keys";
 "KeyDetails.Overlay.Action.Delete" = "Delete";
 "KeyDetails.Overlay.Action.SelectAll" = "Select All";
 "KeyDetails.Overlay.Action.Export" = "Export";
@@ -199,7 +198,7 @@
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key";
 "KeysExport.KeySets.Label.Header.Suffix.Plural" = "Keys";
-"KeysExport.KeySets.Label.Info" = "By scanning this QR code into your application you’ll export all keys from the Key Sets shown in the list below";
+"KeysExport.KeySets.Label.Info" = "Please note that by scanning this QR code into your application you’ll export all the keys shown in the list below";
 "KeysExport.KeySets.Label.Key.Single" = "%@ Key";
 "KeysExport.KeySets.Label.Key.Plural" = "%@ Keys";
 

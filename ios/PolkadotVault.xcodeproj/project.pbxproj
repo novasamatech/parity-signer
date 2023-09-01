@@ -133,6 +133,7 @@
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
+		6D5DCA032A7CFA2E0050B101 /* ExportKeysSelectionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */; };
 		6D5FDDCC2977D08E0076C1C4 /* LogNoteModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FDDCB2977D08E0076C1C4 /* LogNoteModal.swift */; };
 		6D5FDDD02977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FDDCF2977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift */; };
 		6D6430EC28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430EB28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift */; };
@@ -211,7 +212,6 @@
 		6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */; };
 		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
 		6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */; };
-		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
 		6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */; };
 		6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */; };
 		6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */; };
@@ -481,6 +481,7 @@
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
 		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
+		6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeysSelectionModal.swift; sourceTree = "<group>"; };
 		6D5FDDCB2977D08E0076C1C4 /* LogNoteModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNoteModal.swift; sourceTree = "<group>"; };
 		6D5FDDCF2977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenTextEditorBackgroundModifier.swift; sourceTree = "<group>"; };
 		6D605B8E2976897B005822F3 /* RobotoMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Regular.ttf"; sourceTree = "<group>"; };
@@ -556,7 +557,6 @@
 		6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsService.swift; sourceTree = "<group>"; };
 		6DA501D6290BECBE0096DA4E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyAndNetworkCard+PathAndNetwork.swift"; sourceTree = "<group>"; };
-		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
 		6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageNetworkDetailsService.swift; sourceTree = "<group>"; };
 		6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedStateMediator.swift; sourceTree = "<group>"; };
 		6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediator.swift; sourceTree = "<group>"; };
@@ -737,7 +737,6 @@
 			isa = PBXGroup;
 			children = (
 				6D52E3AD2946FF4900AD72F0 /* NetworkSelection */,
-				6DEFB53028FEE17800762219 /* ExportKeys */,
 				6DBF6E2528E44DBA00CC959F /* Errors */,
 				6DCC572528D8C0410014278A /* Backup */,
 				6DD9FF1428C8B83C00FB6195 /* Alerts */,
@@ -1298,6 +1297,16 @@
 			path = Connectivity;
 			sourceTree = "<group>";
 		};
+		6D5DCA012A7CFA1E0050B101 /* ExportKeys */ = {
+			isa = PBXGroup;
+			children = (
+				6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */,
+				6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */,
+				6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */,
+			);
+			path = ExportKeys;
+			sourceTree = "<group>";
+		};
 		6D6430EA28CB2FD300342E37 /* Animators */ = {
 			isa = PBXGroup;
 			children = (
@@ -1571,7 +1580,6 @@
 				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
 				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
 				6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */,
-				6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */,
 				6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */,
 			);
 			path = Views;
@@ -1673,6 +1681,7 @@
 		6DC5643E28B929E0003D540B /* KeyDetails */ = {
 			isa = PBXGroup;
 			children = (
+				6D5DCA012A7CFA1E0050B101 /* ExportKeys */,
 				6DA501CA290A47930096DA4E /* Views */,
 				6DE8466828BF6E9B0051346A /* Models */,
 			);
@@ -1873,15 +1882,6 @@
 				6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */,
 			);
 			path = QRCode;
-			sourceTree = "<group>";
-		};
-		6DEFB53028FEE17800762219 /* ExportKeys */ = {
-			isa = PBXGroup;
-			children = (
-				6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */,
-				6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */,
-			);
-			path = ExportKeys;
 			sourceTree = "<group>";
 		};
 		6DF07ADC29C1060D00C01DE8 /* SetUpNetworks */ = {
@@ -2222,7 +2222,6 @@
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				6DF9A13B2983B0ED00B31B6D /* DevicePincodeRequiredView.swift in Sources */,
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
-				6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
 				6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */,
 				6D7129222952B7800048558C /* NetworkSettingsDetails.swift in Sources */,
@@ -2329,6 +2328,7 @@
 				6D476A1B29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift in Sources */,
 				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
 				6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */,
+				6D5DCA032A7CFA2E0050B101 /* ExportKeysSelectionModal.swift in Sources */,
 				6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */,
 				6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,

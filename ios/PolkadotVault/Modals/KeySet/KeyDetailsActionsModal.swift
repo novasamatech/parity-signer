@@ -12,7 +12,7 @@ struct KeyDetailsActionsModal: View {
     @Binding var isShowingActionSheet: Bool
     @Binding var shouldPresentRemoveConfirmationModal: Bool
     @Binding var shouldPresentBackupModal: Bool
-    @Binding var shouldPresentSelectionOverlay: Bool
+    @Binding var shouldPresentExportKeysSelection: Bool
 
     var body: some View {
         FullScreenRoundedModal(
@@ -22,7 +22,7 @@ struct KeyDetailsActionsModal: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Export Keys
                     ActionSheetButton(
-                        action: { animateDismissal { shouldPresentSelectionOverlay.toggle() } },
+                        action: { animateDismissal { shouldPresentExportKeysSelection.toggle() } },
                         icon: Asset.selectUnselected.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.export.key
                     )
