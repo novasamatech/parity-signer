@@ -82,7 +82,7 @@ struct ExportMultipleKeysModal: View {
                 viewModel.viewModel.derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                 id: \.id
             ) {
-                QRCodeAddressFooterView(viewModel: .init($0), backgroundColor: Asset.fill6Solid.swiftUIColor)
+                ExportDerivedKeyView(dataModel: $0, backgroundColor: Asset.fill6Solid.swiftUIColor)
                 if $0 != viewModel.viewModel.derivedKeys.last {
                     Divider()
                 }
@@ -102,58 +102,73 @@ private extension ExportMultipleKeysModal {
             CloseModalButton(action: animateDismissal)
         }
     }
-
-    func keyItem(_ viewModel: KeySetViewModel, isLast: Bool) -> some View {
-        VStack(alignment: .leading) {
-            Spacer()
-            HStack {
-                Text(viewModel.keyName)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                Text(" · ")
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                Text(viewModel.derivedKeys ?? "")
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                Spacer()
-            }
-            .font(PrimaryFont.bodyM.font)
-            Spacer()
-            if !isLast {
-                Divider()
-            }
-        }
-        .frame(height: Heights.actionSheetButton)
-        .padding(.horizontal, Spacing.extraSmall)
-        .background(Color.clear)
-    }
 }
 
-/// `Hide Secret Key` footer for private key export
-private struct ExportPrivateKeyAddressFooter: View {
-    private enum Constants {
-        static let keyVisibilityTime: CGFloat = 60
-    }
+private struct ExportDerivedKeyView: View {
+    @State private var showFullAddress: Bool = false
+    private let dataModel: DerivedKeyExportModel
+    private let backgroundColor: Color
 
-    private let hideAction: () -> Void
-
-    init(hideAction: @escaping () -> Void) {
-        self.hideAction = hideAction
+    init(
+        dataModel: DerivedKeyExportModel,
+        backgroundColor: Color
+    ) {
+        self.dataModel = dataModel
+        self.backgroundColor = backgroundColor
     }
 
     var body: some View {
-        HStack {
-            Localizable.KeyExport.Label.hide.text
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                .font(PrimaryFont.bodyL.font)
-            CircularProgressView(
-                CircularCountdownModel(
-                    counter: Constants.keyVisibilityTime,
-                    viewModel: .privateKeyCountdown,
-                    onCompletion: hideAction
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    fullPath
+                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .font(PrimaryFont.captionM.font)
+                    Text(dataModel.viewModel.rootKeyName)
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.bodyM.font)
+                }
+                Spacer()
+                NetworkIdenticon(
+                    identicon: dataModel.viewModel.identicon,
+                    network: dataModel.keyData.network.networkLogo,
+                    background: backgroundColor,
+                    size: Heights.identiconInCell
                 )
-            )
+            }
+            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
+                Group {
+                    Text(showFullAddress ? dataModel.viewModel.base58 : dataModel.viewModel.base58.truncateMiddle())
+                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .font(PrimaryFont.bodyL.font)
+                        .frame(idealWidth: .infinity, alignment: .leading)
+                    if !showFullAddress {
+                        Asset.chevronDown.swiftUIImage
+                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .padding(.leading, Spacing.extraExtraSmall)
+                    }
+                }
+                .onTapGesture {
+                    withAnimation {
+                        showFullAddress = true
+                    }
+                }
+                Spacer()
+                NetworkCapsuleView(network: dataModel.viewModel.network)
+            }
         }
-        .padding(.horizontal, Spacing.large)
-        .padding([.top, .bottom], Spacing.extraSmall)
+        .padding(Spacing.medium)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// String interpolation for SFSymbols is a bit unstable if creating `String` inline by using conditional logic or
+    /// `appending` from `StringProtocol`. Hence less DRY approach and dedicated function to wrap that
+    private var fullPath: Text {
+        dataModel.viewModel.hasPassword ?
+            Text(
+                "\(dataModel.viewModel.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
+            ) :
+            Text(dataModel.viewModel.path)
     }
 }
 

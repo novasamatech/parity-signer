@@ -35,12 +35,12 @@ extension KeyDetailsView {
         private var appState: AppState
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
-        @Published var shouldPresentSelectionOverlay = false
+        @Published var shouldPresentExportKeysSelection = false
         @Published var isShowingActionSheet = false
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingBackupModal = false
         @Published var isPresentingConnectivityAlert = false
-        @Published var isPresentingSelectionOverlay = false
+        @Published var isPresentingExportKeySelection = false
         @Published var isPresentingRootDetails = false
         @Published var isPresentingKeyDetails = false
         @Published var presentedKeyDetails: MKeyDetails!
@@ -52,7 +52,6 @@ extension KeyDetailsView {
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
-        @Published var selectedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
         // Error handling
         @Published var isPresentingError: Bool = false
@@ -72,6 +71,8 @@ extension KeyDetailsView {
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
         private let onCompletion: (OnCompletionAction) -> Void
+        var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
+
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
@@ -199,15 +200,29 @@ extension KeyDetailsView {
             )
         }
 
-        func toggleSelectKeysOverlay() {
-            isPresentingSelectionOverlay.toggle()
-            if !isPresentingSelectionOverlay {
-                selectedKeys = []
-            }
-        }
-
         func exportSelectedKeys() {
             isShowingKeysExportModal = true
+        }
+
+        func onExportKeySelectionComplete(_ completionAction: ExportKeysSelectionModal.OnCompletionAction) {
+            switch completionAction {
+            case .onCancel:
+                ()
+            case let .onKeysExport(selectedKeys):
+                guard let keySummary = keySummary else { return }
+                let derivedKeys = selectedKeys.map {
+                    DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
+                }
+                keysExportModalViewModel = { ExportMultipleKeysModalViewModel(
+                    key: keySummary,
+                    derivedKeys: derivedKeys,
+                    count: selectedKeys.count
+                )
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                    self.isShowingKeysExportModal = true
+                }
+            }
         }
     }
 }
@@ -225,7 +240,6 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onRootKeyTap() {
-        guard !isPresentingSelectionOverlay else { return }
         isPresentingRootDetails = true
     }
 
@@ -239,26 +253,18 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
-        if isPresentingSelectionOverlay {
-            if selectedKeys.contains(deriveKey) {
-                selectedKeys.removeAll { $0 == deriveKey }
-            } else {
-                selectedKeys.append(deriveKey)
-            }
-        } else {
-            keyDetailsActionsService.navigateToPublicKey(
-                addressKey: deriveKey.keyData.key.addressKey,
-                networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
-            ) { result in
-                switch result {
-                case let .success(keyDetails):
-                    self.presentedPublicKeyDetails = deriveKey.addressKey
-                    self.presentedKeyDetails = keyDetails
-                    self.isPresentingKeyDetails = true
-                case let .failure(error):
-                    self.presentableError = .alertError(message: error.localizedDescription)
-                    self.isPresentingError = true
-                }
+        keyDetailsActionsService.navigateToPublicKey(
+            addressKey: deriveKey.keyData.key.addressKey,
+            networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
+        ) { result in
+            switch result {
+            case let .success(keyDetails):
+                self.presentedPublicKeyDetails = deriveKey.addressKey
+                self.presentedKeyDetails = keyDetails
+                self.isPresentingKeyDetails = true
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
             }
         }
     }
@@ -295,26 +301,14 @@ extension KeyDetailsView.ViewModel {
                 }
             }
         }
-        if shouldPresentSelectionOverlay {
-            shouldPresentSelectionOverlay.toggle()
-            isPresentingSelectionOverlay.toggle()
+        if shouldPresentExportKeysSelection {
+            shouldPresentExportKeysSelection = false
+            isPresentingExportKeySelection = true
         }
     }
 
     func clearBackupModalState() {
         backupModal = nil
-    }
-
-    func keyExportModel() -> ExportMultipleKeysModalViewModel? {
-        guard let keySummary = keySummary else { return nil }
-        let derivedKeys = selectedKeys.map {
-            DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
-        }
-        return ExportMultipleKeysModalViewModel(
-            key: keySummary,
-            derivedKeys: derivedKeys,
-            count: selectedKeys.count
-        )
     }
 
     func rootKeyDetails() -> RootKeyDetailsModal.ViewModel {

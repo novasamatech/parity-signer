@@ -7,7 +7,8 @@
 
 import UIKit
 
-struct DerivedKeyRowModel: Equatable {
+struct DerivedKeyRowModel: Equatable, Identifiable {
+    let id = UUID().uuidString
     let keyData: MKeyAndNetworkCard
     let viewModel: DerivedKeyRowViewModel
     let addressKey: String
