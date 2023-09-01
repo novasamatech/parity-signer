@@ -78,14 +78,14 @@ struct ExportKeysSelectionModal: View {
                 size: Heights.identiconInCell
             )
             .padding(.top, Spacing.extraExtraSmall)
-            .padding(.leading, Spacing.medium)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                HStack(spacing: Spacing.extraExtraSmall) {
-                    Text(key.viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyL.font)
-                        .lineLimit(1)
-                }
+                fullPath(key.viewModel)
+                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .font(PrimaryFont.captionM.font)
+                Text(key.viewModel.base58.truncateMiddle())
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.bodyL.font)
+                    .lineLimit(1)
             }
             Spacer()
             VStack(alignment: .center) {
@@ -96,10 +96,10 @@ struct ExportKeysSelectionModal: View {
                     Asset.checkmarkUnchecked.swiftUIImage
                 }
             }
-            .padding(.trailing, Spacing.medium)
             .frame(minHeight: .zero, maxHeight: .infinity)
         }
-        .padding([.top, .bottom], Spacing.medium)
+        .padding(.horizontal, Spacing.medium)
+        .frame(height: Heights.exportKeysSelectionCellHeight)
         .fixedSize(horizontal: false, vertical: true)
         .onTapGesture {
             viewModel.toggleSelection(key)
@@ -120,7 +120,8 @@ struct ExportKeysSelectionModal: View {
     func itemsList() -> some View {
         LazyVStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 0) {
+                HStack(alignment: .center, spacing: Spacing.small) {
+                    IdenticonView(identicon: viewModel.rootIdenticon)
                     Text(viewModel.rootKey.truncateMiddle())
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
@@ -128,10 +129,10 @@ struct ExportKeysSelectionModal: View {
                     Asset.checkmarkChecked.swiftUIImage
                 }
                 .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                .padding(.leading, Spacing.large)
-                .padding(.trailing, Spacing.medium)
+                .padding(.horizontal, Spacing.medium)
             }
             .frame(height: Heights.exportKeysSelectionCellHeight)
+            .fixedSize(horizontal: false, vertical: true)
             ForEach(
                 viewModel.derivedKeys,
                 id: \.id
@@ -165,17 +166,20 @@ extension ExportKeysSelectionModal {
         private let onCompletion: (OnCompletionAction) -> Void
         @Published var animateBackground: Bool = false
         @Published var rootKey: String
+        @Published var rootIdenticon: Identicon
         @Published var derivedKeys: [DerivedKeyRowModel]
         @Published var selectedKeys: [DerivedKeyRowModel] = []
         @Binding var isPresented: Bool
 
         init(
             rootKey: String,
+            rootIdenticon: Identicon,
             derivedKeys: [DerivedKeyRowModel],
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.rootKey = rootKey
+            self.rootIdenticon = rootIdenticon
             self.derivedKeys = derivedKeys
             _isPresented = isPresented
             self.onCompletion = onCompletion
@@ -225,6 +229,7 @@ extension ExportKeysSelectionModal {
             ExportKeysSelectionModal(
                 viewModel: .init(
                     rootKey: "",
+                    rootIdenticon: .stubJdenticon,
                     derivedKeys: [],
                     isPresented: Binding<Bool>.constant(true),
                     onCompletion: { _ in }
