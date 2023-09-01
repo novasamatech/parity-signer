@@ -4,11 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeyDetailsModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
-import io.parity.signer.domain.storage.getSeed
+import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
-import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
-import io.parity.signer.uniffi.generateSecretKeyQr
 
 
 class KeyDetailsScreenViewModel {
@@ -20,32 +19,25 @@ class KeyDetailsScreenViewModel {
 
 	suspend fun getPrivateExportKey(
 		model: KeyDetailsModel,
-		context: Context
-	): PrivateKeyExportModel? {
-		val seedResult = repo.getSeedPhraseForceAuth(model.address.cardBase.seedName)
-		//todo dmitry work with
+	): OperationResult<PrivateKeyExportModel, Any> {
+		val seedResult =
+			repo.getSeedPhraseForceAuth(model.address.cardBase.seedName)
 		when (seedResult) {
-
+			is RepoResult.Failure -> return OperationResult.Err(seedResult)
+			is RepoResult.Success -> {
+				val secretKeyDetailsQR = uniFfi.generateSecretKeyQr(
+						publicKey = model.pubkey,
+						expectedSeedName = model.address.cardBase.seedName,
+						networkSpecsKey = model.networkInfo.networkSpecsKey,
+						seedPhrase = seedResult.result,
+						keyPassword = null,
+					)
+				return when (secretKeyDetailsQR) {
+					is UniffiResult.Error -> OperationResult.Err(secretKeyDetailsQR.error)
+					is UniffiResult.Success -> OperationResult.Ok(secretKeyDetailsQR.result)
+				}
+			}
 		}
-
-		val secretKeyDetailsQR = try {
-			generateSecretKeyQr(
-				publicKey = model.pubkey,
-				expectedSeedName = model.address.cardBase.seedName,
-				networkSpecsKey = model.networkInfo.networkSpecsKey,
-				seedPhrase = seed,
-				keyPassword = null,
-			).toPrivateKeyExportModel()
-		} catch (e: Exception) {
-			//todo issue #1533
-			Toast.makeText(
-				context,
-				"For passworded keys not yet supported",
-				Toast.LENGTH_LONG
-			).show()
-			null
-		}
-		return secretKeyDetailsQR
 	}
 
 	suspend fun removeDerivedKey(

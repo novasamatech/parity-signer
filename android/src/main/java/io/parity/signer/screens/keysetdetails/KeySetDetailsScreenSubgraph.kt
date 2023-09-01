@@ -19,7 +19,6 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.getSeedPhraseForBackup
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
@@ -191,8 +190,7 @@ fun KeySetDetailsScreenSubgraph(
 				//content
 				KeySetBackupFullOverlayBottomSheet(
 					model = backupModel,
-					//todo dmitry move to vm below
-					getSeedPhraseForBackup = ::getSeedPhraseForBackup,
+					getSeedPhraseForBackup = keySetViewModel::getSeedPhrase,
 					onClose = closeAction,
 				)
 			}

@@ -1,5 +1,6 @@
 package io.parity.signer.screens.keydetails
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
@@ -102,20 +104,31 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
-			val context = LocalContext.current
-			val privateModel = remember {
-				vm.getPrivateExportKey(model, context)
-			}
-			if (privateModel != null) {
-				BottomSheetWrapperRoot(onClosedAction = closeAction) {
-					PrivateKeyExportBottomSheet(
-						model = privateModel,
-						onClose = closeAction,
-					)
+			val privateModel = remember(Unit) {//don't forget to pass password in this parameter
+				runBlocking {
+					vm.getPrivateExportKey(model)
 				}
-			} else {
-				// #1533
-				// navigate to KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport
+			}
+			when (privateModel) {
+				is OperationResult.Err -> {
+					// #1533
+					// navigate to KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport
+					val context = LocalContext.current
+					Toast.makeText(
+						context,
+						"For passworded keys export not yet supported, ${privateModel.error}",
+						Toast.LENGTH_LONG
+					).show()
+					closeAction()
+				}
+				is OperationResult.Ok -> {
+					BottomSheetWrapperRoot(onClosedAction = closeAction) {
+						PrivateKeyExportBottomSheet(
+							model = privateModel.result,
+							onClose = closeAction,
+						)
+					}
+				}
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {

@@ -6,6 +6,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.storage.mapError
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,8 @@ class KeySetDetailsViewModel : ViewModel() {
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
 	private val networkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
+	private val seedRepository = ServiceLocator.activityScope!!.seedRepository
+
 
 	val filters = preferencesRepository.networksFilter.stateIn(
 		viewModelScope,
@@ -51,5 +54,9 @@ class KeySetDetailsViewModel : ViewModel() {
 			preferencesRepository.setNetworksFilter(networksToFilter.map { it.key }
 				.toSet())
 		}
+	}
+
+	suspend fun getSeedPhrase(seedName: String): String? {
+		return seedRepository.getSeedPhraseForceAuth(seedName).mapError()
 	}
 }

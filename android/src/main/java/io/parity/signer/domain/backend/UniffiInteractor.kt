@@ -8,6 +8,8 @@ import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toNetworkModel
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
+import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
 import io.parity.signer.screens.scan.errors.TransactionError
 import io.parity.signer.screens.scan.errors.findErrorDisplayed
 import io.parity.signer.screens.scan.errors.toTransactionError
@@ -234,6 +236,29 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
+	suspend fun generateSecretKeyQr(
+		publicKey: String,
+		expectedSeedName: String,
+		networkSpecsKey: String,
+		seedPhrase: String,
+		keyPassword: String?,
+	): UniffiResult<PrivateKeyExportModel> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.generateSecretKeyQr(
+						publicKey = publicKey,
+						expectedSeedName = expectedSeedName,
+						networkSpecsKey = networkSpecsKey,
+						seedPhrase = seedPhrase,
+						keyPassword = keyPassword,
+					).toPrivateKeyExportModel()
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 	suspend fun getKeySets(
 		seedNames: List<String>
 	): UniffiResult<KeySetsSelectModel> =
@@ -254,21 +279,10 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =
-					io.parity.signer.uniffi.getKeySetPublicKey(addressKey, networkSpecsKey)
-				UniffiResult.Success(transactionResult)
-			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
-			}
-		}
-
-	suspend fun removeDerivedKey(
-		address: String,
-		networkSpecsKey: String
-	): UniffiResult<Unit> =
-		withContext(Dispatchers.IO) {
-			try {
-				val transactionResult =
-					io.parity.signer.uniffi.removeDerivedKey(address, networkSpecsKey)
+					io.parity.signer.uniffi.getKeySetPublicKey(
+						addressKey,
+						networkSpecsKey
+					)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
