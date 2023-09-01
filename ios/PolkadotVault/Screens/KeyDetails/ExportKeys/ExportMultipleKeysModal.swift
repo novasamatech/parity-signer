@@ -175,7 +175,7 @@ private struct ExportDerivedKeyView: View {
 private extension ExportMultipleKeysModal {
     var headerName: String {
         let localizableKey = Localizable.KeysExport.KeySets.Label.self
-        let count = viewModel.viewModel.count
+        let count = viewModel.viewModel.count + 1
         let suffix = count == 1 ? localizableKey.Header.Suffix.single.string : localizableKey.Header.Suffix.plural
             .string
         return localizableKey.header(String(count), suffix)
