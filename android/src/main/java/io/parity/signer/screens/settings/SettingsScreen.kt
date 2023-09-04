@@ -61,10 +61,22 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
-					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
+					onOpenLogs = { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
+					onManageNetworks = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.MANAGE_NETWORKS)
+					},
+					onGeneralVerifier = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
+					},
+					onExposedClicked = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.SHIELD)
+					},
 					isStrongBoxProtected,
 					appVersion,
 					networkState
@@ -76,10 +88,22 @@ fun SettingsScreenSubgraph(
 				SettingsScreenGeneralView(
 					rootNavigator,
 					onWipeData = { navController.navigate(SettingsScreenSubgraph.wipeConformation) },
-					onOpenLogs =  { navController.navigate(SettingsScreenSubgraph.logs) },
+					onOpenLogs = { navController.navigate(SettingsScreenSubgraph.logs) },
 					onShowTerms = { navController.navigate(SettingsScreenSubgraph.terms) },
 					onShowPrivacyPolicy = { navController.navigate(SettingsScreenSubgraph.privacyPolicy) },
 					onBackup = { navController.navigate(SettingsScreenSubgraph.backup) },
+					onManageNetworks = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.MANAGE_NETWORKS)
+					},
+					onGeneralVerifier = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
+					},
+					onExposedClicked = {
+						//todo dmitry fix it
+						rootNavigator.navigate(Action.SHIELD)
+					},
 					isStrongBoxProtected,
 					appVersion,
 					networkState
@@ -143,6 +167,9 @@ private fun SettingsScreenGeneralView(
 	onShowTerms: Callback,
 	onShowPrivacyPolicy: Callback,
 	onBackup: Callback,
+	onManageNetworks: Callback,
+	onGeneralVerifier: Callback,
+	onExposedClicked: Callback,
 	isStrongBoxProtected: Boolean,
 	appVersion: String,
 	networkState: State<NetworkState?>
@@ -155,15 +182,17 @@ private fun SettingsScreenGeneralView(
 					name = stringResource(R.string.settings_logs),
 					onClick = onOpenLogs
 				)
-				SettingsElement(name = stringResource(R.string.settings_networks)) {
-					rootNavigator.navigate(Action.MANAGE_NETWORKS)
-				}
-				SettingsElement(name = stringResource(R.string.settings_verifier_certificate)) {
-					rootNavigator.navigate(Action.VIEW_GENERAL_VERIFIER)
-				}
+				SettingsElement(
+					name = stringResource(R.string.settings_networks),
+					onClick = onManageNetworks,
+				)
+				SettingsElement(
+					name = stringResource(R.string.settings_verifier_certificate),
+					onClick = onGeneralVerifier,
+				)
 				SettingsElement(
 					name = stringResource(R.string.settings_backup),
-					onClick = onBackup
+					onClick = onBackup,
 				)
 				SettingsElement(
 					name = stringResource(R.string.documents_privacy_policy),
@@ -196,10 +225,10 @@ private fun SettingsScreenGeneralView(
 			}
 			ExposedIcon(
 				networkState = networkState,
-				onClick = { rootNavigator.navigate(Action.SHIELD) },
+				onClick = onExposedClicked,
 				modifier = Modifier
-					.align(Alignment.BottomEnd)
-					.padding(end = 16.dp, bottom = 16.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
 		BottomBar(rootNavigator, BottomBarState.SETTINGS)
@@ -215,16 +244,16 @@ internal fun SettingsElement(
 ) {
 	Row(
 		modifier = Modifier
-			.clickable(onClick = onClick)
-			.padding(vertical = 14.dp),
+            .clickable(onClick = onClick)
+            .padding(vertical = 14.dp),
 	) {
 		Text(
 			text = name,
 			style = SignerTypeface.TitleS,
 			color = if (isDanger) MaterialTheme.colors.red400 else MaterialTheme.colors.primary,
 			modifier = Modifier
-				.padding(start = 24.dp)
-				.weight(1f)
+                .padding(start = 24.dp)
+                .weight(1f)
 		)
 		if (!skipChevron) {
 			Image(
@@ -257,6 +286,9 @@ private fun PreviewSettingsScreen() {
 			onShowTerms = {},
 			onShowPrivacyPolicy = {},
 			onBackup = {},
+			onManageNetworks = {},
+			onGeneralVerifier = {},
+			onExposedClicked = {},
 			isStrongBoxProtected = false,
 			appVersion = "0.6.1",
 			networkState = state,
