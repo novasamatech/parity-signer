@@ -4,11 +4,11 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.uniffi.Action
 
 
-fun BottomBarState.toAction() =
+fun BottomBarOptions.toAction() =
 	when (this) {
-		BottomBarState.KEYS -> Action.NAVBAR_KEYS
-		BottomBarState.SCANNER -> Action.NAVBAR_SCAN
-		BottomBarState.SETTINGS -> Action.NAVBAR_SETTINGS
+		BottomBarOptions.KEYS -> Action.NAVBAR_KEYS
+		BottomBarOptions.SCANNER -> Action.NAVBAR_SCAN
+		BottomBarOptions.SETTINGS -> Action.NAVBAR_SETTINGS
 	}
 
 
@@ -18,7 +18,7 @@ object CameraParentSingleton {
 	 * but still one of bottom sheet states in rust perspective that doesn't back
 	 * back action despite it does in new designs
 	 */
-	var lastPossibleParent: CameraParentScreen = CameraParentScreen.BottomBarScreen(BottomBarState.KEYS)
+	var lastPossibleParent: CameraParentScreen = CameraParentScreen.BottomBarScreen(BottomBarOptions.KEYS)
 //todo dmitry remove this file when root navigator removed
 	fun navigateBackFromCamera(navigator: Navigator) {
 		when (val parent = lastPossibleParent) {
@@ -44,7 +44,7 @@ object CameraParentSingleton {
 }
 
 sealed class CameraParentScreen() {
-	data class BottomBarScreen(val screen: BottomBarState) : CameraParentScreen()
+	data class BottomBarScreen(val screen: BottomBarOptions) : CameraParentScreen()
 	object NetworkListScreen : CameraParentScreen()
 	data class CreateDerivationScreen(val seedName: String) : CameraParentScreen()
 	data class NetworkDetailsScreen(val networkKey: String) : CameraParentScreen()

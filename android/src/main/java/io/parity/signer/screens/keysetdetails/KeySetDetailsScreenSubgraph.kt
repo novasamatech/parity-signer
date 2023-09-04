@@ -18,7 +18,6 @@ import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
@@ -31,7 +30,6 @@ import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 @Composable
 fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
-	navigator: Navigator,
 	navController: NavController,
 	onBack: Callback,
 	onRemoveKeySet: Callback,
@@ -47,7 +45,7 @@ fun KeySetDetailsScreenSubgraph(
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
 			model = filteredModel.value,
-			navigator = navigator,
+			navController = navController,
 			networkState = networkState,
 			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
 			onExposedClicked = {

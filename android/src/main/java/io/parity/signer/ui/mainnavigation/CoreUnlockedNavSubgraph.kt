@@ -69,7 +69,6 @@ fun CoreUnlockedNavSubgraph(
 			model?.let {
 				KeySetDetailsScreenSubgraph(
 					fullModel = model,
-					navigator = rootNavigator,
 					navController = navController,
 					onBack = { rootNavigator.backAction() },
 					onRemoveKeySet = {

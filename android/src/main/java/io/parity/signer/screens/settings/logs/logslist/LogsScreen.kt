@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarState
+import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.settings.logs.LogsScreenModel
@@ -48,7 +48,7 @@ fun LogsScreen(
 		}
 		BottomBar(
 			navigator = rootNavigator,
-			state = BottomBarState.SETTINGS,
+			state = BottomBarOptions.SETTINGS,
 			skipRememberCameraParent = true
 		)
 	}

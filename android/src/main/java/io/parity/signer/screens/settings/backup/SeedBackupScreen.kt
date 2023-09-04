@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarState
+import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.Navigator
@@ -63,7 +63,7 @@ fun SeedBackupScreen(
 			}
 		}
 		BottomBar(
-			rootNavigator, BottomBarState.SETTINGS,
+			rootNavigator, BottomBarOptions.SETTINGS,
 			skipRememberCameraParent = true
 		)
 	}

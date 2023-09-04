@@ -40,11 +40,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarState
+import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
@@ -61,7 +63,6 @@ import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink300
 import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
-import io.parity.signer.uniffi.Action
 
 /**
  * Single Seed/Key set is selected is it's details
@@ -71,7 +72,7 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun KeySetDetailsScreenView(
 	model: KeySetDetailsModel,
-	navigator: Navigator,
+	navController: NavController,
 	networkState: State<NetworkState?>, //for shield icon
 	fullModelWasEmpty: Boolean,
 	onExposedClicked: Callback,
@@ -104,7 +105,10 @@ fun KeySetDetailsScreenView(
 							model = networkAndKeys.key,
 							networkLogo = networkAndKeys.network.networkLogo,
 						) {
-							onOpenKey(networkAndKeys.key.addressKey, networkAndKeys.network.networkSpecsKey)
+							onOpenKey(
+								networkAndKeys.key.addressKey,
+								networkAndKeys.network.networkSpecsKey
+							)
 //							val selectKeyDetails =
 //								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
 //							todo dmitry remove this
@@ -144,13 +148,15 @@ fun KeySetDetailsScreenView(
 					.padding(end = 16.dp, bottom = 24.dp)
 			)
 		}
-		BottomBar(navigator, BottomBarState.KEYS)
+
+		BottomBar(navController, BottomBarOptions.KEYS)
 	}
 }
 
 @Composable
-private fun SeedKeyItemElement(model: KeySetDetailsModel,
-															 onShowPublicKey: (title: String, key: String) -> Unit,
+private fun SeedKeyItemElement(
+	model: KeySetDetailsModel,
+	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	model.root?.let {
 		SeedKeyDetails(
@@ -334,11 +340,12 @@ private fun KeySetDetailsEmptyList(onAdd: Callback) {
 private fun PreviewKeySetDetailsScreen() {
 	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel = KeySetDetailsModel.createStub()
+	val navController = rememberNavController()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsScreenView(
 				model = mockModel,
-				navigator = EmptyNavigator(),
+				navController = navController,
 				networkState = state,
 				fullModelWasEmpty = false,
 				onExposedClicked = {},
@@ -346,8 +353,8 @@ private fun PreviewKeySetDetailsScreen() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->},
-				onOpenKey ={ _, _ ->},
+				onShowPublicKey = { _, _ -> },
+				onOpenKey = { _, _ -> },
 			)
 		}
 	}
@@ -367,11 +374,12 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel =
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
+	val navController = rememberNavController()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsScreenView(
 				model = mockModel,
-				navigator = EmptyNavigator(),
+				navController = navController,
 				networkState = state,
 				fullModelWasEmpty = true,
 				onExposedClicked = {},
@@ -379,9 +387,9 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->},
-				onOpenKey ={ _, _ ->},
-				)
+				onShowPublicKey = { _, _ -> },
+				onOpenKey = { _, _ -> },
+			)
 		}
 	}
 }
@@ -400,11 +408,12 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 	val state = remember { mutableStateOf(NetworkState.Active) }
 	val mockModel =
 		KeySetDetailsModel.createStub().copy(keysAndNetwork = emptyList())
+	val navController = rememberNavController()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetDetailsScreenView(
 				model = mockModel,
-				navigator = EmptyNavigator(),
+				navController = navController,
 				networkState = state,
 				fullModelWasEmpty = false,
 				onExposedClicked = {},
@@ -412,8 +421,8 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ ->},
-				onOpenKey ={ _, _ ->},
+				onShowPublicKey = { _, _ -> },
+				onOpenKey = { _, _ -> },
 			)
 		}
 	}
