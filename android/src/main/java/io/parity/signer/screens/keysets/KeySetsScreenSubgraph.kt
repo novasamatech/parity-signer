@@ -10,14 +10,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
 fun KeySetsScreenSubgraph(
-	rootNavigator: Navigator,
 	navController: NavController,
 ) {
 	val vm: KeySetsViewModel = viewModel()
@@ -36,7 +34,7 @@ fun KeySetsScreenSubgraph(
 	if (modelValue != null) {
 		KeySetsScreenFull(
 			model = modelValue,
-			rootNavigator = rootNavigator,
+			navController = navController,
 			onSelectSeed = { seedname ->
 				navController.navigate(
 					CoreUnlockedNavSubgraph.KeySetDetails.destination(
@@ -57,9 +55,7 @@ fun KeySetsScreenSubgraph(
 			networkState = networkState,
 		)
 	} else {
-		//todo dmitry handle
-		//go back
-		rootNavigator.backAction()
+		//todo dmitry handle post Error
 	}
 
 	//bottoms heets

@@ -41,7 +41,6 @@ fun CoreUnlockedNavSubgraph(
 		composable(CoreUnlockedNavSubgraph.keySetList) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				KeySetsScreenSubgraph(
-					rootNavigator = rootNavigator,
 					navController = navController,
 				)
 			}
@@ -61,8 +60,8 @@ fun CoreUnlockedNavSubgraph(
 					//todo dmitry export this to vm and handle errors - open default for example
 					keysBySeedName(seedName!!).toKeySetDetailsModel()
 				} catch (e: ErrorDisplayed) {
-					rootNavigator.backAction()
 					submitErrorState("unexpected error in keysBySeedName $e")
+					navController.popBackStack()
 					null
 				}
 			}
@@ -70,11 +69,13 @@ fun CoreUnlockedNavSubgraph(
 				KeySetDetailsScreenSubgraph(
 					fullModel = model,
 					navController = navController,
-					onBack = { rootNavigator.backAction() },
+					onBack = { navController.popBackStack() },
 					onRemoveKeySet = {
 						val root = model.root
 						if (root != null) {
+							//todo dmitry implement
 							singleton.removeSeed(root.seedName)
+//							todo dmitry navigate start
 						} else {
 							//todo key details check if this functions should be disabled in a first place
 							submitErrorState("came to remove key set but root key is not available")
@@ -172,5 +173,6 @@ internal object CoreUnlockedNavSubgraph {
 		fun destination(keyAddr: String, keySpec: String) =
 			"$baseRoute/$keyAddr/$keySpec"
 	}
+
 	const val settings = "core_settings_flow"
 }
