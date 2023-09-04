@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings
+package io.parity.signer.screens.settings.general
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable

@@ -66,6 +66,7 @@ fun CombinedScreensSelector(
 		is ScreenData.Settings ->
 			SettingsScreenSubgraph(
 				rootNavigator = rootNavigator,
+//				todo dmitry get this in settings
 				isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
 				appVersion = sharedViewModel.getAppVersion(),
 				wipeToFactory = sharedViewModel::wipeToFactory,
