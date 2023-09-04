@@ -99,6 +99,7 @@ struct SelectKeySetsForNetworkKeyView: View {
             Spacer()
             if viewModel.isSelected(seedName) {
                 Asset.checkmarkChecked.swiftUIImage
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             } else {
                 Asset.checkmarkUnchecked.swiftUIImage
             }

@@ -16,13 +16,13 @@ jsonrpsee = {version = "0.20.0", features = ["ws-client"]}
 lazy_static = "1.4.0"
 parity-scale-codec = "3.6.5"
 qrcode_rtx = {path = "../qrcode_rtx"}
-regex = "1.9.4"
+regex = "1.9.5"
 serde_json = "1.0.105"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
 sp-keyring = { git = "https://github.com/paritytech/substrate", default-features = false }
-thiserror = "1.0.47"
+thiserror = "1.0.48"
 tokio = { version = "1", features = ["full"] }
 
 [dev-dependencies]

@@ -74,6 +74,7 @@ enum Heights {
     static let createKeyNetworkItemHeight: CGFloat = 64
     static let createKeysForNetworkItemHeight: CGFloat = 64
     static let selectKeySetsForNetworkKeyItemHeight: CGFloat = 64
+    static let exportKeysSelectionCellHeight: CGFloat = 64
 
     static let navigationBarProgressViewHeight: CGFloat = 6
     static let navigationBarProgressViewWidth: CGFloat = 40
