@@ -19,7 +19,7 @@ object CameraParentSingleton {
 	 * back action despite it does in new designs
 	 */
 	var lastPossibleParent: CameraParentScreen = CameraParentScreen.BottomBarScreen(BottomBarState.KEYS)
-
+//todo dmitry remove this file when root navigator removed
 	fun navigateBackFromCamera(navigator: Navigator) {
 		when (val parent = lastPossibleParent) {
 			is CameraParentScreen.BottomBarScreen -> {

@@ -73,13 +73,7 @@ fun CombinedScreensSelector(
 				networkState = networkState
 			)
 
-		is ScreenData.ManageNetworks ->
-			Box(modifier = Modifier.statusBarsPadding()) {
-				NetworksListSubgraph(
-					model = screenData.f.toNetworksListModel(),
-					rootNavigator = rootNavigator
-				)
-			}
+		is ScreenData.ManageNetworks -> {}
 
 		is ScreenData.NNetworkDetails ->
 			NetworkDetailsSubgraph(
@@ -134,22 +128,9 @@ fun CombinedScreensSelector(
 			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 
-		is ScreenData.DeriveKey -> {
-			Box(
-				modifier = Modifier
-					.background(MaterialTheme.colors.background)
-			) {
-				DerivationCreateSubgraph(
-					rootNavigator, screenData.f.seedName,
-				)
-			}
-		}
+		is ScreenData.DeriveKey -> {		}
 
-		is ScreenData.VVerifier -> VerifierScreenFull(
-			screenData.f.toVerifierDetailsModels(),
-			sharedViewModel::wipeToJailbreak,
-			rootNavigator,
-		)
+		is ScreenData.VVerifier -> {}
 
 		else -> {} //old Selector showing them
 	}
