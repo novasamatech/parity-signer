@@ -17,15 +17,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
 fun NewKeysetStepSubgraph(
-	navController: NavHostController,
+	coreNavController: NavHostController,
 ) {
 
 	//background
@@ -36,28 +38,30 @@ fun NewKeysetStepSubgraph(
 			.background(MaterialTheme.colors.background)
 	)
 
+	val subgraphNavController = rememberNavController()
+
 	val vm: NewKeysetNameViewModel = viewModel()
 	var seedName by rememberSaveable() {
 		mutableStateOf("")
 	}
 	val seedPhrase = rememberSaveable() {
 		vm.createNewSeedPhrase() ?: run {
-			navController.popBackStack()
+			coreNavController.popBackStack()
 			""
 		}
 	}
 
 	NavHost(
-		navController = navController,
+		navController = subgraphNavController,
 		startDestination = NewKeySetBackupStepSubgraph.NewKeySetName,
 	) {
 		composable(NewKeySetBackupStepSubgraph.NewKeySetName) {
 			NewKeySetNameScreen(
 				prefilledName = seedName,
-				onBack = { navController.popBackStack() },
+				onBack = { coreNavController.popBackStack() },
 				onNextStep = {
 					seedName = it
-					navController.navigate(
+					subgraphNavController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackup
 					)
 				},
@@ -65,16 +69,19 @@ fun NewKeysetStepSubgraph(
 					.statusBarsPadding()
 					.imePadding(),
 			)
+			BackHandler {
+				coreNavController.popBackStack()
+			}
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
 				seedPhrase = seedPhrase,
 				onProceed = {
-					navController.navigate(
+					subgraphNavController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
 					)
 				},
-				onBack = { navController.popBackStack() },
+				onBack = { subgraphNavController.popBackStack() },
 				modifier = Modifier.statusBarsPadding(),
 			)
 		}
@@ -82,35 +89,36 @@ fun NewKeysetStepSubgraph(
 			NewKeySetBackupScreen(
 				seedPhrase = seedPhrase,
 				onProceed = {
-					navController.navigate(
+					subgraphNavController.navigate(
 						NewKeySetBackupStepSubgraph.NewKeySetBackupConfirmation
 					)
 				},
-				onBack = { navController.popBackStack() },
+				onBack = { subgraphNavController.popBackStack() },
 				modifier = Modifier.statusBarsPadding(),
 			)
-			BottomSheetWrapperRoot(onClosedAction = navController::popBackStack) {
+			BottomSheetWrapperRoot(onClosedAction = subgraphNavController::popBackStack) {
 				NewKeySetBackupBottomSheet(
 					onProceed = {
-						navController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
+						subgraphNavController.navigate(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 							popUpTo(NewKeySetBackupStepSubgraph.NewKeySetBackup)
 						}
 					},
-					onCancel = navController::popBackStack,
+					onCancel = subgraphNavController::popBackStack,
 				)
 			}
-			BackHandler(onBack = navController::popBackStack)
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetSelectNetworks) {
 			NewKeySetSelectNetworkScreen(
 				seedName = seedName,
 				seedPhrase = seedPhrase,
 				onSuccess = {
-					navController.popBackStack(
-						NewKeySetBackupStepSubgraph.NewKeySetName, true
+					coreNavController.navigate(
+						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+							seedName
+						)
 					)
 				},
-				onBack = navController::popBackStack,
+				onBack = subgraphNavController::popBackStack,
 			)
 		}
 	}

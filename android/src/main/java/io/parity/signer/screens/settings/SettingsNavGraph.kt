@@ -17,6 +17,8 @@ import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
 import io.parity.signer.screens.settings.general.ConfirmFactorySettingsBottomSheet
 import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
+import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
+import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
 import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
 import io.parity.signer.screens.settings.networks.list.toNetworksListModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -93,6 +95,11 @@ fun SettingsScreenSubgraph(
 //			rootNavigator,
 //			)
 		}
+			//todo dmitry single network subgraph
+//		NetworkDetailsSubgraph(
+//			screenData.f.toNetworkDetailsModel(),
+//			rootNavigator,
+//		)
 	}
 }
 
