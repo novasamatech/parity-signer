@@ -138,6 +138,15 @@ struct KeyDetailsPublicKeyView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -213,7 +222,7 @@ extension KeyDetailsPublicKeyView {
 
     final class ViewModel: ObservableObject {
         let keyDetails: MKeyDetails
-        private let publicKeyDetails: String
+        let addressKey: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let warningStateMediator: WarningStateMediator
@@ -228,6 +237,9 @@ extension KeyDetailsPublicKeyView {
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
+
         var isExportKeyAvailable: Bool {
             keyDetails.address.hasPwd == false
         }
@@ -241,14 +253,14 @@ extension KeyDetailsPublicKeyView {
 
         init(
             keyDetails: MKeyDetails,
-            publicKeyDetails: String,
+            addressKey: String,
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.keyDetails = keyDetails
-            self.publicKeyDetails = publicKeyDetails
+            self.addressKey = addressKey
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.warningStateMediator = warningStateMediator
@@ -300,9 +312,19 @@ extension KeyDetailsPublicKeyView {
         }
 
         func onRemoveKeyTap() {
-            publicKeyDetailsService.forgetSingleKey(keyDetails.address.seedName)
-            onCompletion(.derivedKeyDeleted)
-            dismissRequest.send()
+            publicKeyDetailsService.forgetSingleKey(
+                address: addressKey,
+                networkSpecsKey: keyDetails.networkInfo.networkSpecsKey
+            ) { result in
+                switch result {
+                case .success:
+                    self.onCompletion(.derivedKeyDeleted)
+                    self.dismissRequest.send()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
     }
 }
@@ -314,7 +336,7 @@ extension KeyDetailsPublicKeyView {
                 KeyDetailsPublicKeyView(
                     viewModel: .init(
                         keyDetails: .stub,
-                        publicKeyDetails: "publicKeyDetails",
+                        addressKey: "",
                         onCompletion: { _ in }
                     )
                 )

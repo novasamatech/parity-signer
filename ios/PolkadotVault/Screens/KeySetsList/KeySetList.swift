@@ -23,12 +23,18 @@ struct KeySetList: View {
                             backgroundColor: Asset.backgroundSystem.swiftUIColor
                         )
                     )
-                    // Empty state
-                    if viewModel.listViewModel.list.isEmpty {
-                        KeyListEmptyState()
-                    } else {
-                        // List of Key Sets
-                        keyList()
+                    switch viewModel.listViewModel {
+                    case .none:
+                        // Loading state, we can ignore it, as we'll transit to new design
+                        Spacer()
+                    case let .some(listModel):
+                        // Empty state
+                        if listModel.list.isEmpty {
+                            KeyListEmptyState()
+                        } else {
+                            // List of Key Sets
+                            keyList(listModel: listModel)
+                        }
                     }
                 }
                 .background(
@@ -107,11 +113,11 @@ struct KeySetList: View {
         )
     }
 
-    func keyList() -> some View {
+    func keyList(listModel: KeySetListViewModel) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(
-                    viewModel.listViewModel.list.sorted(by: { $0.keyName < $1.keyName }),
+                    listModel.list.sorted(by: { $0.keyName < $1.keyName }),
                     id: \.keyName
                 ) {
                     keyItem($0)
@@ -144,8 +150,8 @@ extension KeySetList {
         let tabBarViewModel: TabBarView.ViewModel
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         private weak var appState: AppState!
-        @Published var dataModel: MSeeds = .init(seedNameCards: [])
-        @Published var listViewModel: KeySetListViewModel = .init(list: [])
+        @Published var dataModel: MSeeds?
+        @Published var listViewModel: KeySetListViewModel?
         @Published var detailsToPresent: MKeysNew?
         @Published var detailsKeyName: String = ""
 
@@ -180,15 +186,21 @@ extension KeySetList {
             }.store(in: cancelBag)
         }
 
-        func updateView(_ dataModel: MSeeds) {
+        func updateView(_ dataModel: MSeeds?) {
+            guard let dataModel = dataModel else { return }
             listViewModel = modelBuilder.build(for: dataModel)
         }
 
         func updateData() {
-            if let keyList = keyListService.getKeyList() {
-                dataModel = keyList
+            keyListService.getKeyList { result in
+                switch result {
+                case let .success(seeds):
+                    self.dataModel = seeds
+                case .failure:
+                    self.dataModel = .init(seedNameCards: [])
+                }
+                self.updateView(self.dataModel)
             }
-            updateView(dataModel)
         }
 
         func loadKeysInformation(

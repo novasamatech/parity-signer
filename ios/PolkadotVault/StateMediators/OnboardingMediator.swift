@@ -13,33 +13,29 @@ final class OnboardingMediator: ObservableObject {
     private let seedsMediator: SeedsMediating
     private let databaseMediator: DatabaseMediating
     private let warningStateMediator: WarningStateMediator
-    private let initialisationService: AppInitialisationService
     @Published var onboardingDone: Bool = false
 
     init(
         navigationInitialisationService: NavigationInitialisationService = NavigationInitialisationService(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
         databaseMediator: DatabaseMediating = DatabaseMediator(),
-        warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-        initialisationService: AppInitialisationService = AppInitialisationService()
+        warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
     ) {
         self.navigationInitialisationService = navigationInitialisationService
         self.seedsMediator = seedsMediator
         self.databaseMediator = databaseMediator
         self.warningStateMediator = warningStateMediator
-        self.initialisationService = initialisationService
         onboardingDone = databaseMediator.isDatabaseAvailable()
     }
 
     func onboard(verifierRemoved: Bool = false) {
         guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
-        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] in
+        navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] _ in
             guard let self = self else { return }
             self.seedsMediator.refreshSeeds()
             self.onboardingDone = true
             self.warningStateMediator.updateWarnings()
-            self.initialisationService.initialiseAppSession()
         }
     }
 }

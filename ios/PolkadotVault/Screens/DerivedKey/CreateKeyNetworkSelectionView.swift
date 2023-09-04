@@ -120,7 +120,7 @@ extension CreateKeyNetworkSelectionView {
 
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let networkService: GetAllNetworksService
+        private let networkService: GetManagedNetworksService
         private let keyName: String
         private let createKeyService: CreateDerivedKeyService
         private let keySet: MKeysNew
@@ -143,7 +143,7 @@ extension CreateKeyNetworkSelectionView {
             seedName: String,
             keyName: String,
             keySet: MKeysNew,
-            networkService: GetAllNetworksService = GetAllNetworksService(),
+            networkService: GetManagedNetworksService = GetManagedNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {

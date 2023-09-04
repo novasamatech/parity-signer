@@ -78,6 +78,15 @@ struct VerifierCertificateView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
+        }
     }
 }
 
@@ -85,7 +94,8 @@ extension VerifierCertificateView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingRemoveConfirmation = false
         @Published var content: MVerifierDetails?
-
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
         private let onboardingMediator: OnboardingMediator
         private let service: GeneralVerifierService
         var dismissViewRequest: AnyPublisher<Void, Never> {
@@ -114,7 +124,15 @@ extension VerifierCertificateView {
         }
 
         func loadData() {
-            content = service.getGeneralVerifier()
+            service.getGeneralVerifier { result in
+                switch result {
+                case let .success(content):
+                    self.content = content
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
     }
 }

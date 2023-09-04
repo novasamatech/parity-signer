@@ -117,6 +117,7 @@ struct CreateKeysForNetworksView: View {
             Spacer()
             if viewModel.isSelected(network) {
                 Asset.checkmarkChecked.swiftUIImage
+                    .foregroundColor(Asset.accentPink300.swiftUIColor)
             } else {
                 Asset.checkmarkUnchecked.swiftUIImage
             }
@@ -165,7 +166,7 @@ extension CreateKeysForNetworksView {
         }
 
         private let cancelBag = CancelBag()
-        private let networkService: GetAllNetworksService
+        private let networkService: GetManagedNetworksService
         private let createKeySetService: CreateKeySetService
         private let createKeyService: CreateDerivedKeyService
         private let recoveryKeySetService: RecoverKeySetService
@@ -203,7 +204,7 @@ extension CreateKeysForNetworksView {
             seedName: String,
             seedPhrase: String,
             mode: Mode,
-            networkService: GetAllNetworksService = GetAllNetworksService(),
+            networkService: GetManagedNetworksService = GetManagedNetworksService(),
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
             createKeySetService: CreateKeySetService = CreateKeySetService(),
             recoveryKeySetService: RecoverKeySetService = RecoverKeySetService(),
@@ -315,10 +316,9 @@ private extension CreateKeysForNetworksView.ViewModel {
             seedPhrase: seedPhrase,
             shouldCheckForCollision: false
         )
-        recoveryKeySetService.finishKeySetRecover(seedPhrase)
-        createKeyService.createDerivedKeys(
-            seedName,
-            seedPhrase,
+        createKeySetService.confirmKeySetCreation(
+            seedName: seedName,
+            seedPhrase: seedPhrase,
             networks: selectedNetworks
         ) { result in
             switch result {

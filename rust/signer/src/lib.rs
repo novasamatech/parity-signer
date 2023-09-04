@@ -391,7 +391,7 @@ fn history_entry_system(event: Event) -> anyhow::Result<(), ErrorDisplayed> {
 /// Must be called every time seed backup shows seed to user
 ///
 /// Makes record in log
-fn history_seed_name_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDisplayed> {
+fn history_seed_was_shown(seed_name: &str) -> anyhow::Result<(), ErrorDisplayed> {
     db_handling::manage_history::seed_name_was_shown(&get_db()?, seed_name.to_string())
         .map_err(|e| e.to_string().into())
 }
@@ -420,8 +420,11 @@ fn encode_to_qr(payload: &[u8], is_danger: bool) -> anyhow::Result<Vec<u8>, Stri
 }
 
 /// Get all networks registered within this device
-fn get_all_networks() -> anyhow::Result<Vec<MMNetwork>, ErrorDisplayed> {
-    db_handling::interface_signer::show_all_networks(&get_db()?).map_err(|e| e.to_string().into())
+fn get_managed_networks() -> anyhow::Result<MManageNetworks, ErrorDisplayed> {
+    Ok(MManageNetworks {
+        networks: db_handling::interface_signer::show_all_networks(&get_db()?)
+            .map_err(|e| e.to_string())?,
+    })
 }
 
 fn get_logs() -> anyhow::Result<MLog, ErrorDisplayed> {
@@ -537,9 +540,25 @@ fn seed_phrase_guess_words(user_input: &str) -> Vec<String> {
         .collect()
 }
 
+fn get_verifier_details() -> anyhow::Result<MVerifierDetails, ErrorDisplayed> {
+    Ok(db_handling::helpers::get_general_verifier(&get_db()?)
+        .map_err(|e| e.to_string())?
+        .show_card())
+}
+
+fn remove_managed_network(network_key: &str) -> anyhow::Result<(), ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    db_handling::helpers::remove_network(&get_db()?, &network_key)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
 fn print_new_seed(new_seed_name: &str) -> anyhow::Result<MNewSeedBackup, ErrorDisplayed> {
     db_handling::interface_signer::print_new_seed(new_seed_name)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn validate_seed_phrase(seed_phrase: &str) -> bool {
+    db_handling::helpers::validate_mnemonic(seed_phrase)
 }
 
 fn create_key_set(

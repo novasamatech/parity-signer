@@ -71,10 +71,11 @@
 		6D17EF8628EEEDDA008626E9 /* CameraPreviewUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */; };
 		6D199C9F292A8D1100E79113 /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */; };
 		6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */; };
+		6D1F077F2A9CA24F006BA85E /* RecoverKeySetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1F077E2A9CA24F006BA85E /* RecoverKeySetService.swift */; };
 		6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */; };
+		6D22FB882A9748700005993C /* BackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D22FB872A9748700005993C /* BackendService.swift */; };
 		6D25E6B129FFAD1000376AB9 /* BananaSplitRecoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */; };
 		6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6B22A02323A00376AB9 /* FullscreenModal.swift */; };
-		6D25E6C42A04D36F00376AB9 /* AppInitialisationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6C32A04D36F00376AB9 /* AppInitialisationService.swift */; };
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
 		6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */; };
 		6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */; };
@@ -132,6 +133,7 @@
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
+		6D5DCA032A7CFA2E0050B101 /* ExportKeysSelectionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */; };
 		6D5FDDCC2977D08E0076C1C4 /* LogNoteModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FDDCB2977D08E0076C1C4 /* LogNoteModal.swift */; };
 		6D5FDDD02977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FDDCF2977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift */; };
 		6D6430EC28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6430EB28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift */; };
@@ -154,7 +156,7 @@
 		6D755C092A6FECCD00A73E20 /* JdenticonViewPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D755C082A6FECCD00A73E20 /* JdenticonViewPreviews.swift */; };
 		6D755C0B2A6FECE000A73E20 /* Jdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D755C0A2A6FECE000A73E20 /* Jdenticon */; };
 		6D77F31F296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F31E296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift */; };
-		6D77F321296D0D4600044C7C /* GetAllNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */; };
+		6D77F321296D0D4600044C7C /* GetManagedNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */; };
 		6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */; };
 		6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */; };
 		6D7B44FC2979263200111D0E /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7B44FB2979263200111D0E /* TermsOfServiceView.swift */; };
@@ -174,8 +176,6 @@
 		6D88CFFA28C6365A001FB0A1 /* ActionSheetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D88CFF928C6365A001FB0A1 /* ActionSheetButton.swift */; };
 		6D8973A52A08E18C0046A2F3 /* ScanTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */; };
 		6D8973A72A08E6550046A2F3 /* GeneralVerifierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */; };
-		6D8973A92A08E6A90046A2F3 /* SettingsTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */; };
-		6D8973AB2A08EE1E0046A2F3 /* SignSpecService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */; };
 		6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */; };
 		6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */; };
 		6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */; };
@@ -212,8 +212,6 @@
 		6DA501D4290BC55A0096DA4E /* KeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */; };
 		6DA501D7290BECBE0096DA4E /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D6290BECBE0096DA4E /* AppState.swift */; };
 		6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */; };
-		6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */; };
-		6DA9DAE729E57BE7009CC12C /* ManageNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */; };
 		6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */; };
 		6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */; };
 		6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */; };
@@ -300,7 +298,6 @@
 		6DF3CFEC29936F41002DF203 /* EnterKeySetNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF3CFEB29936F41002DF203 /* EnterKeySetNameView.swift */; };
 		6DF3CFEE299370F7002DF203 /* CreateKeySetSeedPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF3CFED299370F7002DF203 /* CreateKeySetSeedPhraseView.swift */; };
 		6DF3CFF029937E48002DF203 /* AttributedTintInfoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF3CFEF29937E48002DF203 /* AttributedTintInfoBox.swift */; };
-		6DF5543629E952270078B8DC /* RecoverKeySetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5543529E952270078B8DC /* RecoverKeySetService.swift */; };
 		6DF5E7A02922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */; };
 		6DF5E7A22923A08A00F2B5B4 /* AttributedString+Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E7A12923A08A00F2B5B4 /* AttributedString+Markdown.swift */; };
 		6DF5E7A42923DD4400F2B5B4 /* Text+Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF5E7A32923DD4400F2B5B4 /* Text+Markdown.swift */; };
@@ -421,10 +418,11 @@
 		6D17EF8528EEEDDA008626E9 /* CameraPreviewUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewUIView.swift; sourceTree = "<group>"; };
 		6D199C9E292A8D1100E79113 /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
 		6D199CA1292A8EB300E79113 /* TransactionSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryModels.swift; sourceTree = "<group>"; };
+		6D1F077E2A9CA24F006BA85E /* RecoverKeySetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverKeySetService.swift; sourceTree = "<group>"; };
 		6D220A2B2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnterBananaSplitPasswordModal.swift; sourceTree = "<group>"; };
+		6D22FB872A9748700005993C /* BackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendService.swift; sourceTree = "<group>"; };
 		6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitRecoveryService.swift; sourceTree = "<group>"; };
 		6D25E6B22A02323A00376AB9 /* FullscreenModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenModal.swift; sourceTree = "<group>"; };
-		6D25E6C32A04D36F00376AB9 /* AppInitialisationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInitialisationService.swift; sourceTree = "<group>"; };
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilder.swift; sourceTree = "<group>"; };
 		6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilderTests.swift; sourceTree = "<group>"; };
@@ -483,6 +481,7 @@
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
 		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
+		6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeysSelectionModal.swift; sourceTree = "<group>"; };
 		6D5FDDCB2977D08E0076C1C4 /* LogNoteModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNoteModal.swift; sourceTree = "<group>"; };
 		6D5FDDCF2977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenTextEditorBackgroundModifier.swift; sourceTree = "<group>"; };
 		6D605B8E2976897B005822F3 /* RobotoMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Regular.ttf"; sourceTree = "<group>"; };
@@ -503,7 +502,7 @@
 		6D755C072A6FBB7600A73E20 /* Jdenticon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Jdenticon; sourceTree = "<group>"; };
 		6D755C082A6FECCD00A73E20 /* JdenticonViewPreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JdenticonViewPreviews.swift; sourceTree = "<group>"; };
 		6D77F31E296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeyNetworkSelectionView.swift; sourceTree = "<group>"; };
-		6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetAllNetworksService.swift; sourceTree = "<group>"; };
+		6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetManagedNetworksService.swift; sourceTree = "<group>"; };
 		6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDerivedKeyService.swift; sourceTree = "<group>"; };
 		6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyExportModel.swift; sourceTree = "<group>"; };
 		6D7B44FB2979263200111D0E /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
@@ -523,8 +522,6 @@
 		6D88CFF928C6365A001FB0A1 /* ActionSheetButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetButton.swift; sourceTree = "<group>"; };
 		6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTabService.swift; sourceTree = "<group>"; };
 		6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralVerifierService.swift; sourceTree = "<group>"; };
-		6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabService.swift; sourceTree = "<group>"; };
-		6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecService.swift; sourceTree = "<group>"; };
 		6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssemblerTests.swift; sourceTree = "<group>"; };
 		6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvidingMock.swift; sourceTree = "<group>"; };
 		6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainQueryProviderTests.swift; sourceTree = "<group>"; };
@@ -560,8 +557,6 @@
 		6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsService.swift; sourceTree = "<group>"; };
 		6DA501D6290BECBE0096DA4E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyAndNetworkCard+PathAndNetwork.swift"; sourceTree = "<group>"; };
-		6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyDetails+SelectionOverlay.swift"; sourceTree = "<group>"; };
-		6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworksService.swift; sourceTree = "<group>"; };
 		6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageNetworkDetailsService.swift; sourceTree = "<group>"; };
 		6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedStateMediator.swift; sourceTree = "<group>"; };
 		6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediator.swift; sourceTree = "<group>"; };
@@ -652,7 +647,6 @@
 		6DF3CFEB29936F41002DF203 /* EnterKeySetNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterKeySetNameView.swift; sourceTree = "<group>"; };
 		6DF3CFED299370F7002DF203 /* CreateKeySetSeedPhraseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeySetSeedPhraseView.swift; sourceTree = "<group>"; };
 		6DF3CFEF29937E48002DF203 /* AttributedTintInfoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedTintInfoBox.swift; sourceTree = "<group>"; };
-		6DF5543529E952270078B8DC /* RecoverKeySetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverKeySetService.swift; sourceTree = "<group>"; };
 		6DF5E79F2922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTransaction+TransactionCards.swift"; sourceTree = "<group>"; };
 		6DF5E7A12923A08A00F2B5B4 /* AttributedString+Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+Markdown.swift"; sourceTree = "<group>"; };
 		6DF5E7A32923DD4400F2B5B4 /* Text+Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Markdown.swift"; sourceTree = "<group>"; };
@@ -743,7 +737,6 @@
 			isa = PBXGroup;
 			children = (
 				6D52E3AD2946FF4900AD72F0 /* NetworkSelection */,
-				6DEFB53028FEE17800762219 /* ExportKeys */,
 				6DBF6E2528E44DBA00CC959F /* Errors */,
 				6DCC572528D8C0410014278A /* Backup */,
 				6DD9FF1428C8B83C00FB6195 /* Alerts */,
@@ -999,6 +992,52 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		6D22FB892A9758350005993C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6DFE588E297A9F78002BFDBF /* ServiceError.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		6D22FB8A2A97583E0005993C /* BaseService */ = {
+			isa = PBXGroup;
+			children = (
+				6D22FB872A9748700005993C /* BackendService.swift */,
+			);
+			path = BaseService;
+			sourceTree = "<group>";
+		};
+		6D22FB8B2A9758490005993C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */,
+				6D1F077E2A9CA24F006BA85E /* RecoverKeySetService.swift */,
+				6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */,
+				6DA08B8F29B68AF90027CFCB /* NavigationInitialisationService.swift */,
+				6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */,
+				6DF714702A55652900F6A527 /* DynamicDerivationsService.swift */,
+				6DD4A6A329E9404200FA6746 /* CreateKeySetService.swift */,
+				6DC909F529C87C8C00AE6BAD /* LogsService.swift */,
+				6DD4A6A529E9480700FA6746 /* KeyListService.swift */,
+				6DEFB53128FEE42D00762219 /* ExportKeySetService.swift */,
+				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
+				6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */,
+				6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		6D22FB8C2A9758B40005993C /* NavigationServices */ = {
+			isa = PBXGroup;
+			children = (
+				6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */,
+				6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */,
+				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
+			);
+			path = NavigationServices;
+			sourceTree = "<group>";
+		};
 		6D2779CB28B3EBBF00570055 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
@@ -1018,32 +1057,15 @@
 		6D2D244928CCAD3700862726 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
+				6D22FB8C2A9758B40005993C /* NavigationServices */,
+				6D22FB8B2A9758490005993C /* Services */,
+				6D22FB8A2A97583E0005993C /* BaseService */,
+				6D22FB892A9758350005993C /* Models */,
 				6D01996D289CA11500F4C317 /* Navigation */,
 				6D57DC49289D614100005C63 /* Adapters */,
 				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
 				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
-				6DEFB53128FEE42D00762219 /* ExportKeySetService.swift */,
-				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
-				6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */,
-				6D77F320296D0D4600044C7C /* GetAllNetworksService.swift */,
 				6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */,
-				6DFE588E297A9F78002BFDBF /* ServiceError.swift */,
-				6DA08B8F29B68AF90027CFCB /* NavigationInitialisationService.swift */,
-				6DC909F529C87C8C00AE6BAD /* LogsService.swift */,
-				6DA9DAE629E57BE7009CC12C /* ManageNetworksService.swift */,
-				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
-				6DD4A6A329E9404200FA6746 /* CreateKeySetService.swift */,
-				6DD4A6A529E9480700FA6746 /* KeyListService.swift */,
-				6DF5543529E952270078B8DC /* RecoverKeySetService.swift */,
-				6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */,
-				6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */,
-				6D25E6B029FFAD1000376AB9 /* BananaSplitRecoveryService.swift */,
-				6D25E6C32A04D36F00376AB9 /* AppInitialisationService.swift */,
-				6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */,
-				6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */,
-				6D8973A82A08E6A90046A2F3 /* SettingsTabService.swift */,
-				6D8973AA2A08EE1E0046A2F3 /* SignSpecService.swift */,
-				6DF714702A55652900F6A527 /* DynamicDerivationsService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -1273,6 +1295,16 @@
 				6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */,
 			);
 			path = Connectivity;
+			sourceTree = "<group>";
+		};
+		6D5DCA012A7CFA1E0050B101 /* ExportKeys */ = {
+			isa = PBXGroup;
+			children = (
+				6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */,
+				6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */,
+				6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */,
+			);
+			path = ExportKeys;
 			sourceTree = "<group>";
 		};
 		6D6430EA28CB2FD300342E37 /* Animators */ = {
@@ -1548,7 +1580,6 @@
 				6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */,
 				6DC5643F28B929EA003D540B /* KeyDetailsView.swift */,
 				6DA501CB290A48190096DA4E /* KeyDetails+ViewModel.swift */,
-				6DA501DA290F16280096DA4E /* KeyDetails+SelectionOverlay.swift */,
 				6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */,
 			);
 			path = Views;
@@ -1650,6 +1681,7 @@
 		6DC5643E28B929E0003D540B /* KeyDetails */ = {
 			isa = PBXGroup;
 			children = (
+				6D5DCA012A7CFA1E0050B101 /* ExportKeys */,
 				6DA501CA290A47930096DA4E /* Views */,
 				6DE8466828BF6E9B0051346A /* Models */,
 			);
@@ -1852,15 +1884,6 @@
 			path = QRCode;
 			sourceTree = "<group>";
 		};
-		6DEFB53028FEE17800762219 /* ExportKeys */ = {
-			isa = PBXGroup;
-			children = (
-				6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */,
-				6D0FA73A2907010E00E45BA6 /* ExportMultipleKeysModal+ViewModel.swift */,
-			);
-			path = ExportKeys;
-			sourceTree = "<group>";
-		};
 		6DF07ADC29C1060D00C01DE8 /* SetUpNetworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1997,8 +2020,9 @@
 		2DE72BB626A588C7002BB752 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					2DE72BBD26A588C7002BB752 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -2192,14 +2216,12 @@
 				6DD17CA42A77A3DD008442FD /* Error+RustDisplayError.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				6D7129252952C3D50048558C /* VerticalRoundedBackgroundContainer.swift in Sources */,
-				6DF5543629E952270078B8DC /* RecoverKeySetService.swift in Sources */,
 				6D03118F2937269100C38F61 /* TransactionErrorsView.swift in Sources */,
 				6D88CFF228C60AED001FB0A1 /* FullScreenRoundedModal.swift in Sources */,
 				6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				6DF9A13B2983B0ED00B31B6D /* DevicePincodeRequiredView.swift in Sources */,
 				6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */,
-				6DA501DB290F16280096DA4E /* KeyDetails+SelectionOverlay.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
 				6D199CA2292A8EB300E79113 /* TransactionSummaryModels.swift in Sources */,
 				6D7129222952B7800048558C /* NetworkSettingsDetails.swift in Sources */,
@@ -2241,7 +2263,6 @@
 				6D971AC32941CDF600121A36 /* IdenticonView.swift in Sources */,
 				6D17D2A12A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift in Sources */,
 				6DEA1B1528D4587200D170B7 /* SeedPhraseView.swift in Sources */,
-				6D8973AB2A08EE1E0046A2F3 /* SignSpecService.swift in Sources */,
 				6D6430EF28CB30A000342E37 /* BottoEdgeOverlay.swift in Sources */,
 				6D749C602A69C6020064D7E5 /* PolkadotIdenticonViewPreviews.swift in Sources */,
 				6D88CFF828C634CA001FB0A1 /* KeyDetailsActionsModal.swift in Sources */,
@@ -2250,19 +2271,21 @@
 				2D48F3532760A2D8004B27BE /* PrimaryFont.swift in Sources */,
 				6DE67D07298AB7B80042415A /* SettingsBackupModal.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
-				6D77F321296D0D4600044C7C /* GetAllNetworksService.swift in Sources */,
+				6D77F321296D0D4600044C7C /* GetManagedNetworksService.swift in Sources */,
 				6D5FDDD02977DBE00076C1C4 /* HiddenTextEditorBackgroundModifier.swift in Sources */,
 				2DAA829327873027002917C0 /* TCDerivations.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */,
 				6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
+				6D22FB882A9748700005993C /* BackendService.swift in Sources */,
 				6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */,
 				6D52E3B12946FF5E00AD72F0 /* NetworkLogoIcon.swift in Sources */,
 				6D52E3A52946C3B400AD72F0 /* SettingsView.swift in Sources */,
 				6DA2ACA22939CB3900AAEADC /* CancelBag.swift in Sources */,
 				6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */,
 				6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */,
+				6D1F077F2A9CA24F006BA85E /* RecoverKeySetService.swift in Sources */,
 				6D52E3A72946C45100AD72F0 /* SettingsItem.swift in Sources */,
 				6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
@@ -2305,6 +2328,7 @@
 				6D476A1B29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift in Sources */,
 				6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */,
 				6D16685728F530F4008C664A /* CaptureDeviceConfigurator.swift in Sources */,
+				6D5DCA032A7CFA2E0050B101 /* ExportKeysSelectionModal.swift in Sources */,
 				6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */,
 				6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
@@ -2328,7 +2352,6 @@
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				6DC5644028B929EA003D540B /* KeyDetailsView.swift in Sources */,
 				6D850BE4292FAA6700BA9017 /* RoundedContainerBackground.swift in Sources */,
-				6D8973A92A08E6A90046A2F3 /* SettingsTabService.swift in Sources */,
 				6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */,
 				6D16687D28F84953008C664A /* EnvironmentValues+SafeAreaInsets.swift in Sources */,
 				6D6DF33429F65A0B00FC06AD /* KeyDetailsActionService.swift in Sources */,
@@ -2343,7 +2366,6 @@
 				6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */,
 				6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */,
 				6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */,
-				6DA9DAE729E57BE7009CC12C /* ManageNetworksService.swift in Sources */,
 				6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */,
 				6D2E66FD29DFFC1E000CE788 /* RootPresentationMode.swift in Sources */,
 				6DED2AB52A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift in Sources */,
@@ -2412,7 +2434,6 @@
 				6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */,
 				6DD4A6A629E9480700FA6746 /* KeyListService.swift in Sources */,
 				6D95E97328B4F42300E28A11 /* ActionButton.swift in Sources */,
-				6D25E6C42A04D36F00376AB9 /* AppInitialisationService.swift in Sources */,
 				2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */,
 				6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,

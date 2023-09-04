@@ -7,10 +7,11 @@
 
 import UIKit
 
-struct DerivedKeyRowModel: Equatable {
+struct DerivedKeyRowModel: Equatable, Identifiable {
+    let id = UUID().uuidString
     let keyData: MKeyAndNetworkCard
     let viewModel: DerivedKeyRowViewModel
-    let publicKeyDetails: String
+    let addressKey: String
 }
 
 /// Model of available actions for `Derived Key` cell

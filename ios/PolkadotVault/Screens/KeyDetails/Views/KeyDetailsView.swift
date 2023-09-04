@@ -59,12 +59,8 @@ struct KeyDetailsView: View {
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
-            if viewModel.isPresentingSelectionOverlay {
-                selectKeysOverlay
-            } else {
-                VStack(spacing: 0) {
-                    ConnectivityAlertOverlay(viewModel: .init())
-                }
+            VStack(spacing: 0) {
+                ConnectivityAlertOverlay(viewModel: .init())
             }
         }
         .fullScreenModal(
@@ -78,7 +74,21 @@ struct KeyDetailsView: View {
                 isShowingActionSheet: $viewModel.isShowingActionSheet,
                 shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal,
                 shouldPresentBackupModal: $viewModel.shouldPresentBackupModal,
-                shouldPresentSelectionOverlay: $viewModel.shouldPresentSelectionOverlay
+                shouldPresentExportKeysSelection: $viewModel.shouldPresentExportKeysSelection
+            )
+            .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingExportKeySelection
+        ) {
+            ExportKeysSelectionModal(
+                viewModel: .init(
+                    rootKey: viewModel.keysData?.root?.base58 ?? "",
+                    rootIdenticon: viewModel.keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
+                    derivedKeys: viewModel.derivedKeys,
+                    isPresented: $viewModel.isPresentingExportKeySelection,
+                    onCompletion: viewModel.onExportKeySelectionComplete
+                )
             )
             .clearModalBackground()
         }
@@ -86,7 +96,6 @@ struct KeyDetailsView: View {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
                 mainAction: viewModel.onRemoveKeySetConfirmationTap(),
-                dismissAction: viewModel.onRemoveKeySetModalDismiss(),
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
@@ -123,7 +132,7 @@ struct KeyDetailsView: View {
         .fullScreenModal(
             isPresented: $viewModel.isShowingKeysExportModal
         ) {
-            if let keyExportModel = viewModel.keyExportModel() {
+            if let keyExportModel = viewModel.keysExportModalViewModel?() {
                 ExportMultipleKeysModal(
                     viewModel: .init(
                         viewModel: keyExportModel,
@@ -131,10 +140,6 @@ struct KeyDetailsView: View {
                     )
                 )
                 .clearModalBackground()
-                .onAppear {
-                    viewModel.selectedKeys.removeAll()
-                    viewModel.isPresentingSelectionOverlay.toggle()
-                }
             } else {
                 EmptyView()
             }
@@ -192,9 +197,7 @@ struct KeyDetailsView: View {
                 id: \.viewModel.addressKey
             ) { deriveKey in
                 DerivedKeyRow(
-                    viewModel: deriveKey.viewModel,
-                    selectedKeys: $viewModel.selectedKeys,
-                    isPresentingSelectionOverlay: $viewModel.isPresentingSelectionOverlay
+                    viewModel: deriveKey.viewModel
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -205,7 +208,7 @@ struct KeyDetailsView: View {
                     KeyDetailsPublicKeyView(
                         viewModel: .init(
                             keyDetails: viewModel.presentedKeyDetails,
-                            publicKeyDetails: viewModel.presentedPublicKeyDetails,
+                            addressKey: viewModel.presentedPublicKeyDetails,
                             onCompletion: viewModel.onPublicKeyCompletion(_:)
                         )
                     )

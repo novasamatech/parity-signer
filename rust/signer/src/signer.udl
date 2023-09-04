@@ -636,7 +636,7 @@ namespace signer {
     void history_entry_system(Event event);
 
     [Throws=ErrorDisplayed]
-    void history_seed_name_was_shown([ByRef] string seed_name);
+    void history_seed_was_shown([ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]
     MKeysInfoExport export_key_info([ByRef] string seed_name, ExportedSet exported_set);
@@ -648,7 +648,7 @@ namespace signer {
     sequence<u8> encode_to_qr([ByRef] sequence<u8> payload, boolean is_danger);
 
     [Throws=ErrorDisplayed]
-    sequence<MMNetwork> get_all_networks();
+    MManageNetworks get_managed_networks();
 
     void init_logging(string tag);
 
@@ -683,6 +683,14 @@ namespace signer {
     void remove_metadata_on_managed_network([ByRef] string network_key, [ByRef] string metadata_specs_version);
 
     sequence<string> seed_phrase_guess_words([ByRef] string user_input);
+
+    [Throws=ErrorDisplayed]
+    void remove_managed_network([ByRef] string network_key);
+
+    [Throws=ErrorDisplayed]
+    MVerifierDetails get_verifier_details();
+
+    boolean validate_seed_phrase([ByRef] string seed_phrase);
 
     [Throws=ErrorDisplayed]
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
