@@ -134,6 +134,7 @@
 "KeyDetails.Overlay.Action.SelectAll" = "Select All";
 "KeyDetails.Overlay.Action.Export" = "Export";
 "KeyDetails.Root.Label.PublicKey" = "Public key";
+"KeyDetails.Root.Action.Close" = "Close";
 "KeyDetails.Error.NoNetworks.Title" = "No Networks Available";
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
