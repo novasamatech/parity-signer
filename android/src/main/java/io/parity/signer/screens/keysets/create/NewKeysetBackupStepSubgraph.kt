@@ -26,12 +26,12 @@ import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
-fun NewKeysetStepSubgraph(
+fun NewKeysetSubgraph(
 	coreNavController: NavHostController,
 ) {
 
 	//background
-	Box(//todo remove when rust navigation not in place already
+	Box(
 		modifier = Modifier
 			.fillMaxSize(1f)
 			.statusBarsPadding()

@@ -18,7 +18,7 @@ import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
-import io.parity.signer.screens.keysets.create.NewKeysetStepSubgraph
+import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
@@ -81,7 +81,7 @@ fun CoreUnlockedNavSubgraph(
 			}
 		}
 		composable(CoreUnlockedNavSubgraph.newKeySet) {
-			NewKeysetStepSubgraph(
+			NewKeysetSubgraph(
 				coreNavController = navController,
 			)
 		}
