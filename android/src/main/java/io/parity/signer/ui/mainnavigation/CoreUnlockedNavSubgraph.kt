@@ -1,7 +1,9 @@
 package io.parity.signer.ui.mainnavigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,6 +17,7 @@ import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
+import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
@@ -109,6 +112,25 @@ fun CoreUnlockedNavSubgraph(
 				keySpec = keySpec
 			)
 		}
+		composable(
+			route = CoreUnlockedNavSubgraph.NewDerivedKey.route,
+			arguments = listOf(
+				navArgument(CoreUnlockedNavSubgraph.NewDerivedKey.seedNameArg) {
+					type = NavType.StringType
+				}
+			),
+		) {
+			val seedName =
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)!!
+			Box(
+				modifier = Modifier
+					.background(MaterialTheme.colors.background)
+			) {
+				DerivationCreateSubgraph(
+					rootNavigator, seedName,
+				)
+			}
+		}
 		composable(CoreUnlockedNavSubgraph.camera) {
 			ScanNavSubgraph(
 				onCloseCamera = {
@@ -122,17 +144,6 @@ fun CoreUnlockedNavSubgraph(
 					)
 				}
 			)
-		}
-		composable(CoreUnlockedNavSubgraph.newDerivationKey) {
-			//todo dmitry implement
-//			Box(
-//				modifier = Modifier
-//					.background(MaterialTheme.colors.background)
-//			) {
-//				DerivationCreateSubgraph(
-//					rootNavigator, screenData.f.seedName,
-//				)
-//			}
 		}
 		composable(CoreUnlockedNavSubgraph.settings) {
 			//todo dmitry implement
@@ -150,14 +161,20 @@ fun CoreUnlockedNavSubgraph(
 internal object CoreUnlockedNavSubgraph {
 	const val keySetList = "core_keyset_list"
 	const val newKeySet = "core_new_keyset"
-	const val newDerivationKey = "core_new_derivation"
 	const val recoverKeySet = "keyset_recover_flow"
 	const val camera = "unlocked_camera"
 
 	object KeySetDetails {
-		internal const val seedNameArg = "title"
+		internal const val seedNameArg = "seed_name_arg"
 		private const val baseRoute = "core_keyset_details_home"
 		const val route = "$baseRoute/{$seedNameArg}"
+		fun destination(seedName: String) = "$baseRoute/${seedName}"
+	}
+
+	object NewDerivedKey {
+		internal const val seedNameArg = "seed_name_arg"
+		private const val baseRoute = "core_new_keyset"
+		const val route = "$baseRoute/{${seedNameArg}}"
 		fun destination(seedName: String) = "$baseRoute/${seedName}"
 	}
 
