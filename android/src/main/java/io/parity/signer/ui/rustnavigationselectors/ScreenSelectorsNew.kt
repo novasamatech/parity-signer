@@ -1,13 +1,7 @@
 package io.parity.signer.ui.rustnavigationselectors
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
@@ -16,19 +10,11 @@ import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.domain.toVerifierDetailsModels
-import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
-import io.parity.signer.screens.keysets.restore.KeysetRecoverNameScreen
-import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSecondStepSubgraph
-import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
-import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
-import io.parity.signer.screens.settings.networks.list.toNetworksListModel
-import io.parity.signer.screens.settings.verifiercert.VerifierScreenFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -43,8 +29,6 @@ fun CombinedScreensSelector(
 	sharedViewModel: SharedViewModel
 ) {
 	val rootNavigator = sharedViewModel.navigator
-	val seedNames =
-		sharedViewModel.seedStorage.lastKnownSeedNames.collectAsStateWithLifecycle()
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
@@ -76,6 +60,7 @@ fun CombinedScreensSelector(
 		is ScreenData.ManageNetworks -> {}
 
 		is ScreenData.NNetworkDetails ->
+			//todo dmitry remove this
 			NetworkDetailsSubgraph(
 				screenData.f.toNetworkDetailsModel(),
 				rootNavigator,
@@ -85,32 +70,9 @@ fun CombinedScreensSelector(
 			submitErrorState("nothing, moved to keyset subgraph")
 		}
 
-		is ScreenData.RecoverSeedName -> {
-			//todo dmitry move this
-			Box(
-				modifier = Modifier
-					.statusBarsPadding()
-					.imePadding()
-			) {
-				KeysetRecoverNameScreen(
-					rootNavigator = rootNavigator,
-					seedNames = seedNames.value,
-				)
-			}
-		}
+		is ScreenData.RecoverSeedName -> {}
 
-		is ScreenData.RecoverSeedPhrase ->
-			//todo dmitry move this
-			Box(
-				modifier = Modifier
-					.statusBarsPadding()
-					.imePadding()
-			) {
-				NewKeysetRecoverSecondStepSubgraph(
-					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
-					rootNavigator = rootNavigator,
-				)
-			}
+		is ScreenData.RecoverSeedPhrase -> {}
 
 		is ScreenData.Scan -> {
 			//todo dmitry remove
@@ -129,7 +91,7 @@ fun CombinedScreensSelector(
 			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 
-		is ScreenData.DeriveKey -> {		}
+		is ScreenData.DeriveKey -> {}
 
 		is ScreenData.VVerifier -> {}
 

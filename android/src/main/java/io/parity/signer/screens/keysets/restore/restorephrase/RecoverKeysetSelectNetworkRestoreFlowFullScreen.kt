@@ -15,11 +15,11 @@ import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKey
 
 
 @Composable
-fun RecoverKeysetSelectNetworkRestoreFlowScreen(
+fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	seedName: String,
 	seedPhrase: String,
-	rootNavigator: Navigator,
 	onBack: Callback,
+	navigateOnSuccess: Callback,
 ) {
 	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
 	val defaultSelectedNetworks =
@@ -40,7 +40,6 @@ fun RecoverKeysetSelectNetworkRestoreFlowScreen(
 			seedName = seedName, seedPhrase = seedPhrase,
 			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
-			navigator = rootNavigator,
 			onPostReaction = { isSuccess ->
 				if (isSuccess) {
 					Toast.makeText(
@@ -49,6 +48,7 @@ fun RecoverKeysetSelectNetworkRestoreFlowScreen(
 						Toast.LENGTH_LONG
 					).show()
 				}
+				navigateOnSuccess()
 			}
 		)
 	}

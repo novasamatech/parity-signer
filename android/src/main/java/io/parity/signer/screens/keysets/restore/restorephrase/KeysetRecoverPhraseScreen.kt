@@ -29,9 +29,10 @@ fun KeysetRecoverPhraseScreen(
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
+	modifier: Modifier = Modifier,
 ) {
 	Column(
-		Modifier
+		modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),

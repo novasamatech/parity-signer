@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -28,20 +29,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderProgressWithButton
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.ui.theme.textTertiary
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 
 @Composable
 fun KeysetRecoverNameScreen(
-	rootNavigator: Navigator,
+	onBack: Callback,
+	onNext: (newName: String) -> Unit,
 	seedNames: Array<String>,
+	modifier: Modifier = Modifier,
 ) {
 	var keySetName by remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
@@ -50,7 +51,7 @@ fun KeysetRecoverNameScreen(
 	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
 
 	Column(
-		Modifier
+		modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background),
 	) {
@@ -60,10 +61,10 @@ fun KeysetRecoverNameScreen(
 			allSteps = 3,
 			modifier = Modifier.padding(start = 8.dp),
 			btnText = stringResource(R.string.button_next),
-			onClose = { rootNavigator.backAction() },
+			onClose = onBack,
 			onButton = {
 				if (canProceed) {
-					rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+					onNext(keySetName)
 					focusManager.clearFocus(true)
 				}
 			},
@@ -93,7 +94,7 @@ fun KeysetRecoverNameScreen(
 			keyboardActions = KeyboardActions(
 				onDone = {
 					if (canProceed) {
-						rootNavigator.navigate(Action.GO_FORWARD, keySetName)
+						onNext(keySetName)
 						focusManager.clearFocus(true)
 					}
 				}
@@ -171,7 +172,7 @@ fun MRecoverSeedPhrase.toKeysetRecoverModel() = KeysetRecoverModel(
 @Composable
 private fun PreviewKeysetRecoverNameScreen() {
 	SignerNewTheme {
-		KeysetRecoverNameScreen(EmptyNavigator(), arrayOf())
+		KeysetRecoverNameScreen({}, {}, arrayOf())
 	}
 }
 

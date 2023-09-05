@@ -19,6 +19,8 @@ class KeysetRecoverViewModel : ViewModel() {
 	private val _recoverState = MutableStateFlow<KeysetRecoverModel?>(null)
 	val recoverState = _recoverState.asStateFlow()
 
+	val existingSeeds = ServiceLocator.seedStorage.lastKnownSeedNames
+
 	fun initValue(model: KeysetRecoverModel) {
 		if (_recoverState.value == null) {
 			_recoverState.value = model
