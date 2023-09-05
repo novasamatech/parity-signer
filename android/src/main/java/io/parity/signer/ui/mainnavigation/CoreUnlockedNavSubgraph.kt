@@ -1,7 +1,6 @@
 package io.parity.signer.ui.mainnavigation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -21,8 +20,7 @@ import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
-import io.parity.signer.screens.keysets.restore.NewKeysetRecoverSubgraph
-import io.parity.signer.screens.keysets.restore.toKeysetRecoverModel
+import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
@@ -90,9 +88,8 @@ fun CoreUnlockedNavSubgraph(
 			)
 		}
 		composable(CoreUnlockedNavSubgraph.recoverKeySet) {
-				NewKeysetRecoverSubgraph(
-					initialRecoverSeedPhrase = screenData.f.toKeysetRecoverModel(),
-					rootNavigator = rootNavigator,
+				KeysetRecoverSubgraph(
+					coreNavController = navController
 				)
 		}
 		composable(

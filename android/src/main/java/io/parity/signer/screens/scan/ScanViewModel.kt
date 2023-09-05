@@ -11,6 +11,7 @@ import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.RepoResult
@@ -48,7 +49,7 @@ private const val TAG = "ScanViewModelTag"
  */
 class ScanViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+	private val uniffiInteractor: UniffiInteractor = ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val importKeysRepository: ImportDerivedKeysRepository by lazy {
 		ImportDerivedKeysRepository(seedRepository)
@@ -121,8 +122,7 @@ class ScanViewModel : ViewModel() {
 						//password protected key, show password
 						when (val modalData = actionResult?.modalData) {
 							is ModalData.EnterPassword -> {
-								passwordModel.value =
-									modalData.f.toEnterPasswordModel(withShowError = false)
+								passwordModel.value = modalData.f.toEnterPasswordModel(withShowError = false)
 							}
 
 							is ModalData.SignatureReady -> {

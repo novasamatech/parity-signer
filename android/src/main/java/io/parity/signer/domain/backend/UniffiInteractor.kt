@@ -33,26 +33,7 @@ class UniffiInteractor(val appContext: Context) {
 	private val suspendedTasksContext: CoroutineScope =
 		CoroutineScope(Dispatchers.IO)
 
-	suspend fun navigate(
-		action: Action,
-		details: String = "",
-		seedPhrase: String = "",
-	): OperationResult<ActionResult, NavigationError> =
-		withContext(Dispatchers.IO) {
-			try {
-				OperationResult.Ok(backendAction(action, details, seedPhrase))
-			} catch (e: ErrorDisplayed) {
-				OperationResult.Err(
-					NavigationError(
-						appContext.getString(
-							R.string.navigation_error_general_message,
-							e.findErrorDisplayed()?.message ?: e.message
-						)
-					)
-				)
-			}
-		}
-
+	//todo dmitry fix it
 	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
 		withContext(Dispatchers.IO) {
 			try {
@@ -338,6 +319,19 @@ class UniffiInteractor(val appContext: Context) {
 			try {
 				val transactionResult =
 					io.parity.signer.uniffi.seedPhraseGuessWords(userInput)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun validateSeedPhrase(
+		seedPhrase: String
+	): UniffiResult<Boolean> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.validateSeedPhrase(seedPhrase)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

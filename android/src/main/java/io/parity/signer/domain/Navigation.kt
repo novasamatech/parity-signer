@@ -2,11 +2,15 @@ package io.parity.signer.domain
 
 import android.util.Log
 import android.widget.Toast
+import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.storage.getSeed
+import io.parity.signer.screens.scan.errors.findErrorDisplayed
 import io.parity.signer.uniffi.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 
 @Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
@@ -38,13 +42,32 @@ interface Navigator {
  */
 class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 
-	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+
+	private suspend fun navigateRust(
+		action: Action,
+		details: String = "",
+		seedPhrase: String = "",
+	): OperationResult<ActionResult, NavigationError> =
+		withContext(Dispatchers.IO) {
+			try {
+				OperationResult.Ok(backendAction(action, details, seedPhrase))
+			} catch (e: ErrorDisplayed) {
+				OperationResult.Err(
+					NavigationError(
+						singleton.activity.applicationContext.getString(
+							R.string.navigation_error_general_message,
+							e.findErrorDisplayed()?.message ?: e.message
+						)
+					)
+				)
+			}
+		}
 
 	override fun navigate(action: Action, details: String, seedPhrase: String) {
 
 		try {
 			val navigationAction = runBlocking {
-				val result = uniffiInteractor.navigate(action, details, seedPhrase)
+				val result = navigateRust(action, details, seedPhrase)
 				when (result) {
 					is OperationResult.Err -> singleton._actionResult.value?.copy(
 						alertData = AlertData.ErrorData(result.error.message)
