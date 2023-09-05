@@ -27,12 +27,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DerivationCreateSubgraph(
-	rootNavigator: Navigator,
+	onBack: Callback,
+	onOpenCamera: Callback,
 	seedName: String,
 ) {
 
 	val deriveViewModel: DerivationCreateViewModel = viewModel()
-	deriveViewModel.setInitValues(seedName, rootNavigator)
+	deriveViewModel.setInitValues(seedName)
 	val context = LocalContext.current
 	val path = deriveViewModel.path.collectAsStateWithLifecycle()
 
@@ -46,7 +47,7 @@ fun DerivationCreateSubgraph(
 				networks = deriveViewModel.getAllNetworks(),
 				onClose = {
 					deriveViewModel.resetState()
-					rootNavigator.backAction()
+					onBack()
 				},
 				onNetworkSelect = { newNetwork ->
 					deriveViewModel.updateSelectedNetwork(newNetwork)
@@ -98,7 +99,7 @@ fun DerivationCreateSubgraph(
 										context
 									)
 									closeAction()
-									rootNavigator.backAction()
+									onBack()
 								}
 							},
 						)
@@ -108,12 +109,7 @@ fun DerivationCreateSubgraph(
 		}
 		networkHelpersSubgraph(
 			routePath = DerivationCreateSubgraph.network_help,
-			onScanClicked = {
-				CameraParentSingleton.lastPossibleParent =
-					CameraParentScreen.CreateDerivationScreen(seedName)
-				rootNavigator.backAction()
-				rootNavigator.navigate(Action.NAVBAR_SCAN)
-			},
+			onScanClicked = onOpenCamera,
 			navController = navController,
 		)
 	}

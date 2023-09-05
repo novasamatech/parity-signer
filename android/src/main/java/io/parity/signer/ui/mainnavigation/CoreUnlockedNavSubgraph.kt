@@ -127,7 +127,9 @@ fun CoreUnlockedNavSubgraph(
 					.background(MaterialTheme.colors.background)
 			) {
 				DerivationCreateSubgraph(
-					rootNavigator, seedName,
+					onBack = { navController.popBackStack() },
+					onOpenCamera = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+					seedName = seedName,
 				)
 			}
 		}
