@@ -1,7 +1,9 @@
 package io.parity.signer.screens.createderivation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -54,7 +56,9 @@ fun DerivationCreateSubgraph(
 					navController.navigate(DerivationCreateSubgraph.path)
 				},
 				onNetworkHelp = { navController.navigate(DerivationCreateSubgraph.network_help) },
-				modifier = Modifier.statusBarsPadding()
+				modifier = Modifier
+					.statusBarsPadding()
+					.background(MaterialTheme.colors.background)
 			)
 		}
 		composable(DerivationCreateSubgraph.path) {
@@ -73,6 +77,7 @@ fun DerivationCreateSubgraph(
 				validator = deriveViewModel::checkPath,
 				modifier = Modifier
 					.statusBarsPadding()
+					.background(MaterialTheme.colors.background)
 					.imePadding(),
 			)
 			//bottom sheets

@@ -122,16 +122,12 @@ fun CoreUnlockedNavSubgraph(
 		) {
 			val seedName =
 				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)!!
-			Box(
-				modifier = Modifier
-					.background(MaterialTheme.colors.background)
-			) {
+
 				DerivationCreateSubgraph(
 					onBack = { navController.popBackStack() },
 					onOpenCamera = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
 					seedName = seedName,
 				)
-			}
 		}
 		composable(CoreUnlockedNavSubgraph.camera) {
 			ScanNavSubgraph(
