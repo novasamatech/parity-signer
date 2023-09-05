@@ -66,7 +66,7 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onBack = onBack,
 			onAddNewKey = {
-				navController.navigate(CoreUnlockedNavSubgraph.newDerivationKey)
+				navController.navigate(CoreUnlockedNavSubgraph.NewDerivedKey.destination(seedName = fullModel.root!!.seedName))
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
