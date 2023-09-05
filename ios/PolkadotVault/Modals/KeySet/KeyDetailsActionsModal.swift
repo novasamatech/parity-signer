@@ -23,7 +23,7 @@ struct KeyDetailsActionsModal: View {
                     // Export Keys
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentExportKeysSelection.toggle() } },
-                        icon: Asset.selectUnselected.swiftUIImage,
+                        icon: Asset.exportKeys.swiftUIImage,
                         text: Localizable.KeySetsModal.Action.export.key
                     )
                     ActionSheetButton(

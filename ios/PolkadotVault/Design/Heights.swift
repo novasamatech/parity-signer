@@ -29,6 +29,7 @@ enum Heights {
     static let keyCellContainer: CGFloat = 72
     /// Height for `Identicon` when used in list collections
     static let identiconInCell: CGFloat = 36
+    static let identiconRootKeyDetails: CGFloat = 56
     /// Height for `Identicon` when used as inline icon
     static let identiconSmall: CGFloat = 16
     static let identiconInAddDerivedKey: CGFloat = 40
@@ -95,4 +96,5 @@ enum Sizes {
     static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
     static let signSpecsIdenticonSize: CGFloat = 36
+    static let chevronDownKeyDetails: CGFloat = 16
 }

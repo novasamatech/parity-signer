@@ -311,8 +311,12 @@ extension KeyDetailsView.ViewModel {
         backupModal = nil
     }
 
-    func rootKeyDetails() -> RootKeyDetailsModal.ViewModel {
-        .init(name: keySummary?.keyName ?? "", publicKey: keySummary?.base58 ?? "")
+    func rootKeyDetails() -> RootKeyDetailsModal.Renderable {
+        .init(
+            seedName: keyName,
+            identicon: keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
+            base58: keysData?.root?.base58 ?? ""
+        )
     }
 }
 

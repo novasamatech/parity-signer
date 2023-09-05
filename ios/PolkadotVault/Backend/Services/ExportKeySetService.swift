@@ -27,4 +27,14 @@ final class ExportKeySetService {
             return AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload))
         }, completion: completion)
     }
+
+    func exportRoot(
+        seedName: String,
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    ) {
+        backendService.performCall({
+            let qrCodes = try exportKeyInfo(seedName: seedName, exportedSet: .selected(s: [])).frames
+            return AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload))
+        }, completion: completion)
+    }
 }
