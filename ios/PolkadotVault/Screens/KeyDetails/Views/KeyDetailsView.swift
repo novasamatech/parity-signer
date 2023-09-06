@@ -27,30 +27,7 @@ struct KeyDetailsView: View {
                 )
                 switch viewModel.viewState {
                 case .list:
-                    ScrollView(showsIndicators: false) {
-                        // Main key cell
-                        rootKeyHeader()
-                        // Derived Keys header
-                        HStack {
-                            Localizable.KeyDetails.Label.derived.text
-                                .font(PrimaryFont.bodyM.font)
-                            Spacer().frame(maxWidth: .infinity)
-                            Asset.switches.swiftUIImage
-                                .foregroundColor(
-                                    viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
-                                        .textAndIconsTertiary.swiftUIColor
-                                )
-                                .frame(width: Heights.actionSheetButton)
-                                .onTapGesture {
-                                    viewModel.onNetworkSelectionTap()
-                                }
-                        }
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.top, Spacing.medium)
-                        // List
-                        mainList
-                    }
+                    derivedKeysList()
                 case .emptyState:
                     rootKeyHeader()
                     Spacer()
@@ -159,8 +136,10 @@ struct KeyDetailsView: View {
             isPresented: $viewModel.isPresentingRootDetails
         ) {
             RootKeyDetailsModal(
-                isPresented: $viewModel.isPresentingRootDetails,
-                viewModel: viewModel.rootKeyDetails()
+                viewModel: .init(
+                    renderable: viewModel.rootKeyDetails(),
+                    isPresented: $viewModel.isPresentingRootDetails
+                )
             )
             .clearModalBackground()
         }
@@ -187,84 +166,5 @@ struct KeyDetailsView: View {
             viewModel.snackbarViewModel,
             isPresented: $viewModel.isSnackbarPresented
         )
-    }
-
-    var mainList: some View {
-        LazyVStack(spacing: 0) {
-            // List of derived keys
-            ForEach(
-                viewModel.derivedKeys,
-                id: \.viewModel.addressKey
-            ) { deriveKey in
-                DerivedKeyRow(
-                    viewModel: deriveKey.viewModel
-                )
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    viewModel.onDerivedKeyTap(deriveKey)
-                }
-                NavigationLink(
-                    destination:
-                    KeyDetailsPublicKeyView(
-                        viewModel: .init(
-                            keyDetails: viewModel.presentedKeyDetails,
-                            addressKey: viewModel.presentedPublicKeyDetails,
-                            onCompletion: viewModel.onPublicKeyCompletion(_:)
-                        )
-                    )
-                    .navigationBarHidden(true),
-                    isActive: $viewModel.isPresentingKeyDetails
-                ) { EmptyView() }
-            }
-            Spacer()
-                .frame(height: Heights.actionButton + Spacing.large)
-        }
-    }
-
-    @ViewBuilder
-    func rootKeyHeader() -> some View {
-        if let keySummary = viewModel.keySummary {
-            VStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                Text(keySummary.keyName)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                    .font(PrimaryFont.titleXL.font)
-                    .padding(.top, Spacing.medium)
-                    .padding(.bottom, Spacing.extraSmall)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.center)
-                HStack {
-                    Text(keySummary.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(PrimaryFont.bodyL.font)
-                        .lineLimit(1)
-                    Asset.chevronDown.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                }
-            }
-            .padding(.horizontal, Spacing.large)
-            .contentShape(Rectangle())
-            .onTapGesture { viewModel.onRootKeyTap() }
-        } else {
-            EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    func emptyState() -> some View {
-        VStack(spacing: 0) {
-            Localizable.KeyDetails.Label.EmptyState.header.text
-                .font(PrimaryFont.titleM.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                .padding(.top, Spacing.large)
-                .padding(.horizontal, Spacing.componentSpacer)
-            PrimaryButton(
-                action: viewModel.onCreateDerivedKeyTap,
-                text: Localizable.KeyDetails.Label.EmptyState.action.key,
-                style: .secondary()
-            )
-            .padding(Spacing.large)
-        }
-        .containerBackground(CornerRadius.large, state: .actionableInfo)
-        .padding(.horizontal, Spacing.medium)
     }
 }
