@@ -24,6 +24,8 @@ fun NetworkDetailsSubgraph(
     model: NetworkDetailsModel,
     rootNavigator: Navigator,
 ) {
+	//todo dmitry get this model like in
+	// ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:10
 	val menuController = rememberNavController()
 	val savedMetadataVersionAction = remember {
 		mutableStateOf("")
