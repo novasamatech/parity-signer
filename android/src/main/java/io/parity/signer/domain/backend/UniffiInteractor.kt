@@ -33,31 +33,6 @@ class UniffiInteractor(val appContext: Context) {
 	private val suspendedTasksContext: CoroutineScope =
 		CoroutineScope(Dispatchers.IO)
 
-	//todo dmitry fix it
-	suspend fun performTransaction(payload: String): OperationResult<ActionResult, TransactionError> =
-		withContext(Dispatchers.IO) {
-			try {
-				OperationResult.Ok(
-					backendAction(
-						Action.TRANSACTION_FETCHED,
-						payload,
-						""
-					)
-				)
-			} catch (e: ErrorDisplayed) {
-				OperationResult.Err(e.toTransactionError())
-			} catch (e: Throwable) {
-				OperationResult.Err(
-					TransactionError.Generic(
-						appContext.getString(
-							R.string.navigation_error_general_message,
-							e.findErrorDisplayed()?.message ?: e.message
-						)
-					)
-				)
-			}
-		}
-
 	fun historyDeviceWasOnline() {
 		if (wasRustInitialized.value) {
 			io.parity.signer.uniffi.historyDeviceWasOnline()

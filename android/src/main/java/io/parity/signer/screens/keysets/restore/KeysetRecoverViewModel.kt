@@ -43,23 +43,25 @@ class KeysetRecoverViewModel : ViewModel() {
 		}
 	}
 
+//	todo dmitry
+//	rust/db_handling/src/interface_signer.rs:805
 	fun addWord(word: String) {
-		val uniffiInteractor = ServiceLocator.uniffiInteractor
-		val result =
-			runBlocking { uniffiInteractor.navigate(Action.PUSH_WORD, word) }
-		when (result) {
-			is OperationResult.Err -> {
-				submitErrorState("error in add suggestion word $result")
-			}
-
-			is OperationResult.Ok -> {
-				val screenData =
-					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: let {
-						submitErrorState("wrong state in add suggestion word $result")
-						return
-					}
-				_recoverState.value = screenData.f.toKeysetRecoverModel()
-			}
-		}
+//		val uniffiInteractor = ServiceLocator.uniffiInteractor
+//		val result =
+//			runBlocking { uniffiInteractor.navigate(Action.PUSH_WORD, word) }
+//		when (result) {
+//			is OperationResult.Err -> {
+//				submitErrorState("error in add suggestion word $result")
+//			}
+//
+//			is OperationResult.Ok -> {
+//				val screenData =
+//					result.result.screenData as? ScreenData.RecoverSeedPhrase ?: let {
+//						submitErrorState("wrong state in add suggestion word $result")
+//						return
+//					}
+//				_recoverState.value = screenData.f.toKeysetRecoverModel()
+//			}
+//		}
 	}
 }
