@@ -38,7 +38,7 @@ fun KeysetRecoverPhraseScreen(
 			.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeaderProgressWithButton(
-			canProceed = model.validSeed != null,
+			canProceed = model.validSeed,
 			currentStep = 2,
 			allSteps = 3,
 			btnText = stringResource(R.string.button_next),
@@ -62,7 +62,7 @@ fun KeysetRecoverPhraseScreen(
 		)
 		EnterSeedPhraseBox(
 			enteredWords = model.enteredWords,
-			userInput = model.userInput,
+			rawUserInput = model.rawUserInput,
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 				.padding(top = 8.dp, bottom = 12.dp),

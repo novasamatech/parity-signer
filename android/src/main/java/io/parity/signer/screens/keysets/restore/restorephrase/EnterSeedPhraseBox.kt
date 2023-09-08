@@ -48,7 +48,7 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
-	userInput: String,
+	rawUserInput: String,
 	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
 ) {
@@ -58,15 +58,13 @@ fun EnterSeedPhraseBox(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
-	val userInputValueInternal = " " + userInput
-
 	//workaround for //https://issuetracker.google.com/issues/160257648 and https://issuetracker.google.com/issues/235576056 - update to new TextField
 	//for now need to keep this intermediate state
 	val seedWord = remember { mutableStateOf(TextFieldValue(" ")) }
 	seedWord.value = TextFieldValue(
-		text = userInputValueInternal,
+		text = rawUserInput,
 		//to always keep position after artificially added " "
-		selection = TextRange(userInputValueInternal.length)
+		selection = TextRange(rawUserInput.length)
 	)
 
 	FlowRow(
@@ -82,7 +80,7 @@ fun EnterSeedPhraseBox(
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
-		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
+		val shouldShowPlaceholder = enteredWords.isEmpty() && rawUserInput.isEmpty()
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS

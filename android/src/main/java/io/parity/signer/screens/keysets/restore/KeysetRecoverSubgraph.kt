@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.keysets.restore.keysetname.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowFullScreen
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
@@ -70,9 +71,9 @@ fun KeysetRecoverSubgraph(
 				KeysetRecoverPhraseScreen(
 					model = model.value,
 					backAction = navController::popBackStack,
-					onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
+					onNewInput = { newInput -> viewModel.onUserInput(newInput) },
 					onAddSuggestedWord = { suggestedWord ->
-						viewModel.addWord(suggestedWord)
+						viewModel.onAddword(suggestedWord)
 					},
 					onDone = {
 						if (model.value.validSeed) {

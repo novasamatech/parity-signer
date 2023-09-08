@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets.restore
+package io.parity.signer.screens.keysets.restore.keysetname
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -33,7 +33,6 @@ import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.ui.theme.textTertiary
-import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 
 @Composable
@@ -129,33 +128,6 @@ fun KeysetRecoverNameScreen(
 	DisposableEffect(Unit) {
 		focusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
-	}
-}
-
-data class KeysetRecoverModel(
-	val userInput: String,
-	val suggestedWords: List<String>,
-	val enteredWords: List<String>,
-	val validSeed: Boolean
-) {
-	companion object {
-		fun new(suggestedWords: List<String>): KeysetRecoverModel {
-			return KeysetRecoverModel(
-				userInput = "",
-				suggestedWords = suggestedWords,
-				enteredWords = emptyList(),
-				validSeed = false,
-			)
-		}
-
-		fun stub(): KeysetRecoverModel {
-			return KeysetRecoverModel(
-				userInput = "ggf",
-				suggestedWords = listOf("ggfhg", "goha"),
-				enteredWords = listOf("somve", "words", "that", "are", "draft"),
-				validSeed = false,
-			)
-		}
 	}
 }
 
