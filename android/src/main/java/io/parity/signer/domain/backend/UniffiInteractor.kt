@@ -287,32 +287,6 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun seedPhraseGuessWords(
-		userInput: String
-	): UniffiResult<List<String>> =
-		withContext(Dispatchers.IO) {
-			try {
-				val transactionResult =
-					io.parity.signer.uniffi.seedPhraseGuessWords(userInput)
-				UniffiResult.Success(transactionResult)
-			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
-			}
-		}
-
-	suspend fun validateSeedPhrase(
-		seedPhrase: String
-	): UniffiResult<Boolean> =
-		withContext(Dispatchers.IO) {
-			try {
-				val transactionResult =
-					io.parity.signer.uniffi.validateSeedPhrase(seedPhrase)
-				UniffiResult.Success(transactionResult)
-			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
-			}
-		}
-
 	suspend fun removedDerivedKey(
 		addressKey: String,
 		networkSpecsKey: String,

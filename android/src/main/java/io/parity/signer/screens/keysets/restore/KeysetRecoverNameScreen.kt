@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -39,12 +38,13 @@ import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 @Composable
 fun KeysetRecoverNameScreen(
+	initialKeySetName: String,
 	onBack: Callback,
 	onNext: (newName: String) -> Unit,
 	seedNames: Array<String>,
 	modifier: Modifier = Modifier,
 ) {
-	var keySetName by remember { mutableStateOf("") }
+	var keySetName by remember { mutableStateOf(initialKeySetName) }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -133,32 +133,31 @@ fun KeysetRecoverNameScreen(
 }
 
 data class KeysetRecoverModel(
-	val seedName: String,
 	val userInput: String,
 	val suggestedWords: List<String>,
-	val draft: List<String>,
-	val readySeed: String?
+	val enteredWords: List<String>,
+	val validSeed: Boolean
 ) {
 	companion object {
+		fun new(suggestedWords: List<String>): KeysetRecoverModel {
+			return KeysetRecoverModel(
+				userInput = "",
+				suggestedWords = suggestedWords,
+				enteredWords = emptyList(),
+				validSeed = false,
+			)
+		}
+
 		fun stub(): KeysetRecoverModel {
 			return KeysetRecoverModel(
-				seedName = "some",
 				userInput = "ggf",
 				suggestedWords = listOf("ggfhg", "goha"),
-				draft = listOf("somve", "words", "that", "are", "draft"),
-				readySeed = "somve words that are draft",
+				enteredWords = listOf("somve", "words", "that", "are", "draft"),
+				validSeed = false,
 			)
 		}
 	}
 }
-
-fun MRecoverSeedPhrase.toKeysetRecoverModel() = KeysetRecoverModel(
-	seedName = seedName,
-	userInput = userInput,
-	suggestedWords = guessSet,
-	draft = draft,
-	readySeed = readySeed,
-)
 
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
@@ -172,7 +171,7 @@ fun MRecoverSeedPhrase.toKeysetRecoverModel() = KeysetRecoverModel(
 @Composable
 private fun PreviewKeysetRecoverNameScreen() {
 	SignerNewTheme {
-		KeysetRecoverNameScreen({}, {}, arrayOf())
+		KeysetRecoverNameScreen("", {}, {}, arrayOf())
 	}
 }
 

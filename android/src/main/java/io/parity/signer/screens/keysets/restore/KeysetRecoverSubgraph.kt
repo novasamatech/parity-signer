@@ -7,13 +7,20 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowFullScreen
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
@@ -32,7 +39,10 @@ fun KeysetRecoverSubgraph(
 	)
 
 	val viewModel: KeysetRecoverViewModel = viewModel()
-	val model = viewModel.recoverState.collectAsStateWithLifecycle()
+	val model = viewModel.recoverSeed.collectAsStateWithLifecycle()
+	var keysetName by rememberSaveable() {
+		mutableStateOf("")
+	}
 
 	val navController = rememberNavController()
 	NavHost(
@@ -41,48 +51,61 @@ fun KeysetRecoverSubgraph(
 	) {
 
 		composable(KeysetRecoverSubgraph.keysetName) {
-			val seedNames =
+			val existingSeedNames =
 				viewModel.existingSeeds.collectAsStateWithLifecycle()
 			KeysetRecoverNameScreen(
+				initialKeySetName = keysetName,
 				onBack = { coreNavController.popBackStack() },
-				onNext = {restoredName ->
-					//todo dmitry remember restored name
-					navController.navigate(KeysetRecoverSubgraph.keysetRecoverSeed) },
-				seedNames = seedNames.value,
+				onNext = { restoredName ->
+					keysetName = restoredName
+					navController.navigate(KeysetRecoverSubgraph.seedPhrase)
+				},
+				seedNames = existingSeedNames.value,
 				modifier = Modifier
 					.statusBarsPadding()
 					.imePadding()
 			)
 		}
-		composable(KeysetRecoverSubgraph.keysetRecoverSeed) {
-			model.value?.let { stateModel ->
+		composable(KeysetRecoverSubgraph.seedPhrase) {
 				KeysetRecoverPhraseScreen(
-					model = stateModel,
+					model = model.value,
 					backAction = navController::popBackStack,
 					onNewInput = { newInput -> viewModel.onTextEntry(newInput) },
 					onAddSuggestedWord = { suggestedWord ->
 						viewModel.addWord(suggestedWord)
 					},
 					onDone = {
-						stateModel.readySeed?.let { seedFinal ->
-							navController.navigate(KeysetRecoverSubgraph.keysetRecoverNetworks)
+						if (model.value.validSeed) {
+							navController.navigate(KeysetRecoverSubgraph.NetworksSelection.destination(
+								model.value.enteredWords.joinToString { " " }))
+						} else {
+							submitErrorState("navigation to finish called, but seed is not valid")
 						}
 					},
 					modifier = Modifier
 						.statusBarsPadding()
 						.imePadding()
 				)
-			}
 		}
-		composable(KeysetRecoverSubgraph.keysetRecoverNetworks) {
+		composable(
+			route = KeysetRecoverSubgraph.NetworksSelection.route,
+			arguments = listOf(
+				navArgument(KeysetRecoverSubgraph.NetworksSelection.seedNameArg) {
+					type = NavType.StringType
+				}
+			)
+		) {
+			val seedName =
+				it.arguments?.getString(KeysetRecoverSubgraph.NetworksSelection.seedNameArg)!!
+
 			RecoverKeysetSelectNetworkRestoreFlowFullScreen(
-				seedName = model.value!!.seedName,
-				seedPhrase = model.value!!.readySeed!!,
+				seedName = keysetName,
+				seedPhrase = seedName,
 				onBack = navController::popBackStack,
 				navigateOnSuccess = {
 					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.KeySetDetails.destination(
-							model.value!!.seedName
+							keysetName
 						)
 					)
 				},
@@ -93,6 +116,12 @@ fun KeysetRecoverSubgraph(
 
 private object KeysetRecoverSubgraph {
 	const val keysetName = "recover_keyset_name"
-	const val keysetRecoverSeed = "recover_keyset_phrase"
-	const val keysetRecoverNetworks = "recover_keyset_backup_confirmation"
+	const val seedPhrase = "recover_keyset_phrase"
+
+	object NetworksSelection {
+		internal const val seedNameArg = "seed_name_arg"
+		private const val baseRoute = "recover_keyset_networks_confirmation"
+		const val route = "$baseRoute/{${seedNameArg}}"
+		fun destination(seedName: String) = "$baseRoute/${seedName}"
+	}
 }
