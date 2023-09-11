@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
@@ -22,12 +21,13 @@ import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
+import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
+import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
 fun CoreUnlockedNavSubgraph(
-	rootNavigator: Navigator,
 	singleton: SharedViewModel,
 ) {
 
@@ -154,6 +154,9 @@ fun CoreUnlockedNavSubgraph(
 //				networkState = networkState
 //			)
 		}
+		networkHelpersCoreSubgraph(
+			navController = navController,
+		)
 	}
 }
 
@@ -187,4 +190,5 @@ internal object CoreUnlockedNavSubgraph {
 	}
 
 	const val settings = "core_settings_flow"
+	const val networkHelpers = "network_helpers_path"
 }

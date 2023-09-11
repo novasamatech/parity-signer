@@ -4,11 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.components.panels.CameraParentScreen
+import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.uniffi.Action
 
-
+//todo dmitry not used?
 @Composable
 fun NetworksListSubgraph(model: NetworksListModel, rootNavigator: Navigator) {
 	val navController = rememberNavController()
@@ -19,7 +21,13 @@ fun NetworksListSubgraph(model: NetworksListModel, rootNavigator: Navigator) {
 		composable(NetworkListSubgraph.home) {
 			NetworksListScreen(
 				model = model,
-				rootNavigator = rootNavigator,
+				coreNavController= rememberNavController(),
+				onBack = { rootNavigator.backAction() },
+				onOpenNetwork = { networkKey ->
+					rootNavigator.navigate(Action.GO_FORWARD, networkKey)
+					CameraParentSingleton.lastPossibleParent =
+						CameraParentScreen.NetworkDetailsScreen(networkKey)
+				},
 				onNetworkHelp = { navController.navigate(NetworkListSubgraph.network_help) },
 				onAddNetwork = {
 					rootNavigator.backAction()

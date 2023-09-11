@@ -33,7 +33,6 @@ fun CombinedScreensSelector(
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
 			CoreUnlockedNavSubgraph(
-				rootNavigator = rootNavigator,
 				singleton = sharedViewModel,
 			)
 		}

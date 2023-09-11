@@ -40,7 +40,7 @@ internal fun SettingsGeneralNavSubgraph(
 			},
 			onBackup = { parentNavController.navigate(SettingsScreenSubgraph.backup) },
 			onManageNetworks = {
-				parentNavController.navigate(SettingsScreenSubgraph.manageNetworks)
+				parentNavController.navigate(SettingsScreenSubgraph.networkList)
 			},
 			onGeneralVerifier = {
 				parentNavController.navigate(SettingsScreenSubgraph.generalVerifier)
