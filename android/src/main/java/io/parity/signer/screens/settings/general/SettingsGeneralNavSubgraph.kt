@@ -16,6 +16,7 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
@@ -25,7 +26,7 @@ internal fun SettingsGeneralNavSubgraph(
 	val context = LocalContext.current
 	val vm: SettingsGeneralViewModel = viewModel()
 
-	val appVersion = rememberSaveable { vm.getAppVersion(context)	}
+	val appVersion = rememberSaveable { vm.getAppVersion(context) }
 	val shieldState = vm.networkState.collectAsStateWithLifecycle()
 
 	val menuNavController = rememberNavController()
@@ -65,7 +66,13 @@ internal fun SettingsGeneralNavSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmFactorySettingsBottomSheet(
 					onCancel = closeAction,
-					onFactoryReset = vm::wipeToFactory
+					onFactoryReset = {
+						vm.wipeToFactory {
+							parentNavController.navigate(
+								CoreUnlockedNavSubgraph.keySetList
+							)
+						}
+					}
 				)
 			}
 		}

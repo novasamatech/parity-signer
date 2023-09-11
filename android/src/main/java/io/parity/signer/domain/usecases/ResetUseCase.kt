@@ -3,6 +3,7 @@ package io.parity.signer.domain.usecases
 import android.security.keystore.UserNotAuthenticatedException
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.getDbNameFromContext
 import io.parity.signer.domain.isDbCreatedAndOnboardingPassed
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
@@ -26,11 +27,12 @@ class ResetUseCase {
 	//todo as in SharevView model - remove from here?
 
 	//todo dmitry test
-	fun wipeToFactory() {
+	fun wipeToFactory(onAfterWide: Callback) {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			databaseAssetsInteractor.wipe()
 			totalRefresh()
+			onAfterWide()
 		}
 	}
 	private fun totalRefreshDbExist() {
