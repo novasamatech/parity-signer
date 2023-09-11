@@ -70,7 +70,6 @@ extension KeyDetailsView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: (OnCompletionAction) -> Void
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
         /// Name of seed to be removed with `Remove Seed` action
@@ -85,8 +84,7 @@ extension KeyDetailsView {
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            onCompletion: @escaping (OnCompletionAction) -> Void
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.keyName = keyName
             self.keysData = keysData
@@ -97,7 +95,6 @@ extension KeyDetailsView {
             self.warningStateMediator = warningStateMediator
             self.appState = appState
             self.seedsMediator = seedsMediator
-            self.onCompletion = onCompletion
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()

@@ -243,7 +243,6 @@
 		6DC33717295559EA0067284B /* NetworkSettingsDetailsActionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */; };
 		6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */; };
 		6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */; };
-		6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642D28B652DE003D540B /* AddKeySetModal.swift */; };
 		6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642F28B65B9C003D540B /* AnimationDuration.swift */; };
 		6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643228B68FC5003D540B /* AccessControlProvider.swift */; };
 		6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643428B69355003D540B /* AccessControlProvidingAssembler.swift */; };
@@ -590,7 +589,6 @@
 		6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetailsActionModal.swift; sourceTree = "<group>"; };
 		6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusModifier.swift; sourceTree = "<group>"; };
 		6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootKeyDetailsModal.swift; sourceTree = "<group>"; };
-		6DC5642D28B652DE003D540B /* AddKeySetModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySetModal.swift; sourceTree = "<group>"; };
 		6DC5642F28B65B9C003D540B /* AnimationDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDuration.swift; sourceTree = "<group>"; };
 		6DC5643228B68FC5003D540B /* AccessControlProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvider.swift; sourceTree = "<group>"; };
 		6DC5643428B69355003D540B /* AccessControlProvidingAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssembler.swift; sourceTree = "<group>"; };
@@ -1921,7 +1919,6 @@
 		6DF7751C28B39F590040012E /* KeySetsList */ = {
 			isa = PBXGroup;
 			children = (
-				6DC5642D28B652DE003D540B /* AddKeySetModal.swift */,
 				6DF7751D28B39F630040012E /* KeySetRow.swift */,
 				6DBE12D728B3A80A005F3CCC /* KeySetList.swift */,
 				6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */,
@@ -2262,7 +2259,6 @@
 				6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */,
 				6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */,
 				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
-				6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */,
 				6DF91F4329C06BB4000A6BB2 /* TextResources.swift in Sources */,
 				6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */,
 				6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */,
