@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.exposesecurity.ExposedIcon
@@ -42,7 +44,7 @@ import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 internal fun SettingsScreenGeneralView(
-	rootNavigator: Navigator,
+	navController: NavController,
 	onWipeData: Callback,
 	onOpenLogs: Callback,
 	onShowTerms: Callback,
@@ -112,7 +114,7 @@ internal fun SettingsScreenGeneralView(
 					.padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
-		BottomBar(rootNavigator, BottomBarOptions.SETTINGS)
+		BottomBar(navController, BottomBarOptions.SETTINGS)
 	}
 }
 
@@ -161,7 +163,7 @@ private fun PreviewSettingsScreen() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.Past) }
 		SettingsScreenGeneralView(
-			rootNavigator = EmptyNavigator(),
+			navController = rememberNavController(),
 			onWipeData = {},
 			onOpenLogs = {},
 			onShowTerms = {},

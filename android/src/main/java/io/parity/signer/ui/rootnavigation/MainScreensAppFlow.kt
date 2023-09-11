@@ -42,18 +42,10 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		BackHandler {
 			sharedViewModel.navigator.backAction()
 		}
-
 		if (authenticated.value) {
 			MainUnlockedSubgraphVault(sharedViewModel)
 		} else {
-			val currentActivity =
-				LocalContext.current.findActivity() as FragmentActivity
-			UnlockAppAuthScreen {
-				val authentication = ServiceLocator.authentication
-				authentication.authenticate(currentActivity) {
-					sharedViewModel.totalRefresh()
-				}
-			}
+			UnlockAppAuthScreen(onUnlockClicked = sharedViewModel::onUnlockClicked)
 		}
 		LaunchedEffect(Unit) {
 			Log.d(
@@ -118,7 +110,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 			) {
 				CombinedScreensSelector(
 					screenData = actionResult.screenData,
-					networkState = shieldNetworkState,
 					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(

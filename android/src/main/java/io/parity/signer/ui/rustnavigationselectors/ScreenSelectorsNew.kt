@@ -25,7 +25,6 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun CombinedScreensSelector(
 	screenData: ScreenData,
-	networkState: State<NetworkState?>,
 	sharedViewModel: SharedViewModel
 ) {
 	val rootNavigator = sharedViewModel.navigator
@@ -46,24 +45,11 @@ fun CombinedScreensSelector(
 		}
 
 		is ScreenData.Log -> {} // moved to settings flow, not part of global state machine now
-		is ScreenData.Settings ->
-			SettingsScreenSubgraph(
-				rootNavigator = rootNavigator,
-//				todo dmitry get this in settings
-				isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
-				appVersion = sharedViewModel.getAppVersion(),
-				wipeToFactory = sharedViewModel::wipeToFactory,
-				networkState = networkState
-			)
+		is ScreenData.Settings -> {}
 
 		is ScreenData.ManageNetworks -> {}
 
-		is ScreenData.NNetworkDetails ->
-			//todo dmitry remove this
-			NetworkDetailsSubgraph(
-				screenData.f.toNetworkDetailsModel(),
-				rootNavigator,
-			)
+		is ScreenData.NNetworkDetails -> {}
 
 		is ScreenData.NewSeed -> {
 			submitErrorState("nothing, moved to keyset subgraph")
@@ -73,17 +59,7 @@ fun CombinedScreensSelector(
 
 		is ScreenData.RecoverSeedPhrase -> {}
 
-		is ScreenData.Scan -> {
-			//todo dmitry remove
-			ScanNavSubgraph(
-				onCloseCamera = {
-					CameraParentSingleton.navigateBackFromCamera(rootNavigator)
-				},
-				openKeySet = { seedName ->
-					rootNavigator.navigate(Action.SELECT_SEED, seedName)
-				}
-			)
-		}
+		is ScreenData.Scan -> {	}
 
 		is ScreenData.Transaction -> {
 			submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")

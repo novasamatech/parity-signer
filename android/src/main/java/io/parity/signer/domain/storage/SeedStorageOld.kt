@@ -14,8 +14,10 @@ import kotlinx.coroutines.*
  * should be called within authentication envelope
  * authentication.authenticate(activity) {refreshSeedNames()}
  * which is somewhat asynchronous
+ * todo dmitry remove
  */
 internal fun SharedViewModel.tellRustSeedNames() {
+	val seedStorage = ServiceLocator.seedStorage
 	val allNames = seedStorage.getSeedNames()
 	updateSeedNames(allNames.toList())
 }
@@ -29,6 +31,7 @@ internal fun SharedViewModel.getSeed(
 	seedName: String,
 	showInLogs: Boolean = false
 ): String {
+	val seedStorage = ServiceLocator.seedStorage
 	return try {
 		seedStorage.getSeed(seedName, showInLogs)
 	} catch (e: java.lang.Exception) {
@@ -47,6 +50,7 @@ internal fun SharedViewModel.getSeed(
  */
 @Deprecated("Use SeedStorage or better SeedRepository")
 fun SharedViewModel.removeSeed(seedName: String) {
+	val seedStorage = ServiceLocator.seedStorage
 	ServiceLocator.authentication.authenticate(activity) {
 		try {
 			seedStorage.removeSeed(seedName)

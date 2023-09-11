@@ -3,35 +3,36 @@ package io.parity.signer.screens.settings.general
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 
 
 @Composable
 internal fun SettingsGeneralNavSubgraph(
-	rootNavigator: Navigator,
 	parentNavController: NavController,
-	isStrongBoxProtected: Boolean,
-	appVersion: String,
-	wipeToFactory: Callback,
-	networkState: State<NetworkState?>,
 ) {
+	val context = LocalContext.current
+	val vm: SettingsGeneralViewModel = viewModel()
+
+	val appVersion = rememberSaveable { vm.getAppVersion(context)	}
+	val shieldState = vm.networkState.collectAsStateWithLifecycle()
 
 	val menuNavController = rememberNavController()
 
 	Box(modifier = Modifier.statusBarsPadding()) {
 		SettingsScreenGeneralView(
-			rootNavigator,
+			navController = parentNavController,
 			onWipeData = { menuNavController.navigate(SettingsGeneralMenu.wipe_factory) },
 			onOpenLogs = { parentNavController.navigate(SettingsScreenSubgraph.logs) },
 			onShowTerms = { parentNavController.navigate(SettingsScreenSubgraph.terms) },
@@ -46,9 +47,9 @@ internal fun SettingsGeneralNavSubgraph(
 				parentNavController.navigate(SettingsScreenSubgraph.generalVerifier)
 			},
 			onExposedClicked = { menuNavController.navigate(SettingsGeneralMenu.exposed_shield_alert) },
-			isStrongBoxProtected,
-			appVersion,
-			networkState
+			isStrongBoxProtected = vm.isStrongBoxProtected,
+			appVersion = appVersion,
+			networkState = shieldState,
 		)
 	}
 
@@ -64,7 +65,7 @@ internal fun SettingsGeneralNavSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmFactorySettingsBottomSheet(
 					onCancel = closeAction,
-					onFactoryReset = wipeToFactory //todo dmitry change to viewmodel and navigate to top
+					onFactoryReset = vm::wipeToFactory
 				)
 			}
 		}

@@ -1,5 +1,6 @@
 package io.parity.signer.domain
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.R
@@ -9,6 +10,9 @@ import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.scan.errors.findErrorDisplayed
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -40,8 +44,14 @@ interface Navigator {
  * Class to navigate within rust state-machine area. It is one (big) part of compose-based navigation.
  * This class have nothing to do with composa-based navigation.
  */
-class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
+class SignerNavigator() : Navigator {
 
+	private val appContext: Context = ServiceLocator.appContext
+	private val activity = ServiceLocator.activityScope?.activity
+	private val _actionResult = MutableStateFlow<ActionResult?>(
+		null
+	)
+	val actionResult: StateFlow<ActionResult?> = _actionResult.asStateFlow()
 
 	private suspend fun navigateRust(
 		action: Action,
@@ -54,7 +64,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 			} catch (e: ErrorDisplayed) {
 				OperationResult.Err(
 					NavigationError(
-						singleton.activity.applicationContext.getString(
+						appContext.getString(
 							R.string.navigation_error_general_message,
 							e.findErrorDisplayed()?.message ?: e.message
 						)
@@ -69,7 +79,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 			val navigationAction = runBlocking {
 				val result = navigateRust(action, details, seedPhrase)
 				when (result) {
-					is OperationResult.Err -> singleton._actionResult.value?.copy(
+					is OperationResult.Err -> _actionResult.value?.copy(
 						alertData = AlertData.ErrorData(result.error.message)
 					)
 
@@ -77,17 +87,17 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 				}
 			} ?: return
 
-			singleton._actionResult.value = navigationAction
+			_actionResult.value = navigationAction
 		} catch (e: java.lang.Exception) {
 			Log.e("Navigation error", e.toString())
-			Toast.makeText(singleton.context, e.toString(), Toast.LENGTH_SHORT).show()
+			Toast.makeText(appContext, e.toString(), Toast.LENGTH_SHORT).show()
 		}
 	}
 
 	override fun backAction() {
-		val lastRustNavAction = singleton.actionResult.value
+		val lastRustNavAction = actionResult.value
 		if (lastRustNavAction == null) {
-			singleton.activity.moveTaskToBack(true)
+			activity?.moveTaskToBack(true)
 		} else if (
 			lastRustNavAction.alertData == null &&
 			lastRustNavAction.modalData == null &&
@@ -98,7 +108,7 @@ class SignerNavigator(private val singleton: SharedViewModel) : Navigator {
 					lastRustNavAction.screenData is ScreenData.Settings
 				)
 		) {
-			singleton.activity.moveTaskToBack(true)
+			activity?.moveTaskToBack(true)
 		} else {
 			navigate(Action.GO_BACK)
 		}

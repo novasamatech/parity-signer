@@ -21,6 +21,7 @@ import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
+import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
 import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
@@ -145,14 +146,9 @@ fun CoreUnlockedNavSubgraph(
 			)
 		}
 		composable(CoreUnlockedNavSubgraph.settings) {
-			//todo dmitry implement
-//			SettingsScreenSubgraph(
-//				rootNavigator = rootNavigator,
-//				isStrongBoxProtected = sharedViewModel.seedStorage.isStrongBoxProtected,
-//				appVersion = sharedViewModel.getAppVersion(),
-//				wipeToFactory = sharedViewModel::wipeToFactory,
-//				networkState = networkState
-//			)
+			SettingsScreenSubgraph(
+				coreNavController = navController,
+			)
 		}
 		networkHelpersCoreSubgraph(
 			navController = navController,

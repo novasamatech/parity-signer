@@ -2,20 +2,16 @@ package io.parity.signer.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
-import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
 import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
-import io.parity.signer.screens.settings.networks.list.NetworksListSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
 
 /**
@@ -25,11 +21,7 @@ import io.parity.signer.screens.settings.networks.list.networkListDestination
  */
 @Composable
 fun SettingsScreenSubgraph(
-	rootNavigator: Navigator,
-	isStrongBoxProtected: Boolean,
-	appVersion: String,
-	wipeToFactory: Callback,
-	networkState: State<NetworkState?>
+	coreNavController: NavController,
 ) {
 // todo dmitry like
 //	io/parity/signer/screens/settings/networks/list/NetworksListSubgraphOld.kt:14
@@ -40,14 +32,7 @@ fun SettingsScreenSubgraph(
 	) {
 
 		composable(SettingsScreenSubgraph.home) {
-			SettingsGeneralNavSubgraph(
-				rootNavigator = rootNavigator,
-				parentNavController = navController,
-				isStrongBoxProtected = isStrongBoxProtected,
-				appVersion = appVersion,
-				wipeToFactory = wipeToFactory,
-				networkState = networkState,
-			)
+			SettingsGeneralNavSubgraph(parentNavController = navController,)
 		}
 		composable(SettingsScreenSubgraph.terms) {
 			Box(modifier = Modifier.statusBarsPadding()) {
@@ -64,7 +49,7 @@ fun SettingsScreenSubgraph(
 			}
 		}
 		composable(SettingsScreenSubgraph.backup) {
-			SeedBackupIntegratedScreen(rootNavigator) {
+			SeedBackupIntegratedScreen(navController) {
 				navController.popBackStack(SettingsScreenSubgraph.home, false)
 			}
 		}

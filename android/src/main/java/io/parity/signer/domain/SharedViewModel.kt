@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.SeedStorage
+import io.parity.signer.domain.usecases.ResetUseCase
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,112 +18,33 @@ import org.json.JSONObject
 
 @SuppressLint("StaticFieldLeak")
 class SharedViewModel() : ViewModel() {
+
+	private val resetUseCase = ResetUseCase()
 	val context: Context
 		get() = ServiceLocator.appContext.applicationContext
 	val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
+	val networkState: StateFlow<NetworkState> =
+		ServiceLocator.networkExposedStateKeeper.airGapModeState
 
 	init {
 		// Imitate ios behavior
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
-			totalRefresh()
+			resetUseCase.totalRefresh()
 		}
 	}
 
-	val navigator by lazy { SignerNavigator(this) }
+	fun onUnlockClicked() {
+		val authentication = ServiceLocator.authentication
+		authentication.authenticate(activity) {
+			resetUseCase.totalRefresh()
+		}
+	}
 
-	val seedStorage: SeedStorage = ServiceLocator.seedStorage
-	private val databaseAssetsInteractor: DatabaseAssetsInteractor =
-		ServiceLocator.databaseAssetsInteractor
-	private val networkExposedStateKeeper =
-		ServiceLocator.networkExposedStateKeeper
+	val navigator = ServiceLocator.navigator
 
-	// Navigator
-	internal val _actionResult = MutableStateFlow<ActionResult?>(
-		null
-	)
-
-	// Observables for screens state
-	val networkState: StateFlow<NetworkState> =
-		networkExposedStateKeeper.airGapModeState
-	val actionResult: StateFlow<ActionResult?> = _actionResult.asStateFlow()
 	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
-
-	// MARK: init boilerplate begin
-
-	/**
-	 * Init database with no general certificate
-	 * @throws UserNotAuthenticatedException
-	 */
-	private fun wipeDbNoCert() {
-		databaseAssetsInteractor.wipe()
-		databaseAssetsInteractor.copyAsset("")
-		totalRefresh()
-		historyInitHistoryNoCert()
-	}
-
-	// MARK: General utils begin
-
-	/**
-	 * This returns the app into starting state;
-	 */
-	fun totalRefresh() {
-		if (!seedStorage.isInitialized()) {
-			seedStorage.init(context)
-		}
-		if (!context.isDbCreatedAndOnboardingPassed()) {
-			initAssetsAndTotalRefresh()
-		} else {
-			totalRefreshDbExist()
-		}
-	}
-
-	private fun totalRefreshDbExist() {
-		val allNames = seedStorage.getSeedNames()
-		initNavigation(context.getDbNameFromContext(), allNames.toList())
-		ServiceLocator.uniffiInteractor.wasRustInitialized.value = true
-		networkExposedStateKeeper.updateAlertStateFromHistory()
-		navigator.navigate(Action.START)
-	}
-
-	/**
-	 * Populate database!
-	 * This is first start of the app
-	 */
-	private fun initAssetsAndTotalRefresh() {
-		databaseAssetsInteractor.wipe()
-		databaseAssetsInteractor.copyAsset("")
-		totalRefreshDbExist()
-		historyInitHistoryWithCert()
-	}
-
-	/**
-	 * Auth user and wipe the Vault to initial state
-	 */
-	fun wipeToFactory() {
-		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			databaseAssetsInteractor.wipe()
-			totalRefresh()
-		}
-	}
-
-	/**
-	 * Auth user and wipe Vault to state without general verifier certificate
-	 */
-	fun wipeToJailbreak() {
-		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			wipeDbNoCert()
-		}
-	}
-
-	fun getAppVersion(): String {
-		return context.packageManager.getPackageInfo(
-			context.packageName,
-			0
-		).versionName
-	}
+	val actionResult: StateFlow<ActionResult?> = navigator.actionResult
 }
 
