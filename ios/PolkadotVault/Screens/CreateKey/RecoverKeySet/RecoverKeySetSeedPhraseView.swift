@@ -61,6 +61,11 @@ struct RecoverKeySetSeedPhraseView: View {
                     }
                     .frame(minHeight: 156)
                     .containerBackground(CornerRadius.small)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        /// #2065 Enable to focus `recoveryTextInput` when tapping anywhere within input rectangle
+                        focus = true
+                    }
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.small)
                     ScrollView(.horizontal, showsIndicators: false) {
