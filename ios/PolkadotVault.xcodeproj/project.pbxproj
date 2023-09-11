@@ -78,6 +78,8 @@
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
 		6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */; };
 		6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */; };
+		6D2A5D0F2AA5DF47009E0C3A /* ManageKeySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */; };
+		6D2A5D112AA607C7009E0C3A /* ActionSheetCircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */; };
 		6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */; };
 		6D2D244D28CE55A000862726 /* String+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244C28CE55A000862726 /* String+Utilities.swift */; };
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
@@ -243,7 +245,6 @@
 		6DC33717295559EA0067284B /* NetworkSettingsDetailsActionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */; };
 		6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */; };
 		6DC33725295BFA4D0067284B /* RootKeyDetailsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */; };
-		6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642D28B652DE003D540B /* AddKeySetModal.swift */; };
 		6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5642F28B65B9C003D540B /* AnimationDuration.swift */; };
 		6DC5643328B68FC5003D540B /* AccessControlProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643228B68FC5003D540B /* AccessControlProvider.swift */; };
 		6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC5643428B69355003D540B /* AccessControlProvidingAssembler.swift */; };
@@ -427,6 +428,8 @@
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilder.swift; sourceTree = "<group>"; };
 		6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilderTests.swift; sourceTree = "<group>"; };
+		6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageKeySetsView.swift; sourceTree = "<group>"; };
+		6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetCircleButton.swift; sourceTree = "<group>"; };
 		6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyService.swift; sourceTree = "<group>"; };
 		6D2D244C28CE55A000862726 /* String+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Utilities.swift"; sourceTree = "<group>"; };
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
@@ -590,7 +593,6 @@
 		6DC33716295559EA0067284B /* NetworkSettingsDetailsActionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingsDetailsActionModal.swift; sourceTree = "<group>"; };
 		6DC33722295ACF2D0067284B /* CornerRadiusModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusModifier.swift; sourceTree = "<group>"; };
 		6DC33724295BFA4D0067284B /* RootKeyDetailsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootKeyDetailsModal.swift; sourceTree = "<group>"; };
-		6DC5642D28B652DE003D540B /* AddKeySetModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySetModal.swift; sourceTree = "<group>"; };
 		6DC5642F28B65B9C003D540B /* AnimationDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDuration.swift; sourceTree = "<group>"; };
 		6DC5643228B68FC5003D540B /* AccessControlProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvider.swift; sourceTree = "<group>"; };
 		6DC5643428B69355003D540B /* AccessControlProvidingAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssembler.swift; sourceTree = "<group>"; };
@@ -1587,6 +1589,7 @@
 				6D33EE2E2A9F47D3005F3827 /* KeyDetailsView+Header.swift */,
 				6D33EE302A9F47F7005F3827 /* KeyDetailsView+EmptyState.swift */,
 				6D33EE322A9F4825005F3827 /* KeyDetailsView+MainList.swift */,
+				6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1798,6 +1801,7 @@
 				6D16687E28F86DE0008C664A /* CameraButton.swift */,
 				6DF8316628F9BA4A00CB2BCE /* CapsuleButton.swift */,
 				6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */,
+				6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -1921,7 +1925,6 @@
 		6DF7751C28B39F590040012E /* KeySetsList */ = {
 			isa = PBXGroup;
 			children = (
-				6DC5642D28B652DE003D540B /* AddKeySetModal.swift */,
 				6DF7751D28B39F630040012E /* KeySetRow.swift */,
 				6DBE12D728B3A80A005F3CCC /* KeySetList.swift */,
 				6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */,
@@ -2262,7 +2265,6 @@
 				6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */,
 				6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */,
 				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
-				6DC5642E28B652DE003D540B /* AddKeySetModal.swift in Sources */,
 				6DF91F4329C06BB4000A6BB2 /* TextResources.swift in Sources */,
 				6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */,
 				6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */,
@@ -2354,6 +2356,7 @@
 				6DF3CFF029937E48002DF203 /* AttributedTintInfoBox.swift in Sources */,
 				6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */,
 				6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */,
+				6D2A5D0F2AA5DF47009E0C3A /* ManageKeySetsView.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* PolkadotVaultApp.swift in Sources */,
 				6D042AF42901B40400B3F4F7 /* ExportMultipleKeysModal.swift in Sources */,
 				6D95E97828B6250B00E28A11 /* ClearBackgroundView.swift in Sources */,
@@ -2382,6 +2385,7 @@
 				6DF714712A55652900F6A527 /* DynamicDerivationsService.swift in Sources */,
 				6D7B44FC2979263200111D0E /* TermsOfServiceView.swift in Sources */,
 				6D52E3A32946C1B500AD72F0 /* SettingsRowView.swift in Sources */,
+				6D2A5D112AA607C7009E0C3A /* ActionSheetCircleButton.swift in Sources */,
 				6D16687F28F86DE0008C664A /* CameraButton.swift in Sources */,
 				6DBBC1F2298CB09C00368638 /* NetworkIdenticon.swift in Sources */,
 				6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */,

@@ -31,6 +31,8 @@ extension KeyDetailsView {
                 .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.small)
+                .contentShape(Rectangle())
+                .onTapGesture { viewModel.onKeySetSelectionTap() }
                 HStack {
                     Text(keySummary.base58.truncateMiddle())
                         .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)

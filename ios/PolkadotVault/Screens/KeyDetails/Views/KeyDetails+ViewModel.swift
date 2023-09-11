@@ -28,11 +28,12 @@ extension KeyDetailsView {
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
         private let seedsMediator: SeedsMediating
-        let keyName: String
+        private var appState: AppState
+
+        @Published var keyName: String
         /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
         /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
-        var keysData: MKeysNew?
-        private var appState: AppState
+        @Published var keysData: MKeysNew?
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
         @Published var shouldPresentExportKeysSelection = false
@@ -49,6 +50,9 @@ extension KeyDetailsView {
         @Published var isShowingKeysExportModal = false
         // Network selection
         @Published var isPresentingNetworkSelection = false
+        @Published var isPresentingKeySetSelection = false
+        @Published var isShowingRecoverKeySet = false
+        @Published var isShowingCreateKeySet = false
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
@@ -70,7 +74,6 @@ extension KeyDetailsView {
         }
 
         private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: (OnCompletionAction) -> Void
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
         /// Name of seed to be removed with `Remove Seed` action
@@ -85,11 +88,10 @@ extension KeyDetailsView {
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            onCompletion: @escaping (OnCompletionAction) -> Void
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
-            self.keyName = keyName
-            self.keysData = keysData
+            _keyName = Published(initialValue: keyName)
+            _keysData = Published(initialValue: keysData)
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
@@ -97,7 +99,6 @@ extension KeyDetailsView {
             self.warningStateMediator = warningStateMediator
             self.appState = appState
             self.seedsMediator = seedsMediator
-            self.onCompletion = onCompletion
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
@@ -157,8 +158,13 @@ extension KeyDetailsView {
             keyDetailsActionsService.forgetKeySet(seedName: keyName) { result in
                 switch result {
                 case .success:
-                    self.dismissRequest.send()
-                    self.onCompletion(.keySetDeleted)
+                    self.keyName = self.seedsMediator.seedNames.first ?? ""
+                    self.refreshData()
+                    self.snackbarViewModel = .init(
+                        title: Localizable.KeySetsModal.Confirmation.snackbar.string,
+                        style: .warning
+                    )
+                    self.isSnackbarPresented = true
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.localizedDescription)
                     self.isPresentingError = true
@@ -224,6 +230,41 @@ extension KeyDetailsView {
                 }
             }
         }
+
+        func onKeySetSelectionComplete(_ completionAction: ManageKeySetsView.OnCompletionAction) {
+            switch completionAction {
+            case .onClose:
+                ()
+            case .addKeySet:
+                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                    self.isShowingCreateKeySet = true
+                }
+            case .recoverKeySet:
+                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                    self.isShowingRecoverKeySet = true
+                }
+            case let .viewKeySet(selectedKeySet):
+                isFilteringActive = false
+                appState.userData.selectedNetworks = []
+                keyName = selectedKeySet.seedName
+                refreshData()
+            }
+        }
+
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            let message: String
+            switch completionAction {
+            case let .createKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+            }
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
+        }
     }
 }
 
@@ -241,6 +282,10 @@ extension KeyDetailsView.ViewModel {
 
     func onRootKeyTap() {
         isPresentingRootDetails = true
+    }
+
+    func onKeySetSelectionTap() {
+        isPresentingKeySetSelection = true
     }
 
     func onNetworkSelectionTap() {

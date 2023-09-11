@@ -69,6 +69,18 @@ struct KeyDetailsView: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingKeySetSelection
+        ) {
+            ManageKeySetsView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingKeySetSelection,
+                    currentKeySet: viewModel.keyName,
+                    onCompletion: viewModel.onKeySetSelectionComplete
+                )
+            )
+            .clearModalBackground()
+        }
         .fullScreenModal(isPresented: $viewModel.isShowingRemoveConfirmation) {
             HorizontalActionsBottomModal(
                 viewModel: .forgetKeySet,
@@ -151,6 +163,26 @@ struct KeyDetailsView: View {
                 isShowingBottomAlert: $viewModel.isPresentingError
             )
             .clearModalBackground()
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isShowingCreateKeySet
+        ) {
+            EnterKeySetNameView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingCreateKeySet,
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
+                )
+            )
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isShowingRecoverKeySet
+        ) {
+            RecoverKeySetNameView(
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingRecoverKeySet,
+                    onCompletion: viewModel.onKeySetAddCompletion(_:)
+                )
+            )
         }
         .fullScreenModal(
             isPresented: $viewModel.isPresentingDeriveNewKey,
