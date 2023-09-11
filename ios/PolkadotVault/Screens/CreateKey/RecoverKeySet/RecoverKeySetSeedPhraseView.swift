@@ -187,7 +187,7 @@ extension RecoverKeySetSeedPhraseView {
 extension RecoverKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
         private enum Constants {
-            static let emptyCharacter = "\u{200B}"
+            static let invisibleNonEmptyCharacter = "\u{200B}"
         }
 
         private let seedsMediator: SeedsMediating
@@ -200,14 +200,14 @@ extension RecoverKeySetSeedPhraseView {
         @Published var isPresentingDetails: Bool = false
         @Published var isValidSeedPhrase: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
-        @Published var userInput: String = Constants.emptyCharacter
+        @Published var userInput: String = Constants.invisibleNonEmptyCharacter
         @Published var guesses: [String] = []
 
         private var seedPhraseDraft: [String] = [] {
             didSet {
                 regenerateGrid()
                 validateSeedPhrase()
-                userInput = Constants.emptyCharacter
+                userInput = Constants.invisibleNonEmptyCharacter
                 updateGuesses("")
             }
         }
@@ -257,9 +257,22 @@ extension RecoverKeySetSeedPhraseView {
         func onUserInput(_ word: String) {
             guard !shouldSkipUpdate else { return }
             shouldSkipUpdate = true
+            // User input is empty and invisible character was deleted
+            // This means that backspace was tapped, we should delete last saved word
             if word.isEmpty {
                 seedPhraseDraft = Array(seedPhraseDraft.dropLast(1))
-                userInput = Constants.emptyCharacter
+                userInput = Constants.invisibleNonEmptyCharacter
+                // User added " " while typing, we should check guess words or delete whitespace
+            } else if word.hasSuffix(" ") {
+                let exactWord = String(word.dropFirst().dropLast(1))
+                // If there is a match, add this word and clear user input
+                if guesses.contains(exactWord) {
+                    seedPhraseDraft.append(exactWord)
+                    // If there is no match, we should remove added whitespace
+                } else {
+                    userInput = exactWord
+                }
+                // User just added new character, generate new guesses
             } else {
                 updateGuesses(String(word.dropFirst()))
             }
