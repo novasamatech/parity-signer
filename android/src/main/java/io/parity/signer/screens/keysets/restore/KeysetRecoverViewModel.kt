@@ -33,34 +33,39 @@ class KeysetRecoverViewModel : ViewModel() {
 	}
 
 	fun onUserInput(rawUserInput: String) {
-		if (rawUserInput.isEmpty()) {
-			_recoverSeed.value = _recoverSeed.value.let { model ->
-				model.copy(
+		val currentModel = _recoverSeed.value
+		if (currentModel.enteredWords.size <= KeysetRecoverModel.WORDS_CAP) {
+			if (rawUserInput.isEmpty()) {
+				_recoverSeed.value = currentModel.copy(
 					rawUserInput = KeysetRecoverModel.SPACE_CHARACTER.toString(),
-					enteredWords = model.enteredWords.dropLast(1)
+					enteredWords = currentModel.enteredWords.dropLast(1)
 				)
-			}
-		} else if (rawUserInput.first() != KeysetRecoverModel.SPACE_CHARACTER) {
-			//user removed first symbol?
-			_recoverSeed.value = _recoverSeed.value.let { model ->
-				model.copy(
+			} else if (rawUserInput.first() != KeysetRecoverModel.SPACE_CHARACTER) {
+				//user removed first symbol?
+				_recoverSeed.value = currentModel.copy(
 					rawUserInput = KeysetRecoverModel.SPACE_CHARACTER.toString() + rawUserInput,
 				)
+			} else {
+				//valid word input handling
+				if (rawUserInput.endsWith(KeysetRecoverModel.SPACE_CHARACTER)) {
+					val input = rawUserInput.trim()
+					val guessing = getGuessWords(input)
+					if (guessing.contains(input)) {
+						onAddword(input)
+					}
+				} else if (getGuessWords(rawUserInput.trimStart()).isNotEmpty()) {
+					_recoverSeed.value = currentModel.copy(
+						rawUserInput = rawUserInput,
+					)
+				}
 			}
 		} else {
-			val input = rawUserInput.drop(1)
-//todo dmitry
-
-			val guessing = getGuessWords(input)
-			when (guessing.size) {
-				1 ->
-			}
+			_recoverSeed.value = currentModel.copy(
+				rawUserInput = KeysetRecoverModel.SPACE_CHARACTER.toString(),
+			)
 		}
 	}
 
-	//	todo dmitry
-//	rust/db_handling/src/interface_signer.rs:805
-//	ios/PolkadotVault/Screens/CreateKey/RecoverKeySet/RecoverKeySetSeedPhraseView.swift:200
 	fun onAddword(word: String) {
 		_recoverSeed.value = _recoverSeed.value.let { model: KeysetRecoverModel ->
 			val newDraft = model.enteredWords + word
@@ -82,6 +87,10 @@ data class KeysetRecoverModel(
 	val validSeed: Boolean
 ) {
 	companion object {
+
+		// Maximum word count in `bip39` standard.
+		// See <https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60>
+		const val WORDS_CAP: Int = 24;
 
 		const val SPACE_CHARACTER: Char = ' '
 		const val NEW_LINE: Char = '\n'
