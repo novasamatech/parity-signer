@@ -2,6 +2,7 @@ package io.parity.signer.domain.backend
 
 import android.content.Context
 import io.parity.signer.domain.KeySetsSelectModel
+import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toNetworkModel
@@ -78,12 +79,12 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun getAllNetworks(): UniffiResult<NetworksListModel> =
+	suspend fun getAllNetworks(): UniffiResult<List<NetworkModel>> =
 		withContext(Dispatchers.IO) {
 			try {
 				val networks =
 					io.parity.signer.uniffi.getManagedNetworks().networks.map { it.toNetworkModel() }
-				UniffiResult.Success(NetworksListModel(networks))
+				UniffiResult.Success(networks)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
 			}

@@ -169,7 +169,6 @@ private fun PreviewNetworksList() {
 			{},
 			{},
 			{},
-			{},
 		)
 	}
 }

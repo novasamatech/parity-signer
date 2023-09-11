@@ -69,9 +69,7 @@ fun SettingsScreenSubgraph(
 			}
 		}
 		logsNavigationSubgraph(
-			SettingsScreenSubgraph.logs,
-			rootNavigator,
-			navController
+			navController = navController,
 		)
 		networkListDestination(navController)
 
