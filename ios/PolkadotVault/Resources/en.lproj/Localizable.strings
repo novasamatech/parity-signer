@@ -625,3 +625,9 @@
 "AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
 "AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
 "AddDerivedKeys.Modal.Action.Cancel" = "Cancel";
+
+"ManageKeySets.Label.Header" = "Key Sets";
+"ManageKeySets.Label.DerivedKeys.single" = "%@ Key";
+"ManageKeySets.Label.DerivedKeys.plural" = "%@ Keys";
+"ManageKeySets.Action.Add" = "Add new Key Set";
+"ManageKeySets.Action.Recover" = "Recover Key Set";
