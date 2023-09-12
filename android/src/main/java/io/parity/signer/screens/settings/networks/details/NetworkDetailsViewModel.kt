@@ -5,7 +5,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.UniffiResult
 
 
-class NetworkDetailsViewModel: ViewModel {
+class NetworkDetailsViewModel : ViewModel() {
 
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	suspend fun getNetworkDetails(networkKey: String): UniffiResult<NetworkDetailsModel> {
@@ -15,5 +15,15 @@ class NetworkDetailsViewModel: ViewModel {
 	suspend fun removeNetwork(networkKey: String): UniffiResult<Unit> {
 		return
 		//remove network and navigate to network list
+	}
+
+	suspend fun removeNetworkMetadata(
+		networkKey: String,
+		metadataSpecsVersion: String
+	): UniffiResult<Unit> {
+		return uniffiInteractor.removeMetadataManagedNetwork(
+			networkKey,
+			metadataSpecsVersion
+		)
 	}
 }

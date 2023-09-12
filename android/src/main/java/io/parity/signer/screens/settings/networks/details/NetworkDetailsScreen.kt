@@ -37,7 +37,8 @@ fun NetworkDetailsScreen(
     onBack: Callback,
     onMenu: Callback,
     onAddNetwork: Callback,
-    onRemoveMetadataCallback: (version: String) -> Unit,
+		onSignMetadata: (metadataSpecVersion: String) -> Unit,
+    onRemoveMetadataCallback: (metadataSpecVersion: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
@@ -145,13 +146,7 @@ fun NetworkDetailsScreen(
 						)
 						SignerDivider(sidePadding = 0.dp)
 						//sign metadata
-						Row(Modifier.clickable {
-							FakeNavigator().navigate(
-								Action.MANAGE_METADATA,
-								metadata.specsVersion
-							)
-							rootNavigator.navigate(Action.SIGN_METADATA)
-						}) {
+						Row(Modifier.clickable(onClick = {onSignMetadata(metadata.specsVersion)})) {
 							Text(
 								text = stringResource(R.string.network_details_metadata_sign_field_label),
 								style = SignerTypeface.BodyL,

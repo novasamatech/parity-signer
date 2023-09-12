@@ -44,17 +44,24 @@ fun NetworkDetailsSubgraph(
 	}
 
 	val menuController = rememberNavController()
-	val savedMetadataVersionAction = remember {
-		mutableStateOf("")
-	}
 
 	Box(modifier = Modifier.statusBarsPadding()) {
 		NetworkDetailsScreen(
 			model = model,
 			onBack = navController::popBackStack,
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
-			onRemoveMetadataCallback = { metadataVersion ->
-				savedMetadataVersionAction.value = metadataVersion
+			onSignMetadata = {metadataSpecVersion ->
+
+//					FakeNavigator().navigate(
+//						Action.MANAGE_METADATA,
+//						metadata.specsVersion
+//					)
+//					rootNavigator.navigate(Action.SIGN_METADATA)
+				//todo dmitry implement
+//				navstate.rs:830 it's Sign sufficient crypto
+			},
+			onRemoveMetadataCallback = { metadataSpecVersion ->
+				savedMetadataVersionAction.value = metadataSpecVersion
 				menuController.navigate(NetworkDetailsMenuSubgraph.metadataDeleteConfirm)
 			},
 			onAddNetwork = {
@@ -100,6 +107,7 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveMetadataBottomSheet(
 					onRemoveMetadata = {
+						vm.removeNetworkMetadata(networkKey, )
 						//todo dmitry implement
 //						FakeNavigator().navigate(
 //							Action.MANAGE_METADATA,
