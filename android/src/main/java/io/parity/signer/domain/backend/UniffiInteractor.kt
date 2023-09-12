@@ -3,12 +3,13 @@ package io.parity.signer.domain.backend
 import android.content.Context
 import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.VerifierDetailsModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toNetworkModel
+import io.parity.signer.domain.toVerifierDetailsModel
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
-import io.parity.signer.screens.settings.networks.list.NetworksListModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -277,6 +278,17 @@ class UniffiInteractor(val appContext: Context) {
 						networkKey,
 						metadataSpecsVersion
 					)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun getVerifierDetails(): UniffiResult<VerifierDetailsModel> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.getVerifierDetails().toVerifierDetailsModel()
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

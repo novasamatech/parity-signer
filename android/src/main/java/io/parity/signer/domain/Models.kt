@@ -306,7 +306,7 @@ data class VerifierDetailsModel(
 	}
 }
 
-fun MVerifierDetails.toVerifierDetailsModels() = VerifierDetailsModel(
+fun MVerifierDetails.toVerifierDetailsModel() = VerifierDetailsModel(
 	publicKey = publicKey,
 	identicon = identicon,
 	encryption = encryption,
