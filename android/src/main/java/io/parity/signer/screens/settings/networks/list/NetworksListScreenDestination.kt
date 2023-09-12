@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import io.parity.signer.domain.backend.mapError
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
+import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.runBlocking
 
@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 fun NavGraphBuilder.networkListDestination(
 	navController: NavController,
 ) {
-	composable(SettingsScreenSubgraph.networkList) {
+	composable(SettingsNavSubgraph.networkList) {
 		val vm: NetworkListViewModel = viewModel()
 
 		val model = remember {
@@ -29,7 +29,7 @@ fun NavGraphBuilder.networkListDestination(
 			onBack = navController::popBackStack,
 			onOpenNetwork = { networkKey ->
 				navController.navigate(
-					SettingsScreenSubgraph.NetworkDetails.destination(networkKey)
+					SettingsNavSubgraph.NetworkDetails.destination(networkKey)
 				)
 			},
 			onNetworkHelp = { navController.navigate(CoreUnlockedNavSubgraph.networkHelpers) },

@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
+import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
@@ -35,17 +35,17 @@ internal fun SettingsGeneralNavSubgraph(
 		SettingsScreenGeneralView(
 			navController = parentNavController,
 			onWipeData = { menuNavController.navigate(SettingsGeneralMenu.wipe_factory) },
-			onOpenLogs = { parentNavController.navigate(SettingsScreenSubgraph.logs) },
-			onShowTerms = { parentNavController.navigate(SettingsScreenSubgraph.terms) },
+			onOpenLogs = { parentNavController.navigate(SettingsNavSubgraph.logs) },
+			onShowTerms = { parentNavController.navigate(SettingsNavSubgraph.terms) },
 			onShowPrivacyPolicy = {
-				parentNavController.navigate(SettingsScreenSubgraph.privacyPolicy)
+				parentNavController.navigate(SettingsNavSubgraph.privacyPolicy)
 			},
-			onBackup = { parentNavController.navigate(SettingsScreenSubgraph.backup) },
+			onBackup = { parentNavController.navigate(SettingsNavSubgraph.backup) },
 			onManageNetworks = {
-				parentNavController.navigate(SettingsScreenSubgraph.networkList)
+				parentNavController.navigate(SettingsNavSubgraph.networkList)
 			},
 			onGeneralVerifier = {
-				parentNavController.navigate(SettingsScreenSubgraph.generalVerifier)
+				parentNavController.navigate(SettingsNavSubgraph.generalVerifier)
 			},
 			onExposedClicked = { menuNavController.navigate(SettingsGeneralMenu.exposed_shield_alert) },
 			isStrongBoxProtected = vm.isStrongBoxProtected,

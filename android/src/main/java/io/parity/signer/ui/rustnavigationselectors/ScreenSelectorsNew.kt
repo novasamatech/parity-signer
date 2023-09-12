@@ -2,7 +2,6 @@ package io.parity.signer.ui.rustnavigationselectors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.components.panels.CameraParentSingleton
@@ -11,10 +10,6 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysets.create.NewKeysetMenu
-import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
-import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
-import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme

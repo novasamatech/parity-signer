@@ -2,8 +2,7 @@ package io.parity.signer.screens.settings.logs
 
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
+import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.logs.comment.AddLogCommentScreen
 import io.parity.signer.screens.settings.logs.logdetails.LogDetailsScreen
 import io.parity.signer.screens.settings.logs.logslist.LogsScreenFull
@@ -12,7 +11,7 @@ fun NavGraphBuilder.logsNavigationSubgraph(
 	navController: NavController,
 ) {
 	navigation(
-		route = SettingsScreenSubgraph.logs,
+		route = SettingsNavSubgraph.logs,
 		startDestination = LogsSubgraph.home,
 	) {
 		composable(route = LogsSubgraph.home) {

@@ -17,7 +17,6 @@ import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
-import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -33,29 +32,29 @@ fun SettingsScreenSubgraph(
 	val navController = rememberNavController()
 	NavHost(
 		navController = navController,
-		startDestination = SettingsScreenSubgraph.home,
+		startDestination = SettingsNavSubgraph.home,
 	) {
 
-		composable(SettingsScreenSubgraph.home) {
+		composable(SettingsNavSubgraph.home) {
 			SettingsGeneralNavSubgraph(parentNavController = navController)
 		}
-		composable(SettingsScreenSubgraph.terms) {
+		composable(SettingsNavSubgraph.terms) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TosScreen(onBack = {
-					navController.popBackStack(SettingsScreenSubgraph.home, false)
+					navController.popBackStack(SettingsNavSubgraph.home, false)
 				})
 			}
 		}
-		composable(SettingsScreenSubgraph.privacyPolicy) {
+		composable(SettingsNavSubgraph.privacyPolicy) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				PpScreen(onBack = {
-					navController.popBackStack(SettingsScreenSubgraph.home, false)
+					navController.popBackStack(SettingsNavSubgraph.home, false)
 				})
 			}
 		}
-		composable(SettingsScreenSubgraph.backup) {
+		composable(SettingsNavSubgraph.backup) {
 			SeedBackupIntegratedScreen(navController) {
-				navController.popBackStack(SettingsScreenSubgraph.home, false)
+				navController.popBackStack(SettingsNavSubgraph.home, false)
 			}
 		}
 		logsNavigationSubgraph(
@@ -64,25 +63,35 @@ fun SettingsScreenSubgraph(
 		networkListDestination(navController)
 		verifierSettingsDestination(navController)
 		composable(
-			route = SettingsScreenSubgraph.NetworkDetails.route,
+			route = SettingsNavSubgraph.NetworkDetails.route,
 			arguments = listOf(
-				navArgument(SettingsScreenSubgraph.NetworkDetails.networkKey) {
+				navArgument(SettingsNavSubgraph.NetworkDetails.networkKey) {
 					type = NavType.StringType
 				}
 			),
 		) {
 			val networkKey =
-				it.arguments?.getString(SettingsScreenSubgraph.NetworkDetails.networkKey)!!
+				it.arguments?.getString(SettingsNavSubgraph.NetworkDetails.networkKey)!!
 			NetworkDetailsSubgraph(
 				networkKey,
-				rootNavigator,
 				navController,
 			)
+		}
+		composable(
+			route = SettingsNavSubgraph.NetworkDetails.route,
+		) {
+//		SignSufficientCrypto(
+//			screenData.f,
+//			sharedViewModel::signSufficientCrypto
+//		)
+// end of action here calling go forward and it's in navstate.rs:427
+//			todo dmitry handle password here on action
+//			io/parity/signer/domain/storage/TransactionOld.kt:8 ^^
 		}
 	}
 }
 
-internal object SettingsScreenSubgraph {
+internal object SettingsNavSubgraph {
 	const val home = "settings_home"
 	const val terms = "settings_terms_of_service"
 	const val privacyPolicy = "settings_privacy_polcy"
@@ -97,5 +106,6 @@ internal object SettingsScreenSubgraph {
 		const val route = "$baseRoute/{$networkKey}"
 		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
+	const val networkSignSufficientCrypto = "signsufficientcryptoggg"
 }
 

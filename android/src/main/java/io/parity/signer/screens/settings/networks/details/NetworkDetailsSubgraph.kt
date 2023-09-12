@@ -15,6 +15,8 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.backend.mapError
+import io.parity.signer.screens.settings.SettingsNavSubgraph
+import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetworkBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.NetworkDetailsMenuGeneral
@@ -27,9 +29,8 @@ import kotlinx.coroutines.runBlocking
 
 @Composable
 fun NetworkDetailsSubgraph(
-		networkKey: String,
-    rootNavigator: Navigator,
-		navController: NavController,
+	networkKey: String,
+	navController: NavController,
 ) {
 	//todo dmitry get this model like in
 	// ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:10
@@ -50,7 +51,7 @@ fun NetworkDetailsSubgraph(
 	Box(modifier = Modifier.statusBarsPadding()) {
 		NetworkDetailsScreen(
 			model = model,
-			onBack = { rootNavigator.backAction() },
+			onBack = navController::popBackStack,
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
 			onRemoveMetadataCallback = { metadataVersion ->
 				savedMetadataVersionAction.value = metadataVersion
@@ -74,9 +75,7 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
-						closeAction()
-						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
-						rootNavigator.navigate(Action.SIGN_NETWORK_SPECS)
+						navController.navigate(SettingsNavSubgraph.networkSignSufficientCrypto)
 					},
 					onDeleteClicked = {
 						menuController.navigate(NetworkDetailsMenuSubgraph.networkDeleteConfirm) {
@@ -91,9 +90,7 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveNetworkBottomSheet(
 					onRemoveNetwork = {
-						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
-						rootNavigator.navigate(Action.REMOVE_NETWORK)
-						closeAction()
+						vm.removeNetwork(networkKey)
 					},
 					onCancel = closeAction,
 				)
@@ -103,11 +100,14 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveMetadataBottomSheet(
 					onRemoveMetadata = {
-						FakeNavigator().navigate(
-							Action.MANAGE_METADATA,
-							savedMetadataVersionAction.value
-						)
-						rootNavigator.navigate(Action.REMOVE_METADATA)
+						//todo dmitry implement
+//						FakeNavigator().navigate(
+//							Action.MANAGE_METADATA,
+//							savedMetadataVersionAction.value
+//						)
+//						rootNavigator.navigate(Action.REMOVE_METADATA)
+						//remove metadata for managed network and stay in network details
+						//todo update network details model as well
 						closeAction()
 					},
 					onCancel = closeAction,

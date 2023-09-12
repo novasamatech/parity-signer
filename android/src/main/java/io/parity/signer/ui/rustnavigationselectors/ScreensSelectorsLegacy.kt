@@ -10,7 +10,7 @@ import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.storage.signSufficientCrypto
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.SelectSeedForBackup
-import io.parity.signer.screens.SignSufficientCrypto
+import io.parity.signer.screens.settings.networks.signnetworkcrypto.SignSufficientCrypto
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -30,10 +30,7 @@ fun ScreenSelector(
 			navigator,
 		)
 
-		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
-			screenData.f,
-			sharedViewModel::signSufficientCrypto
-		)
+		is ScreenData.SignSufficientCrypto -> {}
 
 		is ScreenData.KeyDetailsMulti -> {
 			//migrated, now part of KeySetDetails subgraph and old data used
@@ -74,9 +71,7 @@ fun ModalSelector(
 	sharedViewModel: SharedViewModel
 ) {
 		when (modalData) {
-			is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
-				modalData.f,
-			)
+			is ModalData.SufficientCryptoReady -> {}
 			is ModalData.NewSeedMenu -> {} //new bottom sheet
 			is ModalData.SeedMenu -> {} //migrated
 			is ModalData.NetworkSelector -> {

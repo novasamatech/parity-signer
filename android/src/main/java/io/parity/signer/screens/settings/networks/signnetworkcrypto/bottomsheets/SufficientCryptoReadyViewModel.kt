@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets.sufficientcrypto
+package io.parity.signer.screens.settings.networks.signnetworkcrypto.bottomsheets
 
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.dependencygraph.ServiceLocator
