@@ -13,6 +13,7 @@ enum NavigationButton {
     case xmark
     case more
     case plus
+    case settings
     case action(LocalizedStringKey)
     case activeAction(LocalizedStringKey, Binding<Bool>)
     case questionmark
@@ -110,6 +111,11 @@ struct NavigationBarView: View {
             NavbarButton(
                 action: button.action,
                 icon: Asset.moreDots.swiftUIImage
+            )
+        case .settings:
+            NavbarButton(
+                action: button.action,
+                icon: Asset.tabbarSettings.swiftUIImage
             )
         case .plus:
             NavbarButton(

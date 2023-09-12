@@ -11,7 +11,6 @@ import Foundation
 enum Tab: Equatable, Hashable {
     case keys
     case scanner
-    case settings
 }
 
 extension Tab {
@@ -21,8 +20,6 @@ extension Tab {
             return .navbarKeys
         case .scanner:
             return nil
-        case .settings:
-            return .navbarSettings
         }
     }
 }

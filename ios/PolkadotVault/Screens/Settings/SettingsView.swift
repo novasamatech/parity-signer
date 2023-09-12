@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationView {
@@ -18,7 +18,7 @@ struct SettingsView: View {
                     NavigationBarView(
                         viewModel: NavigationBarViewModel(
                             title: .title(Localizable.Settings.Label.title.string),
-                            leftButtons: [.init(type: .empty)],
+                            leftButtons: [.init(type: .xmark, action: { presentationMode.wrappedValue.dismiss() })],
                             rightButtons: [.init(type: .empty)],
                             backgroundColor: Asset.backgroundPrimary.swiftUIColor
                         )
@@ -47,9 +47,6 @@ struct SettingsView: View {
                 .navigationBarHidden(true)
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
-                    TabBarView(
-                        viewModel: viewModel.tabBarViewModel
-                    )
                 }
                 NavigationLink(
                     destination: detailView(viewModel.detailScreen)
@@ -60,7 +57,6 @@ struct SettingsView: View {
             .background(Asset.backgroundPrimary.swiftUIColor)
         }
         .onAppear {
-            viewModel.use(appState: appState)
             viewModel.loadData()
         }
         .fullScreenModal(isPresented: $viewModel.isPresentingWipeConfirmation) {
@@ -104,20 +100,12 @@ extension SettingsView {
         @Published var isPresentingWipeConfirmation = false
         @Published var isDetailsPresented = false
         @Published var detailScreen: SettingsItem?
-        private weak var appState: AppState!
         private let onboardingMediator: OnboardingMediator
-        let tabBarViewModel: TabBarView.ViewModel
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
-            tabBarViewModel: TabBarView.ViewModel
+            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
         ) {
             self.onboardingMediator = onboardingMediator
-            self.tabBarViewModel = tabBarViewModel
-        }
-
-        func use(appState: AppState) {
-            self.appState = appState
         }
 
         func loadData() {
@@ -172,7 +160,7 @@ struct SettingsViewRenderable: Equatable {
 #if DEBUG
     struct SettingsView_Previews: PreviewProvider {
         static var previews: some View {
-            SettingsView(viewModel: .init(tabBarViewModel: .mock))
+            SettingsView(viewModel: .init())
         }
     }
 #endif
