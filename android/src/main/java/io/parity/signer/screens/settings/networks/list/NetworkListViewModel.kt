@@ -5,7 +5,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.UniffiResult
 
 
-class NetworkListViewModel : ViewModel() {
+internal class NetworkListViewModel : ViewModel() {
 	private val uniffiInteractor = ServiceLocator.uniffiInteractor
 	suspend fun getNetworkList(): UniffiResult<NetworksListModel> {
 			return when (val result = uniffiInteractor.getAllNetworks()) {

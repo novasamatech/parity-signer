@@ -24,14 +24,27 @@ class ResetUseCase {
 	private val navigator = ServiceLocator.navigator
 	private val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
-	//todo as in SharevView model - remove from here?
 
 	//todo dmitry test
-	fun wipeToFactory(onAfterWide: Callback) {
+	fun wipeToFactoryWithAuth(onAfterWide: Callback) {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			databaseAssetsInteractor.wipe()
 			totalRefresh()
+			onAfterWide()
+		}
+	}
+
+	/**
+	 * Auth user and wipe Vault to state without general verifier certificate
+	 */
+	fun wipeNoGeneralCertWithAuth(onAfterWide: Callback) {
+		val authentication = ServiceLocator.authentication
+		authentication.authenticate(activity) {
+			databaseAssetsInteractor.wipe()
+			databaseAssetsInteractor.copyAsset("")
+			totalRefresh()
+			historyInitHistoryNoCert()
 			onAfterWide()
 		}
 	}
@@ -52,27 +65,6 @@ class ResetUseCase {
 		databaseAssetsInteractor.copyAsset("")
 		totalRefreshDbExist()
 		historyInitHistoryWithCert()
-	}
-
-	/**
-	 * Auth user and wipe Vault to state without general verifier certificate
-	 */
-	fun wipeToJailbreak() {
-		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			wipeDbNoCert()
-		}
-	}
-
-	/**
-	 * Init database with no general certificate
-	 * @throws UserNotAuthenticatedException
-	 */
-	private fun wipeDbNoCert() {
-		databaseAssetsInteractor.wipe()
-		databaseAssetsInteractor.copyAsset("")
-		totalRefresh()
-		historyInitHistoryNoCert()
 	}
 
 	/**

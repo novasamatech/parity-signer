@@ -13,6 +13,7 @@ import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
 import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
+import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -57,15 +58,7 @@ fun SettingsScreenSubgraph(
 			navController = navController,
 		)
 		networkListDestination(navController)
-
-		composable(SettingsScreenSubgraph.generalVerifier) {
-			//todo dmitry implement
-//			is ScreenData.VVerifier -> VerifierScreenFull(
-//			screenData.f.toVerifierDetailsModels(),
-//			sharedViewModel::wipeToJailbreak,
-//			rootNavigator,
-//			)
-		}
+		verifierSettingsDestination(navController)
 		composable(SettingsScreenSubgraph.NetworkDetails.route) {
 			//todo dmitry single network subgraph
 //		NetworkDetailsSubgraph(

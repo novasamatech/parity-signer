@@ -30,6 +30,6 @@ class SettingsGeneralViewModel: ViewModel() {
 	 * Auth user and wipe the Vault to initial state
 	 */
 	fun wipeToFactory(onAfterWipe: Callback) {
-		resetUseCase.wipeToFactory(onAfterWipe)
+		resetUseCase.wipeToFactoryWithAuth(onAfterWipe)
 	}
 }
