@@ -10,6 +10,8 @@ import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.domain.toVerifierDetailsModel
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.screens.keydetails.exportprivatekey.toPrivateKeyExportModel
+import io.parity.signer.screens.settings.networks.details.NetworkDetailsModel
+import io.parity.signer.screens.settings.networks.details.toNetworkDetailsModel
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -256,11 +258,11 @@ class UniffiInteractor(val appContext: Context) {
 
 	suspend fun getManagedNetworkDetails(
 		networkKey: String
-	): UniffiResult<MNetworkDetails> =
+	): UniffiResult<NetworkDetailsModel> =
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =
-					io.parity.signer.uniffi.getManagedNetworkDetails(networkKey)
+					io.parity.signer.uniffi.getManagedNetworkDetails(networkKey).toNetworkDetailsModel()
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

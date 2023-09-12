@@ -23,7 +23,6 @@ import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
 import io.parity.signer.screens.settings.SettingsScreenSubgraph
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
-import io.parity.signer.screens.settings.networks.helper.networkHelpersSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
 

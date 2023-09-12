@@ -34,7 +34,7 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun NetworkDetailsScreen(
     model: NetworkDetailsModel,
-    rootNavigator: Navigator,
+    onBack: Callback,
     onMenu: Callback,
     onAddNetwork: Callback,
     onRemoveMetadataCallback: (version: String) -> Unit,
@@ -42,7 +42,7 @@ fun NetworkDetailsScreen(
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = null,
-			onBack = { rootNavigator.backAction() },
+			onBack = onBack,
 			onMenu = onMenu,
 		)
 		Column(
@@ -287,7 +287,7 @@ private fun PreviewNetworkDetailsScreenSmall() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
 			onAddNetwork = { },
@@ -310,7 +310,7 @@ private fun PreviewNetworkDetailsScreen() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
 			onAddNetwork = { },

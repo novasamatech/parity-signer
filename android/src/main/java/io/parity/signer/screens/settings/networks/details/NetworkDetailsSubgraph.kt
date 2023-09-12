@@ -6,26 +6,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetworkBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.NetworkDetailsMenuGeneral
+import io.parity.signer.screens.settings.networks.list.NetworkListViewModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.Action
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun NetworkDetailsSubgraph(
-    model: NetworkDetailsModel,
+		networkKey: String,
     rootNavigator: Navigator,
+		navController: NavController,
 ) {
 	//todo dmitry get this model like in
 	// ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:10
+	val vm: NetworkDetailsViewModel = viewModel()
+
+	val model = remember {
+		runBlocking {
+			vm.getNetworkDetails(networkKey).mapError()!!
+			//todo dmitry post error
+		}
+	}
+
 	val menuController = rememberNavController()
 	val savedMetadataVersionAction = remember {
 		mutableStateOf("")
@@ -34,16 +50,14 @@ fun NetworkDetailsSubgraph(
 	Box(modifier = Modifier.statusBarsPadding()) {
 		NetworkDetailsScreen(
 			model = model,
-			rootNavigator = rootNavigator,
+			onBack = { rootNavigator.backAction() },
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
 			onRemoveMetadataCallback = { metadataVersion ->
 				savedMetadataVersionAction.value = metadataVersion
 				menuController.navigate(NetworkDetailsMenuSubgraph.metadataDeleteConfirm)
 			},
 			onAddNetwork = {
-				rootNavigator.backAction()
-				rootNavigator.backAction()
-				rootNavigator.navigate(Action.NAVBAR_SCAN)
+				navController.navigate(CoreUnlockedNavSubgraph.camera)
 			},
 		)
 	}

@@ -4,16 +4,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
 import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
+import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -33,7 +37,7 @@ fun SettingsScreenSubgraph(
 	) {
 
 		composable(SettingsScreenSubgraph.home) {
-			SettingsGeneralNavSubgraph(parentNavController = navController,)
+			SettingsGeneralNavSubgraph(parentNavController = navController)
 		}
 		composable(SettingsScreenSubgraph.terms) {
 			Box(modifier = Modifier.statusBarsPadding()) {
@@ -59,12 +63,21 @@ fun SettingsScreenSubgraph(
 		)
 		networkListDestination(navController)
 		verifierSettingsDestination(navController)
-		composable(SettingsScreenSubgraph.NetworkDetails.route) {
-			//todo dmitry single network subgraph
-//		NetworkDetailsSubgraph(
-//			screenData.f.toNetworkDetailsModel(),
-//			rootNavigator,
-//		)
+		composable(
+			route = SettingsScreenSubgraph.NetworkDetails.route,
+			arguments = listOf(
+				navArgument(SettingsScreenSubgraph.NetworkDetails.networkKey) {
+					type = NavType.StringType
+				}
+			),
+		) {
+			val networkKey =
+				it.arguments?.getString(SettingsScreenSubgraph.NetworkDetails.networkKey)!!
+			NetworkDetailsSubgraph(
+				networkKey,
+				rootNavigator,
+				navController,
+			)
 		}
 	}
 }
@@ -82,7 +95,7 @@ internal object SettingsScreenSubgraph {
 		internal const val networkKey = "network_key"
 		private const val baseRoute = "settings_network_details"
 		const val route = "$baseRoute/{$networkKey}"
-		fun destination(seedName: String) = "$baseRoute/${networkKey}"
+		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
 }
 
