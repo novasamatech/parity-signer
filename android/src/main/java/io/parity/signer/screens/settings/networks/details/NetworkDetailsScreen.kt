@@ -285,6 +285,7 @@ private fun PreviewNetworkDetailsScreenSmall() {
 			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}
@@ -308,6 +309,7 @@ private fun PreviewNetworkDetailsScreen() {
 			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}

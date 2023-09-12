@@ -3,27 +3,23 @@ package io.parity.signer.screens.settings.networks.details
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.FakeNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.settings.SettingsNavSubgraph
-import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetworkBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.NetworkDetailsMenuGeneral
-import io.parity.signer.screens.settings.networks.list.NetworkListViewModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
-import io.parity.signer.uniffi.Action
 import kotlinx.coroutines.runBlocking
 
 
@@ -50,7 +46,7 @@ fun NetworkDetailsSubgraph(
 			model = model,
 			onBack = navController::popBackStack,
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
-			onSignMetadata = {metadataSpecVersion ->
+			onSignMetadata = { metadataSpecVersion ->
 
 //					FakeNavigator().navigate(
 //						Action.MANAGE_METADATA,
@@ -61,8 +57,11 @@ fun NetworkDetailsSubgraph(
 //				navstate.rs:830 it's Sign sufficient crypto
 			},
 			onRemoveMetadataCallback = { metadataSpecVersion ->
-				savedMetadataVersionAction.value = metadataSpecVersion
-				menuController.navigate(NetworkDetailsMenuSubgraph.metadataDeleteConfirm)
+				menuController.navigate(
+					NetworkDetailsMenuSubgraph.MetadataDeleteConfirm.destination(
+						metadataSpecVersion
+					)
+				)
 			},
 			onAddNetwork = {
 				navController.navigate(CoreUnlockedNavSubgraph.camera)
@@ -103,11 +102,20 @@ fun NetworkDetailsSubgraph(
 				)
 			}
 		}
-		composable(NetworkDetailsMenuSubgraph.metadataDeleteConfirm) {
+		composable(
+			route = NetworkDetailsMenuSubgraph.MetadataDeleteConfirm.route,
+			arguments = listOf(
+				navArgument(NetworkDetailsMenuSubgraph.MetadataDeleteConfirm.metaSpecVersion) {
+					type = NavType.StringType
+				}
+			),
+		) {
+			val versionSpec =
+				it.arguments?.getString(NetworkDetailsMenuSubgraph.MetadataDeleteConfirm.metaSpecVersion)!!
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveMetadataBottomSheet(
 					onRemoveMetadata = {
-						vm.removeNetworkMetadata(networkKey, )
+						vm.removeNetworkMetadata(networkKey, versionSpec)
 						//todo dmitry implement
 //						FakeNavigator().navigate(
 //							Action.MANAGE_METADATA,
@@ -130,5 +138,11 @@ private object NetworkDetailsMenuSubgraph {
 	const val empty = "networkdetails_empty"
 	const val menu = "networkdetails_menu"
 	const val networkDeleteConfirm = "networkdetails_deleteConfirm"
-	const val metadataDeleteConfirm = "networkdetails_metadata_deleteConfirm"
+
+	object MetadataDeleteConfirm {
+		internal const val metaSpecVersion = "metaSpecVersion"
+		private const val baseRoute = "networkdetails_metadata_deleteConfirm"
+		const val route = "$baseRoute/{$metaSpecVersion}"
+		fun destination(metaSpecVersion: String) = "$baseRoute/${metaSpecVersion}"
+	}
 }
