@@ -29,11 +29,7 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Install Rust stable toolchain
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          override:           true
+        uses:                 dtolnay/rust-toolchain@stable
 
       - name:                 Install cargo-nextest
         uses:                 baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0

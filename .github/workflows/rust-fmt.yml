@@ -24,11 +24,7 @@ jobs:
           submodules:         'recursive'
 
       - name:                 Install Rust stable toolchain
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          override:           true
+        uses:                 dtolnay/rust-toolchain@stable
 
       - name:                 cargo fmt
         run:                  |
