@@ -18,10 +18,13 @@ struct KeyDetailsView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
+                        leftButtons: [
+                            .init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() }),
+                            .init(type: .settings, action: viewModel.onSettingsTap)
+                        ],
                         rightButtons: [
                             .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
-                            .init(type: .more, action: { viewModel.isShowingActionSheet.toggle() })
+                            .init(type: .more, action: viewModel.onMoreTap)
                         ]
                     )
                 )
@@ -193,6 +196,11 @@ struct KeyDetailsView: View {
                     .navigationViewStyle(StackNavigationViewStyle())
                     .navigationBarHidden(true)
             }
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingSettings
+        ) {
+            SettingsView(viewModel: .init())
         }
         .bottomSnackbar(
             viewModel.snackbarViewModel,

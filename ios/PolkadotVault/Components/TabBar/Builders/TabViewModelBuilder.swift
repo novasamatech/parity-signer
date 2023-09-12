@@ -30,14 +30,12 @@ final class TabViewModelBuilder {
 }
 
 private extension TabViewModelBuilder {
-    func icon(for tab: Tab, isSelected: Bool) -> Image {
+    func icon(for tab: Tab, isSelected _: Bool) -> Image {
         switch tab {
         case .keys:
             return Asset.tabbarKeys.swiftUIImage
         case .scanner:
             return Asset.tabbarScanner.swiftUIImage
-        case .settings:
-            return isSelected ? Asset.tabbarSettingsSelected.swiftUIImage : Asset.tabbarSettings.swiftUIImage
         }
     }
 
@@ -47,8 +45,6 @@ private extension TabViewModelBuilder {
             return Localizable.TabBar.keys.text
         case .scanner:
             return Localizable.TabBar.scanner.text
-        case .settings:
-            return Localizable.TabBar.settings.text
         }
     }
 }

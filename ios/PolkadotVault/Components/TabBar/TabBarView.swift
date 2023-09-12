@@ -24,10 +24,6 @@ struct TabBarView: View {
                 viewModel: viewModel.scannerTab,
                 onQRCodeTap: viewModel.onQRCodeTap
             )
-            TabBarButton(
-                viewModel: viewModel.settingsTab,
-                onTap: viewModel.onSettingsTap
-            )
         }
         .frame(height: Heights.tabbarHeight)
         .background(Asset.backgroundSecondary.swiftUIColor)
@@ -43,28 +39,23 @@ extension TabBarView {
     final class ViewModel: ObservableObject {
         let onQRCodeTap: () -> Void
         let onKeysTap: () -> Void
-        let onSettingsTap: () -> Void
         @Binding var selectedTab: Tab
         @Published var keysTab: TabViewModel!
         @Published var scannerTab: TabViewModel = TabViewModelBuilder().build(for: .scanner, isSelected: false)
-        @Published var settingsTab: TabViewModel!
 
         init(
             selectedTab: Binding<Tab>,
             onQRCodeTap: @escaping () -> Void,
-            onKeysTap: @escaping () -> Void,
-            onSettingsTap: @escaping () -> Void
+            onKeysTap: @escaping () -> Void
         ) {
             _selectedTab = selectedTab
             self.onQRCodeTap = onQRCodeTap
             self.onKeysTap = onKeysTap
-            self.onSettingsTap = onSettingsTap
             onTabChange(selectedTab.wrappedValue)
         }
 
         func onTabChange(_ tab: Tab) {
             keysTab = TabViewModelBuilder().build(for: .keys, isSelected: tab == .keys)
-            settingsTab = TabViewModelBuilder().build(for: .settings, isSelected: tab == .settings)
         }
     }
 }
@@ -149,7 +140,6 @@ extension TabBarView.ViewModel {
     static let mock = TabBarView.ViewModel(
         selectedTab: .constant(.keys),
         onQRCodeTap: {},
-        onKeysTap: {},
-        onSettingsTap: {}
+        onKeysTap: {}
     )
 }

@@ -48,11 +48,11 @@ extension KeyDetailsView {
         @Published var presentedPublicKeyDetails: String!
 
         @Published var isShowingKeysExportModal = false
-        // Network selection
         @Published var isPresentingNetworkSelection = false
         @Published var isPresentingKeySetSelection = false
         @Published var isShowingRecoverKeySet = false
         @Published var isShowingCreateKeySet = false
+        @Published var isPresentingSettings = false
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
@@ -282,6 +282,14 @@ extension KeyDetailsView.ViewModel {
 
     func onRootKeyTap() {
         isPresentingRootDetails = true
+    }
+
+    func onSettingsTap() {
+        isPresentingSettings = true
+    }
+
+    func onMoreTap() {
+        isShowingActionSheet = true
     }
 
     func onKeySetSelectionTap() {
