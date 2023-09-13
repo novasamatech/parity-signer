@@ -46,8 +46,9 @@ interface Navigator {
  */
 class SignerNavigator() : Navigator {
 
-	private val appContext: Context = ServiceLocator.appContext
-	private val activity = ServiceLocator.activityScope?.activity
+	private val appContext: Context get() = ServiceLocator.appContext
+	private val activity get() = ServiceLocator.activityScope?.activity
+
 	private val _actionResult = MutableStateFlow<ActionResult?>(
 		null
 	)
