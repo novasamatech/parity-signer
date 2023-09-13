@@ -51,15 +51,12 @@ fun NetworkDetailsSubgraph(
 			onBack = navController::popBackStack,
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
 			onSignMetadata = { metadataSpecVersion ->
-
-//					FakeNavigator().navigate(
-//						Action.MANAGE_METADATA,
-//						metadata.specsVersion
-//					)
-//					rootNavigator.navigate(Action.SIGN_METADATA)
-				//todo dmitry implement
-//				as SignSufficientCryptoInteractor done
-//				navstate.rs:830 it's Sign sufficient crypto
+				navController.navigate(
+					SettingsNavSubgraph.SignMetadataSufficientCrypto.destination(
+						networkKey,
+						metadataSpecVersion
+					)
+				)
 			},
 			onRemoveMetadataCallback = { metadataSpecVersion ->
 				menuController.navigate(
@@ -86,11 +83,11 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
-						//todo dmitry parse it again
-//						closeAction()
-//						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
-//						rootNavigator.navigate(Action.SIGN_NETWORK_SPECS)
-						navController.navigate(SettingsNavSubgraph.signSufficientCrypto)
+						navController.navigate(
+							SettingsNavSubgraph.SignNetworkSufficientCrypto.destination(
+								networkKey,
+							)
+						)
 					},
 					onDeleteClicked = {
 						menuController.navigate(NetworkDetailsMenuSubgraph.networkDeleteConfirm) {
@@ -111,6 +108,7 @@ fun NetworkDetailsSubgraph(
 								is UniffiResult.Error -> {
 									//todo dmitry show error
 								}
+
 								is UniffiResult.Success -> {
 									navController.popBackStack()
 								}
@@ -141,6 +139,7 @@ fun NetworkDetailsSubgraph(
 								is UniffiResult.Error -> {
 									//todo dmitry show error
 								}
+
 								is UniffiResult.Success -> {
 									//todo update network details model as well
 									navController.popBackStack()

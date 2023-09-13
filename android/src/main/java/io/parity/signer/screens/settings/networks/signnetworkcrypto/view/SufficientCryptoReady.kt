@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.screens.settings.networks.signnetworkcrypto.bottomsheets.SufficientCryptoReadyViewModel
+import io.parity.signer.screens.settings.networks.signnetworkcrypto.view.SufficientCryptoReadyViewModel
 import io.parity.signer.components.*
 import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.intoImageBitmap

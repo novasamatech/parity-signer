@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings.networks.signnetworkcrypto
+package io.parity.signer.screens.settings.networks.signnetworkcrypto.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.components.KeyCardOld
-import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MSignSufficientCrypto
 

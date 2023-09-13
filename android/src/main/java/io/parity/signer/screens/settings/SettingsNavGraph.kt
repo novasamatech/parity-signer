@@ -16,6 +16,7 @@ import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
+import io.parity.signer.screens.settings.networks.signnetworkcrypto.sufficientCryptoDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
@@ -74,17 +75,7 @@ fun NavGraphBuilder.settingsFullSubgraph(
 				navController,
 			)
 		}
-		composable(
-			route = SettingsNavSubgraph.signSufficientCrypto,
-		) {
-//		SignSufficientCrypto(
-//			screenData.f,
-//			sharedViewModel::signSufficientCrypto
-//		)
-// end of action here calling go forward and it's in navstate.rs:427
-//			todo dmitry handle password here on action
-//			io/parity/signer/domain/storage/TransactionOld.kt:8 ^^
-		}
+		sufficientCryptoDestination(navController)
 	}
 }
 
@@ -103,6 +94,20 @@ internal object SettingsNavSubgraph {
 		const val route = "$baseRoute/{$networkKey}"
 		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
-	const val signSufficientCrypto = "signsufficientcrypto"
+
+	object SignNetworkSufficientCrypto {
+		internal const val networkKey = "network_key"
+		private const val baseRoute = "settings_network_sufficient_crypto"
+		const val route = "$baseRoute/{$networkKey}"
+		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
+	}
+
+	object SignMetadataSufficientCrypto {
+		internal const val networkKey = "network_key"
+		internal const val metadataSpecVer = "spec_ver"
+		private const val baseRoute = "settings_metadata_sufficient_crypto"
+		const val route = "$baseRoute/{$networkKey}/{$metadataSpecVer}"
+		fun destination(networkKey: String, metadataSpecVer: String) = "$baseRoute/${networkKey}/${metadataSpecVer}"
+	}
 }
 
