@@ -58,6 +58,7 @@ fun NetworkDetailsSubgraph(
 //					)
 //					rootNavigator.navigate(Action.SIGN_METADATA)
 				//todo dmitry implement
+//				as SignSufficientCryptoInteractor done
 //				navstate.rs:830 it's Sign sufficient crypto
 			},
 			onRemoveMetadataCallback = { metadataSpecVersion ->
@@ -86,6 +87,9 @@ fun NetworkDetailsSubgraph(
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
 						//todo dmitry parse it again
+//						closeAction()
+//						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
+//						rootNavigator.navigate(Action.SIGN_NETWORK_SPECS)
 						navController.navigate(SettingsNavSubgraph.networkSignSufficientCrypto)
 					},
 					onDeleteClicked = {
