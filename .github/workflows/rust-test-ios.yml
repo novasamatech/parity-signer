@@ -28,14 +28,10 @@ jobs:
           brew install opencv
 
       - name:                 Install Rust stable toolchain
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          override:           true
+        uses:                 dtolnay/rust-toolchain@stable
 
       - name:                 Install cargo-nextest
-        uses:                 baptiste0928/cargo-install@30f432979e99f3ea66a8fa2eede53c07063995d8 # v2.1.0
+        uses:                 baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0
         with:
           crate:              cargo-nextest
           version:            0.9
@@ -48,7 +44,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:                 Swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           workspaces:         rust -> rust/target
 

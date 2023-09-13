@@ -130,17 +130,14 @@ extension EnterBananaSplitPasswordView {
         private var seedPhrase = ""
         private var cancelBag = CancelBag()
         private let seedsMediator: SeedsMediating
-        private let service: BananaSplitRecoveryService
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         init(
-            service: BananaSplitRecoveryService = BananaSplitRecoveryService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             qrCodeData: Binding<[String]>,
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
-            self.service = service
             self.seedsMediator = seedsMediator
             self.onCompletion = onCompletion
             _isPresented = isPresented

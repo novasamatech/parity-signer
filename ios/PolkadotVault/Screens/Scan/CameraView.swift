@@ -404,8 +404,7 @@ extension CameraView {
             switch completionAction {
             case let .createKeySet(seedName):
                 message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
-            case let .recoveredKeySet(seedName),
-                 let .bananaSplitRecovery(seedName):
+            case let .recoveredKeySet(seedName):
                 message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
             }
             snackbarViewModel = .init(

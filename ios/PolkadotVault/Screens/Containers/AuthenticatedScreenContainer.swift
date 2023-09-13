@@ -16,12 +16,7 @@ struct AuthenticatedScreenContainer: View {
 
     var body: some View {
         ZStack {
-            if viewModel.selectedTab == .keys {
-                KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
-            }
-            if viewModel.selectedTab == .settings {
-                SettingsView(viewModel: .init(tabBarViewModel: tabBarViewModel()))
-            }
+            KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
         }
         .animation(.default, value: AnimationDuration.standard)
         .fullScreenModal(
@@ -52,8 +47,7 @@ struct AuthenticatedScreenContainer: View {
         .init(
             selectedTab: $viewModel.selectedTab,
             onQRCodeTap: viewModel.onQRCodeTap,
-            onKeysTap: viewModel.onKeysTap,
-            onSettingsTap: viewModel.onSettingsTap
+            onKeysTap: viewModel.onKeysTap
         )
     }
 }
@@ -75,10 +69,6 @@ extension AuthenticatedScreenContainer {
 
         func onKeysTap() {
             selectedTab = .keys
-        }
-
-        func onSettingsTap() {
-            selectedTab = .settings
         }
 
         func onQRScannerDismiss() {

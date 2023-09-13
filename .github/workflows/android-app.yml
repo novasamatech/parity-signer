@@ -29,11 +29,7 @@ jobs:
           sudo apt-get install -y clang libclang-dev libopencv-dev
 
       - name:           Install Rust stable toolchain
-        uses:           actions-rs/toolchain@v1
-        with:
-          profile:      minimal
-          toolchain:    stable
-          override:     true
+        uses:           dtolnay/rust-toolchain@stable
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -55,7 +51,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:           Swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           workspaces:   rust -> rust/target
 
@@ -96,11 +92,7 @@ jobs:
           sudo apt-get install -y clang libclang-dev libopencv-dev
 
       - name:           Install Rust stable toolchain
-        uses:           actions-rs/toolchain@v1
-        with:
-          profile:      minimal
-          toolchain:    stable
-          override:     true
+        uses:           dtolnay/rust-toolchain@stable
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -122,7 +114,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:           Swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           workspaces:   rust -> rust/target
 

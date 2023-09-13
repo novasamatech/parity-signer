@@ -586,8 +586,6 @@
 "CreateKeysForNetwork.Label.Header.Create" = "Choose networks for the keys to be created";
 "CreateKeysForNetwork.Label.Title.Recover" = "Recover Keys";
 "CreateKeysForNetwork.Label.Header.Recover" = "Choose networks for the keys to be recovered";
-"CreateKeysForNetwork.Label.Title.BananaSplit" = "Recover Keys";
-"CreateKeysForNetwork.Label.Header.BananaSplit" = "Choose networks for the keys to be recovered";
 "CreateKeysForNetwork.Label.Footer" = "Please note that keys with custom named derivation path name can be created from the key set screen separately.";
 "CreateKeysForNetwork.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
 "CreateKeysForNetwork.Action.SelectAll" = "Select All";
@@ -627,3 +625,9 @@
 "AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
 "AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
 "AddDerivedKeys.Modal.Action.Cancel" = "Cancel";
+
+"ManageKeySets.Label.Header" = "Key Sets";
+"ManageKeySets.Label.DerivedKeys.single" = "%@ Key";
+"ManageKeySets.Label.DerivedKeys.plural" = "%@ Keys";
+"ManageKeySets.Action.Add" = "Add new Key Set";
+"ManageKeySets.Action.Recover" = "Recover Key Set";

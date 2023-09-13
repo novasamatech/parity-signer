@@ -46,12 +46,6 @@ struct KeySetList: View {
                 VStack {
                     VStack(spacing: 0) {
                         ConnectivityAlertOverlay(viewModel: .init())
-                        PrimaryButton(
-                            action: viewModel.onAddKeySetTap,
-                            text: Localizable.KeySets.Action.add.key
-                        )
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.large)
                     }
                     TabBarView(
                         viewModel: viewModel.tabBarViewModel
@@ -74,43 +68,6 @@ struct KeySetList: View {
             guard !viewModel.isShowingDetails else { return }
             viewModel.updateData()
         })
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingNewSeedMenu,
-            onDismiss: viewModel.onNewSeedMenuDismiss
-        ) {
-            AddKeySetModal(
-                isShowingNewSeedMenu: $viewModel.isShowingNewSeedMenu,
-                shouldShowCreateKeySet: $viewModel.shouldShowCreateKeySet,
-                shouldShowRecoverKeySet: $viewModel.shouldShowRecoverKeySet
-            )
-            .clearModalBackground()
-        }
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingCreateKeySet,
-            onDismiss: viewModel.updateData
-        ) {
-            EnterKeySetNameView(
-                viewModel: .init(
-                    isPresented: $viewModel.isShowingCreateKeySet,
-                    onCompletion: viewModel.onKeySetAddCompletion(_:)
-                )
-            )
-        }
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingRecoverKeySet,
-            onDismiss: viewModel.updateData
-        ) {
-            RecoverKeySetNameView(
-                viewModel: .init(
-                    isPresented: $viewModel.isShowingRecoverKeySet,
-                    onCompletion: viewModel.onKeySetAddCompletion(_:)
-                )
-            )
-        }
-        .bottomSnackbar(
-            viewModel.snackbarViewModel,
-            isPresented: $viewModel.isSnackbarPresented
-        )
     }
 
     func keyList(listModel: KeySetListViewModel) -> some View {
@@ -148,21 +105,13 @@ extension KeySetList {
         private let modelBuilder: KeySetListViewModelBuilder
         private let keyDetailsService: KeyDetailsService
         let tabBarViewModel: TabBarView.ViewModel
-        var snackbarViewModel: SnackbarViewModel = .init(title: "")
         private weak var appState: AppState!
         @Published var dataModel: MSeeds?
         @Published var listViewModel: KeySetListViewModel?
         @Published var detailsToPresent: MKeysNew?
         @Published var detailsKeyName: String = ""
 
-        @Published var isShowingRecoverKeySet = false
-
-        @Published var isSnackbarPresented: Bool = false
         @Published var isShowingKeyDetails = false
-        @Published var isShowingNewSeedMenu = false
-        @Published var isShowingCreateKeySet = false
-        @Published var shouldShowCreateKeySet = false
-        @Published var shouldShowRecoverKeySet = false
         @Published var isShowingDetails = false
 
         init(
@@ -203,27 +152,8 @@ extension KeySetList {
             }
         }
 
-        func loadKeysInformation(
-            for seedName: String,
-            _ completion: @escaping (Result<MKeysNew, ServiceError>) -> Void
-        ) {
-            keyDetailsService.getKeys(for: seedName, completion)
-        }
-
-        func onKeyDetailsCompletion(_ completionAction: KeyDetailsView.OnCompletionAction) {
-            switch completionAction {
-            case .keySetDeleted:
-                updateData()
-                snackbarViewModel = .init(
-                    title: Localizable.KeySetsModal.Confirmation.snackbar.string,
-                    style: .warning
-                )
-                isSnackbarPresented = true
-            }
-        }
-
         func onKeyTap(_ viewModel: KeySetViewModel) {
-            loadKeysInformation(for: viewModel.keyName) { result in
+            keyDetailsService.getKeys(for: viewModel.keyName) { result in
                 switch result {
                 case let .success(keysData):
                     self.detailsToPresent = keysData
@@ -239,47 +169,8 @@ extension KeySetList {
         func keyDetails() -> KeyDetailsView.ViewModel {
             .init(
                 keyName: detailsKeyName,
-                keysData: detailsToPresent,
-                onCompletion: onKeyDetailsCompletion(_:)
+                keysData: detailsToPresent
             )
-        }
-
-        func onNewSeedMenuDismiss() {
-            // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
-            DispatchQueue.main.async {
-                if self.shouldShowCreateKeySet {
-                    self.shouldShowCreateKeySet = false
-                    self.isShowingCreateKeySet = true
-                }
-                if self.shouldShowRecoverKeySet {
-                    self.shouldShowRecoverKeySet = false
-                    self.isShowingRecoverKeySet = true
-                }
-                if self.shouldShowRecoverKeySet {
-                    self.shouldShowRecoverKeySet = false
-                    self.isShowingRecoverKeySet = true
-                }
-            }
-        }
-
-        func onAddKeySetTap() {
-            isShowingNewSeedMenu = true
-        }
-
-        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
-            let message: String
-            switch completionAction {
-            case let .createKeySet(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
-            case let .recoveredKeySet(seedName),
-                 let .bananaSplitRecovery(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
-            }
-            snackbarViewModel = .init(
-                title: message,
-                style: .info
-            )
-            isSnackbarPresented = true
         }
     }
 }

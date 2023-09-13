@@ -5,7 +5,7 @@ on:
 
 jobs:
   distribute_testflight:
-    if: contains('["krodak","prybalko", "montekki"]', github.actor)
+    if: contains('["krodak","prybalko"]', github.actor)
     runs-on:                  macos-13
     name:                     Distribute TestFlight Build
 
@@ -40,23 +40,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name:                 Install Rust aarch64-apple-ios target
-        uses:                 actions-rs/toolchain@v1.0.7
+      - name:                 Install Rust targets
+        uses:                 dtolnay/rust-toolchain@stable
         with:
-          profile:            minimal
-          toolchain:          stable
-          target:             aarch64-apple-ios
+          targets:            x86_64-apple-ios,aarch64-apple-ios
           components:         rust-std
-          override:           true
-
-      - name:                 Install Rust x86_64-apple-ios target
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          target:             x86_64-apple-ios
-          components:         rust-std
-          override:           true
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -66,7 +54,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:                 Swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           workspaces:         rust -> rust/target
 
