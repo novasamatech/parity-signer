@@ -85,6 +85,7 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
+						//todo dmitry parse it again
 						navController.navigate(SettingsNavSubgraph.networkSignSufficientCrypto)
 					},
 					onDeleteClicked = {
@@ -111,6 +112,7 @@ fun NetworkDetailsSubgraph(
 								}
 							}
 						}
+						closeAction()
 					},
 					onCancel = closeAction,
 				)
@@ -129,15 +131,18 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveMetadataBottomSheet(
 					onRemoveMetadata = {
-						vm.removeNetworkMetadata(networkKey, versionSpec)
-						//todo dmitry implement
-//						FakeNavigator().navigate(
-//							Action.MANAGE_METADATA,
-//							savedMetadataVersionAction.value
-//						)
-//						rootNavigator.navigate(Action.REMOVE_METADATA)
-						//remove metadata for managed network and stay in network details
-						//todo update network details model as well
+						coroutineScope.launch {
+							val result = vm.removeNetworkMetadata(networkKey, versionSpec))
+							when (result) {
+								is UniffiResult.Error -> {
+									//todo dmitry show error
+								}
+								is UniffiResult.Success -> {
+									//todo update network details model as well
+									navController.popBackStack()
+								}
+							}
+						}
 						closeAction()
 					},
 					onCancel = closeAction,
