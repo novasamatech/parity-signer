@@ -286,6 +286,21 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
+	suspend fun removeManagedNetwork(
+		networkKey: String,
+	): UniffiResult<Unit> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.removeManagedNetwork(
+						networkKey,
+					)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 	suspend fun getVerifierDetails(): UniffiResult<VerifierDetailsModel> =
 		withContext(Dispatchers.IO) {
 			try {

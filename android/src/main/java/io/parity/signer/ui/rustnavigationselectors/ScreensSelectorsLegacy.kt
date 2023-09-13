@@ -7,7 +7,6 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.screens.legacy.SelectSeedForBackup
 import io.parity.signer.ui.theme.SignerOldTheme
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
@@ -22,10 +21,7 @@ fun ScreenSelector(
 ) {
 
 	when (screenData) {
-		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
-			screenData.f,
-			navigator,
-		)
+		is ScreenData.SelectSeedForBackup -> {}
 
 		is ScreenData.SignSufficientCrypto -> {}
 

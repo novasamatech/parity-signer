@@ -13,8 +13,7 @@ class NetworkDetailsViewModel : ViewModel() {
 	}
 
 	suspend fun removeNetwork(networkKey: String): UniffiResult<Unit> {
-		return
-		//remove network and navigate to network list
+		return uniffiInteractor.removeManagedNetwork(networkKey)
 	}
 
 	suspend fun removeNetworkMetadata(

@@ -136,7 +136,7 @@ fun NetworkDetailsSubgraph(
 				ConfirmRemoveMetadataBottomSheet(
 					onRemoveMetadata = {
 						coroutineScope.launch {
-							val result = vm.removeNetworkMetadata(networkKey, versionSpec))
+							val result = vm.removeNetworkMetadata(networkKey, versionSpec)
 							when (result) {
 								is UniffiResult.Error -> {
 									//todo dmitry show error

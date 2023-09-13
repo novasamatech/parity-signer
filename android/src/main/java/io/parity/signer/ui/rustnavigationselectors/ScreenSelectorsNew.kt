@@ -100,10 +100,7 @@ fun BottomSheetSelector(
 
 			is ModalData.LogRight -> {} // moved to settings flow, not part of global state machine now
 			is ModalData.EnterPassword ->
-				//todo dmitry check where it should be used - remove from here when navigation not used
-				//it's in signsufficient Crypto and transaction, as well as export qr code
-				//navstate.rs:365
-				//navstate.rs:473
+
 				BottomSheetWrapperRoot(onClosedAction = {
 					navigator.backAction()
 				}) {
