@@ -90,7 +90,7 @@ fun NetworkDetailsSubgraph(
 //						closeAction()
 //						FakeNavigator().navigate(Action.RIGHT_BUTTON_ACTION)
 //						rootNavigator.navigate(Action.SIGN_NETWORK_SPECS)
-						navController.navigate(SettingsNavSubgraph.networkSignSufficientCrypto)
+						navController.navigate(SettingsNavSubgraph.signSufficientCrypto)
 					},
 					onDeleteClicked = {
 						menuController.navigate(NetworkDetailsMenuSubgraph.networkDeleteConfirm) {

@@ -21,7 +21,7 @@ import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.SettingsScreenSubgraph
+import io.parity.signer.screens.settings.settingsFullSubgraph
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
@@ -144,11 +144,9 @@ fun CoreUnlockedNavSubgraph(
 				}
 			)
 		}
-		composable(CoreUnlockedNavSubgraph.settings) {
-			SettingsScreenSubgraph(
-				coreNavController = navController,
+			settingsFullSubgraph(
+				navController = navController,
 			)
-		}
 		networkHelpersCoreSubgraph(
 			navController = navController,
 		)

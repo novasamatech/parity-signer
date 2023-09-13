@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import io.parity.signer.components.documents.PpScreen
 import io.parity.signer.components.documents.TosScreen
 import io.parity.signer.screens.settings.backup.SeedBackupIntegratedScreen
@@ -17,21 +17,18 @@ import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
  * and history should be here. This is final point in navigation:
  * all subsequent interactions should be in modals or drop-down menus
  */
-@Composable
-fun SettingsScreenSubgraph(
-	coreNavController: NavController,
+fun NavGraphBuilder.settingsFullSubgraph(
+	navController: NavController,
 ) {
-// todo dmitry like
-//	io/parity/signer/screens/settings/networks/list/NetworksListSubgraphOld.kt:14
-	val navController = rememberNavController()
-	NavHost(
-		navController = navController,
+	navigation(
+		route = CoreUnlockedNavSubgraph.settings,
 		startDestination = SettingsNavSubgraph.home,
 	) {
 
@@ -78,7 +75,7 @@ fun SettingsScreenSubgraph(
 			)
 		}
 		composable(
-			route = SettingsNavSubgraph.NetworkDetails.route,
+			route = SettingsNavSubgraph.signSufficientCrypto,
 		) {
 //		SignSufficientCrypto(
 //			screenData.f,
@@ -106,6 +103,6 @@ internal object SettingsNavSubgraph {
 		const val route = "$baseRoute/{$networkKey}"
 		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
-	const val networkSignSufficientCrypto = "signsufficientcryptoggg"
+	const val signSufficientCrypto = "signsufficientcrypto"
 }
 
