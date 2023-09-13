@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
@@ -20,6 +22,7 @@ import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetw
 import io.parity.signer.screens.settings.networks.details.menu.NetworkDetailsMenuGeneral
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -39,6 +42,7 @@ fun NetworkDetailsSubgraph(
 		}
 	}
 
+	val coroutineScope = rememberCoroutineScope()
 	val menuController = rememberNavController()
 
 	Box(modifier = Modifier.statusBarsPadding()) {
@@ -96,7 +100,17 @@ fun NetworkDetailsSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmRemoveNetworkBottomSheet(
 					onRemoveNetwork = {
-						vm.removeNetwork(networkKey)
+						coroutineScope.launch {
+							val result = vm.removeNetwork(networkKey)
+							when (result) {
+								is UniffiResult.Error -> {
+									//todo dmitry show error
+								}
+								is UniffiResult.Success -> {
+									navController.popBackStack()
+								}
+							}
+						}
 					},
 					onCancel = closeAction,
 				)
