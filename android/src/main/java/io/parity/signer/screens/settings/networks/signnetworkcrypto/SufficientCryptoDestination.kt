@@ -4,7 +4,9 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.verifiercert.VerifierCertViewModel
@@ -30,40 +32,48 @@ fun NavGraphBuilder.sufficientCryptoDestination(
 //			io/parity/signer/domain/storage/TransactionOld.kt:8 ^^
 
 
-	composable(route = SettingsNavSubgraph.SignNetworkSufficientCrypto.route) {
-//		val vm: NetworkListViewModel = viewModel()
-//
-//		val model = remember {
-//			runBlocking {
-//				vm.getNetworkList().mapError()!!
-//				//todo dmitry post error
-//			}
-//		}
-
-		//		SignSufficientCrypto(
-//			screenData.f,
-//			sharedViewModel::signSufficientCrypto
-//		)
-	}
-	composable(SettingsNavSubgraph.SignMetadataSufficientCrypto.route) {
-		val vm: VerifierCertViewModel = viewModel()
-
+	composable(
+		route = SettingsNavSubgraph.SignNetworkSufficientCrypto.route,
+		arguments = listOf(
+			navArgument(SettingsNavSubgraph.SignNetworkSufficientCrypto.networkKey) {
+				type = NavType.StringType
+			}
+		)
+	) {
+		val networkKey =
+			it.arguments?.getString(SettingsNavSubgraph.SignNetworkSufficientCrypto.networkKey)!!
+		val vm: SignSufficientCryptoViewModel = viewModel()
 		val model = remember {
 			runBlocking {
-				vm.getVerifierCertModel().mapError()!!
+				vm.getNetworkModel(networkKey)!!
 				//todo dmitry post error
 			}
 		}
-		VerifierScreenFull(
-			verifierDetails = model,
-			wipe = {
-				vm.wipeWithGeneralCertificate {
-					navController.navigate(
-						CoreUnlockedNavSubgraph.keySetList
-					)
-				}
+		SignSufficientCryptoFull(model)
+	}
+	composable(
+		route = SettingsNavSubgraph.SignMetadataSufficientCrypto.route,
+		arguments = listOf(
+			navArgument(SettingsNavSubgraph.SignMetadataSufficientCrypto.networkKey) {
+				type = NavType.StringType
 			},
-			onBack = navController::popBackStack,
+			navArgument(SettingsNavSubgraph.SignMetadataSufficientCrypto.metadataSpecVer) {
+				type = NavType.StringType
+			},
 		)
+		) {
+		val networkKey =
+			it.arguments?.getString(SettingsNavSubgraph.SignMetadataSufficientCrypto.networkKey)!!
+		val metadataSpecVer =
+			it.arguments?.getString(SettingsNavSubgraph.SignMetadataSufficientCrypto.metadataSpecVer)!!
+
+		val vm: SignSufficientCryptoViewModel = viewModel()
+		val model = remember {
+			runBlocking {
+				vm.getMetadataModel(networkKey, metadataSpecVer)!!
+				//todo dmitry post error
+			}
+		}
+		SignSufficientCryptoFull(model)
 	}
 }

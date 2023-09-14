@@ -12,11 +12,11 @@ import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
 @Composable
-fun SignSufficientCrypto(
-	sc: MSignSufficientCrypto,
+internal fun SignSufficientCryptoScreen(
+	model: MSignSufficientCrypto,
 	signSufficientCrypto: (seedName: String, addressKey: String) -> Unit
 ) {
-	val identities = sc.identities
+	val identities = model.identities
 	Column {
 		Text("Select key for signing")
 		LazyColumn {
