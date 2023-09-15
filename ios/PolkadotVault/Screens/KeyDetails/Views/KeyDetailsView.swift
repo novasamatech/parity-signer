@@ -12,41 +12,45 @@ struct KeyDetailsView: View {
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                // Navigation bar
-                NavigationBarView(
-                    viewModel: .init(
-                        leftButtons: [
-                            .init(type: .settings, action: viewModel.onSettingsTap)
-                        ],
-                        rightButtons: [
-                            .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
-                            .init(type: .more, action: viewModel.onMoreTap)
-                        ]
+        NavigationView {
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    // Navigation bar
+                    NavigationBarView(
+                        viewModel: .init(
+                            leftButtons: [
+                                .init(type: .settings, action: viewModel.onSettingsTap)
+                            ],
+                            rightButtons: [
+                                .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
+                                .init(type: .more, action: viewModel.onMoreTap)
+                            ]
+                        )
                     )
-                )
-                switch viewModel.viewState {
-                case .list:
-                    derivedKeysList()
-                case .emptyState:
-                    rootKeyHeader()
+                    switch viewModel.viewState {
+                    case .list:
+                        derivedKeysList()
+                    case .emptyState:
+                        rootKeyHeader()
+                        Spacer()
+                        emptyState()
+                        Spacer()
+                    }
+                }
+
+                VStack(spacing: 0) {
+                    ConnectivityAlertOverlay(viewModel: .init())
+                }
+                HStack(alignment: .center) {
                     Spacer()
-                    emptyState()
+                    QRCodeButton(action: viewModel.onQRScannerTap)
                     Spacer()
                 }
             }
-            .navigationBarHidden(true)
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            VStack(spacing: 0) {
-                ConnectivityAlertOverlay(viewModel: .init())
-            }
-            HStack(alignment: .center) {
-                Spacer()
-                QRCodeButton(action: viewModel.onQRScannerTap)
-                Spacer()
-            }
         }
+        .navigationBarHidden(true)
+        .navigationViewStyle(.stack)
+        .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
