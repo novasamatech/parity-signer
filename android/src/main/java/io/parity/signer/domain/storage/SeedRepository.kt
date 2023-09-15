@@ -4,7 +4,6 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
-import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.Navigator
@@ -76,10 +75,10 @@ class SeedRepository(
 	/**
 	 * Force ask for authentication and get seed phrase
 	 */
-	suspend fun getSeedPhraseForceAuth(seed: String): RepoResult<String> {
+	suspend fun getSeedPhraseForceAuth(seedName: String): RepoResult<String> {
 		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
-				getSeedPhrasesDangerous(listOf(seed))
+				getSeedPhrasesDangerous(listOf(seedName))
 			}
 
 			AuthResult.AuthError,

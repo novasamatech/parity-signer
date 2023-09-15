@@ -71,12 +71,12 @@ class SignSufficientCryptoInteractor {
 	}
 
 	suspend fun attemptSigning(
-		keyRecord: MRawKey,
+		addressKey: String,
 		seedPhrase: String
 	): ActionResult? {
 		return navigate(
 			Action.GO_FORWARD,
-			keyRecord.addressKey,
+			addressKey,
 			seedPhrase,
 		).mapError()
 	}

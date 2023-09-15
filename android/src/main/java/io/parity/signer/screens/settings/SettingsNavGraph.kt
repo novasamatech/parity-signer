@@ -1,7 +1,6 @@
 package io.parity.signer.screens.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -16,7 +15,7 @@ import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
-import io.parity.signer.screens.settings.networks.signnetworkcrypto.sufficientCryptoDestination
+import io.parity.signer.screens.settings.networks.sufficientcrypto.sufficientCryptoDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 

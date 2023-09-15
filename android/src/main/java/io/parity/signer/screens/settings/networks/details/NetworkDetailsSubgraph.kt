@@ -31,8 +31,6 @@ fun NetworkDetailsSubgraph(
 	networkKey: String,
 	navController: NavController,
 ) {
-	//todo dmitry get this model like in
-	// ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:10
 	val vm: NetworkDetailsViewModel = viewModel()
 
 	val model = remember {

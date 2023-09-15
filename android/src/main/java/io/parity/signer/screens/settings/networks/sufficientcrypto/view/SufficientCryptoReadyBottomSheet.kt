@@ -1,4 +1,4 @@
-package io.parity.signer.bottomsheets
+package io.parity.signer.screens.settings.networks.sufficientcrypto.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.screens.settings.networks.signnetworkcrypto.view.SufficientCryptoReadyViewModel
 import io.parity.signer.components.*
 import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.intoImageBitmap
@@ -23,7 +22,7 @@ import io.parity.signer.uniffi.MSufficientCryptoReady
 import io.parity.signer.uniffi.MscContent
 
 @Composable
-fun SufficientCryptoReady(
+internal fun SufficientCryptoReadyBottomSheet(
 	sufficientCrypto: MSufficientCryptoReady,
 ) {
 	Surface(
