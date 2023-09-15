@@ -31,7 +31,7 @@ fun NavGraphBuilder.sufficientCryptoDestination(
 				//todo dmitry post error
 			}
 		}
-		SignSufficientCryptoFull(model)
+		SignSufficientCryptoFull(model, onBack = navController::popBackStack)
 	}
 	composable(
 		route = SettingsNavSubgraph.SignMetadataSufficientCrypto.route,
@@ -56,6 +56,6 @@ fun NavGraphBuilder.sufficientCryptoDestination(
 				//todo dmitry post error
 			}
 		}
-		SignSufficientCryptoFull(model)
+		SignSufficientCryptoFull(model, onBack = navController::popBackStack)
 	}
 }

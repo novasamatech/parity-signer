@@ -55,6 +55,7 @@ fun NetworkDetailsSubgraph(
 						metadataSpecVersion
 					)
 				)
+				menuController.popBackStack()
 			},
 			onRemoveMetadataCallback = { metadataSpecVersion ->
 				menuController.navigate(
@@ -65,6 +66,7 @@ fun NetworkDetailsSubgraph(
 			},
 			onAddNetwork = {
 				navController.navigate(CoreUnlockedNavSubgraph.camera)
+				menuController.popBackStack()
 			},
 		)
 	}
@@ -86,6 +88,7 @@ fun NetworkDetailsSubgraph(
 								networkKey,
 							)
 						)
+						menuController.popBackStack()
 					},
 					onDeleteClicked = {
 						menuController.navigate(NetworkDetailsMenuSubgraph.networkDeleteConfirm) {

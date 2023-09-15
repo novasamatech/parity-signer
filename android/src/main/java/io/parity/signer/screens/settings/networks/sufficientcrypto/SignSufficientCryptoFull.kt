@@ -15,19 +15,7 @@ import io.parity.signer.uniffi.MSignSufficientCrypto
 //todo dmitry implement
 //				as SignSufficientCryptoInteractor done
 //				navstate.rs:830 it's Sign sufficient crypto
-
-
-//		SignSufficientCrypto(
-//			screenData.f,
-//			sharedViewModel::signSufficientCrypto
-//		)
 // end of action here calling go forward and it's in navstate.rs:427
-//			todo dmitry handle password here on action
-//			io/parity/signer/domain/storage/TransactionOld.kt:8 ^^
-
-//todo dmitry get this model like in
-// ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:10
-
 
 @Composable
 fun SignSufficientCryptoFull(
