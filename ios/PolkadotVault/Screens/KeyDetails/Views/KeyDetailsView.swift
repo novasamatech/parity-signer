@@ -10,7 +10,6 @@ import SwiftUI
 struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,7 +18,6 @@ struct KeyDetailsView: View {
                 NavigationBarView(
                     viewModel: .init(
                         leftButtons: [
-                            .init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() }),
                             .init(type: .settings, action: viewModel.onSettingsTap)
                         ],
                         rightButtons: [
@@ -38,10 +36,26 @@ struct KeyDetailsView: View {
                     Spacer()
                 }
             }
+            .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
             VStack(spacing: 0) {
                 ConnectivityAlertOverlay(viewModel: .init())
             }
+            HStack(alignment: .center) {
+                Spacer()
+                QRCodeButton(action: viewModel.onQRScannerTap)
+                Spacer()
+            }
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingQRScanner,
+            onDismiss: viewModel.onQRScannerDismiss
+        ) {
+            CameraView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingQRScanner
+                )
+            )
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
@@ -135,9 +149,6 @@ struct KeyDetailsView: View {
             } else {
                 EmptyView()
             }
-        }
-        .onReceive(viewModel.dismissViewRequest) { _ in
-            presentationMode.wrappedValue.dismiss()
         }
         .fullScreenModal(
             isPresented: $viewModel.isPresentingNetworkSelection

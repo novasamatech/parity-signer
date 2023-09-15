@@ -30,9 +30,7 @@ extension KeyDetailsView {
         private let seedsMediator: SeedsMediating
         private var appState: AppState
 
-        @Published var keyName: String
-        /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
-        /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
+        @Published var keyName: String = ""
         @Published var keysData: MKeysNew?
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
@@ -53,6 +51,7 @@ extension KeyDetailsView {
         @Published var isShowingRecoverKeySet = false
         @Published var isShowingCreateKeySet = false
         @Published var isPresentingSettings = false
+        @Published var isPresentingQRScanner: Bool = false
 
         @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
@@ -68,20 +67,12 @@ extension KeyDetailsView {
         // Derive New Key
         @Published var isPresentingDeriveNewKey: Bool = false
 
-        // Back Navigation
-        var dismissViewRequest: AnyPublisher<Void, Never> {
-            dismissRequest.eraseToAnyPublisher()
-        }
-
-        private let dismissRequest = PassthroughSubject<Void, Never>()
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
         init(
-            keyName: String,
-            keysData: MKeysNew?,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
@@ -90,8 +81,6 @@ extension KeyDetailsView {
             appState: AppState = ServiceLocator.appState,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
-            _keyName = Published(initialValue: keyName)
-            _keysData = Published(initialValue: keysData)
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
@@ -99,6 +88,7 @@ extension KeyDetailsView {
             self.warningStateMediator = warningStateMediator
             self.appState = appState
             self.seedsMediator = seedsMediator
+            keyName = seedsMediator.seedNames.first ?? ""
             use(appState: appState)
             updateRenderables()
             subscribeToNetworkChanges()
@@ -292,6 +282,10 @@ extension KeyDetailsView.ViewModel {
         isShowingActionSheet = true
     }
 
+    func onQRScannerTap() {
+        isPresentingQRScanner = true
+    }
+
     func onKeySetSelectionTap() {
         isPresentingKeySetSelection = true
     }
@@ -331,6 +325,8 @@ extension KeyDetailsView.ViewModel {
 // MARK: - Modals
 
 extension KeyDetailsView.ViewModel {
+    func onQRScannerDismiss() {}
+
     func onActionSheetDismissal() {
         let isAlertVisible = warningStateMediator.alert
         if shouldPresentRemoveConfirmationModal {
