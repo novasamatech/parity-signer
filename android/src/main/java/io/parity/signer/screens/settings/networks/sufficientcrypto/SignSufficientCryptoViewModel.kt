@@ -6,9 +6,12 @@ import androidx.lifecycle.viewModelScope
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.NavigationError
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.SignSufficientCryptoInteractor
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.uniffi.ActionResult
 import io.parity.signer.uniffi.MSignSufficientCrypto
 import io.parity.signer.uniffi.MSufficientCryptoReady
 import io.parity.signer.uniffi.ModalData
@@ -25,7 +28,8 @@ class SignSufficientCryptoViewModel : ViewModel() {
 	private val _password: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
 	val password = _password.asStateFlow()
-	private val _signature: MutableStateFlow<MSufficientCryptoReady?> = MutableStateFlow(null)
+	private val _signature: MutableStateFlow<MSufficientCryptoReady?> =
+		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
 
 	suspend fun getNetworkModel(networkKey: String): MSignSufficientCrypto? =
@@ -46,40 +50,59 @@ class SignSufficientCryptoViewModel : ViewModel() {
 						"failed to get seed to sign sufficient crypto"
 					)
 				}
+
 				is RepoResult.Success -> {
 					val signResult = interactor.attemptSigning(
 						addressKey = addressKey,
 						seedPhrase = seedResult.result
 					)
-					when (val modal = signResult?.modalData) {
-						is ModalData.EnterPassword -> {
-							_password.update { modal.f.toEnterPasswordModel() }
-						}
-						is ModalData.SufficientCryptoReady -> {
-							_signature.update { modal.f }
-						}
-						else -> {
-							submitErrorState("should be unreachable - sign succificnt crypto action")
-						}
+					handleSignAttempt(signResult)
+				}
+			}
+		}
+	}
+
+	private fun handleSignAttempt(signResult: OperationResult<ActionResult, NavigationError>) {
+		when (signResult) {
+			is OperationResult.Err -> {
+				submitErrorState("should be unreachable - sign attepmt failed with error ${signResult.error}")
+			}
+
+			is OperationResult.Ok -> {
+				when (val modal = signResult.result.modalData) {
+					is ModalData.EnterPassword -> {
+						_password.update { modal.f.toEnterPasswordModel() }
+					}
+					is ModalData.SufficientCryptoReady -> {
+						_password.update { null }
+						_signature.update { modal.f }
+					}
+					else -> {
+						//todo dmitry show error for exceeded amout of attempts as in scan flow
+						submitErrorState("should be unreachable - sign succificnt crypto different result $modal")
 					}
 				}
 			}
 		}
 	}
 
-	suspend fun passwordAttempt() {
-		//todo dmitry
-//		ios/PolkadotVault/Screens/Settings/Subviews/SignSpecs/SignSpecsListView.swift:148
+	fun passwordAttempt(password: String) {
+		viewModelScope.launch {
+			val result = interactor.attemptPasswordEntered(password)
+			handleSignAttempt(result)
+		}
 	}
 
 	fun isHasStateThenClear(): Boolean {
-		return if (		password.value != null || signature.value != null) {
+		return if (password.value != null || signature.value != null) {
 			clearState()
+			interactor.closedBottomSheet()
 			true
 		} else {
 			false
 		}
 	}
+
 	fun clearState() {
 		_password.value = null
 		_signature.value = null

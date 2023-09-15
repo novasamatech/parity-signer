@@ -40,10 +40,15 @@ class SignSufficientCryptoInteractor {
 			}
 		}
 
-	private suspend fun resetMachineState(networkKey: String) {
+	fun resetMachineState(networkKey: String) {
 		navigator.navigate(Action.START)
 		navigator.navigate(Action.NAVBAR_SETTINGS)
 		navigator.navigate(Action.MANAGE_NETWORKS)
+		navigator.navigate(Action.GO_FORWARD, networkKey)
+	}
+
+	fun closedBottomSheet() {
+		navigator.navigate(Action.GO_BACK)
 	}
 
 	//todo dmitry as ios/PolkadotVault/Backend/NavigationServices/ManageNetworkDetailsService.swift:30
@@ -73,12 +78,12 @@ class SignSufficientCryptoInteractor {
 	suspend fun attemptSigning(
 		addressKey: String,
 		seedPhrase: String
-	): ActionResult? {
+	): OperationResult<ActionResult, NavigationError>  {
 		return navigate(
 			Action.GO_FORWARD,
 			addressKey,
 			seedPhrase,
-		).mapError()
+		)
 	}
 
 	suspend fun attemptPasswordEntered(password: String): OperationResult<ActionResult, NavigationError> {

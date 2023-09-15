@@ -1,11 +1,14 @@
 package io.parity.signer.screens.settings.networks.sufficientcrypto
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.screens.settings.networks.sufficientcrypto.view.SufficientCryptoReadyBottomSheet
 import io.parity.signer.bottomsheets.password.EnterPassword
+import io.parity.signer.domain.Callback
 import io.parity.signer.screens.settings.networks.sufficientcrypto.view.SignSufficientCryptoScreen
+import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
 
@@ -27,11 +30,20 @@ import io.parity.signer.uniffi.MSignSufficientCrypto
 
 
 @Composable
-fun SignSufficientCryptoFull(sc: MSignSufficientCrypto) {
+fun SignSufficientCryptoFull(
+	sc: MSignSufficientCrypto,
+	onBack: Callback
+) {
 	val vm: SignSufficientCryptoViewModel = viewModel()
 
 	val passwordState = vm.password.collectAsStateWithLifecycle()
 	val signatureState = vm.signature.collectAsStateWithLifecycle()
+
+	val backAction = {
+		val wasState = vm.isHasStateThenClear()
+		if (!wasState) onBack()
+	}
+	BackHandler(onBack = backAction)
 
 	SignSufficientCryptoScreen(
 		model = sc,
@@ -39,19 +51,21 @@ fun SignSufficientCryptoFull(sc: MSignSufficientCrypto) {
 	)
 
 	passwordState.value?.let { enterPasswordModel ->
-		EnterPassword(
-			data = enterPasswordModel,
-			proceed = {
-//								todo dmitry
-			},
-			onClose = {
-//								todo dmitry
-			},
-		)
+		BottomSheetWrapperRoot(onClosedAction = vm::clearState) {
+			EnterPassword(
+				data = enterPasswordModel,
+				proceed = { password ->
+					vm.passwordAttempt(password)
+				},
+				onClose = vm::clearState,
+			)
+		}
 	} ?: signatureState.value?.let { signature ->
+		BottomSheetWrapperRoot(onClosedAction = vm::clearState) {
 			SufficientCryptoReadyBottomSheet(
 				sufficientCrypto = signature,
 			)
+		}
 	}
 
 }
