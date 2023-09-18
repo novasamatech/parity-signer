@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings.networks.sufficientcrypto.view
+package io.parity.signer.screens.settings.networks.signspecs.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

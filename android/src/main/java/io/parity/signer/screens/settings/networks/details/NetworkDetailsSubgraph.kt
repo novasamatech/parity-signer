@@ -50,7 +50,7 @@ fun NetworkDetailsSubgraph(
 			onMenu = { menuController.navigate(NetworkDetailsMenuSubgraph.menu) },
 			onSignMetadata = { metadataSpecVersion ->
 				navController.navigate(
-					SettingsNavSubgraph.SignMetadataSufficientCrypto.destination(
+					SettingsNavSubgraph.SignMetadataSpecs.destination(
 						networkKey,
 						metadataSpecVersion
 					)
@@ -84,7 +84,7 @@ fun NetworkDetailsSubgraph(
 				NetworkDetailsMenuGeneral(
 					onSignNetworkSpecs = {
 						navController.navigate(
-							SettingsNavSubgraph.SignNetworkSufficientCrypto.destination(
+							SettingsNavSubgraph.SignNetworkSpecs.destination(
 								networkKey,
 							)
 						)

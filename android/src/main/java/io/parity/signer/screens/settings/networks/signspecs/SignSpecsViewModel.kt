@@ -1,4 +1,4 @@
-package io.parity.signer.screens.settings.networks.sufficientcrypto
+package io.parity.signer.screens.settings.networks.signspecs
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class SignSufficientCryptoViewModel : ViewModel() {
+class SignSpecsViewModel : ViewModel() {
 	private val seedRepo = ServiceLocator.activityScope!!.seedRepository
 	private val interactor = SignSufficientCryptoInteractor()
 

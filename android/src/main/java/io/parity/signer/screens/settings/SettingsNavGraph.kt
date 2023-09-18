@@ -15,7 +15,7 @@ import io.parity.signer.screens.settings.general.SettingsGeneralNavSubgraph
 import io.parity.signer.screens.settings.logs.logsNavigationSubgraph
 import io.parity.signer.screens.settings.networks.details.NetworkDetailsSubgraph
 import io.parity.signer.screens.settings.networks.list.networkListDestination
-import io.parity.signer.screens.settings.networks.sufficientcrypto.sufficientCryptoDestination
+import io.parity.signer.screens.settings.networks.signspecs.signSpecsDestination
 import io.parity.signer.screens.settings.verifiercert.verifierSettingsDestination
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
@@ -74,7 +74,7 @@ fun NavGraphBuilder.settingsFullSubgraph(
 				navController,
 			)
 		}
-		sufficientCryptoDestination(navController)
+		signSpecsDestination(navController)
 	}
 }
 
@@ -94,14 +94,14 @@ internal object SettingsNavSubgraph {
 		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
 
-	object SignNetworkSufficientCrypto {
+	object SignNetworkSpecs {
 		internal const val networkKey = "network_key"
 		private const val baseRoute = "settings_network_sufficient_crypto"
 		const val route = "$baseRoute/{$networkKey}"
 		fun destination(networkKey: String) = "$baseRoute/${networkKey}"
 	}
 
-	object SignMetadataSufficientCrypto {
+	object SignMetadataSpecs {
 		internal const val networkKey = "network_key"
 		internal const val metadataSpecVer = "spec_ver"
 		private const val baseRoute = "settings_metadata_sufficient_crypto"
