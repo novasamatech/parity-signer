@@ -6,7 +6,6 @@ import android.widget.Toast
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.storage.getSeed
 import io.parity.signer.screens.scan.errors.findErrorDisplayed
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.Dispatchers

@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.domain.SharedViewModel
-import io.parity.signer.domain.storage.removeSeed
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
@@ -27,9 +26,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.keysBySeedName
 
 @Composable
-fun CoreUnlockedNavSubgraph(
-	singleton: SharedViewModel,
-) {
+fun CoreUnlockedNavSubgraph() {
 
 	val navController = rememberNavController()
 	NavHost(
@@ -68,17 +65,6 @@ fun CoreUnlockedNavSubgraph(
 					fullModel = model,
 					navController = navController,
 					onBack = { navController.popBackStack() },
-					onRemoveKeySet = {
-						val root = model.root
-						if (root != null) {
-							//todo dmitry implement
-							singleton.removeSeed(root.seedName)
-//							todo dmitry navigate start
-						} else {
-							//todo key details check if this functions should be disabled in a first place
-							submitErrorState("came to remove key set but root key is not available")
-						}
-					},
 				)
 			}
 		}

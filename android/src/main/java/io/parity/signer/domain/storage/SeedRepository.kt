@@ -7,6 +7,9 @@ import androidx.fragment.app.FragmentActivity
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiInteractor
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ErrorDisplayed
@@ -18,6 +21,7 @@ class SeedRepository(
 	private val storage: SeedStorage,
 	private val authentication: Authentication,
 	private val activity: FragmentActivity,
+	private val uniffiInteractor: UniffiInteractor,
 ) {
 
 	fun containSeedName(seedName: String): Boolean {
@@ -222,7 +226,46 @@ class SeedRepository(
 		}
 	}
 
-	internal fun tellRustSeedNames() {
+	/**
+	 * All logic required to remove seed from memory
+	 *
+	 * 1. Remover encrypted storage item
+	 * 2. Synchronizes list of seeds with rust
+	 * 3. Calls rust remove seed logic
+	 */
+	suspend fun removeKeySet(seedName: String): OperationResult<Unit, Exception> {
+		return when (val authResult = authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				try {
+					storage.removeSeed(seedName)
+					tellRustSeedNames()
+					when (val remove = uniffiInteractor.removeKeySet(seedName)) {
+						is UniffiResult.Error -> OperationResult.Err(remove.error)
+						is UniffiResult.Success -> OperationResult.Ok(Unit)
+					}
+				} catch (e: java.lang.Exception) {
+					Log.d("remove seed error", e.toString())
+					OperationResult.Err(e)
+				}
+			}
+
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				Log.d("remove seed auth error ", authResult.toString())
+				OperationResult.Err(Exception("remove seed auth error $authResult"))
+			}
+		}
+	}
+
+
+	/**
+	 * Refresh seed names list
+	 * should be called within authentication envelope
+	 * authentication.authenticate(activity) {refreshSeedNames()}
+	 * which is somewhat asynchronous
+	 */
+	private fun tellRustSeedNames() {
 		val allNames = storage.getSeedNames()
 		updateSeedNames(allNames.toList())
 	}

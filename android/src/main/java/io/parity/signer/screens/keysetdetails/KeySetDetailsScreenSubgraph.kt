@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +19,7 @@ import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
@@ -26,15 +28,16 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBot
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
 	navController: NavController,
 	onBack: Callback,
-	onRemoveKeySet: Callback,
 ) {
 	val menuNavController = rememberNavController()
+	val coroutineScope = rememberCoroutineScope()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
 	val filteredModel =
@@ -66,7 +69,11 @@ fun KeySetDetailsScreenSubgraph(
 			},
 			onBack = onBack,
 			onAddNewKey = {
-				navController.navigate(CoreUnlockedNavSubgraph.NewDerivedKey.destination(seedName = fullModel.root!!.seedName))
+				navController.navigate(
+					CoreUnlockedNavSubgraph.NewDerivedKey.destination(
+						seedName = fullModel.root!!.seedName
+					)
+				)
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
@@ -123,7 +130,22 @@ fun KeySetDetailsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeySetDeleteConfirmBottomSheet(
 					onCancel = closeAction,
-					onRemoveKeySet = onRemoveKeySet,
+					onRemoveKeySet = {
+						val root = fullModel.root
+						if (root != null) {
+							coroutineScope.launch {
+								when (keySetViewModel.removeSeed(root)) {
+									is OperationResult.Err -> TODO() //todo dmitry error state
+									is OperationResult.Ok -> {
+										navController.navigate(CoreUnlockedNavSubgraph.keySetList)
+									}
+								}
+							}
+						} else {
+							//todo dmitry key details check if this functions should be disabled in a first place
+							submitErrorState("came to remove key set but root key is not available")
+						}
+					},
 				)
 			}
 		}

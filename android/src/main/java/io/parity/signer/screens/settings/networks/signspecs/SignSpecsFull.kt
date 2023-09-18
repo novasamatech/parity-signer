@@ -14,7 +14,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
 
-//todo dmitry implement
+//todo dmitry test!
 //				as SignSufficientCryptoInteractor done
 //				navstate.rs:830 it's Sign sufficient crypto
 // end of action here calling go forward and it's in navstate.rs:427

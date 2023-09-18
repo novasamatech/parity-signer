@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.bottomsheets.password.toEnterPasswordModel
-import io.parity.signer.components.panels.CameraParentSingleton
 import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.SharedViewModel
@@ -20,15 +19,11 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun CombinedScreensSelector(
 	screenData: ScreenData,
-	sharedViewModel: SharedViewModel
 ) {
-	val rootNavigator = sharedViewModel.navigator
 
 	when (screenData) {
 		is ScreenData.SeedSelector -> {
-			CoreUnlockedNavSubgraph(
-				singleton = sharedViewModel,
-			)
+			CoreUnlockedNavSubgraph()
 		}
 
 		is ScreenData.Keys -> {//keyset details
@@ -58,7 +53,6 @@ fun CombinedScreensSelector(
 
 		is ScreenData.Transaction -> {
 			submitErrorState("Should be unreachable. Local navigation should be used everywhere and this is part of ScanNavSubgraph $screenData")
-			CameraParentSingleton.navigateBackFromCamera(rootNavigator)
 		}
 
 		is ScreenData.DeriveKey -> {}

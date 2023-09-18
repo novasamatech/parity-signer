@@ -28,7 +28,8 @@ object ServiceLocator {
 		_activityScope = null
 	}
 
-	@Volatile private var _activityScope: ActivityScope? = null
+	@Volatile
+	private var _activityScope: ActivityScope? = null
 	val activityScope: ActivityScope? get() = _activityScope
 
 	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
@@ -36,15 +37,34 @@ object ServiceLocator {
 	val navigator = SignerNavigator()
 
 	val seedStorage: SeedStorage = SeedStorage()
-	val preferencesRepository: PreferencesRepository by lazy { PreferencesRepository(appContext) }
-	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
-	val networkExposedStateKeeper by lazy { NetworkExposedStateKeeper(appContext, uniffiInteractor) }
+	val preferencesRepository: PreferencesRepository by lazy {
+		PreferencesRepository(
+			appContext
+		)
+	}
+	val databaseAssetsInteractor by lazy {
+		DatabaseAssetsInteractor(
+			appContext,
+			seedStorage
+		)
+	}
+	val networkExposedStateKeeper by lazy {
+		NetworkExposedStateKeeper(
+			appContext,
+			uniffiInteractor
+		)
+	}
 	val authentication = Authentication()
-	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator = UnknownNetworkColorsGenerator()
+	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator =
+		UnknownNetworkColorsGenerator()
 
 	class ActivityScope(val activity: FragmentActivity) {
-		val seedRepository: SeedRepository = SeedRepository(seedStorage,
-			authentication, activity)
+		val seedRepository: SeedRepository = SeedRepository(
+			storage = seedStorage,
+			authentication = authentication,
+			activity = activity,
+			uniffiInteractor = uniffiInteractor
+		)
 	}
 }
 

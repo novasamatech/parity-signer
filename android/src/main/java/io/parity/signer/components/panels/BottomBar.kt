@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
@@ -102,8 +103,8 @@ fun BottomBarButton(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-            .clickable(onClick = onClick)
-            .width(66.dp)
+			.clickable(onClick = onClick)
+			.width(66.dp)
 	) {
 		Icon(
 			painter = painterResource(
@@ -171,7 +172,7 @@ fun BottomBarMiddleButton(
 private fun PreviewBottomBar2() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			BottomBar(EmptyNavigator(), BottomBarOptions.KEYS)
+			BottomBar(rememberNavController(), BottomBarOptions.KEYS)
 		}
 	}
 }

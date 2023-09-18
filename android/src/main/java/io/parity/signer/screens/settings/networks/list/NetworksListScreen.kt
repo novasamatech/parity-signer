@@ -1,16 +1,24 @@
 package io.parity.signer.screens.settings.networks.list
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -24,15 +32,14 @@ import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarOptions
-import io.parity.signer.components.panels.CameraParentScreen
-import io.parity.signer.components.panels.CameraParentSingleton
-import io.parity.signer.domain.*
+import io.parity.signer.domain.Callback
+import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.screens.createderivation.derivationsubscreens.NetworkHelpAlarm
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill12
 import io.parity.signer.ui.theme.textTertiary
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MManageNetworks
 
 
@@ -67,10 +74,6 @@ fun NetworksListScreen(
 			)
 		}
 		BottomBar(coreNavController, BottomBarOptions.SETTINGS)
-		LaunchedEffect(key1 = Unit) {
-			CameraParentSingleton.lastPossibleParent =
-				CameraParentScreen.NetworkListScreen
-		}
 	}
 }
 

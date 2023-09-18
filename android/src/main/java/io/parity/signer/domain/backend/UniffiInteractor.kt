@@ -245,11 +245,11 @@ class UniffiInteractor(val appContext: Context) {
 		}
 
 	suspend fun removeKeySet(
-		addressKey: String
+		keySetName: String
 	): UniffiResult<Unit> =
 		withContext(Dispatchers.IO) {
 			try {
-				val transactionResult = io.parity.signer.uniffi.removeKeySet(addressKey)
+				val transactionResult = io.parity.signer.uniffi.removeKeySet(keySetName)
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

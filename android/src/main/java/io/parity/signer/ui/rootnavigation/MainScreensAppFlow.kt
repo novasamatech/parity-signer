@@ -110,7 +110,6 @@ fun MainUnlockedSubgraphVault(sharedViewModel: SharedViewModel) {
 			) {
 				CombinedScreensSelector(
 					screenData = actionResult.screenData,
-					sharedViewModel = sharedViewModel
 				)
 				BottomSheetSelector(
 					modalData = actionResult.modalData,
