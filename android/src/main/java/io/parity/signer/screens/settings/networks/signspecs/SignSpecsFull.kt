@@ -1,13 +1,15 @@
 package io.parity.signer.screens.settings.networks.signspecs
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.parity.signer.screens.settings.networks.signspecs.view.SufficientCryptoReadyBottomSheet
+import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsResultBottomSheet
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.settings.networks.signspecs.view.SignSufficientCryptoScreen
+import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsListScreen
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
@@ -33,9 +35,11 @@ fun SignSpecsFull(
 	}
 	BackHandler(onBack = backAction)
 
-	SignSufficientCryptoScreen(
-		model = sc,
+	SignSpecsListScreen(
+		model = sc.toSignSpecsListModel(),
+		onBack = onBack,
 		signSufficientCrypto = vm::onSignSufficientCrypto,
+		modifier = Modifier.statusBarsPadding(),
 	)
 
 	passwordState.value?.let { enterPasswordModel ->
@@ -50,11 +54,11 @@ fun SignSpecsFull(
 		}
 	} ?: signatureState.value?.let { signature ->
 		BottomSheetWrapperRoot(onClosedAction = vm::clearState) {
-			SufficientCryptoReadyBottomSheet(
-				sufficientCrypto = signature,
+			SignSpecsResultBottomSheet(
+				model = signature.toSignSpecsResultModel(),
+				onBack = vm::clearState,
 			)
 		}
 	}
-
 }
 

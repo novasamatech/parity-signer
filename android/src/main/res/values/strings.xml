@@ -427,6 +427,8 @@
 	<string name="confirm_dynamic_derivation_header">Please confirm derived key import with authorisation</string>
 	<string name="confirm_dynamic_derivation_message">Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.</string>
 	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
+    <string name="sign_specs_keys_list_title">Select key for signing specs</string>
+	<string name="sign_specs_result_title">Specs signature</string>
 
 
 </resources>
