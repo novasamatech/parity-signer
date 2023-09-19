@@ -82,7 +82,7 @@ struct KeyDetailsView: View {
             ExportKeysSelectionModal(
                 viewModel: .init(
                     rootKey: viewModel.keysData?.root?.base58 ?? "",
-                    rootIdenticon: viewModel.keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
+                    rootIdenticon: viewModel.keysData?.root?.address.identicon,
                     derivedKeys: viewModel.derivedKeys,
                     isPresented: $viewModel.isPresentingExportKeySelection,
                     onCompletion: viewModel.onExportKeySelectionComplete

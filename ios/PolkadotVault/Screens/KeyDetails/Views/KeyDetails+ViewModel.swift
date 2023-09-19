@@ -365,7 +365,7 @@ extension KeyDetailsView.ViewModel {
     func rootKeyDetails() -> RootKeyDetailsModal.Renderable {
         .init(
             seedName: keyName,
-            identicon: keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
+            identicon: keysData?.root?.address.identicon,
             base58: keysData?.root?.base58 ?? ""
         )
     }

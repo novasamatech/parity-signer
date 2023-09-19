@@ -121,7 +121,9 @@ struct ExportKeysSelectionModal: View {
         LazyVStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: Spacing.small) {
-                    IdenticonView(identicon: viewModel.rootIdenticon)
+                    if let rootIdenticon = viewModel.rootIdenticon {
+                        IdenticonView(identicon: rootIdenticon)
+                    }
                     Text(viewModel.rootKey.truncateMiddle())
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
@@ -166,14 +168,14 @@ extension ExportKeysSelectionModal {
         private let onCompletion: (OnCompletionAction) -> Void
         @Published var animateBackground: Bool = false
         @Published var rootKey: String
-        @Published var rootIdenticon: Identicon
+        @Published var rootIdenticon: Identicon?
         @Published var derivedKeys: [DerivedKeyRowModel]
         @Published var selectedKeys: [DerivedKeyRowModel] = []
         @Binding var isPresented: Bool
 
         init(
             rootKey: String,
-            rootIdenticon: Identicon,
+            rootIdenticon: Identicon?,
             derivedKeys: [DerivedKeyRowModel],
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
