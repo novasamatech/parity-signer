@@ -38,6 +38,7 @@ struct KeyDetailsView: View {
                     }
                 }
                 .navigationBarHidden(true)
+                .background(Asset.backgroundPrimary.swiftUIColor)
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
                 }
@@ -50,7 +51,6 @@ struct KeyDetailsView: View {
             }
         }
         .navigationViewStyle(.stack)
-        .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
