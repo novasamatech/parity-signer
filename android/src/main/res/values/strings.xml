@@ -429,6 +429,8 @@
 	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
     <string name="sign_specs_keys_list_title">Select key for signing specs</string>
 	<string name="sign_specs_result_title">Specs signature</string>
+    <string name="error_state_screen_title">Error state screen</string>
+	<string name="error_state_screen_verbose_subtitle">Verbose details:</string>
 
 
 </resources>

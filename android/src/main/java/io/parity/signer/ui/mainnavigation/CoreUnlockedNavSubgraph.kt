@@ -74,9 +74,9 @@ fun CoreUnlockedNavSubgraph() {
 			)
 		}
 		composable(CoreUnlockedNavSubgraph.recoverKeySet) {
-				KeysetRecoverSubgraph(
-					coreNavController = navController
-				)
+			KeysetRecoverSubgraph(
+				coreNavController = navController
+			)
 		}
 		composable(
 			route = CoreUnlockedNavSubgraph.KeyDetails.route,
@@ -110,11 +110,11 @@ fun CoreUnlockedNavSubgraph() {
 			val seedName =
 				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)!!
 
-				DerivationCreateSubgraph(
-					onBack = { navController.popBackStack() },
-					onOpenCamera = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
-					seedName = seedName,
-				)
+			DerivationCreateSubgraph(
+				onBack = { navController.popBackStack() },
+				onOpenCamera = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+				seedName = seedName,
+			)
 		}
 		composable(CoreUnlockedNavSubgraph.camera) {
 			ScanNavSubgraph(
@@ -130,9 +130,9 @@ fun CoreUnlockedNavSubgraph() {
 				}
 			)
 		}
-			settingsFullSubgraph(
-				navController = navController,
-			)
+		settingsFullSubgraph(
+			navController = navController,
+		)
 		networkHelpersCoreSubgraph(
 			navController = navController,
 		)
@@ -166,6 +166,20 @@ internal object CoreUnlockedNavSubgraph {
 		const val route = "$baseRoute/{$argKeyAddr}/{$argKeySpec}"
 		fun destination(keyAddr: String, keySpec: String) =
 			"$baseRoute/$keyAddr/$keySpec"
+	}
+
+	object ErrorState {
+		internal const val argHeader = "key_header"
+		internal const val argDescription = "key_descr"
+		internal const val argVerbose = "key_verb"
+		private const val baseRoute = "core_error_state"
+		const val route = "$baseRoute/{$argHeader}/{$argDescription}/{$argVerbose}"
+		fun destination(
+			argHeader: String,
+			argDescription: String,
+			argVerbose: String
+		) =
+			"$baseRoute/$argHeader/$argDescription/$argVerbose"
 	}
 
 	const val settings = "core_settings_flow"

@@ -33,7 +33,7 @@ internal fun ErrorStateScreen(
 	modifier: Modifier = Modifier,
 ) {
 	Column(modifier = modifier) {
-		ScreenHeaderClose(title = "Error state screen",
+		ScreenHeaderClose(title = stringResource(R.string.error_state_screen_title),
 			onClose = onBack)
 		Column(
 			modifier = Modifier
@@ -59,7 +59,7 @@ internal fun ErrorStateScreen(
 			Text(
 				modifier = Modifier
 					.padding(horizontal = 24.dp),
-				text = "Verbose details:",
+				text = stringResource(R.string.error_state_screen_verbose_subtitle),
 				color = MaterialTheme.colors.textSecondary,
 				style = SignerTypeface.BodyM,
 			)
@@ -76,7 +76,7 @@ internal fun ErrorStateScreen(
 //		PrimaryButtonWide(
 //			label = stringResource(R.string.button_next),
 //			modifier = Modifier.padding(24.dp),
-//			onClicked = {},//todo dmitry
+//			onClicked = {},
 //		)
 	}
 }
@@ -96,8 +96,10 @@ private fun PreviewErrorStateScreen() {
 		SignerNewTheme() {
 			ErrorStateScreen(
 				header = "navigation failed to open signer",
-				description = "",//todo dmitry
-				verbose = "",
+				description = "cound't sign specs 0 unknown state recieved",
+				verbose = "alertData=ErrorData(f=Could not decode AddressKey::multisigner:\n" +
+					"Could not decode MultiSigner, variant doesn't exist\n" +
+					")))",
 				onBack = {},
 			)
 		}
