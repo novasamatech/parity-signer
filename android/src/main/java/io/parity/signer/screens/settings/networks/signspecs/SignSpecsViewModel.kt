@@ -79,7 +79,8 @@ class SignSpecsViewModel : ViewModel() {
 					}
 					else -> {
 						//todo dmitry show error for exceeded amout of attempts as in scan flow
-						submitErrorState("should be unreachable - sign succificnt crypto different result $modal")
+						//todo dmitry submut errorData()
+						submitErrorState("should be unreachable - sign succificnt crypto different result $signResult")
 					}
 				}
 			}

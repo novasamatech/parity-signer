@@ -308,10 +308,17 @@ class SeedRepository(
 
 
 private const val TAG = "Seed_Repository"
-
+//refactor to use OperationResult everywhere?
 sealed class RepoResult<T> {
 	data class Success<T>(val result: T) : RepoResult<T>()
 	data class Failure<T>(val error: Throwable = UnknownError()) : RepoResult<T>()
+}
+
+fun <T> RepoResult<T>.toOperationResult(): OperationResult<T,Throwable> {
+	return when (this) {
+		is RepoResult.Failure -> OperationResult.Err(this.error)
+		is RepoResult.Success -> OperationResult.Ok(this.result)
+	}
 }
 
 fun <T> RepoResult<T>.mapError(): T? {
