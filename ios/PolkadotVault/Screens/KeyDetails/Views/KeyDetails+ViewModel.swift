@@ -246,9 +246,12 @@ extension KeyDetailsView {
             switch completionAction {
             case let .createKeySet(seedName):
                 message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+                keyName = seedName
             case let .recoveredKeySet(seedName):
                 message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                keyName = seedName
             }
+            refreshData()
             snackbarViewModel = .init(
                 title: message,
                 style: .info
