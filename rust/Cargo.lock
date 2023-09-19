@@ -3602,6 +3602,7 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "transaction_parsing",
+ "transaction_signing",
  "uniffi",
  "uniffi_build",
 ]
