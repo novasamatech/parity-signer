@@ -37,18 +37,18 @@ struct KeyDetailsView: View {
                         Spacer()
                     }
                 }
-
+                .navigationBarHidden(true)
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
                 }
                 HStack(alignment: .center) {
                     Spacer()
                     QRCodeButton(action: viewModel.onQRScannerTap)
+                        .padding(.bottom, Spacing.extraLarge)
                     Spacer()
                 }
             }
         }
-        .navigationBarHidden(true)
         .navigationViewStyle(.stack)
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
