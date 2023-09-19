@@ -25,7 +25,7 @@ internal fun SignSpecsListScreen(
 	signSufficientCrypto: (seedName: String, addressKey64: String) -> Unit,
 	modifier: Modifier = Modifier,
 ) {
-	val keys = model.keys
+	val keys = model.keysToAddrKey
 	Column(modifier = modifier) {
 		ScreenHeaderClose(
 			title = stringResource(R.string.sign_specs_keys_list_title),
@@ -34,14 +34,14 @@ internal fun SignSpecsListScreen(
 		LazyColumn {
 			items(keys.size) { index ->
 				val identity = keys[index]
-				Box(Modifier.clickable {
-					signSufficientCrypto(identity.seedName, identity.base58)
-				}) {
-					KeyCardSignature(
-						model = identity,
-						modifier = Modifier.padding(vertical = 8.dp, horizontal = 24.dp),
-					)
-				}
+				KeyCardSignature(
+					model = identity.first,
+					modifier = Modifier
+						.clickable {
+							signSufficientCrypto(identity.first.seedName, identity.second)
+						}
+						.padding(vertical = 8.dp, horizontal = 24.dp),
+				)
 			}
 		}
 	}

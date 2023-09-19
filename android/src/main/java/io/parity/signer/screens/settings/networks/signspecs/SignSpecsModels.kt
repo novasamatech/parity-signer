@@ -3,38 +3,37 @@ package io.parity.signer.screens.settings.networks.signspecs
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.domain.toKeysModel
 import io.parity.signer.ui.helpers.PreviewData
-import io.parity.signer.uniffi.MAddressCard
 import io.parity.signer.uniffi.MRawKey
 import io.parity.signer.uniffi.MSignSufficientCrypto
 import io.parity.signer.uniffi.MSufficientCryptoReady
 import io.parity.signer.uniffi.MscContent
 
 
-data class SignSpecsListModel(val keys: List<KeyCardModelBase>) {
+data class SignSpecsListModel(val keysToAddrKey: List<Pair<KeyCardModelBase,String>>) {
 
 	companion object {
 		fun createStub(): SignSpecsListModel = SignSpecsListModel(
 			listOf(
-				KeyCardModelBase.createStub(),
-				KeyCardModelBase.createStub(),
-				KeyCardModelBase.createStub(),
-				KeyCardModelBase.createStub(),
-				KeyCardModelBase.createStub(),
+				KeyCardModelBase.createStub() to "addr",
+				KeyCardModelBase.createStub() to "addr",
+				KeyCardModelBase.createStub() to "addr",
+				KeyCardModelBase.createStub() to "addr",
+				KeyCardModelBase.createStub() to "addr",
 			)
 		)
 	}
 }
 
 fun MSignSufficientCrypto.toSignSpecsListModel() = SignSpecsListModel(
-	keys = identities.map { it.toKeyCardModel() }
+	keysToAddrKey = identities.map { it.toKeyCardModelPair() }
 )
 
-fun MRawKey.toKeyCardModel() =
+fun MRawKey.toKeyCardModelPair() =
 	KeyCardModelBase.fromAddress(
 		address= address,
 		base58 = publicKey,
 		networkLogo,
-	)
+	) to addressKey
 
 
 
