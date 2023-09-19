@@ -226,11 +226,11 @@ extension KeyDetailsView {
             case .onClose:
                 ()
             case .addKeySet:
-                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                DispatchQueue.main.async {
                     self.isShowingCreateKeySet = true
                 }
             case .recoverKeySet:
-                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                DispatchQueue.main.async {
                     self.isShowingRecoverKeySet = true
                 }
             case let .viewKeySet(selectedKeySet):
@@ -300,18 +300,20 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
-        keyDetailsActionsService.navigateToPublicKey(
-            addressKey: deriveKey.keyData.key.addressKey,
-            networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
-        ) { result in
-            switch result {
-            case let .success(keyDetails):
-                self.presentedPublicKeyDetails = deriveKey.addressKey
-                self.presentedKeyDetails = keyDetails
-                self.isPresentingKeyDetails = true
-            case let .failure(error):
-                self.presentableError = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
+        DispatchQueue.main.async {
+            self.keyDetailsActionsService.navigateToPublicKey(
+                addressKey: deriveKey.keyData.key.addressKey,
+                networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
+            ) { result in
+                switch result {
+                case let .success(keyDetails):
+                    self.presentedPublicKeyDetails = deriveKey.addressKey
+                    self.presentedKeyDetails = keyDetails
+                    self.isPresentingKeyDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
             }
         }
     }
