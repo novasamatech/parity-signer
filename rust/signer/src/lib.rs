@@ -87,10 +87,6 @@ pub enum ErrorDisplayed {
     NoMetadata {
         name: String,
     },
-    /// No networks attached to the address
-    NoNetwork {
-        path: String,
-    },
     /// Provided password is incorrect
     WrongPassword,
 }
@@ -100,9 +96,6 @@ impl From<NavigatorError> for ErrorDisplayed {
         match &e {
             NavigatorError::MutexPoisoned => Self::MutexPoisoned,
             NavigatorError::DbNotInitialized => Self::DbNotInitialized,
-            NavigatorError::NoNetwork(path) => Self::NoNetwork {
-                path: path.to_string(),
-            },
             NavigatorError::TransactionParsing(t) => match t {
                 TxParsingError::LoadMetaUnknownNetwork { name } => {
                     Self::LoadMetaUnknownNetwork { name: name.clone() }
