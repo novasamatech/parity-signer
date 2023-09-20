@@ -10,13 +10,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import io.parity.signer.domain.SharedViewModel
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
-import io.parity.signer.screens.keysets.KeySetsScreenSubgraph
+import io.parity.signer.screens.keysets.KeySetsListScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -35,7 +34,7 @@ fun CoreUnlockedNavSubgraph() {
 	) {
 		composable(CoreUnlockedNavSubgraph.keySetList) {
 			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetsScreenSubgraph(
+				KeySetsListScreenSubgraph(
 					navController = navController,
 				)
 			}

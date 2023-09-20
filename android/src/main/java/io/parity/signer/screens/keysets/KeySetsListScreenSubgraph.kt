@@ -15,7 +15,7 @@ import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
-fun KeySetsScreenSubgraph(
+fun KeySetsListScreenSubgraph(
 	navController: NavController,
 ) {
 	val vm: KeySetsViewModel = viewModel()
@@ -32,7 +32,7 @@ fun KeySetsScreenSubgraph(
 
 	val modelValue = model.value
 	if (modelValue != null) {
-		KeySetsScreenFull(
+		KeySetsListScreenFull(
 			model = modelValue,
 			navController = navController,
 			onSelectSeed = { seedname ->
@@ -50,6 +50,11 @@ fun KeySetsScreenSubgraph(
 			onNewKeySet = {
 				navController.navigate(
 					CoreUnlockedNavSubgraph.newKeySet
+				)
+			},
+			onRecoverKeySet = {
+				navController.navigate(
+					CoreUnlockedNavSubgraph.recoverKeySet
 				)
 			},
 			networkState = networkState,

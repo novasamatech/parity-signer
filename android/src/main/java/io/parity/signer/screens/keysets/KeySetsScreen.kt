@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.exposesecurity.ExposedIcon
 import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarOptions
@@ -46,12 +47,13 @@ import io.parity.signer.ui.theme.textSecondary
  */
 
 @Composable
-internal fun KeySetsScreenFull(
+internal fun KeySetsListScreenFull(
 	model: KeySetsSelectModel,
 	navController: NavController,
 	onSelectSeed: (seedName: String) -> Unit,
 	onExposedShow: Callback,
 	onNewKeySet: Callback,
+	onRecoverKeySet: Callback,
 	networkState: State<NetworkState?>, //for shield icon
 ) {
 	Column(Modifier.background(MaterialTheme.colors.backgroundSystem)) {
@@ -90,8 +92,15 @@ internal fun KeySetsScreenFull(
 				PrimaryButtonWide(
 					label = stringResource(R.string.key_sets_screem_add_key_button),
 					modifier = Modifier
-						.padding(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
+						.padding(top = 16.dp, bottom = 8.dp, start = 24.dp, end = 24.dp),
 					onClicked = onNewKeySet,
+				)
+				SecondaryButtonWide(
+					label = stringResource(R.string.add_key_set_menu_recover),
+					modifier = Modifier
+						.padding(top = 0.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
+					withBackground = true,
+					onClicked = onRecoverKeySet,
 				)
 			}
 		}
@@ -139,7 +148,15 @@ private fun PreviewKeySetsSelectScreenFull() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreenFull(mockModel, rememberNavController(), {}, {}, {}, state)
+			KeySetsListScreenFull(
+				mockModel,
+				rememberNavController(),
+				{},
+				{},
+				{},
+				{},
+				state
+			)
 		}
 	}
 }
@@ -201,7 +218,15 @@ private fun PreviewKeySetsSelectScreenFew() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreenFull(mockModel, rememberNavController(), {}, {}, {}, state)
+			KeySetsListScreenFull(
+				mockModel,
+				rememberNavController(),
+				{},
+				{},
+				{},
+				{},
+				state
+			)
 		}
 	}
 }
@@ -222,7 +247,15 @@ private fun PreviewKeySetsSelectScreenEmpty() {
 	val mockModel = KeySetsSelectModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			KeySetsScreenFull(mockModel, rememberNavController(), {}, {}, {}, state)
+			KeySetsListScreenFull(
+				mockModel,
+				rememberNavController(),
+				{},
+				{},
+				{},
+				{},
+				state
+			)
 		}
 	}
 }
