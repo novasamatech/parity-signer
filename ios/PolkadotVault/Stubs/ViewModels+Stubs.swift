@@ -139,21 +139,6 @@ extension ExportMultipleKeysModalViewModel {
     )
 }
 
-extension KeySetViewModel {
-    static let stub: KeySetViewModel = .init(
-        seed: .stub,
-        keyName: "key name",
-        derivedKeys: nil,
-        identicon: .stubIdenticon,
-        networks: []
-    )
-
-    static let stubs: [KeySetViewModel] = [
-        .init(seed: .stub, keyName: "key name", derivedKeys: nil, identicon: .stubIdenticon, networks: []),
-        .init(seed: .stub, keyName: "key name", derivedKeys: nil, identicon: .stubIdenticon, networks: [])
-    ]
-}
-
 extension TransactionSummaryModel {
     static let stub: TransactionSummaryModel = .init(
         pallet: "Balances",
