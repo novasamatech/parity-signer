@@ -28,6 +28,8 @@ extension ErrorDisplayed {
             return .noMetadataForNetwork(name: name)
         case let .Str(errorMessage):
             return .generic(errorMessage)
+        case .WrongPassword:
+            return .generic("Wrong password")
         }
     }
 }
