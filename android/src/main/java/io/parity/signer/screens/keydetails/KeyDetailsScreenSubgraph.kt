@@ -16,6 +16,7 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.toKeyDetailsModel
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -31,12 +32,11 @@ fun KeyDetailsScreenSubgraph(
 ) {
 
 	val vm = KeyDetailsScreenViewModel()
-	//todo dmitry fix
-	val model = remember {
+	val model = remember(keyAddr, keySpec) {
 		runBlocking {
 			vm.fetchModel(keyAddr, keySpec)
-		}.mapError()!!.toKeyDetailsModel()
-	}
+		}.handleErrorAppState(navController)?.toKeyDetailsModel()
+	} ?: return
 	val menuNavController = rememberNavController()
 
 	Box(modifier = Modifier.statusBarsPadding()) {

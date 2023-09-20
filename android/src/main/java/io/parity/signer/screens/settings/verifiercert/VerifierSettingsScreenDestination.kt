@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import io.parity.signer.domain.backend.mapError
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.runBlocking
@@ -19,10 +20,10 @@ fun NavGraphBuilder.verifierSettingsDestination(
 
 		val model = remember {
 			runBlocking {
-				vm.getVerifierCertModel().mapError()!!
-				//todo dmitry post error
-			}
-		}
+				vm.getVerifierCertModel()
+			}.handleErrorAppState(navController)
+		} ?: return@composable
+
 		VerifierScreenFull(
 			verifierDetails = model,
 			wipe = {

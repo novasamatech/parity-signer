@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import io.parity.signer.domain.backend.mapError
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.runBlocking
@@ -22,10 +23,10 @@ fun NavGraphBuilder.networkListDestination(
 
 		val model = remember {
 			runBlocking {
-				vm.getNetworkList().mapError()!!
-				//todo dmitry post error
-			}
-		}
+				vm.getNetworkList()
+			}.handleErrorAppState(navController)
+		} ?: return@composable
+
 		Box(modifier = Modifier.statusBarsPadding()) {
 			NetworksListScreen(
 				model = model,

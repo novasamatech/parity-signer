@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.mapError
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveNetworkBottomSheet
@@ -33,12 +34,9 @@ fun NetworkDetailsSubgraph(
 ) {
 	val vm: NetworkDetailsViewModel = viewModel()
 
-	val model = remember {
-		runBlocking {
-			vm.getNetworkDetails(networkKey).mapError()!!
-			//todo dmitry post error
-		}
-	}
+	val model = runBlocking {
+		vm.getNetworkDetails(networkKey).handleErrorAppState(navController)
+	} ?: return
 
 	val coroutineScope = rememberCoroutineScope()
 	val menuController = rememberNavController()
@@ -105,14 +103,8 @@ fun NetworkDetailsSubgraph(
 					onRemoveNetwork = {
 						coroutineScope.launch {
 							val result = vm.removeNetwork(networkKey)
-							when (result) {
-								is UniffiResult.Error -> {
-									//todo dmitry show error
-								}
-
-								is UniffiResult.Success -> {
-									navController.popBackStack()
-								}
+							result.handleErrorAppState(navController)?.let {
+								navController.popBackStack()
 							}
 						}
 						closeAction()
@@ -136,15 +128,8 @@ fun NetworkDetailsSubgraph(
 					onRemoveMetadata = {
 						coroutineScope.launch {
 							val result = vm.removeNetworkMetadata(networkKey, versionSpec)
-							when (result) {
-								is UniffiResult.Error -> {
-									//todo dmitry show error
-								}
-
-								is UniffiResult.Success -> {
-									//todo update network details model as well
-									navController.popBackStack()
-								}
+							result.handleErrorAppState(navController)?.let {
+								navController.popBackStack()
 							}
 						}
 						closeAction()

@@ -60,7 +60,7 @@ class SignSufficientCryptoInteractor {
 		navigator.navigate(Action.RIGHT_BUTTON_ACTION)
 		val result = navigate(
 			Action.SIGN_NETWORK_SPECS,
-		).mapError()
+		).mapError()//todo dmitry pass error
 		return (result?.screenData as? ScreenData.SignSufficientCrypto)?.f?.toSignSpecsListModel()
 	}
 
