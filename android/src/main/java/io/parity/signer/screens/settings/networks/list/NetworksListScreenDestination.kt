@@ -1,6 +1,9 @@
 package io.parity.signer.screens.settings.networks.list
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -23,17 +26,19 @@ fun NavGraphBuilder.networkListDestination(
 				//todo dmitry post error
 			}
 		}
-		NetworksListScreen(
-			model = model,
-			coreNavController = navController,
-			onBack = navController::popBackStack,
-			onOpenNetwork = { networkKey ->
-				navController.navigate(
-					SettingsNavSubgraph.NetworkDetails.destination(networkKey)
-				)
-			},
-			onNetworkHelp = { navController.navigate(CoreUnlockedNavSubgraph.networkHelpers) },
-			onAddNetwork = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
-		)
+		Box(modifier = Modifier.statusBarsPadding()) {
+			NetworksListScreen(
+				model = model,
+				coreNavController = navController,
+				onBack = navController::popBackStack,
+				onOpenNetwork = { networkKey ->
+					navController.navigate(
+						SettingsNavSubgraph.NetworkDetails.destination(networkKey)
+					)
+				},
+				onNetworkHelp = { navController.navigate(CoreUnlockedNavSubgraph.networkHelpers) },
+				onAddNetwork = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+			)
+		}
 	}
 }
