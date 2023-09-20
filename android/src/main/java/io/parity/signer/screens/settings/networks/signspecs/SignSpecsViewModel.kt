@@ -28,18 +28,19 @@ class SignSpecsViewModel : ViewModel() {
 	private val _password: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
 	val password = _password.asStateFlow()
-	private val _signature: MutableStateFlow<MSufficientCryptoReady?> =
+	private val _signature: MutableStateFlow<SignSpecsResultModel?> =
 		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
 
-	suspend fun getNetworkModel(networkKey: String): MSignSufficientCrypto? =
+	suspend fun getNetworkModel(networkKey: String): SignSpecsListModel? =
 		interactor.signNetworkSpecs(networkKey)
 
 	suspend fun getMetadataModel(
 		networkKey: String,
 		versionSpec: String
-	): MSignSufficientCrypto? =
+	): SignSpecsListModel? =
 		interactor.signMetadataSpecInfo(networkKey, versionSpec)
+
 
 	fun onSignSufficientCrypto(seedName: String, addressKey: String) {
 		viewModelScope.launch {
@@ -75,7 +76,7 @@ class SignSpecsViewModel : ViewModel() {
 					}
 					is ModalData.SufficientCryptoReady -> {
 						_password.update { null }
-						_signature.update { modal.f }
+						_signature.update { modal.f.toSignSpecsResultModel() }
 					}
 					else -> {
 						//todo dmitry show error for exceeded amout of attempts as in scan flow

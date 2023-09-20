@@ -6,22 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsResultBottomSheet
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsListScreen
+import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsResultBottomSheet
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.uniffi.MSignSufficientCrypto
 
-
-//todo dmitry test!
-//				as SignSufficientCryptoInteractor done
-//				navstate.rs:830 it's Sign sufficient crypto
-// end of action here calling go forward and it's in navstate.rs:427
 
 @Composable
 fun SignSpecsFull(
-	sc: MSignSufficientCrypto,
+	sc: SignSpecsListModel,
 	onBack: Callback
 ) {
 	val vm: SignSpecsViewModel = viewModel()
@@ -36,27 +30,27 @@ fun SignSpecsFull(
 	BackHandler(onBack = backAction)
 
 	SignSpecsListScreen(
-		model = sc.toSignSpecsListModel(),
+		model = sc,
 		onBack = onBack,
 		signSufficientCrypto = vm::onSignSufficientCrypto,
 		modifier = Modifier.statusBarsPadding(),
 	)
 
 	passwordState.value?.let { enterPasswordModel ->
-		BottomSheetWrapperRoot(onClosedAction = vm::clearState) {
+		BottomSheetWrapperRoot(onClosedAction = vm::isHasStateThenClear) {
 			EnterPassword(
 				data = enterPasswordModel,
 				proceed = { password ->
 					vm.passwordAttempt(password)
 				},
-				onClose = vm::clearState,
+				onClose = vm::isHasStateThenClear,
 			)
 		}
 	} ?: signatureState.value?.let { signature ->
-		BottomSheetWrapperRoot(onClosedAction = vm::clearState) {
+		BottomSheetWrapperRoot(onClosedAction = vm::isHasStateThenClear) {
 			SignSpecsResultBottomSheet(
-				model = signature.toSignSpecsResultModel(),
-				onBack = vm::clearState,
+				model = signature,
+				onBack = vm::isHasStateThenClear,
 			)
 		}
 	}
