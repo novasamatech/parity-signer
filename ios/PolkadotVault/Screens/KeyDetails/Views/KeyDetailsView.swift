@@ -10,38 +10,56 @@ import SwiftUI
 struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
     @EnvironmentObject private var connectivityMediator: ConnectivityMediator
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                // Navigation bar
-                NavigationBarView(
-                    viewModel: .init(
-                        leftButtons: [
-                            .init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() }),
-                            .init(type: .settings, action: viewModel.onSettingsTap)
-                        ],
-                        rightButtons: [
-                            .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
-                            .init(type: .more, action: viewModel.onMoreTap)
-                        ]
+        NavigationView {
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    // Navigation bar
+                    NavigationBarView(
+                        viewModel: .init(
+                            leftButtons: [
+                                .init(type: .settings, action: viewModel.onSettingsTap)
+                            ],
+                            rightButtons: [
+                                .init(type: .plus, action: viewModel.onCreateDerivedKeyTap),
+                                .init(type: .more, action: viewModel.onMoreTap)
+                            ]
+                        )
                     )
-                )
-                switch viewModel.viewState {
-                case .list:
-                    derivedKeysList()
-                case .emptyState:
-                    rootKeyHeader()
+                    switch viewModel.viewState {
+                    case .list:
+                        derivedKeysList()
+                    case .emptyState:
+                        rootKeyHeader()
+                        Spacer()
+                        emptyState()
+                        Spacer()
+                    }
+                }
+                .navigationBarHidden(true)
+                .background(Asset.backgroundPrimary.swiftUIColor)
+                VStack(spacing: 0) {
+                    ConnectivityAlertOverlay(viewModel: .init())
+                }
+                HStack(alignment: .center) {
                     Spacer()
-                    emptyState()
+                    QRCodeButton(action: viewModel.onQRScannerTap)
+                        .padding(.bottom, Spacing.extraLarge)
                     Spacer()
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            VStack(spacing: 0) {
-                ConnectivityAlertOverlay(viewModel: .init())
-            }
+        }
+        .navigationViewStyle(.stack)
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingQRScanner,
+            onDismiss: viewModel.onQRScannerDismiss
+        ) {
+            CameraView(
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingQRScanner
+                )
+            )
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingActionSheet,
@@ -64,7 +82,7 @@ struct KeyDetailsView: View {
             ExportKeysSelectionModal(
                 viewModel: .init(
                     rootKey: viewModel.keysData?.root?.base58 ?? "",
-                    rootIdenticon: viewModel.keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
+                    rootIdenticon: viewModel.keysData?.root?.address.identicon,
                     derivedKeys: viewModel.derivedKeys,
                     isPresented: $viewModel.isPresentingExportKeySelection,
                     onCompletion: viewModel.onExportKeySelectionComplete
@@ -135,9 +153,6 @@ struct KeyDetailsView: View {
             } else {
                 EmptyView()
             }
-        }
-        .onReceive(viewModel.dismissViewRequest) { _ in
-            presentationMode.wrappedValue.dismiss()
         }
         .fullScreenModal(
             isPresented: $viewModel.isPresentingNetworkSelection

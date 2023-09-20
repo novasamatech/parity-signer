@@ -12,11 +12,13 @@ extension KeyDetailsView {
     func rootKeyHeader() -> some View {
         if let keySummary = viewModel.keySummary {
             VStack(alignment: .center, spacing: 0) {
-                IdenticonView(
-                    identicon: viewModel.keysData?.root?.address.identicon ?? .jdenticon(identity: ""),
-                    rowHeight: Heights.identiconRootKeyDetails
-                )
-                .padding(.top, Spacing.extraSmall)
+                if let identicon = viewModel.keysData?.root?.address.identicon {
+                    IdenticonView(
+                        identicon: identicon,
+                        rowHeight: Heights.identiconRootKeyDetails
+                    )
+                    .padding(.top, Spacing.extraSmall)
+                }
                 HStack(spacing: 0) {
                     Text(keySummary.keyName)
                         .font(PrimaryFont.titleXL.font)
