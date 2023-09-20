@@ -28,6 +28,8 @@ extension ErrorDisplayed {
             return Localizable.TransactionSign.Error.NoMetadataForNetwork.message(name)
         case let .Str(errorMessage):
             return errorMessage
+        case .WrongPassword:
+            return Localizable.ErrorDisplayed.wrongPassword.string
         }
     }
 }

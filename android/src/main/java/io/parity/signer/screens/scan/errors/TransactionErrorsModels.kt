@@ -63,6 +63,7 @@ fun ErrorDisplayed.toTransactionError(): TransactionError {
 			genesisHash = genesisHash.toUByteArray().toByteArray().encodeHex(),
 			encryption = encryption.name
 		)
+		is ErrorDisplayed.WrongPassword -> TransactionError.Generic("Wrong Password")
 	}
 }
 
