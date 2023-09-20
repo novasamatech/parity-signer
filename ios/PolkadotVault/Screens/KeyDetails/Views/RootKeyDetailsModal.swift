@@ -51,10 +51,12 @@ struct RootKeyDetailsModal: View {
                                         }
                                     }
                                     Spacer()
-                                    IdenticonView(
-                                        identicon: viewModel.renderable.identicon,
-                                        rowHeight: Heights.identiconInCell
-                                    )
+                                    if let identicon = viewModel.renderable.identicon {
+                                        IdenticonView(
+                                            identicon: identicon,
+                                            rowHeight: Heights.identiconInCell
+                                        )
+                                    }
                                 }
                             }
                             .padding(Spacing.medium)
@@ -90,7 +92,7 @@ struct RootKeyDetailsModal: View {
 extension RootKeyDetailsModal {
     struct Renderable {
         let seedName: String
-        let identicon: Identicon
+        let identicon: Identicon?
         let base58: String
     }
 

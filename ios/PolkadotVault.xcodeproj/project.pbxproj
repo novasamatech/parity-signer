@@ -76,8 +76,6 @@
 		6D22FB882A9748700005993C /* BackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D22FB872A9748700005993C /* BackendService.swift */; };
 		6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D25E6B22A02323A00376AB9 /* FullscreenModal.swift */; };
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
-		6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */; };
-		6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */; };
 		6D2A5D0F2AA5DF47009E0C3A /* ManageKeySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */; };
 		6D2A5D112AA607C7009E0C3A /* ActionSheetCircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */; };
 		6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */; };
@@ -148,6 +146,7 @@
 		6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */; };
 		6D67F94329825D280017C278 /* JailbreakDetectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94229825D280017C278 /* JailbreakDetectedView.swift */; };
 		6D67F94529837BB00017C278 /* UnlockDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94429837BB00017C278 /* UnlockDeviceView.swift */; };
+		6D699FB52AA9CC7A0043B23A /* QRCodeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */; };
 		6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */; };
 		6D6DF33429F65A0B00FC06AD /* KeyDetailsActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */; };
 		6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */; };
@@ -236,7 +235,6 @@
 		6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */; };
 		6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD21FF289A8C74005D539B /* URL+Generate.swift */; };
 		6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD2201289A8E1F005D539B /* ErrorMock.swift */; };
-		6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBE12D728B3A80A005F3CCC /* KeySetList.swift */; };
 		6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */; };
 		6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */; };
 		6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */; };
@@ -268,10 +266,6 @@
 		6DDD73782940498000F04CE7 /* LogEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD73772940498000F04CE7 /* LogEntryView.swift */; };
 		6DDD737A29404E5000F04CE7 /* Event+EntryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD737929404E5000F04CE7 /* Event+EntryType.swift */; };
 		6DDD737C2940629D00F04CE7 /* LogsMoreActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD737B2940629D00F04CE7 /* LogsMoreActionsModal.swift */; };
-		6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF10F28AD105F004CA2FD /* TabBarView.swift */; };
-		6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11328AD12FA004CA2FD /* Tab.swift */; };
-		6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */; };
-		6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */; };
 		6DDEF13228AE6039004CA2FD /* signer.udl in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF12E28AE5EDA004CA2FD /* signer.udl */; };
 		6DDEF13C28AE7A30004CA2FD /* ApplicationInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13B28AE7A30004CA2FD /* ApplicationInformation.swift */; };
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
@@ -307,7 +301,6 @@
 		6DF714712A55652900F6A527 /* DynamicDerivationsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF714702A55652900F6A527 /* DynamicDerivationsService.swift */; };
 		6DF7257828BE0E08007CD9B6 /* DerivedKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */; };
 		6DF7751B28B399AC0040012E /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751A28B399AC0040012E /* CornerRadius.swift */; };
-		6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF7751D28B39F630040012E /* KeySetRow.swift */; };
 		6DF7751F28B3A0500040012E /* (null) in Resources */ = {isa = PBXBuildFile; };
 		6DF8316728F9BA4A00CB2BCE /* CapsuleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF8316628F9BA4A00CB2BCE /* CapsuleButton.swift */; };
 		6DF91F3E29C06B5F000A6BB2 /* Verifier+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF91F3D29C06B5F000A6BB2 /* Verifier+Show.swift */; };
@@ -426,8 +419,6 @@
 		6D22FB872A9748700005993C /* BackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendService.swift; sourceTree = "<group>"; };
 		6D25E6B22A02323A00376AB9 /* FullscreenModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenModal.swift; sourceTree = "<group>"; };
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
-		6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilder.swift; sourceTree = "<group>"; };
-		6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetListViewModelBuilderTests.swift; sourceTree = "<group>"; };
 		6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageKeySetsView.swift; sourceTree = "<group>"; };
 		6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetCircleButton.swift; sourceTree = "<group>"; };
 		6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyService.swift; sourceTree = "<group>"; };
@@ -498,6 +489,7 @@
 		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
 		6D67F94229825D280017C278 /* JailbreakDetectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectedView.swift; sourceTree = "<group>"; };
 		6D67F94429837BB00017C278 /* UnlockDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockDeviceView.swift; sourceTree = "<group>"; };
+		6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeButton.swift; sourceTree = "<group>"; };
 		6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandler.swift; sourceTree = "<group>"; };
 		6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsActionService.swift; sourceTree = "<group>"; };
 		6D6E99DA28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyOverviewRow.swift; sourceTree = "<group>"; };
@@ -584,7 +576,6 @@
 		6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMediatorTests.swift; sourceTree = "<group>"; };
 		6DBD21FF289A8C74005D539B /* URL+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Generate.swift"; sourceTree = "<group>"; };
 		6DBD2201289A8E1F005D539B /* ErrorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMock.swift; sourceTree = "<group>"; };
-		6DBE12D728B3A80A005F3CCC /* KeySetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetList.swift; sourceTree = "<group>"; };
 		6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModal.swift; sourceTree = "<group>"; };
 		6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModalViewModel.swift; sourceTree = "<group>"; };
 		6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediator.swift; sourceTree = "<group>"; };
@@ -617,10 +608,6 @@
 		6DDD73772940498000F04CE7 /* LogEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryView.swift; sourceTree = "<group>"; };
 		6DDD737929404E5000F04CE7 /* Event+EntryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+EntryType.swift"; sourceTree = "<group>"; };
 		6DDD737B2940629D00F04CE7 /* LogsMoreActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsMoreActionsModal.swift; sourceTree = "<group>"; };
-		6DDEF10F28AD105F004CA2FD /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
-		6DDEF11328AD12FA004CA2FD /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
-		6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilder.swift; sourceTree = "<group>"; };
-		6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModelBuilderTests.swift; sourceTree = "<group>"; };
 		6DDEF12E28AE5EDA004CA2FD /* signer.udl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = signer.udl; path = ../../../rust/signer/src/signer.udl; sourceTree = "<group>"; };
 		6DDEF13328AE6542004CA2FD /* signerFFI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
 		6DDEF13428AE6542004CA2FD /* signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
@@ -659,7 +646,6 @@
 		6DF714702A55652900F6A527 /* DynamicDerivationsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicDerivationsService.swift; sourceTree = "<group>"; };
 		6DF7257728BE0E08007CD9B6 /* DerivedKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRow.swift; sourceTree = "<group>"; };
 		6DF7751A28B399AC0040012E /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
-		6DF7751D28B39F630040012E /* KeySetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySetRow.swift; sourceTree = "<group>"; };
 		6DF8316628F9BA4A00CB2BCE /* CapsuleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleButton.swift; sourceTree = "<group>"; };
 		6DF91F3D29C06B5F000A6BB2 /* Verifier+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Verifier+Show.swift"; sourceTree = "<group>"; };
 		6DF91F3F29C06B70000A6BB2 /* VerifierValue+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VerifierValue+Show.swift"; sourceTree = "<group>"; };
@@ -733,7 +719,6 @@
 				6DCC572428D8C0290014278A /* Backup */,
 				6D2D245028CE5F0E00862726 /* PublicKey */,
 				6DC5643E28B929E0003D540B /* KeyDetails */,
-				6DF7751C28B39F590040012E /* KeySetsList */,
 				6D019966289C936800F4C317 /* Containers */,
 			);
 			path = Screens;
@@ -773,7 +758,6 @@
 				6D6430EA28CB2FD300342E37 /* Animators */,
 				6D95E97628B624FF00E28A11 /* Modals */,
 				6DDEF13D28AE7C4B004CA2FD /* Buttons */,
-				6DDEF11928AE2DD3004CA2FD /* TabBar */,
 				6D2779C728B3D33100570055 /* NavigationBarView.swift */,
 			);
 			path = Components;
@@ -874,8 +858,6 @@
 		2DE72BD226A588C9002BB752 /* PolkadotVaultTests */ = {
 			isa = PBXGroup;
 			children = (
-				6D2779CB28B3EBBF00570055 /* Screens */,
-				6DDEF12328AE38B1004CA2FD /* Components */,
 				6DBD21FE289A8C67005D539B /* Helpers */,
 				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
 				6D5801DA2899235C006C41D8 /* Core */,
@@ -1041,22 +1023,6 @@
 				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
 			);
 			path = NavigationServices;
-			sourceTree = "<group>";
-		};
-		6D2779CB28B3EBBF00570055 /* Screens */ = {
-			isa = PBXGroup;
-			children = (
-				6D2779CC28B3EBC300570055 /* KeySetList */,
-			);
-			path = Screens;
-			sourceTree = "<group>";
-		};
-		6D2779CC28B3EBC300570055 /* KeySetList */ = {
-			isa = PBXGroup;
-			children = (
-				6D2779CD28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift */,
-			);
-			path = KeySetList;
 			sourceTree = "<group>";
 		};
 		6D2D244928CCAD3700862726 /* Backend */ = {
@@ -1744,48 +1710,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		6DDEF11228AD12F2004CA2FD /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				6DDEF11328AD12FA004CA2FD /* Tab.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		6DDEF11628AD4209004CA2FD /* TabBar */ = {
-			isa = PBXGroup;
-			children = (
-				6DDEF12128AE38A1004CA2FD /* TabViewModelBuilderTests.swift */,
-			);
-			path = TabBar;
-			sourceTree = "<group>";
-		};
-		6DDEF11928AE2DD3004CA2FD /* TabBar */ = {
-			isa = PBXGroup;
-			children = (
-				6DDEF11A28AE2DE8004CA2FD /* Builders */,
-				6DDEF11228AD12F2004CA2FD /* ViewModels */,
-				6DDEF10F28AD105F004CA2FD /* TabBarView.swift */,
-			);
-			path = TabBar;
-			sourceTree = "<group>";
-		};
-		6DDEF11A28AE2DE8004CA2FD /* Builders */ = {
-			isa = PBXGroup;
-			children = (
-				6DDEF11B28AE2DF3004CA2FD /* TabViewModelBuilder.swift */,
-			);
-			path = Builders;
-			sourceTree = "<group>";
-		};
-		6DDEF12328AE38B1004CA2FD /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				6DDEF11628AD4209004CA2FD /* TabBar */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
 		6DDEF13D28AE7C4B004CA2FD /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
@@ -1802,6 +1726,7 @@
 				6DF8316628F9BA4A00CB2BCE /* CapsuleButton.swift */,
 				6DB99034295C1080001101DC /* ConnectivityAlertButton.swift */,
 				6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */,
+				6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -1920,16 +1845,6 @@
 			children = (
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		6DF7751C28B39F590040012E /* KeySetsList */ = {
-			isa = PBXGroup;
-			children = (
-				6DF7751D28B39F630040012E /* KeySetRow.swift */,
-				6DBE12D728B3A80A005F3CCC /* KeySetList.swift */,
-				6D2779C928B3E58600570055 /* KeySetListViewModelBuilder.swift */,
-			);
-			path = KeySetsList;
 			sourceTree = "<group>";
 		};
 		6DF91F3B29C06AF6000A6BB2 /* StateMediators */ = {
@@ -2260,7 +2175,6 @@
 				6DA501D9290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift in Sources */,
 				6D8973A72A08E6550046A2F3 /* GeneralVerifierService.swift in Sources */,
 				6D30228329D183BE0074CDDF /* SignSpecEnterPasswordModal.swift in Sources */,
-				6DDEF11428AD12FA004CA2FD /* Tab.swift in Sources */,
 				6DA2ACAC2939E87600AAEADC /* Event+Value.swift in Sources */,
 				6D25E6B32A02323A00376AB9 /* FullscreenModal.swift in Sources */,
 				6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */,
@@ -2285,7 +2199,6 @@
 				2DAA829327873027002917C0 /* TCDerivations.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */,
-				6DDEF11028AD105F004CA2FD /* TabBarView.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				6D22FB882A9748700005993C /* BackendService.swift in Sources */,
 				6D6E99DB28D8DCCB003F45CE /* DerivedKeyOverviewRow.swift in Sources */,
@@ -2372,7 +2285,6 @@
 				6D52E3AA2946F58200AD72F0 /* VerifierCertificateView.swift in Sources */,
 				6DB9903F2962A97E001101DC /* ImportDerivedKeysService.swift in Sources */,
 				6D88CFFA28C6365A001FB0A1 /* ActionSheetButton.swift in Sources */,
-				6DF7751E28B39F630040012E /* KeySetRow.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */,
 				6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */,
@@ -2405,6 +2317,7 @@
 				6D8973A52A08E18C0046A2F3 /* ScanTabService.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				6D0677AE29BB0D0000D76D90 /* WarningStateMediator.swift in Sources */,
+				6D699FB52AA9CC7A0043B23A /* QRCodeButton.swift in Sources */,
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
@@ -2417,8 +2330,6 @@
 				6DFAF36B28AF7F8A0048763B /* Spacing.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
-				6DDEF11C28AE2DF3004CA2FD /* TabViewModelBuilder.swift in Sources */,
-				6DBE12D828B3A80A005F3CCC /* KeySetList.swift in Sources */,
 				6DB9903B295EA7DE001101DC /* ActionableInfoBoxView.swift in Sources */,
 				6DD4A6A429E9404200FA6746 /* CreateKeySetService.swift in Sources */,
 				6D220A2C2963DBC300122DA8 /* EnterBananaSplitPasswordModal.swift in Sources */,
@@ -2447,7 +2358,6 @@
 				6DD4A6A629E9480700FA6746 /* KeyListService.swift in Sources */,
 				6D95E97328B4F42300E28A11 /* ActionButton.swift in Sources */,
 				2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */,
-				6D2779CA28B3E58600570055 /* KeySetListViewModelBuilder.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
 				6D07D370292B40D2001A0B79 /* TransactionSummaryView.swift in Sources */,
 				6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */,
@@ -2494,11 +2404,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */,
-				6DDEF12228AE38A1004CA2FD /* TabViewModelBuilderTests.swift in Sources */,
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
-				6D2779CE28B3EBD100570055 /* KeySetListViewModelBuilderTests.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,

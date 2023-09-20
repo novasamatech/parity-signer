@@ -51,19 +51,19 @@ extension KeyDetailsView {
                 .onTapGesture {
                     viewModel.onDerivedKeyTap(deriveKey)
                 }
-                NavigationLink(
-                    destination:
-                    KeyDetailsPublicKeyView(
-                        viewModel: .init(
-                            keyDetails: viewModel.presentedKeyDetails,
-                            addressKey: viewModel.presentedPublicKeyDetails,
-                            onCompletion: viewModel.onPublicKeyCompletion(_:)
-                        )
-                    )
-                    .navigationBarHidden(true),
-                    isActive: $viewModel.isPresentingKeyDetails
-                ) { EmptyView() }
             }
+            NavigationLink(
+                destination:
+                KeyDetailsPublicKeyView(
+                    viewModel: .init(
+                        keyDetails: viewModel.presentedKeyDetails,
+                        addressKey: viewModel.presentedPublicKeyDetails,
+                        onCompletion: viewModel.onPublicKeyCompletion(_:)
+                    )
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingKeyDetails
+            ) { EmptyView() }
             Spacer()
                 .frame(height: Heights.actionButton + Spacing.large)
         }
