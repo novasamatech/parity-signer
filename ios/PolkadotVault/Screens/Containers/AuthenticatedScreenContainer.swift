@@ -16,19 +16,9 @@ struct AuthenticatedScreenContainer: View {
 
     var body: some View {
         ZStack {
-            KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
+            KeyDetailsView(viewModel: .init())
         }
         .animation(.default, value: AnimationDuration.standard)
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingQRScanner,
-            onDismiss: viewModel.onQRScannerDismiss
-        ) {
-            CameraView(
-                viewModel: .init(
-                    isPresented: $viewModel.isShowingQRScanner
-                )
-            )
-        }
         .fullScreenModal(
             isPresented: $navigation.genericError.isPresented
         ) {
@@ -38,41 +28,9 @@ struct AuthenticatedScreenContainer: View {
             )
             .clearModalBackground()
         }
-        .onAppear {
-            viewModel.use(appState: appState)
-        }
-    }
-
-    private func tabBarViewModel() -> TabBarView.ViewModel {
-        .init(
-            selectedTab: $viewModel.selectedTab,
-            onQRCodeTap: viewModel.onQRCodeTap,
-            onKeysTap: viewModel.onKeysTap
-        )
     }
 }
 
 extension AuthenticatedScreenContainer {
-    final class ViewModel: ObservableObject {
-        private weak var appState: AppState!
-
-        @Published var selectedTab: Tab = .keys
-        @Published var isShowingQRScanner: Bool = false
-
-        func use(appState: AppState) {
-            self.appState = appState
-        }
-
-        func onQRCodeTap() {
-            isShowingQRScanner = true
-        }
-
-        func onKeysTap() {
-            selectedTab = .keys
-        }
-
-        func onQRScannerDismiss() {
-            appState.userData.keyListRequiresUpdate = true
-        }
-    }
+    final class ViewModel: ObservableObject {}
 }
