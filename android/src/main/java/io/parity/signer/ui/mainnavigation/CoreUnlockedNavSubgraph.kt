@@ -110,7 +110,7 @@ fun CoreUnlockedNavSubgraph() {
 	}
 }
 
-internal object CoreUnlockedNavSubgraph {
+object CoreUnlockedNavSubgraph {
 	const val keySetList = "core_keyset_list"
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"

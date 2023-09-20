@@ -150,8 +150,10 @@ fun KeySetDetailsScreenSubgraph(
 								}
 							}
 						} else {
-							//todo dmitry key details check if this functions should be disabled in a first place
-							submitErrorState("came to remove key set but root key is not available")
+							navController.navigate(CoreUnlockedNavSubgraph.ErrorScreen.destination(
+								"This keyset doesn't have a root",
+								"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
+								""))
 						}
 					},
 				)

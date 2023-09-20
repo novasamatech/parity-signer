@@ -325,8 +325,6 @@ class UniffiInteractor(val appContext: Context) {
 				UniffiResult.Error(e)
 			}
 		}
-
-
 }
 
 sealed class UniffiResult<T> {
@@ -345,6 +343,7 @@ sealed class CompletableResult<out T, out E> {
 	object InProgress : CompletableResult<Nothing, Nothing>()
 }
 
+@Deprecated("Handle error state")
 fun <T> UniffiResult<T>.mapError(): T? {
 	return when (this) {
 		is UniffiResult.Error -> {
@@ -362,7 +361,7 @@ fun <T> UniffiResult<T>.mapError(): T? {
 fun <T, V> OperationResult<T, V>.mapError(): T? {
 	return when (this) {
 		is OperationResult.Err -> {
-			submitErrorState("uniffi interaction exception $error")
+			submitErrorState("operation interaction exception $error")
 			null
 		}
 

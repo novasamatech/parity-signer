@@ -109,10 +109,6 @@ fun KeySetDetailsScreenView(
 								networkAndKeys.key.addressKey,
 								networkAndKeys.network.networkSpecsKey
 							)
-//							val selectKeyDetails =
-//								"${networkAndKeys.key.addressKey}\n${networkAndKeys.network.networkSpecsKey}"
-//							todo dmitry remove this
-//							navigator.navigate(Action.SELECT_KEY, selectKeyDetails)
 						}
 					}
 				}

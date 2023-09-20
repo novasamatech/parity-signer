@@ -33,8 +33,10 @@ internal fun ErrorStateScreen(
 	modifier: Modifier = Modifier,
 ) {
 	Column(modifier = modifier) {
-		ScreenHeaderClose(title = stringResource(R.string.error_state_screen_title),
-			onClose = onBack)
+		ScreenHeaderClose(
+			title = stringResource(R.string.error_state_screen_title),
+			onClose = onBack
+		)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
@@ -56,22 +58,23 @@ internal fun ErrorStateScreen(
 				color = MaterialTheme.colors.textSecondary,
 				style = SignerTypeface.BodyL,
 			)
-			Text(
-				modifier = Modifier
-					.padding(horizontal = 24.dp),
-				text = stringResource(R.string.error_state_screen_verbose_subtitle),
-				color = MaterialTheme.colors.textSecondary,
-				style = SignerTypeface.BodyM,
-			)
-			Text(
-				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(bottom = 16.dp),
-				text = verbose,
-				color = MaterialTheme.colors.textSecondary,
-				style = SignerTypeface.BodyM,
-			)
-
+			if (verbose.isNotEmpty()) {
+				Text(
+					modifier = Modifier
+						.padding(horizontal = 24.dp),
+					text = stringResource(R.string.error_state_screen_verbose_subtitle),
+					color = MaterialTheme.colors.textSecondary,
+					style = SignerTypeface.BodyM,
+				)
+				Text(
+					modifier = Modifier
+						.padding(horizontal = 24.dp)
+						.padding(bottom = 16.dp),
+					text = verbose,
+					color = MaterialTheme.colors.textSecondary,
+					style = SignerTypeface.BodyM,
+				)
+			}
 		}
 //		PrimaryButtonWide(
 //			label = stringResource(R.string.button_next),

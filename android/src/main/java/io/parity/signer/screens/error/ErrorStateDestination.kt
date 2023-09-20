@@ -5,6 +5,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.parity.signer.domain.backend.UniffiResult
+import io.parity.signer.domain.getDebugDetailedDescriptionString
+import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
@@ -38,5 +41,25 @@ fun NavGraphBuilder.errorStateDestination(
 			verbose = argVerbose,
 			onBack = { navController.popBackStack() },
 		)
+	}
+}
+
+
+inline fun <reified T> UniffiResult<T>.handleErrorAppState(coreNavController: NavController): T? {
+	return when (this) {
+		is UniffiResult.Error -> {
+			coreNavController.navigate(
+				CoreUnlockedNavSubgraph.ErrorScreen.destination(
+					argHeader = "Uniffi interaction error trying to get ${T::class.java}",
+					argDescription = error.toString(),
+					argVerbose = error.getDebugDetailedDescriptionString(),
+				)
+			)
+			null
+		}
+
+		is UniffiResult.Success -> {
+			result
+		}
 	}
 }
