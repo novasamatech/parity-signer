@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
+import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
 import io.parity.signer.screens.keysets.KeySetsListScreenSubgraph
@@ -133,6 +134,9 @@ fun CoreUnlockedNavSubgraph() {
 			navController = navController,
 		)
 		networkHelpersCoreSubgraph(
+			navController = navController,
+		)
+		errorStateDestination(
 			navController = navController,
 		)
 	}
