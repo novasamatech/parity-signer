@@ -29,7 +29,7 @@ extension ErrorDisplayed {
         case let .Str(errorMessage):
             return .generic(errorMessage)
         case .WrongPassword:
-            return .generic("Wrong password")
+            return .generic(Localizable.ErrorDisplayed.wrongPassword.string)
         }
     }
 }
