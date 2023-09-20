@@ -70,8 +70,6 @@ fun NewKeySetNameScreen(
 			onButton = {
 				if (canProceed) {
 					onNextStep(keySetName)
-					//todo dmitry check if I need it
-					focusManager.clearFocus(true)
 				}
 			},
 			backNotClose = false,
@@ -102,8 +100,6 @@ fun NewKeySetNameScreen(
 				onDone = {
 					if (canProceed) {
 						onNextStep(keySetName)
-//todo dmitry and here as above
-						focusManager.clearFocus(true)
 					}
 				}
 			),

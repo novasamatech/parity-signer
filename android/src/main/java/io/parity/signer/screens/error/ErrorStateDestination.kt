@@ -12,25 +12,25 @@ fun NavGraphBuilder.errorStateDestination(
 	navController: NavController,
 ) {
 	composable(
-		route = CoreUnlockedNavSubgraph.ErrorState.route,
+		route = CoreUnlockedNavSubgraph.ErrorScreen.route,
 		arguments = listOf(
-			navArgument(CoreUnlockedNavSubgraph.ErrorState.argHeader) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argHeader) {
 				type = NavType.StringType
 			},
-			navArgument(CoreUnlockedNavSubgraph.ErrorState.argDescription) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argDescription) {
 				type = NavType.StringType
 			},
-			navArgument(CoreUnlockedNavSubgraph.ErrorState.argVerbose) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argVerbose) {
 				type = NavType.StringType
 			},
 		),
 	) {
 		val argHeader =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorState.argHeader)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argHeader)!!
 		val argDescr =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorState.argDescription)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argDescription)!!
 		val argVerbose =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorState.argVerbose)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argVerbose)!!
 
 		ErrorStateScreen(
 			header = argHeader,

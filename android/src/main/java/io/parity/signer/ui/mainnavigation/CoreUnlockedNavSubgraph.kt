@@ -3,27 +3,22 @@ package io.parity.signer.ui.mainnavigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import io.parity.signer.domain.submitErrorState
-import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
-import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenSubgraph
+import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
 import io.parity.signer.screens.keysets.KeySetsListScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
-import io.parity.signer.screens.settings.settingsFullSubgraph
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
-import io.parity.signer.uniffi.ErrorDisplayed
-import io.parity.signer.uniffi.keysBySeedName
+import io.parity.signer.screens.settings.settingsFullSubgraph
 
 @Composable
 fun CoreUnlockedNavSubgraph() {
@@ -40,34 +35,7 @@ fun CoreUnlockedNavSubgraph() {
 				)
 			}
 		}
-		composable(
-			route = CoreUnlockedNavSubgraph.KeySetDetails.route,
-			arguments = listOf(
-				navArgument(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg) {
-					type = NavType.StringType
-				}
-			)
-		) {
-			val seedName =
-				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)
-			val model = remember {
-				try {
-					//todo dmitry export this to vm and handle errors - open default for example
-					keysBySeedName(seedName!!).toKeySetDetailsModel()
-				} catch (e: ErrorDisplayed) {
-					submitErrorState("unexpected error in keysBySeedName $e")
-					navController.popBackStack()
-					null
-				}
-			}
-			model?.let {
-				KeySetDetailsScreenSubgraph(
-					fullModel = model,
-					navController = navController,
-					onBack = { navController.popBackStack() },
-				)
-			}
-		}
+		keySetDetailsDestination(navController)
 		composable(CoreUnlockedNavSubgraph.newKeySet) {
 			NewKeysetSubgraph(
 				coreNavController = navController,
@@ -171,7 +139,7 @@ internal object CoreUnlockedNavSubgraph {
 			"$baseRoute/$keyAddr/$keySpec"
 	}
 
-	object ErrorState {
+	object ErrorScreen {
 		internal const val argHeader = "key_header"
 		internal const val argDescription = "key_descr"
 		internal const val argVerbose = "key_verb"
