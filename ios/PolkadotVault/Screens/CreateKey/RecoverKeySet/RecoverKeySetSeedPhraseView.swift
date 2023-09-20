@@ -81,6 +81,14 @@ struct RecoverKeySetSeedPhraseView: View {
                     }
                     .frame(height: 36)
                 }
+                NavigationLink(
+                    destination:
+                    CreateKeysForNetworksView(
+                        viewModel: viewModel.createDerivedKeys()
+                    )
+                    .navigationBarHidden(true),
+                    isActive: $viewModel.isPresentingDetails
+                ) { EmptyView() }
             }
             .onAppear {
                 focus = true
@@ -96,14 +104,6 @@ struct RecoverKeySetSeedPhraseView: View {
                 )
                 .clearModalBackground()
             }
-            NavigationLink(
-                destination:
-                CreateKeysForNetworksView(
-                    viewModel: viewModel.createDerivedKeys()
-                )
-                .navigationBarHidden(true),
-                isActive: $viewModel.isPresentingDetails
-            ) { EmptyView() }
         }
     }
 

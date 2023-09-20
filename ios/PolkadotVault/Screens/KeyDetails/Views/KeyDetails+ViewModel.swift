@@ -69,10 +69,12 @@ extension KeyDetailsView {
 
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
+        private let onDeleteCompletion: () -> Void
         /// Name of seed to be removed with `Remove Seed` action
         private var removeSeed: String = ""
 
         init(
+            onDeleteCompletion: @escaping () -> Void,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
@@ -81,6 +83,7 @@ extension KeyDetailsView {
             appState: AppState = ServiceLocator.appState,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
+            self.onDeleteCompletion = onDeleteCompletion
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
@@ -148,13 +151,17 @@ extension KeyDetailsView {
             keyDetailsActionsService.forgetKeySet(seedName: keyName) { result in
                 switch result {
                 case .success:
-                    self.keyName = self.seedsMediator.seedNames.first ?? ""
-                    self.refreshData()
                     self.snackbarViewModel = .init(
                         title: Localizable.KeySetsModal.Confirmation.snackbar.string,
                         style: .warning
                     )
                     self.isSnackbarPresented = true
+                    if self.seedsMediator.seedNames.isEmpty {
+                        self.onDeleteCompletion()
+                    } else {
+                        self.keyName = self.seedsMediator.seedNames.first ?? ""
+                        self.refreshData()
+                    }
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.localizedDescription)
                     self.isPresentingError = true

@@ -631,3 +631,8 @@
 "ManageKeySets.Label.DerivedKeys.plural" = "%@ Keys";
 "ManageKeySets.Action.Add" = "Add new Key Set";
 "ManageKeySets.Action.Recover" = "Recover Key Set";
+
+"NoKeySets.Label.Header" = "Welcome to\nPolkadot Vault";
+"NoKeySets.Label.Subheader" = "Add a new key set or recover an existing one by entering the secret recovery phrase to get started";
+"NoKeySets.Action.Add" = "Add new Key Set";
+"NoKeySets.Action.Recover" = "Recover Key Set";

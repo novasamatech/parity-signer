@@ -38,6 +38,7 @@ struct KeyDetailsView: View {
                     }
                 }
                 .navigationBarHidden(true)
+                .navigationViewStyle(.stack)
                 .background(Asset.backgroundPrimary.swiftUIColor)
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
