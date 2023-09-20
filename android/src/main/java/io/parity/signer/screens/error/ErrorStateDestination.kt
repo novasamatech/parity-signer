@@ -31,6 +31,7 @@ fun NavGraphBuilder.errorStateDestination(
 			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorState.argDescription)!!
 		val argVerbose =
 			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorState.argVerbose)!!
+
 		ErrorStateScreen(
 			header = argHeader,
 			description = argDescr,

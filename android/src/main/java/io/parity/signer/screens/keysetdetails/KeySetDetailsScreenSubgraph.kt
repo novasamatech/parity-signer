@@ -1,5 +1,7 @@
 package io.parity.signer.screens.keysetdetails
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -92,6 +94,12 @@ fun KeySetDetailsScreenSubgraph(
 	NavHost(
 		navController = menuNavController,
 		startDestination = KeySetDetailsMenuSubgraph.empty,
+		enterTransition = {
+			EnterTransition.None
+		},
+		exitTransition = {
+			slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+		},
 	) {
 		val closeAction: Callback = {
 			menuNavController.popBackStack()

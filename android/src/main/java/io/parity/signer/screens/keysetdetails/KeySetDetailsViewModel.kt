@@ -67,14 +67,14 @@ class KeySetDetailsViewModel : ViewModel() {
 	}
 
 	suspend fun getSeedPhrase(seedName: String): String? {
-		val result = seedRepository.getSeedPhraseForceAuth(seedName)
-		when (result) {
+		return when (val result = seedRepository.getSeedPhraseForceAuth(seedName)) {
 			is RepoResult.Failure -> {
+				null
 			}
 			is RepoResult.Success -> {
 				backupInteractor.notifyRustSeedWasShown(seedName)
+				result.result
 			}
 		}
-		return result.toOperationResult().mapError()
 	}
 }
