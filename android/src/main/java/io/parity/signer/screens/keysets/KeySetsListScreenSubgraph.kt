@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
@@ -30,38 +31,36 @@ fun KeySetsListScreenSubgraph(
 
 	val menuNavController = rememberNavController()
 
-	val modelValue = model.value
-	if (modelValue != null) {
-		KeySetsListScreenFull(
-			model = modelValue,
-			navController = navController,
-			onSelectSeed = { seedname ->
-				navController.navigate(
-					CoreUnlockedNavSubgraph.KeySetDetails.destination(
-						seedName = seedname
-					)
+	val modelValue = model.value.handleErrorAppState(navController) ?: return
+
+	KeySetsListScreenFull(
+		model = modelValue,
+		navController = navController,
+		onSelectSeed = { seedname ->
+			navController.navigate(
+				CoreUnlockedNavSubgraph.KeySetDetails.destination(
+					seedName = seedname
 				)
-			},
-			onExposedShow = {
-				menuNavController.navigate(KeySetsMenuSubgraph.exposed_shield_alert) {
-					popUpTo(KeySetsMenuSubgraph.empty)
-				}
-			},
-			onNewKeySet = {
-				navController.navigate(
-					CoreUnlockedNavSubgraph.newKeySet
-				)
-			},
-			onRecoverKeySet = {
-				navController.navigate(
-					CoreUnlockedNavSubgraph.recoverKeySet
-				)
-			},
-			networkState = networkState,
-		)
-	} else {
-		//todo dmitry handle post Error
-	}
+			)
+		},
+		onExposedShow = {
+			menuNavController.navigate(KeySetsMenuSubgraph.exposed_shield_alert) {
+				popUpTo(KeySetsMenuSubgraph.empty)
+			}
+		},
+		onNewKeySet = {
+			navController.navigate(
+				CoreUnlockedNavSubgraph.newKeySet
+			)
+		},
+		onRecoverKeySet = {
+			navController.navigate(
+				CoreUnlockedNavSubgraph.recoverKeySet
+			)
+		},
+		networkState = networkState,
+	)
+
 
 	//bottoms sheets
 	NavHost(

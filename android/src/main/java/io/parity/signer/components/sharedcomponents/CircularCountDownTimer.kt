@@ -153,10 +153,11 @@ fun SnackBarCircularCountDownTimer(
 	}
 
 	//todo dmitry check in launched effect if parent scope is closed - then don't run it.
-	//	DisposableEffect(key1 = onTimeOutAction,) {
-//
-//	}
+
 	val currentTimeoutAction by rememberUpdatedState(onTimeOutAction)
+//	DisposableEffect(key1 = onTimeOutAction) {
+//		onDispose { currentTimeoutAction.value  = {} }
+//	}
 	LaunchedEffect(key1 = Unit) {
 		try {
 			while (timeLeft > 0) {

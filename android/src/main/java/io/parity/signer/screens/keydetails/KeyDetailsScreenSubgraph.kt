@@ -83,8 +83,11 @@ fun KeyDetailsScreenSubgraph(
 					onCancel = closeAction,
 					onRemoveKey = {
 						context.launch {
-							val result = vm.removeDerivedKey(keyAddr, keySpec)
-							//todo dmitry post toast success of not
+							vm.removeDerivedKey(keyAddr, keySpec)
+								.handleErrorAppState(navController)?.let {
+									closeAction()
+									navController.popBackStack()
+								}
 						}
 					},
 				)
@@ -103,11 +106,12 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
-			val privateModel = remember(Unit) {//don't forget to pass password in this parameter
-				runBlocking {
-					vm.getPrivateExportKey(model)
+			val privateModel =
+				remember(Unit) {//don't forget to pass password in this parameter
+					runBlocking {
+						vm.getPrivateExportKey(model)
+					}
 				}
-			}
 			when (privateModel) {
 				is OperationResult.Err -> {
 					// #1533
@@ -120,6 +124,7 @@ fun KeyDetailsScreenSubgraph(
 					).show()
 					closeAction()
 				}
+
 				is OperationResult.Ok -> {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
 						PrivateKeyExportBottomSheet(

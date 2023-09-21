@@ -43,11 +43,7 @@ class KeyDetailsScreenViewModel {
 	suspend fun removeDerivedKey(
 		addressKey: String,
 		networkSpecsKey: String,
-	): Boolean {
-		val result = uniFfi.removedDerivedKey(addressKey, networkSpecsKey)
-		return when (result) {
-			is UniffiResult.Error -> false
-			is UniffiResult.Success -> true
-		}
+	):  UniffiResult<Unit>  {
+		return uniFfi.removedDerivedKey(addressKey, networkSpecsKey)
 	}
 }

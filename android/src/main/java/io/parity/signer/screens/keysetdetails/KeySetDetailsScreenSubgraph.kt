@@ -23,6 +23,7 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
@@ -142,18 +143,19 @@ fun KeySetDetailsScreenSubgraph(
 						val root = fullModel.root
 						if (root != null) {
 							coroutineScope.launch {
-								when (keySetViewModel.removeSeed(root)) {
-									is OperationResult.Err -> TODO() //todo dmitry error state
-									is OperationResult.Ok -> {
+								keySetViewModel.removeSeed(root)
+									.handleErrorAppState(navController)?.let {
 										navController.navigate(CoreUnlockedNavSubgraph.keySetList)
 									}
-								}
 							}
 						} else {
-							navController.navigate(CoreUnlockedNavSubgraph.ErrorScreen.destination(
-								"This keyset doesn't have a root",
-								"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
-								""))
+							navController.navigate(
+								CoreUnlockedNavSubgraph.ErrorScreen.destination(
+									"This keyset doesn't have a root",
+									"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
+									""
+								)
+							)
 						}
 					},
 				)
