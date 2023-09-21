@@ -5,7 +5,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph

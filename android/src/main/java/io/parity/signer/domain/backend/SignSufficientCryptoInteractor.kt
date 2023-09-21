@@ -55,13 +55,21 @@ class SignSufficientCryptoInteractor {
 
 	suspend fun signNetworkSpecs(
 		networkKey: String,
-	): SignSpecsListModel? {
+	): OperationResult<SignSpecsListModel, NavigationError> {
 		resetMachineState(networkKey)
 		navigator.navigate(Action.RIGHT_BUTTON_ACTION)
 		val result = navigate(
 			Action.SIGN_NETWORK_SPECS,
-		).mapError()//todo dmitry pass error
-		return (result?.screenData as? ScreenData.SignSufficientCrypto)?.f?.toSignSpecsListModel()
+		).map {
+			val successful =
+				(it.screenData as? ScreenData.SignSufficientCrypto)?.f?.toSignSpecsListModel()
+			return@map if (successful != null) {
+				OperationResult.Ok(successful)
+			} else {
+				OperationResult.Err(NavigationError(""))//todo dmitry
+			}
+		}
+		return result
 	}
 
 	suspend fun signMetadataSpecInfo(
