@@ -25,7 +25,6 @@ class ResetUseCase {
 	private val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-	//todo dmitry test
 	fun wipeToFactoryWithAuth(onAfterWide: Callback) {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {

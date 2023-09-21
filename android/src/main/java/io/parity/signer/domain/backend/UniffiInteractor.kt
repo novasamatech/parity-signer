@@ -371,7 +371,7 @@ fun <T, V> OperationResult<T, V>.mapError(): T? {
 	}
 }
 
-fun <T, V, R> OperationResult<T, V>.map(transform: (T) -> R): OperationResult<R, V> =
+fun <T, V, R> OperationResult<T, V>.mapInner(transform: (T) -> R): OperationResult<R, V> =
 	when (this) {
 		is OperationResult.Err -> this
 		is OperationResult.Ok -> OperationResult.Ok(transform(this.result))

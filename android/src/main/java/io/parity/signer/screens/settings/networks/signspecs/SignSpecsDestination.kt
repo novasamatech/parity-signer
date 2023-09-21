@@ -28,6 +28,7 @@ fun NavGraphBuilder.signSpecsDestination(
 	) {
 		val networkKey =
 			it.arguments?.getString(SettingsNavSubgraph.SignNetworkSpecs.networkKey)!!
+
 		val vm: SignSpecsViewModel = viewModel()
 		val model = remember(networkKey) {
 			runBlocking {
