@@ -14,8 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.backend.UniffiResult
-import io.parity.signer.domain.backend.mapError
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.networks.details.menu.ConfirmRemoveMetadataBottomSheet

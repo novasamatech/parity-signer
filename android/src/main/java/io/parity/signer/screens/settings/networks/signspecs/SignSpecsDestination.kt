@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import kotlinx.coroutines.runBlocking
 
@@ -30,10 +31,9 @@ fun NavGraphBuilder.signSpecsDestination(
 		val vm: SignSpecsViewModel = viewModel()
 		val model = remember(networkKey) {
 			runBlocking {
-				vm.getNetworkModel(networkKey)!!
-				//todo dmitry post error
+				vm.getNetworkModel(networkKey).handleErrorAppState(navController)
 			}
-		}
+		} ?: return@composable
 		SignSpecsFull(model, onBack = navController::popBackStack)
 	}
 	composable(
@@ -53,12 +53,11 @@ fun NavGraphBuilder.signSpecsDestination(
 			it.arguments?.getString(SettingsNavSubgraph.SignMetadataSpecs.metadataSpecVer)!!
 
 		val vm: SignSpecsViewModel = viewModel()
-		val model = remember {
+		val model = remember(networkKey, metadataSpecVer) {
 			runBlocking {
-				vm.getMetadataModel(networkKey, metadataSpecVer)!!
-				//todo dmitry post error
+				vm.getMetadataModel(networkKey, metadataSpecVer).handleErrorAppState(navController)
 			}
-		}
+		} ?: return@composable
 		SignSpecsFull(model, onBack = navController::popBackStack)
 	}
 }

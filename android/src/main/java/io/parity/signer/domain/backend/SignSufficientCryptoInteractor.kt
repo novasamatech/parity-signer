@@ -8,6 +8,7 @@ import io.parity.signer.screens.settings.networks.signspecs.SignSpecsListModel
 import io.parity.signer.screens.settings.networks.signspecs.toSignSpecsListModel
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ActionResult
+import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.MRawKey
 import io.parity.signer.uniffi.MSignSufficientCrypto
@@ -55,7 +56,7 @@ class SignSufficientCryptoInteractor {
 
 	suspend fun signNetworkSpecs(
 		networkKey: String,
-	): OperationResult<SignSpecsListModel, NavigationError> {
+	): OperationResult<SignSpecsListModel, Any> {
 		resetMachineState(networkKey)
 		navigator.navigate(Action.RIGHT_BUTTON_ACTION)
 		val result = navigate(
@@ -66,7 +67,11 @@ class SignSufficientCryptoInteractor {
 			return@map if (successful != null) {
 				OperationResult.Ok(successful)
 			} else {
-				OperationResult.Err(NavigationError(""))//todo dmitry
+				if (it.alertData is AlertData.ErrorData) {
+					OperationResult.Err(NavigationError("Rust alert error is ${(it.alertData as AlertData.ErrorData).f}"))
+				}else {
+					OperationResult.Err("Unknown navigation, full object is $it")
+				}
 			}
 		}
 		return result
@@ -75,13 +80,25 @@ class SignSufficientCryptoInteractor {
 	suspend fun signMetadataSpecInfo(
 		networkKey: String,
 		specsVersion: String,
-	): SignSpecsListModel? {
+	): OperationResult<SignSpecsListModel, Any> {
 		resetMachineState(networkKey)
 		navigator.navigate(Action.MANAGE_METADATA, specsVersion)
 		val result = navigate(
 			Action.SIGN_METADATA,
-		).mapError()
-		return (result?.screenData as? ScreenData.SignSufficientCrypto)?.f?.toSignSpecsListModel()
+		).map {
+			val successful =
+				(it.screenData as? ScreenData.SignSufficientCrypto)?.f?.toSignSpecsListModel()
+			return@map if (successful != null) {
+				OperationResult.Ok(successful)
+			} else {
+				if (it.alertData is AlertData.ErrorData) {
+					OperationResult.Err(NavigationError("Rust alert error is ${(it.alertData as AlertData.ErrorData).f}"))
+				}else {
+					OperationResult.Err("Unknown navigation, full object is $it")
+				}
+			}
+		}
+		return result
 	}
 
 	suspend fun attemptSigning(

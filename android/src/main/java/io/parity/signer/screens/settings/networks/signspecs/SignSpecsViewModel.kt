@@ -32,13 +32,13 @@ class SignSpecsViewModel : ViewModel() {
 		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
 
-	suspend fun getNetworkModel(networkKey: String): SignSpecsListModel? =
+	suspend fun getNetworkModel(networkKey: String): OperationResult<SignSpecsListModel, Any> =
 		interactor.signNetworkSpecs(networkKey)
 
 	suspend fun getMetadataModel(
 		networkKey: String,
 		versionSpec: String
-	): SignSpecsListModel? =
+	): OperationResult<SignSpecsListModel, Any> =
 		interactor.signMetadataSpecInfo(networkKey, versionSpec)
 
 
