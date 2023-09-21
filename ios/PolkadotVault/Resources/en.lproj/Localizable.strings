@@ -612,6 +612,7 @@
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";
 "ErrorDisplayed.InvalidType" = "Unexpected backend response type";
+"ErrorDisplayed.WrongPassword" = "Wrong Password";
 
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
 "AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
