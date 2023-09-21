@@ -66,6 +66,7 @@ class SignSpecsViewModel : ViewModel() {
 	private fun handleSignAttempt(signResult: OperationResult<ActionResult, NavigationError>) {
 		when (signResult) {
 			is OperationResult.Err -> {
+				isHasStateThenClear()
 				submitErrorState("should be unreachable - sign attepmt failed with error ${signResult.error}")
 			}
 
@@ -79,8 +80,12 @@ class SignSpecsViewModel : ViewModel() {
 						_signature.update { modal.f.toSignSpecsResultModel() }
 					}
 					else -> {
-						//todo dmitry show error for exceeded amout of attempts as in scan flow
-						//todo dmitry submut errorData()
+						isHasStateThenClear()
+						//todo  show error for exceeded amout of attempts as in scan flow
+						// use special api for this call
+//						get_keys_for_signing
+//						sign_metadata_with_key api
+//							sign_network_spec_with_key
 						submitErrorState("should be unreachable - sign succificnt crypto different result $signResult")
 					}
 				}
