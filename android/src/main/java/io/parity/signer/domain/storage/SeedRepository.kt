@@ -78,6 +78,7 @@ class SeedRepository(
 
 	/**
 	 * Force ask for authentication and get seed phrase
+	 * This does not work with runBlocking() !
 	 */
 	suspend fun getSeedPhraseForceAuth(seedName: String): RepoResult<String> {
 		return when (val authResult = authentication.authenticate(activity)) {

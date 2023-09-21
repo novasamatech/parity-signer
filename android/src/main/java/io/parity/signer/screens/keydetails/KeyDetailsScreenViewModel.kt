@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keydetails
 
-import android.content.Context
-import android.widget.Toast
+import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeyDetailsModel
 import io.parity.signer.domain.backend.OperationResult
@@ -10,7 +9,7 @@ import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 
 
-class KeyDetailsScreenViewModel {
+class KeyDetailsScreenViewModel: ViewModel() {
 	private val uniFfi = ServiceLocator.uniffiInteractor
 	private val repo = ServiceLocator.activityScope!!.seedRepository
 
@@ -22,8 +21,8 @@ class KeyDetailsScreenViewModel {
 	): OperationResult<PrivateKeyExportModel, Any> {
 		val seedResult =
 			repo.getSeedPhraseForceAuth(model.address.cardBase.seedName)
-		when (seedResult) {
-			is RepoResult.Failure -> return OperationResult.Err(seedResult)
+		return when (seedResult) {
+			is RepoResult.Failure -> OperationResult.Err(seedResult)
 			is RepoResult.Success -> {
 				val secretKeyDetailsQR = uniFfi.generateSecretKeyQr(
 						publicKey = model.pubkey,
@@ -32,7 +31,7 @@ class KeyDetailsScreenViewModel {
 						seedPhrase = seedResult.result,
 						keyPassword = null,
 					)
-				return when (secretKeyDetailsQR) {
+				when (secretKeyDetailsQR) {
 					is UniffiResult.Error -> OperationResult.Err(secretKeyDetailsQR.error)
 					is UniffiResult.Success -> OperationResult.Ok(secretKeyDetailsQR.result)
 				}

@@ -4,10 +4,14 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +22,7 @@ import io.parity.signer.domain.toKeyDetailsModel
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivateKeyMenu
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
+import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,7 +35,7 @@ fun KeyDetailsScreenSubgraph(
 	keySpec: String,
 ) {
 
-	val vm = KeyDetailsScreenViewModel()
+	val vm: KeyDetailsScreenViewModel = viewModel()
 	val model = remember(keyAddr, keySpec) {
 		runBlocking {
 			vm.fetchModel(keyAddr, keySpec)
@@ -64,12 +69,12 @@ fun KeyDetailsScreenSubgraph(
 				KeyDetailsGeneralMenu(
 					closeMenu = closeAction,
 					onExportPrivateKey = {
-						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportConfirmation) {
+						menuNavController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportConfirmation) {
 							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
 						}
 					},
 					onDelete = {
-						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuDelete) {
+						menuNavController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuDelete) {
 							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
 						}
 					},
@@ -97,7 +102,7 @@ fun KeyDetailsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmExportPrivateKeyMenu(
 					onExportPrivate = {
-						navController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
+						menuNavController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
 							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
 						}
 					},
@@ -106,20 +111,24 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
-			val privateModel =
-				remember(Unit) {//don't forget to pass password in this parameter
-					runBlocking {
-						vm.getPrivateExportKey(model)
-					}
+			val privateModel: MutableState<OperationResult<PrivateKeyExportModel, Any>?> =
+				remember(model) {
+					mutableStateOf(null)
 				}
-			when (privateModel) {
+
+			//don't forget to pass password in this parameter in future
+			LaunchedEffect(key1 = model) {
+				privateModel.value = vm.getPrivateExportKey(model)
+			}
+
+			when (val model = privateModel.value) {
 				is OperationResult.Err -> {
 					// #1533
 					// navigate to KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport
 					val context = LocalContext.current
 					Toast.makeText(
 						context,
-						"For passworded keys export not yet supported, ${privateModel.error}",
+						"For passworded keys export not yet supported, ${model.error}",
 						Toast.LENGTH_LONG
 					).show()
 					closeAction()
@@ -128,11 +137,13 @@ fun KeyDetailsScreenSubgraph(
 				is OperationResult.Ok -> {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
 						PrivateKeyExportBottomSheet(
-							model = privateModel.result,
+							model = model.result,
 							onClose = closeAction,
 						)
 					}
 				}
+
+				null -> {}
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
