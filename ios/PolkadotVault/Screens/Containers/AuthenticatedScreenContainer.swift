@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 05/08/2022.
 //
 
+import Combine
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
@@ -14,37 +15,39 @@ struct AuthenticatedScreenContainer: View {
     @StateObject var viewModel: ViewModel
 
     var body: some View {
-        ZStack {
-            switch viewModel.viewState {
-            case .keyDetails:
-                KeyDetailsView(viewModel: .init(onDeleteCompletion: viewModel.updateViewState))
-            case .noKeys:
-                NoKeySetsView(viewModel: .init(onCompletion: viewModel.onKeySetAddCompletion(_:)))
-            case .loading:
-                EmptyView()
-            }
-        }
-        .animation(.default, value: AnimationDuration.standard)
-        .fullScreenModal(
-            isPresented: $navigation.genericError.isPresented
-        ) {
-            ErrorBottomModal(
-                viewModel: .alertError(message: navigation.genericError.errorMessage),
-                isShowingBottomAlert: $navigation.genericError.isPresented
+        switch viewModel.viewState {
+        case let .keyDetails(initialKeyName):
+            KeyDetailsView(
+                viewModel: .init(
+                    initialKeyName: initialKeyName,
+                    onDeleteCompletion: viewModel.updateViewState
+                )
             )
-            .clearModalBackground()
+            .fullScreenModal(
+                isPresented: $navigation.genericError.isPresented
+            ) {
+                ErrorBottomModal(
+                    viewModel: .alertError(message: navigation.genericError.errorMessage),
+                    isShowingBottomAlert: $navigation.genericError.isPresented
+                )
+                .clearModalBackground()
+            }
+            .bottomSnackbar(
+                viewModel.snackbarViewModel,
+                isPresented: $viewModel.isSnackbarPresented
+            )
+        case .noKeys:
+            NoKeySetsView(viewModel: .init(onCompletion: viewModel.onKeySetAddCompletion(_:)))
+        case .loading:
+            EmptyView()
         }
-        .bottomSnackbar(
-            viewModel.snackbarViewModel,
-            isPresented: $viewModel.isSnackbarPresented
-        )
     }
 }
 
 extension AuthenticatedScreenContainer {
     enum ViewState {
         case loading
-        case keyDetails
+        case keyDetails(String)
         case noKeys
     }
 
@@ -53,10 +56,16 @@ extension AuthenticatedScreenContainer {
         @Published var isSnackbarPresented: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
         private let seedsMediator: SeedsMediating
+        private let cancelBag = CancelBag()
 
         init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
             self.seedsMediator = seedsMediator
             updateViewState()
+            seedsMediator.seedNamesPublisher
+                .sink { [weak self] _ in
+                    self?.updateViewState()
+                }
+                .store(in: cancelBag)
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
@@ -76,7 +85,11 @@ extension AuthenticatedScreenContainer {
         }
 
         func updateViewState() {
-            viewState = seedsMediator.seedNames.isEmpty ? .noKeys : .keyDetails
+            if let initialKeyName = seedsMediator.seedNames.first {
+                viewState = .keyDetails(initialKeyName)
+            } else {
+                viewState = .noKeys
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ extension KeyDetailsView {
         private let seedsMediator: SeedsMediating
         private var appState: AppState
 
-        @Published var keyName: String = ""
+        @Published var keyName: String
         @Published var keysData: MKeysNew?
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
@@ -74,6 +74,7 @@ extension KeyDetailsView {
         private var removeSeed: String = ""
 
         init(
+            initialKeyName: String,
             onDeleteCompletion: @escaping () -> Void,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
@@ -91,9 +92,8 @@ extension KeyDetailsView {
             self.warningStateMediator = warningStateMediator
             self.appState = appState
             self.seedsMediator = seedsMediator
-            keyName = seedsMediator.seedNames.first ?? ""
+            _keyName = .init(initialValue: initialKeyName)
             use(appState: appState)
-            updateRenderables()
             subscribeToNetworkChanges()
             refreshData()
         }
