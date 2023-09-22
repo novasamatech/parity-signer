@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -55,7 +57,6 @@ fun EnterSeedPhraseBox(
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape = RoundedCornerShape(innerRound)
 
-	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	//workaround for //https://issuetracker.google.com/issues/160257648 and https://issuetracker.google.com/issues/235576056 - update to new TextField
@@ -110,9 +111,8 @@ fun EnterSeedPhraseBox(
 
 	DisableScreenshots()
 	KeepScreenOn()
-	DisposableEffect(Unit) {
+	LaunchedEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 

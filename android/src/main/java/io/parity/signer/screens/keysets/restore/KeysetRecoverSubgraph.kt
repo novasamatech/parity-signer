@@ -1,5 +1,6 @@
 package io.parity.signer.screens.keysets.restore
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,6 +69,7 @@ fun KeysetRecoverSubgraph(
 					.imePadding()
 			)
 		}
+		//todo dmitry test suggested words
 		composable(KeysetRecoverSubgraph.seedPhrase) {
 			KeysetRecoverPhraseScreen(
 				model = model.value,

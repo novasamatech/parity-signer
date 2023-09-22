@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysets.create
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -125,7 +126,9 @@ fun NewKeySetNameScreen(
 
 	DisposableEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
+		onDispose {
+			focusManager.clearFocus()
+		}
 	}
 }
 

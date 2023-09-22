@@ -1,6 +1,7 @@
 package io.parity.signer.screens.keysets.restore.keysetname
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +15,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -43,8 +46,7 @@ fun KeysetRecoverNameScreen(
 	seedNames: Array<String>,
 	modifier: Modifier = Modifier,
 ) {
-	var keySetName by remember { mutableStateOf(initialKeySetName) }
-	val focusManager = LocalFocusManager.current
+	var keySetName by rememberSaveable { mutableStateOf(initialKeySetName) }
 	val focusRequester = remember { FocusRequester() }
 
 	val canProceed = keySetName.isNotEmpty() && !seedNames.contains(keySetName)
@@ -64,7 +66,6 @@ fun KeysetRecoverNameScreen(
 			onButton = {
 				if (canProceed) {
 					onNext(keySetName)
-					focusManager.clearFocus(true)
 				}
 			},
 			backNotClose = false,
@@ -94,7 +95,6 @@ fun KeysetRecoverNameScreen(
 				onDone = {
 					if (canProceed) {
 						onNext(keySetName)
-						focusManager.clearFocus(true)
 					}
 				}
 			),
@@ -125,9 +125,8 @@ fun KeysetRecoverNameScreen(
 		)
 	}
 
-	DisposableEffect(Unit) {
+	LaunchedEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 
