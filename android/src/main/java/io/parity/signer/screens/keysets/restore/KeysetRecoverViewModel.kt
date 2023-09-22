@@ -40,7 +40,7 @@ class KeysetRecoverViewModel : ViewModel() {
 				_recoverSeed.update {
 					it.copy(
 						rawUserInput = KeysetRecoverModel.SPACE_CHARACTER.toString(),
-						enteredWords = currentModel.enteredWords.dropLast(1)
+						enteredWords = it.enteredWords.dropLast(1)
 					)
 				}
 			} else if (rawUserInput.first() != KeysetRecoverModel.SPACE_CHARACTER) {
@@ -52,16 +52,18 @@ class KeysetRecoverViewModel : ViewModel() {
 				}
 			} else {
 				//valid word input handling
+				val input = rawUserInput.trim()
+				val guessing = getGuessWords(input)
 				if (rawUserInput.endsWith(KeysetRecoverModel.SPACE_CHARACTER)) {
-					val input = rawUserInput.trim()
-					val guessing = getGuessWords(input)
 					if (guessing.contains(input)) {
 						onAddword(input)
 					}
-				} else if (getGuessWords(rawUserInput.trimStart()).isNotEmpty()) {
+					//valid symbol input handling
+				} else if (guessing.isNotEmpty()) {
 					_recoverSeed.update {
 						it.copy(
 							rawUserInput = rawUserInput,
+							suggestedWords = guessing
 						)
 					}
 				}
