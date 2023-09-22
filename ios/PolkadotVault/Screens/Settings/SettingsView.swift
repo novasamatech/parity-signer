@@ -26,7 +26,6 @@ struct SettingsView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(viewModel.renderable.items, id: \.id) { renderable in
-
                                 SettingsRowView(renderable: renderable)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
@@ -48,13 +47,13 @@ struct SettingsView: View {
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
                 }
-                NavigationLink(
-                    destination: detailView(viewModel.detailScreen)
-                        .navigationBarHidden(true),
-                    isActive: $viewModel.isDetailsPresented
-                ) { EmptyView() }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
+            NavigationLink(
+                destination: detailView(viewModel.detailScreen)
+                    .navigationBarHidden(true),
+                isActive: $viewModel.isDetailsPresented
+            ) { EmptyView() }
         }
         .onAppear {
             viewModel.loadData()
