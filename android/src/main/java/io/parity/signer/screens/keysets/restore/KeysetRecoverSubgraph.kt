@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import io.parity.signer.domain.popUpToTop
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.screens.keysets.restore.keysetname.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
@@ -45,9 +46,9 @@ fun KeysetRecoverSubgraph(
 		mutableStateOf("")
 	}
 
-	val navController = rememberNavController()
+	val localNavController = rememberNavController()
 	NavHost(
-		navController = navController,
+		navController = localNavController,
 		startDestination = KeysetRecoverSubgraph.keysetName,
 	) {
 
@@ -59,7 +60,7 @@ fun KeysetRecoverSubgraph(
 				onBack = { coreNavController.popBackStack() },
 				onNext = { restoredName ->
 					keysetName = restoredName
-					navController.navigate(KeysetRecoverSubgraph.seedPhrase)
+					localNavController.navigate(KeysetRecoverSubgraph.seedPhrase)
 				},
 				seedNames = existingSeedNames.value,
 				modifier = Modifier
@@ -68,25 +69,27 @@ fun KeysetRecoverSubgraph(
 			)
 		}
 		composable(KeysetRecoverSubgraph.seedPhrase) {
-				KeysetRecoverPhraseScreen(
-					model = model.value,
-					backAction = navController::popBackStack,
-					onNewInput = { newInput -> viewModel.onUserInput(newInput) },
-					onAddSuggestedWord = { suggestedWord ->
-						viewModel.onAddword(suggestedWord)
-					},
-					onDone = {
-						if (model.value.validSeed) {
-							navController.navigate(KeysetRecoverSubgraph.NetworksSelection.destination(
-								model.value.enteredWords.joinToString { " " }))
-						} else {
-							submitErrorState("navigation to finish called, but seed is not valid")
-						}
-					},
-					modifier = Modifier
-						.statusBarsPadding()
-						.imePadding()
-				)
+			KeysetRecoverPhraseScreen(
+				model = model.value,
+				backAction = localNavController::popBackStack,
+				onNewInput = { newInput -> viewModel.onUserInput(newInput) },
+				onAddSuggestedWord = { suggestedWord ->
+					viewModel.onAddword(suggestedWord)
+				},
+				onDone = {
+					if (model.value.validSeed) {
+						localNavController.navigate(
+							KeysetRecoverSubgraph.NetworksSelection.destination(
+								model.value.enteredWords.joinToString { " " })
+						)
+					} else {
+						submitErrorState("navigation to finish called, but seed is not valid")
+					}
+				},
+				modifier = Modifier
+					.statusBarsPadding()
+					.imePadding()
+			)
 		}
 		composable(
 			route = KeysetRecoverSubgraph.NetworksSelection.route,
@@ -102,13 +105,15 @@ fun KeysetRecoverSubgraph(
 			RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 				seedName = keysetName,
 				seedPhrase = seedName,
-				onBack = navController::popBackStack,
+				onBack = localNavController::popBackStack,
 				navigateOnSuccess = {
 					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.KeySetDetails.destination(
 							keysetName
 						)
-					)
+					) {
+						popUpToTop(coreNavController)
+					}
 				},
 			)
 		}

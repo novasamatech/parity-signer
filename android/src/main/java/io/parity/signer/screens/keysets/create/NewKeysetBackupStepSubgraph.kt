@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.domain.popUpToTop
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupBottomSheet
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetBackupScreen
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetSelectNetworkScreen
@@ -116,7 +117,9 @@ fun NewKeysetSubgraph(
 						CoreUnlockedNavSubgraph.KeySetDetails.destination(
 							seedName
 						)
-					)
+					) {
+							popUpToTop(coreNavController)
+					}
 				},
 				onBack = subgraphNavController::popBackStack,
 			)
