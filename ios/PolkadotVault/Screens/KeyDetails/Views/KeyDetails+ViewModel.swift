@@ -95,7 +95,6 @@ extension KeyDetailsView {
             _keyName = .init(initialValue: initialKeyName)
             use(appState: appState)
             subscribeToNetworkChanges()
-            refreshData()
         }
 
         func use(appState _: AppState) {
@@ -104,6 +103,10 @@ extension KeyDetailsView {
                 self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
             }
             .store(in: cancelBag)
+        }
+
+        func onAppear() {
+            refreshData()
         }
 
         func subscribeToNetworkChanges() {
