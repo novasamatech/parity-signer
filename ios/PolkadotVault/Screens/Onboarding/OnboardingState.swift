@@ -96,7 +96,6 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func finishOnboarding() {
-        currentState = .overview
         onboardingMediator.onboard()
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 25/08/2022.
 //
 
+import Combine
 import Foundation
 
 enum KeychainError: Error {
@@ -21,6 +22,8 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
+    var seedNamesPublisher: AnyPublisher<[String], Never> { get }
+
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
@@ -72,6 +75,9 @@ final class SeedsMediator: SeedsMediating {
     private let databaseMediator: DatabaseMediating
     private let authenticationStateMediator: AuthenticatedStateMediator
     @Published var seedNames: [String] = []
+    var seedNamesPublisher: AnyPublisher<[String], Never> {
+        $seedNames.eraseToAnyPublisher()
+    }
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
