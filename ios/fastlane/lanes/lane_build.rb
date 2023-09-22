@@ -20,7 +20,7 @@ lane :build_release do |options|
   clean_build_artifacts
 
   increment_build_number(
-    build_number: ENV["BUILD_NUMBER"], # based on commit, defined in GA
+    build_number: ENV.fetch("BUILD_NUMBER", nil), # based on commit, defined in GA
     xcodeproj: xcodeproj_path
   )
   update_code_signing_settings(
@@ -53,8 +53,8 @@ lane :prepare_code_signing do |options|
 
   cert(
     api_key: api_key,
-    keychain_path: ENV["KEYCHAIN_PATH"],
-    keychain_password: ENV["KEYCHAIN_PASSWORD"]
+    keychain_path: ENV.fetch("KEYCHAIN_PATH", nil),
+    keychain_password: ENV.fetch("KEYCHAIN_PASSWORD", nil)
   )
   sigh(
     api_key: api_key,
