@@ -70,9 +70,6 @@ fun NewKeysetSubgraph(
 					.statusBarsPadding()
 					.imePadding(),
 			)
-			BackHandler {
-				coreNavController.popBackStack()
-			}
 		}
 		composable(NewKeySetBackupStepSubgraph.NewKeySetBackup) {
 			NewKeySetBackupScreen(
