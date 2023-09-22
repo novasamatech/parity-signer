@@ -21,7 +21,6 @@ class ResetUseCase {
 	private val appContext = ServiceLocator.appContext
 	private val networkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
-	private val navigator = ServiceLocator.navigator
 	private val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
@@ -47,12 +46,12 @@ class ResetUseCase {
 			onAfterWide()
 		}
 	}
+
 	private fun totalRefreshDbExist() {
 		val allNames = seedStorage.getSeedNames()
 		initNavigation(appContext.getDbNameFromContext(), allNames.toList())
 		ServiceLocator.uniffiInteractor.wasRustInitialized.value = true
 		networkExposedStateKeeper.updateAlertStateFromHistory()
-		navigator.navigate(Action.START)
 	}
 
 	/**
@@ -68,6 +67,7 @@ class ResetUseCase {
 
 	/**
 	 * This returns the app into starting state;
+	 * Do not forget to reset navigation UI state!
 	 */
 	fun totalRefresh() {
 		if (!seedStorage.isInitialized()) {

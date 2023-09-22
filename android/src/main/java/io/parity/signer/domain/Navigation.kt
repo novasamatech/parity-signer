@@ -16,15 +16,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 
-@Deprecated("obsolete, for backwards compatibility, use SignerNavigator class")
-fun SharedViewModel.navigate(
-	button: Action,
-	details: String = "",
-	seedPhrase: String = ""
-) {
-	navigator.navigate(button, details, seedPhrase)
-}
-
 interface Navigator {
 	/**
 	 * For old Rust-backed navigation actions

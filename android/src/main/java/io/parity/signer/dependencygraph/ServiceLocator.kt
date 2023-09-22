@@ -34,8 +34,6 @@ object ServiceLocator {
 
 	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
 
-	val navigator = SignerNavigator()
-
 	val seedStorage: SeedStorage = SeedStorage()
 	val preferencesRepository: PreferencesRepository by lazy {
 		PreferencesRepository(
