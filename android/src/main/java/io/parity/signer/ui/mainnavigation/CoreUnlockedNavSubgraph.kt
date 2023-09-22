@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import io.parity.signer.domain.addVaultLogger
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
@@ -23,7 +24,7 @@ import io.parity.signer.screens.settings.settingsFullSubgraph
 @Composable
 fun CoreUnlockedNavSubgraph() {
 
-	val navController = rememberNavController()
+	val navController = rememberNavController().apply { addVaultLogger() }
 	NavHost(
 		navController = navController,
 		startDestination = CoreUnlockedNavSubgraph.keySetList,

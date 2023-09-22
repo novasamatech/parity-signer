@@ -58,7 +58,7 @@ fun KeysetRecoverSubgraph(
 				viewModel.existingSeeds.collectAsStateWithLifecycle()
 			KeysetRecoverNameScreen(
 				initialKeySetName = keysetName,
-				onBack = { coreNavController.popBackStack() },
+				onBack = coreNavController::popBackStack,
 				onNext = { restoredName ->
 					keysetName = restoredName
 					localNavController.navigate(KeysetRecoverSubgraph.seedPhrase)
@@ -69,7 +69,6 @@ fun KeysetRecoverSubgraph(
 					.imePadding()
 			)
 		}
-		//todo dmitry test suggested words
 		composable(KeysetRecoverSubgraph.seedPhrase) {
 			KeysetRecoverPhraseScreen(
 				model = model.value,
