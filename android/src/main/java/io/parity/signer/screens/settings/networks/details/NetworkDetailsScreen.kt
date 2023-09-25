@@ -34,15 +34,16 @@ import io.parity.signer.uniffi.Action
 @Composable
 fun NetworkDetailsScreen(
     model: NetworkDetailsModel,
-    rootNavigator: Navigator,
+    onBack: Callback,
     onMenu: Callback,
     onAddNetwork: Callback,
-    onRemoveMetadataCallback: (version: String) -> Unit,
+		onSignMetadata: (metadataSpecVersion: String) -> Unit,
+    onRemoveMetadataCallback: (metadataSpecVersion: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = null,
-			onBack = { rootNavigator.backAction() },
+			onBack = onBack,
 			onMenu = onMenu,
 		)
 		Column(
@@ -145,13 +146,7 @@ fun NetworkDetailsScreen(
 						)
 						SignerDivider(sidePadding = 0.dp)
 						//sign metadata
-						Row(Modifier.clickable {
-							FakeNavigator().navigate(
-								Action.MANAGE_METADATA,
-								metadata.specsVersion
-							)
-							rootNavigator.navigate(Action.SIGN_METADATA)
-						}) {
+						Row(Modifier.clickable(onClick = {onSignMetadata(metadata.specsVersion)})) {
 							Text(
 								text = stringResource(R.string.network_details_metadata_sign_field_label),
 								style = SignerTypeface.BodyL,
@@ -287,9 +282,10 @@ private fun PreviewNetworkDetailsScreenSmall() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}
@@ -310,9 +306,10 @@ private fun PreviewNetworkDetailsScreen() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}

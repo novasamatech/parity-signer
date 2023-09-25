@@ -12,42 +12,28 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.Action
 
 /**
  * Bar to be shown on the bottom of screen;
- * Redesigned version
- * @param onBeforeActionWhenClicked is when some actiond need to be done before
- * we can navigate to tapped state. Workaround for state machine
  */
 @Composable
 fun BottomBar(
-	navigator: Navigator,
-	state: BottomBarState,
-	skipRememberCameraParent: Boolean = false,
-	onBeforeActionWhenClicked: Callback? = null,
+	navController: NavController,
+	selectedOption: BottomBarOptions,
 ) {
-	if (!skipRememberCameraParent) {
-		val currentState by rememberUpdatedState(state)
-		LaunchedEffect(key1 = Unit) {
-			CameraParentSingleton.lastPossibleParent =
-				CameraParentScreen.BottomBarScreen(currentState)
-		}
-	}
 	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.backgroundSecondary,
 		elevation = 8.dp,
@@ -59,61 +45,67 @@ fun BottomBar(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			BottomBarButton(
-				navigator = navigator,
+				onClick = { navigateBottomBar(navController, BottomBarOptions.KEYS) },
 				iconId = R.drawable.ic_key_outlined_24,
-				action = Action.NAVBAR_KEYS,
 				labelResId = R.string.bottom_bar_label_key_sets,
-				isEnabled = state == BottomBarState.KEYS,
-				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				isEnabled = selectedOption == BottomBarOptions.KEYS,
 			)
 			BottomBarMiddleButton(
-				navigator = navigator,
+				onClick = {
+					navigateBottomBar(navController, BottomBarOptions.SCANNER)
+				},
 				iconId = R.drawable.ic_qe_code_24,
-				action = Action.NAVBAR_SCAN,
 				labelResId = R.string.bottom_bar_label_scanner,
-				isEnabled = state == BottomBarState.SCANNER,
-				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				isEnabled = selectedOption == BottomBarOptions.SCANNER,
 			)
 			BottomBarButton(
-				navigator = navigator,
+				onClick = {
+					navigateBottomBar(navController, BottomBarOptions.SETTINGS)
+				},
 				iconId = R.drawable.ic_settings_outlined_24,
 				enabledIconId = R.drawable.ic_settings_filled_24,
-				action = Action.NAVBAR_SETTINGS,
 				labelResId = R.string.bottom_bar_label_settings,
-				isEnabled = state == BottomBarState.SETTINGS,
-				onBeforeActionWhenClicked = onBeforeActionWhenClicked,
+				isEnabled = selectedOption == BottomBarOptions.SETTINGS,
 			)
 		}
 	}
 }
 
-enum class BottomBarState { KEYS, SCANNER, SETTINGS }
+enum class BottomBarOptions { KEYS, SCANNER, SETTINGS }
+
+private fun navigateBottomBar(
+	navController: NavController,
+	buttonType: BottomBarOptions,
+) {
+	when (buttonType) {
+		BottomBarOptions.KEYS -> navController.navigate(CoreUnlockedNavSubgraph.keySetList)
+		BottomBarOptions.SCANNER -> navController.navigate(CoreUnlockedNavSubgraph.camera)
+		BottomBarOptions.SETTINGS -> navController.navigate(CoreUnlockedNavSubgraph.settings)
+	}
+}
 
 /**
  * Unified bottom bar button view for [BottomBar]
  */
 @Composable
 fun BottomBarButton(
-	navigator: Navigator,
+	onClick: Callback,
 	@DrawableRes iconId: Int,
 	@DrawableRes enabledIconId: Int? = null,
-	action: Action,
 	@StringRes labelResId: Int,
 	isEnabled: Boolean,
-	onBeforeActionWhenClicked: Callback?
 ) {
 	val color = if (isEnabled) {
 		MaterialTheme.colors.primary
 	} else {
 		MaterialTheme.colors.textTertiary
 	}
-	Column(horizontalAlignment = Alignment.CenterHorizontally,
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier
-			.clickable {
-				onBeforeActionWhenClicked?.invoke()
-				navigator.navigate(action)
-			}
-			.width(66.dp)) {
+			.clickable(onClick = onClick)
+			.width(66.dp)
+	) {
 		Icon(
 			painter = painterResource(
 				id = if (isEnabled) enabledIconId ?: iconId else iconId
@@ -121,8 +113,8 @@ fun BottomBarButton(
 			contentDescription = stringResource(id = labelResId),
 			tint = color,
 			modifier = Modifier
-				.size(28.dp)
-				.padding(bottom = 2.dp)
+                .size(28.dp)
+                .padding(bottom = 2.dp)
 		)
 		Text(
 			text = stringResource(id = labelResId),
@@ -135,24 +127,24 @@ fun BottomBarButton(
 
 @Composable
 fun BottomBarMiddleButton(
-	navigator: Navigator,
+	onClick: Callback,
 	@DrawableRes iconId: Int,
 	@DrawableRes enabledIconId: Int? = null,
 	@StringRes labelResId: Int,
-	action: Action,
 	isEnabled: Boolean,
-	onBeforeActionWhenClicked: Callback?
 ) {
-	Box(contentAlignment = Alignment.Center,
+	Box(
+		contentAlignment = Alignment.Center,
 		modifier = Modifier
-			.padding(vertical = 4.dp)
-			.border(2.dp, MaterialTheme.colors.fill12, RoundedCornerShape(32.dp))
-			.clickable {
-				onBeforeActionWhenClicked?.invoke()
-				navigator.navigate(action)
-			}
-			.width(80.dp)
-			.fillMaxHeight(1f)
+            .padding(vertical = 4.dp)
+            .border(
+                2.dp,
+                MaterialTheme.colors.fill12,
+                RoundedCornerShape(32.dp)
+            )
+            .clickable(onClick = onClick)
+            .width(80.dp)
+            .fillMaxHeight(1f)
 	) {
 		Icon(
 			painter = painterResource(
@@ -161,8 +153,8 @@ fun BottomBarMiddleButton(
 			contentDescription = stringResource(id = labelResId),
 			tint = MaterialTheme.colors.primary,
 			modifier = Modifier
-				.size(28.dp)
-				.padding(bottom = 2.dp)
+                .size(28.dp)
+                .padding(bottom = 2.dp)
 		)
 	}
 }
@@ -180,7 +172,7 @@ fun BottomBarMiddleButton(
 private fun PreviewBottomBar2() {
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
-			BottomBar(EmptyNavigator(), BottomBarState.KEYS)
+			BottomBar(rememberNavController(), BottomBarOptions.KEYS)
 		}
 	}
 }

@@ -23,8 +23,8 @@ import androidx.navigation.compose.composable
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.MainGraphRoutes
-import io.parity.signer.ui.NAVIGATION_TAG
+import io.parity.signer.ui.rootnavigation.MainGraphRoutes
+import io.parity.signer.ui.rootnavigation.NAVIGATION_TAG
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary

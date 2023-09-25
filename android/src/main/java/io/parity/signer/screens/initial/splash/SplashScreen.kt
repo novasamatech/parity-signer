@@ -12,8 +12,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.screens.initial.WaitingScreen
-import io.parity.signer.ui.MainGraphRoutes
-import io.parity.signer.ui.NAVIGATION_TAG
+import io.parity.signer.ui.rootnavigation.MainGraphRoutes
+import io.parity.signer.ui.rootnavigation.NAVIGATION_TAG
 
 
 /**

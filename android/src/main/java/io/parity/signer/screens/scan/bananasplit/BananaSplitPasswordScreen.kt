@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,7 +70,6 @@ private fun BananaSplitPasswordInternal(
 	modifier: Modifier = Modifier,
 ) {
 
-	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
 	val passwordFocusRequester = remember { FocusRequester() }
 
@@ -79,11 +77,6 @@ private fun BananaSplitPasswordInternal(
 		&& !nameCollision.value && !wrongPassword.value
 
 	var passwordVisible by remember { mutableStateOf(false) }
-
-	DisposableEffect(Unit) {
-		pathFocusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
-	}
 
 	Column(
 		modifier
@@ -208,6 +201,10 @@ private fun BananaSplitPasswordInternal(
 			}
 			Spacer(modifier = Modifier.padding(bottom = 24.dp))
 		}
+	}
+
+	LaunchedEffect(Unit) {
+		pathFocusRequester.requestFocus()
 	}
 }
 

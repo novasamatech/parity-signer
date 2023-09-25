@@ -37,7 +37,7 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun PrivateKeyExportBottomSheet(
 	model: PrivateKeyExportModel,
-	navigator: Navigator,
+	onClose: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -45,36 +45,37 @@ fun PrivateKeyExportBottomSheet(
 			.fillMaxWidth(),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		BottomSheetHeader(stringResource(R.string.export_private_key_title)) {
-			navigator.backAction()
-		}
+		BottomSheetHeader(
+			title = stringResource(R.string.export_private_key_title),
+			onCloseClicked = onClose,
+		)
 		//scrollable part if doesn't fit into screen
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(weight = 1f, fill = false)
-                .padding(start = sidePadding, end = sidePadding)
+				.verticalScroll(rememberScrollState())
+				.weight(weight = 1f, fill = false)
+				.padding(start = sidePadding, end = sidePadding)
 		) {
 			val qrRounding = dimensionResource(id = R.dimen.qrShapeCornerRadius)
 			val plateShape =
 				RoundedCornerShape(qrRounding)
 			Column(
 				modifier = Modifier
-                    .clip(plateShape)
-                    .border(
-                        BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
-                        plateShape
-                    )
-                    .background(MaterialTheme.colors.fill6, plateShape)
+					.clip(plateShape)
+					.border(
+						BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+						plateShape
+					)
+					.background(MaterialTheme.colors.fill6, plateShape)
 			) {
 				Box(
 					modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .aspectRatio(1.1f)
-                        .background(
-                            Color.White,
-                            RoundedCornerShape(qrRounding)
-                        ),
+						.fillMaxWidth(1f)
+						.aspectRatio(1.1f)
+						.background(
+							Color.White,
+							RoundedCornerShape(qrRounding)
+						),
 					contentAlignment = Alignment.Center,
 				) {
 					val qrImage =
@@ -113,8 +114,9 @@ fun PrivateKeyExportBottomSheet(
 			val timerText = stringResource(R.string.export_private_key_timer_label)
 			CircularCountDownTimer(
 				SHOW_PRIVATE_KEY_TIMEOUT,
-				timerText
-			) { navigator.backAction() }
+				timerText,
+				onTimeOutAction = onClose,
+			)
 		}
 	}
 	DisableScreenshots()
@@ -169,7 +171,7 @@ private fun PreviewPrivateKeyExportBottomSheet() {
 	SignerNewTheme {
 		PrivateKeyExportBottomSheet(
 			model = PrivateKeyExportModel.createMock(),
-			EmptyNavigator()
+			{},
 		)
 	}
 }

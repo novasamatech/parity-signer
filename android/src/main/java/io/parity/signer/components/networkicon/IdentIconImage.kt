@@ -33,7 +33,6 @@ fun IdentIconImage(
 				modifier = modifier,
 			)
 		}
-
 		is Identicon.Dots -> {
 			DotIcon(
 				seed = identIcon.identity,

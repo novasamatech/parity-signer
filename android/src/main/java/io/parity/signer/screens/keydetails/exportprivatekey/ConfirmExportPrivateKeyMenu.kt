@@ -19,17 +19,15 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SecondaryButtonWide
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.LocalNavRequest
-import io.parity.signer.domain.Navigator
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 fun ConfirmExportPrivateKeyMenu(
-	navigator: Navigator,
-	publicKey: String,
+	onClose: Callback,
+	onExportPrivate: Callback,
 ) {
 	val sidePadding = 24.dp
 	Column(
@@ -57,15 +55,17 @@ fun ConfirmExportPrivateKeyMenu(
 			textAlign = TextAlign.Center,
 		)
 
-		PrimaryButtonWide(stringResource(R.string.export_private_key_confirm_title)) {
-			navigator.navigate(LocalNavRequest.ShowExportPrivateKey(publicKey))
-		}
+		PrimaryButtonWide(
+			label = stringResource(R.string.export_private_key_confirm_title),
+			onClicked = onExportPrivate,
+		)
 
 		Spacer(modifier = Modifier.padding(bottom = 8.dp))
 
-		SecondaryButtonWide(stringResource(R.string.generic_cancel)) {
-			navigator.backAction()
-		}
+		SecondaryButtonWide(
+			label = stringResource(R.string.generic_cancel),
+			onClicked = onClose,
+		)
 		Spacer(modifier = Modifier.padding(bottom = 24.dp))
 	}
 }
@@ -84,8 +84,7 @@ fun ConfirmExportPrivateKeyMenu(
 private fun PreviewConfirmExportPrivateKeyMenu() {
 	SignerNewTheme {
 		ConfirmExportPrivateKeyMenu(
-			EmptyNavigator(),
-			"pubkey"
+			{}, {}
 		)
 	}
 }

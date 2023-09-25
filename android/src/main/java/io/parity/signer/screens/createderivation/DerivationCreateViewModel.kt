@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeyAndNetworkModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.SeedRepository
@@ -33,7 +32,6 @@ class DerivationCreateViewModel : ViewModel() {
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
-	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
 	private lateinit var existingKeys: Set<KeyAndNetworkModel>
 
@@ -58,12 +56,11 @@ class DerivationCreateViewModel : ViewModel() {
 		seedRepository = ServiceLocator.activityScope!!.seedRepository
 	}
 
-	fun setInitValues(seed: String, rootNavigator: Navigator) {
+	fun setInitValues(seed: String) {
 		refreshCachedDependencies()
 		seedName = seed
 		existingKeys =
 			keysBySeedName(seed).set.map { it.toKeyAndNetworkModel() }.toSet()
-		this.rootNavigator = rootNavigator
 	}
 
 	fun updateSelectedNetwork(newNetwork: NetworkModel) {

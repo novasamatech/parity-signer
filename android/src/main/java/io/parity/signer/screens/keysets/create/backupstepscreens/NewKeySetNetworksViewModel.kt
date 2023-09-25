@@ -23,14 +23,14 @@ class NewKeySetNetworksViewModel : ViewModel() {
 	fun createKeySetWithNetworks(
 		seedName: String, seedPhrase: String,
 		networkForKeys: Set<NetworkModel>,
-		onAfterCreate: Callback = {},
+		onAfterCreate: (Boolean) -> Unit = {},
 	): Unit {
 		viewModelScope.launch {
-			createKeySetUseCase.createKeySetWithNetworks(
+			val success = createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,
 				networkForKeys.map { it.key },
 			)
-			onAfterCreate()
+			onAfterCreate(success)
 		}
 	}
 }

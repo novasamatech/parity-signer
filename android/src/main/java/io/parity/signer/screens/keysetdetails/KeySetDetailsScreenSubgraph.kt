@@ -1,11 +1,13 @@
 package io.parity.signer.screens.keysetdetails
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,59 +21,86 @@ import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.NetworkState
-import io.parity.signer.domain.getSeedPhraseForBackup
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.uniffi.Action
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
+import kotlinx.coroutines.launch
 
 @Composable
 fun KeySetDetailsScreenSubgraph(
 	fullModel: KeySetDetailsModel,
-	navigator: Navigator,
 	navController: NavController,
 	onBack: Callback,
-	networkState: State<NetworkState?>, //for shield icon
-	onRemoveKeySet: Callback,
 ) {
 	val menuNavController = rememberNavController()
+	val coroutineScope = rememberCoroutineScope()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
 	val filteredModel =
 		keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
 
+	val networkState = keySetViewModel.networkState.collectAsStateWithLifecycle()
+
 	Box(Modifier.statusBarsPadding()) {
 		KeySetDetailsScreenView(
 			model = filteredModel.value,
-			navigator = navigator,
+			navController = navController,
 			networkState = networkState,
 			fullModelWasEmpty = fullModel.keysAndNetwork.isEmpty(),
+			onExposedClicked = {
+				menuNavController.navigate(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+					popUpTo(KeySetDetailsMenuSubgraph.empty)
+				}
+			},
 			onMenu = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 			},
 			onShowPublicKey = { title: String, key: String ->
-				menuNavController.navigate("${KeySetDetailsMenuSubgraph.keys_public_key}/$title/$key")
+				menuNavController.navigate(
+					KeySetDetailsMenuSubgraph.KeysPublicKey.destination(
+						title,
+						key
+					)
+				)
 			},
 			onBack = onBack,
-			onAddNewKey =
-			{//todo dmitry extend nav graph instead of rust
-				navigator.navigate(Action.NEW_KEY) //new derived key
+			onAddNewKey = {
+				navController.navigate(
+					CoreUnlockedNavSubgraph.NewDerivedKey.destination(
+						seedName = fullModel.root!!.seedName
+					)
+				)
 			},
 			onFilterClicked = {
 				menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
-			}
+			},
+			onOpenKey = { keyAddr: String, keySpecs: String ->
+				navController.navigate(
+					CoreUnlockedNavSubgraph.KeyDetails.destination(
+						keyAddr = keyAddr,
+						keySpec = keySpecs
+					)
+				)
+			},
 		)
 	}
 
 	NavHost(
 		navController = menuNavController,
 		startDestination = KeySetDetailsMenuSubgraph.empty,
+		enterTransition = {
+			EnterTransition.None
+		},
+		exitTransition = {
+			slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+		},
 	) {
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
@@ -110,28 +139,53 @@ fun KeySetDetailsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeySetDeleteConfirmBottomSheet(
 					onCancel = closeAction,
-					onRemoveKeySet = onRemoveKeySet,
+					onRemoveKeySet = {
+						val root = fullModel.root
+						if (root != null) {
+							coroutineScope.launch {
+								keySetViewModel.removeSeed(root)
+									.handleErrorAppState(navController)?.let {
+										navController.navigate(CoreUnlockedNavSubgraph.keySetList)
+									}
+							}
+						} else {
+							navController.navigate(
+								CoreUnlockedNavSubgraph.ErrorScreen.destination(
+									"This keyset doesn't have a root",
+									"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
+									""
+								)
+							)
+						}
+					},
 				)
 			}
 		}
 		composable(
-			route = "${KeySetDetailsMenuSubgraph.keys_public_key}/{$ARGUMENT_PUBLIC_KEY_TITLE}/{$ARGUMENT_PUBLIC_KEY_VALUE}",
+			route = KeySetDetailsMenuSubgraph.KeysPublicKey.route,
 			arguments = listOf(
-				navArgument(ARGUMENT_PUBLIC_KEY_TITLE) { type = NavType.StringType },
-				navArgument(ARGUMENT_PUBLIC_KEY_VALUE) { type = NavType.StringType }
+				navArgument(KeySetDetailsMenuSubgraph.KeysPublicKey.key_title_arg) {
+					type = NavType.StringType
+				},
+				navArgument(KeySetDetailsMenuSubgraph.KeysPublicKey.key_valie_arg) {
+					type = NavType.StringType
+				}
 			)
 		) { backStackEntry ->
 			val keyName =
-				backStackEntry.arguments?.getString(ARGUMENT_PUBLIC_KEY_TITLE) ?: run {
-					submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
-					""
-				}
+				backStackEntry.arguments
+					?.getString(KeySetDetailsMenuSubgraph.KeysPublicKey.key_title_arg)
+					?: run {
+						submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
+						""
+					}
 			val keyValue =
-				backStackEntry.arguments?.getString(ARGUMENT_PUBLIC_KEY_VALUE) ?: run {
-					submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
-					""
-				}
-
+				backStackEntry.arguments
+					?.getString(KeySetDetailsMenuSubgraph.KeysPublicKey.key_valie_arg)
+					?: run {
+						submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
+						""
+					}
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				PublicKeyBottomSheetView(
 					name = keyName,
@@ -168,7 +222,7 @@ fun KeySetDetailsScreenSubgraph(
 				//content
 				KeySetBackupFullOverlayBottomSheet(
 					model = backupModel,
-					getSeedPhraseForBackup = ::getSeedPhraseForBackup,
+					getSeedPhraseForBackup = keySetViewModel::getSeedPhrase,
 					onClose = closeAction,
 				)
 			}
@@ -216,11 +270,16 @@ private object KeySetDetailsMenuSubgraph {
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
 	const val network_filter = "keys_network_filters"
 	const val backup = "keyset_details_backup"
-	const val keys_public_key = "keys_public_key"
 	const val export = "export_multiselect"
 	const val exposed_shield_alert = "keys_exposed_shield_alert"
-}
 
-private const val ARGUMENT_PUBLIC_KEY_TITLE = "ARGUMENT_PUBLIC_KEY_TITLE"
-private const val ARGUMENT_PUBLIC_KEY_VALUE = "ARGUMENT_PUBLIC_KEY_VALUE"
+	object KeysPublicKey {
+		internal const val key_title_arg = "ARGUMENT_PUBLIC_KEY_TITLE"
+		internal const val key_valie_arg = "ARGUMENT_PUBLIC_KEY_VALUE"
+		private const val baseRoute = "keys_public_key"
+		const val route = "$baseRoute/{$key_title_arg}/{$key_valie_arg}"
+		fun destination(keyTitle: String, keyValue: String) =
+			"$baseRoute/$keyTitle/$keyValue"
+	}
+}
 

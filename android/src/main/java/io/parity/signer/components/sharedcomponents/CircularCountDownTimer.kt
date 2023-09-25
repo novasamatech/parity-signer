@@ -152,18 +152,13 @@ fun SnackBarCircularCountDownTimer(
 		}
 	}
 
+
 	val currentTimeoutAction by rememberUpdatedState(onTimeOutAction)
 	LaunchedEffect(key1 = Unit) {
-		try {
-			while (timeLeft > 0) {
-				delay(1.seconds)
-				timeLeft -= 1
-				if (timeLeft == 0) {
-					currentTimeoutAction()
-				}
-			}
-		} finally {
-			if (timeLeft > 0) {
+		while (timeLeft > 0) {
+			delay(1.seconds)
+			timeLeft -= 1
+			if (timeLeft == 0) {
 				currentTimeoutAction()
 			}
 		}

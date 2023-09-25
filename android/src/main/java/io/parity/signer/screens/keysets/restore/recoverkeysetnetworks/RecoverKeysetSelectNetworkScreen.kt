@@ -46,7 +46,7 @@ fun RecoverKeysetSelectNetworkScreenBase(
 	selected: MutableState<Set<String>>,
 	defaultSelectedNetworks: Set<String>,
 	onProceedAction: Callback,
-	onBack: Callback
+	onBack: Callback,
 ) {
 	val confirmBottomSheetState =
 		rememberModalBottomSheetState(
