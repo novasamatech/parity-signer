@@ -35,7 +35,7 @@ class SignSufficientCryptoInteractor {
 			}
 		}
 
-	private suspend fun signMetadataWithKey(
+	suspend fun signNetworkMetadataWithKey(
 		networkKey: String,
 		metadataSpecsVersion: String,
 		signingAddressKey: String,
@@ -60,7 +60,7 @@ class SignSufficientCryptoInteractor {
 			}
 		}
 
-	private suspend fun signNetworkWithKey(
+	suspend fun signNetworkWithKey(
 		networkKey: String,
 		signingAddressKey: String,
 		seedPhrase: String,
@@ -110,7 +110,7 @@ class SignSufficientCryptoInteractor {
 			}
 		}
 
-	fun resetMachineState(networkKey: String) {
+	private fun resetMachineState(networkKey: String) {
 		navigator.navigate(Action.START)
 		navigator.navigate(Action.NAVBAR_SETTINGS)
 		navigator.navigate(Action.MANAGE_NETWORKS)
@@ -121,7 +121,7 @@ class SignSufficientCryptoInteractor {
 		navigator.navigate(Action.GO_BACK)
 	}
 
-	suspend fun signNetworkSpecs(
+	private suspend fun signNetworkSpecs(
 		networkKey: String,
 	): OperationResult<SignSpecsListModel, Any> {
 		resetMachineState(networkKey)
@@ -144,7 +144,7 @@ class SignSufficientCryptoInteractor {
 		return result
 	}
 
-	suspend fun signMetadataSpecInfo(
+	private suspend fun signMetadataSpecInfo(
 		networkKey: String,
 		specsVersion: String,
 	): OperationResult<SignSpecsListModel, Any> {
@@ -168,7 +168,7 @@ class SignSufficientCryptoInteractor {
 		return result
 	}
 
-	suspend fun attemptSigning(
+	private suspend fun attemptSigning(
 		addressKey: String, seedPhrase: String
 	): OperationResult<ActionResult, NavigationError> {
 		return navigate(
@@ -178,7 +178,7 @@ class SignSufficientCryptoInteractor {
 		)
 	}
 
-	suspend fun attemptPasswordEntered(password: String): OperationResult<ActionResult, NavigationError> {
+	private suspend fun attemptPasswordEntered(password: String): OperationResult<ActionResult, NavigationError> {
 		return navigate(
 			Action.GO_FORWARD,
 			password,

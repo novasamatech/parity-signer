@@ -22,7 +22,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 internal fun SignSpecsListScreen(
 	model: SignSpecsListModel,
 	onBack: Callback,
-	signSufficientCrypto: (seedName: String, addressKey64: String) -> Unit,
+	signSufficientCrypto: (seedName: String, addressKey64: String, hadPassword: Boolean) -> Unit,
 	modifier: Modifier = Modifier,
 ) {
 	val keys = model.keysToAddrKey
@@ -38,7 +38,11 @@ internal fun SignSpecsListScreen(
 					model = identity.first,
 					modifier = Modifier
 						.clickable {
-							signSufficientCrypto(identity.first.seedName, identity.second)
+							signSufficientCrypto(
+								identity.first.seedName,
+								identity.second,
+								identity.first.hasPassword
+							)
 						}
 						.padding(vertical = 8.dp, horizontal = 24.dp),
 				)

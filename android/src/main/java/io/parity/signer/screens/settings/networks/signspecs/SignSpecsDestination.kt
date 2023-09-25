@@ -40,7 +40,8 @@ fun NavGraphBuilder.signSpecsDestination(
 			inputData = SignSpecsInput.NetworkSpecs(
 				networkKey = networkKey,
 			),
-			onBack = navController::popBackStack)
+			onBack = navController::popBackStack,
+		)
 	}
 	composable(
 		route = SettingsNavSubgraph.SignMetadataSpecs.route,
@@ -70,7 +71,7 @@ fun NavGraphBuilder.signSpecsDestination(
 				networkKey = networkKey,
 				versionSpec = metadataSpecVer
 			),
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 }

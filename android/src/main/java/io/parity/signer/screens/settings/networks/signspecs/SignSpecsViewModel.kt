@@ -34,11 +34,11 @@ class SignSpecsViewModel : ViewModel() {
 	suspend fun getKeysListModel(): OperationResult<SignSpecsListModel, ErrorDisplayed> =
 		interactor.getSignCryptoKeys()
 
-	suspend fun onSignSpecs(
+	fun onSignSpecs(
 		input: SignSpecsInput,
 		seedName: String,
 		addressKey: String,
-		password: String?
+		password: String?,
 	) {
 		viewModelScope.launch {
 			when (val seedResult = seedRepo.getSeedPhraseForceAuth(seedName)) {
@@ -50,23 +50,44 @@ class SignSpecsViewModel : ViewModel() {
 				}
 
 				is RepoResult.Success -> {
-					when (input) {
-						is SignSpecsInput.NetworkMetadataSpecs -> TODO()
-						is SignSpecsInput.NetworkSpecs -> TODO()
+					val signResult = when (input) {
+						is SignSpecsInput.NetworkMetadataSpecs -> interactor.signNetworkMetadataWithKey(
+							networkKey = input.networkKey,
+							metadataSpecsVersion = input.versionSpec,
+							signingAddressKey = addressKey,
+							seedPhrase = seedName,
+							password = password,
+						)
+						is SignSpecsInput.NetworkSpecs -> interactor.signNetworkWithKey(
+							networkKey = input.networkKey,
+							signingAddressKey = addressKey,
+							seedPhrase = seedName,
+							password = password,
+						)
 					}
-					val signResult = interactor.attemptSigning(
-						addressKey = addressKey,
-						seedPhrase = seedResult.result
-					)
+					when (signResult) {
+						is OperationResult.Err -> TODO() //todo dmitry
+						is OperationResult.Ok -> when (val result = signResult.result) {
+							SignSufficientCryptoInteractor.SignSpecsResult.PasswordWrong -> TODO()
+							is SignSufficientCryptoInteractor.SignSpecsResult.Signature -> TODO()
+						}
+					}
+
 					handleSignAttempt(signResult)
 				}
 			}
 		}
 	}
+
+	fun requestPassword(		seedName: String,
+													addressKey: String,) {
+
+	}
+
 	//todo dmitry remove below
 
 
-	fun onSignSufficientCrypto(seedName: String, addressKey: String) {
+	private fun onSignSufficientCrypto(seedName: String, addressKey: String) {
 		viewModelScope.launch {
 			when (val seedResult = seedRepo.getSeedPhraseForceAuth(seedName)) {
 				is RepoResult.Failure -> {
@@ -109,9 +130,6 @@ class SignSpecsViewModel : ViewModel() {
 						isHasStateThenClear()
 						//todo  show error for exceeded amout of attempts as in scan flow
 						// use special api for this call
-//						get_keys_for_signing
-//						sign_metadata_with_key api
-//							sign_network_spec_with_key
 						submitErrorState("should be unreachable - sign succificnt crypto different result $signResult")
 					}
 				}
@@ -129,14 +147,13 @@ class SignSpecsViewModel : ViewModel() {
 	fun isHasStateThenClear(): Boolean {
 		return if (password.value != null || signature.value != null) {
 			clearState()
-			interactor.closedBottomSheet()
 			true
 		} else {
 			false
 		}
 	}
 
-	fun clearState() {
+	private fun clearState() {
 		_password.value = null
 		_signature.value = null
 	}

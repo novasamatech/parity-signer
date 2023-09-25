@@ -33,7 +33,13 @@ fun SignSpecsFull(
 	SignSpecsListScreen(
 		model = model,
 		onBack = onBack,
-		signSufficientCrypto = vm::onSignSufficientCrypto,
+		signSufficientCrypto = { seedName: String, addressKey64: String, hasPassword: Boolean ->
+			if (hasPassword) {
+				vm.requestPassword(seedName, addressKey64)
+			} else {
+				vm.onSignSpecs(inputData, seedName, addressKey64, null)
+			}
+		},
 		modifier = Modifier.statusBarsPadding(),
 	)
 
