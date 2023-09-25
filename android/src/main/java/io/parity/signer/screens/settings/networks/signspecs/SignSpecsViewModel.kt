@@ -12,8 +12,7 @@ import io.parity.signer.domain.backend.SignSufficientCryptoInteractor
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.ActionResult
-import io.parity.signer.uniffi.MSignSufficientCrypto
-import io.parity.signer.uniffi.MSufficientCryptoReady
+import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.ModalData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,14 +31,39 @@ class SignSpecsViewModel : ViewModel() {
 		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
 
-	suspend fun getNetworkModel(networkKey: String): OperationResult<SignSpecsListModel, Any> =
-		interactor.signNetworkSpecs(networkKey)
+	suspend fun getKeysListModel(): OperationResult<SignSpecsListModel, ErrorDisplayed> =
+		interactor.getSignCryptoKeys()
 
-	suspend fun getMetadataModel(
-		networkKey: String,
-		versionSpec: String,
-	): OperationResult<SignSpecsListModel, Any> =
-		interactor.signMetadataSpecInfo(networkKey, versionSpec)
+	suspend fun onSignSpecs(
+		input: SignSpecsInput,
+		seedName: String,
+		addressKey: String,
+		password: String?
+	) {
+		viewModelScope.launch {
+			when (val seedResult = seedRepo.getSeedPhraseForceAuth(seedName)) {
+				is RepoResult.Failure -> {
+					Log.d(
+						"sufficient crypto",
+						"failed to get seed to sign sufficient crypto"
+					)
+				}
+
+				is RepoResult.Success -> {
+					when (input) {
+						is SignSpecsInput.NetworkMetadataSpecs -> TODO()
+						is SignSpecsInput.NetworkSpecs -> TODO()
+					}
+					val signResult = interactor.attemptSigning(
+						addressKey = addressKey,
+						seedPhrase = seedResult.result
+					)
+					handleSignAttempt(signResult)
+				}
+			}
+		}
+	}
+	//todo dmitry remove below
 
 
 	fun onSignSufficientCrypto(seedName: String, addressKey: String) {
@@ -118,10 +142,10 @@ class SignSpecsViewModel : ViewModel() {
 	}
 }
 
-sealed class SignCryptoInput {
-	data class NetworkSpecs(val networkKey: String)
+sealed class SignSpecsInput {
+	data class NetworkSpecs(val networkKey: String) : SignSpecsInput()
 	data class NetworkMetadataSpecs(
 		val networkKey: String,
 		val versionSpec: String,
-	)
+	) : SignSpecsInput()
 }

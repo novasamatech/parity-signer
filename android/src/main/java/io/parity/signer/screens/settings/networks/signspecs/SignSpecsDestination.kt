@@ -30,12 +30,17 @@ fun NavGraphBuilder.signSpecsDestination(
 			it.arguments?.getString(SettingsNavSubgraph.SignNetworkSpecs.networkKey)!!
 
 		val vm: SignSpecsViewModel = viewModel()
-		val model = remember(networkKey) {
+		val model = remember() {
 			runBlocking {
-				vm.getNetworkModel(networkKey).handleErrorAppState(navController)
+				vm.getKeysListModel().handleErrorAppState(navController)
 			}
 		} ?: return@composable
-		SignSpecsFull(model, onBack = navController::popBackStack)
+		SignSpecsFull(
+			model = model,
+			inputData = SignSpecsInput.NetworkSpecs(
+				networkKey = networkKey,
+			),
+			onBack = navController::popBackStack)
 	}
 	composable(
 		route = SettingsNavSubgraph.SignMetadataSpecs.route,
@@ -47,18 +52,25 @@ fun NavGraphBuilder.signSpecsDestination(
 				type = NavType.StringType
 			},
 		)
-		) {
+	) {
 		val networkKey =
 			it.arguments?.getString(SettingsNavSubgraph.SignMetadataSpecs.networkKey)!!
 		val metadataSpecVer =
 			it.arguments?.getString(SettingsNavSubgraph.SignMetadataSpecs.metadataSpecVer)!!
 
 		val vm: SignSpecsViewModel = viewModel()
-		val model = remember(networkKey, metadataSpecVer) {
+		val model = remember() {
 			runBlocking {
-				vm.getMetadataModel(networkKey, metadataSpecVer).handleErrorAppState(navController)
+				vm.getKeysListModel().handleErrorAppState(navController)
 			}
 		} ?: return@composable
-		SignSpecsFull(model, onBack = navController::popBackStack)
+		SignSpecsFull(
+			model = model,
+			inputData = SignSpecsInput.NetworkMetadataSpecs(
+				networkKey = networkKey,
+				versionSpec = metadataSpecVer
+			),
+			onBack = navController::popBackStack
+		)
 	}
 }

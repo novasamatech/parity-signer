@@ -15,7 +15,8 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
 fun SignSpecsFull(
-	sc: SignSpecsListModel,
+	model: SignSpecsListModel,
+	inputData: SignSpecsInput,
 	onBack: Callback
 ) {
 	val vm: SignSpecsViewModel = viewModel()
@@ -30,7 +31,7 @@ fun SignSpecsFull(
 	BackHandler(onBack = backAction)
 
 	SignSpecsListScreen(
-		model = sc,
+		model = model,
 		onBack = onBack,
 		signSufficientCrypto = vm::onSignSufficientCrypto,
 		modifier = Modifier.statusBarsPadding(),
