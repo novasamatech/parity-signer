@@ -37,7 +37,7 @@ class SignSpecsViewModel : ViewModel() {
 
 	suspend fun getMetadataModel(
 		networkKey: String,
-		versionSpec: String
+		versionSpec: String,
 	): OperationResult<SignSpecsListModel, Any> =
 		interactor.signMetadataSpecInfo(networkKey, versionSpec)
 
@@ -75,10 +75,12 @@ class SignSpecsViewModel : ViewModel() {
 					is ModalData.EnterPassword -> {
 						_password.update { modal.f.toEnterPasswordModel() }
 					}
+
 					is ModalData.SufficientCryptoReady -> {
 						_password.update { null }
 						_signature.update { modal.f.toSignSpecsResultModel() }
 					}
+
 					else -> {
 						isHasStateThenClear()
 						//todo  show error for exceeded amout of attempts as in scan flow
@@ -114,4 +116,12 @@ class SignSpecsViewModel : ViewModel() {
 		_password.value = null
 		_signature.value = null
 	}
+}
+
+sealed class SignCryptoInput {
+	data class NetworkSpecs(val networkKey: String)
+	data class NetworkMetadataSpecs(
+		val networkKey: String,
+		val versionSpec: String,
+	)
 }
