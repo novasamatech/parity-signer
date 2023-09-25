@@ -6,6 +6,7 @@ import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper
+import io.parity.signer.domain.SignerNavigator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.PreferencesRepository
 import io.parity.signer.domain.storage.SeedRepository
@@ -27,21 +28,41 @@ object ServiceLocator {
 		_activityScope = null
 	}
 
-	@Volatile private var _activityScope: ActivityScope? = null
+	@Volatile
+	private var _activityScope: ActivityScope? = null
 	val activityScope: ActivityScope? get() = _activityScope
 
 	val uniffiInteractor by lazy { UniffiInteractor(appContext) }
 
 	val seedStorage: SeedStorage = SeedStorage()
-	val preferencesRepository: PreferencesRepository by lazy { PreferencesRepository(appContext) }
-	val databaseAssetsInteractor by lazy { DatabaseAssetsInteractor(appContext, seedStorage) }
-	val networkExposedStateKeeper by lazy { NetworkExposedStateKeeper(appContext, uniffiInteractor) }
+	val preferencesRepository: PreferencesRepository by lazy {
+		PreferencesRepository(
+			appContext
+		)
+	}
+	val databaseAssetsInteractor by lazy {
+		DatabaseAssetsInteractor(
+			appContext,
+			seedStorage
+		)
+	}
+	val networkExposedStateKeeper by lazy {
+		NetworkExposedStateKeeper(
+			appContext,
+			uniffiInteractor
+		)
+	}
 	val authentication = Authentication()
-	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator = UnknownNetworkColorsGenerator()
+	val unknownNetworkColorsGenerator: UnknownNetworkColorsGenerator =
+		UnknownNetworkColorsGenerator()
 
 	class ActivityScope(val activity: FragmentActivity) {
-		val seedRepository: SeedRepository = SeedRepository(seedStorage,
-			authentication, activity)
+		val seedRepository: SeedRepository = SeedRepository(
+			storage = seedStorage,
+			authentication = authentication,
+			activity = activity,
+			uniffiInteractor = uniffiInteractor
+		)
 	}
 }
 

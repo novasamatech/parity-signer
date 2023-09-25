@@ -16,7 +16,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.backend.CompletableResult
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.screens.settings.logs.LogsSubgraph
 import io.parity.signer.screens.settings.logs.LogsViewModel
@@ -26,7 +25,6 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
 fun LogsScreenFull(
-	rootNavigator: Navigator,
 	navController: NavController,
 ) {
 	val menuNavController = rememberNavController()
@@ -51,7 +49,7 @@ fun LogsScreenFull(
 			is CompletableResult.Ok -> {
 				LogsScreen(
 					model = logsCurrentValue.result.toLogsScreenModel(context),
-					rootNavigator = rootNavigator,
+					coreNavController = navController,
 					onMenu = { menuNavController.navigate(LogsMenuSubgraph.logs_menu) },
 					onBack = { navController.popBackStack() },
 					onLogClicked = { logId -> navController.navigate(LogsSubgraph.logs_details + "/" + logId) },

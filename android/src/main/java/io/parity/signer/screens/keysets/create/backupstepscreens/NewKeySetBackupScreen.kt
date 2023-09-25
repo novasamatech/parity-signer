@@ -28,9 +28,13 @@ import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.uniffi.MNewSeedBackup
 
 
+/**
+ * 2/2 stage to create new key set
+ * first is NewKeySetNameScreen
+ */
 @Composable
 internal fun NewKeySetBackupScreen(
-	model: NewSeedBackupModel,
+	seedPhrase: String,
 	onProceed: Callback,
 	onBack: Callback,
 	modifier: Modifier = Modifier,
@@ -48,7 +52,7 @@ internal fun NewKeySetBackupScreen(
 			btnText = stringResource(R.string.button_next),
 			onClose = onBack,
 			onButton = null,
-			backNotClose = false,
+			backNotClose = true,
 		)
 		Text(
 			text = stringResource(R.string.new_key_set_backup_subtitle),
@@ -58,7 +62,7 @@ internal fun NewKeySetBackupScreen(
 				.padding(horizontal = 24.dp)
 				.padding(bottom = 8.dp),
 		)
-		SeedPhraseBox(seedPhrase = model.seedPhrase)
+		SeedPhraseBox(seedPhrase = seedPhrase)
 		NotificationFrameTextImportant(
 			message = stringResource(R.string.new_key_set_backup_warning_message),
 			modifier = Modifier
@@ -106,12 +110,8 @@ fun MNewSeedBackup.toNewSeedBackupModel(): NewSeedBackupModel =
 )
 @Composable
 private fun PreviewNewKeySetBackupScreen() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	SignerNewTheme {
-		NewKeySetBackupScreen(model, {}, {})
+		NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 	}
 }
 
@@ -119,13 +119,9 @@ private fun PreviewNewKeySetBackupScreen() {
 @Preview
 @Composable
 private fun PreviewNewKeySetBackupScreenNarrow() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	Box(modifier = Modifier.size(height = 400.dp, width = 150.dp)) {
 		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
+			NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 		}
 	}
 }
@@ -133,13 +129,9 @@ private fun PreviewNewKeySetBackupScreenNarrow() {
 @Preview
 @Composable
 private fun PreviewNewKeySetBackupScreenShort() {
-	val model = NewSeedBackupModel(
-		"seedname",
-		"some words many many words secr fphr phrase"
-	)
 	Box(modifier = Modifier.size(height = 400.dp, width = 200.dp)) {
 		SignerNewTheme {
-			NewKeySetBackupScreen(model, {}, {})
+			NewKeySetBackupScreen("some words many many words secr fphr phrase", {}, {})
 		}
 	}
 }

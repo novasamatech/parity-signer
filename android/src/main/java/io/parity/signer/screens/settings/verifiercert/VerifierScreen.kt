@@ -22,9 +22,9 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun VerifierScreen(
-	verifierDetails: VerifierDetailsModels,
-	onBack: Callback,
-	onRemove: Callback,
+    verifierDetails: VerifierDetailsModel,
+    onBack: Callback,
+    onRemove: Callback,
 ) {
 	Column(
 		Modifier
@@ -81,6 +81,6 @@ internal fun VerifierScreen(
 @Composable
 private fun PreviewNetworksList() {
 	SignerNewTheme {
-		VerifierScreen(VerifierDetailsModels.createStub(), {}, {})
+		VerifierScreen(VerifierDetailsModel.createStub(), {}, {})
 	}
 }

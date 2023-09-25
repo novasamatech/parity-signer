@@ -11,14 +11,13 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,7 +74,6 @@ private fun AddLogCommentInternal(
 	val posted = remember { mutableStateOf(false) }
 	val canProceed = note.value.isNotBlank() && !posted.value
 
-	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Column(
@@ -118,9 +116,8 @@ private fun AddLogCommentInternal(
 				.padding(horizontal = 16.dp, vertical = 24.dp)
 		)
 	}
-	DisposableEffect(Unit) {
+	LaunchedEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 
