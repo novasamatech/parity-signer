@@ -4,16 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
-import io.parity.signer.bottomsheets.password.toEnterPasswordModel
+import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.SignSufficientCryptoInteractor
 import io.parity.signer.domain.storage.RepoResult
-import io.parity.signer.domain.submitErrorState
-import io.parity.signer.uniffi.ActionResult
 import io.parity.signer.uniffi.ErrorDisplayed
-import io.parity.signer.uniffi.ModalData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -24,9 +20,9 @@ class SignSpecsViewModel : ViewModel() {
 	private val seedRepo = ServiceLocator.activityScope!!.seedRepository
 	private val interactor = SignSufficientCryptoInteractor()
 
-	private val _password: MutableStateFlow<EnterPasswordModel?> =
+	private val _password: MutableStateFlow<PasswordState?> =
 		MutableStateFlow(null)
-	val password = _password.asStateFlow()
+	internal val password = _password.asStateFlow()
 	private val _signature: MutableStateFlow<SignSpecsResultModel?> =
 		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
@@ -36,12 +32,13 @@ class SignSpecsViewModel : ViewModel() {
 
 	fun onSignSpecs(
 		input: SignSpecsInput,
-		seedName: String,
+		keyModel: KeyCardModelBase,
 		addressKey: String,
 		password: String?,
 	) {
 		viewModelScope.launch {
-			when (val seedResult = seedRepo.getSeedPhraseForceAuth(seedName)) {
+			when (val seedResult =
+				seedRepo.getSeedPhraseForceAuth(keyModel.seedName)) {
 				is RepoResult.Failure -> {
 					Log.d(
 						"sufficient crypto",
@@ -55,92 +52,59 @@ class SignSpecsViewModel : ViewModel() {
 							networkKey = input.networkKey,
 							metadataSpecsVersion = input.versionSpec,
 							signingAddressKey = addressKey,
-							seedPhrase = seedName,
+							seedPhrase = seedResult.result,
 							password = password,
 						)
+
 						is SignSpecsInput.NetworkSpecs -> interactor.signNetworkWithKey(
 							networkKey = input.networkKey,
 							signingAddressKey = addressKey,
-							seedPhrase = seedName,
+							seedPhrase = seedResult.result,
 							password = password,
 						)
 					}
 					when (signResult) {
 						is OperationResult.Err -> TODO() //todo dmitry
 						is OperationResult.Ok -> when (val result = signResult.result) {
-							SignSufficientCryptoInteractor.SignSpecsResult.PasswordWrong -> TODO()
-							is SignSufficientCryptoInteractor.SignSpecsResult.Signature -> TODO()
+							SignSufficientCryptoInteractor.SignSpecsResult.PasswordWrong -> {
+								requestPassword(
+									keyModel = keyModel,
+									addressKey = addressKey,
+								)
+							}
+
+							is SignSufficientCryptoInteractor.SignSpecsResult.Signature -> {
+								_signature.update { result.result }
+								_password.update { null }
+							}
 						}
 					}
-
-					handleSignAttempt(signResult)
 				}
 			}
 		}
 	}
 
-	fun requestPassword(		seedName: String,
-													addressKey: String,) {
-
-	}
-
-	//todo dmitry remove below
-
-
-	private fun onSignSufficientCrypto(seedName: String, addressKey: String) {
-		viewModelScope.launch {
-			when (val seedResult = seedRepo.getSeedPhraseForceAuth(seedName)) {
-				is RepoResult.Failure -> {
-					Log.d(
-						"sufficient crypto",
-						"failed to get seed to sign sufficient crypto"
+	fun requestPassword(
+		keyModel: KeyCardModelBase,
+		addressKey: String,
+	) {
+		_password.update {
+			if (it == null) {
+				PasswordState(
+					model = EnterPasswordModel(keyModel, false, 0),
+					addressKey64 = addressKey,
+				)
+			} else if (it.model.attempt > 3) {
+				//todo dmitry show error
+				null
+			} else {
+				it.copy(
+					model = it.model.copy(
+						showError = true,
+						attempt = it.model.attempt + 1,
 					)
-				}
-
-				is RepoResult.Success -> {
-					val signResult = interactor.attemptSigning(
-						addressKey = addressKey,
-						seedPhrase = seedResult.result
-					)
-					handleSignAttempt(signResult)
-				}
+				)
 			}
-		}
-	}
-
-	private fun handleSignAttempt(signResult: OperationResult<ActionResult, NavigationError>) {
-		when (signResult) {
-			is OperationResult.Err -> {
-				isHasStateThenClear()
-				submitErrorState("should be unreachable - sign attepmt failed with error ${signResult.error}")
-			}
-
-			is OperationResult.Ok -> {
-				when (val modal = signResult.result.modalData) {
-					is ModalData.EnterPassword -> {
-						_password.update { modal.f.toEnterPasswordModel() }
-					}
-
-					is ModalData.SufficientCryptoReady -> {
-						_password.update { null }
-						_signature.update { modal.f.toSignSpecsResultModel() }
-					}
-
-					else -> {
-						isHasStateThenClear()
-						//todo  show error for exceeded amout of attempts as in scan flow
-						// use special api for this call
-						submitErrorState("should be unreachable - sign succificnt crypto different result $signResult")
-					}
-				}
-			}
-		}
-	}
-
-	fun passwordAttempt(password: String) {
-		viewModelScope.launch {
-			val result = interactor.attemptPasswordEntered(password)
-			handleSignAttempt(result)
 		}
 	}
 
@@ -158,6 +122,11 @@ class SignSpecsViewModel : ViewModel() {
 		_signature.value = null
 	}
 }
+
+internal data class PasswordState(
+	val model: EnterPasswordModel,
+	val addressKey64: String
+)
 
 sealed class SignSpecsInput {
 	data class NetworkSpecs(val networkKey: String) : SignSpecsInput()

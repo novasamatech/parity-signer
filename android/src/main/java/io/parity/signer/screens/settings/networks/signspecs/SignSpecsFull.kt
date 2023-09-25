@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.bottomsheets.password.EnterPassword
+import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsListScreen
 import io.parity.signer.screens.settings.networks.signspecs.view.SignSpecsResultBottomSheet
@@ -33,11 +34,11 @@ fun SignSpecsFull(
 	SignSpecsListScreen(
 		model = model,
 		onBack = onBack,
-		signSufficientCrypto = { seedName: String, addressKey64: String, hasPassword: Boolean ->
+		signSufficientCrypto = { key: KeyCardModelBase, addressKey64: String, hasPassword: Boolean ->
 			if (hasPassword) {
-				vm.requestPassword(seedName, addressKey64)
+				vm.requestPassword(key, addressKey64)
 			} else {
-				vm.onSignSpecs(inputData, seedName, addressKey64, null)
+				vm.onSignSpecs(inputData, key, addressKey64, null)
 			}
 		},
 		modifier = Modifier.statusBarsPadding(),
@@ -46,9 +47,14 @@ fun SignSpecsFull(
 	passwordState.value?.let { enterPasswordModel ->
 		BottomSheetWrapperRoot(onClosedAction = vm::isHasStateThenClear) {
 			EnterPassword(
-				data = enterPasswordModel,
+				data = enterPasswordModel.model,
 				proceed = { password ->
-					vm.passwordAttempt(password)
+					vm.onSignSpecs(
+						input = inputData,
+						keyModel = enterPasswordModel.model.keyCard,
+						addressKey = enterPasswordModel.addressKey64,
+						password = password
+					)
 				},
 				onClose = vm::isHasStateThenClear,
 			)
