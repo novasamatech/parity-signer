@@ -74,7 +74,7 @@ final class CreateDerivedKeyService {
     init(
         databaseMediator: DatabaseMediating = DatabaseMediator(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-        callQueue: Dispatching = DispatchQueue(label: "CreateDerivedKeyService", qos: .userInitiated),
+        callQueue: Dispatching = DispatchQueue.global(qos: .userInteractive),
         callbackQueue: Dispatching = DispatchQueue.main,
         navigation: NavigationCoordinator = NavigationCoordinator()
     ) {

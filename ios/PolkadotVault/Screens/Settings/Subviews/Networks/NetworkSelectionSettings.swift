@@ -52,7 +52,6 @@ struct NetworkSelectionSettings: View {
                 destination: NetworkSettingsDetails(
                     viewModel: .init(
                         networkKey: viewModel.selectedDetailsKey,
-                        networkDetails: viewModel.selectedDetails,
                         onCompletion: viewModel.onNetworkDetailsCompletion(_:)
                     )
                 )
@@ -115,7 +114,6 @@ extension NetworkSelectionSettings {
         private let networkDetailsService: ManageNetworkDetailsService
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetailsKey: String!
-        @Published var selectedDetails: MNetworkDetails!
         @Published var isPresentingDetails = false
         @Published var isShowingQRScanner: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
@@ -135,7 +133,6 @@ extension NetworkSelectionSettings {
 
         func onTap(_ network: MmNetwork) {
             selectedDetailsKey = network.key
-            selectedDetails = networkDetailsService.refreshCurrentNavigationState(network.key)
             isPresentingDetails = true
         }
 
