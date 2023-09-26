@@ -9,6 +9,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.SignSufficientCryptoInteractor
 import io.parity.signer.domain.storage.RepoResult
+import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,10 @@ class SignSpecsViewModel : ViewModel() {
 	private val _signature: MutableStateFlow<SignSpecsResultModel?> =
 		MutableStateFlow(null)
 	val signature = _signature.asStateFlow()
+	private val _localError: MutableStateFlow<LocalErrorSheetModel?> =
+		MutableStateFlow(null)
+	val localError = _localError.asStateFlow()
+
 
 	suspend fun getKeysListModel(): OperationResult<SignSpecsListModel, ErrorDisplayed> =
 		interactor.getSignCryptoKeys()
@@ -117,9 +122,14 @@ class SignSpecsViewModel : ViewModel() {
 		}
 	}
 
+	fun clearError() {
+		_localError.value = null
+	}
+
 	private fun clearState() {
 		_password.value = null
 		_signature.value = null
+		_localError.value = null
 	}
 }
 

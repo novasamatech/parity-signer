@@ -11,23 +11,23 @@ import io.parity.signer.ui.theme.SignerNewTheme
 const val COMPOSE_URL_TAG_ANNOTATION = "URL"
 
 @Composable
-fun TransactionError.toBottomSheetModel(): TransactionErrorModel {
+fun TransactionError.toBottomSheetModel(): LocalErrorSheetModel {
 	val context = LocalContext.current
 	return toBottomSheetModel(context)
 }
 
 
-fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel {
+fun TransactionError.toBottomSheetModel(context: Context): LocalErrorSheetModel {
 	return when (this) {
 		is TransactionError.Generic -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(R.string.transaction_error_generic_title),
 				subtitle = context.getString(R.string.transaction_error_generic_subtitle),
 				details = message,
 			)
 		}
 		is TransactionError.MetadataAlreadyAdded -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(
 					R.string.transaction_error_metadata_already_added_title,
 					name,
@@ -37,13 +37,13 @@ fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel
 			)
 		}
 		is TransactionError.MetadataForUnknownNetwork -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(R.string.transaction_error_meta_unknown_network_title),
 				subtitle = context.getString(R.string.transaction_error_meta_unknown_network_subtitle),
 				showNetworkSteps = true,
 			)
 		}
-		is TransactionError.NetworkAlreadyAdded -> TransactionErrorModel(
+		is TransactionError.NetworkAlreadyAdded -> LocalErrorSheetModel(
 			title = context.getString(
 				R.string.transaction_error_network_already_added_title,
 				name
@@ -51,7 +51,7 @@ fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel
 			subtitle = context.getString(R.string.transaction_error_network_already_added_subtitle),
 		)
 		is TransactionError.NoMetadataForNetwork -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(
 					R.string.transaction_error_no_metadata_for_network_title,
 					name
@@ -61,7 +61,7 @@ fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel
 			)
 		}
 		is TransactionError.OutdatedMetadata -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(
 					R.string.transaction_error_outdated_metadata_title,
 					name
@@ -71,7 +71,7 @@ fun TransactionError.toBottomSheetModel(context: Context): TransactionErrorModel
 			)
 		}
 		is TransactionError.UnknownNetwork -> {
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				title = context.getString(R.string.transaction_error_unknown_network_title),
 				subtitle = context.getString(R.string.transaction_error_unknown_network_subtitle),
 				showNetworkSteps = true,
@@ -94,7 +94,7 @@ private fun PreviewTransactionErrorMetadataForUnknownNetwork() {
 	SignerNewTheme {
 		val model =
 			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -116,7 +116,7 @@ private fun PreviewTransactionErrorGeneric() {
 			"Network name and version from metadata received in `load_metadata` message already have a corresponding entry in `METATREE` tree of the Signer database. However, the received metadata is different from the one already stored in the database."
 		val model =
 			TransactionError.Generic(errorMessage).toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -136,7 +136,7 @@ private fun PreviewTransactionErrorUnknownNetwork() {
 	SignerNewTheme {
 		val model =
 			TransactionError.UnknownNetwork("Westend", "crc3322").toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -156,7 +156,7 @@ private fun PreviewTransactionErrorNoMetadataForNetwork() {
 	SignerNewTheme {
 		val model =
 			TransactionError.NoMetadataForNetwork("Westend").toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -176,7 +176,7 @@ private fun PreviewTransactionErrorNetworkAlreadyAdded() {
 	SignerNewTheme {
 		val model =
 			TransactionError.NetworkAlreadyAdded("Westend", "crc3322").toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -196,7 +196,7 @@ private fun PreviewTransactionErrorMetadataAlreadyAdded() {
 	SignerNewTheme {
 		val model =
 			TransactionError.MetadataAlreadyAdded("Westend", 4356u).toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -216,7 +216,7 @@ private fun PreviewTransactionErrorOutdatedMetadata() {
 	SignerNewTheme {
 		val model =
 			TransactionError.OutdatedMetadata("Westend", 3256u, 3257u).toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
