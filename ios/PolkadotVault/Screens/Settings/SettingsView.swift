@@ -12,40 +12,32 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    NavigationBarView(
-                        viewModel: NavigationBarViewModel(
-                            title: .title(Localizable.Settings.Label.title.string),
-                            leftButtons: [.init(type: .xmark, action: { presentationMode.wrappedValue.dismiss() })],
-                            rightButtons: [.init(type: .empty)],
-                            backgroundColor: Asset.backgroundPrimary.swiftUIColor
-                        )
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                NavigationBarView(
+                    viewModel: NavigationBarViewModel(
+                        title: .title(Localizable.Settings.Label.title.string),
+                        leftButtons: [.init(type: .xmark, action: { presentationMode.wrappedValue.dismiss() })],
+                        rightButtons: [.init(type: .empty)],
+                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
                     )
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            ForEach(viewModel.renderable.items, id: \.id) { renderable in
-                                SettingsRowView(renderable: renderable)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        viewModel.onTapAction(renderable.item)
-                                    }
-                            }
-                            Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
-                                .font(PrimaryFont.captionM.font)
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                .padding(.top, Spacing.medium)
-                                .padding(.horizontal, Spacing.large)
-                                .padding(.bottom, Spacing.extraSmall)
+                )
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(viewModel.renderable.items, id: \.id) { renderable in
+                            SettingsRowView(renderable: renderable)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    viewModel.onTapAction(renderable.item)
+                                }
                         }
+                        Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
+                            .font(PrimaryFont.captionM.font)
+                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .padding(.top, Spacing.medium)
+                            .padding(.horizontal, Spacing.large)
+                            .padding(.bottom, Spacing.extraSmall)
                     }
-                }
-                .background(Asset.backgroundPrimary.swiftUIColor)
-                .navigationViewStyle(StackNavigationViewStyle())
-                .navigationBarHidden(true)
-                VStack(spacing: 0) {
-                    ConnectivityAlertOverlay(viewModel: .init())
                 }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
@@ -54,6 +46,10 @@ struct SettingsView: View {
                     .navigationBarHidden(true),
                 isActive: $viewModel.isDetailsPresented
             ) { EmptyView() }
+            VStack(spacing: 0) {
+                ConnectivityAlertOverlay(viewModel: .init())
+            }
+            .background(Asset.backgroundPrimary.swiftUIColor)
         }
         .onAppear {
             viewModel.loadData()
