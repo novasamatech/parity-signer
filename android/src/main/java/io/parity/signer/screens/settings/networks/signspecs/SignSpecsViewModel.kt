@@ -3,11 +3,13 @@ package io.parity.signer.screens.settings.networks.signspecs
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPasswordModel
 import io.parity.signer.components.sharedcomponents.KeyCardModelBase
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.SignSufficientCryptoInteractor
+import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.uniffi.ErrorDisplayed
@@ -18,7 +20,10 @@ import kotlinx.coroutines.launch
 
 
 class SignSpecsViewModel : ViewModel() {
-	private val seedRepo = ServiceLocator.activityScope!!.seedRepository
+	private val appContext
+		get() = ServiceLocator.appContext
+	private val seedRepo
+		get() = ServiceLocator.activityScope!!.seedRepository
 	private val interactor = SignSufficientCryptoInteractor()
 
 	private val _password: MutableStateFlow<PasswordState?> =
@@ -69,7 +74,13 @@ class SignSpecsViewModel : ViewModel() {
 						)
 					}
 					when (signResult) {
-						is OperationResult.Err -> TODO() //todo dmitry
+						is OperationResult.Err -> {
+							_localError.value = LocalErrorSheetModel(
+								title = appContext.getString(R.string.sign_specs_error_signing_title),
+								subtitle = signResult.error.getDebugDetailedDescriptionString(),
+							)
+						}
+
 						is OperationResult.Ok -> when (val result = signResult.result) {
 							SignSufficientCryptoInteractor.SignSpecsResult.PasswordWrong -> {
 								requestPassword(
@@ -100,7 +111,10 @@ class SignSpecsViewModel : ViewModel() {
 					addressKey64 = addressKey,
 				)
 			} else if (it.model.attempt > 3) {
-				//todo dmitry show error
+				_localError.value = LocalErrorSheetModel(
+					title = appContext.getString(R.string.attempts_exceeded_title),
+					subtitle = appContext.getString(R.string.attempts_exceeded_message),
+				)
 				null
 			} else {
 				it.copy(

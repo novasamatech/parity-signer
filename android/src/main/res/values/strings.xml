@@ -434,6 +434,9 @@
 	<string name="sign_spes_result_specs_lable">Specs</string>
 	<string name="sign_specs_load_metadata_label">Metadata for %1$s with version %2$s</string>
 	<string name="sign_specs_load_types_label">Types %1$s</string>
+	<string name="sign_specs_error_signing_title">Error in signing specs</string>
+	<string name="attempts_exceeded_title">Attempts exceeded</string>
+	<string name="attempts_exceeded_message">Many password attempts failed</string>
 
 </resources>
 
