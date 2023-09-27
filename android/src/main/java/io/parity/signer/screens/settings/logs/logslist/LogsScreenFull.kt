@@ -3,6 +3,8 @@ package io.parity.signer.screens.settings.logs.logslist
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,7 +70,11 @@ fun LogsScreenFull(
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
 		}
-		composable(LogsMenuSubgraph.logs_empty) {}//no menu
+		composable(LogsMenuSubgraph.logs_empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(LogsMenuSubgraph.logs_menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				LogsMenuGeneral(

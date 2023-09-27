@@ -1,6 +1,8 @@
 package io.parity.signer.screens.settings.networks.details
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -69,12 +71,16 @@ fun NetworkDetailsSubgraph(
 	val closeAction: Callback = {
 		menuController.popBackStack()
 	}
-	//menus
+	//bottom sheets
 	NavHost(
 		navController = menuController,
 		startDestination = NetworkDetailsMenuSubgraph.empty,
 	) {
-		composable(NetworkDetailsMenuSubgraph.empty) {}
+		composable(NetworkDetailsMenuSubgraph.empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(NetworkDetailsMenuSubgraph.menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				NetworkDetailsMenuGeneral(
