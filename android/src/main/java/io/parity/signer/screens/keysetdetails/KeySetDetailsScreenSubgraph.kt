@@ -116,7 +116,7 @@ fun KeySetDetailsScreenSubgraph(
 					},
 					onBackupClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
-//							popUpTo(KeySetDetailsMenuSubgraph.empty)
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
 					},
 					onCancel = {
@@ -124,12 +124,12 @@ fun KeySetDetailsScreenSubgraph(
 					},
 					onDeleteClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
-//							popUpTo(KeySetDetailsMenuSubgraph.empty)
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
 					},
 					exposeConfirmAction = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
-//							popUpTo(KeySetDetailsMenuSubgraph.empty)
+							popUpTo(KeySetDetailsMenuSubgraph.empty)
 						}
 					}
 				)
