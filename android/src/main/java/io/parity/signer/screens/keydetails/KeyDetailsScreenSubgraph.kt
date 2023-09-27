@@ -2,6 +2,8 @@ package io.parity.signer.screens.keydetails
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,7 +65,11 @@ fun KeyDetailsScreenSubgraph(
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
 		}
-		composable(KeyPublicDetailsMenuSubgraph.empty) {}//no menu
+		composable(KeyPublicDetailsMenuSubgraph.empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuGeneral) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeyDetailsGeneralMenu(

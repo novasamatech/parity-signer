@@ -3,6 +3,8 @@ package io.parity.signer.screens.keysetdetails
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -95,17 +97,15 @@ fun KeySetDetailsScreenSubgraph(
 	NavHost(
 		navController = menuNavController,
 		startDestination = KeySetDetailsMenuSubgraph.empty,
-		enterTransition = {
-			EnterTransition.None
-		},
-		exitTransition = {
-			slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
-		},
 	) {
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
 		}
-		composable(KeySetDetailsMenuSubgraph.empty) {}//no menu
+		composable(KeySetDetailsMenuSubgraph.empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(KeySetDetailsMenuSubgraph.keys_menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				KeyDetailsMenuGeneral(
