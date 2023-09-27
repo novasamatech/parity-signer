@@ -87,12 +87,12 @@ struct SignSpecEnterPasswordModal: View {
                 renderablePath
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
                     .font(PrimaryFont.captionM.font)
-                Text(viewModel.dataModel.authorInfo.address.seedName)
+                Text(viewModel.selectedKeyRecord.address.seedName)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.bodyM.font)
                 HStack {
                     Text(
-                        viewModel.dataModel.authorInfo.base58
+                        viewModel.selectedKeyRecord.publicKey
                             .truncateMiddle()
                     )
                     .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
@@ -101,8 +101,8 @@ struct SignSpecEnterPasswordModal: View {
             }
             Spacer()
             NetworkIdenticon(
-                identicon: viewModel.dataModel.authorInfo.address.identicon,
-                network: viewModel.dataModel.networkInfo?.networkLogo,
+                identicon: viewModel.selectedKeyRecord.address.identicon,
+                network: viewModel.selectedKeyRecord.networkLogo,
                 background: Asset.accentRed300Overlay.swiftUIColor,
                 size: Heights.identiconInCell
             )
@@ -115,36 +115,30 @@ struct SignSpecEnterPasswordModal: View {
     private var renderablePath: Text {
         Text(
             // swiftlint:disable:next line_length
-            "\(viewModel.dataModel.authorInfo.address.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
+            "\(viewModel.selectedKeyRecord.address.path)\(Localizable.Shared.Label.passwordedPathDelimeter.string)\(Image(.lock))"
         )
     }
 }
 
 extension SignSpecEnterPasswordModal {
     final class ViewModel: ObservableObject {
-        private let service: ManageNetworkDetailsService
         @Binding var isPresented: Bool
-        @Binding var shouldPresentError: Bool
-        @Binding var dataModel: MEnterPassword
-        @Binding var detailsContent: MSufficientCryptoReady?
 
         @Published var password: String = ""
         @Published var isActionDisabled: Bool = true
         @Published var isValid: Bool = true
+        let selectedKeyRecord: MRawKey
         private var cancelBag = CancelBag()
+        private let onDoneTapAction: (SignSpecEnterPasswordModal.ViewModel) -> Void
 
         init(
             isPresented: Binding<Bool>,
-            shouldPresentError: Binding<Bool>,
-            dataModel: Binding<MEnterPassword>,
-            detailsContent: Binding<MSufficientCryptoReady?>,
-            service: ManageNetworkDetailsService = ManageNetworkDetailsService()
+            selectedKeyRecord: MRawKey,
+            onDoneTapAction: @escaping ((SignSpecEnterPasswordModal.ViewModel) -> Void)
         ) {
             _isPresented = isPresented
-            _shouldPresentError = shouldPresentError
-            _dataModel = dataModel
-            _detailsContent = detailsContent
-            self.service = service
+            self.selectedKeyRecord = selectedKeyRecord
+            self.onDoneTapAction = onDoneTapAction
             subscribeToUpdates()
         }
 
@@ -153,28 +147,13 @@ extension SignSpecEnterPasswordModal {
         }
 
         func onDoneTap() {
-            let actionResult = service.attemptPassword(password)
-            switch actionResult?.modalData {
-            case let .enterPassword(value):
-                dataModel = value
-                isValid = false
-            case let .sufficientCryptoReady(value):
-                detailsContent = value
-                isPresented = false
-                shouldPresentError = false
-            default:
-                proceedtoErrorState()
-            }
-        }
-
-        private func proceedtoErrorState() {
-            isPresented = false
-            shouldPresentError = true
+            onDoneTapAction(self)
         }
 
         private func subscribeToUpdates() {
             $password.sink { newValue in
                 self.isActionDisabled = newValue.isEmpty
+                self.isValid = true
             }
             .store(in: cancelBag)
         }
@@ -187,9 +166,8 @@ extension SignSpecEnterPasswordModal {
             SignSpecEnterPasswordModal(
                 viewModel: .init(
                     isPresented: Binding<Bool>.constant(true),
-                    shouldPresentError: Binding<Bool>.constant(false),
-                    dataModel: Binding<MEnterPassword>.constant(.stub),
-                    detailsContent: .constant(nil)
+                    selectedKeyRecord: .stub,
+                    onDoneTapAction: { _ in }
                 )
             )
         }

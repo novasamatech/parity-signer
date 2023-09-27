@@ -26,40 +26,42 @@ struct SignSpecsListView: View {
                     backgroundColor: Asset.backgroundPrimary.swiftUIColor
                 )
             )
-            ScrollView {
-                LazyVStack {
-                    ForEach(viewModel.content.identities, id: \.addressKey) { keyRecord in
-                        rawKeyRow(keyRecord)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                viewModel.onRecordTap(keyRecord)
-                            }
+            if let content = viewModel.content {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(content.identities, id: \.addressKey) { keyRecord in
+                            rawKeyRow(keyRecord)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    viewModel.onRecordTap(keyRecord)
+                                }
+                        }
                     }
                 }
             }
             NavigationLink(
-                destination: SignSpecDetails(viewModel: .init(
-                    content: viewModel.detailsContent,
-                    onComplete: viewModel.onDetailsCompletion
-                ))
+                destination: SignSpecDetails(
+                    viewModel: .init(
+                        content: viewModel.detailsContent
+                    )
+                )
                 .navigationBarHidden(true),
                 isActive: $viewModel.isPresentingDetails
             ) { EmptyView() }
         }
+        .onAppear { viewModel.onAppear() }
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
         .background(Asset.backgroundPrimary.swiftUIColor)
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingEnterPassword,
-            onDismiss: viewModel.onPasswordModalDismiss
+            isPresented: $viewModel.isPresentingEnterPassword
         ) {
             SignSpecEnterPasswordModal(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterPassword,
-                    shouldPresentError: $viewModel.shouldPresentError,
-                    dataModel: $viewModel.enterPassword,
-                    detailsContent: $viewModel.detailsContent
+                    selectedKeyRecord: viewModel.selectedKeyRecord,
+                    onDoneTapAction: viewModel.onPasswordModalDoneTapAction(_:)
                 )
             )
             .clearModalBackground()
@@ -113,15 +115,16 @@ struct SignSpecsListView: View {
 extension SignSpecsListView {
     final class ViewModel: ObservableObject {
         private let networkKey: String
-        let content: MSignSufficientCrypto
         private let seedsMediator: SeedsMediating
         private let service: ManageNetworkDetailsService
+        private let type: SpecSignType
         @Published var detailsContent: MSufficientCryptoReady!
+        @Published var content: MSignSufficientCrypto?
+        @Published var selectedKeyRecord: MRawKey!
         @Published var isPresentingDetails: Bool = false
         @Published var isPresentingEnterPassword: Bool = false
         @Published var shouldPresentError: Bool = false
         @Published var isPresentingError: Bool = false
-        @Published var enterPassword: MEnterPassword!
         @Published var presentableError: ErrorBottomModalViewModel = .signingForgotPassword()
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
@@ -131,48 +134,99 @@ extension SignSpecsListView {
 
         init(
             networkKey: String,
-            content: MSignSufficientCrypto,
+            type: SpecSignType,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             service: ManageNetworkDetailsService = ManageNetworkDetailsService()
         ) {
             self.networkKey = networkKey
-            self.content = content
+            self.type = type
             self.seedsMediator = seedsMediator
             self.service = service
         }
 
-        func onDetailsCompletion() {
-            service.signSpecList(networkKey)
-        }
-
-        func onPasswordModalDismiss() {
-            enterPassword = nil
-            if detailsContent != nil {
-                isPresentingDetails = true
-                return
-            } else {
-                service.signSpecList(networkKey)
-            }
-            if shouldPresentError {
-                shouldPresentError = false
-                isPresentingError = true
-                service.signSpecList(networkKey)
-            }
+        func onAppear() {
+            loadData()
         }
 
         func onRecordTap(_ keyRecord: MRawKey) {
             let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
-            guard !seedPhrase.isEmpty,
-                  let actionResult = service.attemptSigning(keyRecord, seedPhrase) else { return }
-            switch actionResult.modalData {
-            case let .enterPassword(enterPassword):
-                self.enterPassword = enterPassword
+            guard !seedPhrase.isEmpty else { return }
+            if keyRecord.address.hasPwd {
+                selectedKeyRecord = keyRecord
                 isPresentingEnterPassword = true
-            case let .sufficientCryptoReady(detailsContent):
+            } else {
+                attemptSigning(keyRecord)
+            }
+        }
+
+        func onPasswordModalDoneTapAction(_ modal: SignSpecEnterPasswordModal.ViewModel) {
+            let seedPhrase = seedsMediator.getSeed(seedName: modal.selectedKeyRecord.address.seedName)
+            guard !seedPhrase.isEmpty else { return }
+            service.signSpec(
+                type,
+                networkKey,
+                signingAddressKey: modal.selectedKeyRecord.addressKey,
+                seedPhrase: seedPhrase,
+                password: modal.password
+            ) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case let .success(detailsContent):
+                    self.isPresentingEnterPassword = false
+                    self.detailsContent = detailsContent
+                    self.isPresentingDetails = true
+                case let .failure(error):
+                    switch error {
+                    case .wrongPassword:
+                        modal.isValid = false
+                    case let .error(serviceError):
+                        self.isPresentingEnterPassword = false
+                        self.presentableError = .alertError(message: serviceError.localizedDescription)
+                        self.isPresentingError = true
+                    }
+                }
+            }
+        }
+    }
+}
+
+private extension SignSpecsListView.ViewModel {
+    func loadData() {
+        service.signSpecList(networkKey) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case let .success(content):
+                self.content = content
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
+        }
+    }
+
+    func attemptSigning(_ keyRecord: MRawKey) {
+        let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
+        guard !seedPhrase.isEmpty else { return }
+        service.signSpec(
+            type,
+            networkKey,
+            signingAddressKey: keyRecord.addressKey,
+            seedPhrase: seedPhrase,
+            password: nil
+        ) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case let .success(detailsContent):
                 self.detailsContent = detailsContent
-                isPresentingDetails = true
-            default:
-                ()
+                self.isPresentingDetails = true
+            case let .failure(error):
+                switch error {
+                case .wrongPassword:
+                    ()
+                case let .error(serviceError):
+                    self.presentableError = .alertError(message: serviceError.localizedDescription)
+                    self.isPresentingError = true
+                }
             }
         }
     }
