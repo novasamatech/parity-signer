@@ -27,8 +27,6 @@ import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import kotlinx.coroutines.delay
 
 
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
 @Composable
 fun RootNavigationGraph(
 	navController: NavHostController,
