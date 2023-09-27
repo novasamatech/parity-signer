@@ -16,7 +16,7 @@ import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
-import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.screens.scan.errors.toBottomSheetModel
 import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
 import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository.ImportDerivedKeyError
@@ -67,7 +67,7 @@ class ScanViewModel : ViewModel() {
 	var dynamicDerivations: MutableStateFlow<DdPreview?> = MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val transactionError: MutableStateFlow<TransactionErrorModel?> =
+	val transactionError: MutableStateFlow<LocalErrorSheetModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
@@ -102,7 +102,7 @@ class ScanViewModel : ViewModel() {
 
 				// Handle transactions with just error payload
 				if (transactions.all { it.isDisplayingErrorOnly() }) {
-					transactionError.value = TransactionErrorModel(context = context,
+					transactionError.value = LocalErrorSheetModel(context = context,
 						details = transactions.joinToString("\n") { it.transactionIssues() })
 					fakeNavigator.navigate(Action.GO_BACK) //fake call
 					clearState()
@@ -140,7 +140,7 @@ class ScanViewModel : ViewModel() {
 						fakeNavigator.navigate(Action.GO_BACK)
 						when (transactions.dominantImportError()) {
 							DerivedKeyError.BadFormat -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_bad_format_title),
 									subtitle = context.getString(R.string.scan_screen_error_bad_format_message),
 								)
@@ -149,7 +149,7 @@ class ScanViewModel : ViewModel() {
 							}
 
 							DerivedKeyError.KeySetMissing -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
 									subtitle = context.getString(R.string.scan_screen_error_missing_key_set_message),
 								)
@@ -158,7 +158,7 @@ class ScanViewModel : ViewModel() {
 							}
 
 							DerivedKeyError.NetworkMissing -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_missing_network_title),
 									subtitle = context.getString(R.string.scan_screen_error_missing_network_message),
 								)
@@ -197,7 +197,7 @@ class ScanViewModel : ViewModel() {
 										}
 									}
 								} else {
-									transactionError.value = TransactionErrorModel(
+									transactionError.value = LocalErrorSheetModel(
 										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 										subtitle = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
 									)
@@ -236,7 +236,7 @@ class ScanViewModel : ViewModel() {
 
 				when (previewDynDerivations) {
 					is UniffiResult.Error -> {
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.dymanic_derivation_error_custom_title),
 							subtitle = previewDynDerivations.error.message ?: "",
 						)
@@ -269,7 +269,7 @@ class ScanViewModel : ViewModel() {
 
 				when (dynDerivations) {
 					is UniffiResult.Error -> {
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 							subtitle = dynDerivations.error.message ?: "",
 						)
@@ -345,7 +345,7 @@ class ScanViewModel : ViewModel() {
 								context.getString(R.string.auth_failed_message)
 							}
 						}
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.dymanic_derivation_error_custom_title),
 							subtitle = errorMessage,
 						)

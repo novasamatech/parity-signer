@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,6 +25,7 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DerivationCreateSubgraph(
 	onBack: Callback,
@@ -59,15 +62,17 @@ fun DerivationCreateSubgraph(
 		}
 		composable(DerivationCreateSubgraph.path) {
 			val menuNavController = rememberNavController()
-
+			val keyboardController = LocalSoftwareKeyboardController.current
 			DerivationPathScreen(
 				initialPath = path.value,
 				onDerivationHelp = {
+					keyboardController?.hide()
 					menuNavController.navigate(PathDerivationSheetsSubGraph.help)
 				},
 				onClose = { navController.popBackStack() },
 				onDone = { newPath ->
 					deriveViewModel.updatePath(newPath)
+					keyboardController?.hide()
 					menuNavController.navigate(PathDerivationSheetsSubGraph.confirmation)
 				},
 				validator = deriveViewModel::checkPath,

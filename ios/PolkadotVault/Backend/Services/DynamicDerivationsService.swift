@@ -14,7 +14,7 @@ final class DynamicDerivationsService {
 
     init(
         backendService: BackendService = BackendService(),
-        callQueue: Dispatching = DispatchQueue(label: "DynamicDerivationsService", qos: .userInitiated),
+        callQueue: Dispatching = DispatchQueue.global(qos: .userInteractive),
         callbackQueue: Dispatching = DispatchQueue.main
     ) {
         self.backendService = backendService

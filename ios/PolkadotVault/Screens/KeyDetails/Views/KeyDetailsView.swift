@@ -219,7 +219,11 @@ struct KeyDetailsView: View {
         .fullScreenModal(
             isPresented: $viewModel.isPresentingSettings
         ) {
-            SettingsView(viewModel: .init())
+            NavigationView {
+                SettingsView(viewModel: .init())
+                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationBarHidden(true)
+            }
         }
         .bottomSnackbar(
             viewModel.snackbarViewModel,

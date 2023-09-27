@@ -114,8 +114,8 @@ extension NetworkSelectionSettings {
         private let service: GetManagedNetworksService
         private let networkDetailsService: ManageNetworkDetailsService
         @Published var networks: [MmNetwork] = []
-        @Published var selectedDetailsKey: String!
         @Published var selectedDetails: MNetworkDetails!
+        @Published var selectedDetailsKey: String!
         @Published var isPresentingDetails = false
         @Published var isShowingQRScanner: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
@@ -135,8 +135,17 @@ extension NetworkSelectionSettings {
 
         func onTap(_ network: MmNetwork) {
             selectedDetailsKey = network.key
-            selectedDetails = networkDetailsService.refreshCurrentNavigationState(network.key)
-            isPresentingDetails = true
+            networkDetailsService.getNetworkDetails(network.key) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case let .success(selectedDetails):
+                    self.selectedDetails = selectedDetails
+                    self.isPresentingDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func onAddTap() {
