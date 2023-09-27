@@ -72,8 +72,6 @@ fun RootNavigationGraph(
 	}
 }
 
-const val NAVIGATION_TAG = "navigation"
-
 object MainGraphRoutes {
 	const val splashRoute = "navigation_point_splash"
 	const val firstTimeOnboarding =
@@ -98,15 +96,9 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 			OnboardingExplanationScreenFull(navigateNext = {navController.navigate(
 				FirstTimeOnboarding.termsConsentRoute
 			)})
-			LaunchedEffect(Unit) {
-				Log.d(NAVIGATION_TAG, "onboarding explanation opened")
-			}
 		}
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
 			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
-			LaunchedEffect(Unit) {
-				Log.d(NAVIGATION_TAG, "terms screen opened")
-			}
 		}
 	}
 }

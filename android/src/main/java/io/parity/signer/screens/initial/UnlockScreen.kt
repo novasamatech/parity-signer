@@ -24,7 +24,6 @@ import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.rootnavigation.MainGraphRoutes
-import io.parity.signer.ui.rootnavigation.NAVIGATION_TAG
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
@@ -39,9 +38,6 @@ fun NavGraphBuilder.initialUnlockAppScreenFlow(globalNavController: NavHostContr
 			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 				popUpTo(0)
 			}
-		}
-		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "initial unlock screen opened")
 		}
 	}
 }
