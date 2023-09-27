@@ -89,7 +89,7 @@ struct NetworkSettingsDetails: View {
                     destination: SignSpecsListView(
                         viewModel: .init(
                             networkKey: viewModel.networkKey,
-                            content: viewModel.signSpecList
+                            type: viewModel.specSignType
                         )
                     )
                     .navigationBarHidden(true),
@@ -97,6 +97,7 @@ struct NetworkSettingsDetails: View {
                 ) { EmptyView() }
             }
             .background(Asset.backgroundPrimary.swiftUIColor)
+            .onAppear { viewModel.onAppear() }
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
@@ -328,12 +329,12 @@ extension NetworkSettingsDetails {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
         private let networkDetailsService: ManageNetworkDetailsService
-        let networkKey: String
         private var metadataToDelete: MMetadataRecord?
-
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
         private let dismissRequest = PassthroughSubject<Void, Never>()
         private let onCompletion: (OnCompletionAction) -> Void
+
+        let networkKey: String
         @Published var isPresentingRemoveMetadataConfirmation = false
         @Published var networkDetails: MNetworkDetails
         @Published var shouldSignSpecs = false
@@ -341,7 +342,7 @@ extension NetworkSettingsDetails {
         @Published var shouldPresentRemoveNetworkConfirmation = false
         @Published var isPresentingRemoveNetworkConfirmation = false
 
-        @Published var signSpecList: MSignSufficientCrypto!
+        @Published var specSignType: SpecSignType!
         @Published var isPresentingSignSpecList: Bool = false
         @Published var isShowingQRScanner: Bool = false
         var snackbarViewModel: SnackbarViewModel = .init(title: "")
@@ -356,10 +357,14 @@ extension NetworkSettingsDetails {
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.networkKey = networkKey
+            _networkDetails = .init(initialValue: networkDetails)
             self.networkDetailsService = networkDetailsService
             self.onCompletion = onCompletion
-            _networkDetails = .init(initialValue: networkDetails)
             listenToNavigationUpdates()
+        }
+
+        func onAppear() {
+            updateView()
         }
 
         func removeMetadata() {
@@ -402,7 +407,7 @@ extension NetworkSettingsDetails {
         }
 
         func didTapSign(_ metadata: MMetadataRecord) {
-            signSpecList = networkDetailsService.signMetadataSpecList(networkKey, metadata.specsVersion)
+            specSignType = .metadata(metadataSpecsVersion: metadata.specsVersion)
             isPresentingSignSpecList = true
         }
 
@@ -417,7 +422,7 @@ extension NetworkSettingsDetails {
 
         func onMoreActionSheetDismissal() {
             if shouldSignSpecs {
-                signSpecList = networkDetailsService.signSpecList(networkKey)
+                specSignType = .network
                 shouldSignSpecs = false
                 isPresentingSignSpecList = true
             }
@@ -443,21 +448,29 @@ extension NetworkSettingsDetails {
         func cancelNetworkRemoval() {
             isPresentingRemoveNetworkConfirmation = false
         }
+    }
+}
 
-        private func updateView() {
-            guard let updatedNetworkDetails = networkDetailsService.refreshCurrentNavigationState(networkKey)
-            else { return }
-            networkDetails = updatedNetworkDetails
+private extension NetworkSettingsDetails.ViewModel {
+    func updateView() {
+        networkDetailsService.getNetworkDetails(networkKey) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case let .success(updatedNetworkDetails):
+                self.networkDetails = updatedNetworkDetails
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
         }
+    }
 
-        private func listenToNavigationUpdates() {
-            guard cancelBag.subscriptions.isEmpty else { return }
-            $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
-                guard let self = self, !isPresentingSignSpecList else { return }
-                self.signSpecList = nil
-                self.updateView()
-            }.store(in: cancelBag)
-        }
+    func listenToNavigationUpdates() {
+        guard cancelBag.subscriptions.isEmpty else { return }
+        $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
+            guard let self = self, !isPresentingSignSpecList else { return }
+            self.updateView()
+        }.store(in: cancelBag)
     }
 }
 

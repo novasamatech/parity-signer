@@ -20,8 +20,8 @@ import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
 import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
-import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
-import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.LocalErrorBottomSheet
+import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
 import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDynamicDerivationScreenFull
@@ -92,7 +92,7 @@ fun ScanNavSubgraph(
 			},
 			onCustomError = { error ->
 				scanViewModel.transactionError.value =
-					TransactionErrorModel(context = context, details = error)
+					LocalErrorSheetModel(context = context, details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
 			onErrorWrongPassword = {
@@ -184,7 +184,7 @@ fun ScanNavSubgraph(
 	//Bottom sheets
 	transactionError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
-			TransactionErrorBottomSheet(
+			LocalErrorBottomSheet(
 				error = presentableErrorValue,
 				onOk = scanViewModel::clearState,
 			)

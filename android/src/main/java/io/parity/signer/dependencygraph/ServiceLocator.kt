@@ -6,7 +6,6 @@ import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper
-import io.parity.signer.domain.SignerNavigator
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.PreferencesRepository
 import io.parity.signer.domain.storage.SeedRepository

@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -96,7 +95,7 @@ internal fun SignSpecsResultBottomSheet(
 			when (val c = model.content) {
 				is MscContent.AddSpecs -> Column {
 					Text(
-						"Specs",
+						text = stringResource(R.string.sign_spes_result_specs_lable),
 						color = MaterialTheme.colors.primary,
 						style = SignerTypeface.LabelM,
 					)
@@ -104,14 +103,18 @@ internal fun SignSpecsResultBottomSheet(
 				}
 
 				is MscContent.LoadMetadata -> Text(
-					"Metadata for " + c.name + " with version " + c.version,
+					stringResource(
+						R.string.sign_specs_load_metadata_label,
+						c.name,
+						c.version
+					),
 					color = MaterialTheme.colors.primary,
 					style = SignerTypeface.LabelM,
 				)
 
 				is MscContent.LoadTypes -> Column {
 					Text(
-						"types " + c.types,
+						stringResource(R.string.sign_specs_load_types_label, c.types),
 						color = MaterialTheme.colors.primary,
 						style = SignerTypeface.LabelM,
 					)

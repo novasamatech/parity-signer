@@ -1002,6 +1002,7 @@
 		6D22FB8B2A9758490005993C /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
 				6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */,
 				6D1F077E2A9CA24F006BA85E /* RecoverKeySetService.swift */,
 				6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */,
@@ -1023,7 +1024,6 @@
 			isa = PBXGroup;
 			children = (
 				6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */,
-				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
 			);
 			path = NavigationServices;
 			sourceTree = "<group>";

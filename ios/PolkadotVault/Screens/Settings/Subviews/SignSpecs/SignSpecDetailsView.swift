@@ -138,7 +138,6 @@ struct SignSpecDetails: View {
 extension SignSpecDetails {
     final class ViewModel: ObservableObject {
         var content: MSufficientCryptoReady
-        private let onComplete: () -> Void
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -146,16 +145,13 @@ extension SignSpecDetails {
         private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            content: MSufficientCryptoReady,
-            onComplete: @escaping () -> Void
+            content: MSufficientCryptoReady
         ) {
             self.content = content
-            self.onComplete = onComplete
         }
 
         func onBackTap() {
             dismissRequest.send()
-            onComplete()
         }
     }
 }
