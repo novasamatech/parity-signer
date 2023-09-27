@@ -1,6 +1,8 @@
 package io.parity.signer.screens.settings.general
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -61,7 +63,11 @@ internal fun SettingsGeneralNavSubgraph(
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
 		}
-		composable(SettingsGeneralMenu.empty) {}//no menu
+		composable(SettingsGeneralMenu.empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(SettingsGeneralMenu.wipe_factory) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmFactorySettingsBottomSheet(
