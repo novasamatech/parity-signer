@@ -35,12 +35,6 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 		} else {
 			UnlockAppAuthScreen(onUnlockClicked = mainFlowViewModel::onUnlockClicked)
 		}
-		LaunchedEffect(Unit) {
-			Log.d(
-				NAVIGATION_TAG,
-				"main rust-handled screen navigation subgraph opened"
-			)
-		}
 	}
 }
 
