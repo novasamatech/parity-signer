@@ -6,9 +6,7 @@ use parity_scale_codec::Encode;
 use sled::{Batch, Db, Tree};
 use sp_core::H256;
 
-use constants::{
-    ADDRTREE, DANGER, GENERALVERIFIER, SCHEMA_VERSION, VERIFIERS,
-};
+use constants::{ADDRTREE, DANGER, GENERALVERIFIER, SCHEMA_VERSION, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
 use definitions::network_specs::NetworkSpecs;
