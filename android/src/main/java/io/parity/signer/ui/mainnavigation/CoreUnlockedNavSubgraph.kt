@@ -77,7 +77,7 @@ fun CoreUnlockedNavSubgraph() {
 			),
 		) {
 			val seedName =
-				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameArg)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameOptionalArg)!!
 
 			DerivationCreateSubgraph(
 				onBack = { navController.popBackStack() },
@@ -118,10 +118,10 @@ object CoreUnlockedNavSubgraph {
 	const val camera = "unlocked_camera"
 
 	object KeySetDetails {
-		internal const val seedNameArg = "seed_name_arg"
+		internal const val seedNameOptionalArg = "seed_name_arg"
 		private const val baseRoute = "core_keyset_details_home"
-		const val route = "$baseRoute/{$seedNameArg}"
-		fun destination(seedName: String) = "$baseRoute/${seedName}"
+		const val route = "$baseRoute/{$seedNameOptionalArg}"
+		fun destination(seedName: String?) = "$baseRoute/${seedName.orEmpty()}"
 	}
 
 	object NewDerivedKey {

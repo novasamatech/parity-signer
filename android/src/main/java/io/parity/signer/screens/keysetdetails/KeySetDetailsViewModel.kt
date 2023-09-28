@@ -38,6 +38,10 @@ class KeySetDetailsViewModel : ViewModel() {
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airGapModeState
 
+	fun getKeySetDetails(seedName: String?) {
+
+	}
+
 	fun makeFilteredFlow(original : KeySetDetailsModel): StateFlow<KeySetDetailsModel> {
 		return filters.map { filterInstance ->
 			if (filterInstance.isEmpty()) original else {

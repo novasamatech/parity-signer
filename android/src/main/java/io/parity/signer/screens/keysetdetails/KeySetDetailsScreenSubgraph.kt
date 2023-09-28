@@ -24,7 +24,9 @@ import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
@@ -33,11 +35,16 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBot
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
+import io.parity.signer.uniffi.ErrorDisplayed
+import io.parity.signer.uniffi.keysBySeedName
 import kotlinx.coroutines.launch
 
+/**
+ * @param seedName is optional - null when we need to open last one
+ */
 @Composable
 fun KeySetDetailsScreenSubgraph(
-	fullModel: KeySetDetailsModel,
+	seedName: String?,
 	navController: NavController,
 	onBack: Callback,
 ) {
@@ -45,8 +52,24 @@ fun KeySetDetailsScreenSubgraph(
 	val coroutineScope = rememberCoroutineScope()
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
+
+	//todo dmitry implement
+	val fullModel = try {
+		//todo export this to vm and handle errors - open default for example
+		keysBySeedName(seedName!!).toKeySetDetailsModel()
+	} catch (e: ErrorDisplayed) {
+		navController.navigate(
+			CoreUnlockedNavSubgraph.ErrorScreen.destination(
+				argHeader = "Unexpected error in keysBySeedName",
+				argDescription = e.toString(),
+				argVerbose = e.getDebugDetailedDescriptionString(),
+			)
+		)
+		null
+	}
+
 	val filteredModel =
-		keySetViewModel.makeFilteredFlow(fullModel).collectAsStateWithLifecycle()
+		keySetViewModel.makeFilteredFlow(seedName).collectAsStateWithLifecycle()
 
 	val networkState = keySetViewModel.networkState.collectAsStateWithLifecycle()
 
