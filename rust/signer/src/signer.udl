@@ -10,6 +10,7 @@ interface ErrorDisplayed {
     UnknownNetwork(H256 genesis_hash, Encryption encryption);
     NoMetadata(string name);
     WrongPassword();
+    DbSchemaMismatch();
 };
 
 [Error]
@@ -695,6 +696,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
+
+    [Throws=ErrorDisplayed]
+    void check_db_version();
 
     [Throws=ErrorDisplayed]
     void create_key_set([ByRef] string seed_name, [ByRef] string seed_phrase, sequence<string> networks);

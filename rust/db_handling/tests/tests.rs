@@ -6,10 +6,7 @@ use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 use std::{convert::TryInto, str::FromStr};
 
-use constants::{
-    test_values::{alice_sr_alice, empty_png, types_known, westend_9000, westend_9010},
-    ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
-};
+use constants::{test_values::{alice_sr_alice, empty_png, types_known, westend_9000, westend_9010}, ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE, SCHEMA_VERSION};
 use db_handling::Error;
 use defaults::default_chainspecs;
 use definitions::{
@@ -67,6 +64,8 @@ use definitions::helpers::multisigner_to_public;
 use definitions::navigation::MAddressCard;
 
 use tempfile::tempdir;
+use db_handling::helpers::assert_db_version;
+
 
 fn westend_genesis() -> H256 {
     H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
@@ -2159,4 +2158,29 @@ fn test_dynamic_derivations() {
             );
         }
     }
+}
+
+#[test]
+fn test_assert_db_version(){
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    assert!(assert_db_version(&db).is_ok());
+}
+
+#[test]
+fn test_assert_empty_db_version(){
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    assert!(matches!(assert_db_version(&db), Err(Error::DbSchemaMismatch {found:0, .. })));
+}
+
+#[test]
+fn test_assert_wrong_db_version(){
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    let mut batch = Batch::default();
+    batch.insert(SCHEMA_VERSION, u32::MAX.to_be_bytes().to_vec());
+    TrDbCold::new().set_settings(batch).apply(&db).unwrap();
+    assert!(matches!(assert_db_version(&db), Err(Error::DbSchemaMismatch {found:u32::MAX, .. })));
 }

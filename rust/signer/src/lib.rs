@@ -26,6 +26,7 @@ mod ffi_types;
 
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use db_handling::{Error as DbHandlingError, Error};
 use definitions::keyring::AddressKey;
 use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
@@ -89,6 +90,8 @@ pub enum ErrorDisplayed {
     },
     /// Provided password is incorrect
     WrongPassword,
+    /// Database schema mismatch
+    DbSchemaMismatch,
 }
 
 impl From<NavigatorError> for ErrorDisplayed {
@@ -139,6 +142,15 @@ impl From<NavigatorError> for ErrorDisplayed {
             NavigatorError::TransactionSigning(transaction_signing::Error::WrongPassword) => {
                 Self::WrongPassword
             }
+            _ => Self::Str { s: format!("{e}") },
+        }
+    }
+}
+
+impl From<DbHandlingError> for ErrorDisplayed {
+    fn from(e: DbHandlingError) -> Self {
+        match &e {
+            Error::DbSchemaMismatch { .. } => Self::DbSchemaMismatch,
             _ => Self::Str { s: format!("{e}") },
         }
     }
@@ -574,6 +586,10 @@ fn create_key_set(
 ) -> anyhow::Result<(), ErrorDisplayed> {
     db_handling::identities::create_key_set(&get_db()?, seed_name, seed_phrase, networks)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn check_db_version() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::helpers::assert_db_version(&get_db()?).map_err(ErrorDisplayed::from)
 }
 
 fn get_keys_for_signing() -> Result<MSignSufficientCrypto, ErrorDisplayed> {
