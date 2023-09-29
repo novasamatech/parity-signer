@@ -1,6 +1,8 @@
 package io.parity.signer.screens.createderivation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
@@ -87,7 +89,11 @@ fun DerivationCreateSubgraph(
 				startDestination = PathDerivationSheetsSubGraph.empty,
 			) {
 				val closeAction: Callback = { menuNavController.popBackStack() }
-				composable(PathDerivationSheetsSubGraph.empty) {}
+				composable(PathDerivationSheetsSubGraph.empty) {
+					//no menu - Spacer element so when other part shown there won't
+					// be an appearance animation from top left part despite there shouldn't be
+					Spacer(modifier = Modifier.fillMaxSize(1f))
+				}
 				composable(PathDerivationSheetsSubGraph.help) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
 						DerivationMethodsHelpBottomSheet(

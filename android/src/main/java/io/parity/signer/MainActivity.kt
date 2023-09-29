@@ -9,6 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.addVaultLogger
 import io.parity.signer.ui.rootnavigation.RootNavigationGraph
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -26,7 +27,12 @@ class MainActivity : AppCompatActivity() {
 
 		setContent {
 			SignerNewTheme {
-				RootNavigationGraph(navController = rememberNavController())
+				RootNavigationGraph(
+					navController = rememberNavController().apply {
+						addVaultLogger(
+							"Root Nav graph controller"
+						)
+					})
 			}
 		}
 	}

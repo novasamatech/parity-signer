@@ -13,7 +13,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.ui.rootnavigation.MainGraphRoutes
-import io.parity.signer.ui.rootnavigation.NAVIGATION_TAG
 
 
 /**
@@ -28,7 +27,6 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		val viewModel: SplashScreenViewModel = viewModel()
 		val context = LocalContext.current
 		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "Splash screen opened")
 			if (viewModel.shouldShowOnboarding(context)) {
 				globalNavController.navigate(MainGraphRoutes.firstTimeOnboarding) {
 					popUpTo(0)

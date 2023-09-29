@@ -1,8 +1,11 @@
 package io.parity.signer.screens.keysets
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -67,7 +70,11 @@ fun KeySetsListScreenSubgraph(
 		navController = menuNavController,
 		startDestination = KeySetsMenuSubgraph.empty,
 	) {
-		composable(KeySetsMenuSubgraph.empty) {}//no menu
+		composable(KeySetsMenuSubgraph.empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(KeySetsMenuSubgraph.exposed_shield_alert) {
 			ExposedAlert(navigateBack = { menuNavController.popBackStack() })
 		}
