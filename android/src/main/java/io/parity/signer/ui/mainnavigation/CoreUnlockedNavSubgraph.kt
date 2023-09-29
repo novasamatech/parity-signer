@@ -1,5 +1,6 @@
 package io.parity.signer.ui.mainnavigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -77,7 +78,7 @@ fun CoreUnlockedNavSubgraph() {
 			),
 		) {
 			val seedName =
-				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameOptionalArg)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedName)!!
 
 			DerivationCreateSubgraph(
 				onBack = { navController.popBackStack() },
@@ -93,7 +94,7 @@ fun CoreUnlockedNavSubgraph() {
 				openKeySet = { seedName ->
 					navController.navigate(
 						CoreUnlockedNavSubgraph.KeySetDetails.destination(
-							seedName = seedName
+							seedNameValue = seedName
 						)
 					)
 				}
@@ -118,10 +119,14 @@ object CoreUnlockedNavSubgraph {
 	const val camera = "unlocked_camera"
 
 	object KeySetDetails {
-		internal const val seedNameOptionalArg = "seed_name_arg"
+		internal const val seedName = "seed_name_arg"
 		private const val baseRoute = "core_keyset_details_home"
-		const val route = "$baseRoute/{$seedNameOptionalArg}"
-		fun destination(seedName: String?) = "$baseRoute/${seedName.orEmpty()}"
+		const val route = "$baseRoute?$seedName={$seedName}" //optional
+		fun destination(seedNameValue: String?): String {
+			val result = if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
+			Log.e("TAGG", result)//todo dmitry remove
+			return result
+		}
 	}
 
 	object NewDerivedKey {

@@ -97,6 +97,8 @@ class KeySetDetailsViewModel : ViewModel() {
 					wasEmptyKeyset = it.keysAndNetwork.isEmpty()
 				)
 			}
+		//todo if root == null - show this keyset doesn't exist? because we are getting empty model for wrong seedName
+		//what if last selected deson't exist anymore?
 	}
 
 	suspend fun feedModelForSeed(seedName: String?) {

@@ -1,5 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
+import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -13,15 +14,16 @@ fun NavGraphBuilder.keySetDetailsDestination(
 	composable(
 		route = CoreUnlockedNavSubgraph.KeySetDetails.route,
 		arguments = listOf(
-			navArgument(CoreUnlockedNavSubgraph.KeySetDetails.seedNameOptionalArg) {
+			navArgument(CoreUnlockedNavSubgraph.KeySetDetails.seedName) {
 				type = NavType.StringType
-				defaultValue = null
+				nullable = true
 			}
 		)
 	) {
 		val seedName =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedNameOptionalArg)
+			it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedName)
 
+		Log.e("TAGG", seedName.toString() + (seedName==null).toString())//todo dmitry remove
 		KeySetDetailsScreenSubgraph(
 			seedName = seedName,
 			navController = navController,
