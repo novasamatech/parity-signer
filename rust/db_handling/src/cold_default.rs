@@ -43,6 +43,7 @@ use parity_scale_codec::Encode;
 #[cfg(feature = "active")]
 use sled::Batch;
 
+use constants::SCHEMA_VERSION;
 #[cfg(feature = "active")]
 use constants::{DANGER, TYPES};
 #[cfg(feature = "active")]
@@ -60,6 +61,7 @@ use defaults::default_general_verifier;
 #[cfg(feature = "active")]
 use defaults::{default_chainspecs, default_types_content, default_verifiers, release_metadata};
 use defaults::{nav_test_metadata, test_metadata};
+use definitions::schema_version::SchemaVersion;
 
 use crate::identities::generate_test_identities;
 #[cfg(feature = "active")]
@@ -142,6 +144,7 @@ fn default_cold_settings_init_later() -> Result<Batch> {
     let types_prep = default_types_content()?;
     batch.insert(TYPES, types_prep.store());
     batch.insert(DANGER, DangerRecord::safe().store());
+    batch.insert(SCHEMA_VERSION, SchemaVersion::store_current());
     Ok(batch)
 }
 

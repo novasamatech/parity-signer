@@ -852,6 +852,7 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
+ "constants",
  "frame-metadata 16.0.0",
  "hex",
  "libsecp256k1",
