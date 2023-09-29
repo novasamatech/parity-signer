@@ -26,6 +26,7 @@ import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.screens.keysetdetails.backup.KeySetBackupFullOverlayBottomSheet
 import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
+import io.parity.signer.screens.keysetdetails.empty.NoKeySetEmptyWelcomeScreen
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
@@ -58,7 +59,26 @@ fun KeySetDetailsScreenSubgraph(
 	when (val state =
 		filteredScreenModel.value.handleErrorAppState(navController)) {
 
-		KeySetDetailsScreenState.NoKeySets -> TODO() //todo dmitry
+		KeySetDetailsScreenState.NoKeySets -> {
+			NoKeySetEmptyWelcomeScreen(
+				onExposedShow = {
+					menuNavController.navigate(KeySetDetailsMenuSubgraph.exposed_shield_alert) {
+						popUpTo(KeySetDetailsMenuSubgraph.empty)
+					}
+				},
+				onNewKeySet = {
+					navController.navigate(
+						CoreUnlockedNavSubgraph.newKeySet
+					)
+				},
+				onRecoverKeySet = {
+					navController.navigate(
+						CoreUnlockedNavSubgraph.recoverKeySet
+					)
+				},
+				networkState = networkState,
+			)
+		}
 
 		KeySetDetailsScreenState.LoadingState, null -> WaitingScreen()
 		is KeySetDetailsScreenState.Data -> {
@@ -255,7 +275,8 @@ fun KeySetDetailsScreenSubgraph(
 								},
 								onExportAll = {
 									selected.value =
-										state.filteredModel.keysAndNetwork.map { it.key.addressKey }.toSet()
+										state.filteredModel.keysAndNetwork.map { it.key.addressKey }
+											.toSet()
 									isResultState.value = true
 								},
 							)
