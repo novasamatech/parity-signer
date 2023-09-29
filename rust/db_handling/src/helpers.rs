@@ -6,10 +6,11 @@ use parity_scale_codec::Encode;
 use sled::{Batch, Db, Tree};
 use sp_core::H256;
 
-use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
+use constants::{ADDRTREE, DANGER, GENERALVERIFIER, SCHEMA_VERSION, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
 use definitions::network_specs::NetworkSpecs;
+use definitions::schema_version::SchemaVersion;
 use definitions::{
     danger::DangerRecord,
     helpers::multisigner_to_public,
@@ -39,6 +40,21 @@ use crate::manage_history::events_to_batch;
 /// Input is `&[u8]` tree identifier.
 pub fn open_tree(database: &Db, tree_name: &[u8]) -> Result<Tree> {
     Ok(database.open_tree(tree_name)?)
+}
+
+/// Check database schema version.
+/// Prevents app stash when user upgrades the app without re-install.
+pub fn assert_db_version(database: &Db) -> Result<()> {
+    let expected = *SchemaVersion::current();
+    let settings = open_tree(database, SETTREE)?;
+    let ivec = settings
+        .get(SCHEMA_VERSION)?
+        .ok_or(Error::DbSchemaMismatch { expected, found: 0 })?;
+    let found = *SchemaVersion::from_ivec(&ivec)?;
+    if expected != found {
+        return Err(Error::DbSchemaMismatch { expected, found });
+    }
+    Ok(())
 }
 
 /// Assemble a [`Batch`] that removes all elements from a tree.
