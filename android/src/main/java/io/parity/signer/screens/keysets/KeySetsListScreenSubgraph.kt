@@ -43,7 +43,6 @@ fun KeySetsListScreenSubgraph(
 			navController.navigate(
 				CoreUnlockedNavSubgraph.KeySetDetails.destination(
 					seedNameValue = seedname
-					//todo dmitry
 				)
 			)
 		},

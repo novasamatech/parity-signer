@@ -264,7 +264,8 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =
-					io.parity.signer.uniffi.getManagedNetworkDetails(networkKey).toNetworkDetailsModel()
+					io.parity.signer.uniffi.getManagedNetworkDetails(networkKey)
+						.toNetworkDetailsModel()
 				UniffiResult.Success(transactionResult)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)
@@ -303,14 +304,15 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun keySetBySeedName(seedName: String): UniffiResult<KeySetDetailsModel> =
+	suspend fun keySetBySeedName(seedName: String): OperationResult<KeySetDetailsModel, ErrorDisplayed> =
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =
-					io.parity.signer.uniffi.keysBySeedName(seedName).toKeySetDetailsModel()
-				UniffiResult.Success(transactionResult)
+					io.parity.signer.uniffi.keysBySeedName(seedName)
+						.toKeySetDetailsModel()
+				transactionResult
 			} catch (e: ErrorDisplayed) {
-				UniffiResult.Error(e)
+				OperationResult.Err(e)
 			}
 		}
 

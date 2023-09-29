@@ -90,15 +90,16 @@ class KeySetDetailsViewModel : ViewModel() {
 			?: seedRepository.getLastKnownSeedNames().firstOrNull()
 			?: return OperationResult.Ok(KeySetDetailsScreenState.NoKeySets)
 
-		return uniffiInteractor.keySetBySeedName(seedName).toOperationResult()
+		return uniffiInteractor.keySetBySeedName(seedName)
 			.mapInner {
 				KeySetDetailsScreenState.Data(
 					filteredModel = it,
 					wasEmptyKeyset = it.keysAndNetwork.isEmpty()
 				)
 			}
-		//todo if root == null - show this keyset doesn't exist? because we are getting empty model for wrong seedName
+		//todo dmitry if root == null - show this keyset doesn't exist? because we are getting empty model for wrong seedName
 		//what if last selected deson't exist anymore?
+		//todo dmitry check above - handle last selected is wrong one
 	}
 
 	suspend fun feedModelForSeed(seedName: String?) {

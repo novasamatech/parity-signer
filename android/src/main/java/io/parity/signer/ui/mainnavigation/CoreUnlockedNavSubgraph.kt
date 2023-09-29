@@ -1,6 +1,5 @@
 package io.parity.signer.ui.mainnavigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -124,7 +123,6 @@ object CoreUnlockedNavSubgraph {
 		const val route = "$baseRoute?$seedName={$seedName}" //optional
 		fun destination(seedNameValue: String?): String {
 			val result = if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
-			Log.e("TAGG", result)//todo dmitry remove
 			return result
 		}
 	}
