@@ -10,6 +10,9 @@ import SwiftUI
 struct RecoverKeySetSeedPhraseView: View {
     private enum Constants {
         static let capsuleContainerID = "capsuleContainerID"
+        static let keyboardAnimationDelay = 0.33
+        static let viewAnimationDelay = 0.6
+        static let tapCapsuleGestureDelay = 0.1
     }
 
     @StateObject var viewModel: ViewModel
@@ -50,54 +53,49 @@ struct RecoverKeySetSeedPhraseView: View {
                     .padding(.bottom, Spacing.medium)
                     .padding(.horizontal, Spacing.large)
                     VStack(alignment: .leading, spacing: 0) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
-                                switch gridElement {
-                                case let .seedPhraseElement(element):
-                                    seedPhraseCapsule(element)
-                                case .input:
-                                    recoveryTextInput()
-                                        .onAppear {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                                focus = true
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                    scrollViewProxy.scrollTo(
-                                                        Constants.capsuleContainerID,
-                                                        anchor: .bottom
-                                                    )
-                                                }
-                                            }
+                        WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
+                            switch gridElement {
+                            case let .seedPhraseElement(element):
+                                seedPhraseCapsule(element)
+                            case .input:
+                                recoveryTextInput(scrollViewProxy)
+                                    .onAppear {
+                                        /// #2088 In order to make sure that we don't try to focus textfield
+                                        /// before it actually renders, we need to trigger it with delay
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.viewAnimationDelay) {
+                                            focus = true
                                         }
-                                }
-                            }
-                            .padding(.leading, Spacing.extraSmall)
-                            .padding(.top, Spacing.extraSmall)
-                            .padding(.bottom, Spacing.extraExtraSmall)
-                            Spacer()
-                        }
-                        .frame(minHeight: 156)
-                        .containerBackground(CornerRadius.small)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            /// #2065 Enable to focus `recoveryTextInput` when tapping anywhere within input rectangle
-                            focus = true
-                        }
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.small)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(alignment: .top, spacing: 0) {
-                                Spacer()
-                                    .frame(width: Spacing.large, height: Spacing.large)
-                                ForEach(viewModel.guesses, id: \.self) { guess in
-                                    guessCapsule(guess, scrollViewProxy: scrollViewProxy)
-                                }
-                                Spacer()
-                                    .frame(width: Spacing.large - Spacing.extraExtraSmall, height: Spacing.large)
+                                    }
                             }
                         }
-                        .frame(height: 36)
-                        .id(Constants.capsuleContainerID)
+                        .padding(.leading, Spacing.extraSmall)
+                        .padding(.top, Spacing.extraSmall)
+                        .padding(.bottom, Spacing.extraExtraSmall)
+                        Spacer()
                     }
+                    .frame(minHeight: 156)
+                    .containerBackground(CornerRadius.small)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        /// #2065 Enable to focus `recoveryTextInput` when tapping anywhere within input rectangle
+                        focus = true
+                    }
+                    .padding(.horizontal, Spacing.large)
+                    .padding(.bottom, Spacing.small)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(alignment: .top, spacing: 0) {
+                            Spacer()
+                                .frame(width: Spacing.large, height: Spacing.large)
+                            ForEach(viewModel.guesses, id: \.self) { guess in
+                                guessCapsule(guess, scrollViewProxy: scrollViewProxy)
+                            }
+                            Spacer()
+                                .frame(width: Spacing.large - Spacing.extraExtraSmall, height: Spacing.large)
+                        }
+                    }
+                    .frame(height: 36)
+                    .padding(.bottom, Spacing.small)
+                    .id(Constants.capsuleContainerID)
                     NavigationLink(
                         destination:
                         CreateKeysForNetworksView(
@@ -146,13 +144,17 @@ struct RecoverKeySetSeedPhraseView: View {
     }
 
     @ViewBuilder
-    func recoveryTextInput() -> some View {
+    func recoveryTextInput(_ scrollViewProxy: ScrollViewProxy) -> some View {
         TextField(
             "",
             text: $viewModel.userInput,
             onEditingChanged: { isEditing in
                 guard isEditing else { return }
-                viewModel.scrollToBottom()
+                /// #2088 Autoscroll to make guess words visible when textfield is focused
+                /// (i.e. after user tapped return and then tapped textfield again)
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.keyboardAnimationDelay) {
+                    scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
+                }
             }
         )
         .focused($focus)
@@ -176,7 +178,10 @@ struct RecoverKeySetSeedPhraseView: View {
             .clipShape(Capsule())
             .onTapGesture {
                 viewModel.onGuessTap(guess)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                /// #2088 As tapping on guess words updates view, we need to do autoscroll with minor delay
+                /// This handles edge case if user would tap guess word when it's not fully visible,
+                /// We should still autoscroll then
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.tapCapsuleGestureDelay) {
                     scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
                 }
             }
@@ -223,7 +228,6 @@ extension RecoverKeySetSeedPhraseView {
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
         private let seedName: String
         @Binding var isPresented: Bool
-        @Published var scrollTargetID: String?
         @Published var isPresentingDetails: Bool = false
         @Published var isValidSeedPhrase: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
@@ -264,10 +268,6 @@ extension RecoverKeySetSeedPhraseView {
 
         func onAppear() {
             updateGuesses("")
-        }
-
-        func scrollToBottom() {
-            scrollTargetID = RecoverKeySetSeedPhraseView.Constants.capsuleContainerID
         }
 
         func onGuessTap(_ guess: String) {
