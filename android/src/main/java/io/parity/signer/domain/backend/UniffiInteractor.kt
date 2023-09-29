@@ -1,10 +1,12 @@
 package io.parity.signer.domain.backend
 
 import android.content.Context
+import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.KeySetsSelectModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.VerifierDetailsModel
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.domain.toKeySetsSelectModel
 import io.parity.signer.domain.toNetworkModel
 import io.parity.signer.domain.toVerifierDetailsModel
@@ -301,6 +303,17 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
+	suspend fun keySetBySeedName(seedName: String): UniffiResult<KeySetDetailsModel> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.keysBySeedName(seedName).toKeySetDetailsModel()
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
 	suspend fun getVerifierDetails(): UniffiResult<VerifierDetailsModel> =
 		withContext(Dispatchers.IO) {
 			try {
@@ -354,6 +367,13 @@ fun <T> UniffiResult<T>.mapError(): T? {
 		is UniffiResult.Success -> {
 			result
 		}
+	}
+}
+
+fun <T> UniffiResult<T>.toOperationResult(): OperationResult<T, ErrorDisplayed> {
+	return when (this) {
+		is UniffiResult.Error -> OperationResult.Err(this.error)
+		is UniffiResult.Success -> OperationResult.Ok(this.result)
 	}
 }
 

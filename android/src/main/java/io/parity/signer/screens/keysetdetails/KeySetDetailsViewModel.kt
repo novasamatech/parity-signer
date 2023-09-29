@@ -3,24 +3,21 @@ package io.parity.signer.screens.keysetdetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.KeyAndNetworkModel
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.NetworkInfoModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.backend.BackupInteractor
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.getDebugDetailedDescriptionString
+import io.parity.signer.domain.backend.mapInner
+import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.domain.storage.RepoResult
-import io.parity.signer.domain.toKeySetDetailsModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
-import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
-import io.parity.signer.uniffi.keysBySeedName
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -34,54 +31,77 @@ class KeySetDetailsViewModel : ViewModel() {
 		ServiceLocator.networkExposedStateKeeper
 	private val seedRepository = ServiceLocator.activityScope!!.seedRepository
 
-	val filters = preferencesRepository.networksFilter.stateIn(
-		viewModelScope,
-		SharingStarted.WhileSubscribed(5_000),
-		initialValue = emptySet(),
-	)
+	val filters: StateFlow<Set<String>> =
+		preferencesRepository.networksFilter.stateIn(
+			viewModelScope,
+			SharingStarted.WhileSubscribed(5_000),
+			initialValue = emptySet(),
+		)
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airGapModeState
 
-	private suspend fun getKeySetDetails(requestseedName: String?): OperationResult<KeySetDetailsScreenState, ErrorDisplayed> {
-		val seedName = requestseedName ?: preferencesRepository.getLastSelectedSeed()
-		?: seedRepository.getLastKnownSeedNames().firstOrNull()
+	private val fullScreenState =
+		MutableStateFlow<OperationResult<KeySetDetailsScreenState, ErrorDisplayed>>(
+			OperationResult.Ok(KeySetDetailsScreenState.LoadingState)
+		)
 
-		val fullModel = try {
-			//todo export this to vm and handle errors - open default for example
-			keysBySeedName(seedName!!).toKeySetDetailsModel()
-		} catch (e: ErrorDisplayed) {
-			//todo dmitry
-//			navController.navigate(
-//				CoreUnlockedNavSubgraph.ErrorScreen.destination(
-//					argHeader = "Unexpected error in keysBySeedName",
-//					argDescription = e.toString(),
-//					argVerbose = e.getDebugDetailedDescriptionString(),
-//				)
-			)
-			null
-		}
-	}
-
-	suspend fun feedModelForSeed(seedName: String?): StateFlow<OperationResult<KeySetDetailsScreenState, ErrorDisplayed>> {
-		val result = getKeySetDetails(requestseedName = seedName)
-		return filters.map { filterInstance ->
-			when (result) {
-				is OperationResult.Err -> result
+	val filteredScreenState: StateFlow<OperationResult<KeySetDetailsScreenState, ErrorDisplayed>> =
+		fullScreenState.combine(filters) { fullState, filter ->
+			when (fullState) {
+				is OperationResult.Err -> fullState
 				is OperationResult.Ok -> {
-					if (filterInstance.isEmpty()) result else {
-						val value = result.result
-						OperationResult.Ok(
-							value.copy(keysAndNetwork = value.keysAndNetwork
-								.filter { filterInstance.contains(it.network.networkSpecsKey) })
-						)
+					if (filter.isEmpty()) fullState else {
+						val value = fullState.result
+						val result: KeySetDetailsScreenState =
+							when (value) {
+								is KeySetDetailsScreenState.Data -> {
+									KeySetDetailsScreenState.Data(
+										filteredModel = value.filteredModel.copy(keysAndNetwork = value.filteredModel.keysAndNetwork.filter {
+											filter.contains(
+												it.network.networkSpecsKey
+											)
+										}),
+										wasEmptyKeyset = value.wasEmptyKeyset,
+									)
+								}
+
+								KeySetDetailsScreenState.NoKeySets,
+								KeySetDetailsScreenState.LoadingState -> {
+									value
+								}
+							}
+						OperationResult.Ok(result)
 					}
 				}
 			}
 		}.stateIn(
 			viewModelScope,
 			SharingStarted.WhileSubscribed(1_000),
-			initialValue = result,
+			initialValue = fullScreenState.value,
 		)
+
+
+	private suspend fun getKeySetDetails(requestedSeedName: String?): OperationResult<KeySetDetailsScreenState, ErrorDisplayed> {
+		if (requestedSeedName != null) {
+			preferencesRepository.setLastSelectedSeed(requestedSeedName)
+		}
+		val seedName =
+			requestedSeedName ?: preferencesRepository.getLastSelectedSeed()
+			?: seedRepository.getLastKnownSeedNames().firstOrNull()
+			?: return OperationResult.Ok(KeySetDetailsScreenState.NoKeySets)
+
+		return uniffiInteractor.keySetBySeedName(seedName).toOperationResult()
+			.mapInner {
+				KeySetDetailsScreenState.Data(
+					filteredModel = it,
+					wasEmptyKeyset = it.keysAndNetwork.isEmpty()
+				)
+			}
+	}
+
+	suspend fun feedModelForSeed(seedName: String?) {
+		val result = getKeySetDetails(requestedSeedName = seedName)
+		fullScreenState.value = result
 	}
 
 	fun getAllNetworks(): List<NetworkModel> {
@@ -115,37 +135,11 @@ class KeySetDetailsViewModel : ViewModel() {
 
 sealed class KeySetDetailsScreenState {
 
-	object LoadingState: KeySetDetailsScreenState()
+	object NoKeySets : KeySetDetailsScreenState()
+	object LoadingState : KeySetDetailsScreenState()
 
-	object EmptyState: KeySetDetailsScreenState()
-
-	/**
-	 * Local copy of shared [MKeys] class
-	 */
-	data class KeySetDetailsState(
-		val keysAndNetwork: List<KeyAndNetworkModel>,
-		val root: KeyModel?,
-	): KeySetDetailsScreenState() {
-		companion object {
-			fun createStub(): KeySetDetailsState = KeySetDetailsState(
-				keysAndNetwork = listOf(
-					KeyAndNetworkModel(
-						key = KeyModel.createStub(addressKey = "address key"),
-						network = NetworkInfoModel.createStub()
-					),
-					KeyAndNetworkModel(
-						key = KeyModel.createStub(addressKey = "address key2"),
-						network = NetworkInfoModel.createStub(networkName = "Some")
-					),
-					KeyAndNetworkModel(
-						key = KeyModel.createStub(addressKey = "address key3")
-							.copy(path = "//polkadot//path3"),
-						network = NetworkInfoModel.createStub()
-					),
-				),
-				root = KeyModel.createStub()
-					.copy(path = "//polkadot"),
-			)
-		}
-	}
+	data class Data(
+		val filteredModel: KeySetDetailsModel,
+		val wasEmptyKeyset: Boolean
+	) : KeySetDetailsScreenState()
 }

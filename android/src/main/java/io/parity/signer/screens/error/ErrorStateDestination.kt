@@ -84,7 +84,7 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 					}
 					is ErrorDisplayed -> {
 						CoreUnlockedNavSubgraph.ErrorScreen.destination(
-							argHeader = "Operation error rust error trying to get ${T::class.java}",
+							argHeader = "Operation error to get ${T::class.java}",
 							argDescription = error.toString(),
 							argVerbose = error.getDebugDetailedDescriptionString(),
 						)

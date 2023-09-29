@@ -1,6 +1,7 @@
 package io.parity.signer.domain
 
 import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenState
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 import java.util.*
@@ -8,6 +9,36 @@ import java.util.*
 /**
  * reflection of uniffi models so compose will work properly
  */
+
+/**
+ * Local copy of shared [MKeys] class
+ */
+data class KeySetDetailsModel(
+	val keysAndNetwork: List<KeyAndNetworkModel>,
+	val root: KeyModel?,
+) {
+	companion object {
+		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
+			keysAndNetwork = listOf(
+				KeyAndNetworkModel(
+					key = KeyModel.createStub(addressKey = "address key"),
+					network = NetworkInfoModel.createStub()
+				),
+				KeyAndNetworkModel(
+					key = KeyModel.createStub(addressKey = "address key2"),
+					network = NetworkInfoModel.createStub(networkName = "Some")
+				),
+				KeyAndNetworkModel(
+					key = KeyModel.createStub(addressKey = "address key3")
+						.copy(path = "//polkadot//path3"),
+					network = NetworkInfoModel.createStub()
+				),
+			),
+			root = KeyModel.createStub()
+				.copy(path = "//polkadot"),
+		)
+	}
+}
 
 
 fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
