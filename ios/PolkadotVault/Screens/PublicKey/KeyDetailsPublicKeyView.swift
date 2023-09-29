@@ -179,7 +179,12 @@ private extension KeyDetailsPublicKeyView {
         }
         .font(PrimaryFont.bodyL.font)
         .padding(.horizontal, Spacing.medium)
-        .containerBackground()
+        .background(
+            RoundedRectangle(cornerRadius: CornerRadius.medium)
+                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                .background(Asset.fill6.swiftUIColor)
+                .cornerRadius(CornerRadius.medium)
+        )
     }
 
     @ViewBuilder

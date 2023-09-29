@@ -37,6 +37,7 @@ struct QRCodeButton: View {
                 }
             }
         )
+        .shadow(color: Color.black.opacity(0.26), radius: 12, x: 0, y: 12)
     }
 }
 
