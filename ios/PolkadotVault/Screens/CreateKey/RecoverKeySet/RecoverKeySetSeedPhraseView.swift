@@ -8,6 +8,13 @@
 import SwiftUI
 
 struct RecoverKeySetSeedPhraseView: View {
+    private enum Constants {
+        static let capsuleContainerID = "capsuleContainerID"
+        static let keyboardAnimationDelay = 0.33
+        static let viewAnimationDelay = 0.6
+        static let tapCapsuleGestureDelay = 0.1
+    }
+
     @StateObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @FocusState private var focus: Bool
@@ -27,31 +34,38 @@ struct RecoverKeySetSeedPhraseView: View {
                     )]
                 )
             )
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Localizable.RecoverSeedPhrase.Label.title.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.titleL.font)
-                        .padding(.top, Spacing.extraSmall)
-                    Localizable.RecoverSeedPhrase.Label.header.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyL.font)
-                        .padding(.vertical, Spacing.extraSmall)
-                    HStack {
-                        Spacer()
+            ScrollViewReader { scrollViewProxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Localizable.RecoverSeedPhrase.Label.title.text
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(PrimaryFont.titleL.font)
+                            .padding(.top, Spacing.extraSmall)
+                        Localizable.RecoverSeedPhrase.Label.header.text
+                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .font(PrimaryFont.bodyL.font)
+                            .padding(.vertical, Spacing.extraSmall)
+                        HStack {
+                            Spacer()
+                        }
                     }
-                }
-                .padding(.top, Spacing.extraExtraSmall)
-                .padding(.bottom, Spacing.medium)
-                .padding(.horizontal, Spacing.large)
-                VStack(alignment: .leading, spacing: 0) {
+                    .padding(.top, Spacing.extraExtraSmall)
+                    .padding(.bottom, Spacing.medium)
+                    .padding(.horizontal, Spacing.large)
                     VStack(alignment: .leading, spacing: 0) {
                         WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
                             switch gridElement {
                             case let .seedPhraseElement(element):
                                 seedPhraseCapsule(element)
                             case .input:
-                                recoveryTextInput()
+                                recoveryTextInput(scrollViewProxy)
+                                    .onAppear {
+                                        /// #2088 In order to make sure that we don't try to focus textfield
+                                        /// before it actually renders, we need to trigger it with delay
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.viewAnimationDelay) {
+                                            focus = true
+                                        }
+                                    }
                             }
                         }
                         .padding(.leading, Spacing.extraSmall)
@@ -73,36 +87,37 @@ struct RecoverKeySetSeedPhraseView: View {
                             Spacer()
                                 .frame(width: Spacing.large, height: Spacing.large)
                             ForEach(viewModel.guesses, id: \.self) { guess in
-                                guessCapsule(guess)
+                                guessCapsule(guess, scrollViewProxy: scrollViewProxy)
                             }
                             Spacer()
                                 .frame(width: Spacing.large - Spacing.extraExtraSmall, height: Spacing.large)
                         }
                     }
                     .frame(height: 36)
+                    .padding(.bottom, Spacing.small)
+                    .id(Constants.capsuleContainerID)
+                    NavigationLink(
+                        destination:
+                        CreateKeysForNetworksView(
+                            viewModel: viewModel.createDerivedKeys()
+                        )
+                        .navigationBarHidden(true),
+                        isActive: $viewModel.isPresentingDetails
+                    ) { EmptyView() }
                 }
-                NavigationLink(
-                    destination:
-                    CreateKeysForNetworksView(
-                        viewModel: viewModel.createDerivedKeys()
+                .onAppear {
+                    viewModel.onAppear()
+                }
+                .background(Asset.backgroundPrimary.swiftUIColor)
+                .fullScreenModal(
+                    isPresented: $viewModel.isPresentingError
+                ) {
+                    ErrorBottomModal(
+                        viewModel: viewModel.presentableError,
+                        isShowingBottomAlert: $viewModel.isPresentingError
                     )
-                    .navigationBarHidden(true),
-                    isActive: $viewModel.isPresentingDetails
-                ) { EmptyView() }
-            }
-            .onAppear {
-                focus = true
-                viewModel.onAppear()
-            }
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            .fullScreenModal(
-                isPresented: $viewModel.isPresentingError
-            ) {
-                ErrorBottomModal(
-                    viewModel: viewModel.presentableError,
-                    isShowingBottomAlert: $viewModel.isPresentingError
-                )
-                .clearModalBackground()
+                    .clearModalBackground()
+                }
             }
         }
     }
@@ -129,10 +144,18 @@ struct RecoverKeySetSeedPhraseView: View {
     }
 
     @ViewBuilder
-    func recoveryTextInput() -> some View {
+    func recoveryTextInput(_ scrollViewProxy: ScrollViewProxy) -> some View {
         TextField(
             "",
-            text: $viewModel.userInput
+            text: $viewModel.userInput,
+            onEditingChanged: { isEditing in
+                guard isEditing else { return }
+                /// #2088 Autoscroll to make guess words visible when textfield is focused
+                /// (i.e. after user tapped return and then tapped textfield again)
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.keyboardAnimationDelay) {
+                    scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
+                }
+            }
         )
         .focused($focus)
         .inlineTextFieldStyle(text: $viewModel.userInput)
@@ -140,15 +163,12 @@ struct RecoverKeySetSeedPhraseView: View {
             viewModel.onUserInput(word)
         })
         .frame(minWidth: 50, maxWidth: 100)
-        .onAppear {
-            focus = true
-        }
         .padding(.bottom, Spacing.extraExtraSmall)
         .padding(.trailing, Spacing.extraExtraSmall)
     }
 
     @ViewBuilder
-    func guessCapsule(_ guess: String) -> some View {
+    func guessCapsule(_ guess: String, scrollViewProxy: ScrollViewProxy) -> some View {
         Text(guess)
             .foregroundColor(Asset.accentPink300.swiftUIColor)
             .font(PrimaryFont.labelS.font)
@@ -158,6 +178,12 @@ struct RecoverKeySetSeedPhraseView: View {
             .clipShape(Capsule())
             .onTapGesture {
                 viewModel.onGuessTap(guess)
+                /// #2088 As tapping on guess words updates view, we need to do autoscroll with minor delay
+                /// This handles edge case if user would tap guess word when it's not fully visible,
+                /// We should still autoscroll then
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.tapCapsuleGestureDelay) {
+                    scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
+                }
             }
             .padding(.trailing, Spacing.extraExtraSmall)
     }
@@ -207,6 +233,7 @@ extension RecoverKeySetSeedPhraseView {
         @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = Constants.invisibleNonEmptyCharacter
         @Published var guesses: [String] = []
+        @Published var keyboardHeight: CGFloat = 0.0
 
         private var seedPhraseDraft: [String] = [] {
             didSet {
