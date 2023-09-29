@@ -30,6 +30,7 @@ struct QRCodeButton: View {
                     Circle()
                         .stroke(Asset.backgroundSecondaryInversed.swiftUIColor, lineWidth: Constants.outerWidth)
                         .frame(width: Constants.outerDiameter, height: Constants.outerDiameter)
+                        .shadow(color: Color.black.opacity(0.26), radius: 8, x: 0, y: 4)
                     Circle()
                         .frame(width: Constants.innerDiameter, height: Constants.innerDiameter)
                         .foregroundColor(Asset.pink500.swiftUIColor)
