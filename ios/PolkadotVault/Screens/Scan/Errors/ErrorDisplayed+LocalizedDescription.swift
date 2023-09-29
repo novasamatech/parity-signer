@@ -30,6 +30,8 @@ extension ErrorDisplayed {
             return errorMessage
         case .WrongPassword:
             return Localizable.ErrorDisplayed.wrongPassword.string
+        case .DbSchemaMismatch:
+            return Localizable.ErrorDisplayed.dbSchemaMismatch.string
         }
     }
 }
