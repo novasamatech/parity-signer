@@ -610,6 +610,7 @@
 "SelectKeySetsForNetworkKey.Snackbar.KeysCreated" = "Derived Keys have been created";
 
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
+"ErrorDisplayed.DbSchemaMismatch" = "Database scheme has been updated. Please do a fresh app install";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";
 "ErrorDisplayed.InvalidType" = "Unexpected backend response type";
 "ErrorDisplayed.WrongPassword" = "Wrong Password";
