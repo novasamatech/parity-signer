@@ -272,7 +272,6 @@
 		6DDEF13F28AE7C57004CA2FD /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */; };
 		6DDEF14328AE8794004CA2FD /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */; };
 		6DDEF14528AE87A7004CA2FD /* EmptyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */; };
-		6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF43942987853000881AFF /* OnboardingOverviewView.swift */; };
 		6DDF439729878D0E00881AFF /* PaginatedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */; };
 		6DDF439C29879D3900881AFF /* SecondaryFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDF439B29879D3900881AFF /* SecondaryFont.swift */; };
 		6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */; };
@@ -617,7 +616,6 @@
 		6DDEF13E28AE7C57004CA2FD /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14228AE8794004CA2FD /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
 		6DDEF14428AE87A7004CA2FD /* EmptyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyButton.swift; sourceTree = "<group>"; };
-		6DDF43942987853000881AFF /* OnboardingOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverviewView.swift; sourceTree = "<group>"; };
 		6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedScrollView.swift; sourceTree = "<group>"; };
 		6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Black.ttf"; sourceTree = "<group>"; };
 		6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Regular.ttf"; sourceTree = "<group>"; };
@@ -743,6 +741,7 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */,
 				6D749C5E2A69C5F00064D7E5 /* Identicons */,
 				6DEB18ED2A0BAFA60013995E /* Progress */,
 				6D10EACC297114550063FB71 /* DerivationPathComponents.swift */,
@@ -1498,7 +1497,6 @@
 			children = (
 				6DF07ADC29C1060D00C01DE8 /* SetUpNetworks */,
 				6DD860E6299CAD030000D81E /* Airgap */,
-				6DDF43932987851700881AFF /* Overview */,
 				6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */,
 				6D7DF6532987ADEF00A8438E /* OnboardingState.swift */,
 				6D3A538D299B162F0004DDDD /* OnboardingScreenshotsView.swift */,
@@ -1740,15 +1738,6 @@
 				6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */,
 			);
 			path = Buttons;
-			sourceTree = "<group>";
-		};
-		6DDF43932987851700881AFF /* Overview */ = {
-			isa = PBXGroup;
-			children = (
-				6DDF43942987853000881AFF /* OnboardingOverviewView.swift */,
-				6DDF439629878D0E00881AFF /* PaginatedScrollView.swift */,
-			);
-			path = Overview;
 			sourceTree = "<group>";
 		};
 		6DE67D03298AA41D0042415A /* Backup */ = {
@@ -2192,7 +2181,6 @@
 				6D6430F628CB460A00342E37 /* ServiceLocator.swift in Sources */,
 				6DF91F4329C06BB4000A6BB2 /* TextResources.swift in Sources */,
 				6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */,
-				6DDF43952987853000881AFF /* OnboardingOverviewView.swift in Sources */,
 				6DBD21FA289A7A26005D539B /* DatabaseMediator.swift in Sources */,
 				6D971AC32941CDF600121A36 /* IdenticonView.swift in Sources */,
 				6D17D2A12A2E7DF70023B3A7 /* ErrorDisplayed+LocalizedDescription.swift in Sources */,
