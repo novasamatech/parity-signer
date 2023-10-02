@@ -139,6 +139,7 @@ class KeySetDetailsViewModel : ViewModel() {
 	}
 
 	suspend fun removeSeed(root: KeyModel): OperationResult<Unit, Exception> {
+		//todo dmitry check last known seed name we should update after removal
 		val result =  seedRepository.removeKeySet(root.seedName)
 		if (result is OperationResult.Ok) feedModelForSeed(null)
 		return result
@@ -161,6 +162,7 @@ class KeySetDetailsViewModel : ViewModel() {
 sealed class KeySetDetailsScreenState {
 
 	object NoKeySets : KeySetDetailsScreenState()
+
 	object LoadingState : KeySetDetailsScreenState()
 
 	data class Data(

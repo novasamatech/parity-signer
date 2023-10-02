@@ -11,6 +11,7 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.domain.KeySetsListModel
+import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -33,15 +34,32 @@ fun SeedSelectMenuView(
 		)
 		SignerDivider()
 
-		keySetsListModel.keys.forEach {
-//todo dmitry items
+		keySetsListModel.keys.forEach { item ->
+			//todo dmitry udate select mark if selected
+			KeySetItem(
+				model = item,
+				isSelected = item.seedName == selectedSeed,
+				onClick = {
+					onSelectSeed(item.seedName)
+				})
 		}
+
 		SignerDivider()
 		//todo dmitry to create add and create
+		MenuItemForBottomSheet(
+			iconId = R.drawable.ic_add_28,
+			label = stringResource(R.string.add_key_set_menu_add),
+			onclick = onNewKeySet,
+		)
+
+		MenuItemForBottomSheet(
+			iconId = R.drawable.ic_download_offline_28,
+			label = stringResource(R.string.add_key_set_menu_recover),
+			onclick = onRecoverKeySet,
+		)
 	}
 
 }
-
 
 
 @Preview(
@@ -71,14 +89,12 @@ private fun PreviewSeedSelectMenu() {
 	)
 	val mockModel = KeySetsListModel(keys)
 	SignerNewTheme {
-		SeedSelectMenuView(
-			keySetsListModel = mockModel,
+		SeedSelectMenuView(keySetsListModel = mockModel,
 			selectedSeed = "first seed name",
 			onSelectSeed = {},
 			onNewKeySet = {},
 			onRecoverKeySet = {},
-			onClose = {}
-		)
+			onClose = {})
 	}
 }
 
@@ -119,13 +135,11 @@ private fun PreviewSeedSelectMenuALot() {
 	}
 	val mockModel = KeySetsListModel(keys)
 	SignerNewTheme {
-		SeedSelectMenuView(
-			keySetsListModel = mockModel,
+		SeedSelectMenuView(keySetsListModel = mockModel,
 			selectedSeed = "second seed name",
 			onSelectSeed = {},
 			onNewKeySet = {},
 			onRecoverKeySet = {},
-			onClose = {}
-		)
+			onClose = {})
 	}
 }

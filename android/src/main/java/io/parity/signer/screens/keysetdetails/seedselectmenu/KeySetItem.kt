@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysetdetails.seedselectmenu.old
+package io.parity.signer.screens.keysetdetails.seedselectmenu
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -20,13 +20,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.IdentIconImage
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetModel
 import io.parity.signer.ui.theme.*
 
 @Composable
 fun KeySetItem(
 	model: KeySetModel,
-	onClick: () -> Unit = {},
+	isSelected: Boolean,
+	onClick: Callback,
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
@@ -86,7 +88,9 @@ fun KeySetItem(
 private fun PreviewKeySetItem() {
 	SignerNewTheme {
 		KeySetItem(
-			KeySetModel.createStub("My special key set", 2)
+			model = KeySetModel.createStub("My special key set", 2),
+			isSelected = true,
+			onClick = {},
 		)
 	}
 }
