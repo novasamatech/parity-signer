@@ -88,11 +88,12 @@ internal fun MenuItemForBottomSheet(
 	vector: ImageVector,
 	label: String,
 	tint: Color? = null,
-	onclick: () -> Unit
+	onclick: () -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 	MenuItemForBottomSheetInternal(
 		onclick, rememberVectorPainter(vector),
-		tint, label
+		tint, label, modifier = modifier,
 	)
 }
 
@@ -101,11 +102,12 @@ internal fun MenuItemForBottomSheet(
 	@DrawableRes iconId: Int,
 	label: String,
 	tint: Color? = null,
-	onclick: () -> Unit
+	onclick: () -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 	MenuItemForBottomSheetInternal(
-		onclick, painterResource(id = iconId),
-		tint, label
+		onclick = onclick, painter = painterResource(id = iconId),
+		tint = tint, label = label, modifier = modifier,
 	)
 }
 
@@ -114,10 +116,11 @@ private fun MenuItemForBottomSheetInternal(
 	onclick: () -> Unit,
 	painter: Painter,
 	tint: Color?,
-	label: String
+	label: String,
+	modifier: Modifier = Modifier,
 ) {
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.clickable(onClick = onclick)
 			.padding(vertical = 8.dp)
 			.fillMaxWidth(),
@@ -153,7 +156,7 @@ private fun MenuItemForBottomSheetInternal(
 private fun PreviewKeyDetailsGeneralMenu() {
 	SignerNewTheme {
 		KeyDetailsGeneralMenu(
-			{},{},{},
+			{}, {}, {},
 		)
 	}
 }

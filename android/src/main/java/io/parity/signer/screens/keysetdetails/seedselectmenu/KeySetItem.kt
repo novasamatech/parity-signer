@@ -19,6 +19,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.CheckIcon
 import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetModel
@@ -32,7 +33,6 @@ fun KeySetItem(
 ) {
 	Surface(
 		shape = RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius)),
-		color = MaterialTheme.colors.backgroundSecondary,
 		modifier = Modifier.clickable(onClick = onClick),
 	) {
 		Row(
@@ -62,15 +62,9 @@ fun KeySetItem(
 					)
 				}
 			}
-			Image(
-				imageVector = Icons.Filled.ChevronRight,
-				contentDescription = null,
-				colorFilter = ColorFilter.tint(MaterialTheme.colors.textSecondary),
-				modifier = Modifier
-					.padding(end = 8.dp)
-					.size(28.dp)
-
-			)
+			if (isSelected) {
+				CheckIcon(modifier = Modifier.padding(end = 16.dp))
+			}
 		}
 	}
 }

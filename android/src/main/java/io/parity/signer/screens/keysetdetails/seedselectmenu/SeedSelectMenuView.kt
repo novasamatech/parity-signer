@@ -2,9 +2,12 @@ package io.parity.signer.screens.keysetdetails.seedselectmenu
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetHeader
 import io.parity.signer.components.base.SignerDivider
@@ -33,28 +36,28 @@ fun SeedSelectMenuView(
 		SignerDivider()
 
 		keySetsListModel.keys.forEach { item ->
-			//todo dmitry udate select mark if selected
 			KeySetItem(
 				model = item,
 				isSelected = item.seedName == selectedSeed,
 				onClick = {
 					onSelectSeed(item.seedName)
-				})
+				},)
 		}
 
 		SignerDivider()
-		//todo dmitry to create add and create
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_add_28,
 			label = stringResource(R.string.add_key_set_menu_add),
 			onclick = onNewKeySet,
+			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
 		)
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_download_offline_28,
 			label = stringResource(R.string.add_key_set_menu_recover),
 			onclick = onRecoverKeySet,
-		)
+			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+			)
 	}
 
 }
