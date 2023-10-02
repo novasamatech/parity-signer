@@ -136,9 +136,9 @@ fun MNetworkCard.toNetworkBasicModel() = NetworkBasicModel(
 /**
  * Local copy of shared [MSeeds] class
  */
-data class KeySetsSelectModel(val keys: List<KeySetModel>)
+data class KeySetsListModel(val keys: List<KeySetModel>)
 
-fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
+fun MSeeds.toKeySetsSelectModel() = KeySetsListModel(
 	seedNameCards.map { it.toSeedModel() }
 )
 

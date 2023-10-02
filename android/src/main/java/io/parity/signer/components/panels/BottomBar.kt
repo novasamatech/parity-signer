@@ -78,7 +78,7 @@ private fun navigateBottomBar(
 	buttonType: BottomBarOptions,
 ) {
 	when (buttonType) {
-		BottomBarOptions.KEYS -> navController.navigate(CoreUnlockedNavSubgraph.keySetList)
+		BottomBarOptions.KEYS -> navController.navigate(CoreUnlockedNavSubgraph.KeySet.destination(null))
 		BottomBarOptions.SCANNER -> navController.navigate(CoreUnlockedNavSubgraph.camera)
 		BottomBarOptions.SETTINGS -> navController.navigate(CoreUnlockedNavSubgraph.settings)
 	}

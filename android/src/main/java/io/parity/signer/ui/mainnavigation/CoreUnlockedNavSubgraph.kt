@@ -14,7 +14,7 @@ import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
-import io.parity.signer.screens.keysets.KeySetsListScreenSubgraph
+import io.parity.signer.screens.keysetdetails.seedselectmenu.old.KeySetsListScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -27,15 +27,8 @@ fun CoreUnlockedNavSubgraph() {
 	val navController = rememberNavController().apply { addVaultLogger() }
 	NavHost(
 		navController = navController,
-		startDestination = CoreUnlockedNavSubgraph.keySetList,
+		startDestination = CoreUnlockedNavSubgraph.KeySet.destination(null),
 	) {
-		composable(CoreUnlockedNavSubgraph.keySetList) {
-			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetsListScreenSubgraph(
-					navController = navController,
-				)
-			}
-		}
 		keySetDetailsDestination(navController)
 		composable(CoreUnlockedNavSubgraph.newKeySet) {
 			NewKeysetSubgraph(
@@ -77,7 +70,7 @@ fun CoreUnlockedNavSubgraph() {
 			),
 		) {
 			val seedName =
-				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedName)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySet.seedName)!!
 
 			DerivationCreateSubgraph(
 				onBack = { navController.popBackStack() },
@@ -92,7 +85,7 @@ fun CoreUnlockedNavSubgraph() {
 				},
 				openKeySet = { seedName ->
 					navController.navigate(
-						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+						CoreUnlockedNavSubgraph.KeySet.destination(
 							seedNameValue = seedName
 						)
 					)
@@ -112,12 +105,11 @@ fun CoreUnlockedNavSubgraph() {
 }
 
 object CoreUnlockedNavSubgraph {
-	const val keySetList = "core_keyset_list"
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
 	const val camera = "unlocked_camera"
 
-	object KeySetDetails {
+	object KeySet {
 		internal const val seedName = "seed_name_arg"
 		private const val baseRoute = "core_keyset_details_home"
 		const val route = "$baseRoute?$seedName={$seedName}" //optional

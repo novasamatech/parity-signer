@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysetdetails.seedselectmenu.old
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +18,7 @@ import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
+//todo dmitry remove this whole folder
 @Composable
 fun KeySetsListScreenSubgraph(
 	navController: NavController,
@@ -41,7 +42,7 @@ fun KeySetsListScreenSubgraph(
 		navController = navController,
 		onSelectSeed = { seedname ->
 			navController.navigate(
-				CoreUnlockedNavSubgraph.KeySetDetails.destination(
+				CoreUnlockedNavSubgraph.KeySet.destination(
 					seedNameValue = seedname
 				)
 			)

@@ -174,22 +174,11 @@ fun KeySetDetailsScreenSubgraph(
 							onCancel = closeAction,
 							onRemoveKeySet = {
 								val root = state.filteredModel.root
-								if (root != null) {
 									coroutineScope.launch {
 										keySetViewModel.removeSeed(root)
-											.handleErrorAppState(navController)?.let {
-												navController.navigate(CoreUnlockedNavSubgraph.keySetList)
-											}
+											.handleErrorAppState(navController)
+										closeAction()
 									}
-								} else {
-									navController.navigate(
-										CoreUnlockedNavSubgraph.ErrorScreen.destination(
-											"This keyset doesn't have a root",
-											"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
-											""
-										)
-									)
-								}
 							},
 						)
 					}

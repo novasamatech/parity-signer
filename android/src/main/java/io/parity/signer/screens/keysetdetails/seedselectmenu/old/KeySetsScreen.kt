@@ -1,4 +1,4 @@
-package io.parity.signer.screens.keysets
+package io.parity.signer.screens.keysetdetails.seedselectmenu.old
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -34,7 +34,7 @@ import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetModel
-import io.parity.signer.domain.KeySetsSelectModel
+import io.parity.signer.domain.KeySetsListModel
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -48,7 +48,7 @@ import io.parity.signer.ui.theme.textSecondary
 
 @Composable
 internal fun KeySetsListScreenFull(
-	model: KeySetsSelectModel,
+	model: KeySetsListModel,
 	navController: NavController,
 	onSelectSeed: (seedName: String) -> Unit,
 	onExposedShow: Callback,
@@ -137,7 +137,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 	repeat(30) {
 		keys.add(
 			KeySetModel(
-				"second seed name",
+				"second seed name2",
 				PreviewData.Identicon.dotIcon,
 				listOf("westend", "some"),
 				3.toUInt()
@@ -145,7 +145,7 @@ private fun PreviewKeySetsSelectScreenFull() {
 		)
 	}
 	val state = remember { mutableStateOf(NetworkState.Past) }
-	val mockModel = KeySetsSelectModel(keys)
+	val mockModel = KeySetsListModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetsListScreenFull(
@@ -215,7 +215,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 		),
 	)
 	val state = remember { mutableStateOf(NetworkState.Past) }
-	val mockModel = KeySetsSelectModel(keys)
+	val mockModel = KeySetsListModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetsListScreenFull(
@@ -244,7 +244,7 @@ private fun PreviewKeySetsSelectScreenFew() {
 private fun PreviewKeySetsSelectScreenEmpty() {
 	val keys = emptyList<KeySetModel>()
 	val state = remember { mutableStateOf(NetworkState.Past) }
-	val mockModel = KeySetsSelectModel(keys)
+	val mockModel = KeySetsListModel(keys)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 550.dp)) {
 			KeySetsListScreenFull(

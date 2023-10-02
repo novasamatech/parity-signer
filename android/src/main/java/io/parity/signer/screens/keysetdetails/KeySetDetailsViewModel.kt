@@ -139,7 +139,9 @@ class KeySetDetailsViewModel : ViewModel() {
 	}
 
 	suspend fun removeSeed(root: KeyModel): OperationResult<Unit, Exception> {
-		return seedRepository.removeKeySet(root.seedName)
+		val result =  seedRepository.removeKeySet(root.seedName)
+		if (result is OperationResult.Ok) feedModelForSeed(null)
+		return result
 	}
 
 	suspend fun getSeedPhrase(seedName: String): String? {

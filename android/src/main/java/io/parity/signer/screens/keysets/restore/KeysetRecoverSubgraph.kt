@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysets.restore
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -109,7 +108,7 @@ fun KeysetRecoverSubgraph(
 				onBack = localNavController::popBackStack,
 				navigateOnSuccess = {
 					coreNavController.navigate(
-						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+						CoreUnlockedNavSubgraph.KeySet.destination(
 							keysetName
 						)
 					) {
