@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 
 enum OnboardingState: Equatable {
-    case overview
     case terms
     case airgap
     case screenshots
@@ -19,7 +18,7 @@ enum OnboardingState: Equatable {
 }
 
 final class OnboardingStateMachine: ObservableObject {
-    @Published var currentState: OnboardingState = .overview
+    @Published var currentState: OnboardingState = .terms
     private let onboardingMediator: OnboardingMediator
 
     init(
@@ -31,8 +30,6 @@ final class OnboardingStateMachine: ObservableObject {
     @ViewBuilder
     func currentView() -> some View {
         switch currentState {
-        case .overview:
-            OnboardingOverviewView(viewModel: .init(onNextTap: { self.onOverviewFinishTap() }))
         case .terms:
             OnboardingAgreementsView(viewModel: .init(onNextTap: { self.onAgreementNextTap() }))
         case .airgap:

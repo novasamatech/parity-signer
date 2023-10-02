@@ -59,7 +59,9 @@ struct RootKeyDetailsModal: View {
                                     }
                                 }
                             }
-                            .padding(Spacing.medium)
+                            .padding(.horizontal, Spacing.medium)
+                            .padding(.top, Spacing.medium)
+                            .padding(.bottom, Spacing.extraSmall)
                             .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(Spacing.extraSmall)

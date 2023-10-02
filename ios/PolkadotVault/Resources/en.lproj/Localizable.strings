@@ -515,15 +515,6 @@
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
 
-"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
-"OnboardingOverview.Action.Skip" = "Skip";
-"OnboardingOverview.Action.Continue" = "Continue";
-"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
-"OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
-"OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
-"OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
-"OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
-
 "Onboarding.Screenshots.Label.Title" = "Please confirm you understand the risks of screenshots";
 "Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
 "Onboarding.Screenshots.Label.Confirmation" = "I'm aware of the risks involved in taking screenshots";

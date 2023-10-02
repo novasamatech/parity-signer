@@ -61,6 +61,7 @@ struct ManageKeySetsView: View {
                 }
                 .padding(.leading, Spacing.large)
                 .padding(.trailing, Spacing.medium)
+                .padding(.bottom, Spacing.medium)
                 .onAppear {
                     viewModel.onAppear()
                 }
