@@ -42,7 +42,7 @@ fun KeySetsListScreenSubgraph(
 		onSelectSeed = { seedname ->
 			navController.navigate(
 				CoreUnlockedNavSubgraph.KeySetDetails.destination(
-					seedName = seedname
+					seedNameValue = seedname
 				)
 			)
 		},
