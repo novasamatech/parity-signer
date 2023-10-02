@@ -2,7 +2,6 @@ package io.parity.signer.domain
 
 import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.screens.keysetdetails.KeySetDetailsScreenState
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 import java.util.*
@@ -44,7 +43,7 @@ data class KeySetDetailsModel(
 
 fun MKeysNew.toKeySetDetailsModel(): OperationResult<KeySetDetailsModel, ErrorDisplayed> {
 	return if (root == null) {
-		return OperationResult.Err(ErrorDisplayed.Str("Key Set is missing in DB or storage inconsistent"))
+		OperationResult.Err(ErrorDisplayed.Str("Key Set is missing in DB or storage inconsistent"))
 	} else {
 		OperationResult.Ok(
 			KeySetDetailsModel(

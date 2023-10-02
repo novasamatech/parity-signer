@@ -1,5 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -10,7 +11,6 @@ import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.backend.BackupInteractor
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.mapInner
-import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.uniffi.ErrorDisplayed
@@ -85,22 +85,42 @@ class KeySetDetailsViewModel : ViewModel() {
 		if (requestedSeedName != null) {
 			preferencesRepository.setLastSelectedSeed(requestedSeedName)
 		}
+
 		val seedName =
 			requestedSeedName ?: preferencesRepository.getLastSelectedSeed()
-			?: seedRepository.getLastKnownSeedNames().firstOrNull()
-			?: return OperationResult.Ok(KeySetDetailsScreenState.NoKeySets)
 
-		return uniffiInteractor.keySetBySeedName(seedName)
-			.mapInner {
-				KeySetDetailsScreenState.Data(
-					filteredModel = it,
-					wasEmptyKeyset = it.keysAndNetwork.isEmpty()
+		val result = seedName?.let { seedName ->
+			uniffiInteractor.keySetBySeedName(seedName)
+				.mapInner {
+					KeySetDetailsScreenState.Data(
+						filteredModel = it,
+						wasEmptyKeyset = it.keysAndNetwork.isEmpty()
+					)
+				}
+		}
+
+		return when (result) {
+			null, is OperationResult.Err -> {
+				Log.d(
+					"Keyset",
+					"wrong seed name requested or wrong last known seed getting another one"
 				)
+				val seedNameNew = seedRepository.getLastKnownSeedNames().firstOrNull()
+					?: return OperationResult.Ok(KeySetDetailsScreenState.NoKeySets)
+
+				uniffiInteractor.keySetBySeedName(seedNameNew)
+					.mapInner {
+						KeySetDetailsScreenState.Data(
+							filteredModel = it,
+							wasEmptyKeyset = it.keysAndNetwork.isEmpty()
+						)
+					}
 			}
-		//todo dmitry if root == null - show this keyset doesn't exist? because we are getting empty model for wrong seedName
-		//what if last selected deson't exist anymore?
-		//todo dmitry check above - handle last selected is wrong one
+
+			is OperationResult.Ok -> result
+		}
 	}
+
 
 	suspend fun feedModelForSeed(seedName: String?) {
 		val result = getKeySetDetails(requestedSeedName = seedName)
