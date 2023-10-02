@@ -1,6 +1,7 @@
 package io.parity.signer.domain
 
 import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 import java.util.*
@@ -9,13 +10,12 @@ import java.util.*
  * reflection of uniffi models so compose will work properly
  */
 
-
 /**
  * Local copy of shared [MKeys] class
  */
 data class KeySetDetailsModel(
 	val keysAndNetwork: List<KeyAndNetworkModel>,
-	val root: KeyModel?,
+	val root: KeyModel,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
@@ -40,10 +40,20 @@ data class KeySetDetailsModel(
 	}
 }
 
-fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
-	keysAndNetwork = set.map { it.toKeyAndNetworkModel() },
-	root = root?.toKeysModel(),
-)
+
+fun MKeysNew.toKeySetDetailsModel(): OperationResult<KeySetDetailsModel, ErrorDisplayed> {
+	return if (root == null) {
+		OperationResult.Err(ErrorDisplayed.Str("Key Set is missing in DB or storage inconsistent"))
+	} else {
+		OperationResult.Ok(
+			KeySetDetailsModel(
+				keysAndNetwork = set.map { it.toKeyAndNetworkModel() },
+				root = root!!.toKeysModel(),
+			)
+		)
+	}
+}
+
 
 data class KeyAndNetworkModel(
 	val key: KeyModel,
