@@ -25,7 +25,6 @@ class NewKeySetNetworksViewModel : ViewModel() {
 		networkForKeys: Set<NetworkModel>,
 		onAfterCreate: (Boolean) -> Unit = {},
 	): Unit {
-		//todo dmitry check that we updating lastKnown in seedRepo
 		viewModelScope.launch {
 			val success = createKeySetUseCase.createKeySetWithNetworks(
 				seedName, seedPhrase,

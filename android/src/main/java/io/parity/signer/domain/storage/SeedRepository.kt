@@ -185,6 +185,7 @@ class SeedRepository(
 		seedPhrase: String,
 		networksKeys: List<String>
 	): Boolean {
+		//todo return operation result here and show error in UI
 		// Check if seed name already exists
 		if (isSeedPhraseCollision(seedPhrase)) {
 			return false
