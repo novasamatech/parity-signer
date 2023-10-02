@@ -26,8 +26,6 @@ fun SeedSelectMenuView(
 	onClose: Callback,
 ) {
 	Column {
-		//todo Dmitry scrollable?
-
 		BottomSheetHeader(
 			title = stringResource(R.string.key_sets_screem_title),
 			onCloseClicked = onClose
