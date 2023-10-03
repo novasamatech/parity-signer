@@ -23,7 +23,7 @@ fun NavGraphBuilder.keySetDetailsDestination(
 			it.arguments?.getString(CoreUnlockedNavSubgraph.KeySet.seedName)
 
 		KeySetDetailsScreenSubgraph(
-			seedName = seedName,
+			originalSeedName = seedName,
 			navController = navController,
 			onBack = { navController.popBackStack() },
 		)

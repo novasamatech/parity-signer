@@ -20,7 +20,7 @@ import io.parity.signer.ui.theme.SignerNewTheme
 
 
 @Composable
-fun SeedSelectMenuView(
+internal fun SeedSelectMenuView(
 	keySetsListModel: KeySetsListModel,
 	selectedSeed: String,
 	onSelectSeed: (String) -> Unit,
@@ -34,16 +34,15 @@ fun SeedSelectMenuView(
 			onCloseClicked = onClose
 		)
 		SignerDivider()
-
 		keySetsListModel.keys.forEach { item ->
 			KeySetItem(
 				model = item,
 				isSelected = item.seedName == selectedSeed,
 				onClick = {
 					onSelectSeed(item.seedName)
-				},)
+				},
+			)
 		}
-
 		SignerDivider()
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_add_28,
@@ -51,15 +50,13 @@ fun SeedSelectMenuView(
 			onclick = onNewKeySet,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
 		)
-
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_download_offline_28,
 			label = stringResource(R.string.add_key_set_menu_recover),
 			onclick = onRecoverKeySet,
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-			)
+		)
 	}
-
 }
 
 

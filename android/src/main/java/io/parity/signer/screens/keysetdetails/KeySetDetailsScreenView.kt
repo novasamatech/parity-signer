@@ -49,10 +49,8 @@ import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.conditional
@@ -78,14 +76,15 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
-	onAddNewKey: Callback,
+	onSeedSelectClicked: Callback, //todo dmitry handle click
+	onAddNewDerivation: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
 	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
-			onAddKey = onAddNewKey,
+			onAddKey = onAddNewDerivation,
 			onBack = onBack,
 			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
 		)
@@ -117,7 +116,7 @@ fun KeySetDetailsScreenView(
 				Column() {
 					//seed
 					SeedKeyItemElement(model, onShowPublicKey)
-					KeySetDetailsEmptyList(onAdd = onAddNewKey)
+					KeySetDetailsEmptyList(onAdd = onAddNewDerivation)
 				}
 			} else {
 				Column() {
@@ -347,8 +346,9 @@ private fun PreviewKeySetDetailsScreen() {
 				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
-				onAddNewKey = {},
+				onAddNewDerivation = {},
 				onBack = {},
+				onSeedSelectClicked = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
 			)
@@ -381,7 +381,8 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
-				onAddNewKey = {},
+				onAddNewDerivation = {},
+				onSeedSelectClicked = {},
 				onBack = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
@@ -414,8 +415,9 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				fullModelWasEmpty = false,
 				onExposedClicked = {},
 				onFilterClicked = {},
+				onSeedSelectClicked = {},
 				onMenu = {},
-				onAddNewKey = {},
+				onAddNewDerivation = {},
 				onBack = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
