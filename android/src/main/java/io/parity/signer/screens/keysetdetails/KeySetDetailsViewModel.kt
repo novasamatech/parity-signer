@@ -139,8 +139,11 @@ class KeySetDetailsViewModel : ViewModel() {
 	}
 
 	suspend fun removeSeed(root: KeyModel): OperationResult<Unit, Exception> {
-		val result =  seedRepository.removeKeySet(root.seedName)
-		if (result is OperationResult.Ok) feedModelForSeed(null)
+		val result = seedRepository.removeKeySet(root.seedName)
+		if (result is OperationResult.Ok) {
+			preferencesRepository.setLastSelectedSeed(null)
+			feedModelForSeed(null)
+		}
 		return result
 	}
 
