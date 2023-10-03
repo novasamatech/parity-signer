@@ -155,7 +155,7 @@ data class KeySetModel(
 		fun createStub(name: String? = null, number: Int? = null) =
 			KeySetModel(
 				name ?: "first seed name",
-				PreviewData.Identicon.dotIcon,
+				PreviewData.Identicon.jdenticonIcon,
 				listOf("westend", "some"),
 				number?.toUInt() ?: 1.toUInt()
 			)
