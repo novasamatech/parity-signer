@@ -183,7 +183,10 @@ fun KeySetDetailsScreenSubgraph(
 					SeedSelectMenuFull(
 						coreNavController = navController,
 						selectedSeed = state.filteredModel.root.seedName,
-						onSelectSeed = { newSeed -> seedName = newSeed},
+						onSelectSeed = { newSeed ->
+							seedName = newSeed
+							closeAction()
+						},
 						onClose = closeAction,
 					)
 				}

@@ -35,6 +35,7 @@ internal fun SeedSelectMenuView(
 		)
 		SignerDivider()
 		keySetsListModel.keys.forEach { item ->
+			//todo dmitry investigate icons not shown
 			KeySetItem(
 				model = item,
 				isSelected = item.seedName == selectedSeed,
