@@ -340,7 +340,9 @@ extension KeyDetailsView.ViewModel {
 // MARK: - Modals
 
 extension KeyDetailsView.ViewModel {
-    func onQRScannerDismiss() {}
+    func onQRScannerDismiss() {
+        refreshData()
+    }
 
     func onActionSheetDismissal() {
         let isAlertVisible = warningStateMediator.alert
