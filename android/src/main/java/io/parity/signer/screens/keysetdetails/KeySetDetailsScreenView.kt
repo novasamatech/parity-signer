@@ -76,7 +76,7 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
-	onSeedSelectClicked: Callback, //todo dmitry handle click
+	onSeedSelect: Callback,
 	onAddNewDerivation: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
@@ -95,7 +95,11 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowPublicKey = onShowPublicKey
+					)
 
 					FilterRow(onFilterClicked)
 
@@ -115,12 +119,12 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onSeedSelect, onShowPublicKey)
 					KeySetDetailsEmptyList(onAdd = onAddNewDerivation)
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onSeedSelect, onShowPublicKey)
 					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
@@ -151,17 +155,17 @@ fun KeySetDetailsScreenView(
 @Composable
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
+	onSeedSelect: Callback,
 	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
-	model.root?.let {
-		SeedKeyDetails(
-			model = it,
-			onShowPublicKey = onShowPublicKey,
-			Modifier
-				.padding(horizontal = 24.dp, vertical = 8.dp)
-				.padding(bottom = 16.dp)
-		)
-	}
+	SeedKeyDetails(
+		model = model.root,
+		onSeedSelect = onSeedSelect,
+		onShowPublicKey = onShowPublicKey,
+		Modifier
+			.padding(horizontal = 24.dp, vertical = 8.dp)
+			.padding(bottom = 16.dp)
+	)
 }
 
 @Composable
@@ -348,7 +352,7 @@ private fun PreviewKeySetDetailsScreen() {
 				onMenu = {},
 				onAddNewDerivation = {},
 				onBack = {},
-				onSeedSelectClicked = {},
+				onSeedSelect = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
 			)
@@ -382,7 +386,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onFilterClicked = {},
 				onMenu = {},
 				onAddNewDerivation = {},
-				onSeedSelectClicked = {},
+				onSeedSelect = {},
 				onBack = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
@@ -415,7 +419,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				fullModelWasEmpty = false,
 				onExposedClicked = {},
 				onFilterClicked = {},
-				onSeedSelectClicked = {},
+				onSeedSelect = {},
 				onMenu = {},
 				onAddNewDerivation = {},
 				onBack = {},

@@ -121,7 +121,7 @@ fun KeySetDetailsScreenSubgraph(
 							)
 						)
 					},
-					onSeedSelectClicked = {
+					onSeedSelect = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.select_keyset)
 					},
 					onFilterClicked = {
