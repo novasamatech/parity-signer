@@ -438,6 +438,7 @@
 	<string name="attempts_exceeded_title">Attempts exceeded</string>
 	<string name="attempts_exceeded_message">Many password attempts failed</string>
     <string name="description_check_botton">Check botton</string>
+	<string name="description_scan_icon">Scan icon</string>
 
 </resources>
 
