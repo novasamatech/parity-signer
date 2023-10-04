@@ -13,16 +13,18 @@ struct MainScreenContainer: View {
     @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
-        switch viewModel.viewState {
-        case .authenticated:
-            AuthenticatedScreenContainer(viewModel: .init())
-        case .deviceLocked:
-            UnlockDeviceView(viewModel: .init())
-        case .onboarding:
-            onboarding.currentView()
-        case .noPincode:
-            DevicePincodeRequired(viewModel: .init())
-        }
+//        switch viewModel.viewState {
+//        case .authenticated:
+//            AuthenticatedScreenContainer(viewModel: .init())
+//        case .deviceLocked:
+//            UnlockDeviceView(viewModel: .init())
+//        case .onboarding:
+//            onboarding.currentView()
+//        case .updateRequired:
+        ApplicationUpdateRequiredView(viewModel: .init())
+//        case .noPincode:
+//            DevicePincodeRequired(viewModel: .init())
+//        }
     }
 }
 
@@ -31,6 +33,7 @@ extension MainScreenContainer {
         case authenticated
         case deviceLocked
         case onboarding
+        case updateRequired
         case noPincode
     }
 
