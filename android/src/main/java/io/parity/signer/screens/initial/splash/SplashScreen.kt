@@ -36,7 +36,7 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 					popUpTo(0)
 				}
 			} else {
-				globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+				globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 					popUpTo(0)
 				}
 			}

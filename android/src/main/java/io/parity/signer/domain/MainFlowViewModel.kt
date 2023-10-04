@@ -2,12 +2,15 @@ package io.parity.signer.domain
 
 import android.annotation.SuppressLint
 import android.content.*
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.usecases.ResetUseCase
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("StaticFieldLeak")
@@ -19,17 +22,17 @@ class MainFlowViewModel() : ViewModel() {
 	val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-//	init {
-//		// Imitate ios behavior
-//		authentication.authenticate(activity) {
-//			resetUseCase.totalRefresh()
-//		}
-//	}
-//	todo dmitry fix few calls run
-
 	fun onUnlockClicked() {
-		authentication.authenticate(activity) {
-			resetUseCase.totalRefresh()
+		viewModelScope.launch {
+			val authResult = authentication.authenticate(activity)
+			when (authResult) {
+				AuthResult.AuthSuccess -> resetUseCase.totalRefresh()
+				AuthResult.AuthError,
+				AuthResult.AuthFailed,
+				AuthResult.AuthUnavailable -> {
+					Log.e("Signer", "Auth failed, not unlocked")
+				}
+			}
 		}
 	}
 

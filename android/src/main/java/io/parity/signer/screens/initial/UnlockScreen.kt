@@ -29,20 +29,6 @@ import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
 
-/**
- * Initial screen so we won't ask token/password rightaway
- */
-fun NavGraphBuilder.initialUnlockAppScreenFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.initialUnlockRoute) {
-		UnlockAppAuthScreen {
-			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
-				popUpTo(0)
-			}
-		}
-	}
-}
-
-
 @Composable
 fun UnlockAppAuthScreen(onUnlockClicked: Callback) {
 	Column(modifier = Modifier.padding(24.dp)) {
