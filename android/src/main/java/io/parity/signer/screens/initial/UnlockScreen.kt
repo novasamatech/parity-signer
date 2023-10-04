@@ -77,9 +77,10 @@ fun UnlockAppAuthScreen(onUnlockClicked: Callback) {
 			textAlign = TextAlign.Center,
 		)
 		Spacer(modifier = Modifier.padding(top = 40.dp))
-		PrimaryButtonWide(label = stringResource(R.string.unlock_app_button),) {
-			onUnlockClicked()
-		}
+		PrimaryButtonWide(
+			label = stringResource(R.string.unlock_app_button),
+			onClicked = onUnlockClicked,
+		)
 		Spacer(Modifier.weight(0.5f))
 	}
 }

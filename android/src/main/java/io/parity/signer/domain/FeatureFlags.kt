@@ -9,7 +9,7 @@ object FeatureFlags {
 
 		return when (feature) {
 			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
-			FeatureOption.SKIP_ROOTED_CHECK_EMULATOR -> true
+			FeatureOption.SKIP_ROOTED_CHECK_EMULATOR -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 		}
 	}

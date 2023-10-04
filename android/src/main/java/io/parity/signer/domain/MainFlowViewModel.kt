@@ -14,25 +14,25 @@ import kotlinx.coroutines.flow.StateFlow
 class MainFlowViewModel() : ViewModel() {
 
 	private val resetUseCase = ResetUseCase()
+	private val authentication = ServiceLocator.authentication
 
 	val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-	init {
-		// Imitate ios behavior
-		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			resetUseCase.totalRefresh()
-		}
-	}
+//	init {
+//		// Imitate ios behavior
+//		authentication.authenticate(activity) {
+//			resetUseCase.totalRefresh()
+//		}
+//	}
+//	todo dmitry fix few calls run
 
 	fun onUnlockClicked() {
-		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			resetUseCase.totalRefresh()
 		}
 	}
 
-	val authenticated: StateFlow<Boolean> = ServiceLocator.authentication.auth
+	val authenticated: StateFlow<Boolean> = authentication.auth
 }
 
