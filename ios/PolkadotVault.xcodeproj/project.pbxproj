@@ -312,6 +312,7 @@
 		6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */; };
 		6DFE588D297A72B1002BFDBF /* JailbreakDetectionPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */; };
 		6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE588E297A9F78002BFDBF /* ServiceError.swift */; };
+		6DFF33E02AC93FE200062A09 /* ApplicationUpdateRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFF33DF2AC93FE200062A09 /* ApplicationUpdateRequiredView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -656,6 +657,7 @@
 		6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatePublisher.swift; sourceTree = "<group>"; };
 		6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectionPublisher.swift; sourceTree = "<group>"; };
 		6DFE588E297A9F78002BFDBF /* ServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceError.swift; sourceTree = "<group>"; };
+		6DFF33DF2AC93FE200062A09 /* ApplicationUpdateRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationUpdateRequiredView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1302,6 +1304,7 @@
 				6D67F94229825D280017C278 /* JailbreakDetectedView.swift */,
 				6DF9A13A2983B0ED00B31B6D /* DevicePincodeRequiredView.swift */,
 				6D67F94429837BB00017C278 /* UnlockDeviceView.swift */,
+				6DFF33DF2AC93FE200062A09 /* ApplicationUpdateRequiredView.swift */,
 			);
 			path = Errors;
 			sourceTree = "<group>";
@@ -2268,6 +2271,7 @@
 				6DF3CFF029937E48002DF203 /* AttributedTintInfoBox.swift in Sources */,
 				6DBD21F2289A74EE005D539B /* FileManagingProtocol.swift in Sources */,
 				6D78E4C72949AA5A001767A3 /* DerivedKeyExportModel.swift in Sources */,
+				6DFF33E02AC93FE200062A09 /* ApplicationUpdateRequiredView.swift in Sources */,
 				6D2A5D0F2AA5DF47009E0C3A /* ManageKeySetsView.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* PolkadotVaultApp.swift in Sources */,
 				6D042AF42901B40400B3F4F7 /* ExportMultipleKeysModal.swift in Sources */,
