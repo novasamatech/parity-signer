@@ -3,11 +3,9 @@ package io.parity.signer.screens.keysets.create.backupstepscreens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
 import io.parity.signer.domain.usecases.CreateKeySetUseCase
-import io.parity.signer.domain.usecases.CreateKeySetViaStateMachineUseCase
 import kotlinx.coroutines.launch
 
 

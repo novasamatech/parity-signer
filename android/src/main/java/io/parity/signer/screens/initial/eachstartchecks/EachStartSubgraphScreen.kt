@@ -33,7 +33,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 		val context: Context = LocalContext.current
 
 		val goToNextFlow: Callback = {
-			globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 				popUpTo(0)
 			}
 		}
