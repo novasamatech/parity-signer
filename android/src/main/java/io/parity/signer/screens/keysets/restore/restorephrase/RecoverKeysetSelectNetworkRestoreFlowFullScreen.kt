@@ -9,8 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksWithNavigatorViewModel
+import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
 import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreenBase
 
 
@@ -21,7 +20,7 @@ fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	onBack: Callback,
 	navigateOnSuccess: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
 	val defaultSelectedNetworks =
 		networksViewModel.getDefaultPreselectedNetworks()
 			.map { it.key }
@@ -38,9 +37,9 @@ fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
 			seedName = seedName, seedPhrase = seedPhrase,
-			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
+			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
-			onPostReaction = { isSuccess ->
+			onAfterCreate = { isSuccess ->
 				if (isSuccess) {
 					Toast.makeText(
 						context,

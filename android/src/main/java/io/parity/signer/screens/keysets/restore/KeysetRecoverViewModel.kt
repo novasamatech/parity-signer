@@ -28,7 +28,7 @@ class KeysetRecoverViewModel : ViewModel() {
 
 	private fun validateSeedPhrase(phrase: List<String>): Boolean {
 		return runBlocking {
-			backendInteractor.validateSeedPhrase(phrase.joinToString(separator = " ") )
+			backendInteractor.validateSeedPhrase(phrase.joinToString(separator = " "))
 				.mapError() ?: false
 		}
 	}
