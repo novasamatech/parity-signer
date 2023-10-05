@@ -116,6 +116,7 @@ fun KeySetDetailsScreenSubgraph(
 					onFilterClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 					},
+					onExportRoot = {},//todo dmitry
 					onOpenKey = { keyAddr: String, keySpecs: String ->
 						navController.navigate(
 							CoreUnlockedNavSubgraph.KeyDetails.destination(

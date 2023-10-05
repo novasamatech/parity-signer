@@ -78,6 +78,7 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
+	onExportRoot: Callback,
 	onAddNewKey: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
@@ -96,7 +97,7 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowPublicKey, onExportRoot)
 
 					FilterRow(onFilterClicked)
 
@@ -116,12 +117,12 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowPublicKey, onExportRoot)
 					KeySetDetailsEmptyList(onAdd = onAddNewKey)
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowPublicKey, onExportRoot)
 					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
@@ -153,12 +154,14 @@ fun KeySetDetailsScreenView(
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
 	onShowPublicKey: (title: String, key: String) -> Unit,
+	onExportRoot: Callback,
 ) {
 	model.root?.let {
 		SeedKeyDetails(
 			model = it,
+			onExportRoot = onExportRoot,
 			onShowPublicKey = onShowPublicKey,
-			Modifier
+			modifier = Modifier
 				.padding(horizontal = 24.dp, vertical = 8.dp)
 				.padding(bottom = 16.dp)
 		)
@@ -350,6 +353,7 @@ private fun PreviewKeySetDetailsScreen() {
 				onAddNewKey = {},
 				onBack = {},
 				onShowPublicKey = { _, _ -> },
+				onExportRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -384,6 +388,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onAddNewKey = {},
 				onBack = {},
 				onShowPublicKey = { _, _ -> },
+				onExportRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -417,6 +422,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
+				onExportRoot = {},
 				onShowPublicKey = { _, _ -> },
 				onOpenKey = { _, _ -> },
 			)
