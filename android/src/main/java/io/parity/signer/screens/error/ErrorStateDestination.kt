@@ -1,5 +1,7 @@
 package io.parity.signer.screens.error
 
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -9,7 +11,6 @@ import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.getDebugDetailedDescriptionString
-import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 
@@ -43,6 +44,7 @@ fun NavGraphBuilder.errorStateDestination(
 			description = argDescr,
 			verbose = argVerbose,
 			onBack = { navController.popBackStack() },
+			modifier = Modifier.statusBarsPadding()
 		)
 	}
 }
