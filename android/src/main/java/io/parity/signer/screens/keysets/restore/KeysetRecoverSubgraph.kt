@@ -1,6 +1,5 @@
 package io.parity.signer.screens.keysets.restore
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -81,7 +80,8 @@ fun KeysetRecoverSubgraph(
 					if (model.value.validSeed) {
 						localNavController.navigate(
 							KeysetRecoverSubgraph.NetworksSelection.destination(
-								model.value.enteredWords.joinToString { " " })
+								model.value.enteredWords.joinToString(separator = " ")
+							)
 						)
 					} else {
 						submitErrorState("navigation to finish called, but seed is not valid")
@@ -95,17 +95,17 @@ fun KeysetRecoverSubgraph(
 		composable(
 			route = KeysetRecoverSubgraph.NetworksSelection.route,
 			arguments = listOf(
-				navArgument(KeysetRecoverSubgraph.NetworksSelection.seedNameArg) {
+				navArgument(KeysetRecoverSubgraph.NetworksSelection.seedPhrase) {
 					type = NavType.StringType
 				}
 			)
 		) {
-			val seedName =
-				it.arguments?.getString(KeysetRecoverSubgraph.NetworksSelection.seedNameArg)!!
+			val seedPhrase =
+				it.arguments?.getString(KeysetRecoverSubgraph.NetworksSelection.seedPhrase)!!
 
 			RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 				seedName = keysetName,
-				seedPhrase = seedName,
+				seedPhrase = seedPhrase,
 				onBack = localNavController::popBackStack,
 				navigateOnSuccess = {
 					coreNavController.navigate(
@@ -126,9 +126,9 @@ private object KeysetRecoverSubgraph {
 	const val seedPhrase = "recover_keyset_phrase"
 
 	object NetworksSelection {
-		internal const val seedNameArg = "seed_name_arg"
+		internal const val seedPhrase = "seed_name_arg"
 		private const val baseRoute = "recover_keyset_networks_confirmation"
-		const val route = "$baseRoute/{${seedNameArg}}"
+		const val route = "$baseRoute/{$seedPhrase}"
 		fun destination(seedName: String) = "$baseRoute/${seedName}"
 	}
 }
