@@ -9,9 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
-import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksWithNavigatorViewModel
 import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreenBase
 
 
