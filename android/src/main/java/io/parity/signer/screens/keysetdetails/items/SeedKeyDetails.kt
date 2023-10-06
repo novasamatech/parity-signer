@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsed
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyModel
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 
@@ -22,15 +25,20 @@ import io.parity.signer.ui.theme.SignerTypeface
 @Composable
 fun SeedKeyDetails(
 	model: KeyModel,
-	onShowPublicKey: (title: String, key: String) -> Unit,
+	onShowRoot: Callback,
 	modifier: Modifier = Modifier,
 ) {
 	Column(
 		modifier = modifier
 			.fillMaxWidth()
-			.clickable { onShowPublicKey(model.seedName, model.base58) },
+			.clickable(onClick = onShowRoot),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
+		IdentIconImage(
+			identIcon = model.identicon,
+			modifier = Modifier.clickable(onClick = onShowRoot),
+			size = 56.dp
+		)
 		Text(
 			text = model.seedName,
 			color = MaterialTheme.colors.primary,
@@ -55,6 +63,7 @@ fun SeedKeyDetails(
 @Composable
 private fun PreviewKeySeedCard() {
 	SignerNewTheme {
-		SeedKeyDetails(KeyModel.createStub(), {_,_ ->})
+		SeedKeyDetails(KeyModel.createStub()
+			.copy(identicon = PreviewData.Identicon.jdenticonIcon), {})
 	}
 }
