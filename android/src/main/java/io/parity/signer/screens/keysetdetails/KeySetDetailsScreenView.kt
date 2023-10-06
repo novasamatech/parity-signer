@@ -76,7 +76,7 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
-	onExportRoot: Callback,
+	onShowRoot: Callback,
 	onAddNewKey: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
@@ -94,7 +94,7 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model, onExportRoot)
+					SeedKeyItemElement(model, onShowRoot)
 
 					FilterRow(onFilterClicked)
 
@@ -114,12 +114,12 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onExportRoot)
+					SeedKeyItemElement(model, onShowRoot)
 					KeySetDetailsEmptyList(onAdd = onAddNewKey)
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model, onExportRoot)
+					SeedKeyItemElement(model, onShowRoot)
 					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
@@ -150,12 +150,12 @@ fun KeySetDetailsScreenView(
 @Composable
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
-	onExportRoot: Callback,
+	onShowRoot: Callback,
 ) {
 	model.root?.let {
 		SeedKeyDetails(
 			model = it,
-			onShowRoot = onExportRoot,
+			onShowRoot = onShowRoot,
 			modifier = Modifier
 				.padding(horizontal = 24.dp, vertical = 8.dp)
 				.padding(bottom = 16.dp)
@@ -347,7 +347,7 @@ private fun PreviewKeySetDetailsScreen() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onExportRoot = {},
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -381,7 +381,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onExportRoot = {},
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -415,7 +415,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onExportRoot = {},
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}

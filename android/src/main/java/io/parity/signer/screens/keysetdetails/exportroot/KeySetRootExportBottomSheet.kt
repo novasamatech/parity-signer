@@ -18,19 +18,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.BottomSheetHeader
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.networkicon.IdentIconImage
+import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
+import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyModel
+import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportService
+import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.appliedStroke
-import io.parity.signer.ui.theme.backgroundTertiary
 import io.parity.signer.ui.theme.fill6
 
 @Composable
@@ -38,20 +42,12 @@ fun KeySetRootExportBottomSheet(
 	model: KeyModel,
 	onClose: Callback,
 ) {
-	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
-		BottomSheetHeader(
-			title = pluralStringResource(
-				id = R.plurals.key_export_title,
-				count = 0,
-				0,//todo dmitry
-			),
-			onCloseClicked = onClose
-		)
+	Column() {
 		val plateShape =
 			RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
 		Column(
 			modifier = Modifier
-				.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+				.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
 				.clip(plateShape)
 				.border(
 					BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
@@ -61,6 +57,7 @@ fun KeySetRootExportBottomSheet(
 		) {
 			Box(
 				modifier = Modifier
+					.padding(top = 8.dp, start = 8.dp, end = 8.dp)
 					.fillMaxWidth(1f)
 					.aspectRatio(1.1f)
 					.background(
@@ -69,22 +66,22 @@ fun KeySetRootExportBottomSheet(
 					),
 				contentAlignment = Alignment.Center,
 			) {
-//todo dmitry
-//				val isPreview = LocalInspectionMode.current
-//				val qrImage = remember {
-//					if (isPreview) {
-//						PreviewData.exampleQRImage
-//					} else {
-//						runBlocking { encodeToQr(model.qrData, false) }
-//					}
-//				}
-//
-//				Image(
-//					bitmap = qrImage.intoImageBitmap(),
-//					contentDescription = stringResource(R.string.qr_with_address_to_scan_description),
-//					contentScale = ContentScale.Fit,
-//					modifier = Modifier.size(264.dp)
-//				)
+				if (LocalInspectionMode.current) {
+					AnimatedQrKeysInfo(
+						input = Unit,
+						provider = EmptyAnimatedQrKeysProvider(),
+						modifier = Modifier.padding(8.dp)
+					)
+				} else {
+					AnimatedQrKeysInfo(
+						input = KeySetDetailsExportService.GetQrCodesListRequest(
+							seedName = model.seedName,
+							keys = emptyList()
+						),
+						provider = KeySetDetailsExportService(),
+						modifier = Modifier.padding(8.dp)
+					)
+				}
 			}
 			Row(
 				Modifier.padding(16.dp),
@@ -102,6 +99,12 @@ fun KeySetRootExportBottomSheet(
 				)
 			}
 		}
+		SecondaryButtonWide(
+			label = stringResource(id = R.string.button_next),
+			withBackground = true,
+			onClicked = onClose,
+			modifier = Modifier.padding(24.dp)
+		)
 	}
 }
 
@@ -116,7 +119,8 @@ fun KeySetRootExportBottomSheet(
 )
 @Composable
 private fun PreviewKeySetDetailsExportResultBottomSheet() {
-val model = KeyModel.createStub()
+	val model = KeyModel.createStub()
+		.copy(identicon = PreviewData.Identicon.jdenticonIcon)
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
 			KeySetRootExportBottomSheet(model, {})

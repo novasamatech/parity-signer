@@ -13,12 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.submitErrorState
@@ -109,7 +106,9 @@ fun KeySetDetailsScreenSubgraph(
 					onFilterClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
 					},
-					onExportRoot = {},//todo dmitry
+					onShowRoot = {
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.show_root)
+					},
 					onOpenKey = { keyAddr: String, keySpecs: String ->
 						navController.navigate(
 							CoreUnlockedNavSubgraph.KeyDetails.destination(
