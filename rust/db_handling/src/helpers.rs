@@ -118,8 +118,6 @@ pub fn try_get_valid_current_verifier(
                     }
                     Ok(Some(b))
                 }
-                // verifier is dead, network could not be used
-                CurrentVerifier::Dead => Err(Error::DeadVerifier(verifier_key.to_owned())),
             }
         }
         // no verifier for network in the database
@@ -463,22 +461,6 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
 /// - Remove from [`ADDRTREE`] all addresses in the networks being removed
 /// - Modify `Verifier` data if necessary.
 ///
-/// Removing the network **may result** in blocking the network altogether until
-/// the Vault is reset. This happens only if the removed network
-/// [`ValidCurrentVerifier`] was set to
-/// `ValidCurrentVerifier::Custom(Verifier(Some(_)))` and is a security measure.
-/// This should be used to deal with compromised `Custom` verifiers.
-///
-/// Compromised general verifier is a major disaster and will require Vault
-/// reset in any case.
-///
-/// Removing the network verified by the general verifier **does not** block the
-/// network.
-///
-/// Removing the network verified by
-/// `ValidCurrentVerifier::Custom(Verifier(None))` **does not** block the
-/// network.
-///
 /// Note that if the network supports multiple encryption algorithms, the
 /// removal of network with one of the encryptions will cause the networks
 /// with other encryptions be removed as well.
@@ -501,7 +483,6 @@ pub fn remove_network(database: &Db, network_specs_key: &NetworkSpecsKey) -> Res
             Verifier { v: None } => (),
             _ => {
                 verifiers_batch.remove(verifier_key.key());
-                verifiers_batch.insert(verifier_key.key(), (CurrentVerifier::Dead).encode());
             }
         }
     }
