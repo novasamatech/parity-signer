@@ -131,28 +131,22 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
 
                     // `u64` value does not fit into `u16` base58 prefix format,
                     // this is an error
-                    Err(_) => {
-                        Err(SpecsError::Base58PrefixFormatNotSupported {
-                            value: a.to_string(),
-                        })?
-                    }
+                    Err(_) => Err(SpecsError::Base58PrefixFormatNotSupported {
+                        value: a.to_string(),
+                    })?,
                 },
 
                 // base58 prefix value could not be presented as `u64` number,
                 // this is an error
-                None => {
-                    Err(SpecsError::Base58PrefixFormatNotSupported {
-                        value: a.to_string(),
-                    })?
-                }
+                None => Err(SpecsError::Base58PrefixFormatNotSupported {
+                    value: a.to_string(),
+                })?,
             },
 
             // base58 prefix value is not a number, this is an error
-            _ => {
-                Err(SpecsError::Base58PrefixFormatNotSupported {
-                    value: a.to_string(),
-                })?
-            }
+            _ => Err(SpecsError::Base58PrefixFormatNotSupported {
+                value: a.to_string(),
+            })?,
         },
 
         // no base58 prefix fetched in `system_properties` RPC call
