@@ -261,7 +261,7 @@ where
         }
         if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
             if prefix_from_meta != set_element.base58prefix {
-                return Err(MetadataError::Base58PrefixSpecsMismatch {
+                Err(MetadataError::Base58PrefixSpecsMismatch {
                     specs: set_element.base58prefix,
                     meta: prefix_from_meta,
                 })?;
@@ -553,7 +553,7 @@ fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched> {
     }
     if let Some(prefix_from_meta) = meta_fetched.meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
-            return Err(MetadataError::Base58PrefixSpecsMismatch {
+            Err(MetadataError::Base58PrefixSpecsMismatch {
                 specs: set_element.base58prefix,
                 meta: prefix_from_meta,
             })?;
@@ -595,7 +595,7 @@ where
     let set_element = search_name(database, &meta_values.name)?;
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
-            return Err(MetadataError::Base58PrefixSpecsMismatch {
+            Err(MetadataError::Base58PrefixSpecsMismatch {
                 specs: set_element.base58prefix,
                 meta: prefix_from_meta,
             })?;
