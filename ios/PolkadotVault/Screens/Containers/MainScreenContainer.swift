@@ -67,10 +67,10 @@ extension MainScreenContainer {
                     switch error {
                     case .invalidVersion:
                         self.viewState = .updateRequired
-                    case let .error(serviceError):
-                        // todo what we should really do here?
+                    case .error:
+                        /// If DB version check was unavailable, assume user needs to update
+                        /// If that's not the case (i.e. there is no newer version), app restart will fix it so should be ok
                         self.viewState = .updateRequired
-                        print(serviceError)
                     }
                 }
             }
