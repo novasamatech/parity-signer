@@ -69,7 +69,8 @@ extension MainScreenContainer {
                         self.viewState = .updateRequired
                     case .error:
                         /// If DB version check was unavailable, assume user needs to update
-                        /// If that's not the case (i.e. there is no newer version), app restart will fix it so should be ok
+                        /// If that's not the case (i.e. there is no newer version), app restart will fix it so should
+                        /// be ok
                         self.viewState = .updateRequired
                     }
                 }
