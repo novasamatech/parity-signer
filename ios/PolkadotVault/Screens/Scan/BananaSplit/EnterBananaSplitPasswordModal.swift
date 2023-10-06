@@ -93,7 +93,7 @@ struct EnterBananaSplitPasswordView: View {
                 .padding(.bottom, Spacing.small)
                 Spacer()
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
             .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
             .onAppear {
