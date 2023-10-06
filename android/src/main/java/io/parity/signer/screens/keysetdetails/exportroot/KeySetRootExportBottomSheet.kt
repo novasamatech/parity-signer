@@ -100,7 +100,7 @@ fun KeySetRootExportBottomSheet(
 			}
 		}
 		SecondaryButtonWide(
-			label = stringResource(id = R.string.button_next),
+			label = stringResource(R.string.generic_close_button),
 			withBackground = true,
 			onClicked = onClose,
 			modifier = Modifier.padding(24.dp)
