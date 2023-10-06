@@ -20,6 +20,8 @@ struct MainScreenContainer: View {
             UnlockDeviceView(viewModel: .init())
         case .onboarding:
             onboarding.currentView()
+        case .updateRequired:
+            ApplicationUpdateRequiredView(viewModel: .init())
         case .noPincode:
             DevicePincodeRequired(viewModel: .init())
         }
@@ -31,6 +33,7 @@ extension MainScreenContainer {
         case authenticated
         case deviceLocked
         case onboarding
+        case updateRequired
         case noPincode
     }
 
@@ -38,18 +41,39 @@ extension MainScreenContainer {
         private let authenticationStateMediator: AuthenticatedStateMediator
         private let onboardingMediator: OnboardingMediator
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
+        private let databaseVersionMediator: DatabaseVersionMediator
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
 
         init(
             authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator,
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
-            passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher()
+            passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
+            databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator()
         ) {
             self.authenticationStateMediator = authenticationStateMediator
             self.onboardingMediator = onboardingMediator
             self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
-            listenToStateChanges()
+            self.databaseVersionMediator = databaseVersionMediator
+            checkInitialState()
+        }
+
+        private func checkInitialState() {
+            databaseVersionMediator.checkDatabaseScheme { result in
+                switch result {
+                case .success:
+                    self.listenToStateChanges()
+                case let .failure(error):
+                    switch error {
+                    case .invalidVersion:
+                        self.viewState = .updateRequired
+                    case let .error(serviceError):
+                        // todo what we should really do here?
+                        self.viewState = .updateRequired
+                        print(serviceError)
+                    }
+                }
+            }
         }
 
         private func listenToStateChanges() {
