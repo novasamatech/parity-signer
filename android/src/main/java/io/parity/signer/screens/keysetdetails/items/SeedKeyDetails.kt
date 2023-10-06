@@ -25,19 +25,18 @@ import io.parity.signer.ui.theme.SignerTypeface
 @Composable
 fun SeedKeyDetails(
 	model: KeyModel,
-	onShowPublicKey: (title: String, key: String) -> Unit,
-	onExportRoot: Callback,
+	onShowRoot: Callback,
 	modifier: Modifier = Modifier,
 ) {
 	Column(
 		modifier = modifier
 			.fillMaxWidth()
-			.clickable { onShowPublicKey(model.seedName, model.base58) },
+			.clickable(onClick = onShowRoot),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		IdentIconImage(
 			identIcon = model.identicon,
-			modifier = Modifier.clickable(onClick = onExportRoot),
+			modifier = Modifier.clickable(onClick = onShowRoot),
 			size = 56.dp
 		)
 		Text(
@@ -65,6 +64,6 @@ fun SeedKeyDetails(
 private fun PreviewKeySeedCard() {
 	SignerNewTheme {
 		SeedKeyDetails(KeyModel.createStub()
-			.copy(identicon = PreviewData.Identicon.jdenticonIcon), { _, _ -> }, {})
+			.copy(identicon = PreviewData.Identicon.jdenticonIcon), {})
 	}
 }
