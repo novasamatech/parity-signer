@@ -9,7 +9,6 @@ import SwiftUI
 
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -27,8 +26,8 @@ struct BackupSelectKeyView: View {
             )
             ScrollView {
                 Localizable.Settings.SelectKey.header.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
+                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .font(PrimaryFont.titleL.font)
                     .padding(.horizontal, Spacing.large)
                     .padding(.vertical, Spacing.medium)
                 LazyVStack(alignment: .leading, spacing: 0) {
@@ -55,15 +54,12 @@ struct BackupSelectKeyView: View {
             isPresented: $viewModel.isPresentingConnectivityAlert
         ) {
             ErrorBottomModal(
-                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
+                viewModel: viewModel.connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
                     continueAction: viewModel.onConnectivityWarningTap()
                 ),
                 isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
             )
             .clearModalBackground()
-        }
-        .onAppear {
-            viewModel.use(connectivityMediator: connectivityMediator)
         }
     }
 
@@ -95,19 +91,17 @@ extension BackupSelectKeyView {
             seedPhrase: .init(seedPhrase: "")
         )
         private var awaitingSeedName: String?
-        private weak var connectivityMediator: ConnectivityMediator!
+        weak var connectivityMediator: ConnectivityMediator!
         let seedsMediator: SeedsMediating
         private let warningStateMediator: WarningStateMediator
 
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            connectivityMediator: ConnectivityMediator = ServiceLocator.connectivityMediator
         ) {
             self.seedsMediator = seedsMediator
             self.warningStateMediator = warningStateMediator
-        }
-
-        func use(connectivityMediator: ConnectivityMediator) {
             self.connectivityMediator = connectivityMediator
         }
 

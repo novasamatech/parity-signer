@@ -68,16 +68,6 @@ pub enum Error {
     )]
     CustomVerifierIsGeneral(VerifierKey),
 
-    /// User tried to interact with previously disabled network.
-    ///
-    /// Associated data is the [`VerifierKey`] of the network.
-    #[error(
-        "Network with genesis hash {} is disabled. It could be enabled \
-        again only after complete wipe and re-installation of Vault.",
-        hex::encode(.0.genesis_hash()),
-    )]
-    DeadVerifier(VerifierKey),
-
     /// Network has no entry for
     /// [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) under
     /// `verifier_key` in `VERIFIERS` tree of the database, however, the

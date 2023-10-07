@@ -88,7 +88,8 @@ class UniffiInteractor(val appContext: Context) {
 		withContext(Dispatchers.IO) {
 			try {
 				val networks =
-					io.parity.signer.uniffi.getManagedNetworks().networks.map { it.toNetworkModel() }
+					io.parity.signer.uniffi.getManagedNetworks().networks
+						.map { it.toNetworkModel() }
 				UniffiResult.Success(networks)
 			} catch (e: ErrorDisplayed) {
 				UniffiResult.Error(e)

@@ -13,12 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import io.parity.signer.bottomsheets.PublicKeyBottomSheetView
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.submitErrorState
@@ -29,6 +26,7 @@ import io.parity.signer.screens.keysetdetails.backup.toSeedBackupModel
 import io.parity.signer.screens.keysetdetails.empty.NoKeySetEmptyWelcomeScreen
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBottomSheet
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
+import io.parity.signer.screens.keysetdetails.exportroot.KeySetRootExportBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
@@ -97,14 +95,6 @@ fun KeySetDetailsScreenSubgraph(
 					onMenu = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 					},
-					onShowPublicKey = { title: String, key: String ->
-						menuNavController.navigate(
-							KeySetDetailsMenuSubgraph.KeysPublicKey.destination(
-								title,
-								key
-							)
-						)
-					},
 					onBack = onBack,
 					onAddNewKey = {
 						navController.navigate(
@@ -115,6 +105,9 @@ fun KeySetDetailsScreenSubgraph(
 					},
 					onFilterClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
+					},
+					onShowRoot = {
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.show_root)
 					},
 					onOpenKey = { keyAddr: String, keySpecs: String ->
 						navController.navigate(
@@ -195,34 +188,11 @@ fun KeySetDetailsScreenSubgraph(
 					}
 				}
 				composable(
-					route = KeySetDetailsMenuSubgraph.KeysPublicKey.route,
-					arguments = listOf(
-						navArgument(KeySetDetailsMenuSubgraph.KeysPublicKey.key_title_arg) {
-							type = NavType.StringType
-						},
-						navArgument(KeySetDetailsMenuSubgraph.KeysPublicKey.key_valie_arg) {
-							type = NavType.StringType
-						}
-					)
+					route = KeySetDetailsMenuSubgraph.show_root,
 				) { backStackEntry ->
-					val keyName =
-						backStackEntry.arguments
-							?.getString(KeySetDetailsMenuSubgraph.KeysPublicKey.key_title_arg)
-							?: run {
-								submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
-								""
-							}
-					val keyValue =
-						backStackEntry.arguments
-							?.getString(KeySetDetailsMenuSubgraph.KeysPublicKey.key_valie_arg)
-							?: run {
-								submitErrorState("mandatory parameter missing for KeySetDetailsMenuSubgraph.keys_public_key")
-								""
-							}
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
-						PublicKeyBottomSheetView(
-							name = keyName,
-							key = keyValue,
+						KeySetRootExportBottomSheet(
+							model = state.filteredModel.root,
 							onClose = closeAction,
 						)
 					}
@@ -308,14 +278,6 @@ private object KeySetDetailsMenuSubgraph {
 	const val backup = "keyset_details_backup"
 	const val export = "export_multiselect"
 	const val exposed_shield_alert = "keys_exposed_shield_alert"
-
-	object KeysPublicKey {
-		internal const val key_title_arg = "ARGUMENT_PUBLIC_KEY_TITLE"
-		internal const val key_valie_arg = "ARGUMENT_PUBLIC_KEY_VALUE"
-		private const val baseRoute = "keys_public_key"
-		const val route = "$baseRoute/{$key_title_arg}/{$key_valie_arg}"
-		fun destination(keyTitle: String, keyValue: String) =
-			"$baseRoute/$keyTitle/$keyValue"
-	}
+	const val show_root = "keyset_root_export_and_base58"
 }
 

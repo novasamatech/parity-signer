@@ -569,10 +569,6 @@ impl VerifierValue {
 pub enum CurrentVerifier {
     /// Verifier is valid, Vault can use the network
     Valid(ValidCurrentVerifier),
-
-    /// Verifier is invalid, Vault would not be able to use the network
-    /// without wipe and reset
-    Dead,
 }
 
 /// Possible variants of valid current network verifier

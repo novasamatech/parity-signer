@@ -256,4 +256,17 @@ extension Localizable {
         )
         return AttributedString(attributedString)
     }
+
+    static func applicationUpdateRequiredInfo() -> AttributedString {
+        var attributedString = AttributedString(
+            Localizable.Error.ApplicationUpdateRequired.Label.info.string,
+            attributes: .init([.font: PrimaryFont.bodyL.font])
+        )
+        if let range = attributedString
+            .range(of: Localizable.Error.ApplicationUpdateRequired.Label.Info.highlight.string) {
+            attributedString[range].foregroundColor = Asset.accentPink300.color
+            attributedString[range].font = PrimaryFont.titleS.font
+        }
+        return attributedString
+    }
 }
