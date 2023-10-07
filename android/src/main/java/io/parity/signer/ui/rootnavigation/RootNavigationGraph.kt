@@ -1,11 +1,8 @@
 package io.parity.signer.ui.rootnavigation
 
-import android.util.Log
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -21,7 +18,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
 import io.parity.signer.screens.initial.explanation.OnboardingExplanationScreenFull
-import io.parity.signer.screens.initial.initialUnlockAppScreenFlow
 import io.parity.signer.screens.initial.splash.splashScreen
 import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import kotlinx.coroutines.delay
@@ -64,7 +60,6 @@ fun RootNavigationGraph(
 				},
 			)
 			enableEachStartAppFlow(navController)
-			initialUnlockAppScreenFlow(navController)
 			mainSignerAppFlow(navController)
 		}
 	}
@@ -75,10 +70,8 @@ object MainGraphRoutes {
 	const val firstTimeOnboarding =
 		"navigation_point_once_onboarding"
 	const val eachTimeOnboardingRoute = "navigation_point_enable_airgap"
-	const val initialUnlockRoute = "navigation_point_initial_unlock"
 	const val mainScreenRoute = "navigation_main_screen"
 }
-
 
 
 fun NavGraphBuilder.firstTimeOnlyOnboarding(
@@ -88,13 +81,8 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 ) {
 	navigation(
 		route = routePath,
-		startDestination = FirstTimeOnboarding.onboardingExplanationRoute,
+		startDestination = FirstTimeOnboarding.termsConsentRoute,
 	) {
-		composable(route = FirstTimeOnboarding.onboardingExplanationRoute) {
-			OnboardingExplanationScreenFull(navigateNext = {navController.navigate(
-				FirstTimeOnboarding.termsConsentRoute
-			)})
-		}
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
 			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
 		}
@@ -102,7 +90,7 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 }
 
 private object FirstTimeOnboarding {
-	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
+//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
 	const val termsConsentRoute = "navigation_point_terms_consent"
 }
 

@@ -212,7 +212,7 @@ struct KeyDetailsView: View {
         ) {
             NavigationView {
                 CreateKeyNetworkSelectionView(viewModel: viewModel.createDerivedKeyViewModel())
-                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationViewStyle(.stack)
                     .navigationBarHidden(true)
             }
         }
@@ -221,7 +221,7 @@ struct KeyDetailsView: View {
         ) {
             NavigationView {
                 SettingsView(viewModel: .init())
-                    .navigationViewStyle(StackNavigationViewStyle())
+                    .navigationViewStyle(.stack)
                     .navigationBarHidden(true)
             }
         }

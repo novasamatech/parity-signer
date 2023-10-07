@@ -78,15 +78,15 @@ fun KeySetDetailsScreenView(
 	onMenu: Callback,
 	onSeedSelect: Callback,
 	onAddNewDerivation: Callback,
+	onShowRoot: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
-	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
 			onAddKey = onAddNewDerivation,
 			onBack = onBack,
-			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
+			onMenu = onMenu,
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			if (model.keysAndNetwork.isNotEmpty()) {
@@ -98,7 +98,7 @@ fun KeySetDetailsScreenView(
 					SeedKeyItemElement(
 						model = model,
 						onSeedSelect = onSeedSelect,
-						onShowPublicKey = onShowPublicKey
+						onShowRoot = onShowRoot
 					)
 
 					FilterRow(onFilterClicked)
@@ -119,13 +119,20 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onSeedSelect, onShowPublicKey)
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowRoot = onShowRoot
+					)
 					KeySetDetailsEmptyList(onAdd = onAddNewDerivation)
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model, onSeedSelect, onShowPublicKey)
-					//no keys because filtered
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowRoot = onShowRoot
+					)					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
 					Text(
@@ -156,13 +163,13 @@ fun KeySetDetailsScreenView(
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
 	onSeedSelect: Callback,
-	onShowPublicKey: (title: String, key: String) -> Unit,
+	onShowRoot: Callback,
 ) {
 	SeedKeyDetails(
 		model = model.root,
 		onSeedSelect = onSeedSelect,
-		onShowPublicKey = onShowPublicKey,
-		Modifier
+		onShowRoot = onShowRoot,
+		modifier =Modifier
 			.padding(horizontal = 24.dp, vertical = 8.dp)
 			.padding(bottom = 16.dp)
 	)
@@ -353,7 +360,7 @@ private fun PreviewKeySetDetailsScreen() {
 				onAddNewDerivation = {},
 				onBack = {},
 				onSeedSelect = {},
-				onShowPublicKey = { _, _ -> },
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -386,9 +393,9 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onFilterClicked = {},
 				onMenu = {},
 				onAddNewDerivation = {},
-				onSeedSelect = {},
 				onBack = {},
-				onShowPublicKey = { _, _ -> },
+				onSeedSelect = {},
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -423,7 +430,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewDerivation = {},
 				onBack = {},
-				onShowPublicKey = { _, _ -> },
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}

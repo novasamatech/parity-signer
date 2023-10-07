@@ -35,7 +35,7 @@ data class KeySetDetailsModel(
 				),
 			),
 			root = KeyModel.createStub()
-				.copy(path = "//polkadot"),
+				.copy(path = "//polkadot", identicon = PreviewData.Identicon.jdenticonIcon),
 		)
 	}
 }

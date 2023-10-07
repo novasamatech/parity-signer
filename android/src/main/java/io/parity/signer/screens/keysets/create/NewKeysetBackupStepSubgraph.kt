@@ -30,14 +30,6 @@ fun NewKeysetSubgraph(
 	coreNavController: NavHostController,
 ) {
 
-	//background
-	Box(
-		modifier = Modifier
-			.fillMaxSize(1f)
-			.statusBarsPadding()
-			.background(MaterialTheme.colors.background)
-	)
-
 	val subgraphNavController = rememberNavController()
 
 	val vm: NewKeysetNameViewModel = viewModel()
