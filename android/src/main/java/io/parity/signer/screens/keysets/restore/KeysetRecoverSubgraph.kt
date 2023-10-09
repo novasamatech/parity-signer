@@ -32,13 +32,6 @@ import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 fun KeysetRecoverSubgraph(
 	coreNavController: NavController,
 ) {
-//background
-	Box(
-		modifier = Modifier
-			.fillMaxSize(1f)
-			.statusBarsPadding()
-			.background(MaterialTheme.colors.background)
-	)
 
 	val viewModel: KeysetRecoverViewModel = viewModel()
 	val model = viewModel.recoverSeed.collectAsStateWithLifecycle()
