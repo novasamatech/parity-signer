@@ -15,16 +15,22 @@ enum DatabaseCheckError: Error {
 
 final class DatabaseVersionMediator {
     private let backendService: BackendService
+    private let databaseMediator: DatabaseMediating
 
     init(
-        backendService: BackendService = BackendService()
+        backendService: BackendService = BackendService(),
+        databaseMediator: DatabaseMediating = DatabaseMediator()
     ) {
         self.backendService = backendService
+        self.databaseMediator = databaseMediator
     }
 
     func checkDatabaseScheme(
         _ completion: @escaping (Result<Void, DatabaseCheckError>) -> Void
     ) {
+        guard databaseMediator.isDatabaseAvailable() else { completion(.success(()))
+            return
+        }
         backendService.performCall({
             try checkDbVersion()
         }, completion: { (result: Result<Void, ErrorDisplayed>) in

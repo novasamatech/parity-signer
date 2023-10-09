@@ -14,10 +14,6 @@ struct PolkadotVaultApp: App {
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
-    init() {
-        AppLaunchMediator().finaliseInitialisation()
-    }
-
     var body: some Scene {
         WindowGroup {
             if jailbreakDetectionPublisher.isJailbroken {
