@@ -79,7 +79,7 @@
 "SEED PHRASE" = "Secret Recovery Phrase";
 "RecoverSeedPhrase.Action.Next" = "Next";
 "RecoverSeedPhrase.Label.Title" = "Enter a Secret Recovery Phrase";
-"RecoverSeedPhrase.Label.Header" = "Enter a 24-word phrase you were given when you created your key set";
+"RecoverSeedPhrase.Label.Header" = "Enter a phrase you were given when you created your key set";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 

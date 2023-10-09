@@ -13,17 +13,28 @@ struct MainScreenContainer: View {
     @StateObject var onboarding: OnboardingStateMachine
 
     var body: some View {
-        switch viewModel.viewState {
-        case .authenticated:
-            AuthenticatedScreenContainer(viewModel: .init())
-        case .deviceLocked:
-            UnlockDeviceView(viewModel: .init())
-        case .onboarding:
-            onboarding.currentView()
-        case .updateRequired:
-            ApplicationUpdateRequiredView(viewModel: .init())
-        case .noPincode:
-            DevicePincodeRequired(viewModel: .init())
+        Group {
+            switch viewModel.viewState {
+            case .authenticated:
+                AuthenticatedScreenContainer(viewModel: .init())
+            case .deviceLocked:
+                UnlockDeviceView(viewModel: .init())
+            case .onboarding:
+                onboarding.currentView()
+            case .updateRequired:
+                ApplicationUpdateRequiredView(viewModel: .init())
+            case .noPincode:
+                DevicePincodeRequired(viewModel: .init())
+            }
+        }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingError
+        ) {
+            ErrorBottomModal(
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
+            )
+            .clearModalBackground()
         }
     }
 }
@@ -42,20 +53,37 @@ extension MainScreenContainer {
         private let onboardingMediator: OnboardingMediator
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let databaseVersionMediator: DatabaseVersionMediator
+        private let appLaunchMediator: AppLaunchMediating
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
 
         init(
             authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator,
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
             passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
-            databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator()
+            databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator(),
+            appLaunchMediator: AppLaunchMediating = AppLaunchMediator()
         ) {
             self.authenticationStateMediator = authenticationStateMediator
             self.onboardingMediator = onboardingMediator
             self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
             self.databaseVersionMediator = databaseVersionMediator
-            checkInitialState()
+            self.appLaunchMediator = appLaunchMediator
+            initialiseAppRun()
+        }
+
+        private func initialiseAppRun() {
+            appLaunchMediator.finaliseInitialisation { result in
+                switch result {
+                case .success:
+                    self.checkInitialState()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         private func checkInitialState() {
@@ -68,9 +96,12 @@ extension MainScreenContainer {
                     case .invalidVersion:
                         self.viewState = .updateRequired
                     case let .error(serviceError):
-                        // todo what we should really do here?
+                        /// If DB version check was unavailable, assume user needs to update
+                        /// If that's not the case (i.e. there is no newer version), app restart will fix it so should
+                        /// be ok
                         self.viewState = .updateRequired
-                        print(serviceError)
+                        self.presentableError = .alertError(message: serviceError.localizedDescription)
+                        self.isPresentingError = true
                     }
                 }
             }
