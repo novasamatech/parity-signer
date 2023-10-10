@@ -1,5 +1,5 @@
 //
-//  EnterBananaSplitPasswordView.swift
+//  EnterBananaSplitPasswordModal.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 3/1/2023.

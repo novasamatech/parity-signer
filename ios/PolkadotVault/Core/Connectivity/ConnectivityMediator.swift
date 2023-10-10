@@ -26,11 +26,11 @@ final class ConnectivityMediator: ObservableObject {
 private extension ConnectivityMediator {
     func setUpConnectivityMonitoring() {
         connectivityMonitor.startMonitoring { [weak self] isConnected in
-            guard let self = self else { return }
-            if isConnected, self.databaseMediator.isDatabaseAvailable() {
+            guard let self else { return }
+            if isConnected, databaseMediator.isDatabaseAvailable() {
                 try? historyDeviceWasOnline()
             }
-            self.isConnectivityOn = isConnected
+            isConnectivityOn = isConnected
         }
     }
 }

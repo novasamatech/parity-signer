@@ -16,18 +16,18 @@ extension QrData {
     var payload: [UInt8] {
         switch self {
         case let .regular(data):
-            return data
+            data
         case let .sensitive(data):
-            return data
+            data
         }
     }
 
     var type: DataType {
         switch self {
         case .regular:
-            return .regular
+            .regular
         case .sensitive:
-            return .sensitive
+            .sensitive
         }
     }
 }

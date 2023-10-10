@@ -136,14 +136,14 @@ extension NetworkSelectionSettings {
         func onTap(_ network: MmNetwork) {
             selectedDetailsKey = network.key
             networkDetailsService.getNetworkDetails(network.key) { [weak self] result in
-                guard let self = self else { return }
+                guard let self else { return }
                 switch result {
                 case let .success(selectedDetails):
                     self.selectedDetails = selectedDetails
-                    self.isPresentingDetails = true
+                    isPresentingDetails = true
                 case let .failure(error):
-                    self.presentableError = .alertError(message: error.localizedDescription)
-                    self.isPresentingError = true
+                    presentableError = .alertError(message: error.localizedDescription)
+                    isPresentingError = true
                 }
             }
         }
@@ -173,8 +173,8 @@ extension NetworkSelectionSettings {
 private extension NetworkSelectionSettings.ViewModel {
     func onDetailsDismiss() {
         $isPresentingDetails.sink { [weak self] isPresented in
-            guard let self = self, !isPresented else { return }
-            self.updateNetworks()
+            guard let self, !isPresented else { return }
+            updateNetworks()
         }.store(in: cancelBag)
     }
 

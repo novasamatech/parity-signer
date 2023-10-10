@@ -190,11 +190,11 @@ extension ManageKeySetsView {
         func countLabel(for keySet: SeedNameCard) -> String? {
             switch keySet.derivedKeysCount {
             case 0:
-                return nil
+                nil
             case 1:
-                return Localizable.ManageKeySets.Label.DerivedKeys.single(1)
+                Localizable.ManageKeySets.Label.DerivedKeys.single(1)
             default:
-                return Localizable.ManageKeySets.Label.DerivedKeys.plural(keySet.derivedKeysCount)
+                Localizable.ManageKeySets.Label.DerivedKeys.plural(keySet.derivedKeysCount)
             }
         }
     }

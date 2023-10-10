@@ -17,9 +17,9 @@ final class AirgapMediatorAssembler {
 
     func assemble() -> AirgapMediating {
         if runtimePropertiesProvider.isInDevelopmentMode {
-            return AirgapMediatingStub()
+            AirgapMediatingStub()
         } else {
-            return AirgapMediator()
+            AirgapMediator()
         }
     }
 }

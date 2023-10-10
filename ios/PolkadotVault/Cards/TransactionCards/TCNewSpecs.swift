@@ -1,5 +1,5 @@
 //
-//  TCAddNewNetwork.swift
+//  TCNewSpecs.swift
 //  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 21.10.2021.

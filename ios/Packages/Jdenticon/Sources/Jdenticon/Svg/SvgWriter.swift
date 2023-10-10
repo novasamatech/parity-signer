@@ -18,7 +18,7 @@ class SvgWriter {
     }
 
     func setBackground(fillColor: String, opacity: CGFloat?) {
-        if let opacity = opacity {
+        if let opacity {
             _s +=
                 "<rect width=\"100%\" height=\"100%\" fill=\"\(fillColor)\" opacity=\"\(String(format: "%.2f", opacity))\"/>"
         }

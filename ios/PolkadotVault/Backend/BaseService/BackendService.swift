@@ -35,8 +35,8 @@ final class BackendService {
     /// - Parameters:
     ///   - call: A closure encapsulating the logic of the Rust backend call.
     ///   - completion: A closure to be called when the service call completes.
-    func performCall<T, Success>(
-        _ call: @escaping () throws -> T,
+    func performCall<Success>(
+        _ call: @escaping () throws -> some Any,
         completion: @escaping (Result<Success, ServiceError>) -> Void
     ) {
         callQueue.async {
@@ -65,8 +65,8 @@ final class BackendService {
     /// - Parameters:
     ///   - call: A closure encapsulating the logic of the Rust backend call.
     ///   - completion: A closure to be called when the service call completes.
-    func performCall<T, Success>(
-        _ call: @escaping () throws -> T,
+    func performCall<Success>(
+        _ call: @escaping () throws -> some Any,
         completion: @escaping (Result<Success, ErrorDisplayed>) -> Void
     ) {
         callQueue.async {

@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainScreenContainer.swift
 //  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 19.7.2021.

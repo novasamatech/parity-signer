@@ -19,27 +19,27 @@ extension AirgapComponent {
     var title: String {
         switch self {
         case .aiplaneMode:
-            return Localizable.Onboarding.Airgap.Label.airplane.string
+            Localizable.Onboarding.Airgap.Label.airplane.string
         case .wifi:
-            return Localizable.Onboarding.Airgap.Label.wifi.string
+            Localizable.Onboarding.Airgap.Label.wifi.string
         }
     }
 
     var uncheckedIcon: Image {
         switch self {
         case .aiplaneMode:
-            return Asset.airgapAirplaneError.swiftUIImage
+            Asset.airgapAirplaneError.swiftUIImage
         case .wifi:
-            return Asset.airgapWifiError.swiftUIImage
+            Asset.airgapWifiError.swiftUIImage
         }
     }
 
     var checkedIcon: Image {
         switch self {
         case .aiplaneMode:
-            return Asset.airgapAirplane.swiftUIImage
+            Asset.airgapAirplane.swiftUIImage
         case .wifi:
-            return Asset.airgapWifi.swiftUIImage
+            Asset.airgapWifi.swiftUIImage
         }
     }
 }

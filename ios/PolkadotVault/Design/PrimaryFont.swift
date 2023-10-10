@@ -41,31 +41,31 @@ extension PrimaryFont {
     var font: SwiftUI.Font {
         switch self {
         case .titleXL:
-            return FontFamily.Inter.bold.swiftUIFont(size: 28)
+            FontFamily.Inter.bold.swiftUIFont(size: 28)
         case .titleL:
-            return FontFamily.Inter.bold.swiftUIFont(size: 24)
+            FontFamily.Inter.bold.swiftUIFont(size: 24)
         case .titleM:
-            return FontFamily.Inter.bold.swiftUIFont(size: 22)
+            FontFamily.Inter.bold.swiftUIFont(size: 22)
         case .titleS:
-            return FontFamily.Inter.bold.swiftUIFont(size: 16)
+            FontFamily.Inter.bold.swiftUIFont(size: 16)
         case .labelL:
-            return FontFamily.Inter.semiBold.swiftUIFont(size: 17)
+            FontFamily.Inter.semiBold.swiftUIFont(size: 17)
         case .labelM:
-            return FontFamily.Inter.semiBold.swiftUIFont(size: 16)
+            FontFamily.Inter.semiBold.swiftUIFont(size: 16)
         case .labelS:
-            return FontFamily.Inter.semiBold.swiftUIFont(size: 14)
+            FontFamily.Inter.semiBold.swiftUIFont(size: 14)
         case .labelXS:
-            return FontFamily.Inter.medium.swiftUIFont(size: 13)
+            FontFamily.Inter.medium.swiftUIFont(size: 13)
         case .labelXXS:
-            return FontFamily.Inter.semiBold.swiftUIFont(size: 12)
+            FontFamily.Inter.semiBold.swiftUIFont(size: 12)
         case .bodyL:
-            return FontFamily.Inter.regular.swiftUIFont(size: 16)
+            FontFamily.Inter.regular.swiftUIFont(size: 16)
         case .bodyM:
-            return FontFamily.Inter.regular.swiftUIFont(size: 14)
+            FontFamily.Inter.regular.swiftUIFont(size: 14)
         case .captionM:
-            return FontFamily.Inter.regular.swiftUIFont(size: 12)
+            FontFamily.Inter.regular.swiftUIFont(size: 12)
         case .captionS:
-            return FontFamily.Inter.regular.swiftUIFont(size: 10)
+            FontFamily.Inter.regular.swiftUIFont(size: 10)
         }
     }
 }

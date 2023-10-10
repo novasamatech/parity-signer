@@ -213,15 +213,15 @@ struct TransactionPreview: View {
     func title(_ transactionsCount: Int, previewType: MTransaction.TransactionPreviewType?) -> String {
         switch previewType {
         case .addNetwork:
-            return Localizable.TransactionSign.Label.Header.network.string
+            Localizable.TransactionSign.Label.Header.network.string
         case .metadata:
-            return Localizable.TransactionSign.Label.Header.metadata.string
+            Localizable.TransactionSign.Label.Header.metadata.string
         case let .importKeys(keysCount):
-            return keysCount == 1 ?
+            keysCount == 1 ?
                 Localizable.ImportKeys.Label.Title.single.string :
                 Localizable.ImportKeys.Label.Title.multiple(keysCount)
         default:
-            return transactionsCount == 1 ?
+            transactionsCount == 1 ?
                 Localizable.TransactionSign.Label.Header.single.string :
                 Localizable.TransactionSign.Label.Header.multiple(transactionsCount)
         }

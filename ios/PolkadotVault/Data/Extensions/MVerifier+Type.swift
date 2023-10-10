@@ -36,13 +36,13 @@ extension MVerifier {
         public var rawValue: String {
             switch self {
             case .general:
-                return RustValues.general.rawValue
+                RustValues.general.rawValue
             case .none:
-                return RustValues.none.rawValue
+                RustValues.none.rawValue
             case .custom:
-                return RustValues.custom.rawValue
+                RustValues.custom.rawValue
             case .unknown:
-                return "Unknown"
+                "Unknown"
             }
         }
     }
