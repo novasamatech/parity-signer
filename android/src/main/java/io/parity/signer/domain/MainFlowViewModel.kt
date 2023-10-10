@@ -24,8 +24,7 @@ class MainFlowViewModel() : ViewModel() {
 
 	fun onUnlockClicked() {
 		viewModelScope.launch {
-			val authResult = authentication.authenticate(activity)
-			when (authResult) {
+			when (authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> resetUseCase.totalRefresh()
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
