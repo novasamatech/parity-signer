@@ -18,7 +18,7 @@ final class PrivateKeyQRCodeService {
 
     func backupViewModel(_ keys: MKeysNew?) -> BackupModalViewModel? {
         guard
-            let keys = keys,
+            let keys,
             let root = keys.root
         else { return nil }
         let seedName = root.address.seedName

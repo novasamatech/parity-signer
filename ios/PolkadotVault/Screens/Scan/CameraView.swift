@@ -400,12 +400,11 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
-            let message: String
-            switch completionAction {
+            let message: String = switch completionAction {
             case let .createKeySet(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+                Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
             case let .recoveredKeySet(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
             }
             snackbarViewModel = .init(
                 title: message,

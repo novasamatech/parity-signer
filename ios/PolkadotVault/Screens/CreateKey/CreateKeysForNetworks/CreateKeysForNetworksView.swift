@@ -190,11 +190,11 @@ extension CreateKeysForNetworksView {
         var step: Int {
             switch mode {
             case .bananaSplit:
-                return 2
+                2
             case .createKeySet:
-                return 3
+                3
             case .recoverKeySet:
-                return 3
+                3
             }
         }
 
@@ -261,20 +261,20 @@ extension CreateKeysForNetworksView.ViewModel {
     func title() -> String {
         switch mode {
         case .recoverKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Title.recover.string
+            Localizable.CreateKeysForNetwork.Label.Title.recover.string
         case .createKeySet,
              .bananaSplit:
-            return Localizable.CreateKeysForNetwork.Label.Title.create.string
+            Localizable.CreateKeysForNetwork.Label.Title.create.string
         }
     }
 
     func header() -> String {
         switch mode {
         case .recoverKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Header.recover.string
+            Localizable.CreateKeysForNetwork.Label.Header.recover.string
         case .createKeySet,
              .bananaSplit:
-            return Localizable.CreateKeysForNetwork.Label.Header.create.string
+            Localizable.CreateKeysForNetwork.Label.Header.create.string
         }
     }
 }

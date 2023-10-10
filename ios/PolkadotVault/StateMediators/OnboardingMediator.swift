@@ -32,10 +32,10 @@ final class OnboardingMediator: ObservableObject {
         guard seedsMediator.removeAllSeeds() else { return }
         databaseMediator.recreateDatabaseFile()
         navigationInitialisationService.initialiseNavigation(verifierRemoved: verifierRemoved) { [weak self] _ in
-            guard let self = self else { return }
-            self.seedsMediator.refreshSeeds()
-            self.onboardingDone = true
-            self.warningStateMediator.updateWarnings()
+            guard let self else { return }
+            seedsMediator.refreshSeeds()
+            onboardingDone = true
+            warningStateMediator.updateWarnings()
         }
     }
 }

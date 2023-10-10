@@ -22,7 +22,7 @@ struct NetworkLogoIcon: View {
     var body: some View {
         let image = UIImage(named: networkName)
         Group {
-            if let image = image {
+            if let image {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)

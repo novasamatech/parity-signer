@@ -76,13 +76,12 @@ enum Shapes {
         { (g: Graphics, cell: CGFloat, _: Int?) in
             var inner = cell * 0.14
             inner = cell < 8 ? inner : floor(inner)
-            var outer: CGFloat
-            if cell < 4 {
-                outer = 1
+            var outer: CGFloat = if cell < 4 {
+                1
             } else if cell < 6 {
-                outer = 2
+                2
             } else {
-                outer = floor(cell * 0.35)
+                floor(cell * 0.35)
             }
 
             g.addRectangle(x: 0, y: 0, w: cell, h: cell)

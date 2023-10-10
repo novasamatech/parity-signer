@@ -1,5 +1,5 @@
 //
-//  ImageRenderer.swift
+//  BlockiesImageRenderer.swift
 //
 //
 //  Created by Krzysztof Rodak on 17/07/2023.
@@ -122,16 +122,15 @@ public class BlockiesImageRenderer {
 
             let number = data[index]
 
-            let blockColor: PlatformColor
-            switch number {
+            let blockColor: PlatformColor = switch number {
             case 0:
-                blockColor = backgroundColor
+                backgroundColor
             case 1:
-                blockColor = primaryColor
+                primaryColor
             case 2:
-                blockColor = spotColor
+                spotColor
             default:
-                blockColor = PlatformColor.black
+                PlatformColor.black
             }
             context.setFillColor(blockColor.cgColor)
             context.fill(CGRect(

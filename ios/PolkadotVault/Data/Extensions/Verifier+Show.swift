@@ -1,5 +1,5 @@
 //
-//  Verifier+show.swift
+//  Verifier+Show.swift
 //  PolkadotVault
 //
 //  Created by Krzysztof Rodak on 14/03/2023.
@@ -10,9 +10,9 @@ extension Verifier {
     func show() -> String {
         switch v {
         case let .standard(value):
-            return value[0]
+            value[0]
         case .none:
-            return "None"
+            "None"
         }
     }
 }

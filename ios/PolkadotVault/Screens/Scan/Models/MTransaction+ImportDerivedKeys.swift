@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Array where Element == MTransaction {
+extension [MTransaction] {
     /// Informs whether there are any valid keys to be imported in `[MTransaction]` payload
     var hasImportableKeys: Bool {
         reduce(false) { $0 || $1.hasImportableKeys }
@@ -38,9 +38,9 @@ extension Array where Element == MTransaction {
             .flatMap(\.derivedKeys)
             .compactMap {
                 if case let .invalid(errors) = $0.status {
-                    return errors
+                    errors
                 } else {
-                    return nil
+                    nil
                 }
             }
             .flatMap { $0 }

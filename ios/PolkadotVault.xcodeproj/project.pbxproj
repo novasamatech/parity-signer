@@ -1905,7 +1905,6 @@
 				6DDEF13A28AE744F004CA2FD /* Generate Database */,
 				6D4C0750289AC2F400B2EE48 /* Run SwiftGen */,
 				6DBD21F0289983DB005D539B /* Run Code Formatter */,
-				2D75EF99280EACC800C48FAF /* Run Linter */,
 				2DE72BBA26A588C7002BB752 /* Sources */,
 				2DE72BBB26A588C7002BB752 /* Frameworks */,
 				2DE72BBC26A588C7002BB752 /* Resources */,
@@ -1975,6 +1974,7 @@
 			mainGroup = 2DE72BB526A588C7002BB752;
 			packageReferences = (
 				6D971AC82942E79100121A36 /* XCRemoteSwiftPackageReference "QRCode" */,
+				6DC1EF8B2AD55E4F009A2777 /* XCRemoteSwiftPackageReference "SwiftLint" */,
 			);
 			productRefGroup = 2DE72BBF26A588C7002BB752 /* Products */;
 			projectDirPath = "";
@@ -2022,25 +2022,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2D75EF99280EACC800C48FAF /* Run Linter */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Linter";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --strict\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
 		6D4C0750289AC2F400B2EE48 /* Run SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -2726,6 +2707,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 16.0.0;
+			};
+		};
+		6DC1EF8B2AD55E4F009A2777 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.53.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

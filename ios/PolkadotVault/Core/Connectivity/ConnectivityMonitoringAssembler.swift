@@ -17,9 +17,9 @@ final class ConnectivityMonitoringAssembler {
 
     func assemble() -> ConnectivityMonitoring {
         if runtimePropertiesProvider.isInDevelopmentMode {
-            return ConnectivityMonitoringStub()
+            ConnectivityMonitoringStub()
         } else {
-            return ConnectivityMonitoringAdapter()
+            ConnectivityMonitoringAdapter()
         }
     }
 }

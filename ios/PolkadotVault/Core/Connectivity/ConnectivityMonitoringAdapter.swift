@@ -34,13 +34,13 @@ final class ConnectivityMonitoringAdapter: ObservableObject, ConnectivityMonitor
 
     func startMonitoring(_ update: @escaping (Bool) -> Void) {
         adaptee.pathUpdateHandler = { [weak self] path in
-            guard let self = self else { return }
+            guard let self else { return }
             let isConnected = !path.availableInterfaces.isEmpty
 
             // Update only on connectivity changes
             guard isConnected != self.isConnected else { return }
             self.isConnected = isConnected
-            self.notificationQueue.async {
+            notificationQueue.async {
                 update(isConnected)
             }
         }

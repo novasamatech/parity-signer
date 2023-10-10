@@ -15,9 +15,9 @@ final class HashGenerator {
 
     func keepOrCreateHash(_ hashOrValue: String) -> String {
         if isValidHash(hashOrValue) {
-            return hashOrValue
+            hashOrValue
         } else {
-            return computeHash(for: hashOrValue)
+            computeHash(for: hashOrValue)
         }
     }
 }
