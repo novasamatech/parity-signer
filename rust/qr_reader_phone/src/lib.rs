@@ -4,6 +4,7 @@
 use std::convert::TryFrom;
 
 use banana_recovery::Share;
+use constants::ENABLE_DYNAMIC_DERIVATIONS;
 
 use definitions::navigation::{BananaSplitRecoveryResult, DecodeSequenceResult};
 
@@ -68,7 +69,7 @@ pub fn decode_sequence(
         }
     }
     match final_result {
-        Some(s) => Ok(decode_payload(&s)?),
+        Some(s) => Ok(decode_payload(&s, ENABLE_DYNAMIC_DERIVATIONS)?),
         None => Err(Error::UnableToDecode),
     }
 }
