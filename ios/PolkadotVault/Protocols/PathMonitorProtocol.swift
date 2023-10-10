@@ -12,6 +12,7 @@ import Network
 protocol PathMonitorProtocol: AnyObject {
     /// Set a block to be called when the connection's path has changed, which may be called
     /// multiple times until the connection is cancelled.
+    @preconcurrency
     var pathUpdateHandler: ((NWPath) -> Void)? { get set }
     /// Start the connection and provide a dispatch queue for callback blocks.
     ///
