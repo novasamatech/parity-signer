@@ -61,7 +61,7 @@ fun CheckIcon(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewSignerCheckbox() {
+private fun PreviewCheckIcon() {
 	SignerNewTheme {
 		Column() {
 			CheckIcon(noBackground = true)

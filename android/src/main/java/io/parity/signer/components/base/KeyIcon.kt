@@ -1,75 +1,57 @@
 package io.parity.signer.components.base
 
 import android.content.res.Configuration
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import io.parity.signer.R
-import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.pink300
-
-
-@Composable
-fun ScanIconComponent(
-	onClick: Callback,
-	modifier: Modifier,
-) {
-	ScanIcon(
-		onClick,
-		modifier
-			.zIndex(1f)
-			.shadow(
-				elevation = 16.dp,
-				shape = CircleShape,
-			)
-	)
-}
-
+import io.parity.signer.ui.theme.fill18
 
 @Composable
-fun ScanIcon(
-	onClick: Callback,
+fun KeyIcon(
 	modifier: Modifier = Modifier,
+	noBackground: Boolean = false,
 ) {
 	Box(
 		modifier = modifier
-			.size(72.dp)
-			.clickable(onClick = onClick)
-			.border(6.dp, MaterialTheme.colors.primary, CircleShape)
-			.background(MaterialTheme.colors.background),
+			.size(32.dp)
+			.run {
+				if (noBackground) {
+					this
+				} else {
+					background(
+						MaterialTheme.colors.fill18,
+						CircleShape
+					)
+				}
+			},
 		contentAlignment = Alignment.Center,
 	) {
-		Box(
-			modifier = Modifier
-				.background(MaterialTheme.colors.pink300, CircleShape)
-				.size(56.dp)
-		)
 		Image(
-			painter = painterResource(R.drawable.ic_qr_code_2),
-			contentDescription = stringResource(R.string.description_scan_icon),
+			painter = painterResource(R.drawable.ic_key_outlined_24),
+			contentDescription = stringResource(R.string.description_check_botton),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
-			modifier = Modifier.size(32.dp)
+			modifier = Modifier
+				.size(20.dp)
 		)
 	}
 }
-
 
 
 @Preview(
@@ -81,30 +63,11 @@ fun ScanIcon(
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewScanIcon() {
+private fun PreviewKeyIcon() {
 	SignerNewTheme {
 		Column() {
-			ScanIcon(onClick = {})
+			KeyIcon(noBackground = true)
+			KeyIcon(noBackground = false)
 		}
 	}
 }
-
-
-@Preview(
-	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
-	showBackground = true, backgroundColor = 0xFFFFFFFF,
-)
-@Composable
-private fun PreviewScanIconComponent() {
-	SignerNewTheme {
-		Column() {
-			Box(
-				modifier = Modifier.size(90.dp),
-				contentAlignment = Alignment.Center,
-			) {
-				ScanIconComponent(onClick = {}, modifier = Modifier)
-			}
-		}
-	}
-}
-
