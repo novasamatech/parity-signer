@@ -146,11 +146,11 @@ struct DerivationPathNameView: View {
             .clearModalBackground()
         }
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingInfoModal
+            isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(
-                viewModel: viewModel.presentableInfoModal,
-                isShowingBottomAlert: $viewModel.isPresentingInfoModal
+                viewModel: viewModel.presentableError,
+                isShowingBottomAlert: $viewModel.isPresentingError
             )
             .clearModalBackground()
         }
@@ -224,7 +224,8 @@ extension DerivationPathNameView {
 
         // State presentatation
         @Published var isPresentingInfoModal: Bool = false
-        @Published var presentableInfoModal: ErrorBottomModalViewModel!
+        @Published var isPresentingError: Bool = false
+        @Published var presentableError: ErrorBottomModalViewModel!
 
         init(
             seedName: String,
@@ -251,8 +252,8 @@ extension DerivationPathNameView {
                 case .success:
                     self.isPresentingConfirmation = true
                 case let .failure(error):
-                    self.presentableInfoModal = .alertError(message: error.localizedDescription)
-                    self.isPresentingInfoModal = true
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
                 }
             }
             createKeyService.createDerivedKey(
@@ -357,8 +358,8 @@ private extension DerivationPathNameView.ViewModel {
                 derivationPathError = nil
             }
         case let .failure(error):
-            presentableInfoModal = .alertError(message: error.backendDisplayError)
-            isPresentingInfoModal = true
+            presentableError = .alertError(message: error.backendDisplayError)
+            isPresentingError = true
         }
     }
 }
