@@ -115,10 +115,10 @@ extension LogNoteModal {
                 guard let self else { return }
                 switch result {
                 case .success:
-                    self.isPresented = false
+                    isPresented = false
                 case let .failure(error):
-                    self.presentableError = .init(title: error.description)
-                    self.isPresentingError = true
+                    presentableError = .init(title: error.description)
+                    isPresentingError = true
                 }
             }
         }

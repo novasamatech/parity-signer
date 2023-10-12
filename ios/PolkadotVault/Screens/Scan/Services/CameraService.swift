@@ -72,9 +72,9 @@ final class CameraService: ObservableObject {
 
     func configure() {
         cameraPermissionHandler.checkForPermissions { [weak self] isGranted in
-            guard let self = self else { return }
-            self.setupResult = isGranted ? .success : .notAuthorized
-            self.sessionQueue.async(execute: self.configureSession)
+            guard let self else { return }
+            setupResult = isGranted ? .success : .notAuthorized
+            sessionQueue.async(execute: configureSession)
         }
     }
 

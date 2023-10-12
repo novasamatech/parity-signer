@@ -215,7 +215,7 @@ extension KeyDetailsView {
             case .onCancel:
                 ()
             case let .onKeysExport(selectedKeys):
-                guard let keySummary = keySummary else { return }
+                guard let keySummary else { return }
                 let derivedKeys = selectedKeys.map {
                     DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
                 }
@@ -396,14 +396,13 @@ private extension KeyDetailsView.ViewModel {
     }
 
     func refreshDerivedKeys() {
-        guard let keysData = keysData else { return }
+        guard let keysData else { return }
         let sortedDerivedKeys = keysData.set
             .sorted(by: { $0.key.address.path < $1.key.address.path })
-        let filteredKeys: [MKeyAndNetworkCard]
-        if appState.userData.selectedNetworks.isEmpty {
-            filteredKeys = sortedDerivedKeys
+        let filteredKeys: [MKeyAndNetworkCard] = if appState.userData.selectedNetworks.isEmpty {
+            sortedDerivedKeys
         } else {
-            filteredKeys = sortedDerivedKeys.filter {
+            sortedDerivedKeys.filter {
                 appState.userData.selectedNetworks
                     .map(\.key)
                     .contains($0.network.networkSpecsKey)
@@ -421,7 +420,7 @@ private extension KeyDetailsView.ViewModel {
     }
 
     func refreshKeySummary() {
-        guard let keysData = keysData else { return }
+        guard let keysData else { return }
         keySummary = KeySummaryViewModel(
             keyName: keysData.root?.address.seedName ?? "",
             base58: keysData.root?.base58 ?? ""

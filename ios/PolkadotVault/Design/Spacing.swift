@@ -1,5 +1,5 @@
 //
-//  Padding.swift
+//  Spacing.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 19/08/2022.
@@ -44,9 +44,9 @@ enum Spacing {
     static var flexibleComponentSpacer: CGFloat {
         switch UIScreen.main.bounds.width {
         case DeviceConstants.compactDeviceWidth:
-            return 40
+            40
         default:
-            return 60
+            60
         }
     }
 
@@ -54,9 +54,9 @@ enum Spacing {
     static var flexibleSmallComponentSpacer: CGFloat {
         switch UIScreen.main.bounds.width {
         case DeviceConstants.compactDeviceWidth:
-            return 30
+            30
         default:
-            return 60
+            60
         }
     }
 }

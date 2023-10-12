@@ -212,27 +212,27 @@ extension TCDerivations {
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.networkMissing)
+                        error.contains(.networkMissing)
                     } else {
-                        return false
+                        false
                     }
                 }
             isKeySetMissing = value
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.keySetMissing)
+                        error.contains(.keySetMissing)
                     } else {
-                        return false
+                        false
                     }
                 }
             isPathInBadFormat = value
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.badFormat)
+                        error.contains(.badFormat)
                     } else {
-                        return false
+                        false
                     }
                 }
         }

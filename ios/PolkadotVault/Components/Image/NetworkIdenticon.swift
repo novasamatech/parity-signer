@@ -25,7 +25,7 @@ struct NetworkIdenticon: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             IdenticonView(identicon: identicon, rowHeight: size)
-            if let network = network, !network.isEmpty {
+            if let network, !network.isEmpty {
                 NetworkLogoIcon(
                     networkName: network,
                     size: size / 2

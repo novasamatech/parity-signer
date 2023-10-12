@@ -169,20 +169,20 @@ extension SignSpecsListView {
                 seedPhrase: seedPhrase,
                 password: modal.password
             ) { [weak self] result in
-                guard let self = self else { return }
+                guard let self else { return }
                 switch result {
                 case let .success(detailsContent):
-                    self.isPresentingEnterPassword = false
+                    isPresentingEnterPassword = false
                     self.detailsContent = detailsContent
-                    self.isPresentingDetails = true
+                    isPresentingDetails = true
                 case let .failure(error):
                     switch error {
                     case .wrongPassword:
                         modal.isValid = false
                     case let .error(serviceError):
-                        self.isPresentingEnterPassword = false
-                        self.presentableError = .alertError(message: serviceError.localizedDescription)
-                        self.isPresentingError = true
+                        isPresentingEnterPassword = false
+                        presentableError = .alertError(message: serviceError.localizedDescription)
+                        isPresentingError = true
                     }
                 }
             }
@@ -193,13 +193,13 @@ extension SignSpecsListView {
 private extension SignSpecsListView.ViewModel {
     func loadData() {
         service.signSpecList(networkKey) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             switch result {
             case let .success(content):
                 self.content = content
             case let .failure(error):
-                self.presentableError = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
+                presentableError = .alertError(message: error.localizedDescription)
+                isPresentingError = true
             }
         }
     }
@@ -214,18 +214,18 @@ private extension SignSpecsListView.ViewModel {
             seedPhrase: seedPhrase,
             password: nil
         ) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             switch result {
             case let .success(detailsContent):
                 self.detailsContent = detailsContent
-                self.isPresentingDetails = true
+                isPresentingDetails = true
             case let .failure(error):
                 switch error {
                 case .wrongPassword:
                     ()
                 case let .error(serviceError):
-                    self.presentableError = .alertError(message: serviceError.localizedDescription)
-                    self.isPresentingError = true
+                    presentableError = .alertError(message: serviceError.localizedDescription)
+                    isPresentingError = true
                 }
             }
         }

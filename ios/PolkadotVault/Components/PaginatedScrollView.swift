@@ -23,13 +23,13 @@ struct PaginatedScrollView: View {
     @State private var currentScrollOffset: CGFloat = 0
     @State private var gestureDragOffset: CGFloat = 0
 
-    init<Page: View>(
+    init(
         currentPageIndex: Binding<Int>,
         itemsAmount: Int,
         itemWidth: CGFloat,
         itemPadding: CGFloat,
         pageWidth: CGFloat,
-        @ViewBuilder content: () -> Page
+        @ViewBuilder content: () -> some View
     ) {
         let views = content()
         items = [AnyView(views)]

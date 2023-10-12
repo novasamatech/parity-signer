@@ -46,11 +46,11 @@ public final class PublicKeyDecoder {
     func keyAsData(_ publicKey: PublicKey) -> [UInt8] {
         switch publicKey {
         case let .data(data):
-            return [UInt8](data)
+            [UInt8](data)
         case let .hex(string):
-            return hexToBytes(hex: string)
+            hexToBytes(hex: string)
         case let .base58(string):
-            return base58ToBytes(base58: string)
+            base58ToBytes(base58: string)
         }
     }
 }
