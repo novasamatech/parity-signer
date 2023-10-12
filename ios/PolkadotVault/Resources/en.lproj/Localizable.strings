@@ -139,8 +139,6 @@
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
 
-"PublicKeyDetails.Label.Title" = "Public Key";
-"PublicKeyDetails.Label.Subtitle" = "Derived Key";
 "PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";

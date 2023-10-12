@@ -19,7 +19,6 @@ struct KeyDetailsPublicKeyView: View {
                 // Navigation bar
                 NavigationBarView(
                     viewModel: .init(
-                        title: viewModel.navigationTitle(),
                         leftButtons: [.init(type: .arrow, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreButtonTap)]
                     )
@@ -275,14 +274,6 @@ extension KeyDetailsPublicKeyView {
 
         func onMoreButtonTap() {
             isShowingActionSheet.toggle()
-        }
-
-        func navigationTitle() -> NavigationBarTitle {
-            renderable.isRootKey ? .title(Localizable.PublicKeyDetails.Label.title.string) :
-                .subtitle(
-                    title: Localizable.PublicKeyDetails.Label.title.string,
-                    subtitle: Localizable.PublicKeyDetails.Label.subtitle.string
-                )
         }
 
         func checkForActionsPresentation() {
