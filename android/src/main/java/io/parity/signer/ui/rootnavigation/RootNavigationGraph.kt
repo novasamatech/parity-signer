@@ -81,15 +81,8 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 ) {
 	navigation(
 		route = routePath,
-		startDestination = FirstTimeOnboarding.onboardingExplanationRoute,
+		startDestination = FirstTimeOnboarding.termsConsentRoute,
 	) {
-		composable(route = FirstTimeOnboarding.onboardingExplanationRoute) {
-			OnboardingExplanationScreenFull(navigateNext = {
-				navController.navigate(
-					FirstTimeOnboarding.termsConsentRoute
-				)
-			})
-		}
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
 			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
 		}
@@ -97,7 +90,7 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 }
 
 private object FirstTimeOnboarding {
-	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
+//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
 	const val termsConsentRoute = "navigation_point_terms_consent"
 }
 

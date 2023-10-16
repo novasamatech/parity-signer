@@ -1,5 +1,5 @@
 //
-//  EnterBananaSplitPasswordView.swift
+//  EnterBananaSplitPasswordModal.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 3/1/2023.
@@ -93,7 +93,7 @@ struct EnterBananaSplitPasswordView: View {
                 .padding(.bottom, Spacing.small)
                 Spacer()
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
             .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
             .onAppear {

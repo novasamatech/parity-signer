@@ -6187,7 +6187,7 @@ fn test_sign_dd_transaction() {
     let payload =
         "530105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
 
-    let transaction = match decode_payload(&payload).expect("decode payload") {
+    let transaction = match decode_payload(&payload, true).expect("decode payload") {
         DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
         _ => panic!("Unexpected payload type"),
     };
@@ -6234,7 +6234,7 @@ fn test_bulk_dd_signing() {
         encoded_transactions,
     });
     let bulk_payload = hex::encode([&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat());
-    let transactions = match decode_payload(&bulk_payload).expect("decode payload") {
+    let transactions = match decode_payload(&bulk_payload, true).expect("decode payload") {
         DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
         _ => panic!("Unexpected payload type"),
     };

@@ -14,14 +14,14 @@ enum CreateDerivedKeyError: Error {
     var localizedDescription: String {
         switch self {
         case let .keysNotCreated(networksWithErrors):
-            return networksWithErrors.reduce(into: "") {
+            networksWithErrors.reduce(into: "") {
                 $0 += (
                     Localizable.CreateKeysForNetwork.Error
                         .derivedKeyForNetwork($1.network.title, $1.error) + "\n"
                 )
             }
         case let .noKeysCreates(errors):
-            return errors.reduce(into: "") { $0 += ($1 + "\n") }
+            errors.reduce(into: "") { $0 += ($1 + "\n") }
         }
     }
 }
@@ -33,14 +33,14 @@ enum CreateDerivedKeyForKeySetsError: Error {
     var localizedDescription: String {
         switch self {
         case let .keysNotCreated(seedNamesWithErrors):
-            return seedNamesWithErrors.reduce(into: "") {
+            seedNamesWithErrors.reduce(into: "") {
                 $0 += (
                     Localizable.SelectKeySetsForNetworkKey.Error
                         .derivedKeyForNetwork($1.seedName, $1.error) + "\n"
                 )
             }
         case .noNetwork:
-            return Localizable.SelectKeySetsForNetworkKey.Error.noNetwork.string
+            Localizable.SelectKeySetsForNetworkKey.Error.noNetwork.string
         }
     }
 }
@@ -52,14 +52,14 @@ enum ImportDerivedKeyError: Error {
     var localizedDescription: String {
         switch self {
         case let .keyNotImported(errorInfo):
-            return errorInfo.reduce(into: "") {
+            errorInfo.reduce(into: "") {
                 $0 += (
                     Localizable.AddDerivedKeys.Error
                         .DerivedKeyForNetwork.content($1.key, $1.error) + "\n"
                 )
             }
         case let .noKeysImported(errors):
-            return errors.reduce(into: "") { $0 += ($1 + "\n") }
+            errors.reduce(into: "") { $0 += ($1 + "\n") }
         }
     }
 }

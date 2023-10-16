@@ -193,9 +193,9 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
 
     func listenToChanges() {
         $isNetworkTutorialPresented.sink { [weak self] isPresented in
-            guard let self = self, !isPresented else { return }
-            self.createKeyService.resetNavigationState(self.keyName)
-            self.updateNetworks()
+            guard let self, !isPresented else { return }
+            createKeyService.resetNavigationState(keyName)
+            updateNetworks()
         }
         .store(in: cancelBag)
     }

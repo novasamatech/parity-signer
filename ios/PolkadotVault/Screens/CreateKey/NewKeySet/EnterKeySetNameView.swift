@@ -47,7 +47,7 @@ struct EnterKeySetNameView: View {
                     isActive: $viewModel.isPresentingDetails
                 ) { EmptyView() }
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
             .navigationBarHidden(true)
             .background(Asset.backgroundPrimary.swiftUIColor)
             .fullScreenModal(

@@ -43,9 +43,9 @@ struct Snackbar: View {
         var tintColor: Color {
             switch self {
             case .info:
-                return Asset.fill12Solid.swiftUIColor
+                Asset.fill12Solid.swiftUIColor
             case .warning:
-                return Asset.accentRed400.swiftUIColor
+                Asset.accentRed400.swiftUIColor
             }
         }
     }

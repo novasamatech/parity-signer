@@ -79,7 +79,7 @@
 "SEED PHRASE" = "Secret Recovery Phrase";
 "RecoverSeedPhrase.Action.Next" = "Next";
 "RecoverSeedPhrase.Label.Title" = "Enter a Secret Recovery Phrase";
-"RecoverSeedPhrase.Label.Header" = "Enter a 24-word phrase you were given when you created your key set";
+"RecoverSeedPhrase.Label.Header" = "Enter a phrase you were given when you created your key set";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
@@ -139,8 +139,6 @@
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
 
-"PublicKeyDetails.Label.Title" = "Public Key";
-"PublicKeyDetails.Label.Subtitle" = "Derived Key";
 "PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
@@ -508,8 +506,15 @@
 "Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Polkadot Vault requires passcode confirmation. Using the application without a password is not allowed.";
 "Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
 "Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
-
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+
+
+"Error.ApplicationUpdateRequired.Label.Title" = "Upgrade your Polkadot Vault according\n to the requirements";
+"Error.ApplicationUpdateRequired.Label.Subtitle" = "The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements.";
+"Error.ApplicationUpdateRequired.Label.Info" = "Find the latest Polkadot Vault upgrade information here paritytech.github.io/parity-signer/tutorials/Upgrading.html";
+"Error.ApplicationUpdateRequired.Label.Info.Highlight" = "paritytech.github.io/parity-signer/tutorials/Upgrading.html";
+"Error.ApplicationUpdateRequired.Action.Backup" = "Backup Secret Phrase";
+
 
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";

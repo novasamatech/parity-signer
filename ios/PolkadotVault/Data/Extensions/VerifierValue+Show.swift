@@ -11,7 +11,7 @@ extension VerifierValue {
     func show() -> String {
         switch self {
         case let .standard(value):
-            return value[0]
+            value[0]
         }
     }
 }

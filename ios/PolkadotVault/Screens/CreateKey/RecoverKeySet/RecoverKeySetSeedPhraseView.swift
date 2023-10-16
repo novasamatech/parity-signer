@@ -207,9 +207,9 @@ extension RecoverKeySetSeedPhraseView {
         var id: UUID {
             switch self {
             case let .seedPhraseElement(element):
-                return element.id
+                element.id
             case let .input(input):
-                return input.id
+                input.id
             }
         }
     }

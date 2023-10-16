@@ -49,10 +49,8 @@ import io.parity.signer.components.panels.BottomBar
 import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.conditional
@@ -78,16 +76,16 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
+	onShowRoot: Callback,
 	onAddNewKey: Callback,
 	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
-	onShowPublicKey: (title: String, key: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
 			onAddKey = onAddNewKey,
 			onBack = onBack,
-			onMenu = onMenu, //navigator.navigate(Action.RIGHT_BUTTON_ACTION) was in rust navigation
+			onMenu = onMenu,
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			if (model.keysAndNetwork.isNotEmpty()) {
@@ -96,7 +94,7 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowRoot)
 
 					FilterRow(onFilterClicked)
 
@@ -116,12 +114,12 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowRoot)
 					KeySetDetailsEmptyList(onAdd = onAddNewKey)
 				}
 			} else {
 				Column() {
-					SeedKeyItemElement(model, onShowPublicKey)
+					SeedKeyItemElement(model, onShowRoot)
 					//no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
@@ -152,13 +150,13 @@ fun KeySetDetailsScreenView(
 @Composable
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
-	onShowPublicKey: (title: String, key: String) -> Unit,
+	onShowRoot: Callback,
 ) {
 	model.root?.let {
 		SeedKeyDetails(
 			model = it,
-			onShowPublicKey = onShowPublicKey,
-			Modifier
+			onShowRoot = onShowRoot,
+			modifier = Modifier
 				.padding(horizontal = 24.dp, vertical = 8.dp)
 				.padding(bottom = 16.dp)
 		)
@@ -349,7 +347,7 @@ private fun PreviewKeySetDetailsScreen() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ -> },
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -383,7 +381,7 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ -> },
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}
@@ -417,7 +415,7 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				onMenu = {},
 				onAddNewKey = {},
 				onBack = {},
-				onShowPublicKey = { _, _ -> },
+				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
 		}

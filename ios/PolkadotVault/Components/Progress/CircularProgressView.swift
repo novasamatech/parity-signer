@@ -110,7 +110,7 @@ struct CircularProgressView: View {
                 lastApplicationState = updatedState
                 switch updatedState {
                 case .active:
-                    guard let moveToBackgroundDate = moveToBackgroundDate else { return }
+                    guard let moveToBackgroundDate else { return }
                     let timePassed = Date().timeIntervalSince(moveToBackgroundDate)
                     counter = max(0, counter - timePassed)
                     if counter < 0 {

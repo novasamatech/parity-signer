@@ -33,7 +33,7 @@ struct ActionableInfoBoxView: View {
                     .foregroundColor(Asset.accentPink300.swiftUIColor)
                     .padding(.leading, Spacing.medium)
             }
-            if let action = action {
+            if let action {
                 Text(action.name)
                     .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
                     .font(PrimaryFont.labelS.font)

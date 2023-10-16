@@ -35,13 +35,13 @@ extension Encryption: RawRepresentable {
     public var rawValue: String {
         switch self {
         case .ecdsa:
-            return EncryptionValues.ecdsa.rawValue
+            EncryptionValues.ecdsa.rawValue
         case .ed25519:
-            return EncryptionValues.ed25519.rawValue
+            EncryptionValues.ed25519.rawValue
         case .sr25519:
-            return EncryptionValues.sr25519.rawValue
+            EncryptionValues.sr25519.rawValue
         case .ethereum:
-            return EncryptionValues.ethereum.rawValue
+            EncryptionValues.ethereum.rawValue
         }
     }
 }

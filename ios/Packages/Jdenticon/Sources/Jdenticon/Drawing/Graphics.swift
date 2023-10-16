@@ -20,11 +20,10 @@ final class Graphics {
         let currentTransform = transform
         var transformedPoints = [CGPoint]()
 
-        let indices: [Int]
-        if inverted {
-            indices = points.indices.reversed()
+        let indices: [Int] = if inverted {
+            points.indices.reversed()
         } else {
-            indices = Array(points.indices)
+            Array(points.indices)
         }
 
         indices.forEach { index in

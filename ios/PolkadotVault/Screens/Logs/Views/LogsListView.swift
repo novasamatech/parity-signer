@@ -116,10 +116,10 @@ extension LogsListView {
                 switch result {
                 case let .success(logs):
                     self.logs = logs
-                    self.renderables = self.renderableBuilder.build(logs)
+                    renderables = renderableBuilder.build(logs)
                 case let .failure(error):
-                    self.presentableError = .init(title: error.description)
-                    self.isPresentingError = true
+                    presentableError = .init(title: error.description)
+                    isPresentingError = true
                 }
             }
         }
@@ -145,12 +145,12 @@ extension LogsListView {
                 guard let self else { return }
                 switch result {
                 case let .success(logDetails):
-                    self.selectedDetails = logDetails
-                    self.isPresentingDetails = true
+                    selectedDetails = logDetails
+                    isPresentingDetails = true
                 case let .failure(error):
-                    self.selectedDetails = nil
-                    self.presentableError = .init(title: error.description)
-                    self.isPresentingError = true
+                    selectedDetails = nil
+                    presentableError = .init(title: error.description)
+                    isPresentingError = true
                 }
             }
         }
@@ -164,10 +164,10 @@ extension LogsListView {
                 guard let self else { return }
                 switch result {
                 case .success:
-                    self.loadData()
+                    loadData()
                 case let .failure(error):
-                    self.presentableError = .init(title: error.description)
-                    self.isPresentingError = true
+                    presentableError = .init(title: error.description)
+                    isPresentingError = true
                 }
             }
         }

@@ -147,12 +147,11 @@ struct ExportKeysSelectionModal: View {
     var selectionTitle: String {
         let localizable = Localizable.KeyDetails.Overlay.Label.self
         let itemsCount = viewModel.selectedKeys.count + 1
-        let result: String
-        switch itemsCount {
+        let result: String = switch itemsCount {
         case 1:
-            result = localizable.title(String(itemsCount), localizable.Key.single.string)
+            localizable.title(String(itemsCount), localizable.Key.single.string)
         default:
-            result = localizable.title(String(itemsCount), localizable.Key.plural.string)
+            localizable.title(String(itemsCount), localizable.Key.plural.string)
         }
         return result
     }

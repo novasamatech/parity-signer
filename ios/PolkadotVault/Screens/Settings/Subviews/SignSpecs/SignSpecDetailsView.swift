@@ -1,5 +1,5 @@
 //
-//  SignSpecDetails.swift
+//  SignSpecDetailsView.swift
 //  PolkadotVault
 //
 //  Created by Krzysztof Rodak on 22/03/2023.

@@ -454,13 +454,13 @@ extension NetworkSettingsDetails {
 private extension NetworkSettingsDetails.ViewModel {
     func updateView() {
         networkDetailsService.getNetworkDetails(networkKey) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             switch result {
             case let .success(updatedNetworkDetails):
-                self.networkDetails = updatedNetworkDetails
+                networkDetails = updatedNetworkDetails
             case let .failure(error):
-                self.presentableError = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
+                presentableError = .alertError(message: error.localizedDescription)
+                isPresentingError = true
             }
         }
     }
@@ -468,8 +468,8 @@ private extension NetworkSettingsDetails.ViewModel {
     func listenToNavigationUpdates() {
         guard cancelBag.subscriptions.isEmpty else { return }
         $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
-            guard let self = self, !isPresentingSignSpecList else { return }
-            self.updateView()
+            guard let self, !isPresentingSignSpecList else { return }
+            updateView()
         }.store(in: cancelBag)
     }
 }
