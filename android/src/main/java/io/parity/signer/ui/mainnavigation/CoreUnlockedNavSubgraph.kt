@@ -1,5 +1,9 @@
 package io.parity.signer.ui.mainnavigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
@@ -28,6 +32,31 @@ fun CoreUnlockedNavSubgraph() {
 	NavHost(
 		navController = navController,
 		startDestination = CoreUnlockedNavSubgraph.KeySet.destination(null),
+		enterTransition = {
+			slideIntoContainer(
+				AnimatedContentTransitionScope.SlideDirection.End,
+				animationSpec = tween()
+			)
+		},
+		exitTransition = {
+			slideOutOfContainer(
+				AnimatedContentTransitionScope.SlideDirection.End,
+				animationSpec = tween()
+			)
+		},
+		popEnterTransition = {
+			slideIntoContainer(
+				AnimatedContentTransitionScope.SlideDirection.Start,
+				animationSpec = tween()
+			)
+		},
+		popExitTransition = {
+			EnterTransition.None
+			slideOutOfContainer(
+				AnimatedContentTransitionScope.SlideDirection.Start,
+				animationSpec = tween()
+			)
+		}
 	) {
 		keySetDetailsDestination(navController)
 		composable(CoreUnlockedNavSubgraph.newKeySet) {
@@ -78,7 +107,21 @@ fun CoreUnlockedNavSubgraph() {
 				seedName = seedName,
 			)
 		}
-		composable(CoreUnlockedNavSubgraph.camera) {
+		composable(
+			CoreUnlockedNavSubgraph.camera,
+			enterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Up,
+					animationSpec = tween()
+				)
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Down,
+					animationSpec = tween()
+				)
+			},
+		) {
 			ScanNavSubgraph(
 				onCloseCamera = {
 					navController.popBackStack()
@@ -114,7 +157,8 @@ object CoreUnlockedNavSubgraph {
 		private const val baseRoute = "core_keyset_details_home"
 		const val route = "$baseRoute?$seedName={$seedName}" //optional
 		fun destination(seedNameValue: String?): String {
-			val result = if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
+			val result =
+				if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
 			return result
 		}
 	}
