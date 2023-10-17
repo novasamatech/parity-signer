@@ -2,10 +2,14 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
+import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.FeatureFlags
+import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
@@ -116,12 +120,14 @@ class CameraViewModel() : ViewModel() {
 							//we passed a null password in qrparserTryDecodeQrSequence so we can't get there
 							submitErrorState("cannot happen here that for scanning we don't have password request")
 						}
+
 						BananaSplitRecoveryResult.RequestPassword -> {
 							resetScanValues()
 							_bananaSplitPayload.value = completePayload
 						}
 					}
 				}
+
 				is DecodeSequenceResult.Other -> {
 					val actualPayload = payload.s
 					resetScanValues()
@@ -129,14 +135,31 @@ class CameraViewModel() : ViewModel() {
 				}
 
 				is DecodeSequenceResult.DynamicDerivations -> {
-					resetScanValues()
-					_dynamicDerivationPayload.value = payload.s
+					if (FeatureFlags.isEnabled(FeatureOption.ENABLE_DYNAMIC_DERIVATIONS)) {
+						resetScanValues()
+						_dynamicDerivationPayload.value = payload.s
+					} else {
+						val context = ServiceLocator.appContext
+						Toast.makeText(
+							context,
+							"Dynamic derivations not supported yet",
+							Toast.LENGTH_LONG
+						).show()
+					}
 				}
 
 				is DecodeSequenceResult.DynamicDerivationTransaction -> {
-					resetScanValues()
-					_dynamicDerivationTransactionPayload.value = payload.s
-
+					if (FeatureFlags.isEnabled(FeatureOption.ENABLE_DYNAMIC_DERIVATIONS)) {
+						resetScanValues()
+						_dynamicDerivationTransactionPayload.value = payload.s
+					} else {
+						val context = ServiceLocator.appContext
+						Toast.makeText(
+							context,
+							"Dynamic derivations not supported yet",
+							Toast.LENGTH_LONG
+						).show()
+					}
 				}
 			}
 
