@@ -25,7 +25,7 @@ struct LogsListView: View {
                         title: .title(Localizable.LogsList.Label.title.string),
                         leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .more, action: viewModel.onMoreMenuTap)],
-                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                        backgroundColor: .backgroundPrimary
                     )
                 )
                 ScrollView {
@@ -39,7 +39,7 @@ struct LogsListView: View {
                     }
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {

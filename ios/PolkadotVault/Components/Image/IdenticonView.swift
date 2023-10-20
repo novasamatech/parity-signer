@@ -40,11 +40,11 @@ struct IdenticonView: View {
         case let .jdenticon(identity):
             ZStack {
                 Circle()
-                    .stroke(Asset.appliedStroke.swiftUIColor, lineWidth: 2)
+                    .stroke(.appliedStroke, lineWidth: 2)
                     .frame(width: rowHeight, height: rowHeight)
                     .overlay(
                         Circle()
-                            .fill(Asset.backgroundSystemLightOnly.swiftUIColor)
+                            .fill(.backgroundSystemLightOnly)
                     )
                 JdenticonView(hash: identity, size: rowHeight / sqrt(2.0))
             }

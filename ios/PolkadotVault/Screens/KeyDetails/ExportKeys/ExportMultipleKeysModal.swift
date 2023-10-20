@@ -82,7 +82,7 @@ struct ExportMultipleKeysModal: View {
                 viewModel.viewModel.derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                 id: \.id
             ) {
-                ExportDerivedKeyView(dataModel: $0, backgroundColor: Asset.fill6Solid.swiftUIColor)
+                ExportDerivedKeyView(dataModel: $0, backgroundColor: .fill6Solid)
                 if $0 != viewModel.viewModel.derivedKeys.last {
                     Divider()
                 }
@@ -96,7 +96,7 @@ private extension ExportMultipleKeysModal {
     var header: some View {
         HStack {
             Text(headerName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
             CloseModalButton(action: animateDismissal)
@@ -122,10 +122,10 @@ private struct ExportDerivedKeyView: View {
             HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                 VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                     fullPath
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .font(PrimaryFont.captionM.font)
                     Text(dataModel.viewModel.rootKeyName)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyM.font)
                 }
                 Spacer()
@@ -139,12 +139,12 @@ private struct ExportDerivedKeyView: View {
             HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
                 Group {
                     Text(showFullAddress ? dataModel.viewModel.base58 : dataModel.viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .frame(idealWidth: .infinity, alignment: .leading)
                     if !showFullAddress {
-                        Asset.chevronDown.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        Image(.chevronDown)
+                            .foregroundColor(.textAndIconsSecondary)
                             .padding(.leading, Spacing.extraExtraSmall)
                     }
                 }

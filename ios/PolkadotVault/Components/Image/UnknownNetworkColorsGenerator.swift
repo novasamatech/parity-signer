@@ -42,15 +42,15 @@ final class UnknownNetworkColorsGenerator {
 private extension Color {
     static let unknownNetworkBackgrounds: Set<UnknownNetworkRenderable> = .init(
         arrayLiteral:
-        .init(background: Asset.cyan500.swiftUIColor, text: Asset.accentForegroundTextAlt.swiftUIColor),
-        .init(background: Asset.gray500.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.gray600.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.gray800.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.green700.swiftUIColor, text: Asset.accentForegroundTextAlt.swiftUIColor),
-        .init(background: Asset.lime600.swiftUIColor, text: Asset.accentForegroundTextAlt.swiftUIColor),
-        .init(background: Asset.pink300.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.pink500.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.purple400.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor),
-        .init(background: Asset.purple600.swiftUIColor, text: Asset.accentForegroundText.swiftUIColor)
+        .init(background: .cyan500, text: .accentForegroundTextAlt),
+        .init(background: .gray500, text: .accentForegroundText),
+        .init(background: .gray600, text: .accentForegroundText),
+        .init(background: .gray800, text: .accentForegroundText),
+        .init(background: .green700, text: .accentForegroundTextAlt),
+        .init(background: .lime600, text: .accentForegroundTextAlt),
+        .init(background: .pink300, text: .accentForegroundText),
+        .init(background: .pink500, text: .accentForegroundText),
+        .init(background: .purple400, text: .accentForegroundText),
+        .init(background: .purple600, text: .accentForegroundText)
     )
 }

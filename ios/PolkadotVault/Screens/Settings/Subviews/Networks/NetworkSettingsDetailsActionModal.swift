@@ -22,13 +22,13 @@ struct NetworkSettingsDetailsActionModal: View {
                     // Sign Specs
                     ActionSheetButton(
                         action: { animateDismissal { shouldSignSpecs = true } },
-                        icon: Asset.signSpecs.swiftUIImage,
+                        icon: Image(.signSpecs),
                         text: Localizable.Settings.NetworkDetails.More.Action.sign.key
                     )
                     // Remove Network
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentRemoveNetworkConfirmation = true } },
-                        icon: Asset.delete.swiftUIImage,
+                        icon: Image(.delete),
                         text: Localizable.Settings.NetworkDetails.More.Action.delete.key,
                         style: .destructive
                     )

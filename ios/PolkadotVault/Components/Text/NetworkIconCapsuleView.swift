@@ -16,12 +16,12 @@ struct NetworkIconCapsuleView: View {
             NetworkLogoIcon(networkName: networkLogo, size: Heights.networkLogoInCapsule)
                 .padding(.trailing, Spacing.extraSmall)
             Text(networkTitle.capitalized)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .foregroundColor(.textAndIconsSecondary)
                 .font(PrimaryFont.bodyM.font)
                 .padding(.trailing, Spacing.extraSmall)
         }
         .padding(Spacing.minimal)
-        .background(Asset.fill12.swiftUIColor)
+        .background(.fill12)
         .clipShape(Capsule())
     }
 }

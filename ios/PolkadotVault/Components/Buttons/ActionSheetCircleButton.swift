@@ -16,9 +16,9 @@ struct ActionSheetCircleButtonStyle: ButtonStyle {
             .font(PrimaryFont.titleS.font)
     }
 
-    static let destructive = ActionSheetCircleButtonStyle(foregroundColor: Asset.accentRed400.swiftUIColor)
-    static let `default` = ActionSheetCircleButtonStyle(foregroundColor: Asset.textAndIconsSecondary.swiftUIColor)
-    static let hightlighted = ActionSheetCircleButtonStyle(foregroundColor: Asset.textAndIconsPrimary.swiftUIColor)
+    static let destructive = ActionSheetCircleButtonStyle(foregroundColor: .accentRed400)
+    static let `default` = ActionSheetCircleButtonStyle(foregroundColor: .textAndIconsSecondary)
+    static let hightlighted = ActionSheetCircleButtonStyle(foregroundColor: .textAndIconsPrimary)
 }
 
 struct ActionSheetCircleButton: View {
@@ -44,7 +44,7 @@ struct ActionSheetCircleButton: View {
             HStack(alignment: .center, spacing: Spacing.small) {
                 icon
                     .frame(width: Sizes.actionSheetCircleIcon, height: Sizes.actionSheetCircleIcon)
-                    .background(Circle().foregroundColor(Asset.fill6.swiftUIColor))
+                    .background(Circle().foregroundColor(.fill6))
                 Text(text)
                 Spacer()
             }

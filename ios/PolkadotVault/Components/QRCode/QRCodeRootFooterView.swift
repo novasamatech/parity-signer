@@ -25,16 +25,16 @@ struct QRCodeRootFooterView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
             Text(Localizable.PublicKeyDetails.Label.keys(viewModel.keyName))
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyM.font)
             HStack(spacing: Spacing.extraExtraSmall) {
                 Text(showFullAddress ? viewModel.base58 : viewModel.base58.truncateMiddle())
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.bodyM.font)
                     .frame(idealWidth: .infinity, alignment: .leading)
                 if !showFullAddress {
-                    Asset.chevronDown.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    Image(.chevronDown)
+                        .foregroundColor(.textAndIconsSecondary)
                         .padding(.leading, Spacing.extraExtraSmall)
                 }
                 Spacer()
@@ -60,7 +60,7 @@ struct QRCodeRootFooterView: View {
                     QRCodeRootFooterView(
                         viewModel: .stub
                     )
-                    .background(Asset.fill6Solid.swiftUIColor)
+                    .background(.fill6Solid)
                     Spacer()
                 }
                 .background(.white)

@@ -19,7 +19,7 @@ struct SettingsView: View {
                         title: .title(Localizable.Settings.Label.title.string),
                         leftButtons: [.init(type: .xmark, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .empty)],
-                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                        backgroundColor: .backgroundPrimary
                     )
                 )
                 ScrollView {
@@ -33,14 +33,14 @@ struct SettingsView: View {
                         }
                         Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
                             .font(PrimaryFont.captionM.font)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .foregroundColor(.textAndIconsTertiary)
                             .padding(.top, Spacing.medium)
                             .padding(.horizontal, Spacing.large)
                             .padding(.bottom, Spacing.extraSmall)
                     }
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             NavigationLink(
                 destination: detailView(viewModel.detailScreen)
                     .navigationBarHidden(true),
@@ -49,7 +49,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 ConnectivityAlertOverlay(viewModel: .init())
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
         .onAppear {
             viewModel.loadData()

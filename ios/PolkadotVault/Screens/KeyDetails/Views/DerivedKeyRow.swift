@@ -15,7 +15,7 @@ struct DerivedKeyRow: View {
             NetworkIdenticon(
                 identicon: viewModel.identicon,
                 network: viewModel.network,
-                background: Asset.backgroundPrimary.swiftUIColor,
+                background: .backgroundPrimary,
                 size: Heights.identiconInCell
             )
             .padding(.top, Spacing.extraExtraSmall)
@@ -23,20 +23,20 @@ struct DerivedKeyRow: View {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 if !isRoot {
                     fullPath
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .font(PrimaryFont.captionM.font)
                 }
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Text(viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                 }
             }
             Spacer()
             VStack(alignment: .center) {
-                Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                Image(.chevronRight)
+                    .foregroundColor(.textAndIconsSecondary)
             }
             .padding(.trailing, Spacing.large)
             .frame(minHeight: .zero, maxHeight: .infinity)

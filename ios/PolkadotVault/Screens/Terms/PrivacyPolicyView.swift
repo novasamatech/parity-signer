@@ -21,18 +21,18 @@ struct PrivacyPolicyView: View {
                         action: { viewModel.onBackTap?() ?? presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             ScrollView {
                 Text(TextResources.privacyPolicy.text)
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .padding(.horizontal, Spacing.large)
                     .padding(.vertical, Spacing.medium)
             }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
     }
 }
 

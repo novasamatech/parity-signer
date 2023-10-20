@@ -62,10 +62,10 @@ struct SelectKeySetsForNetworkKeyView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
             Text(Localizable.SelectKeySetsForNetworkKey.Label.title(viewModel.networkName))
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
             Localizable.SelectKeySetsForNetworkKey.Label.content.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
         }
         .padding(.horizontal, Spacing.large)
@@ -94,14 +94,14 @@ struct SelectKeySetsForNetworkKeyView: View {
     func item(for seedName: String) -> some View {
         HStack(alignment: .center, spacing: 0) {
             Text(seedName.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
             if viewModel.isSelected(seedName) {
-                Asset.checkmarkChecked.swiftUIImage
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                Image(.checkmarkChecked)
+                    .foregroundColor(.accentPink300)
             } else {
-                Asset.checkmarkUnchecked.swiftUIImage
+                Image(.checkmarkUnchecked)
             }
         }
         .contentShape(Rectangle())
@@ -116,7 +116,7 @@ struct SelectKeySetsForNetworkKeyView: View {
     func selectAllSeeds() -> some View {
         HStack(alignment: .center, spacing: 0) {
             Localizable.SelectKeySetsForNetworkKey.Action.selectAll.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
         }

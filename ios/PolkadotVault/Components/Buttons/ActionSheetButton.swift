@@ -18,9 +18,9 @@ struct ActionSheetButtonStyle: ButtonStyle {
             .font(PrimaryFont.labelL.font)
     }
 
-    static let destructive = ActionSheetButtonStyle(foregroundColor: Asset.accentRed400.swiftUIColor)
-    static let `default` = ActionSheetButtonStyle(foregroundColor: Asset.textAndIconsSecondary.swiftUIColor)
-    static let hightlighted = ActionSheetButtonStyle(foregroundColor: Asset.textAndIconsPrimary.swiftUIColor)
+    static let destructive = ActionSheetButtonStyle(foregroundColor: .accentRed400)
+    static let `default` = ActionSheetButtonStyle(foregroundColor: .textAndIconsSecondary)
+    static let hightlighted = ActionSheetButtonStyle(foregroundColor: .textAndIconsPrimary)
 }
 
 struct ActionSheetButton: View {

@@ -24,7 +24,7 @@ struct CreateKeySetSeedPhraseView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
                         Localizable.NewSeed.Backup.Label.header.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleM.font)
                             .multilineTextAlignment(.leading)
                             .lineSpacing(Spacing.extraSmall)
@@ -50,15 +50,11 @@ struct CreateKeySetSeedPhraseView: View {
                             },
                             label: {
                                 HStack {
-                                    (
-                                        viewModel.confirmBackup ? Asset.checkboxChecked.swiftUIImage : Asset
-                                            .checkboxEmpty
-                                            .swiftUIImage
-                                    )
-                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                    Image(viewModel.confirmBackup ?.checkboxChecked : .checkboxEmpty)
+                                        .foregroundColor(.accentPink300)
                                     Localizable.NewSeed.Backup.Label.confirmation.text
                                         .multilineTextAlignment(.leading)
-                                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                        .foregroundColor(.textAndIconsSecondary)
                                     Spacer()
                                 }
                             }
@@ -88,7 +84,7 @@ struct CreateKeySetSeedPhraseView: View {
                     isActive: $viewModel.isPresentingDetails
                 ) { EmptyView() }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingInfo
             ) {

@@ -19,18 +19,18 @@ struct TCEnumVariantName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                         Spacer()
                         if !value.docsEnumVariant.isEmpty {
-                            Asset.questionCircle.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                            Image(.questionCircle)
+                                .foregroundColor(.textAndIconsDisabled)
                         }
                     }
                     if showDoc {
                         withAnimation {
                             VStack(alignment: .leading) {
                                 Text.markdownWithFallback(value.docsEnumVariant)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                 HStack {
                                     Spacer()
                                 }

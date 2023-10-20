@@ -32,7 +32,7 @@ struct TransactionDetailsView: View {
                 .padding(.horizontal, Spacing.large)
             }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
     }
 }
 

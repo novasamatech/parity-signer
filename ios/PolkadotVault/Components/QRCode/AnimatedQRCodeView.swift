@@ -85,8 +85,8 @@ struct AnimatedQRCodeView: View {
         )
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                .background(Asset.backgroundSystemLightOnly.swiftUIColor)
+                .stroke(.fill12, lineWidth: 1)
+                .background(.backgroundSystemLightOnly)
                 .cornerRadius(CornerRadius.medium)
         )
     }

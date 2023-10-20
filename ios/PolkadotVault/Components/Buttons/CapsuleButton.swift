@@ -35,13 +35,13 @@ struct CapsuleButton: View {
                 }
             }
             .foregroundColor(
-                isDisabled ? Asset.textAndIconsDisabled.swiftUIColor : Asset.accentForegroundText.swiftUIColor
+                isDisabled ? .textAndIconsDisabled : .accentForegroundText
             )
         }
         .padding([.leading], Spacing.medium)
         .padding([.trailing], icon == nil ? Spacing.medium : Spacing.small)
         .frame(height: Heights.capsuleButton)
-        .background(isDisabled ? Asset.fill6.swiftUIColor : Asset.accentPink500.swiftUIColor)
+        .background(isDisabled ? .fill6 : .accentPink500)
         .clipShape(Capsule())
         .disabled(isDisabled)
     }
@@ -54,12 +54,12 @@ struct CapsuleButton: View {
                 Spacer()
                 CapsuleButton(
                     action: {},
-                    icon: Asset.arrowForward.swiftUIImage,
+                    icon: Image(.arrowForward),
                     title: Localizable.Scanner.Action.sign.string
                 )
                 CapsuleButton(
                     action: {},
-                    icon: Asset.arrowForward.swiftUIImage,
+                    icon: Image(.arrowForward),
                     title: Localizable.Scanner.Action.sign.string,
                     isDisabled: .constant(true)
                 )

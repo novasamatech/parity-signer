@@ -46,10 +46,10 @@ struct BackupModal: View {
                     HStack {
                         VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                             Text(viewModel.header.keyName)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                                 .font(PrimaryFont.titleS.font)
                             Text(viewModel.header.base58.truncateMiddle())
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                .foregroundColor(.textAndIconsSecondary)
                                 .font(PrimaryFont.bodyM.font)
                         }
                         Spacer()
@@ -64,7 +64,7 @@ struct BackupModal: View {
                             // Seed phrase
                             HStack {
                                 Localizable.BackupModal.Label.secret.text
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                     .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }
@@ -72,7 +72,7 @@ struct BackupModal: View {
                             // Derived Keys
                             HStack {
                                 Localizable.BackupModal.Label.derived.text
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                     .font(PrimaryFont.bodyL.font)
                                 Spacer()
                             }

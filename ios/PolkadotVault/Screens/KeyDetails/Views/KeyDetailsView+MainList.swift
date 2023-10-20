@@ -18,17 +18,16 @@ extension KeyDetailsView {
                 Localizable.KeyDetails.Label.derived.text
                     .font(PrimaryFont.bodyM.font)
                 Spacer().frame(maxWidth: .infinity)
-                Asset.switches.swiftUIImage
+                Image(.switches)
                     .foregroundColor(
-                        viewModel.isFilteringActive ? Asset.accentPink300.swiftUIColor : Asset
-                            .textAndIconsTertiary.swiftUIColor
+                        viewModel.isFilteringActive ? .accentPink300 : .textAndIconsTertiary
                     )
                     .frame(width: Heights.actionSheetButton)
                     .onTapGesture {
                         viewModel.onNetworkSelectionTap()
                     }
             }
-            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            .foregroundColor(.textAndIconsTertiary)
             .padding(.horizontal, Spacing.large)
             .padding(.top, Spacing.medium)
             // List

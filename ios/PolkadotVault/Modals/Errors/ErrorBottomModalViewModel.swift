@@ -121,7 +121,7 @@ struct ErrorBottomModalViewModel {
 
     static func connectivityOn(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            icon: Asset.wifiOn.swiftUIImage,
+            icon: Image(.wifiOn),
             title: Localizable.Connectivity.Label.title.string,
             content: Localizable.Connectivity.Label.content.string,
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
@@ -133,7 +133,7 @@ struct ErrorBottomModalViewModel {
         continueAction: @escaping @autoclosure () -> Void
     ) -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
-            icon: Asset.wifiWasOn.swiftUIImage,
+            icon: Image(.wifiWasOn),
             title: Localizable.PastConnectivity.Label.title.string,
             content: Localizable.PastConnectivity.Label.content.string,
             primaryAction: .init(label: Localizable.PastConnectivity.Action.back.key, action: backAction),

@@ -38,11 +38,11 @@ struct RecoverKeySetSeedPhraseView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 0) {
                         Localizable.RecoverSeedPhrase.Label.title.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleL.font)
                             .padding(.top, Spacing.extraSmall)
                         Localizable.RecoverSeedPhrase.Label.header.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.bodyL.font)
                             .padding(.vertical, Spacing.extraSmall)
                         HStack {
@@ -108,7 +108,7 @@ struct RecoverKeySetSeedPhraseView: View {
                 .onAppear {
                     viewModel.onAppear()
                 }
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .background(.backgroundPrimary)
                 .fullScreenModal(
                     isPresented: $viewModel.isPresentingError
                 ) {
@@ -126,12 +126,12 @@ struct RecoverKeySetSeedPhraseView: View {
     func seedPhraseCapsule(_ element: SeedPhraseElement) -> some View {
         HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
             Text(element.position)
-                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .foregroundColor(.textAndIconsDisabled)
                 .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
                 .lineLimit(1)
                 .padding(.leading, Spacing.extraSmall)
             Text(element.word)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .lineLimit(1)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.trailing, Spacing.small)
@@ -170,11 +170,11 @@ struct RecoverKeySetSeedPhraseView: View {
     @ViewBuilder
     func guessCapsule(_ guess: String, scrollViewProxy: ScrollViewProxy) -> some View {
         Text(guess)
-            .foregroundColor(Asset.accentPink300.swiftUIColor)
+            .foregroundColor(.accentPink300)
             .font(PrimaryFont.labelS.font)
             .padding([.top, .bottom], Spacing.extraSmall)
             .padding(.horizontal, Spacing.small)
-            .background(Asset.accentPink12.swiftUIColor)
+            .background(.accentPink12)
             .clipShape(Capsule())
             .onTapGesture {
                 viewModel.onGuessTap(guess)

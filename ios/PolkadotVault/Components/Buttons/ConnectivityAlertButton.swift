@@ -30,13 +30,13 @@ struct ConnectivityAlertButton: View {
                             height: Sizes.connectivityAlertDiameter,
                             alignment: .center
                         )
-                        .foregroundColor(Asset.accentRed400.swiftUIColor)
+                        .foregroundColor(.accentRed400)
                     if isConnectivityOn {
-                        Asset.connectivityIsOn.swiftUIImage
-                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                        Image(.connectivityIsOn)
+                            .foregroundColor(.accentForegroundText)
                     } else {
-                        Asset.connectivityWasOn.swiftUIImage
-                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                        Image(.connectivityWasOn)
+                            .foregroundColor(.accentForegroundText)
                     }
                 }
             }

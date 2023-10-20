@@ -27,7 +27,7 @@ struct NetworkSelectionModal: View {
                     // Header with X button
                     HStack {
                         Localizable.NetworkFilter.Label.header.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: viewModel.resetAction)
@@ -67,14 +67,14 @@ struct NetworkSelectionModal: View {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.labelM.font)
             Spacer()
             if viewModel.isSelected(network) {
-                Asset.checkmarkChecked.swiftUIImage
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                Image(.checkmarkChecked)
+                    .foregroundColor(.accentPink300)
             } else {
-                Asset.checkmarkUnchecked.swiftUIImage
+                Image(.checkmarkUnchecked)
             }
         }
         .contentShape(Rectangle())

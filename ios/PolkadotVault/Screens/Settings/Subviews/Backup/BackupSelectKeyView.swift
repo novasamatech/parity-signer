@@ -21,12 +21,12 @@ struct BackupSelectKeyView: View {
                         action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             ScrollView {
                 Localizable.Settings.SelectKey.header.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.titleL.font)
                     .padding(.horizontal, Spacing.large)
                     .padding(.vertical, Spacing.medium)
@@ -39,7 +39,7 @@ struct BackupSelectKeyView: View {
                 }
             }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingBackupModal,
             onDismiss: { viewModel.seedPhraseToPresent = .init(keyName: "", seedPhrase: .init(seedPhrase: "")) }
@@ -67,15 +67,15 @@ struct BackupSelectKeyView: View {
     func seedNameView(_ seedName: String) -> some View {
         HStack(alignment: .center) {
             Text(seedName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
-            Asset.chevronRight.swiftUIImage
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Image(.chevronRight)
+                .foregroundColor(.textAndIconsTertiary)
         }
         .padding(.horizontal, Spacing.medium)
         .frame(height: Heights.settingsSelectKeyEntryHeight)
-        .background(Asset.fill6.swiftUIColor)
+        .background(.fill6)
         .cornerRadius(CornerRadius.small)
         .contentShape(Rectangle())
         .onTapGesture { viewModel.onSeedNameTap(seedName) }

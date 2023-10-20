@@ -31,10 +31,10 @@ struct KeyDetailsPublicKeyView: View {
                                 Localizable.KeyScreen.Label.hotkey.text
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .font(PrimaryFont.labelXS.font)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                 Spacer().frame(maxWidth: Spacing.small)
-                                Asset.exclamationRed.swiftUIImage
-                                    .foregroundColor(Asset.accentRed300.swiftUIColor)
+                                Image(.exclamationRed)
+                                    .foregroundColor(.accentRed300)
                             }
                             .padding(Spacing.medium)
                             .strokeContainerBackground(CornerRadius.small, state: .error)
@@ -51,7 +51,7 @@ struct KeyDetailsPublicKeyView: View {
                             .padding(Spacing.stroke)
                             QRCodeAddressFooterView(
                                 viewModel: viewModel.renderable.footer,
-                                backgroundColor: Asset.fill6Solid.swiftUIColor
+                                backgroundColor: .fill6Solid
                             )
                         }
                         .strokeContainerBackground()
@@ -67,7 +67,7 @@ struct KeyDetailsPublicKeyView: View {
                 minWidth: geo.size.width,
                 minHeight: geo.size.height
             )
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
@@ -157,7 +157,7 @@ private extension KeyDetailsPublicKeyView {
                 Localizable.PublicKeyDetails.Label.network.text
                     .frame(height: Spacing.large, alignment: .center)
                     .padding(.vertical, Spacing.small)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                 Spacer()
                 NetworkIconCapsuleView(
                     networkLogo: viewModel.renderable.networkLogo,
@@ -180,8 +180,8 @@ private extension KeyDetailsPublicKeyView {
         .padding(.horizontal, Spacing.medium)
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                .background(Asset.fill6.swiftUIColor)
+                .stroke(.fill12, lineWidth: 1)
+                .background(.fill6)
                 .cornerRadius(CornerRadius.medium)
         )
     }
@@ -194,13 +194,13 @@ private extension KeyDetailsPublicKeyView {
     ) -> some View {
         HStack(spacing: Spacing.medium) {
             Text(key)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .frame(height: Spacing.large, alignment: .center)
             Spacer()
             value
                 .frame(idealWidth: .infinity, alignment: .trailing)
                 .multilineTextAlignment(.trailing)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
         .padding(.vertical, Spacing.small)
         if !isLast {

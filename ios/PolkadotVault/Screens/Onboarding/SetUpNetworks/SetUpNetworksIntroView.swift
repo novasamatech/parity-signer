@@ -15,19 +15,19 @@ struct SetUpNetworksIntroView: View {
             // Header text
             Localizable.Onboarding.SetUpNetworks.Label.title.text
                 .font(PrimaryFont.titleL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .multilineTextAlignment(.center)
                 .padding(.top, Spacing.extraLarge)
                 .padding(.horizontal, Spacing.extraLarge)
                 .padding(.bottom, Spacing.medium)
             Localizable.Onboarding.SetUpNetworks.Label.content.text
                 .font(PrimaryFont.bodyM.font)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Spacing.large)
             Spacer()
             // Networks preview
-            Asset.networkPreviewIcons.swiftUIImage
+            Image(.networkPreviewIcons)
             Spacer()
             PrimaryButton(
                 action: viewModel.onSetUpTap,
@@ -44,7 +44,7 @@ struct SetUpNetworksIntroView: View {
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.large)
         }
-        .background(Asset.backgroundSystem.swiftUIColor)
+        .background(.backgroundSystem)
     }
 }
 

@@ -18,7 +18,7 @@ struct AddDerivedKeysView: View {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
                     leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             GeometryReader { geo in
@@ -42,7 +42,7 @@ struct AddDerivedKeysView: View {
                     )
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
         .fullScreenModal(
             isPresented: $viewModel.isPresentingError
@@ -83,11 +83,11 @@ struct AddDerivedKeysView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.AddDerivedKeys.Label.title.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
             Localizable.AddDerivedKeys.Label.header.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
         }
@@ -105,7 +105,7 @@ struct AddDerivedKeysView: View {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     Text(keySet.keySetName)
                         .font(PrimaryFont.titleS.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .multilineTextAlignment(.leading)
                         .padding(Spacing.medium)
                     Divider()
@@ -134,19 +134,19 @@ struct AddDerivedKeysView: View {
             NetworkIdenticon(
                 identicon: key.identicon,
                 network: key.network,
-                background: Asset.fill6.swiftUIColor,
+                background: .fill6,
                 size: Heights.identiconInAddDerivedKey
             )
             .padding(.vertical, Spacing.medium)
             .padding(.trailing, Spacing.extraSmall)
             VStack(alignment: .leading, spacing: 0) {
                 Text(key.path)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
                 Spacer().frame(height: Spacing.extraExtraSmall)
                 HStack(spacing: Spacing.extraExtraSmall) {
                     Text(key.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                 }
@@ -162,7 +162,7 @@ struct AddDerivedKeysView: View {
             // Header
             Localizable.AddDerivedKeys.Label.footer.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
             // QR Code container
             VStack(alignment: .leading, spacing: 0) {
                 AnimatedQRCodeView(
