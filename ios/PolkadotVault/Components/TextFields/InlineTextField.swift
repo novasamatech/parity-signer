@@ -12,7 +12,7 @@ struct InlineTextFieldStyle: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            .foregroundColor(.textAndIconsPrimary)
             .font(PrimaryFont.bodyM.font)
             .autocapitalization(.none)
             .disableAutocorrection(true)

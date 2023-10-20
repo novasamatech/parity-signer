@@ -131,7 +131,7 @@ struct OldTransactionBlock: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: CornerRadius.extraSmall)
-                .stroke(Asset.fill6.swiftUIColor)
+                .stroke(.fill6)
             VStack {
                 ForEach(cards, id: \.index) { card in
                     TransactionCardView(card: card)

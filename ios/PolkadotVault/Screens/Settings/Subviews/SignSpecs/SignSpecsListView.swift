@@ -23,7 +23,7 @@ struct SignSpecsListView: View {
                             presentationMode.wrappedValue.dismiss()
                         }
                     )],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             if let content = viewModel.content {
@@ -53,7 +53,7 @@ struct SignSpecsListView: View {
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingEnterPassword
         ) {
@@ -83,28 +83,28 @@ struct SignSpecsListView: View {
             NetworkIdenticon(
                 identicon: rawKey.address.identicon,
                 network: rawKey.networkLogo,
-                background: Asset.backgroundPrimary.swiftUIColor,
+                background: .backgroundPrimary,
                 size: Sizes.signSpecsIdenticonSize
             )
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 if !rawKey.address.displayablePath.isEmpty {
                     Text(rawKey.address.displayablePath)
                         .font(PrimaryFont.captionM.font)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
                 Text(rawKey.publicKey.truncateMiddle())
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                 Text(rawKey.address.seedName)
                     .font(PrimaryFont.bodyM.font)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
             }
             Spacer()
-            Asset.chevronRight.swiftUIImage
+            Image(.chevronRight)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(height: Heights.chevronRightInList)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(Spacing.small)
         }
         .frame(height: Heights.signSpecsListRowHeight)

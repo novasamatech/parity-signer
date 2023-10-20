@@ -22,7 +22,7 @@ struct SignSpecDetails: View {
                         type: .arrow,
                         action: viewModel.onBackTap
                     )],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             ScrollView {
@@ -32,7 +32,7 @@ struct SignSpecDetails: View {
                         .padding(.top, Spacing.extraSmall)
                         .padding(.bottom, Spacing.medium)
                     Localizable.SignSpecsDetails.Label.scanQRCode.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.extraSmall)
@@ -54,7 +54,7 @@ struct SignSpecDetails: View {
                 }
             }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
@@ -77,13 +77,13 @@ struct SignSpecDetails: View {
                         Text(Localizable.SignSpecsDetails.Label.networkMetadataSignature(name, String(version)))
                     }
                 }
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyM.font)
             }
             Divider()
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.SignSpecsDetails.Label.sign.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
                 HStack {
                     signatureDetails()
@@ -91,7 +91,7 @@ struct SignSpecDetails: View {
                     NetworkIdenticon(
                         identicon: viewModel.content.authorInfo.address.identicon,
                         network: viewModel.content.networkLogo,
-                        background: Asset.fill6Solid.swiftUIColor,
+                        background: .fill6Solid,
                         size: Heights.identiconInCell
                     )
                 }
@@ -106,22 +106,22 @@ struct SignSpecDetails: View {
         VStack(alignment: .leading, spacing: Spacing.minimal) {
             if !viewModel.content.authorInfo.address.displayablePath.isEmpty {
                 Text(viewModel.content.authorInfo.address.displayablePath)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
             }
             Text(viewModel.content.authorInfo.address.seedName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyM.font)
             HStack {
                 Text(
                     isShowingFullAddress ? viewModel.content.authorInfo.base58 : viewModel.content.authorInfo.base58
                         .truncateMiddle()
                 )
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .font(PrimaryFont.bodyM.font)
                 if !isShowingFullAddress {
-                    Asset.chevronDown.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Image(.chevronDown)
+                        .foregroundColor(.textAndIconsTertiary)
                         .padding(.leading, Spacing.extraExtraSmall)
                 }
             }

@@ -15,10 +15,10 @@ struct InfoBoxView: View {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
             Spacer().frame(maxWidth: Spacing.medium)
-            Asset.infoIconBold.swiftUIImage
-                .foregroundColor(Asset.accentPink300.swiftUIColor)
+            Image(.infoIconBold)
+                .foregroundColor(.accentPink300)
         }
         .padding()
         .font(PrimaryFont.bodyM.font)

@@ -14,31 +14,31 @@ struct TCVerifier: View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.Transaction.Verifier.Label.header.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .foregroundColor(.textAndIconsSecondary)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraExtraSmall)
             VStack {
                 VStack(spacing: Spacing.small) {
                     VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                         Localizable.Transaction.Verifier.Label.key.text
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .foregroundColor(.textAndIconsTertiary)
                         Text(value.publicKey)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                     }
                     Divider()
                     VStack(alignment: .leading) {
                         HStack {
                             Localizable.Transaction.Verifier.Label.crypto.text
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                .foregroundColor(.textAndIconsTertiary)
                             Spacer()
                             Text(value.encryption)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                         }
                     }
                 }
                 .padding(Spacing.medium)
             }
-            .background(Asset.fill6.swiftUIColor)
+            .background(.fill6)
             .cornerRadius(CornerRadius.medium)
             .padding(.bottom, Spacing.extraSmall)
         }

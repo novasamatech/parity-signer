@@ -14,7 +14,7 @@ struct PrimaryTextFieldStyle: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .foregroundColor(isValid ? Asset.textAndIconsPrimary.swiftUIColor : Asset.accentRed300.swiftUIColor)
+            .foregroundColor(isValid ? .textAndIconsPrimary : .accentRed300)
             .placeholder(placeholder, when: text.isEmpty)
             .font(PrimaryFont.bodyL.font)
             .autocapitalization(.none)
@@ -23,11 +23,11 @@ struct PrimaryTextFieldStyle: ViewModifier {
             .submitLabel(.return)
             .frame(height: Heights.textFieldHeight)
             .padding(.horizontal, Spacing.medium)
-            .background(Asset.fill6.swiftUIColor)
+            .background(.fill6)
             .cornerRadius(CornerRadius.small)
             .overlay(
                 RoundedRectangle(cornerRadius: CornerRadius.small)
-                    .stroke(isValid ? .clear : Asset.accentRed300.swiftUIColor, lineWidth: 1)
+                    .stroke(isValid ? .clear : .accentRed300, lineWidth: 1)
             )
     }
 }

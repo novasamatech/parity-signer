@@ -20,7 +20,7 @@ struct CreateKeysForNetworksView: View {
                 viewModel: NavigationBarViewModel(
                     title: .progress(current: viewModel.step, upTo: viewModel.step),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             GeometryReader { geo in
@@ -44,7 +44,7 @@ struct CreateKeysForNetworksView: View {
                 }
             }
 
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError,
                 onDismiss: { viewModel.onErrorDismiss?() }
@@ -70,11 +70,11 @@ struct CreateKeysForNetworksView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(viewModel.title())
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
             Text(viewModel.header())
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
         }
@@ -112,14 +112,14 @@ struct CreateKeysForNetworksView: View {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
             if viewModel.isSelected(network) {
-                Asset.checkmarkChecked.swiftUIImage
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                Image(.checkmarkChecked)
+                    .foregroundColor(.accentPink300)
             } else {
-                Asset.checkmarkUnchecked.swiftUIImage
+                Image(.checkmarkUnchecked)
             }
         }
         .contentShape(Rectangle())
@@ -134,7 +134,7 @@ struct CreateKeysForNetworksView: View {
     func selectAllNetworks() -> some View {
         HStack(alignment: .center, spacing: 0) {
             Localizable.CreateKeysForNetwork.Action.selectAll.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
         }

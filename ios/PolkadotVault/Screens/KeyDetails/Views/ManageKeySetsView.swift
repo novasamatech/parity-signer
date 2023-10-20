@@ -25,7 +25,7 @@ struct ManageKeySetsView: View {
                     // Header
                     HStack {
                         Localizable.ManageKeySets.Label.header.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: viewModel.onClose)
@@ -49,12 +49,12 @@ struct ManageKeySetsView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         ActionSheetCircleButton(
                             action: viewModel.onAddKeySet,
-                            icon: Asset.addSmall.swiftUIImage,
+                            icon: Image(.addSmall),
                             text: Localizable.ManageKeySets.Action.add.key
                         )
                         ActionSheetCircleButton(
                             action: viewModel.onRecoverKeySet,
-                            icon: Asset.recover.swiftUIImage,
+                            icon: Image(.recover),
                             text: Localizable.ManageKeySets.Action.recover.key
                         )
                     }
@@ -79,22 +79,22 @@ struct ManageKeySetsView: View {
             .padding(.vertical, Spacing.extraSmall)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 Text(keySet.seedName)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.titleS.font)
                 if let countLabel = viewModel.countLabel(for: keySet) {
                     Text(countLabel)
                         .font(PrimaryFont.captionM.font)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .padding(.bottom, Spacing.extraExtraSmall)
                 }
             }
             Spacer()
             VStack(alignment: .center) {
                 if viewModel.isSelected(keySet) {
-                    Asset.checkmarkList.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    Image(.checkmarkList)
+                        .foregroundColor(.textAndIconsPrimary)
                         .frame(width: Heights.manageKeySetSelectionIcon, height: Heights.manageKeySetSelectionIcon)
-                        .background(Circle().foregroundColor(Asset.fill6.swiftUIColor))
+                        .background(Circle().foregroundColor(.fill6))
                 }
             }
         }

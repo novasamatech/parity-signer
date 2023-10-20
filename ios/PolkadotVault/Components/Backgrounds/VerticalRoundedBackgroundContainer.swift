@@ -16,7 +16,7 @@ struct VerticalRoundedBackgroundContainer: ViewModifier {
             content
                 .padding(Spacing.medium)
         }
-        .background(Asset.fill6Solid.swiftUIColor)
+        .background(.fill6Solid)
         .cornerRadius(cornerRadius)
     }
 }

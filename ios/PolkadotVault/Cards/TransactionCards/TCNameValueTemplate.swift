@@ -27,11 +27,11 @@ struct TCNamedValueCard: View {
             HStack(alignment: .top, spacing: Spacing.extraSmall) {
                 if let name {
                     Text(name)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
                 if let value {
                     Text(value)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                 }
                 Spacer()
             }
@@ -40,11 +40,11 @@ struct TCNamedValueCard: View {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 if let name, name.isEmpty == false {
                     Text(name)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
                 if let value, value.isEmpty == false {
                     Text(value)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                 }
                 HStack {
                     Spacer()

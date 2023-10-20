@@ -25,13 +25,13 @@ struct CreateKeyNetworkSelectionView: View {
                         type: .xmark,
                         action: { presentationMode.wrappedValue.dismiss() }
                     )],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             .padding(.bottom, Spacing.extraSmall)
             // Content
             Localizable.CreateDerivedKey.Label.header.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.small)
@@ -52,7 +52,7 @@ struct CreateKeyNetworkSelectionView: View {
                 isActive: $viewModel.isPresentingDerivationPath
             ) { EmptyView() }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
@@ -97,11 +97,11 @@ struct CreateKeyNetworkSelectionView: View {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
-            Asset.chevronRight.swiftUIImage
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Image(.chevronRight)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.trailing, Spacing.extraSmall)
         }
         .contentShape(Rectangle())

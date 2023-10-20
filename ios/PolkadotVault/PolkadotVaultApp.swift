@@ -24,7 +24,7 @@ struct PolkadotVaultApp: App {
                     onboarding: OnboardingStateMachine()
                 )
                 .font(PrimaryFont.bodyL.font)
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .background(.backgroundPrimary)
                 .environmentObject(navigation)
                 .environmentObject(connectivityMediator)
                 .environmentObject(ServiceLocator.appState)

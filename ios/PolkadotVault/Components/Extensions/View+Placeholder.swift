@@ -15,7 +15,7 @@ extension View {
     ) -> some View {
         placeholder(when: shouldShow, alignment: alignment) {
             Text(text)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
         }
     }
 

@@ -10,7 +10,7 @@ import SwiftUI
 struct NavbarButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .foregroundColor(Asset.navbarIcon.swiftUIColor)
+            .foregroundColor(.navbarIcon)
             .frame(
                 width: Heights.navigationButton,
                 height: Heights.navigationButton,
@@ -50,11 +50,11 @@ struct NavbarButton: View {
             VStack(alignment: .leading, spacing: 10) {
                 NavbarButton(
                     action: {},
-                    icon: Asset.arrowBack.swiftUIImage
+                    icon: Image(.arrowBack)
                 )
                 NavbarButton(
                     action: {},
-                    icon: Asset.moreDots.swiftUIImage
+                    icon: Image(.moreDots)
                 )
             }
             .preferredColorScheme(.dark)
@@ -62,11 +62,11 @@ struct NavbarButton: View {
             VStack(alignment: .leading, spacing: 10) {
                 NavbarButton(
                     action: {},
-                    icon: Asset.arrowBack.swiftUIImage
+                    icon: Image(.arrowBack)
                 )
                 NavbarButton(
                     action: {},
-                    icon: Asset.moreDots.swiftUIImage
+                    icon: Image(.moreDots)
                 )
             }
             .preferredColorScheme(.light)

@@ -13,24 +13,24 @@ struct TCMeta: View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.Transaction.Metadata.Label.header.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .foregroundColor(.textAndIconsSecondary)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraExtraSmall)
             VStack(spacing: Spacing.small) {
                 VStack(alignment: .leading) {
                     HStack {
                         Localizable.Transaction.Metadata.Label.metadata.text
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .foregroundColor(.textAndIconsTertiary)
                         Spacer()
                         Text(value.specname)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                         Text(value.specsVersion)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                     }
                 }
                 Divider()
                 Text(value.metaHash)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
             }
             .verticalRoundedBackgroundContainer()
         }
