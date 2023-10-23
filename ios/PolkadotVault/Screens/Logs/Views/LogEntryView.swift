@@ -15,7 +15,7 @@ struct LogEntryView: View {
             if let date = viewModel.renderable.dateHeader {
                 HStack(alignment: .center) {
                     Text(date)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .font(PrimaryFont.bodyM.font)
                         .padding(.vertical, Spacing.small)
                 }
@@ -26,8 +26,8 @@ struct LogEntryView: View {
                         Text(viewModel.renderable.title)
                             .foregroundColor(
                                 viewModel.renderable.isWarning ?
-                                    Asset.accentRed300.swiftUIColor :
-                                    Asset.textAndIconsPrimary.swiftUIColor
+                                    .accentRed300 :
+                                    .textAndIconsPrimary
                             )
                             .font(PrimaryFont.titleS.font)
                         Spacer()
@@ -35,7 +35,7 @@ struct LogEntryView: View {
                             Text(viewModel.renderable.timestamp)
                                 .padding(.leading, Spacing.extraSmall)
                             if viewModel.renderable.type != .basic {
-                                Asset.chevronRight.swiftUIImage
+                                Image(.chevronRight)
                                     .frame(width: Heights.chevronLogElementWidth)
                             } else {
                                 Spacer()
@@ -45,20 +45,20 @@ struct LogEntryView: View {
                     }
                     if let displayValue = viewModel.renderable.displayValue, !displayValue.isEmpty {
                         Text(displayValue)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                             .font(PrimaryFont.bodyM.font)
                             .padding(.top, Spacing.small)
                             .padding(.trailing, Spacing.large)
                     }
                     if let additionalValue = viewModel.renderable.additionalValue, !additionalValue.isEmpty {
                         Text(additionalValue)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                             .font(PrimaryFont.captionM.font)
                             .padding(.top, Spacing.extraExtraSmall)
                             .padding(.trailing, Spacing.large)
                     }
                 }
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.vertical, Spacing.small)
             }
         }

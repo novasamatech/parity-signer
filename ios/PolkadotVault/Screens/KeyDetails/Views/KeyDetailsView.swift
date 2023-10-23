@@ -42,7 +42,7 @@ struct KeyDetailsView: View {
                 .onAppear {
                     viewModel.onAppear()
                 }
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .background(.backgroundPrimary)
                 VStack(spacing: 0) {
                     ConnectivityAlertOverlay(viewModel: .init())
                 }

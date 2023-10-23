@@ -31,7 +31,7 @@ struct ExportPrivateKeyModal: View {
                     // Header with X button
                     HStack {
                         Localizable.KeyExport.Label.header.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: animateDismissal)
@@ -53,7 +53,7 @@ struct ExportPrivateKeyModal: View {
                         .privacySensitive()
                         QRCodeAddressFooterView(
                             viewModel: viewModel.addressFooter,
-                            backgroundColor: Asset.fill6Solid.swiftUIColor
+                            backgroundColor: .fill6Solid
                         )
                     }
                     .redacted(
@@ -94,7 +94,7 @@ private struct ExportPrivateKeyAddressFooter: View {
     var body: some View {
         HStack {
             Localizable.KeyExport.Label.hide.text
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .foregroundColor(.textAndIconsSecondary)
                 .font(PrimaryFont.bodyL.font)
             CircularProgressView(
                 CircularCountdownModel(

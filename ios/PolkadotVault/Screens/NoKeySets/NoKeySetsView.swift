@@ -14,14 +14,14 @@ struct NoKeySetsView: View {
         VStack {
             Spacer()
             VStack(alignment: .center, spacing: Spacing.medium) {
-                Asset.logo.swiftUIImage
+                Image(.logo)
                 Localizable.NoKeySets.Label.header.text
                     .font(PrimaryFont.titleXL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .multilineTextAlignment(.center)
                 Localizable.NoKeySets.Label.subheader.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .multilineTextAlignment(.center)
             }
             .padding(.horizontal, Spacing.extraLarge)

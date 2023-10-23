@@ -49,7 +49,7 @@ struct RecoverKeySetNameView: View {
             }
             .navigationViewStyle(.stack)
             .navigationBarHidden(true)
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
     }
 
@@ -57,11 +57,11 @@ struct RecoverKeySetNameView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.RecoverSeedName.Label.title.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
             Localizable.RecoverSeedName.Label.content.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
             TextField("", text: $viewModel.seedName)
@@ -80,7 +80,7 @@ struct RecoverKeySetNameView: View {
                 }
                 .padding(.vertical, Spacing.medium)
             Localizable.RecoverSeedName.Label.footer.text
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .font(PrimaryFont.captionM.font)
             Spacer()
         }

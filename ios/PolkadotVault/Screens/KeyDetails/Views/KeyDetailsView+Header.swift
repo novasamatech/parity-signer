@@ -24,25 +24,25 @@ extension KeyDetailsView {
                         .font(PrimaryFont.titleXL.font)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.center)
-                    Asset.chevronDown.swiftUIImage
+                    Image(.chevronDown)
                         .resizable(resizingMode: .stretch)
                         .aspectRatio(contentMode: .fit)
                         .frame(width: Sizes.chevronDownKeyDetails)
                         .padding(Spacing.extraSmall)
                 }
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.top, Spacing.medium)
                 .padding(.bottom, Spacing.small)
                 .contentShape(Rectangle())
                 .onTapGesture { viewModel.onKeySetSelectionTap() }
                 HStack {
                     Text(keySummary.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.extraSmall)
-                        .background(Asset.fill6.swiftUIColor)
+                        .background(.fill6)
                         .clipShape(Capsule())
                 }
                 .contentShape(Rectangle())

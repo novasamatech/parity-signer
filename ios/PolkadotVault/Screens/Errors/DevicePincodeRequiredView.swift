@@ -13,33 +13,33 @@ struct DevicePincodeRequired: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
-            Asset.devicePincode.swiftUIImage
+            Image(.devicePincode)
                 .padding(.bottom, Spacing.extraExtraLarge)
             Localizable.Error.DevicePincodeRequired.Label.title.text
                 .font(PrimaryFont.titleL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.horizontal, Spacing.x3Large)
                 .padding(.bottom, Spacing.small)
             Localizable.Error.DevicePincodeRequired.Label.subtitle.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.medium)
             VStack(alignment: .leading, spacing: Spacing.small) {
                 HStack(alignment: .top, spacing: 0) {
                     Text("1")
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .frame(width: Spacing.large, alignment: .leading)
                     Localizable.Error.DevicePincodeRequired.Label.step1.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .lineSpacing(Spacing.extraExtraSmall)
                 }
                 HStack(alignment: .top, spacing: 0) {
                     Text("2")
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .frame(width: Spacing.large, alignment: .leading)
                     Localizable.Error.DevicePincodeRequired.Label.step2.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .lineSpacing(Spacing.extraExtraSmall)
                 }
             }
@@ -59,7 +59,7 @@ struct DevicePincodeRequired: View {
             Spacer()
         }
         .multilineTextAlignment(.center)
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
     }
 }
 

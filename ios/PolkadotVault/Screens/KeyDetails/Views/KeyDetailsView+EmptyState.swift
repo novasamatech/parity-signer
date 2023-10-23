@@ -13,7 +13,7 @@ extension KeyDetailsView {
         VStack(spacing: 0) {
             Localizable.KeyDetails.Label.EmptyState.header.text
                 .font(PrimaryFont.titleM.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.top, Spacing.large)
                 .padding(.horizontal, Spacing.componentSpacer)
             PrimaryButton(

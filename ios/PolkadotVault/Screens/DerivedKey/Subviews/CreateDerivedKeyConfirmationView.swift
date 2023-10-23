@@ -18,16 +18,16 @@ struct CreateDerivedKeyConfirmationView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Header
                     Localizable.CreateDerivedKey.Modal.Confirmation.title.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.titleL.font)
                         .padding(.bottom, Spacing.small)
                     Localizable.CreateDerivedKey.Modal.Confirmation.content.text
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .font(PrimaryFont.bodyL.font)
                         .padding(.bottom, Spacing.large)
                     VStack(alignment: .leading, spacing: 0) {
                         Localizable.CreateDerivedKey.Modal.Confirmation.header.text
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                             .font(PrimaryFont.bodyL.font)
                             .padding(.bottom, Spacing.extraSmall)
                         if viewModel.derivationPath.formattedAsPasswordedPath.isEmpty {
@@ -39,21 +39,21 @@ struct CreateDerivedKeyConfirmationView: View {
                         }
                         HStack { Spacer() }
                     }
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    .foregroundColor(.accentPink300)
                     .font(PrimaryFont.bodyL.font)
                     .padding(Spacing.medium)
                     .strokeContainerBackground()
                     .padding(.bottom, Spacing.medium)
                     HStack(spacing: Spacing.small) {
                         if viewModel.isCheckboxSelected {
-                            Asset.checkboxChecked.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            Image(.checkboxChecked)
+                                .foregroundColor(.textAndIconsPrimary)
                         } else {
-                            Asset.checkboxEmpty.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            Image(.checkboxEmpty)
+                                .foregroundColor(.textAndIconsPrimary)
                         }
                         Localizable.CreateDerivedKey.Modal.Confirmation.confirmation.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.bodyL.font)
                     }
                     .contentShape(Rectangle())

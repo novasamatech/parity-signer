@@ -17,13 +17,13 @@ struct OnboardingAirgapView: View {
                     // Header text
                     Localizable.Onboarding.Airgap.Label.title.text
                         .font(PrimaryFont.titleL.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .multilineTextAlignment(.center)
                         .padding(.top, Spacing.extraLarge)
                         .padding(.horizontal, Spacing.large)
                     Localizable.Onboarding.Airgap.Label.content.text
                         .font(PrimaryFont.bodyM.font)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.medium)
@@ -45,11 +45,11 @@ struct OnboardingAirgapView: View {
                     VStack(spacing: 0) {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(alignment: .center, spacing: Spacing.large) {
-                                Asset.airgapCables.swiftUIImage
+                                Image(.airgapCables)
                                     .padding(.leading, Spacing.extraSmall)
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsTertiary)
                                 Localizable.Onboarding.Airgap.Label.cables.text
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsTertiary)
                                     .font(PrimaryFont.bodyL.font)
                             }
                             .padding(.bottom, Spacing.medium)
@@ -57,18 +57,18 @@ struct OnboardingAirgapView: View {
                             HStack(alignment: .center, spacing: Spacing.large) {
                                 Group {
                                     if viewModel.isCableCheckBoxSelected {
-                                        Asset.checkboxChecked.swiftUIImage
-                                            .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                        Image(.checkboxChecked)
+                                            .foregroundColor(.accentPink300)
                                     } else {
-                                        Asset.checkboxEmpty.swiftUIImage
-                                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                        Image(.checkboxEmpty)
+                                            .foregroundColor(.textAndIconsPrimary)
                                     }
                                 }
                                 .padding(.leading, Spacing.extraSmall)
                                 Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
                                     .multilineTextAlignment(.leading)
                                     .fixedSize(horizontal: false, vertical: true)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                     .font(PrimaryFont.bodyL.font)
                             }
                             .padding(.top, Spacing.medium)
@@ -95,7 +95,7 @@ struct OnboardingAirgapView: View {
                     minHeight: geo.size.height
                 )
             }
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(.backgroundSystem)
         }
     }
 

@@ -22,13 +22,13 @@ struct LogsMoreActionsModal: View {
                     // Add Note
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentAddNoteModal.toggle() } },
-                        icon: Asset.add.swiftUIImage,
+                        icon: Image(.addLarge),
                         text: Localizable.LogsList.More.Action.add.key
                     )
                     // Clear Log
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentClearConfirmationModal.toggle() } },
-                        icon: Asset.delete.swiftUIImage,
+                        icon: Image(.delete),
                         text: Localizable.LogsList.More.Action.clear.key,
                         style: .destructive
                     )

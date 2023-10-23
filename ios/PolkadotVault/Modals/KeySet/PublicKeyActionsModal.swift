@@ -39,13 +39,13 @@ struct PublicKeyActionsModal: View {
                                     shouldPresentExportKeysWarningModal = true
                                 }
                             },
-                            icon: Asset.exportPrivateKeySmall.swiftUIImage,
+                            icon: Image(.exportPrivateKeySmall),
                             text: Localizable.PublicKeyDetailsModal.Action.share.key
                         )
                     }
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
-                        icon: Asset.delete.swiftUIImage,
+                        icon: Image(.delete),
                         text: Localizable.PublicKeyDetailsModal.Action.delete.key,
                         style: .destructive
                     )

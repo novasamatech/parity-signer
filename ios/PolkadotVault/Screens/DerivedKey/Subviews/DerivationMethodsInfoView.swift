@@ -21,7 +21,7 @@ struct DerivationMethodsInfoView: View {
                     // Header with X button
                     HStack {
                         Localizable.CreateDerivedKey.InfoModal.DerivationMethods.title.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: viewModel.animateDismissal)
@@ -32,22 +32,22 @@ struct DerivationMethodsInfoView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: Spacing.small) {
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Soft.title.text
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                                 .font(PrimaryFont.titleS.font)
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Soft.content.text
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                .foregroundColor(.textAndIconsSecondary)
                                 .font(PrimaryFont.bodyM.font)
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Hard.title.text
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                                 .font(PrimaryFont.titleS.font)
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Hard.content.text
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                .foregroundColor(.textAndIconsSecondary)
                                 .font(PrimaryFont.bodyM.font)
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Password.title.text
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                                 .font(PrimaryFont.titleS.font)
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Password.content.text
-                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                .foregroundColor(.textAndIconsSecondary)
                                 .font(PrimaryFont.bodyM.font)
                             SecondaryButton(
                                 action: viewModel.animateDismissal(),

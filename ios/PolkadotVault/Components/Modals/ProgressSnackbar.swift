@@ -27,32 +27,32 @@ struct ProgressSnackbar: View {
                     VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                         Text(viewModel.title)
                             .font(PrimaryFont.bodyL.font)
-                            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                            .foregroundColor(.accentForegroundText)
                         Text(
                             Localizable.Scanner.Label
                                 .progress(min(viewModel.current, viewModel.total), viewModel.total)
                         )
                         .font(PrimaryFont.captionM.font)
-                        .foregroundColor(Asset.textAndIconsTertiarySolid.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiarySolid)
                     }
                     Spacer()
                     Button(
                         action: { viewModel.cancelAction() }
                     ) {
                         Text(viewModel.cancelActionTitle)
-                            .foregroundColor(Asset.accentPink300.swiftUIColor)
+                            .foregroundColor(.accentPink300)
                             .font(PrimaryFont.labelM.font)
                     }
                     .padding(.trailing, Spacing.extraSmall)
                 }
                 ProgressView(value: min(Float(viewModel.current) / Float(viewModel.total), 1))
-                    .tint(Asset.accentPink300.swiftUIColor)
-                    .background(Asset.fill18LightOnly.swiftUIColor)
+                    .tint(.accentPink300)
+                    .background(.fill18LightOnly)
                     .cornerRadius(2)
             }
             .padding(Spacing.medium)
             .frame(height: Heights.progressSnackbarHeight, alignment: .center)
-            .background(Asset.fill12Solid.swiftUIColor)
+            .background(.fill12Solid)
             .cornerRadius(CornerRadius.medium)
         }
         .padding(.horizontal, Spacing.medium)

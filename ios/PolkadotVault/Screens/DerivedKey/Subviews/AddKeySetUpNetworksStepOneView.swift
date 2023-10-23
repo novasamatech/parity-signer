@@ -34,13 +34,13 @@ struct AddKeySetUpNetworksStepOneView: View {
                         // Header
                         Localizable.Onboarding.SetUpNetworks.Step1.Label.step.text
                             .font(PrimaryFont.captionM.font)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                             .padding(.horizontal, Spacing.large)
                             .padding(.top, Spacing.medium)
                             .padding(.bottom, Spacing.extraExtraSmall)
                         Localizable.Onboarding.SetUpNetworks.Step1.Label.title.text
                             .font(PrimaryFont.titleL.font)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .padding(.horizontal, Spacing.large)
                             .padding(.bottom, Spacing.large)
                         // Tutorial
@@ -66,7 +66,7 @@ struct AddKeySetUpNetworksStepOneView: View {
                 minWidth: geo.size.width,
                 minHeight: geo.size.height
             )
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(.backgroundSystem)
             .onReceive(viewModel.dismissViewRequest) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
@@ -87,11 +87,11 @@ struct AddKeySetUpNetworksStepOneView: View {
     func pointCircle(_ number: String) -> some View {
         ZStack(alignment: .center) {
             Circle()
-                .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
+                .foregroundColor(.backgroundPrimary)
                 .frame(width: Sizes.pointCircle)
             Text(number)
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
     }
 
@@ -102,12 +102,12 @@ struct AddKeySetUpNetworksStepOneView: View {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.Onboarding.SetUpNetworks.Step1.Label.Step1.one.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                 Text(Localizable.setUpNetworkStepOneStepPartTwo())
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .font(PrimaryFont.bodyM.font)
                 Text(Localizable.setUpNetworkStepOneStepPartThree())
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .font(PrimaryFont.bodyM.font)
             }
             Spacer()
@@ -123,7 +123,7 @@ struct AddKeySetUpNetworksStepOneView: View {
             pointCircle("2")
             Localizable.Onboarding.SetUpNetworks.Step1.Label.step2.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
             Spacer()
         }
         .padding(Spacing.medium)
@@ -157,7 +157,7 @@ struct AddKeySetUpNetworksStepOneView: View {
             pointCircle("4")
             Localizable.Onboarding.SetUpNetworks.Step1.Label.step4.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
             Spacer()
         }
         .padding(Spacing.medium)
