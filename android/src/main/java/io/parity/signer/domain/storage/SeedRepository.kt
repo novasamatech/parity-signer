@@ -48,27 +48,19 @@ class SeedRepository(
 		}
 	}
 
-	/**
-	 * Try to get phrases if timeout - request auth
-	 */
-	suspend fun getSeedPhrases(seedNames: List<String>): RepoResult<String> {
+	suspend fun getSeedPhrasesForceAuth(seedNames: List<String>): RepoResult<String> {
 		return try {
-			try {
-				getSeedPhrasesDangerous(seedNames)
-			} catch (e: UserNotAuthenticatedException) {
 				when (val authResult =
 					authentication.authenticate(activity)) {
 					AuthResult.AuthSuccess -> {
 						getSeedPhrasesDangerous(seedNames)
 					}
-
 					AuthResult.AuthError,
 					AuthResult.AuthFailed,
 					AuthResult.AuthUnavailable -> {
 						RepoResult.Failure(RuntimeException("auth error - $authResult"))
 					}
 				}
-			}
 		} catch (e: java.lang.Exception) {
 			Log.d("get seed failure", e.toString())
 			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
