@@ -1,7 +1,8 @@
 package io.parity.signer.screens.settings
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.Modifier
@@ -36,18 +37,8 @@ fun NavGraphBuilder.settingsFullSubgraph(
 	) {
 		composable(
 			SettingsNavSubgraph.home,
-			enterTransition = {
-				slideIntoContainer(
-					AnimatedContentTransitionScope.SlideDirection.Up,
-					animationSpec = tween()
-				)
-			},
-			exitTransition = {
-				slideOutOfContainer(
-					AnimatedContentTransitionScope.SlideDirection.Down,
-					animationSpec = tween()
-				)
-			},
+			enterTransition = { fadeIn(animationSpec = tween(700)) },
+			exitTransition = { fadeOut(animationSpec = tween(700)) },
 		) {
 			SettingsGeneralNavSubgraph(parentNavController = navController)
 		}
