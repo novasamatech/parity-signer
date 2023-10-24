@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -20,13 +20,10 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
-import io.parity.signer.uniffi.Action
 
 
 @Composable
@@ -60,7 +57,7 @@ fun KeyDetailsMenuGeneral(
 	) {
 
 		MenuItemForBottomSheet(
-			Icons.Outlined.Circle,
+			Icons.Outlined.FileUpload,
 			label = stringResource(R.string.menu_option_export_keys),
 			onclick = onSelectKeysClicked
 		)

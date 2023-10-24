@@ -1,9 +1,10 @@
 package io.parity.signer.ui.mainnavigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,7 +15,6 @@ import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
-import io.parity.signer.screens.keysets.KeySetsListScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -27,15 +27,26 @@ fun CoreUnlockedNavSubgraph() {
 	val navController = rememberNavController().apply { addVaultLogger() }
 	NavHost(
 		navController = navController,
-		startDestination = CoreUnlockedNavSubgraph.keySetList,
-	) {
-		composable(CoreUnlockedNavSubgraph.keySetList) {
-			Box(modifier = Modifier.statusBarsPadding()) {
-				KeySetsListScreenSubgraph(
-					navController = navController,
-				)
-			}
+		startDestination = CoreUnlockedNavSubgraph.KeySet.destination(null),
+		enterTransition = {
+			slideIntoContainer(
+				AnimatedContentTransitionScope.SlideDirection.Start,
+				animationSpec = tween()
+			)
+		},
+		exitTransition = {
+			ExitTransition.None
+		},
+		popEnterTransition = {
+			EnterTransition.None
+		},
+		popExitTransition = {
+			slideOutOfContainer(
+				AnimatedContentTransitionScope.SlideDirection.End,
+				animationSpec = tween()
+			)
 		}
+	) {
 		keySetDetailsDestination(navController)
 		composable(CoreUnlockedNavSubgraph.newKeySet) {
 			NewKeysetSubgraph(
@@ -77,7 +88,7 @@ fun CoreUnlockedNavSubgraph() {
 			),
 		) {
 			val seedName =
-				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedName)!!
+				it.arguments?.getString(CoreUnlockedNavSubgraph.KeySet.seedName)!!
 
 			DerivationCreateSubgraph(
 				onBack = { navController.popBackStack() },
@@ -85,14 +96,28 @@ fun CoreUnlockedNavSubgraph() {
 				seedName = seedName,
 			)
 		}
-		composable(CoreUnlockedNavSubgraph.camera) {
+		composable(
+			CoreUnlockedNavSubgraph.camera,
+			enterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Up,
+					animationSpec = tween()
+				)
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Down,
+					animationSpec = tween()
+				)
+			},
+		) {
 			ScanNavSubgraph(
 				onCloseCamera = {
 					navController.popBackStack()
 				},
 				openKeySet = { seedName ->
 					navController.navigate(
-						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+						CoreUnlockedNavSubgraph.KeySet.destination(
 							seedNameValue = seedName
 						)
 					)
@@ -112,17 +137,17 @@ fun CoreUnlockedNavSubgraph() {
 }
 
 object CoreUnlockedNavSubgraph {
-	const val keySetList = "core_keyset_list"
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
 	const val camera = "unlocked_camera"
 
-	object KeySetDetails {
+	object KeySet {
 		internal const val seedName = "seed_name_arg"
 		private const val baseRoute = "core_keyset_details_home"
 		const val route = "$baseRoute?$seedName={$seedName}" //optional
 		fun destination(seedNameValue: String?): String {
-			val result = if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
+			val result =
+				if (seedNameValue == null) baseRoute else "$baseRoute?$seedName=${seedNameValue}"
 			return result
 		}
 	}

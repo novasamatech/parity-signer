@@ -30,9 +30,12 @@ class PreferencesRepository(private val context: Context) {
 		}
 	}
 
-	suspend fun setLastSelectedSeed(seedName: String) {
+	suspend fun setLastSelectedSeed(seedName: String?) {
 		context.dataStore.edit { settings ->
-			settings[lastSelectedKeySet] = seedName
+			when (seedName) {
+				is String -> settings[lastSelectedKeySet] = seedName
+				null -> settings -= lastSelectedKeySet
+			}
 		}
 	}
 

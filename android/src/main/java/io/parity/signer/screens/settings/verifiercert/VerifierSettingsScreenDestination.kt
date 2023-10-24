@@ -28,7 +28,7 @@ fun NavGraphBuilder.verifierSettingsDestination(
 			wipe = {
 				vm.wipeWithGeneralCertificate {
 					navController.navigate(
-						CoreUnlockedNavSubgraph.keySetList
+						CoreUnlockedNavSubgraph.KeySet.destination(null)
 					)
 				}
 			},

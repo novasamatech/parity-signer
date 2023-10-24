@@ -23,7 +23,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
@@ -43,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
+import io.parity.signer.components.base.ScanIconComponent
 import io.parity.signer.components.base.SecondaryButtonWide
+import io.parity.signer.components.base.SettingsIcon
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeyModel
@@ -56,6 +55,7 @@ import io.parity.signer.domain.abbreviateString
 import io.parity.signer.domain.conditional
 import io.parity.signer.screens.keysetdetails.items.KeyDerivedItem
 import io.parity.signer.screens.keysetdetails.items.SeedKeyDetails
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink300
@@ -76,15 +76,17 @@ fun KeySetDetailsScreenView(
 	onExposedClicked: Callback,
 	onFilterClicked: Callback,
 	onMenu: Callback,
+	onSeedSelect: Callback,
+	onAddNewDerivation: Callback,
 	onShowRoot: Callback,
-	onAddNewKey: Callback,
-	onBack: Callback,
 	onOpenKey: (keyAddr: String, keySpecs: String) -> Unit,
 ) {
 	Column {
 		KeySetDetailsHeader(
-			onAddKey = onAddNewKey,
-			onBack = onBack,
+			onAddKey = onAddNewDerivation,
+			onSettings = {
+				navController.navigate(CoreUnlockedNavSubgraph.settings)
+			},
 			onMenu = onMenu,
 		)
 		Box(modifier = Modifier.weight(1f)) {
@@ -94,7 +96,11 @@ fun KeySetDetailsScreenView(
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
-					SeedKeyItemElement(model, onShowRoot)
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowRoot = onShowRoot
+					)
 
 					FilterRow(onFilterClicked)
 
@@ -114,13 +120,21 @@ fun KeySetDetailsScreenView(
 				//no derived keys at all
 				Column() {
 					//seed
-					SeedKeyItemElement(model, onShowRoot)
-					KeySetDetailsEmptyList(onAdd = onAddNewKey)
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowRoot = onShowRoot
+					)
+					KeySetDetailsEmptyList(onAdd = onAddNewDerivation)
 				}
 			} else {
+				//nothing to show but filter enabled
 				Column() {
-					SeedKeyItemElement(model, onShowRoot)
-					//no keys because filtered
+					SeedKeyItemElement(
+						model = model,
+						onSeedSelect = onSeedSelect,
+						onShowRoot = onShowRoot
+					)          //no keys because filtered
 					FilterRow(onFilterClicked)
 					Spacer(modifier = Modifier.weight(0.5f))
 					Text(
@@ -141,26 +155,32 @@ fun KeySetDetailsScreenView(
 					.align(Alignment.BottomEnd)
 					.padding(end = 16.dp, bottom = 24.dp)
 			)
+			ScanIconComponent(
+				onClick = {
+					navController.navigate(CoreUnlockedNavSubgraph.camera)
+				},
+				Modifier
+					.align(Alignment.BottomCenter)
+					.padding(bottom = 24.dp)
+			)
 		}
-
-		BottomBar(navController, BottomBarOptions.KEYS)
 	}
 }
 
 @Composable
 private fun SeedKeyItemElement(
 	model: KeySetDetailsModel,
+	onSeedSelect: Callback,
 	onShowRoot: Callback,
 ) {
-	model.root?.let {
-		SeedKeyDetails(
-			model = it,
-			onShowRoot = onShowRoot,
-			modifier = Modifier
-				.padding(horizontal = 24.dp, vertical = 8.dp)
-				.padding(bottom = 16.dp)
-		)
-	}
+	SeedKeyDetails(
+		model = model.root,
+		onSeedSelect = onSeedSelect,
+		onShowRoot = onShowRoot,
+		modifier = Modifier
+			.padding(horizontal = 24.dp, vertical = 8.dp)
+			.padding(bottom = 16.dp)
+	)
 }
 
 @Composable
@@ -190,7 +210,7 @@ private fun FilterRow(onFilterClicked: Callback) {
 @Composable
 fun KeySetDetailsHeader(
 	onAddKey: Callback,
-	onBack: Callback,
+	onSettings: Callback,
 	onMenu: Callback,
 ) {
 	Row(
@@ -199,16 +219,15 @@ fun KeySetDetailsHeader(
 			.defaultMinSize(minHeight = 56.dp),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Image(
-			imageVector = Icons.Filled.ChevronLeft,
-			contentDescription = stringResource(R.string.description_back_button),
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+		//start
+		SettingsIcon(
+			onClick = onSettings,
+			noBackground = true,
 			modifier = Modifier
 				.padding(horizontal = 8.dp)
-				.clickable(onClick = onBack)
+				.size(40.dp)
 				.padding(8.dp)
-				.size(24.dp)
-				.align(Alignment.CenterVertically)
+				.align(Alignment.CenterVertically),
 		)
 		//center
 		Spacer(modifier = Modifier.weight(1f))
@@ -345,8 +364,8 @@ private fun PreviewKeySetDetailsScreen() {
 				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
-				onAddNewKey = {},
-				onBack = {},
+				onAddNewDerivation = {},
+				onSeedSelect = {},
 				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
@@ -379,8 +398,8 @@ private fun PreviewKeySetDetailsScreenEmpty() {
 				onExposedClicked = {},
 				onFilterClicked = {},
 				onMenu = {},
-				onAddNewKey = {},
-				onBack = {},
+				onAddNewDerivation = {},
+				onSeedSelect = {},
 				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)
@@ -412,9 +431,9 @@ private fun PreviewKeySetDetailsScreenFiltered() {
 				fullModelWasEmpty = false,
 				onExposedClicked = {},
 				onFilterClicked = {},
+				onSeedSelect = {},
 				onMenu = {},
-				onAddNewKey = {},
-				onBack = {},
+				onAddNewDerivation = {},
 				onShowRoot = {},
 				onOpenKey = { _, _ -> },
 			)

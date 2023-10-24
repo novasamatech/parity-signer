@@ -33,6 +33,7 @@ fun IdentIconImage(
 				modifier = modifier,
 			)
 		}
+
 		is Identicon.Dots -> {
 			DotIcon(
 				seed = identIcon.identity,
@@ -40,6 +41,7 @@ fun IdentIconImage(
 				modifier = modifier,
 			)
 		}
+
 		is Identicon.Jdenticon -> {
 			Jdenticon(seed = identIcon.identity, size = size, modifier = modifier)
 		}
@@ -80,6 +82,22 @@ private fun PreviewIdentIcon() {
 			IdentIconImage(iconDot, size = 56.dp)
 			IdentIconImage(iconBlockies, size = 56.dp)
 			IdentIconImage(iconJdenticon, size = 56.dp)
+
+			IdentIconImage(
+				iconDot, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
+			IdentIconImage(
+				iconBlockies, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
+			IdentIconImage(
+				iconJdenticon, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
 		}
 	}
 }

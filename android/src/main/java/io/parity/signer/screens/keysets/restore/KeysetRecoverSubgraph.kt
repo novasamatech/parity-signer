@@ -102,7 +102,7 @@ fun KeysetRecoverSubgraph(
 				onBack = localNavController::popBackStack,
 				navigateOnSuccess = {
 					coreNavController.navigate(
-						CoreUnlockedNavSubgraph.KeySetDetails.destination(
+						CoreUnlockedNavSubgraph.KeySet.destination(
 							keysetName
 						)
 					) {
