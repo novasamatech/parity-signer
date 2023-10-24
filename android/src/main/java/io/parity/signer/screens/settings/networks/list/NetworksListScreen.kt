@@ -30,8 +30,6 @@ import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.networkicon.NetworkIcon
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.toNetworkModel
@@ -46,7 +44,6 @@ import io.parity.signer.uniffi.MManageNetworks
 @Composable
 fun NetworksListScreen(
 	model: NetworksListModel,
-	coreNavController: NavController,
 	onBack: Callback,
 	onOpenNetwork: (networkKey: String) -> Unit,
 	onNetworkHelp: Callback,
@@ -73,7 +70,6 @@ fun NetworksListScreen(
                     .clickable(onClick = onNetworkHelp)
 			)
 		}
-		BottomBar(coreNavController, BottomBarOptions.SETTINGS)
 	}
 }
 
@@ -167,7 +163,6 @@ private fun PreviewNetworksList() {
 	SignerNewTheme {
 		NetworksListScreen(
 			model,
-			rememberNavController(),
 			{},
 			{},
 			{},
