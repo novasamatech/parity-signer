@@ -103,7 +103,6 @@ fun KeySetDetailsScreenSubgraph(
 					onMenu = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 					},
-					onBack = onBack,
 					onAddNewDerivation = {
 						navController.navigate(
 							CoreUnlockedNavSubgraph.NewDerivedKey.destination(

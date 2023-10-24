@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -20,17 +21,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.fill18
 
 @Composable
 fun SettingsIcon(
 	modifier: Modifier = Modifier,
+	onClick: Callback,
 	noBackground: Boolean = false,
 ) {
 	Box(
 		modifier = modifier
-			.size(32.dp)
+			.clickable(onClick = onClick)
 			.run {
 				if (noBackground) {
 					this
@@ -48,7 +51,7 @@ fun SettingsIcon(
 			contentDescription = stringResource(R.string.description_check_botton),
 			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
 			modifier = Modifier
-				.size(20.dp)
+				.size(24.dp)
 		)
 	}
 }
@@ -66,8 +69,8 @@ fun SettingsIcon(
 private fun PreviewSettingsIcon() {
 	SignerNewTheme {
 		Column() {
-			SettingsIcon(noBackground = true)
-			SettingsIcon(noBackground = false)
+			SettingsIcon(onClick = {}, noBackground = true)
+			SettingsIcon(onClick = {}, noBackground = false)
 		}
 	}
 }

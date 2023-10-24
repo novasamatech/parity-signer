@@ -28,6 +28,9 @@ import io.parity.signer.ui.theme.*
 
 /**
  * Bar to be shown on the bottom of screen;
+ *
+ * todo dmitry remove it
+ *
  */
 @Composable
 fun BottomBar(
