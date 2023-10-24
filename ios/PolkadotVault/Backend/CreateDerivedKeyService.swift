@@ -65,24 +65,44 @@ enum ImportDerivedKeyError: Error {
 }
 
 final class CreateDerivedKeyService {
+    private let backendService: BackendService
     private let databaseMediator: DatabaseMediating
     private let callQueue: Dispatching
     private let callbackQueue: Dispatching
     private let seedsMediator: SeedsMediating
-    private let navigation: NavigationCoordinator
+    private let createKeyNameService: CreateDerivedKeyNameService
 
     init(
+        backendService: BackendService = BackendService(),
         databaseMediator: DatabaseMediating = DatabaseMediator(),
+        createKeyNameService: CreateDerivedKeyNameService = CreateDerivedKeyNameService(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
         callQueue: Dispatching = DispatchQueue.global(qos: .userInteractive),
-        callbackQueue: Dispatching = DispatchQueue.main,
-        navigation: NavigationCoordinator = NavigationCoordinator()
+        callbackQueue: Dispatching = DispatchQueue.main
     ) {
+        self.backendService = backendService
         self.databaseMediator = databaseMediator
+        self.createKeyNameService = createKeyNameService
         self.seedsMediator = seedsMediator
         self.callQueue = callQueue
         self.callbackQueue = callbackQueue
-        self.navigation = navigation
+    }
+
+    func createDefaultDerivedKey(
+        _ keySet: MKeysNew,
+        _ keyName: String,
+        _ network: MmNetwork,
+        completion: @escaping (Result<Void, ServiceError>) -> Void
+    ) {
+        let seedPhrase = seedsMediator.getSeed(seedName: keyName)
+        backendService.performCall({
+            try tryCreateAddress(
+                seedName: keyName,
+                seedPhrase: seedPhrase,
+                path: self.createKeyNameService.defaultDerivedKeyName(keySet, network: network),
+                network: network.key
+            )
+        }, completion: completion)
     }
 
     func createDerivedKeys(
@@ -233,13 +253,5 @@ final class CreateDerivedKeyService {
         } catch {
             return .failure(.init(message: error.backendDisplayError))
         }
-    }
-
-    func resetNavigationState(_ keyName: String) {
-        navigation.performFake(navigation: .init(action: .start))
-        navigation.performFake(navigation: .init(action: .navbarKeys))
-        navigation.performFake(navigation: .init(action: .selectSeed, details: keyName))
-        navigation.performFake(navigation: .init(action: .newKey))
-        navigation.performFake(navigation: .init(action: .goBack))
     }
 }
