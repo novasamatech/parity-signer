@@ -1,6 +1,9 @@
 package io.parity.signer.screens.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -31,8 +34,21 @@ fun NavGraphBuilder.settingsFullSubgraph(
 		route = CoreUnlockedNavSubgraph.settings,
 		startDestination = SettingsNavSubgraph.home,
 	) {
-
-		composable(SettingsNavSubgraph.home) {
+		composable(
+			SettingsNavSubgraph.home,
+			enterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Up,
+					animationSpec = tween()
+				)
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Down,
+					animationSpec = tween()
+				)
+			},
+		) {
 			SettingsGeneralNavSubgraph(parentNavController = navController)
 		}
 		composable(SettingsNavSubgraph.terms) {
@@ -106,7 +122,8 @@ internal object SettingsNavSubgraph {
 		internal const val metadataSpecVer = "spec_ver"
 		private const val baseRoute = "settings_metadata_sufficient_crypto"
 		const val route = "$baseRoute/{$networkKey}/{$metadataSpecVer}"
-		fun destination(networkKey: String, metadataSpecVer: String) = "$baseRoute/${networkKey}/${metadataSpecVer}"
+		fun destination(networkKey: String, metadataSpecVer: String) =
+			"$baseRoute/${networkKey}/${metadataSpecVer}"
 	}
 }
 

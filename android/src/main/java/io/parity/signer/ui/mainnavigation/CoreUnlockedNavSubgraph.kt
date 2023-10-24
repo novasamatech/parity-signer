@@ -36,20 +36,11 @@ fun CoreUnlockedNavSubgraph() {
 		},
 		exitTransition = {
 			ExitTransition.None
-//			slideOutOfContainer(
-//				AnimatedContentTransitionScope.SlideDirection.Start,
-//				animationSpec = tween()
-//			)
 		},
 		popEnterTransition = {
 			EnterTransition.None
-//			slideIntoContainer(
-//				AnimatedContentTransitionScope.SlideDirection.End,
-//				animationSpec = tween()
-//			)
 		},
 		popExitTransition = {
-//			ExitTransition.None
 			slideOutOfContainer(
 				AnimatedContentTransitionScope.SlideDirection.End,
 				animationSpec = tween()
