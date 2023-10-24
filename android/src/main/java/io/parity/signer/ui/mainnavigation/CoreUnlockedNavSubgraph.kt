@@ -1,13 +1,10 @@
 package io.parity.signer.ui.mainnavigation
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +15,6 @@ import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
 import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
-import io.parity.signer.screens.keysetdetails.seedselectmenu.old.KeySetsListScreenSubgraph
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
@@ -34,26 +30,28 @@ fun CoreUnlockedNavSubgraph() {
 		startDestination = CoreUnlockedNavSubgraph.KeySet.destination(null),
 		enterTransition = {
 			slideIntoContainer(
-				AnimatedContentTransitionScope.SlideDirection.End,
+				AnimatedContentTransitionScope.SlideDirection.Start,
 				animationSpec = tween()
 			)
 		},
 		exitTransition = {
-			slideOutOfContainer(
-				AnimatedContentTransitionScope.SlideDirection.End,
-				animationSpec = tween()
-			)
+			ExitTransition.None
+//			slideOutOfContainer(
+//				AnimatedContentTransitionScope.SlideDirection.Start,
+//				animationSpec = tween()
+//			)
 		},
 		popEnterTransition = {
-			slideIntoContainer(
-				AnimatedContentTransitionScope.SlideDirection.Start,
-				animationSpec = tween()
-			)
+			EnterTransition.None
+//			slideIntoContainer(
+//				AnimatedContentTransitionScope.SlideDirection.End,
+//				animationSpec = tween()
+//			)
 		},
 		popExitTransition = {
-			EnterTransition.None
+//			ExitTransition.None
 			slideOutOfContainer(
-				AnimatedContentTransitionScope.SlideDirection.Start,
+				AnimatedContentTransitionScope.SlideDirection.End,
 				animationSpec = tween()
 			)
 		}
