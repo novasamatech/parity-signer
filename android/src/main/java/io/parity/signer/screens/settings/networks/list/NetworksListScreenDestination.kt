@@ -30,7 +30,6 @@ fun NavGraphBuilder.networkListDestination(
 		Box(modifier = Modifier.statusBarsPadding()) {
 			NetworksListScreen(
 				model = model,
-				coreNavController = navController,
 				onBack = navController::popBackStack,
 				onOpenNetwork = { networkKey ->
 					navController.navigate(

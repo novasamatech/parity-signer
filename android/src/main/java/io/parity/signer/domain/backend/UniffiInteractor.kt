@@ -2,7 +2,7 @@ package io.parity.signer.domain.backend
 
 import android.content.Context
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.KeySetsSelectModel
+import io.parity.signer.domain.KeySetsListModel
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.VerifierDetailsModel
 import io.parity.signer.domain.submitErrorState
@@ -219,7 +219,7 @@ class UniffiInteractor(val appContext: Context) {
 
 	suspend fun getKeySets(
 		seedNames: List<String>
-	): UniffiResult<KeySetsSelectModel> =
+	): UniffiResult<KeySetsListModel> =
 		withContext(Dispatchers.IO) {
 			try {
 				val transactionResult =

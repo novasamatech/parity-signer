@@ -75,7 +75,7 @@ internal fun SettingsGeneralNavSubgraph(
 					onFactoryReset = {
 						vm.wipeToFactory {
 							parentNavController.navigate(
-								CoreUnlockedNavSubgraph.keySetList
+								CoreUnlockedNavSubgraph.KeySet.destination(null)
 							)
 						}
 					}
