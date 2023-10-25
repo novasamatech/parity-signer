@@ -9,7 +9,7 @@ lane :test_build do |options|
   scan(
     clean: true,
     scheme: scheme,
-    device: "iPhone 13",
+    device: "iPhone 15",
     output_directory: "./fastlane/test_output/"
   )
 end
