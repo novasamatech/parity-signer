@@ -314,7 +314,7 @@ extension KeyDetailsView.ViewModel {
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
         DispatchQueue.main.async {
-            self.keyDetailsActionsService.navigateToPublicKey(
+            self.keyDetailsActionsService.publicKey(
                 addressKey: deriveKey.keyData.key.addressKey,
                 networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
             ) { result in
