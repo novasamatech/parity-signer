@@ -14,7 +14,7 @@ struct ActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding(Spacing.large)
+            .padding(.vertical, Spacing.large)
             .background(backgroundColor)
             .foregroundColor(foregroundColor)
             .frame(height: Heights.actionButton, alignment: .center)
