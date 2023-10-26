@@ -48,13 +48,19 @@ fun DerivationCreateSubgraph(
 		composable(DerivationCreateSubgraph.select_network) {
 			DeriveKeyNetworkSelectScreen(
 				networks = deriveViewModel.getAllNetworks(),
+				preselectd = null,
 				onClose = {
 					deriveViewModel.resetState()
 					onBack()
 				},
-				onNetworkSelect = { newNetwork ->
+				onAdvancePath = { newNetwork ->
 					deriveViewModel.updateSelectedNetwork(newNetwork)
 					navController.navigate(DerivationCreateSubgraph.path)
+				},
+				onFastCreate = { newNetwork ->
+					deriveViewModel.fastCreateDerivationForNetwork(newNetwork)
+
+//											 todo dmitry implement
 				},
 				onNetworkHelp = { navController.navigate(DerivationCreateSubgraph.network_help) },
 				modifier = Modifier

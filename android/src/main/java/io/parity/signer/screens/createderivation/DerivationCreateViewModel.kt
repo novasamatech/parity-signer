@@ -39,9 +39,9 @@ class DerivationCreateViewModel : ViewModel() {
 		MutableStateFlow(INITIAL_DERIVATION_PATH)
 	val path: StateFlow<String> = _path.asStateFlow()
 
-	private val _selectedNetwork: MutableStateFlow<NetworkModel> =
-		MutableStateFlow(getAllNetworks().first())
-	val selectedNetwork: StateFlow<NetworkModel> =
+	private val _selectedNetwork: MutableStateFlow<NetworkModel?> =
+		MutableStateFlow(null)
+	val selectedNetwork: StateFlow<NetworkModel?> =
 		_selectedNetwork.asStateFlow()
 
 	fun updatePath(newPath: String) {
@@ -66,6 +66,10 @@ class DerivationCreateViewModel : ViewModel() {
 	fun updateSelectedNetwork(newNetwork: NetworkModel) {
 		_selectedNetwork.value = newNetwork
 		_path.value = getInitialPath(newNetwork)
+	}
+
+	fun fastCreateDerivationForNetwork(newNetwork: NetworkModel) {
+//		todo dmitry
 	}
 
 	fun getInitialPath(netWork: NetworkModel): String {
@@ -107,7 +111,7 @@ class DerivationCreateViewModel : ViewModel() {
 			uniffiInteractor.validateDerivationPath(
 				path,
 				seedName,
-				selectedNetwork.value.key
+				selectedNetwork.value?.key ?: ""
 			).mapError()
 		}
 	}
@@ -119,7 +123,7 @@ class DerivationCreateViewModel : ViewModel() {
 				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
 			if (phrase.isNotBlank()) {
 				try {
-					val selectedNetwork = selectedNetwork.value
+					val selectedNetwork = selectedNetwork.value!!
 					tryCreateAddress(
 						seedName,
 						phrase,
