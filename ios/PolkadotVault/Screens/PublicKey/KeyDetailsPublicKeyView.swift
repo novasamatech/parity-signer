@@ -285,8 +285,16 @@ extension KeyDetailsPublicKeyView {
                 if warningStateMediator.alert {
                     isPresentingConnectivityAlert = true
                 } else {
-                    exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey(keyDetails)
-                    isPresentingExportKeysWarningModal = true
+                    exportPrivateKeyService.exportPrivateKey(keyDetails) { result in
+                        switch result {
+                        case let .success(model):
+                            self.exportPrivateKeyViewModel = model
+                            self.isPresentingExportKeysWarningModal = true
+                        case let .failure(error):
+                            self.presentableError = .alertError(message: error.message)
+                            self.isPresentingError = true
+                        }
+                    }
                 }
             }
             if shouldPresentRemoveConfirmationModal {

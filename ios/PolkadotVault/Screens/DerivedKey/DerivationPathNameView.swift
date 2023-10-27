@@ -244,7 +244,7 @@ extension DerivationPathNameView {
 
         func onRightNavigationButtonTap() {
             derivationPath = inputText
-            let completion: (Result<Void, Error>) -> Void = { result in
+            let completion: (Result<Void, ServiceError>) -> Void = { result in
                 switch result {
                 case .success:
                     self.isPresentingConfirmation = true
@@ -287,7 +287,12 @@ extension DerivationPathNameView {
                 skipValidation = false
                 return
             }
-            pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, networkSelection.key))
+            createKeyService.checkForCollision(
+                seedName,
+                inputText,
+                networkSelection.key,
+                completion: pathErrorCheck(_:)
+            )
         }
 
         func onPasswordConfirmationDoneTap() {

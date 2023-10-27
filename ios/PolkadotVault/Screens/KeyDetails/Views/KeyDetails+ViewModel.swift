@@ -358,8 +358,7 @@ extension KeyDetailsView.ViewModel {
                 keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
                     switch result {
                     case .success:
-                        self.updateBackupModel()
-                        self.isShowingBackupModal = true
+                        self.tryToPresentBackupModal()
                     case let .failure(error):
                         self.presentableError = .alertError(message: error.localizedDescription)
                         self.isPresentingError = true
@@ -387,8 +386,15 @@ extension KeyDetailsView.ViewModel {
 }
 
 private extension KeyDetailsView.ViewModel {
-    func updateBackupModel() {
-        backupModal = exportPrivateKeyService.backupViewModel(keysData)
+    func tryToPresentBackupModal() {
+        switch exportPrivateKeyService.backupViewModel(keysData) {
+        case let .success(backupModal):
+            self.backupModal = backupModal
+            isShowingBackupModal = true
+        case let .failure(error):
+            presentableError = .alertError(message: error.message)
+            isPresentingError = true
+        }
     }
 
     func keyData(for derivedKey: DerivedKeyRowModel) -> MKeyAndNetworkCard? {
