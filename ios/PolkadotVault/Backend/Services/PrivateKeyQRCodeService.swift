@@ -16,21 +16,24 @@ final class PrivateKeyQRCodeService {
         self.seedsMediator = seedsMediator
     }
 
-    func backupViewModel(_ keys: MKeysNew?) -> BackupModalViewModel? {
+    func backupViewModel(
+        _ keys: MKeysNew?
+    ) -> Result<BackupModalViewModel, ServiceError> {
         guard
             let keys,
             let root = keys.root
-        else { return nil }
+        else { return .failure(.init(message: Localizable.Error.PrivateKeyQRCodeService.noKeyDetails.string)) }
         let seedName = root.address.seedName
         let seedPhrase = seedsMediator.getSeedBackup(seedName: seedName)
-        guard !seedPhrase.isEmpty else { return nil }
-        return BackupModalViewModel(
+        guard !seedPhrase.isEmpty
+        else { return .failure(.init(message: Localizable.Error.PrivateKeyQRCodeService.backupUnavailable.string)) }
+        return .success(BackupModalViewModel(
             header: KeySummaryViewModel(
                 keyName: seedName,
                 base58: root.base58.truncateMiddle()
             ),
             derivedKeys: keys.set.map { DerivedKeyOverviewViewModel($0) },
             seedPhrase: SeedPhraseViewModel(seedPhrase: seedPhrase)
-        )
+        ))
     }
 }
