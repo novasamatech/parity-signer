@@ -507,6 +507,8 @@
 "Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
 "Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+"Error.PrivateKeyQRCodeService.NoKeyDetails" = "Key Details data not available.";
+"Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
 
 
 "Error.ApplicationUpdateRequired.Label.Title" = "Upgrade your Polkadot Vault according\n to the requirements";
