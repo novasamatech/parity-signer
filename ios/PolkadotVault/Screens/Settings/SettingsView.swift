@@ -74,8 +74,6 @@ struct SettingsView: View {
             NetworkSelectionSettings(viewModel: .init())
         case .verifier:
             VerifierCertificateView(viewModel: .init())
-        case .backup:
-            BackupSelectKeyView(viewModel: .init())
         case .privacyPolicy:
             PrivacyPolicyView(viewModel: .init())
         case .termsAndConditions:
@@ -119,9 +117,6 @@ extension SettingsView {
                 isDetailsPresented = true
             case .privacyPolicy:
                 detailScreen = .privacyPolicy
-                isDetailsPresented = true
-            case .backup:
-                detailScreen = .backup
                 isDetailsPresented = true
             case .networks:
                 detailScreen = .networks

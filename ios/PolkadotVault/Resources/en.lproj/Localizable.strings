@@ -342,7 +342,6 @@
 "Settings.Label.Networks" = "Networks";
 "Settings.Label.Logs" = "Logs";
 "Settings.Label.Verifier" = "Verifier Certificate";
-"Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
 "Settings.Label.Terms" = "Terms of Service";
 "Settings.Label.Version" = "App version %@";
