@@ -33,7 +33,7 @@ extension ExportMultipleKeysModal {
                 self.qrCode = (try? result.get()) ?? .init(qrCodes: [])
             }
             keyExportService.exportRootWithDerivedKeys(
-                seedName: viewModel.key.keyName,
+                seedName: viewModel.keyName,
                 keys: viewModel.derivedKeys.map(\.keyData),
                 completion
             )

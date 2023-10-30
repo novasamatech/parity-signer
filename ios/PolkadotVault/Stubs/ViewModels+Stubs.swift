@@ -26,7 +26,7 @@ extension QRCodeAddressFooterViewModel {
 
 extension QRCodeRootFooterViewModel {
     static let stub: QRCodeRootFooterViewModel = .init(
-        keyName: "Staking",
+        identicon: .stubJdenticon,
         base58: "5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX"
     )
 }
@@ -133,6 +133,7 @@ extension SettingsBackupViewModel {
 
 extension ExportMultipleKeysModalViewModel {
     static let stub: ExportMultipleKeysModalViewModel = .init(
+        keyName: "key",
         key: .stub,
         derivedKeys: [],
         count: 3

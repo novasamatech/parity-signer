@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-extension QRCodeRootFooterViewModel {
-    init(_ keySummary: KeySummaryViewModel) {
-        keyName = keySummary.keyName
-        base58 = keySummary.base58
-    }
-}
-
 extension QRCodeAddressFooterViewModel {
     init(_ derivedKey: DerivedKeyExportModel) {
         identicon = derivedKey.viewModel.identicon
@@ -23,7 +16,8 @@ extension QRCodeAddressFooterViewModel {
 }
 
 struct ExportMultipleKeysModalViewModel: Equatable {
-    let key: KeySummaryViewModel
+    let keyName: String
+    let key: QRCodeRootFooterViewModel
     let derivedKeys: [DerivedKeyExportModel]
     let count: Int
 }
@@ -74,7 +68,7 @@ struct ExportMultipleKeysModal: View {
 
     var keyList: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
-            QRCodeRootFooterView(viewModel: .init(viewModel.viewModel.key))
+            QRCodeRootFooterView(viewModel: viewModel.viewModel.key)
             if !viewModel.viewModel.derivedKeys.isEmpty {
                 Divider()
             }
@@ -105,7 +99,6 @@ private extension ExportMultipleKeysModal {
 }
 
 private struct ExportDerivedKeyView: View {
-    @State private var showFullAddress: Bool = false
     private let dataModel: DerivedKeyExportModel
     private let backgroundColor: Color
 
@@ -119,42 +112,23 @@ private struct ExportDerivedKeyView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
-            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                    fullPath
-                        .foregroundColor(.textAndIconsTertiary)
-                        .font(PrimaryFont.captionM.font)
-                    Text(dataModel.viewModel.rootKeyName)
-                        .foregroundColor(.textAndIconsPrimary)
-                        .font(PrimaryFont.bodyM.font)
-                }
-                Spacer()
+            HStack(alignment: .center, spacing: Spacing.small) {
                 NetworkIdenticon(
                     identicon: dataModel.viewModel.identicon,
                     network: dataModel.keyData.network.networkLogo,
                     background: backgroundColor,
                     size: Heights.identiconInCell
                 )
-            }
-            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                Group {
-                    Text(showFullAddress ? dataModel.viewModel.base58 : dataModel.viewModel.base58.truncateMiddle())
+                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    fullPath
+                        .foregroundColor(.textAndIconsTertiary)
+                        .font(PrimaryFont.captionM.font)
+                    Text(dataModel.viewModel.base58.truncateMiddle())
                         .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .frame(idealWidth: .infinity, alignment: .leading)
-                    if !showFullAddress {
-                        Image(.chevronDown)
-                            .foregroundColor(.textAndIconsSecondary)
-                            .padding(.leading, Spacing.extraExtraSmall)
-                    }
-                }
-                .onTapGesture {
-                    withAnimation {
-                        showFullAddress = true
-                    }
                 }
                 Spacer()
-                NetworkCapsuleView(network: dataModel.viewModel.network)
             }
         }
         .padding(Spacing.medium)
