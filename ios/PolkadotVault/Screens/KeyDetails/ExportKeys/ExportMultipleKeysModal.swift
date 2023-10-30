@@ -71,6 +71,7 @@ struct ExportMultipleKeysModal: View {
             QRCodeRootFooterView(viewModel: viewModel.viewModel.key)
             if !viewModel.viewModel.derivedKeys.isEmpty {
                 Divider()
+                    .padding(.horizontal, Spacing.medium)
             }
             ForEach(
                 viewModel.viewModel.derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
@@ -79,6 +80,7 @@ struct ExportMultipleKeysModal: View {
                 ExportDerivedKeyView(dataModel: $0, backgroundColor: .fill6Solid)
                 if $0 != viewModel.viewModel.derivedKeys.last {
                     Divider()
+                        .padding(.horizontal, Spacing.medium)
                 }
             }
         }
