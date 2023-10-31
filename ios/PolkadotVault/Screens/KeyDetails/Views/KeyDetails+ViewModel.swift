@@ -53,7 +53,6 @@ extension KeyDetailsView {
         @Published var isPresentingSettings = false
         @Published var isPresentingQRScanner: Bool = false
 
-        @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
         // Error handling
@@ -119,7 +118,6 @@ extension KeyDetailsView {
 
         func updateRenderables() {
             refreshDerivedKeys()
-            refreshKeySummary()
             refreshNetworks()
         }
 
@@ -215,12 +213,13 @@ extension KeyDetailsView {
             case .onCancel:
                 ()
             case let .onKeysExport(selectedKeys):
-                guard let keySummary else { return }
+                guard let root = keysData?.root else { return }
                 let derivedKeys = selectedKeys.map {
                     DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
                 }
                 keysExportModalViewModel = { ExportMultipleKeysModalViewModel(
-                    key: keySummary,
+                    keyName: root.address.seedName,
+                    key: .init(identicon: root.address.identicon, base58: root.base58),
                     derivedKeys: derivedKeys,
                     count: selectedKeys.count
                 )
@@ -423,14 +422,5 @@ private extension KeyDetailsView.ViewModel {
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list
-    }
-
-    func refreshKeySummary() {
-        guard let keysData else { return }
-        keySummary = KeySummaryViewModel(
-            keyName: keysData.root?.address.seedName ?? "",
-            base58: keysData.root?.base58 ?? ""
-        )
-        removeSeed = keysData.root?.address.seedName ?? ""
     }
 }
