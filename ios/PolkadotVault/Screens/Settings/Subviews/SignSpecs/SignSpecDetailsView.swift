@@ -17,7 +17,7 @@ struct SignSpecDetails: View {
         VStack {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: .title(Localizable.SignSpecsDetails.Label.title.string),
+                    title: .title(viewModel.title),
                     leftButtons: [.init(
                         type: .arrow,
                         action: viewModel.onBackTap
@@ -31,7 +31,7 @@ struct SignSpecDetails: View {
                         .padding(.horizontal, Spacing.medium)
                         .padding(.top, Spacing.extraSmall)
                         .padding(.bottom, Spacing.medium)
-                    Localizable.SignSpecsDetails.Label.scanQRCode.text
+                    Text(viewModel.qrCodeSectionTitle)
                         .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .padding(.horizontal, Spacing.large)
@@ -137,7 +137,8 @@ struct SignSpecDetails: View {
 
 extension SignSpecDetails {
     final class ViewModel: ObservableObject {
-        var content: MSufficientCryptoReady
+        private let type: SpecSignType
+        let content: MSufficientCryptoReady
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -145,13 +146,33 @@ extension SignSpecDetails {
         private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            content: MSufficientCryptoReady
+            content: MSufficientCryptoReady,
+            type: SpecSignType
         ) {
             self.content = content
+            self.type = type
         }
 
         func onBackTap() {
             dismissRequest.send()
+        }
+
+        var title: String {
+            switch type {
+            case .metadata:
+                Localizable.SignSpecsDetails.Label.Title.metadata.string
+            case .network:
+                Localizable.SignSpecsDetails.Label.Title.specs.string
+            }
+        }
+
+        var qrCodeSectionTitle: String {
+            switch type {
+            case .metadata:
+                Localizable.SignSpecsDetails.Label.ScanQRCode.metadata.string
+            case .network:
+                Localizable.SignSpecsDetails.Label.ScanQRCode.specs.string
+            }
         }
     }
 }

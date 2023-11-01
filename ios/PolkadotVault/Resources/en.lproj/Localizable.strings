@@ -85,12 +85,15 @@
 
 // Sign Specs
 "SignSpecsList.Label.Title" = "Select Key for Signing";
-"SignSpecsDetails.Label.Title" = "Sign Transaction";
+"SignSpecsDetails.Label.Title.Metadata" = "Sign Metadata";
+"SignSpecsDetails.Label.Title.Specs" = "Sign Specs";
 
 "SignSpecsDetails.Label.NetworkMetadataSignature" = "Signature for metadata update %@ version %@";
 "SignSpecsDetails.Label.TypesSignature" = "Signature for types";
 "SignSpecsDetails.Label.NetworkSpecSignature" = "Signature for network specs update\nFor network: %@\nSpecs key: %@";
-"SignSpecsDetails.Label.ScanQRCode" = "Scan QR code to Sign Transaction";
+"SignSpecsDetails.Label.ScanQRCode.Metadata" = "Scan QR code to Sign Metadata";
+"SignSpecsDetails.Label.ScanQRCode.Specs" = "Scan QR code to Sign Specs";
+
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
 

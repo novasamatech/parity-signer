@@ -42,7 +42,8 @@ struct SignSpecsListView: View {
             NavigationLink(
                 destination: SignSpecDetails(
                     viewModel: .init(
-                        content: viewModel.detailsContent
+                        content: viewModel.detailsContent,
+                        type: viewModel.type
                     )
                 )
                 .navigationBarHidden(true),
@@ -117,7 +118,7 @@ extension SignSpecsListView {
         private let networkKey: String
         private let seedsMediator: SeedsMediating
         private let service: ManageNetworkDetailsService
-        private let type: SpecSignType
+        let type: SpecSignType
         @Published var detailsContent: MSufficientCryptoReady!
         @Published var content: MSignSufficientCrypto?
         @Published var selectedKeyRecord: MRawKey!
@@ -149,8 +150,6 @@ extension SignSpecsListView {
         }
 
         func onRecordTap(_ keyRecord: MRawKey) {
-            let seedPhrase = seedsMediator.getSeed(seedName: keyRecord.address.seedName)
-            guard !seedPhrase.isEmpty else { return }
             if keyRecord.address.hasPwd {
                 selectedKeyRecord = keyRecord
                 isPresentingEnterPassword = true
