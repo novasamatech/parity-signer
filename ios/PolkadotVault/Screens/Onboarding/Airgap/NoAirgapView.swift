@@ -1,5 +1,5 @@
 //
-//  OnboardingAirgapView.swift
+//  NoAirgapView.swift
 //  NativeSigner
 //
 //  Created by Krzysztof Rodak on 15/02/2023.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OnboardingAirgapView: View {
+struct NoAirgapView: View {
     @StateObject var viewModel: ViewModel
 
     var body: some View {
@@ -112,7 +112,7 @@ struct OnboardingAirgapView: View {
     }
 }
 
-extension OnboardingAirgapView {
+extension NoAirgapView {
     struct AirgapComponentStatus: Equatable, Hashable {
         let component: AirgapComponent
         let isChecked: Bool
@@ -159,9 +159,9 @@ extension OnboardingAirgapView {
 }
 
 #if DEBUG
-    struct OnboardingAirgapView_Previews: PreviewProvider {
+    struct NoAirgapView_Previews: PreviewProvider {
         static var previews: some View {
-            OnboardingAirgapView(
+            NoAirgapView(
                 viewModel: .init(onNextTap: {})
             )
             .preferredColorScheme(.dark)

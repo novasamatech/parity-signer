@@ -171,14 +171,6 @@
 "PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
 "PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
 
-"Connectivity.Label.Title" = "Network Connected";
-"Connectivity.Label.Content" = "Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
-"Connectivity.Action.Ok" = "Got It";
-"PastConnectivity.Label.Title" = "Network Was Connected!";
-"PastConnectivity.Label.Content" = "Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
-"PastConnectivity.Action.Back" = "Go Back";
-"PastConnectivity.Action.Continue" = "Acknowledge and Proceed";
-
 "BackupModal.Label.Secret" = "Secret Recovery Phrase";
 "BackupModal.Label.Derived" = "Derived keys";
 "BackupModal.Label.QRCode" = "Backup with QR Code";
