@@ -33,7 +33,7 @@ final class OnboardingStateMachine: ObservableObject {
         case .terms:
             OnboardingAgreementsView(viewModel: .init(onNextTap: { self.onAgreementNextTap() }))
         case .airgap:
-            OnboardingAirgapView(viewModel: .init(onNextTap: { self.onAirgapNextTap() }))
+            NoAirgapView(viewModel: .init(onNextTap: { self.onAirgapNextTap() }))
         case .screenshots:
             OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.onScreenshotNextTap() }))
         case .setUpNetworksIntro:

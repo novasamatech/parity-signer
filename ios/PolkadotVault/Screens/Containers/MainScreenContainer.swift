@@ -36,6 +36,11 @@ struct MainScreenContainer: View {
             )
             .clearModalBackground()
         }
+        .fullScreenModal(
+            isPresented: $viewModel.isPresentingNoAirgap
+        ) {
+            NoAirgapView(viewModel: viewModel.noAirgapViewModel())
+        }
     }
 }
 
@@ -54,9 +59,12 @@ extension MainScreenContainer {
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let databaseVersionMediator: DatabaseVersionMediator
         private let appLaunchMediator: AppLaunchMediating
+        private let connectivityMediator: ConnectivityMediator
+
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
         @Published var isPresentingError: Bool = false
+        @Published var isPresentingNoAirgap: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
 
         init(
@@ -64,67 +72,78 @@ extension MainScreenContainer {
             onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
             passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
             databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator(),
-            appLaunchMediator: AppLaunchMediating = AppLaunchMediator()
+            appLaunchMediator: AppLaunchMediating = AppLaunchMediator(),
+            connectivityMediator: ConnectivityMediator = ServiceLocator.connectivityMediator
         ) {
             self.authenticationStateMediator = authenticationStateMediator
             self.onboardingMediator = onboardingMediator
             self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
             self.databaseVersionMediator = databaseVersionMediator
             self.appLaunchMediator = appLaunchMediator
+            self.connectivityMediator = connectivityMediator
             initialiseAppRun()
         }
 
-        private func initialiseAppRun() {
-            appLaunchMediator.finaliseInitialisation { result in
-                switch result {
-                case .success:
-                    self.checkInitialState()
-                case let .failure(error):
-                    self.presentableError = .alertError(message: error.localizedDescription)
+        func noAirgapViewModel() -> NoAirgapView.ViewModel {
+            .init(onNextTap: {})
+        }
+    }
+}
+
+private extension MainScreenContainer.ViewModel {
+    func initialiseAppRun() {
+        appLaunchMediator.finaliseInitialisation { result in
+            switch result {
+            case .success:
+                self.checkInitialState()
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
+        }
+    }
+
+    func checkInitialState() {
+        databaseVersionMediator.checkDatabaseScheme { result in
+            switch result {
+            case .success:
+                self.listenToStateChanges()
+            case let .failure(error):
+                switch error {
+                case .invalidVersion:
+                    self.viewState = .updateRequired
+                case let .error(serviceError):
+                    /// If DB version check was unavailable, assume user needs to update
+                    /// If that's not the case (i.e. there is no newer version), app restart will fix it so should
+                    /// be ok
+                    self.viewState = .updateRequired
+                    self.presentableError = .alertError(message: serviceError.localizedDescription)
                     self.isPresentingError = true
                 }
             }
         }
+    }
 
-        private func checkInitialState() {
-            databaseVersionMediator.checkDatabaseScheme { result in
-                switch result {
-                case .success:
-                    self.listenToStateChanges()
-                case let .failure(error):
-                    switch error {
-                    case .invalidVersion:
-                        self.viewState = .updateRequired
-                    case let .error(serviceError):
-                        /// If DB version check was unavailable, assume user needs to update
-                        /// If that's not the case (i.e. there is no newer version), app restart will fix it so should
-                        /// be ok
-                        self.viewState = .updateRequired
-                        self.presentableError = .alertError(message: serviceError.localizedDescription)
-                        self.isPresentingError = true
-                    }
-                }
+    func listenToStateChanges() {
+        Publishers.CombineLatest3(
+            onboardingMediator.$onboardingDone,
+            authenticationStateMediator.$authenticated,
+            passwordProtectionStatePublisher.$isProtected
+        )
+        .map {
+            let (onboardingDone, authenticated, isProtected) = $0
+            if !isProtected {
+                return .noPincode
             }
+            if !onboardingDone {
+                return .onboarding
+            }
+            return authenticated ? .authenticated : .deviceLocked
         }
-
-        private func listenToStateChanges() {
-            Publishers.CombineLatest3(
-                onboardingMediator.$onboardingDone,
-                authenticationStateMediator.$authenticated,
-                passwordProtectionStatePublisher.$isProtected
-            )
-            .map {
-                let (onboardingDone, authenticated, isProtected) = $0
-                if !isProtected {
-                    return .noPincode
-                }
-                if !onboardingDone {
-                    return .onboarding
-                }
-                return authenticated ? .authenticated : .deviceLocked
-            }
-            .assign(to: \.viewState, on: self)
+        .assign(to: \.viewState, on: self)
+        .store(in: cancelBag)
+        connectivityMediator.$isConnectivityOn
+            .assign(to: \.isPresentingNoAirgap, on: self)
             .store(in: cancelBag)
-        }
     }
 }
