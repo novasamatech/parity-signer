@@ -10,7 +10,7 @@ import SwiftUI
 extension KeyDetailsView {
     @ViewBuilder
     func rootKeyHeader() -> some View {
-        if let keySummary = viewModel.keySummary {
+        if let keySummary = viewModel.keysData?.root {
             VStack(alignment: .center, spacing: 0) {
                 if let identicon = viewModel.keysData?.root?.address.identicon {
                     IdenticonView(
@@ -20,7 +20,7 @@ extension KeyDetailsView {
                     .padding(.top, Spacing.extraSmall)
                 }
                 HStack(spacing: 0) {
-                    Text(keySummary.keyName)
+                    Text(keySummary.address.seedName)
                         .font(PrimaryFont.titleXL.font)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.center)

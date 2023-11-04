@@ -85,12 +85,15 @@
 
 // Sign Specs
 "SignSpecsList.Label.Title" = "Select Key for Signing";
-"SignSpecsDetails.Label.Title" = "Sign Transaction";
+"SignSpecsDetails.Label.Title.Metadata" = "Sign Metadata";
+"SignSpecsDetails.Label.Title.Specs" = "Sign Specs";
 
 "SignSpecsDetails.Label.NetworkMetadataSignature" = "Signature for metadata update %@ version %@";
 "SignSpecsDetails.Label.TypesSignature" = "Signature for types";
 "SignSpecsDetails.Label.NetworkSpecSignature" = "Signature for network specs update\nFor network: %@\nSpecs key: %@";
-"SignSpecsDetails.Label.ScanQRCode" = "Scan QR code to Sign Transaction";
+"SignSpecsDetails.Label.ScanQRCode.Metadata" = "Scan QR code to Sign Metadata";
+"SignSpecsDetails.Label.ScanQRCode.Specs" = "Scan QR code to Sign Specs";
+
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
 
@@ -342,7 +345,6 @@
 "Settings.Label.Networks" = "Networks";
 "Settings.Label.Logs" = "Logs";
 "Settings.Label.Verifier" = "Verifier Certificate";
-"Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
 "Settings.Label.Terms" = "Terms of Service";
 "Settings.Label.Version" = "App version %@";
@@ -452,14 +454,14 @@
 "EnterBananaSplitPasswordView.Action.Next" = "Next";
 
 "CreateDerivedKey.Label.Title" = "Create Derived Key";
-"CreateDerivedKey.Label.Subtitle" = "Step 1 / 2";
 "CreateDerivedKey.Label.Header" = "Select Network";
 "CreateDerivedKey.Label.Footer.Network" = "Haven’t found a network needed?\nLearn more about how to set up networks";
 "CreateDerivedKey.Label.Network.Title" = "Choose Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
+"CreateDerivedKey.Action.Create" = "Create Key";
+"CreateDerivedKey.Action.AddCustom" = "Add Custom Derivation Path";
 
 "CreateDerivedKey.Modal.Path.Title" = "Create Derived Key";
-"CreateDerivedKey.Modal.Path.Subtitle" = "Step 2 / 2";
 "CreateDerivedKey.Modal.Path.Header" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
 "CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
@@ -507,6 +509,8 @@
 "Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
 "Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+"Error.PrivateKeyQRCodeService.NoKeyDetails" = "Key Details data not available.";
+"Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
 
 
 "Error.ApplicationUpdateRequired.Label.Title" = "Upgrade your Polkadot Vault according\n to the requirements";

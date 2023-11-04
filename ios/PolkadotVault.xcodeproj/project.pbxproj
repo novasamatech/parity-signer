@@ -825,7 +825,7 @@
 		2DE72BC026A588C7002BB752 /* PolkadotVault */ = {
 			isa = PBXGroup;
 			children = (
-				6DEB18EB2A0BAEBC0013995E /* Data */,
+				6D8045DA28D0840500237F8C /* RustDataExtensions */,
 				6DA2ACA02939CB3000AAEADC /* Helpers */,
 				6D2D244928CCAD3700862726 /* Backend */,
 				6DEEA87D28AFBF5D00371ECA /* libsigner.a */,
@@ -913,6 +913,7 @@
 		6D01996D289CA11500F4C317 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */,
 				6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */,
 				6D019970289CA13000F4C317 /* Navigation.swift */,
 				6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */,
@@ -1002,7 +1003,10 @@
 		6D22FB8B2A9758490005993C /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */,
+				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
 				6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */,
+				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
 				6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */,
 				6D1F077E2A9CA24F006BA85E /* RecoverKeySetService.swift */,
 				6D6DF33329F65A0B00FC06AD /* KeyDetailsActionService.swift */,
@@ -1036,10 +1040,6 @@
 				6D22FB8A2A97583E0005993C /* BaseService */,
 				6D22FB892A9758350005993C /* Models */,
 				6D01996D289CA11500F4C317 /* Navigation */,
-				6D57DC49289D614100005C63 /* Adapters */,
-				6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */,
-				6D42793628DB147800C141DC /* PrivateKeyQRCodeService.swift */,
-				6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -1136,14 +1136,6 @@
 				6D52E3AE2946FF5400AD72F0 /* NetworkSelectionModal.swift */,
 			);
 			path = NetworkSelection;
-			sourceTree = "<group>";
-		};
-		6D57DC49289D614100005C63 /* Adapters */ = {
-			isa = PBXGroup;
-			children = (
-				6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */,
-			);
-			path = Adapters;
 			sourceTree = "<group>";
 		};
 		6D57DC4E289D667000005C63 /* Navigation */ = {
@@ -1391,7 +1383,7 @@
 			path = Deprecated;
 			sourceTree = "<group>";
 		};
-		6D8045DA28D0840500237F8C /* Extensions */ = {
+		6D8045DA28D0840500237F8C /* RustDataExtensions */ = {
 			isa = PBXGroup;
 			children = (
 				6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */,
@@ -1402,7 +1394,7 @@
 				6DF91F3D29C06B5F000A6BB2 /* Verifier+Show.swift */,
 				6DF91F3F29C06B70000A6BB2 /* VerifierValue+Show.swift */,
 			);
-			path = Extensions;
+			path = RustDataExtensions;
 			sourceTree = "<group>";
 		};
 		6D8045DF28D095AE00237F8C /* QRCode */ = {
@@ -1776,14 +1768,6 @@
 				6DEA1B1428D4587200D170B7 /* SeedPhraseView.swift */,
 			);
 			path = SeedPhrase;
-			sourceTree = "<group>";
-		};
-		6DEB18EB2A0BAEBC0013995E /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				6D8045DA28D0840500237F8C /* Extensions */,
-			);
-			path = Data;
 			sourceTree = "<group>";
 		};
 		6DEB18EC2A0BAEE10013995E /* TextFields */ = {
@@ -2477,7 +2461,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2535,7 +2519,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -2562,6 +2546,7 @@
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2596,6 +2581,7 @@
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

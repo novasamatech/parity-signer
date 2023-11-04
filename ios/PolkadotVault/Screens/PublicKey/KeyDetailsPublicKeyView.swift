@@ -225,12 +225,13 @@ extension KeyDetailsPublicKeyView {
     }
 
     final class ViewModel: ObservableObject {
-        let keyDetails: MKeyDetails
         let addressKey: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
+        private let keyDetailsService: KeyDetailsActionService
         private let warningStateMediator: WarningStateMediator
 
+        @Published var keyDetails: MKeyDetails
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
         @Published var isShowingRemoveConfirmation = false
@@ -260,13 +261,15 @@ extension KeyDetailsPublicKeyView {
             addressKey: String,
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
+            keyDetailsService: KeyDetailsActionService = KeyDetailsActionService(),
             warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
-            self.keyDetails = keyDetails
+            _keyDetails = .init(initialValue: keyDetails)
             self.addressKey = addressKey
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
+            self.keyDetailsService = keyDetailsService
             self.warningStateMediator = warningStateMediator
             self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
@@ -282,8 +285,16 @@ extension KeyDetailsPublicKeyView {
                 if warningStateMediator.alert {
                     isPresentingConnectivityAlert = true
                 } else {
-                    exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey(keyDetails)
-                    isPresentingExportKeysWarningModal = true
+                    exportPrivateKeyService.exportPrivateKey(keyDetails) { result in
+                        switch result {
+                        case let .success(model):
+                            self.exportPrivateKeyViewModel = model
+                            self.isPresentingExportKeysWarningModal = true
+                        case let .failure(error):
+                            self.presentableError = .alertError(message: error.message)
+                            self.isPresentingError = true
+                        }
+                    }
                 }
             }
             if shouldPresentRemoveConfirmationModal {
@@ -300,6 +311,19 @@ extension KeyDetailsPublicKeyView {
 
         func onExportKeysDismissal() {
             exportPrivateKeyViewModel = nil
+            keyDetailsService.publicKey(
+                addressKey: addressKey,
+                networkSpecsKey: keyDetails.networkInfo.networkSpecsKey
+            ) { result in
+                switch result {
+                case let .success(keyDetails):
+                    self.keyDetails = keyDetails
+                    self.renderable = KeyDetailsPublicKeyViewModel(keyDetails)
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func onConnectivityErrorContinueTap() {

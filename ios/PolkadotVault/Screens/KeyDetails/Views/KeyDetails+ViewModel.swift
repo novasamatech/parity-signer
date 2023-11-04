@@ -53,7 +53,6 @@ extension KeyDetailsView {
         @Published var isPresentingSettings = false
         @Published var isPresentingQRScanner: Bool = false
 
-        @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
         // Error handling
@@ -119,7 +118,6 @@ extension KeyDetailsView {
 
         func updateRenderables() {
             refreshDerivedKeys()
-            refreshKeySummary()
             refreshNetworks()
         }
 
@@ -215,12 +213,13 @@ extension KeyDetailsView {
             case .onCancel:
                 ()
             case let .onKeysExport(selectedKeys):
-                guard let keySummary else { return }
+                guard let root = keysData?.root else { return }
                 let derivedKeys = selectedKeys.map {
                     DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
                 }
                 keysExportModalViewModel = { ExportMultipleKeysModalViewModel(
-                    key: keySummary,
+                    keyName: root.address.seedName,
+                    key: .init(identicon: root.address.identicon, base58: root.base58),
                     derivedKeys: derivedKeys,
                     count: selectedKeys.count
                 )
@@ -314,7 +313,7 @@ extension KeyDetailsView.ViewModel {
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
         DispatchQueue.main.async {
-            self.keyDetailsActionsService.navigateToPublicKey(
+            self.keyDetailsActionsService.publicKey(
                 addressKey: deriveKey.keyData.key.addressKey,
                 networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
             ) { result in
@@ -358,8 +357,7 @@ extension KeyDetailsView.ViewModel {
                 keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
                     switch result {
                     case .success:
-                        self.updateBackupModel()
-                        self.isShowingBackupModal = true
+                        self.tryToPresentBackupModal()
                     case let .failure(error):
                         self.presentableError = .alertError(message: error.localizedDescription)
                         self.isPresentingError = true
@@ -387,8 +385,15 @@ extension KeyDetailsView.ViewModel {
 }
 
 private extension KeyDetailsView.ViewModel {
-    func updateBackupModel() {
-        backupModal = exportPrivateKeyService.backupViewModel(keysData)
+    func tryToPresentBackupModal() {
+        switch exportPrivateKeyService.backupViewModel(keysData) {
+        case let .success(backupModal):
+            self.backupModal = backupModal
+            isShowingBackupModal = true
+        case let .failure(error):
+            presentableError = .alertError(message: error.message)
+            isPresentingError = true
+        }
     }
 
     func keyData(for derivedKey: DerivedKeyRowModel) -> MKeyAndNetworkCard? {
@@ -417,14 +422,5 @@ private extension KeyDetailsView.ViewModel {
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list
-    }
-
-    func refreshKeySummary() {
-        guard let keysData else { return }
-        keySummary = KeySummaryViewModel(
-            keyName: keysData.root?.address.seedName ?? "",
-            base58: keysData.root?.base58 ?? ""
-        )
-        removeSeed = keysData.root?.address.seedName ?? ""
     }
 }
