@@ -85,7 +85,9 @@ extension MainScreenContainer {
         }
 
         func noAirgapViewModel() -> NoAirgapView.ViewModel {
-            .init(onNextTap: {})
+            .init(mode: .noAirgap) {
+                self.isPresentingNoAirgap = false
+            }
         }
     }
 }
@@ -143,7 +145,10 @@ private extension MainScreenContainer.ViewModel {
         .assign(to: \.viewState, on: self)
         .store(in: cancelBag)
         connectivityMediator.$isConnectivityOn
-            .assign(to: \.isPresentingNoAirgap, on: self)
+            .sink(receiveValue: { newValue in
+                guard !self.isPresentingNoAirgap, newValue else { return }
+                self.isPresentingNoAirgap = newValue
+            })
             .store(in: cancelBag)
     }
 }

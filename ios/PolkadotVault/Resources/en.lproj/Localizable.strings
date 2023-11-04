@@ -521,13 +521,15 @@
 "Onboarding.Screenshots.Label.Confirmation" = "I'm aware of the risks involved in taking screenshots";
 "Onboarding.Screenshots.Action.Next" = "Next";
 
-"Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
-"Onboarding.Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
-"Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
-"Onboarding.Airgap.Label.Wifi" = "Turn off WiFi Connection";
-"Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
-"Onboarding.Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
-"Onboarding.Airgap.Action.Next" = "Next";
+"Airgap.Label.Title.Setup" = "Set Up\nAir Gap Mode";
+"Airgap.Label.Title.Broken" = "Please Enable\nAir Gap Mode";
+"Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
+"Airgap.Label.Airplane" = "Enable Airplane Mode";
+"Airgap.Label.Wifi" = "Turn off WiFi Connection";
+"Airgap.Label.Cables" = "Disconnect all cables";
+"Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
+"Airgap.Action.Next" = "Next";
+"Airgap.Action.Done" = "Done";
 
 "Onboarding.SetUpNetworks.Label.Title" = "Set Up Networks On Which You Will Sign Transactions";
 "Onboarding.SetUpNetworks.Label.Content" = "Polkadot Vault is a fully Decentralised wallet, which means users have to manage networks themselves. Follow the tutorial to learn more.";

@@ -15,13 +15,13 @@ struct NoAirgapView: View {
             ScrollView {
                 VStack(alignment: .center, spacing: 0) {
                     // Header text
-                    Localizable.Onboarding.Airgap.Label.title.text
+                    Text(viewModel.title)
                         .font(PrimaryFont.titleL.font)
                         .foregroundColor(.textAndIconsPrimary)
                         .multilineTextAlignment(.center)
                         .padding(.top, Spacing.extraLarge)
                         .padding(.horizontal, Spacing.large)
-                    Localizable.Onboarding.Airgap.Label.content.text
+                    Localizable.Airgap.Label.content.text
                         .font(PrimaryFont.bodyM.font)
                         .foregroundColor(.textAndIconsTertiary)
                         .multilineTextAlignment(.center)
@@ -48,7 +48,7 @@ struct NoAirgapView: View {
                                 Image(.airgapCables)
                                     .padding(.leading, Spacing.extraSmall)
                                     .foregroundColor(.textAndIconsTertiary)
-                                Localizable.Onboarding.Airgap.Label.cables.text
+                                Localizable.Airgap.Label.cables.text
                                     .foregroundColor(.textAndIconsTertiary)
                                     .font(PrimaryFont.bodyL.font)
                             }
@@ -65,7 +65,7 @@ struct NoAirgapView: View {
                                     }
                                 }
                                 .padding(.leading, Spacing.extraSmall)
-                                Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
+                                Localizable.Airgap.Label.Cables.confirmation.text
                                     .multilineTextAlignment(.leading)
                                     .fixedSize(horizontal: false, vertical: true)
                                     .foregroundColor(.textAndIconsPrimary)
@@ -85,7 +85,7 @@ struct NoAirgapView: View {
                     Spacer()
                     PrimaryButton(
                         action: viewModel.onDoneTap,
-                        text: Localizable.Onboarding.Screenshots.Action.next.key,
+                        text: viewModel.actionTitle,
                         style: .primary(isDisabled: $viewModel.isActionDisabled)
                     )
                     .padding(Spacing.large)
@@ -113,6 +113,11 @@ struct NoAirgapView: View {
 }
 
 extension NoAirgapView {
+    enum Mode {
+        case onboarding
+        case noAirgap
+    }
+
     struct AirgapComponentStatus: Equatable, Hashable {
         let component: AirgapComponent
         let isChecked: Bool
@@ -123,15 +128,26 @@ extension NoAirgapView {
         @Published var isActionDisabled: Bool = true
         @Published var isAirplaneModeChecked: Bool = false
         @Published var isWifiChecked: Bool = false
+        private let mode: Mode
         private let airgapMediator: AirgapMediating
-        private let onNextTap: () -> Void
+        private let onActionTap: () -> Void
+        var title: String {
+            mode == .onboarding ? Localizable.Airgap.Label.Title.setup.string : Localizable.Airgap.Label.Title.broken
+                .string
+        }
+
+        var actionTitle: LocalizedStringKey {
+            mode == .onboarding ? Localizable.Airgap.Action.next.key : Localizable.Airgap.Action.done.key
+        }
 
         init(
+            mode: Mode,
             airgapMediator: AirgapMediating = AirgapMediatorAssembler().assemble(),
-            onNextTap: @escaping () -> Void
+            onActionTap: @escaping () -> Void
         ) {
+            self.mode = mode
             self.airgapMediator = airgapMediator
-            self.onNextTap = onNextTap
+            self.onActionTap = onActionTap
             subscribeToUpdates()
         }
 
@@ -144,7 +160,7 @@ extension NoAirgapView {
         }
 
         func onDoneTap() {
-            onNextTap()
+            onActionTap()
         }
 
         func toggleCheckbox() {
@@ -162,7 +178,7 @@ extension NoAirgapView {
     struct NoAirgapView_Previews: PreviewProvider {
         static var previews: some View {
             NoAirgapView(
-                viewModel: .init(onNextTap: {})
+                viewModel: .init(mode: .onboarding, onActionTap: {})
             )
             .preferredColorScheme(.dark)
         }
