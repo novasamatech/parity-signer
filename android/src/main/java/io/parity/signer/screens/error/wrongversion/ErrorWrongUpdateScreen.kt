@@ -57,65 +57,67 @@ fun ErrorWrongUpdateScreen(onBackupClicked: Callback) {
 	Column(
 		modifier = Modifier
 			.padding(24.dp)
-			.verticalScroll(rememberScrollState())
 	) {
 		Spacer(Modifier.weight(0.5f))
-		Image(
-			imageVector = Icons.Outlined.SettingsBackupRestore,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.pink500),
+		Column(
 			modifier = Modifier
-				.padding(horizontal = 8.dp)
-				.size(80.dp)
-				.align(Alignment.CenterHorizontally)
-		)
-		Spacer(modifier = Modifier.padding(top = 16.dp))
-		Text(
-			modifier = Modifier
-				.fillMaxWidth(1f),
-			text = stringResource(R.string.error_wrong_version_title),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleL,
-			textAlign = TextAlign.Center,
-		)
-		Spacer(modifier = Modifier.padding(top = 16.dp))
-		Text(
-			modifier = Modifier
-				.fillMaxWidth(1f),
-			text = stringResource(R.string.error_wrong_version_description),
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.BodyL,
-			textAlign = TextAlign.Center,
-		)
-		Spacer(modifier = Modifier.padding(top = 24.dp))
-
-		Box(
-			modifier = Modifier
-				.background(
-					MaterialTheme.colors.fill6,
-					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-				)
-				.border(
-					width = 1.dp, MaterialTheme.colors.fill12,
-					RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-				)
+				.verticalScroll(rememberScrollState())
 		) {
-			Text(
-				text = getDescriptionHelpText(),
-				style = SignerTypeface.BodyM,
-				color = MaterialTheme.colors.textSecondary,
-				modifier = Modifier.padding(16.dp)
+			Image(
+				imageVector = Icons.Outlined.SettingsBackupRestore,
+				contentDescription = null,
+				colorFilter = ColorFilter.tint(MaterialTheme.colors.pink500),
+				modifier = Modifier
+					.padding(horizontal = 8.dp)
+					.size(80.dp)
+					.align(Alignment.CenterHorizontally)
 			)
-			//todo dmitry as in io/parity/signer/screens/settings/networks/helper/HowAddNetworks.kt:63
-		}
-		//todo dmitry implement square and positioning
+			Spacer(modifier = Modifier.padding(top = 16.dp))
+			Text(
+				modifier = Modifier
+					.fillMaxWidth(1f),
+				text = stringResource(R.string.error_wrong_version_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleL,
+				textAlign = TextAlign.Center,
+			)
+			Spacer(modifier = Modifier.padding(top = 16.dp))
+			Text(
+				modifier = Modifier
+					.fillMaxWidth(1f),
+				text = stringResource(R.string.error_wrong_version_description),
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.BodyL,
+				textAlign = TextAlign.Center,
+			)
+			Spacer(modifier = Modifier.padding(top = 24.dp))
 
-		Spacer(modifier = Modifier.padding(top = 8.dp))
-		PrimaryButtonWide(
-			modifier = Modifier.padding(vertical = 24.dp),
-			label = stringResource(R.string.error_wrong_version_backup_cta),
-			onClicked = onBackupClicked,
-		)
+			Box(
+				modifier = Modifier
+					.background(
+						MaterialTheme.colors.fill6,
+						RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+					)
+					.border(
+						width = 1.dp, MaterialTheme.colors.fill12,
+						RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+					)
+			) {
+				Text(
+					text = getDescriptionHelpText(),
+					style = SignerTypeface.BodyM,
+					color = MaterialTheme.colors.textSecondary,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.padding(16.dp)
+				)
+			}
+			Spacer(modifier = Modifier.padding(top = 8.dp))
+			PrimaryButtonWide(
+				modifier = Modifier.padding(vertical = 24.dp),
+				label = stringResource(R.string.error_wrong_version_backup_cta),
+				onClicked = onBackupClicked,
+			)
+		}
 		Spacer(Modifier.weight(0.5f))
 	}
 }
@@ -136,7 +138,7 @@ private fun getDescriptionHelpText(): AnnotatedString {
 				COMPOSE_URL_TAG_ANNOTATION,
 				"https://${context.getString(R.string.error_version_helper_link)}"
 			) {
-				append(stringResource(R.string.error_version_helper_link))
+				append(context.getString(R.string.error_version_helper_link))
 			}
 		}
 	}
@@ -153,6 +155,26 @@ private fun getDescriptionHelpText(): AnnotatedString {
 @Composable
 private fun ErrorWrongUpdateScreenPreview() {
 	Box(modifier = Modifier.fillMaxSize()) {
+		SignerNewTheme() {
+			ErrorWrongUpdateScreen(
+				onBackupClicked = {},
+			)
+		}
+	}
+}
+
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun ErrorWrongUpdateScreenSmallPreview() {
+	Box(modifier = Modifier.size(width = 350.dp, height = 450.dp)) {
 		SignerNewTheme() {
 			ErrorWrongUpdateScreen(
 				onBackupClicked = {},
