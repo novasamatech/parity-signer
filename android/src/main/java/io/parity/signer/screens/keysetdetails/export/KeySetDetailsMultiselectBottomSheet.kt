@@ -48,7 +48,10 @@ fun KeySetDetailsMultiselectBottomSheet(
 	onExportSelected: Callback,
 	onExportAll: Callback,
 ) {
-	Column {
+	Column(
+		modifier = Modifier
+			.verticalScroll(rememberScrollState())
+	) {
 		val keysToExport = selected.value.size + 1 // + root key
 		BottomSheetHeader(
 			pluralStringResource(
@@ -61,13 +64,10 @@ fun KeySetDetailsMultiselectBottomSheet(
 		SignerDivider(sidePadding = 24.dp)
 		Column(
 			modifier = Modifier
-				.padding(horizontal = 8.dp)
-				.verticalScroll(rememberScrollState()),
+				.padding(horizontal = 8.dp),
 		) {
 			//seed - key set
-			model.root?.let {
-				DisabledSelectedKey(it.base58)
-			}
+			DisabledSelectedKey(model.root.base58)
 			for (item in model.keysAndNetwork) {
 				KeyDerivedItemMultiselect(
 					model = item.key,
