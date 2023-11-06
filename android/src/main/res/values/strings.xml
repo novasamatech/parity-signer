@@ -443,6 +443,8 @@
 	<string name="error_wrong_version_title">Upgrade your Polkadot Vault according the requirements</string>
 	<string name="error_wrong_version_description">"The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements. "</string>
 	<string name="error_wrong_version_backup_cta">Backup Secret Phrase</string>
+	<string name="error_version_helper_link">paritytech.github.io/parity-signer/tutorials/Upgrading.html</string>
+	<string name="error_version_helper_description">"Find the latest Polkadot Vault upgrade information here "</string>
 
 </resources>
 

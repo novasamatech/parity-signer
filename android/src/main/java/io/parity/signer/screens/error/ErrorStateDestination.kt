@@ -49,7 +49,7 @@ fun NavGraphBuilder.errorStateDestination(
 			modifier = Modifier.statusBarsPadding()
 		)
 	}
-	errorWrongVersionSubgraph()
+	errorWrongVersionSubgraph(navController)
 }
 
 

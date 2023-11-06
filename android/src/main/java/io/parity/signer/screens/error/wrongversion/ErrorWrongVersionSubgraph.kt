@@ -1,6 +1,5 @@
 package io.parity.signer.screens.error.wrongversion
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -8,6 +7,7 @@ import androidx.navigation.navigation
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 fun NavGraphBuilder.errorWrongVersionSubgraph(navController: NavController) {
+	//todo dmitry test this
 	navigation(
 		route = CoreUnlockedNavSubgraph.errorWrongDbVersionUpdate,
 		startDestination = ErrorWrongVersionSubgraph.default,
