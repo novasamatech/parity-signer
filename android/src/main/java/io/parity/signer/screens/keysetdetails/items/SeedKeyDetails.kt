@@ -50,7 +50,7 @@ fun SeedKeyDetails(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		IdentIconImage(
-			identIcon = model.identicon,
+			identicon = model.identicon,
 			modifier = Modifier.clickable(onClick = onShowRoot),
 			size = 56.dp
 		)
