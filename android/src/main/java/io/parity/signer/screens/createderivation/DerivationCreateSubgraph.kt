@@ -58,9 +58,10 @@ fun DerivationCreateSubgraph(
 					navController.navigate(DerivationCreateSubgraph.path)
 				},
 				onFastCreate = { newNetwork ->
-					deriveViewModel.fastCreateDerivationForNetwork(newNetwork)
-
-//											 todo dmitry implement
+					deriveViewModel.viewModelScope.launch {
+						deriveViewModel.fastCreateDerivationForNetwork(newNetwork, context)
+						onBack()
+					}
 				},
 				onNetworkHelp = { navController.navigate(DerivationCreateSubgraph.network_help) },
 				modifier = Modifier

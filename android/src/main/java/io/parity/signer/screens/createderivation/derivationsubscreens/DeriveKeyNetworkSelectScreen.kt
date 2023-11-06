@@ -136,7 +136,6 @@ fun NetworkHelpAlarm(modifier: Modifier = Modifier) {
 				innerShape
 			)
 	) {
-
 		Text(
 			text = stringResource(R.string.derivation_create_help_network_setup_label),
 			color = MaterialTheme.colors.textTertiary,
