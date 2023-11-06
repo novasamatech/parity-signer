@@ -3,6 +3,8 @@ package io.parity.signer.components.items
 import SignerCheckbox
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +52,11 @@ fun NetworkItemSelectable(
 			style = SignerTypeface.TitleS,
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		AnimatedVisibility(visible = isSelected) {
+		AnimatedVisibility(
+			visible = isSelected,
+			enter = fadeIn(),
+			exit = fadeOut(),
+		) {
 			CheckIcon(modifier = Modifier.padding(end = 16.dp))
 		}
 	}

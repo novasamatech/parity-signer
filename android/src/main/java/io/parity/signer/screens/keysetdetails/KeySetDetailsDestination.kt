@@ -25,7 +25,6 @@ fun NavGraphBuilder.keySetDetailsDestination(
 		KeySetDetailsScreenSubgraph(
 			originalSeedName = seedName,
 			navController = navController,
-			onBack = { navController.popBackStack() },
 		)
 	}
 }

@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 fun KeySetDetailsScreenSubgraph(
 	originalSeedName: String?,
 	navController: NavController,
-	onBack: Callback,
 ) {
 	val menuNavController = rememberNavController()
 	val coroutineScope = rememberCoroutineScope()
@@ -106,7 +105,7 @@ fun KeySetDetailsScreenSubgraph(
 					onAddNewDerivation = {
 						navController.navigate(
 							CoreUnlockedNavSubgraph.NewDerivedKey.destination(
-								seedName = state.filteredModel.root!!.seedName
+								seedName = state.filteredModel.root.seedName
 							)
 						)
 					},
