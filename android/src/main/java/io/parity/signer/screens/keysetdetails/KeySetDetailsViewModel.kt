@@ -10,9 +10,11 @@ import io.parity.signer.domain.NetworkModel
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.domain.backend.BackupInteractor
 import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.mapInner
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.usecases.AllNetworksUseCase
+import io.parity.signer.domain.usecases.DBVersionValidationUseCase
 import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +32,7 @@ class KeySetDetailsViewModel : ViewModel() {
 	private val networkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
 	private val seedRepository = ServiceLocator.activityScope!!.seedRepository
+	private val dbVersionValidate = DBVersionValidationUseCase()
 
 	val filters: StateFlow<Set<String>> =
 		preferencesRepository.networksFilter.stateIn(
@@ -121,6 +124,9 @@ class KeySetDetailsViewModel : ViewModel() {
 		}
 	}
 
+	suspend fun validateDbSchemaCorrect(): UniffiResult<Unit> {
+		return dbVersionValidate.validate()
+	}
 
 	suspend fun feedModelForSeed(seedName: String?) {
 		val result = getKeySetDetails(requestedSeedName = seedName)

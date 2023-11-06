@@ -57,6 +57,10 @@ fun KeySetDetailsScreenSubgraph(
 	LaunchedEffect(key1 = seedName) {
 		keySetViewModel.feedModelForSeed(seedName)
 	}
+	LaunchedEffect(key1 = Unit) {
+		//this is first screen - check db version here
+		keySetViewModel.validateDbSchemaCorrect().handleErrorAppState(navController)
+	}
 
 	val filteredScreenModel =
 		keySetViewModel.filteredScreenState.collectAsStateWithLifecycle()
