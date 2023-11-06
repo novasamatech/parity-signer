@@ -40,7 +40,7 @@ fun KeySetItem(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IdentIconImage(
-				identIcon = model.identicon,
+				identicon = model.identicon,
 				modifier = Modifier.padding(
 					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
 				),
