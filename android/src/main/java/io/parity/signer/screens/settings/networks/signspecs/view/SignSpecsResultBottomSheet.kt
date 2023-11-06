@@ -118,7 +118,7 @@ internal fun SignSpecsResultBottomSheet(
 						color = MaterialTheme.colors.primary,
 						style = SignerTypeface.LabelM,
 					)
-					IdentIconImage(identIcon = c.pic)
+					IdentIconImage(identicon = c.pic)
 				}
 			}
 		}

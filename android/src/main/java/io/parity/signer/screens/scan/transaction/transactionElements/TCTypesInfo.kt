@@ -11,7 +11,7 @@ import io.parity.signer.uniffi.MTypesInfo
 fun TCTypesInfo(types: MTypesInfo) {
 	Row {
 		types.typesIdPic?.let {
-			IdentIconImage(identIcon = it)
+			IdentIconImage(identicon = it)
 		}
 		TCNameValueElement(
 			name = stringResource(R.string.transaction_types_info_hash),

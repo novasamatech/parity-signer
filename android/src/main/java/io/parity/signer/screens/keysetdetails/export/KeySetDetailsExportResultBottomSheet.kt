@@ -76,7 +76,7 @@ fun KeySetDetailsExportResultBottomSheet(
 			}
 			NotificationFrameText(message = stringResource(id = R.string.key_set_export_description_content))
 			KeySeedCard(
-				seedTitle = model.root.seedName,
+				model.root.identicon,
 				base58 = model.root.base58,
 			)
 			SignerDivider()
