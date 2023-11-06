@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
+import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
@@ -19,25 +20,25 @@ fun NavGraphBuilder.errorStateDestination(
 	navController: NavController,
 ) {
 	composable(
-		route = CoreUnlockedNavSubgraph.ErrorScreen.route,
+		route = CoreUnlockedNavSubgraph.ErrorScreenGeneral.route,
 		arguments = listOf(
-			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argHeader) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argHeader) {
 				type = NavType.StringType
 			},
-			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argDescription) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argDescription) {
 				type = NavType.StringType
 			},
-			navArgument(CoreUnlockedNavSubgraph.ErrorScreen.argVerbose) {
+			navArgument(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argVerbose) {
 				type = NavType.StringType
 			},
 		),
 	) {
 		val argHeader =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argHeader)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argHeader)!!
 		val argDescr =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argDescription)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argDescription)!!
 		val argVerbose =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreen.argVerbose)!!
+			it.arguments?.getString(CoreUnlockedNavSubgraph.ErrorScreenGeneral.argVerbose)!!
 
 		ErrorStateScreen(
 			header = argHeader,
@@ -51,22 +52,7 @@ fun NavGraphBuilder.errorStateDestination(
 
 
 inline fun <reified T> UniffiResult<T>.handleErrorAppState(coreNavController: NavController): T? {
-	return when (this) {
-		is UniffiResult.Error -> {
-			coreNavController.navigate(
-				CoreUnlockedNavSubgraph.ErrorScreen.destination(
-					argHeader = "Uniffi interaction error trying to get ${T::class.java}",
-					argDescription = error.toString(),
-					argVerbose = error.getDebugDetailedDescriptionString(),
-				)
-			)
-			null
-		}
-
-		is UniffiResult.Success -> {
-			result
-		}
-	}
+	return this.toOperationResult().handleErrorAppState(coreNavController)
 }
 
 
@@ -78,21 +64,29 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 			coreNavController.navigate(
 				when (error) {
 					is NavigationError -> {
-						CoreUnlockedNavSubgraph.ErrorScreen.destination(
+						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
 							argHeader = "Operation navigation error trying to get ${T::class.java}",
 							argDescription = error.message,
 							argVerbose = "",
 						)
 					}
-					is ErrorDisplayed -> {
-						CoreUnlockedNavSubgraph.ErrorScreen.destination(
-							argHeader = "Operation error to get ${T::class.java}",
-							argDescription = error.toString(),
-							argVerbose = error.getDebugDetailedDescriptionString(),
-						)
-					}
+
+					is ErrorDisplayed ->
+						when (error) {
+							is ErrorDisplayed.DbSchemaMismatch -> {
+								CoreUnlockedNavSubgraph.errorWrongDbVersionUpdate
+							}
+							else -> {
+								CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
+									argHeader = "Operation error to get ${T::class.java}",
+									argDescription = error.toString(),
+									argVerbose = error.getDebugDetailedDescriptionString(),
+								)
+							}
+						}
+
 					else -> {
-						CoreUnlockedNavSubgraph.ErrorScreen.destination(
+						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
 							argHeader = "Operation unknown error trying to get ${T::class.java}",
 							argDescription = "",
 							argVerbose = error.toString(),
