@@ -12,6 +12,7 @@ import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.domain.getDebugDetailedDescriptionString
+import io.parity.signer.screens.error.wrongversion.errorWrongVersionSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 
@@ -48,6 +49,7 @@ fun NavGraphBuilder.errorStateDestination(
 			modifier = Modifier.statusBarsPadding()
 		)
 	}
+	errorWrongVersionSubgraph()
 }
 
 
