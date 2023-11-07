@@ -2114,7 +2114,7 @@ fn test_dynamic_derivations() {
     let derivation = result
         .key_set
         .derivations
-        .get(0)
+        .first()
         .expect("dynamic derivations is missing from result");
     assert_eq!(derivation.path, "//dd");
     assert_eq!(
@@ -2127,7 +2127,7 @@ fn test_dynamic_derivations() {
         DynamicDerivationsAddressResponse::V1(r) => {
             let key_set = r.addr;
             assert_eq!(key_set.dynamic_derivations.len(), 2);
-            let derivation_1 = key_set.dynamic_derivations.get(0).unwrap();
+            let derivation_1 = key_set.dynamic_derivations.first().unwrap();
             assert_eq!(derivation_1.derivation_path, "//dd");
             assert_eq!(
                 derivation_1.public_key,
