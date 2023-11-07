@@ -64,14 +64,6 @@ struct ActionButtonStyle: ButtonStyle {
             isDisabled: isDisabled
         )
     }
-
-    static func white(isDisabled: Binding<Bool> = Binding<Bool>.constant(false)) -> ActionButtonStyle {
-        ActionButtonStyle(
-            backgroundColor: .accentForegroundText,
-            foregroundColor: .accentPink500,
-            isDisabled: isDisabled
-        )
-    }
 }
 
 struct ActionButton: View {

@@ -41,19 +41,15 @@ struct UnlockDeviceView: View {
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
         private let seedsMediator: SeedsMediating
-        private let warningStateMediator: WarningStateMediator
 
         init(
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.seedsMediator = seedsMediator
-            self.warningStateMediator = warningStateMediator
         }
 
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
-            warningStateMediator.updateWarnings()
         }
     }
 }

@@ -8,17 +8,14 @@
 import Foundation
 
 final class ExportPrivateKeyService {
-    private let databaseMediator: DatabaseMediating
     private let seedsMediator: SeedsMediating
     private let backendService: BackendService
 
     init(
         backendService: BackendService = BackendService(),
-        databaseMediator: DatabaseMediating = DatabaseMediator(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
         self.backendService = backendService
-        self.databaseMediator = databaseMediator
         self.seedsMediator = seedsMediator
     }
 

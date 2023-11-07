@@ -65,18 +65,15 @@ enum ImportDerivedKeyError: Error {
 }
 
 final class CreateDerivedKeyService {
-    private let databaseMediator: DatabaseMediating
     private let backendService: BackendService
     private let seedsMediator: SeedsMediating
     private let createKeyNameService: CreateDerivedKeyNameService
 
     init(
-        databaseMediator: DatabaseMediating = DatabaseMediator(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
         backendService: BackendService = BackendService(),
         createKeyNameService: CreateDerivedKeyNameService = CreateDerivedKeyNameService()
     ) {
-        self.databaseMediator = databaseMediator
         self.seedsMediator = seedsMediator
         self.backendService = backendService
         self.createKeyNameService = createKeyNameService

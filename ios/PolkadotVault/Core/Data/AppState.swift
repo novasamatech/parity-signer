@@ -19,16 +19,13 @@ extension AppState {
     final class UserData {
         var allNetworks: [MmNetwork] = []
         var selectedNetworks: [MmNetwork] = []
-        @Published var keyListRequiresUpdate: Bool
 
         init(
             allNetworks: [MmNetwork] = [],
-            selectedNetworks: [MmNetwork] = [],
-            keyListRequiresUpdate: Bool = false
+            selectedNetworks: [MmNetwork] = []
         ) {
             self.allNetworks = allNetworks
             self.selectedNetworks = selectedNetworks
-            _keyListRequiresUpdate = .init(initialValue: keyListRequiresUpdate)
         }
     }
 }

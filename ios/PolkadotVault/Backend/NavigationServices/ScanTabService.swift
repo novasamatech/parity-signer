@@ -50,10 +50,6 @@ final class ScanTabService {
     func attemptPassword(_ password: String) -> ActionResult? {
         navigation.performFake(navigation: .init(action: .goForward, details: password))
     }
-
-    func onSuccessfullPasswordEntry() {
-        navigation.performFake(navigation: .init(action: .goBack))
-    }
 }
 
 private extension ScanTabService {
