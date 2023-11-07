@@ -150,7 +150,7 @@ private fun AirgapScreen(
 			}
 		}
 		PrimaryButtonWide(
-			label = stringResource(R.string.button_next),
+			label = stringResource(R.string.generic_done),
 			modifier = Modifier.padding(24.dp),
 			isEnabled = state.isReadyToProceed(),
 			onClicked = onCta,
@@ -176,6 +176,9 @@ private fun CheckboxWithTextWithGap(
 		Box(Modifier.padding(8.dp)) {
 			CheckboxIcon(
 				checked = checked,
+				checkedColor = MaterialTheme.colors.pink500,
+				uncheckedColor = MaterialTheme.colors.primary,
+				checkmarkColor = MaterialTheme.colors.pink500,
 			)
 		}
 		Spacer(Modifier.width(16.dp))

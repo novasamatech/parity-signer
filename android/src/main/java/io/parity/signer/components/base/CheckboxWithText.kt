@@ -57,15 +57,18 @@ fun CheckboxWithText(
  */
 @Composable
 fun CheckboxIcon(
-	checked: Boolean
+	checked: Boolean,
+	checkedColor: Color = MaterialTheme.colors.pink500,
+	uncheckedColor: Color = MaterialTheme.colors.textTertiary,
+	checkmarkColor: Color = Color.White,
 ) {
 	Checkbox(
 		checked = checked,
 		onCheckedChange = null,
 		colors = CheckboxDefaults.colors(
-			checkedColor = MaterialTheme.colors.pink500,
-			uncheckedColor = MaterialTheme.colors.textTertiary,
-			checkmarkColor = Color.White
+			checkedColor = checkedColor,
+			uncheckedColor = uncheckedColor,
+			checkmarkColor = checkmarkColor
 		)
 	)
 }
