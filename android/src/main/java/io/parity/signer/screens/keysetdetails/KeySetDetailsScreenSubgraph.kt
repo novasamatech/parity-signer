@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 fun KeySetDetailsScreenSubgraph(
 	originalSeedName: String?,
 	navController: NavController,
-	onBack: Callback,
 ) {
 	val menuNavController = rememberNavController()
 	val coroutineScope = rememberCoroutineScope()
@@ -106,7 +105,7 @@ fun KeySetDetailsScreenSubgraph(
 					onAddNewDerivation = {
 						navController.navigate(
 							CoreUnlockedNavSubgraph.NewDerivedKey.destination(
-								seedName = state.filteredModel.root!!.seedName
+								seedName = state.filteredModel.root.seedName
 							)
 						)
 					},
@@ -241,8 +240,8 @@ fun KeySetDetailsScreenSubgraph(
 					}
 				}
 				composable(KeySetDetailsMenuSubgraph.export) {
-					val selected = remember { mutableStateOf(setOf<String>()) }
-					val isResultState = remember { mutableStateOf(false) }
+					val selected = rememberSaveable { mutableStateOf(setOf<String>()) }
+					val isResultState = rememberSaveable { mutableStateOf(false) }
 
 					if (!isResultState.value) {
 						BottomSheetWrapperRoot(onClosedAction = closeAction) {

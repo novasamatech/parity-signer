@@ -440,6 +440,8 @@
 	<string name="generic_close_button">Close</string>
     <string name="description_check_botton">Check botton</string>
 	<string name="description_scan_icon">Scan icon</string>
+    <string name="derivation_create_fast_cta">Create Key</string>
+	<string name="derivation_create_advanced_cta">Add Custom Derivation Path</string>
 
 </resources>
 
