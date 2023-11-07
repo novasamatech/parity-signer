@@ -7,7 +7,6 @@ import androidx.navigation.navigation
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 fun NavGraphBuilder.errorWrongVersionSubgraph(navController: NavController) {
-	//todo dmitry test this
 	navigation(
 		route = CoreUnlockedNavSubgraph.errorWrongDbVersionUpdate,
 		startDestination = ErrorWrongVersionSubgraph.default,

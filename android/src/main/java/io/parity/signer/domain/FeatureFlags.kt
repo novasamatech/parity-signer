@@ -12,7 +12,7 @@ object FeatureFlags {
 			FeatureOption.SKIP_ROOTED_CHECK_EMULATOR -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 			FeatureOption.ENABLE_DYNAMIC_DERIVATIONS -> true // enable for debug only
-			FeatureOption.FAIL_DB_VERSION_CHECK -> true // enable for debug only
+			FeatureOption.FAIL_DB_VERSION_CHECK -> false
 
 		}
 	}
