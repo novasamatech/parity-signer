@@ -46,10 +46,6 @@ struct SettingsView: View {
                     .navigationBarHidden(true),
                 isActive: $viewModel.isDetailsPresented
             ) { EmptyView() }
-            VStack(spacing: 0) {
-                ConnectivityAlertOverlay(viewModel: .init())
-            }
-            .background(.backgroundPrimary)
         }
         .onAppear {
             viewModel.loadData()

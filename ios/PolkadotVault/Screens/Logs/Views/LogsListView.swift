@@ -40,7 +40,6 @@ struct LogsListView: View {
                 }
             }
             .background(.backgroundPrimary)
-            ConnectivityAlertOverlay(viewModel: .init())
         }
         .onAppear {
             viewModel.loadData()

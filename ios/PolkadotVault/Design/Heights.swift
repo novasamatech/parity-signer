@@ -97,8 +97,6 @@ enum Sizes {
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28
     static let roundedQuestionmark: CGFloat = 24
-    /// Diameter for connectivity alert button, 56pt
-    static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
     static let signSpecsIdenticonSize: CGFloat = 36
     static let chevronDownKeyDetails: CGFloat = 16

@@ -10,7 +10,6 @@ import SwiftUI
 
 struct KeyDetailsPublicKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -123,21 +122,6 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: {
-                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
-                DispatchQueue.main.async { viewModel.checkForActionsPresentation() }
-            }
-        ) {
-            ErrorBottomModal(
-                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: viewModel.onConnectivityErrorContinueTap()
-                ),
-                isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
-            )
-            .clearModalBackground()
-        }
-        .fullScreenModal(
             isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(
@@ -229,7 +213,6 @@ extension KeyDetailsPublicKeyView {
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
         private let keyDetailsService: KeyDetailsActionService
-        private let warningStateMediator: WarningStateMediator
 
         @Published var keyDetails: MKeyDetails
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
@@ -238,7 +221,6 @@ extension KeyDetailsPublicKeyView {
         @Published var isShowingActionSheet = false
         @Published var isPresentingExportKeysWarningModal = false
         @Published var isPresentingExportKeysModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
@@ -262,7 +244,6 @@ extension KeyDetailsPublicKeyView {
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
             keyDetailsService: KeyDetailsActionService = KeyDetailsActionService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             _keyDetails = .init(initialValue: keyDetails)
@@ -270,7 +251,6 @@ extension KeyDetailsPublicKeyView {
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
-            self.warningStateMediator = warningStateMediator
             self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
         }
@@ -282,18 +262,14 @@ extension KeyDetailsPublicKeyView {
         func checkForActionsPresentation() {
             if shouldPresentExportKeysWarningModal {
                 shouldPresentExportKeysWarningModal = false
-                if warningStateMediator.alert {
-                    isPresentingConnectivityAlert = true
-                } else {
-                    exportPrivateKeyService.exportPrivateKey(keyDetails) { result in
-                        switch result {
-                        case let .success(model):
-                            self.exportPrivateKeyViewModel = model
-                            self.isPresentingExportKeysWarningModal = true
-                        case let .failure(error):
-                            self.presentableError = .alertError(message: error.message)
-                            self.isPresentingError = true
-                        }
+                exportPrivateKeyService.exportPrivateKey(keyDetails) { result in
+                    switch result {
+                    case let .success(model):
+                        self.exportPrivateKeyViewModel = model
+                        self.isPresentingExportKeysWarningModal = true
+                    case let .failure(error):
+                        self.presentableError = .alertError(message: error.message)
+                        self.isPresentingError = true
                     }
                 }
             }
@@ -324,11 +300,6 @@ extension KeyDetailsPublicKeyView {
                     self.isPresentingError = true
                 }
             }
-        }
-
-        func onConnectivityErrorContinueTap() {
-            warningStateMediator.resetConnectivityWarnings()
-            shouldPresentExportKeysWarningModal.toggle()
         }
 
         func onRemoveKeyTap() {
