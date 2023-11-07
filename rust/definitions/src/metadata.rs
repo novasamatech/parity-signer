@@ -18,6 +18,7 @@
 
 use frame_metadata::{decode_different::DecodeDifferent, v14::RuntimeMetadataV14, RuntimeMetadata};
 use parity_scale_codec::{Decode, Encode};
+use sc_executor_common::wasm_runtime::DEFAULT_HEAP_ALLOC_STRATEGY;
 #[cfg(feature = "active")]
 use sc_executor_common::{
     runtime_blob::RuntimeBlob,
@@ -25,16 +26,13 @@ use sc_executor_common::{
 };
 #[cfg(feature = "active")]
 use sc_executor_wasmtime::create_runtime;
+use sc_executor_wasmtime::{Config, InstantiationStrategy, Semantics};
 use sled::IVec;
 #[cfg(feature = "active")]
 use sp_core::H256;
 #[cfg(feature = "active")]
 use sp_io::SubstrateHostFunctions;
 use sp_version::RuntimeVersion;
-// #[cfg(feature = "active")]
-// use sp_wasm_interface::HostFunctions;
-use sc_executor_common::wasm_runtime::DEFAULT_HEAP_ALLOC_STRATEGY;
-use sc_executor_wasmtime::{Config, InstantiationStrategy, Semantics};
 use std::collections::HashMap;
 
 #[cfg(feature = "active")]
