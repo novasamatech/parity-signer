@@ -3,6 +3,7 @@ package io.parity.signer.screens.error.wrongversion
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,7 +63,9 @@ fun FallbackRecoverPhraseScreen(
 					)
 			) {
 				seedList.forEachIndexed { index, it ->
-					KeysetEntry(it)
+					KeysetEntry(it) {
+						onSelected(it)
+					}
 					if (index < seedList.lastIndex) {
 						SignerDivider()
 					}
@@ -73,8 +76,11 @@ fun FallbackRecoverPhraseScreen(
 }
 
 @Composable
-private fun KeysetEntry(name: String) {
-	Row(verticalAlignment = Alignment.CenterVertically) {
+private fun KeysetEntry(name: String, onClicked: Callback) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier.clickable(onClick = onClicked),
+	) {
 		Text(
 			text = name,
 			color = MaterialTheme.colors.primary,
