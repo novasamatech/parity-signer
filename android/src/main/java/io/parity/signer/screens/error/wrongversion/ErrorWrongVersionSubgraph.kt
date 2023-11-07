@@ -20,10 +20,12 @@ fun NavGraphBuilder.errorWrongVersionSubgraph(navController: NavController) {
 			})
 		}
 		composable(ErrorWrongVersionSubgraph.backup) {
-			//todo dmitry implement
+			FallbackRecoverPhraseScreenFull(
+				onBack = navController::popBackStack,
+				navController = navController,
+			)
 		}
 	}
-
 }
 
 internal object ErrorWrongVersionSubgraph {
