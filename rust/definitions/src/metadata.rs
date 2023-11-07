@@ -24,15 +24,17 @@ use sc_executor_common::{
     wasm_runtime::{InvokeMethod, WasmModule},
 };
 #[cfg(feature = "active")]
-use sc_executor_wasmi::create_runtime;
+use sc_executor_wasmtime::create_runtime;
 use sled::IVec;
 #[cfg(feature = "active")]
 use sp_core::H256;
 #[cfg(feature = "active")]
 use sp_io::SubstrateHostFunctions;
 use sp_version::RuntimeVersion;
-#[cfg(feature = "active")]
-use sp_wasm_interface::HostFunctions;
+// #[cfg(feature = "active")]
+// use sp_wasm_interface::HostFunctions;
+use sc_executor_common::wasm_runtime::DEFAULT_HEAP_ALLOC_STRATEGY;
+use sc_executor_wasmtime::{Config, InstantiationStrategy, Semantics};
 use std::collections::HashMap;
 
 #[cfg(feature = "active")]
@@ -171,11 +173,23 @@ impl MetaValues {
 pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
     let buffer = std::fs::read(filename).map_err(Wasm::File)?;
     let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::WasmError)?;
-    let wasmi_runtime = create_runtime(
+    let wasmi_runtime = create_runtime::<SubstrateHostFunctions>(
         runtime_blob,
-        64,
-        SubstrateHostFunctions::host_functions(),
-        false,
+        Config {
+            allow_missing_func_imports: false,
+            cache_path: None,
+            semantics: Semantics {
+                instantiation_strategy: InstantiationStrategy::PoolingCopyOnWrite,
+                heap_alloc_strategy: DEFAULT_HEAP_ALLOC_STRATEGY,
+                deterministic_stack_limit: None,
+                canonicalize_nans: false,
+                parallel_compilation: true,
+                wasm_multi_value: false,
+                wasm_bulk_memory: false,
+                wasm_reference_types: false,
+                wasm_simd: false,
+            },
+        },
     )
     .map_err(Wasm::WasmError)?;
     let mut wasmi_instance = wasmi_runtime.new_instance().map_err(Wasm::Executor)?;

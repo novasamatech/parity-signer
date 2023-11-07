@@ -9,24 +9,24 @@ edition = "2021"
 frame-metadata = {version = "16.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
-parity-scale-codec = {version = "3.6.8", features = ["derive"]}
-sc-executor-common = {git = "https://github.com/paritytech/substrate"}
-sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
+parity-scale-codec = {version = "3.6.5", features = ["derive"]}
+sc-executor-common = {git = "https://github.com/paritytech/polkadot-sdk"}
+sc-executor-wasmtime = {git = "https://github.com/paritytech/polkadot-sdk", optional = true}
 sled = "0.34.6"
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
-sp-version = {git = "https://github.com/paritytech/substrate"}
-sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
+sp-core = {git = "https://github.com/paritytech/polkadot-sdk", default-features = false, features = ["full_crypto"]}
+sp-io = {git = "https://github.com/paritytech/polkadot-sdk", optional = true}
+sp-runtime = {git = "https://github.com/paritytech/polkadot-sdk", default-features = false}
+sp-version = {git = "https://github.com/paritytech/polkadot-sdk"}
+#sp-wasm-interface = {git = "https://github.com/paritytech/polkadot-sdk", optional = true}
 thiserror = "1.0.50"
 constants = {path = "../constants"}
 
 [features]
-default = []
+default = ["active"]
 active = [
-	"sc-executor-wasmi",
+	"sc-executor-wasmtime",
 	"sp-io",
-	"sp-wasm-interface",
+#	"sp-wasm-interface",
 ]
 
 [lib]
