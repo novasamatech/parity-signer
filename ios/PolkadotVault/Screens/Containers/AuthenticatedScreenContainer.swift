@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
     @EnvironmentObject private var appState: AppState
     @StateObject var viewModel: ViewModel

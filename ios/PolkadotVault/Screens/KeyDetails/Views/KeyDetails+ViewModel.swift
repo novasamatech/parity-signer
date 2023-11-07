@@ -22,7 +22,6 @@ extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetManagedNetworksService
-        private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
 
         private let exportPrivateKeyService: PrivateKeyQRCodeService
@@ -38,7 +37,6 @@ extension KeyDetailsView {
         @Published var isShowingActionSheet = false
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingBackupModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var isPresentingExportKeySelection = false
         @Published var isPresentingRootDetails = false
         @Published var isPresentingKeyDetails = false
@@ -79,7 +77,6 @@ extension KeyDetailsView {
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
             appState: AppState = ServiceLocator.appState,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
@@ -88,7 +85,6 @@ extension KeyDetailsView {
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
             self.keyDetailsActionsService = keyDetailsActionsService
-            self.warningStateMediator = warningStateMediator
             self.appState = appState
             self.seedsMediator = seedsMediator
             _keyName = .init(initialValue: initialKeyName)
@@ -329,11 +325,6 @@ extension KeyDetailsView.ViewModel {
             }
         }
     }
-
-    func onConnectivityAlertTap() {
-        warningStateMediator.resetConnectivityWarnings()
-        shouldPresentBackupModal.toggle()
-    }
 }
 
 // MARK: - Modals
@@ -344,24 +335,19 @@ extension KeyDetailsView.ViewModel {
     }
 
     func onActionSheetDismissal() {
-        let isAlertVisible = warningStateMediator.alert
         if shouldPresentRemoveConfirmationModal {
             shouldPresentRemoveConfirmationModal.toggle()
             isShowingRemoveConfirmation.toggle()
         }
         if shouldPresentBackupModal {
             shouldPresentBackupModal.toggle()
-            if isAlertVisible {
-                isPresentingConnectivityAlert.toggle()
-            } else {
-                keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
-                    switch result {
-                    case .success:
-                        self.tryToPresentBackupModal()
-                    case let .failure(error):
-                        self.presentableError = .alertError(message: error.localizedDescription)
-                        self.isPresentingError = true
-                    }
+            keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
+                switch result {
+                case .success:
+                    self.tryToPresentBackupModal()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
                 }
             }
         }

@@ -16,9 +16,7 @@ struct ActionSheetCircleButtonStyle: ButtonStyle {
             .font(PrimaryFont.titleS.font)
     }
 
-    static let destructive = ActionSheetCircleButtonStyle(foregroundColor: .accentRed400)
     static let `default` = ActionSheetCircleButtonStyle(foregroundColor: .textAndIconsSecondary)
-    static let hightlighted = ActionSheetCircleButtonStyle(foregroundColor: .textAndIconsPrimary)
 }
 
 struct ActionSheetCircleButton: View {

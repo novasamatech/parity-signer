@@ -50,17 +50,6 @@ struct BackupSelectKeyView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingConnectivityAlert
-        ) {
-            ErrorBottomModal(
-                viewModel: viewModel.connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: viewModel.onConnectivityWarningTap()
-                ),
-                isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
-            )
-            .clearModalBackground()
-        }
     }
 
     @ViewBuilder
@@ -85,43 +74,20 @@ struct BackupSelectKeyView: View {
 extension BackupSelectKeyView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingBackupModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var seedPhraseToPresent: SettingsBackupViewModel = .init(
             keyName: "",
             seedPhrase: .init(seedPhrase: "")
         )
-        private var awaitingSeedName: String?
-        weak var connectivityMediator: ConnectivityMediator!
         let seedsMediator: SeedsMediating
-        private let warningStateMediator: WarningStateMediator
 
         init(
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            connectivityMediator: ConnectivityMediator = ServiceLocator.connectivityMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.seedsMediator = seedsMediator
-            self.warningStateMediator = warningStateMediator
-            self.connectivityMediator = connectivityMediator
         }
 
         func onSeedNameTap(_ seedName: String) {
-            if connectivityMediator.isConnectivityOn || warningStateMediator.alert {
-                isPresentingConnectivityAlert = true
-                awaitingSeedName = seedName
-            } else {
-                presentBackupModal(seedName)
-            }
-        }
-
-        func onConnectivityWarningTap() {
-            warningStateMediator.resetConnectivityWarnings()
-            isPresentingConnectivityAlert = false
-            guard let awaitingSeedName else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.presentBackupModal(awaitingSeedName)
-                self.isPresentingBackupModal = true
-            }
+            presentBackupModal(seedName)
         }
 
         private func presentBackupModal(_ seedName: String) {
@@ -132,7 +98,6 @@ extension BackupSelectKeyView {
                 )
             )
             isPresentingBackupModal = true
-            awaitingSeedName = nil
         }
     }
 }

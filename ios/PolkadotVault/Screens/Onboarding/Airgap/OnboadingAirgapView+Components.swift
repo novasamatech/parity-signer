@@ -19,9 +19,9 @@ extension AirgapComponent {
     var title: String {
         switch self {
         case .aiplaneMode:
-            Localizable.Onboarding.Airgap.Label.airplane.string
+            Localizable.Airgap.Label.airplane.string
         case .wifi:
-            Localizable.Onboarding.Airgap.Label.wifi.string
+            Localizable.Airgap.Label.wifi.string
         }
     }
 

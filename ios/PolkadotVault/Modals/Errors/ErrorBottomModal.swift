@@ -126,15 +126,6 @@ struct ErrorBottomModal: View {
     struct ErrorBottomModal_Previews: PreviewProvider {
         static var previews: some View {
             Group {
-                // Connectivity
-                ErrorBottomModal(
-                    viewModel: .connectivityOn(),
-                    isShowingBottomAlert: Binding<Bool>.constant(true)
-                )
-                ErrorBottomModal(
-                    viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
-                    isShowingBottomAlert: Binding<Bool>.constant(true)
-                )
                 // General Error
                 ErrorBottomModal(
                     viewModel: .alertError(
