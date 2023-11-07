@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -24,11 +25,12 @@ import io.parity.signer.ui.theme.fill18
 @Composable
 fun CheckIcon(
 	modifier: Modifier = Modifier,
+	size: Dp = 28.dp,
 	noBackground: Boolean = false,
 ) {
 	Box(
 		modifier = modifier
-			.size(32.dp)
+			.size(size)
 			.run {
 				if (noBackground) {
 					this

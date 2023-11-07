@@ -440,6 +440,8 @@
 	<string name="generic_close_button">Close</string>
     <string name="description_check_botton">Check botton</string>
 	<string name="description_scan_icon">Scan icon</string>
+    <string name="derivation_create_fast_cta">Create Key</string>
+	<string name="derivation_create_advanced_cta">Add Custom Derivation Path</string>
 	<string name="error_wrong_version_title">Upgrade your Polkadot Vault according the requirements</string>
 	<string name="error_wrong_version_description">"The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements. "</string>
 	<string name="error_wrong_version_backup_cta">Backup Secret Phrase</string>
