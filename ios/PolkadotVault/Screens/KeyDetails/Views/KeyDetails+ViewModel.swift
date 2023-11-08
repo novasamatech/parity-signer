@@ -67,8 +67,6 @@ extension KeyDetailsView {
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
         private let onDeleteCompletion: () -> Void
-        /// Name of seed to be removed with `Remove Seed` action
-        private var removeSeed: String = ""
 
         init(
             initialKeyName: String,
@@ -143,7 +141,7 @@ extension KeyDetailsView {
         }
 
         func onRemoveKeySetConfirmationTap() {
-            let isRemoved = seedsMediator.removeSeed(seedName: removeSeed)
+            let isRemoved = seedsMediator.removeSeed(seedName: keyName)
             guard isRemoved else { return }
             keyDetailsActionsService.forgetKeySet(seedName: keyName) { result in
                 switch result {
