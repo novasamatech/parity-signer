@@ -56,7 +56,6 @@ fun NavGraphBuilder.errorStateDestination(
 		AirgapScreen(isInitialOnboarding = false) {
 			navController.popBackStack()
 		}
-		//todo dmitry show this when bottom sheets icon present. Or else?
 	}
 }
 

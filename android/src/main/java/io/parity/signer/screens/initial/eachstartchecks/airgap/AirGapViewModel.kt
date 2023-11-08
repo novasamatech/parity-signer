@@ -3,6 +3,7 @@ package io.parity.signer.screens.initial.eachstartchecks.airgap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.NetworkState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -59,6 +60,8 @@ class AirGapViewModel : ViewModel() {
 	}
 
 	fun onConfirmedAirgap() {
-		//todo dmitry confirm as in bottom sheets
+		if (networkExposedStateKeeper.airGapModeState.value == NetworkState.Past) {
+			networkExposedStateKeeper.acknowledgeWarning()
+		}
 	}
 }

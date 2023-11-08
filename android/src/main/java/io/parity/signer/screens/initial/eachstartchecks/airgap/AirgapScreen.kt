@@ -185,7 +185,7 @@ private fun CheckboxWithTextWithGap(
 				checked = checked,
 				checkedColor = MaterialTheme.colors.pink500,
 				uncheckedColor = MaterialTheme.colors.primary,
-				checkmarkColor = MaterialTheme.colors.pink500,
+				checkmarkColor = Color.White,
 			)
 		}
 		Spacer(Modifier.width(16.dp))
