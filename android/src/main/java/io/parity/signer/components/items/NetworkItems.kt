@@ -2,7 +2,9 @@ package io.parity.signer.components.items
 
 import SignerCheckbox
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,24 +13,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.base.CheckIcon
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
-import io.parity.signer.ui.theme.textTertiary
 
 
 @Composable
-fun NetworkItemClickable(
+fun NetworkItemSelectable(
 	network: NetworkModel,
+	isSelected: Boolean,
 	onClick: (NetworkModel) -> Unit,
 ) {
 	Row(
@@ -52,15 +52,13 @@ fun NetworkItemClickable(
 			style = SignerTypeface.TitleS,
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		Image(
-			imageVector = Icons.Filled.ChevronRight,
-			contentDescription = null,
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.textTertiary),
-			modifier = Modifier
-				.padding(2.dp)// because it's 28 not 32pd
-				.padding(end = 16.dp)
-				.size(28.dp)
-		)
+		AnimatedVisibility(
+			visible = isSelected,
+			enter = fadeIn(),
+			exit = fadeOut(),
+		) {
+			CheckIcon(modifier = Modifier.padding(end = 16.dp))
+		}
 	}
 }
 
@@ -103,7 +101,6 @@ fun NetworkItemMultiselect(
 }
 
 
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -131,13 +128,18 @@ private fun PreviewNetworkItem() {
 	)
 	SignerNewTheme {
 		Column() {
-			NetworkItemClickable(
+			NetworkItemSelectable(
 				network = networks[0],
+				isSelected = true,
+				onClick = {})
+			NetworkItemSelectable(
+				network = networks[0],
+				isSelected = false,
 				onClick = {})
 			NetworkItemMultiselect(
 				network = networks[0],
-					isSelected = true,
-					onClick = {}
+				isSelected = true,
+				onClick = {}
 			)
 			NetworkItemMultiselect(
 				network = networks[1],

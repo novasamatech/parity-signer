@@ -39,6 +39,7 @@ import io.parity.signer.uniffi.MEnterPassword
 //it's in signsufficient Crypto and transaction, as well as export qr code
 //navstate.rs:365
 //navstate.rs:473
+
 @Composable
 fun EnterPassword(
 	data: EnterPasswordModel,

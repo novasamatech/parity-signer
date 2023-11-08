@@ -185,6 +185,7 @@ class SeedRepository(
 		seedPhrase: String,
 		networksKeys: List<String>
 	): Boolean {
+		//todo return operation result here and show error in UI
 		// Check if seed name already exists
 		if (isSeedPhraseCollision(seedPhrase)) {
 			return false
@@ -265,6 +266,9 @@ class SeedRepository(
 	 * should be called within authentication envelope
 	 * authentication.authenticate(activity) {refreshSeedNames()}
 	 * which is somewhat asynchronous
+	 *
+	 * todo dmitry we don't need to tell rust names - remove it, yet make sure we
+	 * update known seeds in all cases we need to update - now it's in storage.getSeedNames()
 	 */
 	private fun tellRustSeedNames() {
 		val allNames = storage.getSeedNames()

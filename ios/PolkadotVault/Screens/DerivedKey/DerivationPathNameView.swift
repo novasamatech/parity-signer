@@ -20,10 +20,7 @@ struct DerivationPathNameView: View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    title: .subtitle(
-                        title: Localizable.CreateDerivedKey.Modal.Path.title.string,
-                        subtitle: Localizable.CreateDerivedKey.Modal.Path.subtitle.string
-                    ),
+                    title: .title(Localizable.CreateDerivedKey.Modal.Path.title.string),
                     leftButtons: [.init(
                         type: .arrow,
                         action: { presentationMode.wrappedValue.dismiss() }
@@ -35,13 +32,13 @@ struct DerivationPathNameView: View {
                         ),
                         action: viewModel.onRightNavigationButtonTap
                     )],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             .padding(.bottom, Spacing.extraSmall)
             // Content
             Localizable.CreateDerivedKey.Modal.Path.header.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.small)
@@ -69,26 +66,26 @@ struct DerivationPathNameView: View {
                         .padding(.bottom, Spacing.extraSmall)
                     if let derivationPathError = viewModel.derivationPathError {
                         Text(derivationPathError)
-                            .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            .foregroundColor(.accentRed300)
                             .font(PrimaryFont.captionM.font)
                             .padding(.bottom, Spacing.small)
                     }
                     if viewModel.isEntrySuggestionActive {
                         Localizable.CreateDerivedKey.Modal.Path.Suggestion.path.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.captionM.font)
                             .padding(.bottom, Spacing.small)
                     }
                     quickActions()
                         .padding(.bottom, Spacing.extraSmall)
                     Localizable.CreateDerivedKey.Modal.Path.Footer.path.text
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .font(PrimaryFont.captionM.font)
                         .padding(.vertical, Spacing.extraSmall)
                     if viewModel.isPassworded {
                         Localizable.CreateDerivedKey.Modal.Path.Header.password.text
                             .font(PrimaryFont.bodyL.font)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .padding(.bottom, Spacing.medium)
                             .padding(.top, Spacing.medium)
                         SecurePrimaryTextField(
@@ -105,7 +102,7 @@ struct DerivationPathNameView: View {
                         .padding(.bottom, Spacing.small)
                         if !viewModel.isPasswordValid {
                             Localizable.CreateDerivedKey.Modal.Path.Error.password.text
-                                .foregroundColor(Asset.accentRed300.swiftUIColor)
+                                .foregroundColor(.accentRed300)
                                 .font(PrimaryFont.captionM.font)
                                 .padding(.bottom, Spacing.small)
                         }
@@ -118,9 +115,9 @@ struct DerivationPathNameView: View {
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.medium)
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .onAppear {
             focusedPath = true
         }
@@ -182,11 +179,11 @@ struct DerivationPathNameView: View {
 struct SoftCapsuleButton: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .foregroundColor(Asset.accentPink300.swiftUIColor)
+            .foregroundColor(.accentPink300)
             .font(PrimaryFont.labelS.font)
             .padding(.vertical, Spacing.extraSmall)
             .padding(.horizontal, Spacing.medium)
-            .background(Asset.accentPink12.swiftUIColor)
+            .background(.accentPink12)
             .clipShape(Capsule())
     }
 }
@@ -247,7 +244,7 @@ extension DerivationPathNameView {
 
         func onRightNavigationButtonTap() {
             derivationPath = inputText
-            let completion: (Result<Void, Error>) -> Void = { result in
+            let completion: (Result<Void, ServiceError>) -> Void = { result in
                 switch result {
                 case .success:
                     self.isPresentingConfirmation = true
@@ -290,7 +287,12 @@ extension DerivationPathNameView {
                 skipValidation = false
                 return
             }
-            pathErrorCheck(createKeyService.checkForCollision(seedName, inputText, networkSelection.key))
+            createKeyService.checkForCollision(
+                seedName,
+                inputText,
+                networkSelection.key,
+                completion: pathErrorCheck(_:)
+            )
         }
 
         func onPasswordConfirmationDoneTap() {

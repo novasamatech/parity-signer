@@ -11,20 +11,20 @@ struct JailbreakDetectedView: View {
     var body: some View {
         VStack(spacing: Spacing.small) {
             Spacer()
-            Asset.jailbreak.swiftUIImage
+            Image(.jailbreak)
                 .padding(.bottom, Spacing.small)
             Localizable.Error.Jailbreak.Label.title.text
                 .font(PrimaryFont.titleL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.horizontal, Spacing.x3Large)
             Localizable.Error.Jailbreak.Label.subtitle.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.extraExtraLarge)
             Spacer()
         }
         .multilineTextAlignment(.center)
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
     }
 }
 

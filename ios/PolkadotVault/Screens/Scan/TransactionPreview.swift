@@ -42,7 +42,7 @@ struct TransactionPreview: View {
         .onAppear {
             viewModel.onAppear()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .bottomEdgeOverlay(
             overlayView:
             TransactionDetailsView(
@@ -106,7 +106,7 @@ struct TransactionPreview: View {
                 if isLogNoteVisible {
                     VStack(alignment: .leading) {
                         Localizable.TransactionSign.Action.note.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.bodyL.font)
                         TextField("", text: $comment)
                             .primaryTextFieldStyle(
@@ -122,7 +122,7 @@ struct TransactionPreview: View {
                                 isLogNoteVisible = true
                             }
                         },
-                        icon: Asset.add.swiftUIImage,
+                        icon: Image(.addLarge),
                         text: Localizable.TransactionSign.Action.note.string
                     )
                 }
@@ -185,7 +185,7 @@ struct TransactionPreview: View {
                 // Header
                 Localizable.TransactionSign.Label.signCode.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .padding(.leading, Spacing.extraSmall)
                 // QR Code container
                 VStack(alignment: .leading, spacing: Spacing.medium) {

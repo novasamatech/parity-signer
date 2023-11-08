@@ -9,7 +9,6 @@ import SwiftUI
 
 struct KeyDetailsView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
 
     var body: some View {
         NavigationView {
@@ -42,10 +41,7 @@ struct KeyDetailsView: View {
                 .onAppear {
                     viewModel.onAppear()
                 }
-                .background(Asset.backgroundPrimary.swiftUIColor)
-                VStack(spacing: 0) {
-                    ConnectivityAlertOverlay(viewModel: .init())
-                }
+                .background(.backgroundPrimary)
                 HStack(alignment: .center) {
                     Spacer()
                     QRCodeButton(action: viewModel.onQRScannerTap)
@@ -127,21 +123,6 @@ struct KeyDetailsView: View {
             } else {
                 EmptyView()
             }
-        }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: {
-                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
-                DispatchQueue.main.async { viewModel.onActionSheetDismissal() }
-            }
-        ) {
-            ErrorBottomModal(
-                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: viewModel.onConnectivityAlertTap()
-                ),
-                isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
-            )
-            .clearModalBackground()
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingKeysExportModal

@@ -28,12 +28,12 @@ struct QRCodeButton: View {
             label: {
                 ZStack(alignment: .center) {
                     Circle()
-                        .stroke(Asset.backgroundSecondaryInversed.swiftUIColor, lineWidth: Constants.outerWidth)
+                        .strokeBorder(.white, lineWidth: Constants.outerWidth)
                         .frame(width: Constants.outerDiameter, height: Constants.outerDiameter)
                     Circle()
                         .frame(width: Constants.innerDiameter, height: Constants.innerDiameter)
-                        .foregroundColor(Asset.pink500.swiftUIColor)
-                    Asset.scanIcon.swiftUIImage
+                        .foregroundColor(.pink500)
+                    Image(.scanIcon)
                 }
             }
         )

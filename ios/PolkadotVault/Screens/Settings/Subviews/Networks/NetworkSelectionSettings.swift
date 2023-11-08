@@ -21,7 +21,7 @@ struct NetworkSelectionSettings: View {
                         action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             ScrollView(showsIndicators: false) {
@@ -30,13 +30,13 @@ struct NetworkSelectionSettings: View {
                         item(for: $0)
                     }
                     HStack(alignment: .center, spacing: 0) {
-                        Asset.add.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        Image(.addLarge)
+                            .foregroundColor(.textAndIconsTertiary)
                             .frame(width: Heights.networkLogoInCell, height: Heights.networkLogoInCell)
-                            .background(Circle().foregroundColor(Asset.fill12.swiftUIColor))
+                            .background(Circle().foregroundColor(.fill12))
                             .padding(.trailing, Spacing.small)
                         Text(Localizable.Settings.Networks.Action.add.string)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.labelL.font)
                         Spacer()
                     }
@@ -60,7 +60,7 @@ struct NetworkSelectionSettings: View {
                 isActive: $viewModel.isPresentingDetails
             ) { EmptyView() }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isShowingQRScanner,
             onDismiss: viewModel.onQRScannerDismiss
@@ -92,12 +92,12 @@ struct NetworkSelectionSettings: View {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.labelL.font)
             Spacer()
-            Asset.chevronRight.swiftUIImage
+            Image(.chevronRight)
                 .frame(width: Sizes.rightChevronContainerSize, height: Sizes.rightChevronContainerSize)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
         }
         .contentShape(Rectangle())
         .padding(.horizontal, Spacing.medium)

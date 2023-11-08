@@ -93,7 +93,7 @@ fun KeySetRootExportBottomSheet(
 						.weight(1f)
 				)
 				IdentIconImage(
-					identIcon = model.identicon,
+					identicon = model.identicon,
 					size = 36.dp,
 					modifier = Modifier.padding(start = 8.dp)
 				)

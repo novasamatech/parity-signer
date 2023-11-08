@@ -90,15 +90,13 @@ enum Sizes {
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
     static let actionSheetCircleIcon: CGFloat = 40
-
+    static let checkmarkCircleButton: CGFloat = 32
     /// Size for seed word position label
     static let seedWordPositionWidth: CGFloat = 18
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28
     static let roundedQuestionmark: CGFloat = 24
-    /// Diameter for connectivity alert button, 56pt
-    static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
     static let signSpecsIdenticonSize: CGFloat = 36
     static let chevronDownKeyDetails: CGFloat = 16

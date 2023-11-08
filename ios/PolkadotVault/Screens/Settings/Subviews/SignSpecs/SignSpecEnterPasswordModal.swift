@@ -26,8 +26,8 @@ struct SignSpecEnterPasswordModal: View {
                     Button(
                         action: viewModel.onCancelTap
                     ) {
-                        Asset.xmarkButtonMedium.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        Image(.xmarkButtonMedium)
+                            .foregroundColor(.textAndIconsSecondary)
                             .frame(
                                 width: Heights.navigationButton,
                                 height: Heights.navigationButton,
@@ -47,7 +47,7 @@ struct SignSpecEnterPasswordModal: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Localizable.Transaction.EnterPassword.Label.title.text
                         .font(PrimaryFont.titleL.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .padding(.bottom, Spacing.extraSmall)
                     keyComponent()
                         .padding(.top, Spacing.medium)
@@ -62,10 +62,10 @@ struct SignSpecEnterPasswordModal: View {
                     Group {
                         if !viewModel.isValid {
                             Localizable.Transaction.EnterPassword.Label.invalidPassword.text
-                                .foregroundColor(Asset.accentRed300.swiftUIColor)
+                                .foregroundColor(.accentRed300)
                         }
                         Localizable.Transaction.EnterPassword.Label.explanation.text
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .foregroundColor(.textAndIconsTertiary)
                     }
                     .font(PrimaryFont.captionM.font)
                     .padding(.top, Spacing.extraSmall)
@@ -73,7 +73,7 @@ struct SignSpecEnterPasswordModal: View {
                 }
                 .padding(.horizontal, Spacing.large)
             }
-            .background(Asset.backgroundTertiary.swiftUIColor)
+            .background(.backgroundTertiary)
             .onAppear {
                 focusedField = .secure
             }
@@ -85,17 +85,17 @@ struct SignSpecEnterPasswordModal: View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 renderablePath
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
                 Text(viewModel.selectedKeyRecord.address.seedName)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyM.font)
                 HStack {
                     Text(
                         viewModel.selectedKeyRecord.publicKey
                             .truncateMiddle()
                     )
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.bodyM.font)
                 }
             }
@@ -103,7 +103,7 @@ struct SignSpecEnterPasswordModal: View {
             NetworkIdenticon(
                 identicon: viewModel.selectedKeyRecord.address.identicon,
                 network: viewModel.selectedKeyRecord.networkLogo,
-                background: Asset.accentRed300Overlay.swiftUIColor,
+                background: .accentRed300Overlay,
                 size: Heights.identiconInCell
             )
         }

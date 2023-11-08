@@ -10,7 +10,6 @@ import SwiftUI
 
 struct KeyDetailsPublicKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -31,10 +30,10 @@ struct KeyDetailsPublicKeyView: View {
                                 Localizable.KeyScreen.Label.hotkey.text
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .font(PrimaryFont.labelXS.font)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                 Spacer().frame(maxWidth: Spacing.small)
-                                Asset.exclamationRed.swiftUIImage
-                                    .foregroundColor(Asset.accentRed300.swiftUIColor)
+                                Image(.exclamationRed)
+                                    .foregroundColor(.accentRed300)
                             }
                             .padding(Spacing.medium)
                             .strokeContainerBackground(CornerRadius.small, state: .error)
@@ -51,7 +50,7 @@ struct KeyDetailsPublicKeyView: View {
                             .padding(Spacing.stroke)
                             QRCodeAddressFooterView(
                                 viewModel: viewModel.renderable.footer,
-                                backgroundColor: Asset.fill6Solid.swiftUIColor
+                                backgroundColor: .fill6Solid
                             )
                         }
                         .strokeContainerBackground()
@@ -67,7 +66,7 @@ struct KeyDetailsPublicKeyView: View {
                 minWidth: geo.size.width,
                 minHeight: geo.size.height
             )
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
         }
         .onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
@@ -123,21 +122,6 @@ struct KeyDetailsPublicKeyView: View {
             .clearModalBackground()
         }
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingConnectivityAlert,
-            onDismiss: {
-                // iOS 15 handling of following .fullscreen presentation after dismissal, we need to dispatch this async
-                DispatchQueue.main.async { viewModel.checkForActionsPresentation() }
-            }
-        ) {
-            ErrorBottomModal(
-                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: viewModel.onConnectivityErrorContinueTap()
-                ),
-                isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
-            )
-            .clearModalBackground()
-        }
-        .fullScreenModal(
             isPresented: $viewModel.isPresentingError
         ) {
             ErrorBottomModal(
@@ -157,7 +141,7 @@ private extension KeyDetailsPublicKeyView {
                 Localizable.PublicKeyDetails.Label.network.text
                     .frame(height: Spacing.large, alignment: .center)
                     .padding(.vertical, Spacing.small)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                 Spacer()
                 NetworkIconCapsuleView(
                     networkLogo: viewModel.renderable.networkLogo,
@@ -180,8 +164,8 @@ private extension KeyDetailsPublicKeyView {
         .padding(.horizontal, Spacing.medium)
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
-                .background(Asset.fill6.swiftUIColor)
+                .stroke(.fill12, lineWidth: 1)
+                .background(.fill6)
                 .cornerRadius(CornerRadius.medium)
         )
     }
@@ -194,13 +178,13 @@ private extension KeyDetailsPublicKeyView {
     ) -> some View {
         HStack(spacing: Spacing.medium) {
             Text(key)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .frame(height: Spacing.large, alignment: .center)
             Spacer()
             value
                 .frame(idealWidth: .infinity, alignment: .trailing)
                 .multilineTextAlignment(.trailing)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
         .padding(.vertical, Spacing.small)
         if !isLast {
@@ -225,19 +209,18 @@ extension KeyDetailsPublicKeyView {
     }
 
     final class ViewModel: ObservableObject {
-        let keyDetails: MKeyDetails
         let addressKey: String
         private let publicKeyDetailsService: PublicKeyDetailsService
         private let exportPrivateKeyService: ExportPrivateKeyService
-        private let warningStateMediator: WarningStateMediator
+        private let keyDetailsService: KeyDetailsActionService
 
+        @Published var keyDetails: MKeyDetails
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
         @Published var renderable: KeyDetailsPublicKeyViewModel
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingExportKeysWarningModal = false
         @Published var isPresentingExportKeysModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var shouldPresentExportKeysWarningModal = false
         @Published var shouldPresentExportKeysModal = false
         @Published var shouldPresentRemoveConfirmationModal = false
@@ -260,14 +243,14 @@ extension KeyDetailsPublicKeyView {
             addressKey: String,
             publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
             exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
+            keyDetailsService: KeyDetailsActionService = KeyDetailsActionService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
-            self.keyDetails = keyDetails
+            _keyDetails = .init(initialValue: keyDetails)
             self.addressKey = addressKey
             self.publicKeyDetailsService = publicKeyDetailsService
             self.exportPrivateKeyService = exportPrivateKeyService
-            self.warningStateMediator = warningStateMediator
+            self.keyDetailsService = keyDetailsService
             self.onCompletion = onCompletion
             _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
         }
@@ -279,11 +262,15 @@ extension KeyDetailsPublicKeyView {
         func checkForActionsPresentation() {
             if shouldPresentExportKeysWarningModal {
                 shouldPresentExportKeysWarningModal = false
-                if warningStateMediator.alert {
-                    isPresentingConnectivityAlert = true
-                } else {
-                    exportPrivateKeyViewModel = exportPrivateKeyService.exportPrivateKey(keyDetails)
-                    isPresentingExportKeysWarningModal = true
+                exportPrivateKeyService.exportPrivateKey(keyDetails) { result in
+                    switch result {
+                    case let .success(model):
+                        self.exportPrivateKeyViewModel = model
+                        self.isPresentingExportKeysWarningModal = true
+                    case let .failure(error):
+                        self.presentableError = .alertError(message: error.message)
+                        self.isPresentingError = true
+                    }
                 }
             }
             if shouldPresentRemoveConfirmationModal {
@@ -300,11 +287,19 @@ extension KeyDetailsPublicKeyView {
 
         func onExportKeysDismissal() {
             exportPrivateKeyViewModel = nil
-        }
-
-        func onConnectivityErrorContinueTap() {
-            warningStateMediator.resetConnectivityWarnings()
-            shouldPresentExportKeysWarningModal.toggle()
+            keyDetailsService.publicKey(
+                addressKey: addressKey,
+                networkSpecsKey: keyDetails.networkInfo.networkSpecsKey
+            ) { result in
+                switch result {
+                case let .success(keyDetails):
+                    self.keyDetails = keyDetails
+                    self.renderable = KeyDetailsPublicKeyViewModel(keyDetails)
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
+            }
         }
 
         func onRemoveKeyTap() {

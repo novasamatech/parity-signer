@@ -8,7 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,6 +31,7 @@ import io.parity.signer.screens.keysetdetails.export.KeySetDetailsExportResultBo
 import io.parity.signer.screens.keysetdetails.export.KeySetDetailsMultiselectBottomSheet
 import io.parity.signer.screens.keysetdetails.exportroot.KeySetRootExportBottomSheet
 import io.parity.signer.screens.keysetdetails.filtermenu.NetworkFilterMenu
+import io.parity.signer.screens.keysetdetails.seedselectmenu.SeedSelectMenuFull
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.launch
@@ -37,12 +41,15 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun KeySetDetailsScreenSubgraph(
-	seedName: String?,
+	originalSeedName: String?,
 	navController: NavController,
-	onBack: Callback,
 ) {
 	val menuNavController = rememberNavController()
 	val coroutineScope = rememberCoroutineScope()
+
+	var seedName by rememberSaveable() {
+		mutableStateOf(originalSeedName)
+	}
 
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
 
@@ -95,13 +102,15 @@ fun KeySetDetailsScreenSubgraph(
 					onMenu = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 					},
-					onBack = onBack,
-					onAddNewKey = {
+					onAddNewDerivation = {
 						navController.navigate(
 							CoreUnlockedNavSubgraph.NewDerivedKey.destination(
-								seedName = state.filteredModel.root!!.seedName
+								seedName = state.filteredModel.root.seedName
 							)
 						)
+					},
+					onSeedSelect = {
+						menuNavController.navigate(KeySetDetailsMenuSubgraph.select_keyset)
 					},
 					onFilterClicked = {
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.network_filter)
@@ -161,27 +170,27 @@ fun KeySetDetailsScreenSubgraph(
 						)
 					}
 				}
+				composable(KeySetDetailsMenuSubgraph.select_keyset) {
+					SeedSelectMenuFull(
+						coreNavController = navController,
+						selectedSeed = state.filteredModel.root.seedName,
+						onSelectSeed = { newSeed ->
+							seedName = newSeed
+							closeAction()
+						},
+						onClose = closeAction,
+					)
+				}
 				composable(KeySetDetailsMenuSubgraph.keys_menu_delete_confirm) {
 					BottomSheetWrapperRoot(onClosedAction = closeAction) {
 						KeySetDeleteConfirmBottomSheet(
 							onCancel = closeAction,
 							onRemoveKeySet = {
 								val root = state.filteredModel.root
-								if (root != null) {
-									coroutineScope.launch {
-										keySetViewModel.removeSeed(root)
-											.handleErrorAppState(navController)?.let {
-												navController.navigate(CoreUnlockedNavSubgraph.keySetList)
-											}
-									}
-								} else {
-									navController.navigate(
-										CoreUnlockedNavSubgraph.ErrorScreen.destination(
-											"This keyset doesn't have a root",
-											"Came to remove key set but root key is not available. Are you updated very old version? Maybe database is corrupted.",
-											""
-										)
-									)
+								coroutineScope.launch {
+									keySetViewModel.removeSeed(root)
+										.handleErrorAppState(navController)
+									closeAction()
 								}
 							},
 						)
@@ -231,8 +240,8 @@ fun KeySetDetailsScreenSubgraph(
 					}
 				}
 				composable(KeySetDetailsMenuSubgraph.export) {
-					val selected = remember { mutableStateOf(setOf<String>()) }
-					val isResultState = remember { mutableStateOf(false) }
+					val selected = rememberSaveable { mutableStateOf(setOf<String>()) }
+					val isResultState = rememberSaveable { mutableStateOf(false) }
 
 					if (!isResultState.value) {
 						BottomSheetWrapperRoot(onClosedAction = closeAction) {
@@ -272,6 +281,7 @@ fun KeySetDetailsScreenSubgraph(
 
 private object KeySetDetailsMenuSubgraph {
 	const val empty = "keys_menu_empty"
+	const val select_keyset = "keys_menu_select_keyset"
 	const val keys_menu = "keys_menu"
 	const val keys_menu_delete_confirm = "keys_menu_delete_confirm"
 	const val network_filter = "keys_network_filters"

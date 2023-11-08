@@ -24,6 +24,12 @@ jobs:
           fetch-depth:        50
           submodules:         'recursive'
 
+      - name:                 Setup Ruby
+        uses:                 ruby/setup-ruby@v1
+        with:
+          ruby-version:       '2.7'
+          bundler-cache:      true
+
       - name:                 Setup - Xcode
         run:                  sudo xcode-select -switch '/Applications/Xcode_15.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
 
@@ -31,7 +37,6 @@ jobs:
         run:                  |
           brew install swiftgen
           brew install swiftformat
-          brew install xcbeautify
 
       - name: Get cached Swift Packages managed by Xcode
         uses: actions/cache@v3
@@ -55,7 +60,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
+        uses:                 Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           workspaces:         rust -> rust/target
 
@@ -63,10 +68,4 @@ jobs:
         shell:                bash
         run:                  |
           cd ios
-          xcodebuild \
-          -project PolkadotVault.xcodeproj \
-          -scheme PolkadotVault \
-          -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 14' \
-          test \
-          | xcbeautify
+          bundle exec fastlane run_unit_tests

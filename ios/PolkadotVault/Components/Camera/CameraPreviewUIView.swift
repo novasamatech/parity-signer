@@ -11,10 +11,8 @@ import UIKit
 /// UIKit wrapper for `AVCaptureSession` camera layer
 final class CameraPreviewUIView: UIView {
     var videoPreviewLayer: AVCaptureVideoPreviewLayer?
-    let session: AVCaptureSession
 
-    init(session: AVCaptureSession) {
-        self.session = session
+    init() {
         super.init(frame: .zero)
     }
 

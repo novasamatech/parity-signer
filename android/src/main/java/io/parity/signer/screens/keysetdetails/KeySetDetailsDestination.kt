@@ -11,21 +11,20 @@ fun NavGraphBuilder.keySetDetailsDestination(
 	navController: NavController,
 ) {
 	composable(
-		route = CoreUnlockedNavSubgraph.KeySetDetails.route,
+		route = CoreUnlockedNavSubgraph.KeySet.route,
 		arguments = listOf(
-			navArgument(CoreUnlockedNavSubgraph.KeySetDetails.seedName) {
+			navArgument(CoreUnlockedNavSubgraph.KeySet.seedName) {
 				type = NavType.StringType
 				nullable = true
 			}
 		)
 	) {
 		val seedName =
-			it.arguments?.getString(CoreUnlockedNavSubgraph.KeySetDetails.seedName)
+			it.arguments?.getString(CoreUnlockedNavSubgraph.KeySet.seedName)
 
 		KeySetDetailsScreenSubgraph(
-			seedName = seedName,
+			originalSeedName = seedName,
 			navController = navController,
-			onBack = { navController.popBackStack() },
 		)
 	}
 }

@@ -36,12 +36,12 @@ struct RootKeyDetailsModal: View {
                                             showFullAddress ? viewModel.renderable.base58 : viewModel.renderable.base58
                                                 .truncateMiddle()
                                         )
-                                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                        .foregroundColor(.textAndIconsPrimary)
                                         .font(PrimaryFont.bodyL.font)
                                         .frame(idealWidth: .infinity, alignment: .leading)
                                         if !showFullAddress {
-                                            Asset.chevronDown.swiftUIImage
-                                                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                                            Image(.chevronDown)
+                                                .foregroundColor(.textAndIconsSecondary)
                                                 .padding(.leading, Spacing.extraExtraSmall)
                                         }
                                     }

@@ -27,13 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
-import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.exposesecurity.ExposedIcon
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -58,7 +54,10 @@ internal fun SettingsScreenGeneralView(
 	networkState: State<NetworkState?>,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
-		ScreenHeader(title = stringResource(R.string.settings_title))
+		ScreenHeaderClose(
+			title = stringResource(R.string.settings_title),
+			onClose = { navController.popBackStack() },
+		)
 		Box(modifier = Modifier.weight(1f)) {
 			Column(Modifier.verticalScroll(rememberScrollState())) {
 				SettingsElement(
@@ -114,7 +113,6 @@ internal fun SettingsScreenGeneralView(
 					.padding(end = 16.dp, bottom = 16.dp)
 			)
 		}
-		BottomBar(navController, BottomBarOptions.SETTINGS)
 	}
 }
 

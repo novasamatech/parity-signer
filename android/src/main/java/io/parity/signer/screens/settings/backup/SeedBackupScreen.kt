@@ -27,11 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarOptions
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
@@ -64,9 +60,6 @@ fun SeedBackupScreen(
 				}
 			}
 		}
-		BottomBar(
-			coreNavController, BottomBarOptions.SETTINGS,
-		)
 	}
 }
 

@@ -116,7 +116,7 @@ impl From<NavigatorError> for ErrorDisplayed {
                     ref errors,
                 } => {
                     if let Some((want, parser::Error::WrongNetworkVersion { in_metadata, .. })) =
-                        errors.get(0)
+                        errors.first()
                     {
                         Self::MetadataOutdated {
                             name: network_name.to_string(),

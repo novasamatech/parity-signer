@@ -66,7 +66,7 @@ struct VerticalActionsBottomModal: View {
                             .font(PrimaryFont.bodyL.font)
                             .lineSpacing(Spacing.extraExtraSmall)
                             .multilineTextAlignment(viewModel.contentAlignment)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                     }
                     VStack {
                         PrimaryButton(

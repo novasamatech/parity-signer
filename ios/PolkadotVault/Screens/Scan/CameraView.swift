@@ -49,12 +49,12 @@ struct CameraView: View {
                         HStack(spacing: Spacing.small) {
                             CameraButton(
                                 action: viewModel.dismissView,
-                                icon: Asset.xmarkButton.swiftUIImage
+                                icon: Image(.xmarkButton)
                             )
                             Spacer()
                             CameraButton(
                                 action: { model.toggleTorch() },
-                                icon: Asset.torchOff.swiftUIImage,
+                                icon: Image(.torchOff),
                                 isPressed: $model.isTorchOn
                             )
                         }
@@ -67,7 +67,7 @@ struct CameraView: View {
                                 .aspectRatio(1.0, contentMode: .fit)
                                 .blendMode(.destinationOut)
                                 .overlay(
-                                    Asset.cameraOverlay.swiftUIImage
+                                    Image(.cameraOverlay)
                                         .resizable(resizingMode: .stretch)
                                         .padding(-Spacing.extraExtraSmall)
                                 )
@@ -82,14 +82,14 @@ struct CameraView: View {
                                 .font(PrimaryFont.bodyL.font)
                                 .multilineTextAlignment(.center)
                         }
-                        .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                        .foregroundColor(.accentForegroundText)
                         .frame(width: UIScreen.main.bounds.width * 0.86, alignment: .center)
                         Spacer()
                     }
                     if viewModel.isScanningMultiple, !model.multipleTransactions.isEmpty {
                         VStack(spacing: 0) {
                             multipleTransactionOverlay
-                            Asset.backgroundSecondaryDarkOnly.swiftUIColor
+                            Color(.backgroundSecondaryDarkOnly)
                                 .frame(height: safeAreaInsets.bottom)
                         }
                         .transition(.move(edge: .bottom))
@@ -115,7 +115,7 @@ struct CameraView: View {
         .onDisappear {
             model.shutdown()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingTransactionPreview
         ) {
@@ -216,14 +216,14 @@ struct CameraView: View {
         HStack(alignment: .center) {
             Text(signText())
                 .font(PrimaryFont.titleS.font)
-                .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                .foregroundColor(.accentForegroundText)
                 .padding(.top, Spacing.medium)
             Spacer()
             CapsuleButton(
                 action: {
                     viewModel.onMultipleTransactionSign(model.multipleTransactions)
                 },
-                icon: Asset.arrowForward.swiftUIImage,
+                icon: Image(.arrowForward),
                 title: Localizable.Scanner.Action.sign.string
             )
             .padding(.top, Spacing.extraSmall)
@@ -231,7 +231,7 @@ struct CameraView: View {
         .padding(.leading, Spacing.medium)
         .padding(.trailing, Spacing.extraSmall)
         .frame(height: Heights.bottomBarHeight)
-        .background(Asset.backgroundSecondaryDarkOnly.swiftUIColor)
+        .background(.backgroundSecondaryDarkOnly)
     }
 
     func signText() -> String {

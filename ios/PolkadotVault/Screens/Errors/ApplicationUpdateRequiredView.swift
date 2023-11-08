@@ -14,14 +14,14 @@ struct ApplicationUpdateRequiredView: View {
         NavigationView {
             VStack(spacing: 0) {
                 Spacer()
-                Asset.updateApp.swiftUIImage
+                Image(.updateApp)
                     .padding(.bottom, Spacing.extraLarge)
                 Localizable.Error.ApplicationUpdateRequired.Label.title.text
                     .font(
                         UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? PrimaryFont.titleM
                             .font : PrimaryFont.titleL.font
                     )
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .padding(
                         .horizontal,
                         UIScreen.main.bounds.width == DeviceConstants.compactDeviceWidth ? Spacing.large : Spacing
@@ -30,11 +30,11 @@ struct ApplicationUpdateRequiredView: View {
                     .padding(.bottom, Spacing.medium)
                 Localizable.Error.ApplicationUpdateRequired.Label.subtitle.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.large)
                 Text(Localizable.applicationUpdateRequiredInfo())
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .multilineTextAlignment(.leading)
                     .font(PrimaryFont.bodyL.font)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -56,7 +56,7 @@ struct ApplicationUpdateRequiredView: View {
                 ) { EmptyView() }
             }
             .multilineTextAlignment(.center)
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .navigationBarHidden(true)
             .navigationViewStyle(.stack)
         }

@@ -19,7 +19,7 @@ struct SettingsView: View {
                         title: .title(Localizable.Settings.Label.title.string),
                         leftButtons: [.init(type: .xmark, action: { presentationMode.wrappedValue.dismiss() })],
                         rightButtons: [.init(type: .empty)],
-                        backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                        backgroundColor: .backgroundPrimary
                     )
                 )
                 ScrollView {
@@ -33,23 +33,19 @@ struct SettingsView: View {
                         }
                         Text(Localizable.Settings.Label.version(ApplicationInformation.cfBundleShortVersionString))
                             .font(PrimaryFont.captionM.font)
-                            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                            .foregroundColor(.textAndIconsTertiary)
                             .padding(.top, Spacing.medium)
                             .padding(.horizontal, Spacing.large)
                             .padding(.bottom, Spacing.extraSmall)
                     }
                 }
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             NavigationLink(
                 destination: detailView(viewModel.detailScreen)
                     .navigationBarHidden(true),
                 isActive: $viewModel.isDetailsPresented
             ) { EmptyView() }
-            VStack(spacing: 0) {
-                ConnectivityAlertOverlay(viewModel: .init())
-            }
-            .background(Asset.backgroundPrimary.swiftUIColor)
         }
         .onAppear {
             viewModel.loadData()
@@ -74,8 +70,6 @@ struct SettingsView: View {
             NetworkSelectionSettings(viewModel: .init())
         case .verifier:
             VerifierCertificateView(viewModel: .init())
-        case .backup:
-            BackupSelectKeyView(viewModel: .init())
         case .privacyPolicy:
             PrivacyPolicyView(viewModel: .init())
         case .termsAndConditions:
@@ -119,9 +113,6 @@ extension SettingsView {
                 isDetailsPresented = true
             case .privacyPolicy:
                 detailScreen = .privacyPolicy
-                isDetailsPresented = true
-            case .backup:
-                detailScreen = .backup
                 isDetailsPresented = true
             case .networks:
                 detailScreen = .networks

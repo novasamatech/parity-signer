@@ -9,37 +9,37 @@ import SwiftUI
 
 extension AirgapComponent {
     var uncheckedForegroundColor: Color {
-        Asset.accentRed300.swiftUIColor
+        .accentRed300
     }
 
     var checkedForegroundColor: Color {
-        Asset.accentGreen300.swiftUIColor
+        .accentGreen300
     }
 
     var title: String {
         switch self {
         case .aiplaneMode:
-            Localizable.Onboarding.Airgap.Label.airplane.string
+            Localizable.Airgap.Label.airplane.string
         case .wifi:
-            Localizable.Onboarding.Airgap.Label.wifi.string
+            Localizable.Airgap.Label.wifi.string
         }
     }
 
     var uncheckedIcon: Image {
         switch self {
         case .aiplaneMode:
-            Asset.airgapAirplaneError.swiftUIImage
+            Image(.airgapAirplaneError)
         case .wifi:
-            Asset.airgapWifiError.swiftUIImage
+            Image(.airgapWifiError)
         }
     }
 
     var checkedIcon: Image {
         switch self {
         case .aiplaneMode:
-            Asset.airgapAirplane.swiftUIImage
+            Image(.airgapAirplane)
         case .wifi:
-            Asset.airgapWifi.swiftUIImage
+            Image(.airgapWifi)
         }
     }
 }

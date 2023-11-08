@@ -1,5 +1,5 @@
 //
-//  OnboardingAirgapView.swift
+//  NoAirgapView.swift
 //  NativeSigner
 //
 //  Created by Krzysztof Rodak on 15/02/2023.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OnboardingAirgapView: View {
+struct NoAirgapView: View {
     @StateObject var viewModel: ViewModel
 
     var body: some View {
@@ -15,15 +15,15 @@ struct OnboardingAirgapView: View {
             ScrollView {
                 VStack(alignment: .center, spacing: 0) {
                     // Header text
-                    Localizable.Onboarding.Airgap.Label.title.text
+                    Text(viewModel.title)
                         .font(PrimaryFont.titleL.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .multilineTextAlignment(.center)
                         .padding(.top, Spacing.extraLarge)
                         .padding(.horizontal, Spacing.large)
-                    Localizable.Onboarding.Airgap.Label.content.text
+                    Localizable.Airgap.Label.content.text
                         .font(PrimaryFont.bodyM.font)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.medium)
@@ -45,11 +45,11 @@ struct OnboardingAirgapView: View {
                     VStack(spacing: 0) {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(alignment: .center, spacing: Spacing.large) {
-                                Asset.airgapCables.swiftUIImage
+                                Image(.airgapCables)
                                     .padding(.leading, Spacing.extraSmall)
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                                Localizable.Onboarding.Airgap.Label.cables.text
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsTertiary)
+                                Localizable.Airgap.Label.cables.text
+                                    .foregroundColor(.textAndIconsTertiary)
                                     .font(PrimaryFont.bodyL.font)
                             }
                             .padding(.bottom, Spacing.medium)
@@ -57,18 +57,18 @@ struct OnboardingAirgapView: View {
                             HStack(alignment: .center, spacing: Spacing.large) {
                                 Group {
                                     if viewModel.isCableCheckBoxSelected {
-                                        Asset.checkboxChecked.swiftUIImage
-                                            .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                        Image(.checkboxChecked)
+                                            .foregroundColor(.accentPink300)
                                     } else {
-                                        Asset.checkboxEmpty.swiftUIImage
-                                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                        Image(.checkboxEmpty)
+                                            .foregroundColor(.textAndIconsPrimary)
                                     }
                                 }
                                 .padding(.leading, Spacing.extraSmall)
-                                Localizable.Onboarding.Airgap.Label.Cables.confirmation.text
+                                Localizable.Airgap.Label.Cables.confirmation.text
                                     .multilineTextAlignment(.leading)
                                     .fixedSize(horizontal: false, vertical: true)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                     .font(PrimaryFont.bodyL.font)
                             }
                             .padding(.top, Spacing.medium)
@@ -85,7 +85,7 @@ struct OnboardingAirgapView: View {
                     Spacer()
                     PrimaryButton(
                         action: viewModel.onDoneTap,
-                        text: Localizable.Onboarding.Screenshots.Action.next.key,
+                        text: viewModel.actionTitle,
                         style: .primary(isDisabled: $viewModel.isActionDisabled)
                     )
                     .padding(Spacing.large)
@@ -95,7 +95,7 @@ struct OnboardingAirgapView: View {
                     minHeight: geo.size.height
                 )
             }
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(.backgroundSystem)
         }
     }
 
@@ -112,7 +112,12 @@ struct OnboardingAirgapView: View {
     }
 }
 
-extension OnboardingAirgapView {
+extension NoAirgapView {
+    enum Mode {
+        case onboarding
+        case noAirgap
+    }
+
     struct AirgapComponentStatus: Equatable, Hashable {
         let component: AirgapComponent
         let isChecked: Bool
@@ -123,15 +128,26 @@ extension OnboardingAirgapView {
         @Published var isActionDisabled: Bool = true
         @Published var isAirplaneModeChecked: Bool = false
         @Published var isWifiChecked: Bool = false
+        private let mode: Mode
         private let airgapMediator: AirgapMediating
-        private let onNextTap: () -> Void
+        private let onActionTap: () -> Void
+        var title: String {
+            mode == .onboarding ? Localizable.Airgap.Label.Title.setup.string : Localizable.Airgap.Label.Title.broken
+                .string
+        }
+
+        var actionTitle: LocalizedStringKey {
+            mode == .onboarding ? Localizable.Airgap.Action.next.key : Localizable.Airgap.Action.done.key
+        }
 
         init(
+            mode: Mode,
             airgapMediator: AirgapMediating = AirgapMediatorAssembler().assemble(),
-            onNextTap: @escaping () -> Void
+            onActionTap: @escaping () -> Void
         ) {
+            self.mode = mode
             self.airgapMediator = airgapMediator
-            self.onNextTap = onNextTap
+            self.onActionTap = onActionTap
             subscribeToUpdates()
         }
 
@@ -144,7 +160,7 @@ extension OnboardingAirgapView {
         }
 
         func onDoneTap() {
-            onNextTap()
+            onActionTap()
         }
 
         func toggleCheckbox() {
@@ -159,10 +175,10 @@ extension OnboardingAirgapView {
 }
 
 #if DEBUG
-    struct OnboardingAirgapView_Previews: PreviewProvider {
+    struct NoAirgapView_Previews: PreviewProvider {
         static var previews: some View {
-            OnboardingAirgapView(
-                viewModel: .init(onNextTap: {})
+            NoAirgapView(
+                viewModel: .init(mode: .onboarding, onActionTap: {})
             )
             .preferredColorScheme(.dark)
         }

@@ -48,20 +48,20 @@ struct NetworkIdenticon: View {
                 NetworkIdenticon(
                     identicon: .stubIdenticon,
                     network: "polkadot",
-                    background: Asset.backgroundPrimary.swiftUIColor
+                    background: .backgroundPrimary
                 )
                 .frame(width: Heights.identiconInCell, height: Heights.identiconInCell)
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             VStack(alignment: .center, spacing: 10) {
                 NetworkIdenticon(
                     identicon: .stubIdenticon,
                     network: "polkadot",
-                    background: Asset.backgroundPrimary.swiftUIColor
+                    background: .backgroundPrimary
                 )
                 .frame(width: Heights.identiconInCell, height: Heights.identiconInCell)
             }
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .preferredColorScheme(.dark)
         }
     }

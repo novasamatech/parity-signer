@@ -13,8 +13,8 @@ struct NavbarActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding(Spacing.medium)
-            .background($isDisabled.wrappedValue ? Asset.fill18.swiftUIColor : Asset.accentPink500.swiftUIColor)
-            .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+            .background($isDisabled.wrappedValue ? .fill18 : .accentPink500)
+            .foregroundColor(.accentForegroundText)
             .font(PrimaryFont.labelM.font)
             .frame(
                 height: Heights.navigationButton,

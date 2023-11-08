@@ -13,7 +13,7 @@ struct TCTXSpecPlain: View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.unknownNetwork.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.bodyL.font)
                 TCNamedValueCard(
                     name: Localizable.TCName.genesisHash.string,

@@ -19,22 +19,22 @@ struct TCFieldNumber: View {
                 VStack {
                     HStack {
                         Text(value.number)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                         Spacer()
                         if value.displayableValue.isEmpty {
-                            Asset.questionCircle.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                            Image(.questionCircle)
+                                .foregroundColor(.textAndIconsDisabled)
                         }
                     }
                     if showDoc {
                         withAnimation {
                             VStack(alignment: .leading) {
                                 Text(Localizable.TCField.path(value.pathType))
-                                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                    .foregroundColor(.accentPink300)
                                 Text.markdownWithFallback(value.docsFieldNumber)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                 Text.markdownWithFallback(value.docsType)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                             }
                             .padding(.horizontal, Spacing.medium)
                             .padding(.vertical, Spacing.small)

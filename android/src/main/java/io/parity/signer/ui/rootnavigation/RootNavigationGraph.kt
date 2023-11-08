@@ -1,5 +1,9 @@
 package io.parity.signer.ui.rootnavigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,7 +51,25 @@ fun RootNavigationGraph(
 	) {
 		NavHost(
 			navController = navController,
-			startDestination = startDestination
+			startDestination = startDestination,
+			enterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Start,
+					animationSpec = tween()
+				)
+			},
+			exitTransition = {
+				ExitTransition.None
+			},
+			popEnterTransition = {
+				EnterTransition.None
+			},
+			popExitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.End,
+					animationSpec = tween()
+				)
+			}
 		) {
 			splashScreen(navController)
 			firstTimeOnlyOnboarding(
@@ -90,7 +112,7 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 }
 
 private object FirstTimeOnboarding {
-//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
+	//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
 	const val termsConsentRoute = "navigation_point_terms_consent"
 }
 

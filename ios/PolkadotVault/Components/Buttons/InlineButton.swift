@@ -44,7 +44,7 @@ struct InlineButton: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .buttonStyle(InlineButtonStyle(foregroundColor: Asset.textAndIconsPrimary.swiftUIColor))
+        .buttonStyle(InlineButtonStyle(foregroundColor: .textAndIconsPrimary))
     }
 }
 
@@ -54,7 +54,7 @@ struct InlineButton: View {
             VStack(alignment: .leading, spacing: 10) {
                 InlineButton(
                     action: {},
-                    icon: Asset.add.swiftUIImage,
+                    icon: Image(.addLarge),
                     text: Localizable.TransactionSign.Action.note.string
                 )
                 .padding(10)
@@ -64,7 +64,7 @@ struct InlineButton: View {
             VStack(alignment: .leading, spacing: 10) {
                 InlineButton(
                     action: {},
-                    icon: Asset.add.swiftUIImage,
+                    icon: Image(.addLarge),
                     text: Localizable.TransactionSign.Action.note.string
                 )
                 .padding(10)

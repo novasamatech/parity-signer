@@ -9,7 +9,7 @@ import io.parity.signer.uniffi.MSufficientCryptoReady
 import io.parity.signer.uniffi.MscContent
 
 
-data class SignSpecsListModel(val keysToAddrKey: List<Pair<KeyCardModelBase,String>>) {
+data class SignSpecsListModel(val keysToAddrKey: List<Pair<KeyCardModelBase, String>>) {
 
 	companion object {
 		fun createStub(): SignSpecsListModel = SignSpecsListModel(
@@ -30,12 +30,10 @@ fun MSignSufficientCrypto.toSignSpecsListModel() = SignSpecsListModel(
 
 fun MRawKey.toKeyCardModelPair() =
 	KeyCardModelBase.fromAddress(
-		address= address,
+		address = address,
 		base58 = publicKey,
 		networkLogo,
 	) to addressKey
-
-
 
 
 data class SignSpecsResultModel(
@@ -46,16 +44,16 @@ data class SignSpecsResultModel(
 	companion object {
 		fun createStub(): SignSpecsResultModel = SignSpecsResultModel(
 			key = KeyCardModelBase.createStub(),
-				sufficientSignature = PreviewData.exampleQRData,
-				content = MscContent.LoadMetadata("metadata name", 2015u)
+			sufficientSignature = PreviewData.exampleQRData,
+			content = MscContent.LoadMetadata("metadata name", 2015u)
 		)
-
 	}
 }
+
 internal fun MSufficientCryptoReady.toSignSpecsResultModel(): SignSpecsResultModel {
 	return SignSpecsResultModel(
 		key = KeyCardModelBase.fromKeyModel(authorInfo.toKeysModel(), networkLogo),
 		sufficientSignature = sufficient,
-		content =content,
+		content = content,
 	)
 }

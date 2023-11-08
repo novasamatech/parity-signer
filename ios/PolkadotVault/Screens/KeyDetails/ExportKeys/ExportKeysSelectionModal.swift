@@ -27,7 +27,7 @@ struct ExportKeysSelectionModal: View {
                     // Header with X button
                     HStack {
                         Text(selectionTitle)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: viewModel.cancelAction)
@@ -49,7 +49,7 @@ struct ExportKeysSelectionModal: View {
                         // Select All
                         Button(action: { viewModel.selectAll() }) {
                             Localizable.KeyDetails.Overlay.Action.selectAll.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                .foregroundColor(.accentPink300)
                                 .font(PrimaryFont.labelL.font)
                         }
                         .padding(.leading, Spacing.medium)
@@ -57,7 +57,7 @@ struct ExportKeysSelectionModal: View {
                         // Export
                         Button(action: viewModel.onExport) {
                             Localizable.KeyDetails.Overlay.Action.export.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                .foregroundColor(.accentPink300)
                                 .font(PrimaryFont.labelL.font)
                         }
                         .padding(.trailing, Spacing.medium)
@@ -74,26 +74,26 @@ struct ExportKeysSelectionModal: View {
             NetworkIdenticon(
                 identicon: key.viewModel.identicon,
                 network: key.viewModel.network,
-                background: Asset.backgroundPrimary.swiftUIColor,
+                background: .backgroundPrimary,
                 size: Heights.identiconInCell
             )
             .padding(.top, Spacing.extraExtraSmall)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 fullPath(key.viewModel)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
                 Text(key.viewModel.base58.truncateMiddle())
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyL.font)
                     .lineLimit(1)
             }
             Spacer()
             VStack(alignment: .center) {
                 if viewModel.isSelected(key) {
-                    Asset.checkmarkChecked.swiftUIImage
-                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    Image(.checkmarkChecked)
+                        .foregroundColor(.accentPink300)
                 } else {
-                    Asset.checkmarkUnchecked.swiftUIImage
+                    Image(.checkmarkUnchecked)
                 }
             }
             .frame(minHeight: .zero, maxHeight: .infinity)
@@ -128,9 +128,9 @@ struct ExportKeysSelectionModal: View {
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                     Spacer()
-                    Asset.checkmarkChecked.swiftUIImage
+                    Image(.checkmarkChecked)
                 }
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.medium)
             }
             .frame(height: Heights.exportKeysSelectionCellHeight)

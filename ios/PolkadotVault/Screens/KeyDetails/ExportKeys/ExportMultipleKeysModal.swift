@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-extension QRCodeRootFooterViewModel {
-    init(_ keySummary: KeySummaryViewModel) {
-        keyName = keySummary.keyName
-        base58 = keySummary.base58
-    }
-}
-
 extension QRCodeAddressFooterViewModel {
     init(_ derivedKey: DerivedKeyExportModel) {
         identicon = derivedKey.viewModel.identicon
@@ -23,7 +16,8 @@ extension QRCodeAddressFooterViewModel {
 }
 
 struct ExportMultipleKeysModalViewModel: Equatable {
-    let key: KeySummaryViewModel
+    let keyName: String
+    let key: QRCodeRootFooterViewModel
     let derivedKeys: [DerivedKeyExportModel]
     let count: Int
 }
@@ -74,17 +68,19 @@ struct ExportMultipleKeysModal: View {
 
     var keyList: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
-            QRCodeRootFooterView(viewModel: .init(viewModel.viewModel.key))
+            QRCodeRootFooterView(viewModel: viewModel.viewModel.key)
             if !viewModel.viewModel.derivedKeys.isEmpty {
                 Divider()
+                    .padding(.horizontal, Spacing.medium)
             }
             ForEach(
                 viewModel.viewModel.derivedKeys.sorted(by: { $0.viewModel.path < $1.viewModel.path }),
                 id: \.id
             ) {
-                ExportDerivedKeyView(dataModel: $0, backgroundColor: Asset.fill6Solid.swiftUIColor)
+                ExportDerivedKeyView(dataModel: $0, backgroundColor: .fill6Solid)
                 if $0 != viewModel.viewModel.derivedKeys.last {
                     Divider()
+                        .padding(.horizontal, Spacing.medium)
                 }
             }
         }
@@ -96,7 +92,7 @@ private extension ExportMultipleKeysModal {
     var header: some View {
         HStack {
             Text(headerName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
             CloseModalButton(action: animateDismissal)
@@ -105,7 +101,6 @@ private extension ExportMultipleKeysModal {
 }
 
 private struct ExportDerivedKeyView: View {
-    @State private var showFullAddress: Bool = false
     private let dataModel: DerivedKeyExportModel
     private let backgroundColor: Color
 
@@ -119,42 +114,23 @@ private struct ExportDerivedKeyView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
-            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                    fullPath
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                        .font(PrimaryFont.captionM.font)
-                    Text(dataModel.viewModel.rootKeyName)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyM.font)
-                }
-                Spacer()
+            HStack(alignment: .center, spacing: Spacing.small) {
                 NetworkIdenticon(
                     identicon: dataModel.viewModel.identicon,
                     network: dataModel.keyData.network.networkLogo,
                     background: backgroundColor,
                     size: Heights.identiconInCell
                 )
-            }
-            HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
-                Group {
-                    Text(showFullAddress ? dataModel.viewModel.base58 : dataModel.viewModel.base58.truncateMiddle())
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
+                    fullPath
+                        .foregroundColor(.textAndIconsTertiary)
+                        .font(PrimaryFont.captionM.font)
+                    Text(dataModel.viewModel.base58.truncateMiddle())
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .frame(idealWidth: .infinity, alignment: .leading)
-                    if !showFullAddress {
-                        Asset.chevronDown.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
-                            .padding(.leading, Spacing.extraExtraSmall)
-                    }
-                }
-                .onTapGesture {
-                    withAnimation {
-                        showFullAddress = true
-                    }
                 }
                 Spacer()
-                NetworkCapsuleView(network: dataModel.viewModel.network)
             }
         }
         .padding(Spacing.medium)

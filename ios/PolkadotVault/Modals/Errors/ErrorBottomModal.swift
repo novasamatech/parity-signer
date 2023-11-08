@@ -48,16 +48,16 @@ struct ErrorBottomModal: View {
                         Text(attributedContent)
                             .font(PrimaryFont.bodyM.font)
                             .lineSpacing(Spacing.extraExtraSmall)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                     } else {
                         Text(viewModel.content)
                             .font(PrimaryFont.bodyM.font)
                             .lineSpacing(Spacing.extraExtraSmall)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                     }
                     if let detailsMessage = viewModel.details {
                         Text(detailsMessage)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.bodyL.font)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.medium)
@@ -69,7 +69,7 @@ struct ErrorBottomModal: View {
                             ForEach(viewModel.steps, id: \.step) { step in
                                 HStack(alignment: .top, spacing: 0) {
                                     Text(step.step)
-                                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                        .foregroundColor(.textAndIconsTertiary)
                                         .frame(width: Spacing.large, alignment: .leading)
                                     Text(step.content)
                                         .lineSpacing(Spacing.extraExtraSmall)
@@ -126,15 +126,6 @@ struct ErrorBottomModal: View {
     struct ErrorBottomModal_Previews: PreviewProvider {
         static var previews: some View {
             Group {
-                // Connectivity
-                ErrorBottomModal(
-                    viewModel: .connectivityOn(),
-                    isShowingBottomAlert: Binding<Bool>.constant(true)
-                )
-                ErrorBottomModal(
-                    viewModel: .connectivityWasOn(backAction: {}(), continueAction: {}()),
-                    isShowingBottomAlert: Binding<Bool>.constant(true)
-                )
                 // General Error
                 ErrorBottomModal(
                     viewModel: .alertError(

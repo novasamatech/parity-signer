@@ -52,17 +52,17 @@ struct DerivedKeyOverviewRow: View {
             NetworkIdenticon(
                 identicon: viewModel.identicon,
                 network: viewModel.networkLogo,
-                background: Asset.backgroundPrimary.swiftUIColor,
+                background: .backgroundPrimary,
                 size: Heights.identiconInCell
             )
             if viewModel.path.isEmpty, !viewModel.hasPassword {
                 Localizable.BackupModal.Label.emptyPath.text
-                    .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                    .foregroundColor(.textAndIconsDisabled)
                     .font(PrimaryFont.captionM.font)
                     .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
             } else {
                 fullPath
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyL.font)
                     .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .leading)
             }
