@@ -182,6 +182,7 @@ object CoreUnlockedNavSubgraph {
 			"$baseRoute/$argHeader/$argDescription/$argVerbose"
 	}
 
+	const val airgapBreached = "core_airgap_blocker"
 	const val settings = "core_settings_flow"
 	const val networkHelpers = "network_helpers_path"
 }

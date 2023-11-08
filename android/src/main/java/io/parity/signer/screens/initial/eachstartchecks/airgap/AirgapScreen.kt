@@ -41,7 +41,7 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun AirgapScreen(
 	isInitialOnboarding: Boolean,
-	onCta: Callback,
+	onProceed: Callback,
 ) {
 	val viewModel = viewModel<AirGapViewModel>()
 	val state = viewModel.state.collectAsStateWithLifecycle()
@@ -56,7 +56,10 @@ fun AirgapScreen(
 		state = state.value,
 		isInitialOnboarding = isInitialOnboarding,
 		onCablesConfirmCheckbox = viewModel::onCableCheckboxClicked,
-		onCta = onCta
+		onCta = {
+			viewModel.onConfirmedAirgap()
+			onProceed()
+		},
 	)
 }
 
@@ -173,11 +176,9 @@ private fun CheckboxWithTextWithGap(
 ) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = modifier.toggleable(
-			value = checked,
+		modifier = modifier.toggleable(value = checked,
 			role = Role.Checkbox,
-			onValueChange = { onValueChange(it) }
-		)
+			onValueChange = { onValueChange(it) })
 	) {
 		Box(Modifier.padding(8.dp)) {
 			CheckboxIcon(
@@ -204,8 +205,7 @@ data class AirGapScreenState(
 )
 
 private fun AirGapScreenState.isReadyToProceed() =
-	airplaneModeEnabled && wifiDisabled
-		&& bluetoothDisabled && cablesDisconnected
+	airplaneModeEnabled && wifiDisabled && bluetoothDisabled && cablesDisconnected
 
 @Composable
 private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
@@ -242,10 +242,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 
 @Composable
 private fun IconWithCheckmark(
-	color: Color,
-	icon: ImageVector,
-	backgroundColor: Color,
-	isPassed: Boolean
+	color: Color, icon: ImageVector, backgroundColor: Color, isPassed: Boolean
 ) {
 	Box(contentAlignment = Alignment.BottomEnd) {
 //			icon
@@ -259,17 +256,14 @@ private fun IconWithCheckmark(
 				imageVector = icon,
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(backgroundColor),
-				modifier = Modifier
-					.size(20.dp)
+				modifier = Modifier.size(20.dp)
 			)
 		}
 		//checkmark
 		if (isPassed) {
 			//because icon have paddings on a side we need to draw background separately with different paddings
 			Surface(
-				color = color,
-				shape = CircleShape,
-				modifier = Modifier.size(16.dp)
+				color = color, shape = CircleShape, modifier = Modifier.size(16.dp)
 			) {}
 			Image(
 				imageVector = Icons.Outlined.CheckCircle,
@@ -304,8 +298,7 @@ private fun PreviewAirgapScreenObnoarding() {
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)
-			AirgapScreen(
-				state = state,
+			AirgapScreen(state = state,
 				isInitialOnboarding = true,
 				onCablesConfirmCheckbox = {},
 				onCta = {})
@@ -330,8 +323,7 @@ private fun PreviewAirgapScreenBlocker() {
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)
-			AirgapScreen(
-				state = state,
+			AirgapScreen(state = state,
 				isInitialOnboarding = false,
 				onCablesConfirmCheckbox = {},
 				onCta = {})
@@ -357,8 +349,7 @@ private fun PreviewAirgapScreenSmall() {
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)
-			AirgapScreen(
-				state = state,
+			AirgapScreen(state = state,
 				isInitialOnboarding = true,
 				onCablesConfirmCheckbox = {},
 				onCta = {})
