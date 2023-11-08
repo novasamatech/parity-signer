@@ -143,7 +143,11 @@ struct KeyDetailsView: View {
             isPresented: $viewModel.isPresentingNetworkSelection
         ) {
             NetworkSelectionModal(
-                viewModel: .init(isPresented: $viewModel.isPresentingNetworkSelection)
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingNetworkSelection,
+                    networks: $viewModel.networks,
+                    selectedNetworks: $viewModel.selectedNetworks
+                )
             )
             .clearModalBackground()
         }
