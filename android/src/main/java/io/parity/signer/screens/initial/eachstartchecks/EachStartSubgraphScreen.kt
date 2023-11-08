@@ -80,7 +80,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 					SetScreenLockScreen()
 				}
 				EachStartSubgraphScreenSteps.AIR_GAP -> {
-					AirgapScreen {
+					AirgapScreen(isInitialOnboarding = true) {
 						//go to next screen
 						goToNextFlow()
 					}

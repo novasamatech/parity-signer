@@ -289,6 +289,8 @@
 	<string name="root_exposed_title">Please try again with not Rooted device</string>
 	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
 	<string name="airgap_onboarding_disconnect_cable_header">Disconnect all cables</string>
+	<string name="airgap_onboarding_title_onboarding">Set Up Air Gap Mode</string>
+	<string name="airgap_onboarding_subtitle_onboarding">Please Follow these steps to enable Air Gap mode and keep it enabled all the time</string>
 	<string name="airgap_onboarding_title">Please Enable Air Gap Mode</string>
 	<string name="airgap_onboarding_subtitle">Please follow these steps to enable Air Gap mode and keep it permanently enabled.</string>
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>

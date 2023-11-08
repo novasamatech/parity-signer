@@ -40,6 +40,7 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 fun AirgapScreen(
+	isInitialOnboarding: Boolean,
 	onCta: Callback,
 ) {
 	val viewModel = viewModel<AirGapViewModel>()
@@ -53,6 +54,7 @@ fun AirgapScreen(
 
 	AirgapScreen(
 		state = state.value,
+		isInitialOnboarding = isInitialOnboarding,
 		onCablesConfirmCheckbox = viewModel::onCableCheckboxClicked,
 		onCta = onCta
 	)
@@ -61,6 +63,7 @@ fun AirgapScreen(
 @Composable
 private fun AirgapScreen(
 	state: AirGapScreenState,
+	isInitialOnboarding: Boolean,
 	onCablesConfirmCheckbox: Callback,
 	onCta: Callback,
 ) {
@@ -75,7 +78,8 @@ private fun AirgapScreen(
 					.fillMaxWidth(1f)
 					.padding(horizontal = 24.dp)
 					.padding(top = 32.dp, bottom = 12.dp),
-				text = stringResource(R.string.airgap_onboarding_title),
+				text = if (isInitialOnboarding) stringResource(R.string.airgap_onboarding_title_onboarding)
+				else stringResource(R.string.airgap_onboarding_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				textAlign = TextAlign.Center,
@@ -85,7 +89,8 @@ private fun AirgapScreen(
 					.fillMaxWidth(1f)
 					.padding(horizontal = 24.dp)
 					.padding(bottom = 16.dp),
-				text = stringResource(R.string.airgap_onboarding_subtitle),
+				text = if (isInitialOnboarding) stringResource(R.string.airgap_onboarding_subtitle_onboarding)
+				else stringResource(R.string.airgap_onboarding_subtitle),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyL,
 				textAlign = TextAlign.Center,
@@ -150,7 +155,8 @@ private fun AirgapScreen(
 			}
 		}
 		PrimaryButtonWide(
-			label = stringResource(R.string.generic_done),
+			label = if (isInitialOnboarding) stringResource(R.string.button_next)
+			else stringResource(R.string.generic_done),
 			modifier = Modifier.padding(24.dp),
 			isEnabled = state.isReadyToProceed(),
 			onClicked = onCta,
@@ -290,7 +296,7 @@ private enum class AirgapItemType { WIFI, AIRPLANE_MODE, BLUETOOTH }
 	showBackground = true, backgroundColor = 0xFF000000,
 )
 @Composable
-private fun PreviewAirgapScreen() {
+private fun PreviewAirgapScreenObnoarding() {
 	Box(modifier = Modifier.fillMaxSize(1f)) {
 		SignerNewTheme() {
 			val state = AirGapScreenState(
@@ -298,7 +304,37 @@ private fun PreviewAirgapScreen() {
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)
-			AirgapScreen(state, {}, {})
+			AirgapScreen(
+				state = state,
+				isInitialOnboarding = true,
+				onCablesConfirmCheckbox = {},
+				onCta = {})
+		}
+	}
+}
+
+@Preview(
+	name = "light", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "themes", uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewAirgapScreenBlocker() {
+	Box(modifier = Modifier.fillMaxSize(1f)) {
+		SignerNewTheme() {
+			val state = AirGapScreenState(
+				airplaneModeEnabled = true,
+				wifiDisabled = false,
+				bluetoothDisabled = true
+			)
+			AirgapScreen(
+				state = state,
+				isInitialOnboarding = false,
+				onCablesConfirmCheckbox = {},
+				onCta = {})
 		}
 	}
 }
@@ -321,7 +357,11 @@ private fun PreviewAirgapScreenSmall() {
 				wifiDisabled = false,
 				bluetoothDisabled = true
 			)
-			AirgapScreen(state, {}, {})
+			AirgapScreen(
+				state = state,
+				isInitialOnboarding = true,
+				onCablesConfirmCheckbox = {},
+				onCta = {})
 		}
 	}
 }
