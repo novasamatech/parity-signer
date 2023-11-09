@@ -18,6 +18,11 @@ class MainFlowViewModel() : ViewModel() {
 
 	private val resetUseCase = ResetUseCase()
 	private val authentication = ServiceLocator.authentication
+	private val networkExposedStateKeeper =
+		ServiceLocator.networkExposedStateKeeper
+
+	val networkState: StateFlow<NetworkState> =
+		networkExposedStateKeeper.airGapModeState
 
 	val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
