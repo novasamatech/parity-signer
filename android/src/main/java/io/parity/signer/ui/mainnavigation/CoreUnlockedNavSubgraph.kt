@@ -166,7 +166,7 @@ object CoreUnlockedNavSubgraph {
 			"$baseRoute/$keyAddr/$keySpec"
 	}
 
-	object ErrorScreen {
+	object ErrorScreenGeneral {
 		internal const val argHeader = "key_header"
 		internal const val argDescription = "key_descr"
 		internal const val argVerbose = "key_verb"
@@ -179,6 +179,7 @@ object CoreUnlockedNavSubgraph {
 		) =
 			"$baseRoute/$argHeader/$argDescription/$argVerbose"
 	}
+	const val errorWrongDbVersionUpdate = "core_wrong_version_mismatch"
 
 	const val airgapBreached = "core_airgap_blocker"
 	const val settings = "core_settings_flow"

@@ -3,7 +3,6 @@ package io.parity.signer.screens.error
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme

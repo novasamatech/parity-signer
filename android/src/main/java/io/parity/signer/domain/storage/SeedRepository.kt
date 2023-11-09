@@ -267,8 +267,7 @@ class SeedRepository(
 	 * authentication.authenticate(activity) {refreshSeedNames()}
 	 * which is somewhat asynchronous
 	 *
-	 * todo dmitry we don't need to tell rust names - remove it, yet make sure we
-	 * update known seeds in all cases we need to update - now it's in storage.getSeedNames()
+	 * todo dmitry we don't need to tell rust names - remove it when not using state machine
 	 */
 	private fun tellRustSeedNames() {
 		val allNames = storage.getSeedNames()
