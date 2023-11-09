@@ -5,12 +5,11 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import io.parity.signer.domain.addVaultLogger
 import io.parity.signer.screens.createderivation.DerivationCreateSubgraph
 import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.keydetails.KeyDetailsScreenSubgraph
@@ -22,9 +21,8 @@ import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgr
 import io.parity.signer.screens.settings.settingsFullSubgraph
 
 @Composable
-fun CoreUnlockedNavSubgraph() {
+fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 
-	val navController = rememberNavController().apply { addVaultLogger() }
 	NavHost(
 		navController = navController,
 		startDestination = CoreUnlockedNavSubgraph.KeySet.destination(null),
@@ -182,6 +180,7 @@ object CoreUnlockedNavSubgraph {
 			"$baseRoute/$argHeader/$argDescription/$argVerbose"
 	}
 
+	const val airgapBreached = "core_airgap_blocker"
 	const val settings = "core_settings_flow"
 	const val networkHelpers = "network_helpers_path"
 }

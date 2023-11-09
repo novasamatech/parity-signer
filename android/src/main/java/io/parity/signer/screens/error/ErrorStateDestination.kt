@@ -1,5 +1,6 @@
 package io.parity.signer.screens.error
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -11,6 +12,7 @@ import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.getDebugDetailedDescriptionString
+import io.parity.signer.screens.initial.eachstartchecks.airgap.AirgapScreen
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import io.parity.signer.uniffi.ErrorDisplayed
 
@@ -46,6 +48,14 @@ fun NavGraphBuilder.errorStateDestination(
 			onBack = { navController.popBackStack() },
 			modifier = Modifier.statusBarsPadding()
 		)
+	}
+	composable(route = CoreUnlockedNavSubgraph.airgapBreached) {
+		BackHandler {
+			//disable back navigation on this screen
+		}
+		AirgapScreen(isInitialOnboarding = false) {
+			navController.popBackStack()
+		}
 	}
 }
 
