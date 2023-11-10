@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,7 +65,7 @@ fun ScanIcon(
 		Image(
 			painter = painterResource(R.drawable.ic_qr_code_2),
 			contentDescription = stringResource(R.string.description_scan_icon),
-			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			colorFilter = ColorFilter.tint(Color.White),
 			modifier = Modifier.size(32.dp)
 		)
 	}
