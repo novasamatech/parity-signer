@@ -10,7 +10,6 @@ import SwiftUI
 
 struct VerifierCertificateView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {

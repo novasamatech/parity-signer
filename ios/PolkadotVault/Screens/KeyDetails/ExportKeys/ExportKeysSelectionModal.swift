@@ -13,7 +13,6 @@ struct ExportKeysSelectionModal: View {
     }
 
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         FullScreenRoundedModal(
@@ -236,7 +235,6 @@ extension ExportKeysSelectionModal {
                     onCompletion: { _ in }
                 )
             )
-            .environmentObject(AppState.preview)
         }
     }
 #endif

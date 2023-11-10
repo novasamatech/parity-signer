@@ -10,7 +10,6 @@ import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var appState: AppState
     @StateObject var viewModel: ViewModel
 
     var body: some View {
