@@ -396,7 +396,7 @@
 	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
 	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
 	<string name="recover_key_set_phrase_title">Enter a Secret Recovery Phrase</string>
-	<string name="recover_key_set_phrase_subtitle">Enter a 24-word phrase you were given when you created your key set</string>
+	<string name="recover_key_set_phrase_subtitle">Enter seed phrase you were given when you created your key set</string>
 	<string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
 	<string name="key_set_has_been_recovered_toast">"%1$s Key Set Has Been Recovered"</string>
 	<string name="key_set_has_been_created_toast">"%1$s Key Set Has Been Created"</string>
