@@ -196,4 +196,4 @@ pub const BORDER: i32 = 4;
 pub const LIVE_SCHEMA_VERSION: u32 = 1;
 
 /// Feature flag to disable dynamic derivations
-pub const ENABLE_DYNAMIC_DERIVATIONS: bool = false;
+pub const ENABLE_DYNAMIC_DERIVATIONS: bool = true;
