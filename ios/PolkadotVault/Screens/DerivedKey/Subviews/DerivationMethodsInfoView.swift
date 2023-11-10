@@ -9,7 +9,6 @@ import SwiftUI
 
 struct DerivationMethodsInfoView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         FullScreenRoundedModal(

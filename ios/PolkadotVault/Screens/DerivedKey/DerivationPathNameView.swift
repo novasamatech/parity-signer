@@ -12,7 +12,6 @@ struct DerivationPathNameView: View {
     @FocusState var focusedPath: Bool
     @FocusState var focusedField: SecurePrimaryTextField.Field?
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
     @State var isUpdatingText = false
     @Environment(\.presentationMode) var presentationMode
 
