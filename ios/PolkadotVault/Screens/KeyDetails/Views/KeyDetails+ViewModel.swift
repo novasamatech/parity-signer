@@ -27,7 +27,6 @@ extension KeyDetailsView {
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
         private let seedsMediator: SeedsMediating
-        private var appState: AppState
 
         @Published var keyName: String
         @Published var keysData: MKeysNew?
@@ -53,6 +52,8 @@ extension KeyDetailsView {
 
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
+        @Published var networks: [MmNetwork] = []
+        @Published var selectedNetworks: [MmNetwork] = []
         // Error handling
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
@@ -75,7 +76,6 @@ extension KeyDetailsView {
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
-            appState: AppState = ServiceLocator.appState,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.onDeleteCompletion = onDeleteCompletion
@@ -83,19 +83,9 @@ extension KeyDetailsView {
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
             self.keyDetailsActionsService = keyDetailsActionsService
-            self.appState = appState
             self.seedsMediator = seedsMediator
             _keyName = .init(initialValue: initialKeyName)
-            use(appState: appState)
             subscribeToNetworkChanges()
-        }
-
-        func use(appState _: AppState) {
-            $isPresentingNetworkSelection.sink { newValue in
-                guard !newValue else { return }
-                self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
-            }
-            .store(in: cancelBag)
         }
 
         func onAppear() {
@@ -105,6 +95,7 @@ extension KeyDetailsView {
         func subscribeToNetworkChanges() {
             $isPresentingNetworkSelection.sink { newValue in
                 guard !newValue else { return }
+                self.isFilteringActive = !self.selectedNetworks.isEmpty
                 self.refreshDerivedKeys()
             }
             .store(in: cancelBag)
@@ -132,7 +123,7 @@ extension KeyDetailsView {
             networksService.getNetworks { result in
                 switch result {
                 case let .success(networks):
-                    self.appState.userData.allNetworks = networks
+                    self.networks = networks
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.description)
                     self.isPresentingError = true
@@ -238,7 +229,7 @@ extension KeyDetailsView {
                 }
             case let .viewKeySet(selectedKeySet):
                 isFilteringActive = false
-                appState.userData.selectedNetworks = []
+                selectedNetworks = []
                 keyName = selectedKeySet.seedName
                 refreshData()
             }
@@ -268,7 +259,7 @@ extension KeyDetailsView {
 
 extension KeyDetailsView.ViewModel {
     func onCreateDerivedKeyTap() {
-        if appState.userData.allNetworks.isEmpty {
+        if networks.isEmpty {
             presentableError = .noNetworksAvailable()
             isPresentingError = true
         } else {
@@ -299,7 +290,7 @@ extension KeyDetailsView.ViewModel {
     func onNetworkSelectionTap() {
         networksService.getNetworks { result in
             if case let .success(networks) = result {
-                self.appState.userData.allNetworks = networks
+                self.networks = networks
                 self.isPresentingNetworkSelection = true
             }
         }
@@ -388,11 +379,11 @@ private extension KeyDetailsView.ViewModel {
         guard let keysData else { return }
         let sortedDerivedKeys = keysData.set
             .sorted(by: { $0.key.address.path < $1.key.address.path })
-        let filteredKeys: [MKeyAndNetworkCard] = if appState.userData.selectedNetworks.isEmpty {
+        let filteredKeys: [MKeyAndNetworkCard] = if selectedNetworks.isEmpty {
             sortedDerivedKeys
         } else {
             sortedDerivedKeys.filter {
-                appState.userData.selectedNetworks
+                selectedNetworks
                     .map(\.key)
                     .contains($0.network.networkSpecsKey)
             }

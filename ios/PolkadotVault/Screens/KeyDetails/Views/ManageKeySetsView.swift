@@ -210,7 +210,6 @@ extension ManageKeySetsView {
                     onCompletion: { _ in }
                 )
             )
-            .environmentObject(AppState.preview)
         }
     }
 #endif

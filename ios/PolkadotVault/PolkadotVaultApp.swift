@@ -27,7 +27,6 @@ struct PolkadotVaultApp: App {
                 .background(.backgroundPrimary)
                 .environmentObject(navigation)
                 .environmentObject(connectivityMediator)
-                .environmentObject(ServiceLocator.appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
             }
