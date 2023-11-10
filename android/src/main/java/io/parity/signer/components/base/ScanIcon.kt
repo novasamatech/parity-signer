@@ -23,7 +23,7 @@ import androidx.compose.ui.zIndex
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.pink500
 
 
 @Composable
@@ -58,7 +58,7 @@ fun ScanIcon(
 	) {
 		Box(
 			modifier = Modifier
-				.background(MaterialTheme.colors.pink300, CircleShape)
+				.background(MaterialTheme.colors.pink500, CircleShape)
 				.size(56.dp)
 		)
 		Image(
