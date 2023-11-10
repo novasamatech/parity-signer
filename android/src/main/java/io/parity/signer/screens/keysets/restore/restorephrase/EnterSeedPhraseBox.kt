@@ -1,7 +1,6 @@
 package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,7 +83,9 @@ fun EnterSeedPhraseBox(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
 			onValueChange = {
-				onEnteredChange(it.text)
+				if (it.text != seedWord.value.text) {
+					onEnteredChange(it.text)
+				}
 				seedWord.value = it
 			},
 			cursorBrush = SolidColor(MaterialTheme.colors.primary),
