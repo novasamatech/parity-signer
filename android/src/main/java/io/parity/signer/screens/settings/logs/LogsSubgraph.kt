@@ -1,7 +1,11 @@
 package io.parity.signer.screens.settings.logs
 
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.logs.comment.AddLogCommentScreen
 import io.parity.signer.screens.settings.logs.logdetails.LogDetailsScreen
