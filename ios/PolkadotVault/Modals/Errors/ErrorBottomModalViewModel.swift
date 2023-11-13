@@ -167,4 +167,14 @@ struct ErrorBottomModalViewModel {
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }
+
+    static func featureNotAvailable(
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.FeatureNotAvailable.title.string,
+            content: Localizable.FeatureNotAvailable.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
 }

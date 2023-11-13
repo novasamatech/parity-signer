@@ -16,10 +16,12 @@ final class AccessControlProvidingAssembler {
     }
 
     func assemble() -> AccessControlProviding {
-        if runtimePropertiesProvider.isInDevelopmentMode {
-            SimulatorAccessControlProvider()
-        } else {
+        switch runtimePropertiesProvider.runtimeMode {
+        case .production,
+             .qa:
             AccessControlProvider()
+        case .debug:
+            SimulatorAccessControlProvider()
         }
     }
 }

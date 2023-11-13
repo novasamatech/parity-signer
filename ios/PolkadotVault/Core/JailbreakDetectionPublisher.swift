@@ -15,7 +15,7 @@ final class JailbreakDetectionPublisher: ObservableObject {
     private let cancelBag = CancelBag()
 
     init() {
-        guard !RuntimePropertiesProvider().isInDevelopmentMode else { return }
+        guard RuntimePropertiesProvider().runtimeMode == .production else { return }
         NotificationCenter.default
             .publisher(for: UIApplication.didBecomeActiveNotification)
             .map { _ in self.detectJailbreak() }

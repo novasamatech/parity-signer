@@ -16,10 +16,12 @@ final class ConnectivityMonitoringAssembler {
     }
 
     func assemble() -> ConnectivityMonitoring {
-        if runtimePropertiesProvider.isInDevelopmentMode {
-            ConnectivityMonitoringStub()
-        } else {
+        switch runtimePropertiesProvider.runtimeMode {
+        case .production,
+             .qa:
             ConnectivityMonitoringAdapter()
+        case .debug:
+            ConnectivityMonitoringStub()
         }
     }
 }
