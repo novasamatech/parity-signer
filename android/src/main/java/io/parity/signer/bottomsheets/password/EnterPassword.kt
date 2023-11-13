@@ -35,10 +35,6 @@ import io.parity.signer.ui.theme.red500
 import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.MEnterPassword
 
-//todo export qr code
-//it's in signsufficient Crypto and transaction, as well as export qr code
-//navstate.rs:365
-//navstate.rs:473
 
 @Composable
 fun EnterPassword(
@@ -54,8 +50,7 @@ fun EnterPassword(
 	val canProceed = password.isNotBlank()
 
 	Column(
-		modifier = Modifier
-			.imePadding()
+		modifier = Modifier.imePadding()
 	) {
 		EnterPasswordHeader(
 			onClose = onClose,
