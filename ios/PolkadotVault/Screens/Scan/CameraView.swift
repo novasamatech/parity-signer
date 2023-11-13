@@ -328,15 +328,15 @@ extension CameraView {
             switch payload.type {
             case .dynamicDerivations:
                 guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
-                    self.presentableError = .featureNotAvailable()
-                    self.isPresentingError = true
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
                     return
                 }
                 startDynamicDerivationsFlow(payload.payload.first ?? "")
             case .dynamicDerivationsTransaction:
                 guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
-                    self.presentableError = .featureNotAvailable()
-                    self.isPresentingError = true
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
                     return
                 }
                 startDynamicDerivationsTransactionFlow(payload.payload)
