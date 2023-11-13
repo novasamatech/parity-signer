@@ -13,11 +13,14 @@ platform :ios do
   main_target = "PolkadotVault"
   main_scheme = "PolkadotVault"
   configuration = "Release"
-  desc "Runs unit tests for main scheme"
+  test_scheme = "PolkadotVault-Dev"
+  desc "Runs unit tests for development scheme"
   desc "Example usage: fastlane run_unit_tests"
   lane :run_unit_tests do
     test_build(
-      scheme:main_scheme
+      scheme:test_scheme
+    )
+  end
     )
   end
 
