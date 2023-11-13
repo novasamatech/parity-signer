@@ -301,19 +301,21 @@ extension CameraView {
         private let scanService: ScanTabService
         private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
-
+        private let runtimePropertiesProvider: RuntimePropertiesProviding
         private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService(),
-            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService()
+            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService(),
+            runtimePropertiesProvider: RuntimePropertiesProviding = RuntimePropertiesProvider()
         ) {
             _isPresented = isPresented
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
+            self.runtimePropertiesProvider = runtimePropertiesProvider
         }
 
         func use(cameraModel: CameraService) {
@@ -325,11 +327,21 @@ extension CameraView {
             isInTransactionProgress = true
             switch payload.type {
             case .dynamicDerivations:
+                guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
+                    return
+                }
                 startDynamicDerivationsFlow(payload.payload.first ?? "")
+            case .dynamicDerivationsTransaction:
+                guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
+                    return
+                }
+                startDynamicDerivationsTransactionFlow(payload.payload)
             case .transaction:
                 startTransactionSigningFlow(payload.payload.first ?? "")
-            case .dynamicDerivationsTransaction:
-                startDynamicDerivationsTransactionFlow(payload.payload)
             }
         }
 

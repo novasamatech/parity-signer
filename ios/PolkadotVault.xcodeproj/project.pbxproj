@@ -129,7 +129,6 @@
 		6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */; };
 		6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */; };
 		6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */; };
-		6D5801DE28992375006C41D8 /* RuntimePropertiesProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801DD28992375006C41D8 /* RuntimePropertiesProviderTests.swift */; };
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
@@ -371,7 +370,7 @@
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
 		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
 		2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpecPlain.swift; sourceTree = "<group>"; };
-		2DE72BBE26A588C7002BB752 /* PolkadotVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PolkadotVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Polkadot Vault Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* PolkadotVaultApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolkadotVaultApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
 		2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -389,6 +388,9 @@
 		6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeImageGenerator.swift; sourceTree = "<group>"; };
 		6D042AF32901B40400B3F4F7 /* ExportMultipleKeysModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportMultipleKeysModal.swift; sourceTree = "<group>"; };
 		6D0677AB29BB0C6000D76D90 /* AppLaunchMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchMediator.swift; sourceTree = "<group>"; };
+		6D06CD282AFD2F0500FAB275 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
+		6D06CD292AFD2F0F00FAB275 /* QA.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = QA.xcconfig; sourceTree = "<group>"; };
+		6D06CD2A2AFD2F1900FAB275 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		6D07D36F292B40D2001A0B79 /* TransactionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSummaryView.swift; sourceTree = "<group>"; };
 		6D0991292A7AA10800DF75EC /* BlockiesIdenticonViewPreviews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockiesIdenticonViewPreviews.swift; sourceTree = "<group>"; };
 		6D0AE5572A6129100042282A /* Blockies */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Blockies; sourceTree = "<group>"; };
@@ -470,7 +472,6 @@
 		6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvider.swift; sourceTree = "<group>"; };
 		6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfoProtocol.swift; sourceTree = "<group>"; };
 		6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PolkadotVaultTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		6D5801DD28992375006C41D8 /* RuntimePropertiesProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProviderTests.swift; sourceTree = "<group>"; };
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
 		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
@@ -808,7 +809,7 @@
 		2DE72BBF26A588C7002BB752 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2DE72BBE26A588C7002BB752 /* PolkadotVault.app */,
+				2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */,
 				2DE72BCF26A588C9002BB752 /* PolkadotVaultTests.xctest */,
 			);
 			name = Products;
@@ -817,6 +818,7 @@
 		2DE72BC026A588C7002BB752 /* PolkadotVault */ = {
 			isa = PBXGroup;
 			children = (
+				6D06CD272AFD2EF000FAB275 /* Configuration */,
 				6D8045DA28D0840500237F8C /* RustDataExtensions */,
 				6DA2ACA02939CB3000AAEADC /* Helpers */,
 				6D2D244928CCAD3700862726 /* Backend */,
@@ -911,6 +913,16 @@
 				6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */,
 			);
 			path = Navigation;
+			sourceTree = "<group>";
+		};
+		6D06CD272AFD2EF000FAB275 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				6D06CD282AFD2F0500FAB275 /* Production.xcconfig */,
+				6D06CD292AFD2F0F00FAB275 /* QA.xcconfig */,
+				6D06CD2A2AFD2F1900FAB275 /* Debug.xcconfig */,
+			);
+			path = Configuration;
 			sourceTree = "<group>";
 		};
 		6D0AE5532A6128F00042282A /* Packages */ = {
@@ -1233,17 +1245,8 @@
 				6D57DC4E289D667000005C63 /* Navigation */,
 				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
-				6D5801DB28992361006C41D8 /* Runtime */,
 			);
 			path = Core;
-			sourceTree = "<group>";
-		};
-		6D5801DB28992361006C41D8 /* Runtime */ = {
-			isa = PBXGroup;
-			children = (
-				6D5801DD28992375006C41D8 /* RuntimePropertiesProviderTests.swift */,
-			);
-			path = Runtime;
 			sourceTree = "<group>";
 		};
 		6D5801DF289924A3006C41D8 /* Connectivity */ = {
@@ -1891,7 +1894,7 @@
 				6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */,
 			);
 			productName = PolkadotVault;
-			productReference = 2DE72BBE26A588C7002BB752 /* PolkadotVault.app */;
+			productReference = 2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2DE72BCE26A588C9002BB752 /* PolkadotVaultTests */ = {
@@ -2365,7 +2368,6 @@
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
-				6D5801DE28992375006C41D8 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2516,6 +2518,7 @@
 		};
 		2DE72BE426A588C9002BB752 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D06CD2A2AFD2F1900FAB275 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = accent_pink300;
@@ -2541,7 +2544,7 @@
 				);
 				MARKETING_VERSION = 6.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -2552,6 +2555,7 @@
 		};
 		2DE72BE526A588C9002BB752 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D06CD282AFD2F0500FAB275 /* Production.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = accent_pink300;
@@ -2576,7 +2580,7 @@
 				);
 				MARKETING_VERSION = 6.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -2606,7 +2610,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolkadotVault.app/PolkadotVault";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
 			};
 			name = Debug;
 		};
@@ -2629,9 +2633,126 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolkadotVault.app/PolkadotVault";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
 			};
 			name = Release;
+		};
+		6D06CD2B2AFD305A00FAB275 /* QA */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOL_FRAMEWORKS = SwiftUI;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = QA;
+		};
+		6D06CD2C2AFD305A00FAB275 /* QA */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D06CD292AFD2F0F00FAB275 /* QA.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = accent_pink300;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PolkadotVault/Preview Content\"";
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = PolkadotVault/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PolkadotVault",
+				);
+				MARKETING_VERSION = 6.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_MODULE_NAME = PolkadotVault;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e x86_64";
+			};
+			name = QA;
+		};
+		6D06CD2D2AFD305A00FAB275 /* QA */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				INFOPLIST_FILE = PolkadotVaultTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+			};
+			name = QA;
 		};
 /* End XCBuildConfiguration section */
 
@@ -2641,6 +2762,7 @@
 			buildConfigurations = (
 				2DE72BE126A588C9002BB752 /* Debug */,
 				2DE72BE226A588C9002BB752 /* Release */,
+				6D06CD2B2AFD305A00FAB275 /* QA */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2650,6 +2772,7 @@
 			buildConfigurations = (
 				2DE72BE426A588C9002BB752 /* Debug */,
 				2DE72BE526A588C9002BB752 /* Release */,
+				6D06CD2C2AFD305A00FAB275 /* QA */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2659,6 +2782,7 @@
 			buildConfigurations = (
 				2DE72BE726A588C9002BB752 /* Debug */,
 				2DE72BE826A588C9002BB752 /* Release */,
+				6D06CD2D2AFD305A00FAB275 /* QA */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
