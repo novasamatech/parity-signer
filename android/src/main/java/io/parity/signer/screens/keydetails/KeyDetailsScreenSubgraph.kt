@@ -192,9 +192,7 @@ fun KeyDetailsScreenSubgraph(
 				data = passwordModel.value,
 				proceed = { password ->
 					vm.viewModelScope.launch {
-						val reply = vm.tryPassword(model, passwordModel.value, password)
-
-						when (reply) {
+						when (val reply = vm.tryPassword(model, passwordModel.value, password)) {
 							ExportTryPasswordReply.ErrorAttemptsExceeded -> {
 								Toast.makeText(
 									context,
