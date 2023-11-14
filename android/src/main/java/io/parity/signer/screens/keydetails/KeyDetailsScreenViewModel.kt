@@ -15,6 +15,9 @@ class KeyDetailsScreenViewModel : ViewModel() {
 	private val uniFfi = ServiceLocator.uniffiInteractor
 	private val repo = ServiceLocator.activityScope!!.seedRepository
 
+	//keeping this state because we don't want to ask for password twice
+	private var privateExportStateModel: PrivateKeyExportModel? = null
+
 	suspend fun fetchModel(
 		keyAddr: String,
 		networkSpecs: String
@@ -26,7 +29,14 @@ class KeyDetailsScreenViewModel : ViewModel() {
 		model: KeyDetailsModel,
 		password: String?
 	): OperationResult<PrivateKeyExportModel, Any> {
-		//todo dmitry think of not asking twice in case of password
+
+		privateExportStateModel?.let { saved ->
+			if (saved.keyCard == model.address) {
+				//password check result saved or already saved before config change
+				return OperationResult.Ok(saved)
+			}
+		}
+
 		val seedResult =
 			repo.getSeedPhraseForceAuth(model.address.cardBase.seedName)
 		return when (seedResult) {
@@ -41,10 +51,17 @@ class KeyDetailsScreenViewModel : ViewModel() {
 				)
 				when (secretKeyDetailsQR) {
 					is UniffiResult.Error -> OperationResult.Err(secretKeyDetailsQR.error)
-					is UniffiResult.Success -> OperationResult.Ok(secretKeyDetailsQR.result)
+					is UniffiResult.Success -> {
+						privateExportStateModel = secretKeyDetailsQR.result
+						OperationResult.Ok(secretKeyDetailsQR.result)
+					}
 				}
 			}
 		}
+	}
+
+	fun clearExportResultState() {
+		privateExportStateModel = null
 	}
 
 	fun createPasswordModel(keyModel: KeyDetailsModel): EnterPasswordModel {
@@ -55,23 +72,60 @@ class KeyDetailsScreenViewModel : ViewModel() {
 		)
 	}
 
-	fun tryPassword(
+	suspend fun tryPassword(
 		keyModel: KeyDetailsModel,
 		passwordModel: EnterPasswordModel,
 		password: String
 	): EnterPasswordReply {
-		val result = getPrivateExportKey(keyModel, password)
-		when (result) {
-			is OperationResult.Err -> TODO()
-			is OperationResult.Ok -> TODO()
+		val seedResult = if (passwordModel.attempt == 0) {
+			repo.getSeedPhraseForceAuth(keyModel.address.cardBase.seedName)
+		} else {
+			repo.getSeedPhrases(listOf(keyModel.address.cardBase.seedName))
 		}
-//todo dmitry finalize
+
+		return when (seedResult) {
+			is RepoResult.Failure -> {
+				EnterPasswordReply.ErrorAuthWrong
+			}
+
+			is RepoResult.Success -> {
+				val secretKeyDetailsQR = uniFfi.generateSecretKeyQr(
+					publicKey = keyModel.pubkey,
+					expectedSeedName = keyModel.address.cardBase.seedName,
+					networkSpecsKey = keyModel.networkInfo.networkSpecsKey,
+					seedPhrase = seedResult.result,
+					keyPassword = password,
+				)
+				when (secretKeyDetailsQR) {
+					is UniffiResult.Error -> {
+						if (passwordModel.attempt > 3) {
+							EnterPasswordReply.ErrorAttemptsExceeded
+						} else {
+							EnterPasswordReply.UpdatePassword(
+								passwordModel.copy(
+									showError = true,
+									attempt = passwordModel.attempt + 1
+								)
+							)
+						}
+					}
+
+					is UniffiResult.Success -> {
+						privateExportStateModel = secretKeyDetailsQR.result
+						EnterPasswordReply.OK(password)
+					}
+				}
+			}
+		}
 	}
 
 	sealed class EnterPasswordReply {
 		data class OK(val password: String) : EnterPasswordReply()
-		data class UpdatePass(val model: EnterPasswordModel) : EnterPasswordReply()
+		data class UpdatePassword(val model: EnterPasswordModel) :
+			EnterPasswordReply()
+
 		data object ErrorAttemptsExceeded : EnterPasswordReply()
+		data object ErrorAuthWrong : EnterPasswordReply()
 	}
 
 	suspend fun removeDerivedKey(
