@@ -7,5 +7,5 @@
 
 APP_RUNTIME_MODE = debug
 DYNAMIC_DERIVATIONS_ENABLED = true
-PRODUCT_NAME = Polkadot Vault Dev
+PRODUCT_NAME = Vault Dev
 PRODUCT_MODULE_NAME = PolkadotVault
