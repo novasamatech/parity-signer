@@ -187,48 +187,51 @@ fun KeyDetailsScreenSubgraph(
 			val passwordModel =
 				remember { mutableStateOf(vm.createPasswordModel(model)) }
 			val context = LocalContext.current
+//todo dmitry sheck why password asked few times
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				EnterPassword(
+					data = passwordModel.value,
+					proceed = { password ->
+						vm.viewModelScope.launch {
+							when (val reply =
+								vm.tryPassword(model, passwordModel.value, password)) {
+								ExportTryPasswordReply.ErrorAttemptsExceeded -> {
+									Toast.makeText(
+										context,
+										context.getString(R.string.attempts_exceeded_title),
+										Toast.LENGTH_LONG
+									).show()
+									closeAction()
+								}
 
-			EnterPassword(
-				data = passwordModel.value,
-				proceed = { password ->
-					vm.viewModelScope.launch {
-						when (val reply = vm.tryPassword(model, passwordModel.value, password)) {
-							ExportTryPasswordReply.ErrorAttemptsExceeded -> {
-								Toast.makeText(
-									context,
-									context.getString(R.string.attempts_exceeded_title),
-									Toast.LENGTH_LONG
-								).show()
-								closeAction()
-							}
+								ExportTryPasswordReply.ErrorAuthWrong -> {
+									Toast.makeText(
+										context,
+										context.getString(R.string.auth_failed_message),
+										Toast.LENGTH_LONG
+									).show()
+									closeAction()
+								}
 
-							ExportTryPasswordReply.ErrorAuthWrong -> {
-								Toast.makeText(
-									context,
-									context.getString(R.string.auth_failed_message),
-									Toast.LENGTH_LONG
-								).show()
-								closeAction()
-							}
+								is ExportTryPasswordReply.OK -> {
+									menuNavController.navigate(
+										KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.destination(
+											reply.password
+										)
+									) {
+										popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+									}
+								}
 
-							is ExportTryPasswordReply.OK -> {
-								menuNavController.navigate(
-									KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.destination(
-										reply.password
-									)
-								) {
-									popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+								is ExportTryPasswordReply.UpdatePassword -> {
+									passwordModel.value = reply.model
 								}
 							}
-
-							is ExportTryPasswordReply.UpdatePassword -> {
-								passwordModel.value = reply.model
-							}
 						}
-					}
-				},
-				onClose = closeAction
-			)
+					},
+					onClose = closeAction
+				)
+			}
 		}
 	}
 }
