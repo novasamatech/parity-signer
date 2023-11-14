@@ -20,9 +20,9 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         )
     }
 
-    func test_assemble_whenInDevelopmentMode_returnsStub() {
+    func test_assemble_whenDebug_returnsStub() {
         // Given
-        runtimePropertiesProvider.isInDevelopmentMode = true
+        runtimePropertiesProvider.runtimeMode = .debug
 
         // When
         let result = subject.assemble()
@@ -31,9 +31,20 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         XCTAssertTrue(result is ConnectivityMonitoringStub)
     }
 
-    func test_assemble_whenNotInDevelopmentMode_returnsSystemAdapter() {
+    func test_assemble_whenProduction_returnsSystemAdapter() {
         // Given
-        runtimePropertiesProvider.isInDevelopmentMode = false
+        runtimePropertiesProvider.runtimeMode = .production
+
+        // When
+        let result = subject.assemble()
+
+        // Then
+        XCTAssertTrue(result is ConnectivityMonitoringAdapter)
+    }
+
+    func test_assemble_whenQA_returnsSystemAdapter() {
+        // Given
+        runtimePropertiesProvider.runtimeMode = .qa
 
         // When
         let result = subject.assemble()

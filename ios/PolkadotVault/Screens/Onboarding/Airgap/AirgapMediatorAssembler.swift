@@ -16,10 +16,12 @@ final class AirgapMediatorAssembler {
     }
 
     func assemble() -> AirgapMediating {
-        if runtimePropertiesProvider.isInDevelopmentMode {
-            AirgapMediatingStub()
-        } else {
+        switch runtimePropertiesProvider.runtimeMode {
+        case .production,
+             .qa:
             AirgapMediator()
+        case .debug:
+            AirgapMediatingStub()
         }
     }
 }

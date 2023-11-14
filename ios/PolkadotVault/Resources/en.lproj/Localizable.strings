@@ -97,10 +97,6 @@
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
 
-"TabBar.Keys" = "Key Sets";
-"TabBar.Scanner" = "Scanner";
-"TabBar.Settings" = "Settings";
-
 "KeySets.Title" = "Key Sets";
 "KeySets.Action.Add" = "Add Key Set";
 "KeySets.Label.DerivedKeys.single" = "%@ Key";
@@ -188,6 +184,9 @@
 "Error.Service.Label.Prefix" = "Internal service error.";
 "Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
 "Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
+
+"Error.FeatureNotAvailable.Title" = "Feature Disabled";
+"Error.FeatureNotAvailable.Message" = "This feature is not available in current build version. Please contact Polkadot Vault team if you require build with this feature.";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key";
@@ -503,7 +502,7 @@
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
 "Error.PrivateKeyQRCodeService.NoKeyDetails" = "Key Details data not available.";
 "Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
-
+"Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
 
 "Error.ApplicationUpdateRequired.Label.Title" = "Upgrade your Polkadot Vault according\n to the requirements";
 "Error.ApplicationUpdateRequired.Label.Subtitle" = "The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements.";
