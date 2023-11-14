@@ -1,4 +1,4 @@
-name: Distribute TestFlight Build
+name: Distribute TestFlight Production Build
 
 on:
  workflow_dispatch:
@@ -7,7 +7,7 @@ jobs:
   distribute_testflight:
     if: contains('["krodak","prybalko"]', github.actor)
     runs-on:                  macos-13
-    name:                     Distribute TestFlight Build
+    name:                     Distribute TestFlight Production Build
 
     steps:
       - name:                 Cancel Previous Runs
@@ -92,4 +92,4 @@ jobs:
           KEYCHAIN_PASSWORD:  ${{ secrets.KEYCHAIN_PASSWORD }}
         run:                  |
           cd ios
-          bundle exec fastlane distribute_testflight
+          bundle exec fastlane distribute_production_testflight
