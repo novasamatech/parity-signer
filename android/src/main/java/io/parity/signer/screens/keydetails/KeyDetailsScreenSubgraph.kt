@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,7 +31,6 @@ import io.parity.signer.screens.keydetails.exportprivatekey.ConfirmExportPrivate
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportBottomSheet
 import io.parity.signer.screens.keydetails.exportprivatekey.PrivateKeyExportModel
 import io.parity.signer.ui.BottomSheetWrapperRoot
-import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -183,13 +183,39 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
-			val model = remember { mutableStateOf(vm.createPasswordModel(model)) }
+			val passwordModel =
+				remember { mutableStateOf(vm.createPasswordModel(model)) }
 
 			EnterPassword(
-				data = model.value,
+				data = passwordModel.value,
 				proceed = { password ->
+					vm.viewModelScope.launch {
+						val reply = vm.tryPassword(model, passwordModel.value, password)
 
-					//todo dmitry SignSpecsFull
+						when (reply) {
+							ExportTryPasswordReply.ErrorAttemptsExceeded -> {
+								//todo dmitry
+							}
+
+							ExportTryPasswordReply.ErrorAuthWrong -> {
+								//todo dmitry SignSpecsFull
+							}
+
+							is ExportTryPasswordReply.OK -> {
+								menuNavController.navigate(
+									KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.destination(
+										reply.password
+									)
+								) {
+									popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+								}
+							}
+
+							is ExportTryPasswordReply.UpdatePassword -> {
+								passwordModel.value = reply.model
+							}
+						}
+					}
 				},
 				onClose = closeAction
 			)

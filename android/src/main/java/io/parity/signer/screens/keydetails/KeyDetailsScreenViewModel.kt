@@ -76,7 +76,7 @@ class KeyDetailsScreenViewModel : ViewModel() {
 		keyModel: KeyDetailsModel,
 		passwordModel: EnterPasswordModel,
 		password: String
-	): EnterPasswordReply {
+	): ExportTryPasswordReply {
 		val seedResult = if (passwordModel.attempt == 0) {
 			repo.getSeedPhraseForceAuth(keyModel.address.cardBase.seedName)
 		} else {
@@ -85,7 +85,7 @@ class KeyDetailsScreenViewModel : ViewModel() {
 
 		return when (seedResult) {
 			is RepoResult.Failure -> {
-				EnterPasswordReply.ErrorAuthWrong
+				ExportTryPasswordReply.ErrorAuthWrong
 			}
 
 			is RepoResult.Success -> {
@@ -99,9 +99,9 @@ class KeyDetailsScreenViewModel : ViewModel() {
 				when (secretKeyDetailsQR) {
 					is UniffiResult.Error -> {
 						if (passwordModel.attempt > 3) {
-							EnterPasswordReply.ErrorAttemptsExceeded
+							ExportTryPasswordReply.ErrorAttemptsExceeded
 						} else {
-							EnterPasswordReply.UpdatePassword(
+							ExportTryPasswordReply.UpdatePassword(
 								passwordModel.copy(
 									showError = true,
 									attempt = passwordModel.attempt + 1
@@ -112,20 +112,11 @@ class KeyDetailsScreenViewModel : ViewModel() {
 
 					is UniffiResult.Success -> {
 						privateExportStateModel = secretKeyDetailsQR.result
-						EnterPasswordReply.OK(password)
+						ExportTryPasswordReply.OK(password)
 					}
 				}
 			}
 		}
-	}
-
-	sealed class EnterPasswordReply {
-		data class OK(val password: String) : EnterPasswordReply()
-		data class UpdatePassword(val model: EnterPasswordModel) :
-			EnterPasswordReply()
-
-		data object ErrorAttemptsExceeded : EnterPasswordReply()
-		data object ErrorAuthWrong : EnterPasswordReply()
 	}
 
 	suspend fun removeDerivedKey(
@@ -135,3 +126,13 @@ class KeyDetailsScreenViewModel : ViewModel() {
 		return uniFfi.removedDerivedKey(addressKey, networkSpecsKey)
 	}
 }
+
+sealed class ExportTryPasswordReply {
+	data class OK(val password: String) : ExportTryPasswordReply()
+	data class UpdatePassword(val model: EnterPasswordModel) :
+		ExportTryPasswordReply()
+
+	data object ErrorAttemptsExceeded : ExportTryPasswordReply()
+	data object ErrorAuthWrong : ExportTryPasswordReply()
+}
+
