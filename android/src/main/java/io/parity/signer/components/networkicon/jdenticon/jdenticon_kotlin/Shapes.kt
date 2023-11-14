@@ -8,7 +8,7 @@ internal class Shapes {
     companion object {
         val center = listOf(
                 fun(g: Graphics, cell: Float, index: Int?) {
-                    var k = cell * 0.42f
+                    val k = cell * 0.42f
                     g.addPolygon(
                             listOf(
                                     Point(0f, 0f),
