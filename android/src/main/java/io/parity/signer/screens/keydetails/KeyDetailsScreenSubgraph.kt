@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.backend.OperationResult
@@ -185,6 +186,7 @@ fun KeyDetailsScreenSubgraph(
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
 			val passwordModel =
 				remember { mutableStateOf(vm.createPasswordModel(model)) }
+			val context = LocalContext.current
 
 			EnterPassword(
 				data = passwordModel.value,
@@ -194,11 +196,21 @@ fun KeyDetailsScreenSubgraph(
 
 						when (reply) {
 							ExportTryPasswordReply.ErrorAttemptsExceeded -> {
-								//todo dmitry
+								Toast.makeText(
+									context,
+									context.getString(R.string.attempts_exceeded_title),
+									Toast.LENGTH_LONG
+								).show()
+								closeAction()
 							}
 
 							ExportTryPasswordReply.ErrorAuthWrong -> {
-								//todo dmitry SignSpecsFull
+								Toast.makeText(
+									context,
+									context.getString(R.string.auth_failed_message),
+									Toast.LENGTH_LONG
+								).show()
+								closeAction()
 							}
 
 							is ExportTryPasswordReply.OK -> {
