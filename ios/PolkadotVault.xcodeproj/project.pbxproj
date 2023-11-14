@@ -2593,7 +2593,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
@@ -2610,7 +2609,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault Dev";
 			};
 			name = Debug;
 		};
@@ -2618,7 +2617,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
@@ -2633,7 +2631,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault";
 			};
 			name = Release;
 		};
@@ -2735,7 +2733,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
@@ -2750,7 +2747,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault QA.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault QA";
 			};
 			name = QA;
 		};

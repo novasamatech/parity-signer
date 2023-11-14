@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2DE72BBD26A588C7002BB752"
-               BuildableName = "Polkadot Vault.app"
+               BuildableName = "Vault.app"
                BlueprintName = "PolkadotVault"
                ReferencedContainer = "container:PolkadotVault.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2DE72BBD26A588C7002BB752"
-            BuildableName = "Polkadot Vault.app"
+            BuildableName = "Vault.app"
             BlueprintName = "PolkadotVault"
             ReferencedContainer = "container:PolkadotVault.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2DE72BBD26A588C7002BB752"
-            BuildableName = "Polkadot Vault.app"
+            BuildableName = "Vault.app"
             BlueprintName = "PolkadotVault"
             ReferencedContainer = "container:PolkadotVault.xcodeproj">
          </BuildableReference>
