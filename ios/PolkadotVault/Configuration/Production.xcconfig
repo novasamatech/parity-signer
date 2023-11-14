@@ -7,5 +7,5 @@
 
 APP_RUNTIME_MODE = production
 DYNAMIC_DERIVATIONS_ENABLED = false
-PRODUCT_NAME = Polkadot Vault
+PRODUCT_NAME = Vault
 PRODUCT_MODULE_NAME = PolkadotVault
