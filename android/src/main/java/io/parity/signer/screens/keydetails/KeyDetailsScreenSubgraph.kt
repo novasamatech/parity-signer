@@ -187,7 +187,6 @@ fun KeyDetailsScreenSubgraph(
 			val passwordModel =
 				remember { mutableStateOf(vm.createPasswordModel(model)) }
 			val context = LocalContext.current
-//todo dmitry sheck why password asked few times
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				EnterPassword(
 					data = passwordModel.value,
