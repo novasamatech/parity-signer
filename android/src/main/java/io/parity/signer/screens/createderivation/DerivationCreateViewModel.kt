@@ -7,16 +7,16 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.KeyAndNetworkModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.storage.mapError
 import io.parity.signer.domain.toKeyAndNetworkModel
 import io.parity.signer.domain.usecases.AllNetworksUseCase
+import io.parity.signer.domain.usecases.CreateDerivationUseCase
 import io.parity.signer.uniffi.DerivationCheck
 import io.parity.signer.uniffi.keysBySeedName
-import io.parity.signer.uniffi.tryCreateAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,10 +30,10 @@ class DerivationCreateViewModel : ViewModel() {
 		ServiceLocator.activityScope!!.seedRepository
 	private val pathAnalyzer: DerivationPathAnalyzer = DerivationPathAnalyzer()
 	private val allNetworksUseCase = AllNetworksUseCase(uniffiInteractor)
+	private val createDerivationUseCase = CreateDerivationUseCase()
 
 	fun getAllNetworks(): List<NetworkModel> = allNetworksUseCase.getAllNetworks()
 
-	private lateinit var rootNavigator: Navigator
 	private lateinit var seedName: String
 	private lateinit var existingKeys: Set<KeyAndNetworkModel>
 
@@ -41,9 +41,9 @@ class DerivationCreateViewModel : ViewModel() {
 		MutableStateFlow(INITIAL_DERIVATION_PATH)
 	val path: StateFlow<String> = _path.asStateFlow()
 
-	private val _selectedNetwork: MutableStateFlow<NetworkModel> =
-		MutableStateFlow(getAllNetworks().first())
-	val selectedNetwork: StateFlow<NetworkModel> =
+	private val _selectedNetwork: MutableStateFlow<NetworkModel?> =
+		MutableStateFlow(null)
+	val selectedNetwork: StateFlow<NetworkModel?> =
 		_selectedNetwork.asStateFlow()
 
 	fun updatePath(newPath: String) {
@@ -58,12 +58,11 @@ class DerivationCreateViewModel : ViewModel() {
 		seedRepository = ServiceLocator.activityScope!!.seedRepository
 	}
 
-	fun setInitValues(seed: String, rootNavigator: Navigator) {
+	fun setInitValues(seed: String) {
 		refreshCachedDependencies()
 		seedName = seed
 		existingKeys =
 			keysBySeedName(seed).set.map { it.toKeyAndNetworkModel() }.toSet()
-		this.rootNavigator = rootNavigator
 	}
 
 	fun updateSelectedNetwork(newNetwork: NetworkModel) {
@@ -71,7 +70,15 @@ class DerivationCreateViewModel : ViewModel() {
 		_path.value = getInitialPath(newNetwork)
 	}
 
-	fun getInitialPath(netWork: NetworkModel): String {
+	suspend fun fastCreateDerivationForNetwork(
+		newNetwork: NetworkModel,
+		context: Context
+	) {
+		updateSelectedNetwork(newNetwork)
+		proceedCreateKey(context)
+	}
+
+	private fun getInitialPath(netWork: NetworkModel): String {
 		var path = netWork.pathId
 		val keys = existingKeys.filter { it.network.networkSpecsKey == netWork.key }
 		if (!keys.any { it.key.path == path }) {
@@ -110,7 +117,7 @@ class DerivationCreateViewModel : ViewModel() {
 			uniffiInteractor.validateDerivationPath(
 				path,
 				seedName,
-				selectedNetwork.value.key
+				selectedNetwork.value?.key ?: ""
 			).mapError()
 		}
 	}
@@ -121,29 +128,33 @@ class DerivationCreateViewModel : ViewModel() {
 			val phrase =
 				seedRepository.getSeedPhraseForceAuth(seedName).mapError() ?: return
 			if (phrase.isNotBlank()) {
-				try {
-					val selectedNetwork = selectedNetwork.value
-					tryCreateAddress(
-						seedName,
-						phrase,
-						path.value,
-						selectedNetwork.key
-					)
-					Toast.makeText(
-						context,
-						context.getString(R.string.create_derivations_success),
-						Toast.LENGTH_SHORT
-					).show()
-					resetState()
-				} catch (e: Exception) {
-					Toast.makeText(
-						context,
-						context.getString(
-							R.string.create_derivations_failure,
-							e.localizedMessage
-						),
-						Toast.LENGTH_SHORT
-					).show()
+				val selectedNetwork = selectedNetwork.value!!
+				val result = createDerivationUseCase.createDerivation(
+					seedName = seedName,
+					seedPhrase = phrase,
+					path = path.value,
+					networkKey = selectedNetwork.key
+				)
+				when (result) {
+					is OperationResult.Ok -> {
+						Toast.makeText(
+							context,
+							context.getString(R.string.create_derivations_success),
+							Toast.LENGTH_SHORT
+						).show()
+						resetState()
+					}
+
+					is OperationResult.Err -> {
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.create_derivations_failure,
+								result.error.localizedMessage
+							),
+							Toast.LENGTH_SHORT
+						).show()
+					}
 				}
 			} else {
 				Log.e(TAG, "Seed phrase received but it's empty")

@@ -13,12 +13,12 @@ jobs:
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
+        uses:                 styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
         with:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.6.0
+        uses:                 actions/checkout@v4.1.1
         with:
           fetch-depth:        1
           submodules:         recursive
@@ -30,12 +30,12 @@ jobs:
           sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:                 Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
-        uses:                 baptiste0928/cargo-install@30f432979e99f3ea66a8fa2eede53c07063995d8 # v2.1.0
+        uses:                 baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0
         with:
           crate:              cargo-spellcheck
 
@@ -66,12 +66,12 @@ jobs:
           mdbook-version:     latest
 
       - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@30f432979e99f3ea66a8fa2eede53c07063995d8 # v2.1.0
+        uses:                 baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0
         with:
           crate:              mdbook-linkcheck
 
       - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@30f432979e99f3ea66a8fa2eede53c07063995d8 # v2.1.0
+        uses:                 baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0
         with:
           crate:              mdbook-mermaid
 

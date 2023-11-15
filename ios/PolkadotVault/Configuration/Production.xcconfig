@@ -1,0 +1,11 @@
+//
+//  Production.xcconfig
+//  PolkadotVault
+//
+//  Created by Krzysztof Rodak on 09/11/2023.
+//
+
+APP_RUNTIME_MODE = production
+DYNAMIC_DERIVATIONS_ENABLED = false
+PRODUCT_NAME = Vault
+PRODUCT_MODULE_NAME = PolkadotVault

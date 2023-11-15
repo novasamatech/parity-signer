@@ -23,19 +23,19 @@ struct KeyDetailsActionsModal: View {
                     // Export Keys
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentExportKeysSelection.toggle() } },
-                        icon: Asset.selectUnselected.swiftUIImage,
+                        icon: Image(.exportKeys),
                         text: Localizable.KeySetsModal.Action.export.key
                     )
                     ActionSheetButton(
                         action: {
                             animateDismissal { shouldPresentBackupModal.toggle() }
                         },
-                        icon: Asset.backupKey.swiftUIImage,
+                        icon: Image(.backupKey),
                         text: Localizable.KeySetsModal.Action.backup.key
                     )
                     ActionSheetButton(
                         action: { animateDismissal { shouldPresentRemoveConfirmationModal.toggle() } },
-                        icon: Asset.delete.swiftUIImage,
+                        icon: Image(.delete),
                         text: Localizable.KeySetsModal.Action.delete.key,
                         style: .destructive
                     )

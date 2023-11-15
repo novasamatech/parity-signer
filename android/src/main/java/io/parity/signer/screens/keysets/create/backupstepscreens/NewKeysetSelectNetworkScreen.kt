@@ -46,17 +46,19 @@ import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
+import io.parity.signer.uniffi.ScreenData
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewKeySetSelectNetworkScreen(
-	model: NewSeedBackupModel,
-	navigator: Navigator,
+	seedName: String,
+	seedPhrase: String,
 	onBack: Callback,
+	onSuccess: Callback,
 ) {
-	val networksViewModel: NewKeySetNetworksWithNavigatorViewModel = viewModel()
+	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
 	val selected: MutableState<Set<String>> =
 		remember {
 			mutableStateOf(
@@ -79,17 +81,17 @@ fun NewKeySetSelectNetworkScreen(
 
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
-			seedName = model.seed, seedPhrase = model.seedPhrase,
-			networksForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
+			seedName = seedName, seedPhrase = seedPhrase,
+			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
-			navigator = navigator,
-			onPostReaction = { isSuccess ->
+			onAfterCreate = { isSuccess ->
 				if (isSuccess) {
 					Toast.makeText(
 						context,
-						context.getString(R.string.key_set_has_been_created_toast, model.seed),
+						context.getString(R.string.key_set_has_been_created_toast, seedName),
 						Toast.LENGTH_LONG
 					).show()
+					onSuccess()
 				}
 			}
 		)

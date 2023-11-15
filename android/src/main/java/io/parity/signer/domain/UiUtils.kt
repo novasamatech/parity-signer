@@ -6,6 +6,8 @@ import android.content.ContextWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.navigation.NavController
+import androidx.navigation.NavOptionsBuilder
 
 
 fun Modifier.conditional(
@@ -33,4 +35,8 @@ fun Context.findActivity(): Activity? {
 }
 
 
-
+fun NavOptionsBuilder.popUpToTop(navController: NavController) {
+	popUpTo(navController.currentBackStackEntry?.destination?.route ?: return) {
+		inclusive =  true
+	}
+}

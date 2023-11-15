@@ -14,18 +14,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.bottomsheets.password.EnterPassword
-import io.parity.signer.components.panels.CameraParentSingleton
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.FakeNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
 import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
-import io.parity.signer.screens.scan.errors.TransactionErrorBottomSheet
-import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.LocalErrorBottomSheet
+import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.screens.scan.transaction.TransactionPreviewType
 import io.parity.signer.screens.scan.transaction.TransactionsScreenFull
-import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDerivedKeysScreen
 import io.parity.signer.screens.scan.transaction.dynamicderivations.AddDynamicDerivationScreenFull
 import io.parity.signer.screens.scan.transaction.previewType
 import io.parity.signer.ui.BottomSheetWrapperRoot
@@ -38,7 +36,8 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun ScanNavSubgraph(
-	rootNavigator: Navigator,
+	onCloseCamera: Callback,
+	openKeySet:(seedName: String) -> Unit,
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
 
@@ -61,13 +60,9 @@ fun ScanNavSubgraph(
 	val showingModals = transactionError.value != null ||
 		passwordModel.value != null || errorWrongPassword.value
 
-	val navigateToPrevious = {
-		CameraParentSingleton.navigateBackFromCamera(rootNavigator)
-	}
-
 	val backAction = {
 		val wasState = scanViewModel.ifHasStateThenClear()
-		if (!wasState) navigateToPrevious()
+		if (!wasState) onCloseCamera()
 	}
 	BackHandler(onBack = backAction)
 
@@ -93,11 +88,11 @@ fun ScanNavSubgraph(
 					Toast.LENGTH_LONG
 				).show()
 				scanViewModel.clearState()
-				rootNavigator.navigate(Action.SELECT_SEED, seedName)
+				openKeySet(seedName)
 			},
 			onCustomError = { error ->
 				scanViewModel.transactionError.value =
-					TransactionErrorModel(context = context, details = error)
+					LocalErrorSheetModel(context = context, details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
 			onErrorWrongPassword = {
@@ -119,7 +114,7 @@ fun ScanNavSubgraph(
 	} else if (transactionsValue == null || showingModals) {
 
 		ScanScreen(
-			onClose = { navigateToPrevious() },
+			onClose = onCloseCamera,
 			performPayloads = { payloads ->
 				scanViewModel.performTransactionPayload(payloads, context)
 			},
@@ -189,7 +184,7 @@ fun ScanNavSubgraph(
 	//Bottom sheets
 	transactionError.value?.let { presentableErrorValue ->
 		BottomSheetWrapperRoot(onClosedAction = scanViewModel::clearState) {
-			TransactionErrorBottomSheet(
+			LocalErrorBottomSheet(
 				error = presentableErrorValue,
 				onOk = scanViewModel::clearState,
 			)

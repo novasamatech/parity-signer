@@ -61,11 +61,10 @@ pub fn find_meta_set(database: &sled::Db, short_specs: &ShortSpecs) -> Result<Ve
         let new_element = MetaSetElement::from_entry(x)?;
         if let Some(found_now) = new_element.optional_base58prefix() {
             if found_now != short_specs.base58prefix {
-                return Err(MetadataError::Base58PrefixSpecsMismatch {
+                Err(MetadataError::Base58PrefixSpecsMismatch {
                     specs: short_specs.base58prefix,
                     meta: found_now,
-                }
-                .into());
+                })?;
             }
         }
         out.push(new_element);

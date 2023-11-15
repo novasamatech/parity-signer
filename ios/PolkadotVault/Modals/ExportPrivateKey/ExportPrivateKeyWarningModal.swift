@@ -21,15 +21,15 @@ struct ExportPrivateKeyWarningModal: View {
             content: {
                 // Modal content
                 VStack(alignment: .center, spacing: Spacing.medium) {
-                    Asset.privateKeyIcon.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    Image(.privateKeyIcon)
+                        .foregroundColor(.textAndIconsPrimary)
                         .padding([.bottom, .top], Spacing.small)
                     Localizable.KeyExportWarning.Label.header.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.titleL.font)
                         .padding(.bottom, Spacing.extraSmall)
                     Localizable.KeyExportWarning.Label.content.text
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .font(PrimaryFont.bodyL.font)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, Spacing.small)

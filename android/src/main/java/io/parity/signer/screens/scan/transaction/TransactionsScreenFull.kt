@@ -269,13 +269,11 @@ private fun AddLogElement() {
 //		color = MaterialTheme.colors.Text400
 //	)
 //
-//	val focusManager = LocalFocusManager.current
 //	val focusRequester = remember { FocusRequester() }
 //	SingleTextInput(
 //		content = comment,
 //		update = { comment.value = it },
 //		onDone = { },
-//		focusManager = focusManager,
 //		focusRequester = focusRequester
 //	)
 //	Text(

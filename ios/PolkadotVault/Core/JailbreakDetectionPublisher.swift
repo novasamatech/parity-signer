@@ -15,7 +15,7 @@ final class JailbreakDetectionPublisher: ObservableObject {
     private let cancelBag = CancelBag()
 
     init() {
-        guard !RuntimePropertiesProvider().isInDevelopmentMode else { return }
+        guard RuntimePropertiesProvider().runtimeMode == .production else { return }
         NotificationCenter.default
             .publisher(for: UIApplication.didBecomeActiveNotification)
             .map { _ in self.detectJailbreak() }
@@ -23,7 +23,9 @@ final class JailbreakDetectionPublisher: ObservableObject {
             .sink { self.isJailbroken = $0 }
             .store(in: cancelBag)
     }
+}
 
+private extension JailbreakDetectionPublisher {
     func detectJailbreak() -> AnyPublisher<Bool, Never> {
         Future { promise in
             let isJailbroken = [
@@ -36,17 +38,17 @@ final class JailbreakDetectionPublisher: ObservableObject {
         }.eraseToAnyPublisher()
     }
 
-    private func checkJailbreakFilesAndDirectories() -> Bool {
+    func checkJailbreakFilesAndDirectories() -> Bool {
         Constants.jailbreakApplicationPaths
             .contains { FileManager.default.fileExists(atPath: $0) }
     }
 
-    private func checkSystemModifications() -> Bool {
+    func checkSystemModifications() -> Bool {
         Constants.inaccessibleSystemPaths
             .contains { FileManager.default.fileExists(atPath: $0) }
     }
 
-    private func checkJailbreakTools() -> Bool {
+    func checkJailbreakTools() -> Bool {
         let jailbreakTools = [
             Constants.jailbreakToolCydia,
             Constants.jailbreakToolIcy,
@@ -56,7 +58,7 @@ final class JailbreakDetectionPublisher: ObservableObject {
         return jailbreakTools.contains { UIApplication.shared.canOpenURL($0!) }
     }
 
-    private func checkEnvironmentVariables() -> Bool {
+    func checkEnvironmentVariables() -> Bool {
         let environmentVariables = [
             Constants.environmentVariableDyldInsertLibraries,
             Constants.environmentVariableDyldPrintToFile,

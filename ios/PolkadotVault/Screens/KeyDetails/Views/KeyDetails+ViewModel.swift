@@ -22,24 +22,20 @@ extension KeyDetailsView {
     final class ViewModel: ObservableObject {
         let keyDetailsService: KeyDetailsService
         private let networksService: GetManagedNetworksService
-        private let warningStateMediator: WarningStateMediator
         private let cancelBag = CancelBag()
 
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
         private let seedsMediator: SeedsMediating
-        let keyName: String
-        /// `MKwysNew` will currently be `nil` when navigating through given navigation path:
-        /// `.newSeed` -> `.keys`, data will be filled on `onAppear`, so this can remain optional
-        var keysData: MKeysNew?
-        private var appState: AppState
+
+        @Published var keyName: String
+        @Published var keysData: MKeysNew?
         @Published var shouldPresentRemoveConfirmationModal = false
         @Published var shouldPresentBackupModal = false
         @Published var shouldPresentExportKeysSelection = false
         @Published var isShowingActionSheet = false
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingBackupModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var isPresentingExportKeySelection = false
         @Published var isPresentingRootDetails = false
         @Published var isPresentingKeyDetails = false
@@ -47,12 +43,17 @@ extension KeyDetailsView {
         @Published var presentedPublicKeyDetails: String!
 
         @Published var isShowingKeysExportModal = false
-        // Network selection
         @Published var isPresentingNetworkSelection = false
+        @Published var isPresentingKeySetSelection = false
+        @Published var isShowingRecoverKeySet = false
+        @Published var isShowingCreateKeySet = false
+        @Published var isPresentingSettings = false
+        @Published var isPresentingQRScanner: Bool = false
 
-        @Published var keySummary: KeySummaryViewModel?
         @Published var derivedKeys: [DerivedKeyRowModel] = []
         @Published var isFilteringActive: Bool = false
+        @Published var networks: [MmNetwork] = []
+        @Published var selectedNetworks: [MmNetwork] = []
         // Error handling
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
@@ -64,57 +65,37 @@ extension KeyDetailsView {
         // Derive New Key
         @Published var isPresentingDeriveNewKey: Bool = false
 
-        // Back Navigation
-        var dismissViewRequest: AnyPublisher<Void, Never> {
-            dismissRequest.eraseToAnyPublisher()
-        }
-
-        private let dismissRequest = PassthroughSubject<Void, Never>()
-        private let onCompletion: (OnCompletionAction) -> Void
         var keysExportModalViewModel: (() -> ExportMultipleKeysModalViewModel)?
 
-        /// Name of seed to be removed with `Remove Seed` action
-        private var removeSeed: String = ""
+        private let onDeleteCompletion: () -> Void
 
         init(
-            keyName: String,
-            keysData: MKeysNew?,
+            initialKeyName: String,
+            onDeleteCompletion: @escaping () -> Void,
             exportPrivateKeyService: PrivateKeyQRCodeService = PrivateKeyQRCodeService(),
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator,
-            appState: AppState = ServiceLocator.appState,
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            onCompletion: @escaping (OnCompletionAction) -> Void
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
-            self.keyName = keyName
-            self.keysData = keysData
+            self.onDeleteCompletion = onDeleteCompletion
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.networksService = networksService
             self.keyDetailsActionsService = keyDetailsActionsService
-            self.warningStateMediator = warningStateMediator
-            self.appState = appState
             self.seedsMediator = seedsMediator
-            self.onCompletion = onCompletion
-            use(appState: appState)
-            updateRenderables()
+            _keyName = .init(initialValue: initialKeyName)
             subscribeToNetworkChanges()
-            refreshData()
         }
 
-        func use(appState _: AppState) {
-            $isPresentingNetworkSelection.sink { newValue in
-                guard !newValue else { return }
-                self.isFilteringActive = !self.appState.userData.selectedNetworks.isEmpty
-            }
-            .store(in: cancelBag)
+        func onAppear() {
+            refreshData()
         }
 
         func subscribeToNetworkChanges() {
             $isPresentingNetworkSelection.sink { newValue in
                 guard !newValue else { return }
+                self.isFilteringActive = !self.selectedNetworks.isEmpty
                 self.refreshDerivedKeys()
             }
             .store(in: cancelBag)
@@ -122,7 +103,6 @@ extension KeyDetailsView {
 
         func updateRenderables() {
             refreshDerivedKeys()
-            refreshKeySummary()
             refreshNetworks()
         }
 
@@ -143,7 +123,7 @@ extension KeyDetailsView {
             networksService.getNetworks { result in
                 switch result {
                 case let .success(networks):
-                    self.appState.userData.allNetworks = networks
+                    self.networks = networks
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.description)
                     self.isPresentingError = true
@@ -152,13 +132,22 @@ extension KeyDetailsView {
         }
 
         func onRemoveKeySetConfirmationTap() {
-            let isRemoved = seedsMediator.removeSeed(seedName: removeSeed)
+            let isRemoved = seedsMediator.removeSeed(seedName: keyName)
             guard isRemoved else { return }
             keyDetailsActionsService.forgetKeySet(seedName: keyName) { result in
                 switch result {
                 case .success:
-                    self.dismissRequest.send()
-                    self.onCompletion(.keySetDeleted)
+                    self.snackbarViewModel = .init(
+                        title: Localizable.KeySetsModal.Confirmation.snackbar.string,
+                        style: .warning
+                    )
+                    self.isSnackbarPresented = true
+                    if self.seedsMediator.seedNames.isEmpty {
+                        self.onDeleteCompletion()
+                    } else {
+                        self.keyName = self.seedsMediator.seedNames.first ?? ""
+                        self.refreshData()
+                    }
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.localizedDescription)
                     self.isPresentingError = true
@@ -209,12 +198,13 @@ extension KeyDetailsView {
             case .onCancel:
                 ()
             case let .onKeysExport(selectedKeys):
-                guard let keySummary = keySummary else { return }
+                guard let root = keysData?.root else { return }
                 let derivedKeys = selectedKeys.map {
                     DerivedKeyExportModel(viewModel: $0.viewModel, keyData: $0.keyData)
                 }
                 keysExportModalViewModel = { ExportMultipleKeysModalViewModel(
-                    key: keySummary,
+                    keyName: root.address.seedName,
+                    key: .init(identicon: root.address.identicon, base58: root.base58),
                     derivedKeys: derivedKeys,
                     count: selectedKeys.count
                 )
@@ -224,6 +214,44 @@ extension KeyDetailsView {
                 }
             }
         }
+
+        func onKeySetSelectionComplete(_ completionAction: ManageKeySetsView.OnCompletionAction) {
+            switch completionAction {
+            case .onClose:
+                ()
+            case .addKeySet:
+                DispatchQueue.main.async {
+                    self.isShowingCreateKeySet = true
+                }
+            case .recoverKeySet:
+                DispatchQueue.main.async {
+                    self.isShowingRecoverKeySet = true
+                }
+            case let .viewKeySet(selectedKeySet):
+                isFilteringActive = false
+                selectedNetworks = []
+                keyName = selectedKeySet.seedName
+                refreshData()
+            }
+        }
+
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            let message: String
+            switch completionAction {
+            case let .createKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+                keyName = seedName
+            case let .recoveredKeySet(seedName):
+                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                keyName = seedName
+            }
+            refreshData()
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
+        }
     }
 }
 
@@ -231,7 +259,7 @@ extension KeyDetailsView {
 
 extension KeyDetailsView.ViewModel {
     func onCreateDerivedKeyTap() {
-        if appState.userData.allNetworks.isEmpty {
+        if networks.isEmpty {
             presentableError = .noNetworksAvailable()
             isPresentingError = true
         } else {
@@ -243,61 +271,72 @@ extension KeyDetailsView.ViewModel {
         isPresentingRootDetails = true
     }
 
+    func onSettingsTap() {
+        isPresentingSettings = true
+    }
+
+    func onMoreTap() {
+        isShowingActionSheet = true
+    }
+
+    func onQRScannerTap() {
+        isPresentingQRScanner = true
+    }
+
+    func onKeySetSelectionTap() {
+        isPresentingKeySetSelection = true
+    }
+
     func onNetworkSelectionTap() {
         networksService.getNetworks { result in
             if case let .success(networks) = result {
-                self.appState.userData.allNetworks = networks
+                self.networks = networks
                 self.isPresentingNetworkSelection = true
             }
         }
     }
 
     func onDerivedKeyTap(_ deriveKey: DerivedKeyRowModel) {
-        keyDetailsActionsService.navigateToPublicKey(
-            addressKey: deriveKey.keyData.key.addressKey,
-            networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
-        ) { result in
-            switch result {
-            case let .success(keyDetails):
-                self.presentedPublicKeyDetails = deriveKey.addressKey
-                self.presentedKeyDetails = keyDetails
-                self.isPresentingKeyDetails = true
-            case let .failure(error):
-                self.presentableError = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
+        DispatchQueue.main.async {
+            self.keyDetailsActionsService.publicKey(
+                addressKey: deriveKey.keyData.key.addressKey,
+                networkSpecsKey: deriveKey.keyData.network.networkSpecsKey
+            ) { result in
+                switch result {
+                case let .success(keyDetails):
+                    self.presentedPublicKeyDetails = deriveKey.addressKey
+                    self.presentedKeyDetails = keyDetails
+                    self.isPresentingKeyDetails = true
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
+                }
             }
         }
-    }
-
-    func onConnectivityAlertTap() {
-        warningStateMediator.resetConnectivityWarnings()
-        shouldPresentBackupModal.toggle()
     }
 }
 
 // MARK: - Modals
 
 extension KeyDetailsView.ViewModel {
+    func onQRScannerDismiss() {
+        refreshData()
+    }
+
     func onActionSheetDismissal() {
-        let isAlertVisible = warningStateMediator.alert
         if shouldPresentRemoveConfirmationModal {
             shouldPresentRemoveConfirmationModal.toggle()
             isShowingRemoveConfirmation.toggle()
         }
         if shouldPresentBackupModal {
             shouldPresentBackupModal.toggle()
-            if isAlertVisible {
-                isPresentingConnectivityAlert.toggle()
-            } else {
-                keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
-                    switch result {
-                    case .success:
-                        self.updateBackupModel()
-                        self.isShowingBackupModal = true
-                    case let .failure(error):
-                        self.presentableError = .alertError(message: error.localizedDescription)
-                        self.isPresentingError = true
-                    }
+            keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
+                switch result {
+                case .success:
+                    self.tryToPresentBackupModal()
+                case let .failure(error):
+                    self.presentableError = .alertError(message: error.localizedDescription)
+                    self.isPresentingError = true
                 }
             }
         }
@@ -311,14 +350,25 @@ extension KeyDetailsView.ViewModel {
         backupModal = nil
     }
 
-    func rootKeyDetails() -> RootKeyDetailsModal.ViewModel {
-        .init(name: keySummary?.keyName ?? "", publicKey: keySummary?.base58 ?? "")
+    func rootKeyDetails() -> RootKeyDetailsModal.Renderable {
+        .init(
+            seedName: keyName,
+            identicon: keysData?.root?.address.identicon,
+            base58: keysData?.root?.base58 ?? ""
+        )
     }
 }
 
 private extension KeyDetailsView.ViewModel {
-    func updateBackupModel() {
-        backupModal = exportPrivateKeyService.backupViewModel(keysData)
+    func tryToPresentBackupModal() {
+        switch exportPrivateKeyService.backupViewModel(keysData) {
+        case let .success(backupModal):
+            self.backupModal = backupModal
+            isShowingBackupModal = true
+        case let .failure(error):
+            presentableError = .alertError(message: error.message)
+            isPresentingError = true
+        }
     }
 
     func keyData(for derivedKey: DerivedKeyRowModel) -> MKeyAndNetworkCard? {
@@ -326,15 +376,14 @@ private extension KeyDetailsView.ViewModel {
     }
 
     func refreshDerivedKeys() {
-        guard let keysData = keysData else { return }
+        guard let keysData else { return }
         let sortedDerivedKeys = keysData.set
             .sorted(by: { $0.key.address.path < $1.key.address.path })
-        let filteredKeys: [MKeyAndNetworkCard]
-        if appState.userData.selectedNetworks.isEmpty {
-            filteredKeys = sortedDerivedKeys
+        let filteredKeys: [MKeyAndNetworkCard] = if selectedNetworks.isEmpty {
+            sortedDerivedKeys
         } else {
-            filteredKeys = sortedDerivedKeys.filter {
-                appState.userData.selectedNetworks
+            sortedDerivedKeys.filter {
+                selectedNetworks
                     .map(\.key)
                     .contains($0.network.networkSpecsKey)
             }
@@ -348,14 +397,5 @@ private extension KeyDetailsView.ViewModel {
                 )
             }
         viewState = derivedKeys.isEmpty ? .emptyState : .list
-    }
-
-    func refreshKeySummary() {
-        guard let keysData = keysData else { return }
-        keySummary = KeySummaryViewModel(
-            keyName: keysData.root?.address.seedName ?? "",
-            base58: keysData.root?.base58 ?? ""
-        )
-        removeSeed = keysData.root?.address.seedName ?? ""
     }
 }

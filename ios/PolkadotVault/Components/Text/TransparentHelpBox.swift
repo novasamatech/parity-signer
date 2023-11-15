@@ -15,16 +15,16 @@ struct TransparentHelpBox: View {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
             Spacer().frame(maxWidth: Spacing.medium)
-            Asset.helpOutline.swiftUIImage
-                .foregroundColor(Asset.accentPink300.swiftUIColor)
+            Image(.helpOutline)
+                .foregroundColor(.accentPink300)
         }
         .padding(Spacing.medium)
         .font(PrimaryFont.bodyM.font)
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.small)
-                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                .stroke(.fill12, lineWidth: 1)
                 .cornerRadius(CornerRadius.small)
         )
     }

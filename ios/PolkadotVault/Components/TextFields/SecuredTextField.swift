@@ -49,11 +49,9 @@ struct SecurePrimaryTextField: View {
                     focusedField = isSecured ? .secure : .plain
                 }
             ) {
-                Group {
-                    isSecured ? Asset.showPassword.swiftUIImage : Asset.hidePassword.swiftUIImage
-                }
-                .padding(.trailing, Spacing.medium)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Image(isSecured ? .showPassword : .hidePassword)
+                    .padding(.trailing, Spacing.medium)
+                    .foregroundColor(.textAndIconsTertiary)
             }
         }
     }

@@ -13,22 +13,18 @@ jobs:
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
+        uses:                 styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
         with:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.6.0
+        uses:                 actions/checkout@v4.1.1
         with:
           fetch-depth:        50
           submodules:         'recursive'
 
       - name:                 Install Rust stable toolchain
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          override:           true
+        uses:                 dtolnay/rust-toolchain@stable
 
       - name:                 cargo fmt
         run:                  |

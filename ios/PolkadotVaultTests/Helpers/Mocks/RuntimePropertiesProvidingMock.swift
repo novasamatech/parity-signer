@@ -9,5 +9,6 @@ import Foundation
 @testable import PolkadotVault
 
 final class RuntimePropertiesProvidingMock: RuntimePropertiesProviding {
-    var isInDevelopmentMode: Bool = false
+    var runtimeMode: PolkadotVault.ApplicationRuntimeMode = .debug
+    var dynamicDerivationsEnabled: Bool = true
 }

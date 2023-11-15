@@ -86,7 +86,7 @@ task buildDB (type: Exec) {
 }
 
 dependencies {
-	implementation 'androidx.core:core-ktx:1.10.1'
+	implementation "androidx.core:core-ktx:1.12.0"
 	implementation 'androidx.appcompat:appcompat:1.6.1'
 	implementation 'com.google.android.material:material:1.9.0'
 	implementation 'androidx.activity:activity-compose:1.7.2'
@@ -98,10 +98,10 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version" //for flow-layout which is non-lazy grid
 	implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
 	implementation "androidx.datastore:datastore-preferences:1.0.0"
-	implementation "androidx.navigation:navigation-compose:2.7.0"
-	implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
-	implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-	implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+	implementation "androidx.navigation:navigation-compose:2.7.3"
+	implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.2"
+	implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+	implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2'
 	implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 	implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha06'
 	implementation "androidx.camera:camera-core:$androidx_camera_version"
@@ -111,14 +111,13 @@ dependencies {
 	implementation "com.google.mlkit:barcode-scanning:17.2.0"
 	implementation "com.halilibo.compose-richtext:richtext-commonmark-android:0.17.0"
 	implementation "com.halilibo.compose-richtext:richtext-ui-material-android:0.17.0"
-	implementation "androidx.core:core-ktx:1.10.1"
-	implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5"
+	implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.6"
 	implementation "net.java.dev.jna:jna:5.13.0@aar"
 	implementation "com.appmattus.crypto:cryptohash:0.10.1" //black2b hash for dot icon
 	implementation "io.coil-kt:coil-compose:$coilVersion"
 	implementation "io.coil-kt:coil-svg:$coilVersion"
 	testImplementation 'junit:junit:4.13.2'
-	testImplementation "org.mockito:mockito-core:5.5.0"
+	testImplementation "org.mockito:mockito-core:5.7.0"
 	testImplementation "androidx.test:core:1.5.0"
 	testImplementation "androidx.test.ext:junit:1.1.5"
 	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'

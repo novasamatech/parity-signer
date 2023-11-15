@@ -6,17 +6,16 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
-import io.parity.signer.domain.VerifierDetailsModels
+import io.parity.signer.domain.VerifierDetailsModel
 import io.parity.signer.ui.BottomSheetWrapperContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun VerifierScreenFull(
-	verifierDetails: VerifierDetailsModels,
+	verifierDetails: VerifierDetailsModel,
 	wipe: Callback,
-	navigator: Navigator,
+	onBack: Callback,
 ) {
 	val bottomSheetState =
 		rememberModalBottomSheetState(
@@ -39,7 +38,7 @@ fun VerifierScreenFull(
 		mainContent = {
 			VerifierScreen(
 				verifierDetails = verifierDetails,
-				onBack = navigator::backAction,
+				onBack = onBack,
 				onRemove = { scope.launch { bottomSheetState.show() } },
 			)
 		},

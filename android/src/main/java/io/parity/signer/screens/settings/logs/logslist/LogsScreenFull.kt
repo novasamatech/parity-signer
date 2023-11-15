@@ -3,6 +3,8 @@ package io.parity.signer.screens.settings.logs.logslist
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,7 +18,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.backend.CompletableResult
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.initial.WaitingScreen
 import io.parity.signer.screens.settings.logs.LogsSubgraph
 import io.parity.signer.screens.settings.logs.LogsViewModel
@@ -26,7 +27,6 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 
 @Composable
 fun LogsScreenFull(
-	rootNavigator: Navigator,
 	navController: NavController,
 ) {
 	val menuNavController = rememberNavController()
@@ -51,7 +51,7 @@ fun LogsScreenFull(
 			is CompletableResult.Ok -> {
 				LogsScreen(
 					model = logsCurrentValue.result.toLogsScreenModel(context),
-					rootNavigator = rootNavigator,
+					coreNavController = navController,
 					onMenu = { menuNavController.navigate(LogsMenuSubgraph.logs_menu) },
 					onBack = { navController.popBackStack() },
 					onLogClicked = { logId -> navController.navigate(LogsSubgraph.logs_details + "/" + logId) },
@@ -70,7 +70,11 @@ fun LogsScreenFull(
 		val closeAction: Callback = {
 			menuNavController.popBackStack()
 		}
-		composable(LogsMenuSubgraph.logs_empty) {}//no menu
+		composable(LogsMenuSubgraph.logs_empty) {
+			//no menu - Spacer element so when other part shown there won't
+			// be an appearance animation from top left part despite there shouldn't be
+			Spacer(modifier = Modifier.fillMaxSize(1f))
+		}
 		composable(LogsMenuSubgraph.logs_menu) {
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				LogsMenuGeneral(

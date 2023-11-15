@@ -26,24 +26,26 @@ import io.parity.signer.ui.theme.*
 
 @Composable
 internal fun OnboardingScreen4(onContinue: Callback) {
-	OnboardingScreenGeneric(
-		page = 4,
-		showSkip = false,
-		title = stringResource(R.string.onboarding_header_4),
-		image = painterResource(id = R.drawable.onboarding_4),
-		onSkip = onContinue,
-	)
-	Box(
-		modifier = Modifier.fillMaxSize(1f),
-		contentAlignment = Alignment.BottomCenter,
-	) {
-		PrimaryButtonWide(
-			label = stringResource(R.string.onboarding_cta_continue),
-			activeBackground = Color.White,
-			activeText = MaterialTheme.colors.pink500,
-			modifier = Modifier.padding(24.dp),
-			onClicked = onContinue,
+	Box() {
+		OnboardingScreenGeneric(
+			page = 4,
+			showSkip = false,
+			title = stringResource(R.string.onboarding_header_4),
+			image = painterResource(id = R.drawable.onboarding_4),
+			onSkip = onContinue,
 		)
+		Box(
+			modifier = Modifier.fillMaxSize(1f),
+			contentAlignment = Alignment.BottomCenter,
+		) {
+			PrimaryButtonWide(
+				label = stringResource(R.string.onboarding_cta_continue),
+				activeBackground = Color.White,
+				activeText = MaterialTheme.colors.pink500,
+				modifier = Modifier.padding(24.dp),
+				onClicked = onContinue,
+			)
+		}
 	}
 }
 

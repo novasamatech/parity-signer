@@ -6,34 +6,50 @@
 //
 import Foundation
 
+enum ApplicationRuntimeMode: String, Equatable {
+    case production
+    case qa
+    case debug
+}
+
 /// Protocol that provides access to app process properties
 protocol RuntimePropertiesProviding: AnyObject {
-    /// Indicates whether application is launched in development mode with stubed data
-    var isInDevelopmentMode: Bool { get }
+    var runtimeMode: ApplicationRuntimeMode { get }
+    var dynamicDerivationsEnabled: Bool { get }
 }
 
 /// Wrapper for accessing `RuntimeProperties` and other application runtime values
 final class RuntimePropertiesProvider: RuntimePropertiesProviding {
-    enum Properties: String, CustomStringConvertible {
-        case developmentMode
-
-        var description: String { rawValue }
-    }
-
-    enum PropertiesValues: String, CustomStringConvertible {
+    private enum PropertiesValues: String, CustomStringConvertible {
         case `true`
         case `false`
 
         var description: String { rawValue }
     }
 
+    private let appInformationContainer: ApplicationInformationContaining.Type
     private let processInfo: ProcessInfoProtocol
 
-    init(processInfo: ProcessInfoProtocol = ProcessInfo.processInfo) {
+    init(
+        appInformationContainer: ApplicationInformationContaining.Type = ApplicationInformation.self,
+        processInfo: ProcessInfoProtocol = ProcessInfo.processInfo
+    ) {
+        self.appInformationContainer = appInformationContainer
         self.processInfo = processInfo
     }
 
-    var isInDevelopmentMode: Bool {
-        processInfo.environment[Properties.developmentMode.description] == PropertiesValues.true.description
+    var runtimeMode: ApplicationRuntimeMode {
+        ApplicationRuntimeMode(rawValue: appInformationContainer.appRuntimeMode) ?? .production
     }
+
+    var dynamicDerivationsEnabled: Bool {
+        appInformationContainer.dynamicDerivationsEnabled == PropertiesValues.true.rawValue
+    }
+}
+
+extension ApplicationInformation: ApplicationInformationContaining {}
+
+protocol ApplicationInformationContaining {
+    static var dynamicDerivationsEnabled: String { get }
+    static var appRuntimeMode: String { get }
 }

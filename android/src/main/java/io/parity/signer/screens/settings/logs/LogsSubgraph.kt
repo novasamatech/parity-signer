@@ -1,23 +1,25 @@
 package io.parity.signer.screens.settings.logs
 
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import io.parity.signer.domain.Navigator
+import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.screens.settings.logs.comment.AddLogCommentScreen
 import io.parity.signer.screens.settings.logs.logdetails.LogDetailsScreen
 import io.parity.signer.screens.settings.logs.logslist.LogsScreenFull
 
 fun NavGraphBuilder.logsNavigationSubgraph(
-	routePath: String,
-	rootNavigator: Navigator,
 	navController: NavController,
 ) {
 	navigation(
-		route = routePath,
+		route = SettingsNavSubgraph.logs,
 		startDestination = LogsSubgraph.home,
 	) {
 		composable(route = LogsSubgraph.home) {
-			LogsScreenFull(rootNavigator, navController)
+			LogsScreenFull(navController)
 		}
 		composable(
 			route = LogsSubgraph.logs_details + "/{${LogsSubgraph.PARAM_LOG_DETAILS}}",

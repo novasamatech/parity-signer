@@ -1,5 +1,5 @@
 //
-//  RootPresentationEnvironment.swift
+//  RootPresentationMode.swift
 //  PolkadotVault
 //
 //  Created by Krzysztof Rodak on 07/04/2023.

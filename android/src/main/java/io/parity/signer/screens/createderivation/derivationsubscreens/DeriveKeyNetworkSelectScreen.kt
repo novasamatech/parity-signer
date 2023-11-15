@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -25,9 +28,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeaderWithButton
+import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
-import io.parity.signer.components.items.NetworkItemClickable
+import io.parity.signer.components.items.NetworkItemSelectable
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -40,51 +45,82 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun DeriveKeyNetworkSelectScreen(
 	networks: List<NetworkModel>,
+	preselectd: NetworkModel?,
 	onClose: Callback,
-	onNetworkSelect: (NetworkModel) -> Unit,
+	onAdvancePath: (NetworkModel) -> Unit,
+	onFastCreate: (NetworkModel) -> Unit,
 	onNetworkHelp: Callback,
 	modifier: Modifier = Modifier
 ) {
+	val selected = remember { mutableStateOf(preselectd) }
 
 	Column(modifier) {
 		ScreenHeaderWithButton(
 			canProceed = false,
 			title = stringResource(R.string.create_derivation_title),
-			subtitle = stringResource(R.string.screen_step_1_2),
 			btnText = null,
 			backNotClose = false,
 			onClose = onClose,
 			onDone = null,
 		)
-		Text(
-			text = stringResource(R.string.derivation_network_select_title),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 8.dp)
-		)
 		Column(
 			modifier = Modifier
+				.fillMaxHeight(1f)
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 8.dp, vertical = 8.dp)
-				.background(
-					MaterialTheme.colors.fill6,
-					RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
-				)
 		) {
-			networks.forEach { network ->
-				NetworkItemClickable(network) { network ->
-					onNetworkSelect(network)
+			Text(
+				text = stringResource(R.string.derivation_network_select_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.BodyL,
+				modifier = Modifier
+					.padding(horizontal = 16.dp, vertical = 8.dp)
+			)
+			Column(
+				modifier = Modifier
+					.padding(horizontal = 8.dp, vertical = 8.dp)
+					.background(
+						MaterialTheme.colors.fill6,
+						RoundedCornerShape(dimensionResource(id = R.dimen.plateDefaultCornerRadius))
+					)
+			) {
+				networks.forEach { network ->
+					NetworkItemSelectable(
+						network,
+						isSelected = selected.value == network,
+					) { network ->
+						selected.value = network
+					}
+					SignerDivider()
 				}
-				SignerDivider()
 			}
+			NetworkHelpAlarm(
+				Modifier
+					.padding(horizontal = 24.dp)
+					.clickable(onClick = onNetworkHelp)
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			val network = selected.value
+			PrimaryButtonWide(
+				label = stringResource(R.string.derivation_create_fast_cta),
+				modifier = Modifier.padding(horizontal = 24.dp)
+					.padding(top = 24.dp),
+				isEnabled = network != null,
+				onClicked = {
+					if (network != null) {
+						onFastCreate(network)
+					}
+				},
+			)
+			SecondaryButtonWide(
+				label = stringResource(R.string.derivation_create_advanced_cta),
+				modifier = Modifier.padding(24.dp),
+				onClicked = {
+					if (network != null) {
+						onAdvancePath(network)
+					}
+				},
+			)
 		}
-		NetworkHelpAlarm(
-			Modifier
-				.padding(horizontal = 24.dp)
-				.clickable(onClick = onNetworkHelp)
-		)
-		Spacer(modifier = Modifier.weight(1f))
 	}
 }
 
@@ -100,7 +136,6 @@ fun NetworkHelpAlarm(modifier: Modifier = Modifier) {
 				innerShape
 			)
 	) {
-
 		Text(
 			text = stringResource(R.string.derivation_create_help_network_setup_label),
 			color = MaterialTheme.colors.textTertiary,
@@ -155,8 +190,44 @@ private fun PreviewDeriveKeyNetworkSelectScreen() {
 	SignerNewTheme {
 		DeriveKeyNetworkSelectScreen(
 			networks = networks,
+			preselectd = networks[1],
 			onClose = {},
-			onNetworkSelect = {},
+			onAdvancePath = {},
+			onFastCreate = {},
+			onNetworkHelp = {},
+		)
+	}
+}
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewDeriveKeyNetworkMenu() {
+	val networks = mutableListOf<NetworkModel>()
+	repeat(10) {
+		networks.add(
+			NetworkModel(
+				key = "0",
+				logo = "polkadot",
+				title = "Polkadot$it",
+				pathId = "polkadot$it",
+			)
+		)
+	}
+	SignerNewTheme {
+		DeriveKeyNetworkSelectScreen(
+			networks = networks,
+			preselectd = networks[1],
+			onClose = {},
+			onAdvancePath = {},
+			onFastCreate = {},
 			onNetworkHelp = {},
 		)
 	}

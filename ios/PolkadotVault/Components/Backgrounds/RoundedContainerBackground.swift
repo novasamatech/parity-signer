@@ -21,15 +21,15 @@ struct RoundedContainerBackground: ViewModifier {
         var foregroundColor: Color {
             switch self {
             case .list:
-                return Asset.backgroundSecondary.swiftUIColor
+                .backgroundSecondary
             case .standard:
-                return Asset.fill6.swiftUIColor
+                .fill6
             case .textContainer:
-                return Asset.fill12.swiftUIColor
+                .fill12
             case .error:
-                return Asset.accentRed300.swiftUIColor.opacity(0.12)
+                .accentRed300.opacity(0.12)
             case .actionableInfo:
-                return Asset.accentPink12.swiftUIColor
+                .accentPink12
             }
         }
     }

@@ -37,27 +37,27 @@ extension SecondaryFont {
     var font: SwiftUI.Font {
         switch self {
         case .titleXL:
-            return FontFamily.Unbounded.black.swiftUIFont(size: 28)
+            FontFamily.Unbounded.black.swiftUIFont(size: 28)
         case .titleL:
-            return FontFamily.Unbounded.black.swiftUIFont(size: 24)
+            FontFamily.Unbounded.black.swiftUIFont(size: 24)
         case .titleM:
-            return FontFamily.Unbounded.black.swiftUIFont(size: 22)
+            FontFamily.Unbounded.black.swiftUIFont(size: 22)
         case .titleS:
-            return FontFamily.Unbounded.black.swiftUIFont(size: 16)
+            FontFamily.Unbounded.black.swiftUIFont(size: 16)
         case .labelL:
-            return FontFamily.Unbounded.bold.swiftUIFont(size: 17)
+            FontFamily.Unbounded.bold.swiftUIFont(size: 17)
         case .labelM:
-            return FontFamily.Unbounded.bold.swiftUIFont(size: 16)
+            FontFamily.Unbounded.bold.swiftUIFont(size: 16)
         case .labelS:
-            return FontFamily.Unbounded.bold.swiftUIFont(size: 14)
+            FontFamily.Unbounded.bold.swiftUIFont(size: 14)
         case .bodyL:
-            return FontFamily.Unbounded.regular.swiftUIFont(size: 16)
+            FontFamily.Unbounded.regular.swiftUIFont(size: 16)
         case .bodyM:
-            return FontFamily.Unbounded.regular.swiftUIFont(size: 14)
+            FontFamily.Unbounded.regular.swiftUIFont(size: 14)
         case .captionM:
-            return FontFamily.Unbounded.regular.swiftUIFont(size: 12)
+            FontFamily.Unbounded.regular.swiftUIFont(size: 12)
         case .captionS:
-            return FontFamily.Unbounded.regular.swiftUIFont(size: 10)
+            FontFamily.Unbounded.regular.swiftUIFont(size: 10)
         }
     }
 }

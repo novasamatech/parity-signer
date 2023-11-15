@@ -25,7 +25,7 @@ final class KeyDetailsActionService {
         }, completion: completion)
     }
 
-    func navigateToPublicKey(
+    func publicKey(
         addressKey: String,
         networkSpecsKey: String,
         _ completion: @escaping (Result<MKeyDetails, ServiceError>) -> Void

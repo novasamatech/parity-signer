@@ -39,7 +39,7 @@ extension View {
     ///   - overlayView: view to be presented as overlay
     ///   - isPresented: action controller in form of `Bool`
     /// - Returns: view that modifier is applied to
-    func bottomEdgeOverlay<T: View>(overlayView: T, isPresented: Binding<Bool>) -> some View {
+    func bottomEdgeOverlay(overlayView: some View, isPresented: Binding<Bool>) -> some View {
         modifier(BottomEdgeOverlay(isPresented: isPresented, overlayView: overlayView))
     }
 }

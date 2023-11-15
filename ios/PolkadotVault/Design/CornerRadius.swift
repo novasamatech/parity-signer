@@ -26,9 +26,9 @@ enum CornerRadius {
     static var qrCodeScanner: CGFloat {
         switch UIScreen.main.bounds.width {
         case DeviceConstants.compactDeviceWidth:
-            return 56
+            56
         default:
-            return 74
+            74
         }
     }
 }

@@ -23,13 +23,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.fill6
@@ -39,7 +37,7 @@ import io.parity.signer.ui.theme.textSecondary
 @Composable
 fun SeedBackupScreen(
 	seeds: List<String>,
-	rootNavigator: Navigator,
+	coreNavController: NavController,
 	onBack: Callback,
 	onSelected: (selectedSeed: String) -> Unit,
 ) {
@@ -62,10 +60,6 @@ fun SeedBackupScreen(
 				}
 			}
 		}
-		BottomBar(
-			rootNavigator, BottomBarState.SETTINGS,
-			skipRememberCameraParent = true
-		)
 	}
 }
 
@@ -116,7 +110,7 @@ private fun PreviewBackupScreen() {
 	SignerNewTheme {
 		SeedBackupScreen(
 			listOf("Seed", "Seed Some", "Another name"),
-			rootNavigator = EmptyNavigator(),
+			coreNavController = rememberNavController(),
 			{},
 		) { some ->
 		}

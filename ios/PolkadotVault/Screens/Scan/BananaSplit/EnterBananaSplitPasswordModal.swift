@@ -1,5 +1,5 @@
 //
-//  EnterBananaSplitPasswordView.swift
+//  EnterBananaSplitPasswordModal.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 3/1/2023.
@@ -35,11 +35,11 @@ struct EnterBananaSplitPasswordView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Localizable.EnterBananaSplitPasswordView.Label.title.text
                         .font(PrimaryFont.titleM.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .padding(.bottom, Spacing.small)
                     Localizable.EnterBananaSplitPasswordView.Label.enterName.text
                         .font(PrimaryFont.bodyM.font)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .padding(.bottom, Spacing.extraSmall)
                     TextField("", text: $viewModel.seedName)
                         .primaryTextFieldStyle(
@@ -54,13 +54,13 @@ struct EnterBananaSplitPasswordView: View {
                         .padding(.bottom, Spacing.small)
                     if !viewModel.isNameValid {
                         Localizable.EnterBananaSplitPasswordView.Error.Label.invalidSeedName.text
-                            .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            .foregroundColor(.accentRed300)
                             .font(PrimaryFont.captionM.font)
                             .padding(.bottom, Spacing.small)
                     }
                     Localizable.EnterBananaSplitPasswordView.Label.enterPassword.text
                         .font(PrimaryFont.bodyM.font)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .padding(.bottom, Spacing.extraSmall)
                     SecurePrimaryTextField(
                         placeholder: Localizable.EnterBananaSplitPasswordView.Placeholder.enterPassword.string,
@@ -75,7 +75,7 @@ struct EnterBananaSplitPasswordView: View {
                     .padding(.bottom, Spacing.small)
                     if !viewModel.isPasswordValid {
                         Localizable.EnterBananaSplitPasswordView.Error.Label.invalidPassword.text
-                            .foregroundColor(Asset.accentRed300.swiftUIColor)
+                            .foregroundColor(.accentRed300)
                             .font(PrimaryFont.captionM.font)
                             .padding(.bottom, Spacing.small)
                     }
@@ -93,9 +93,9 @@ struct EnterBananaSplitPasswordView: View {
                 .padding(.bottom, Spacing.small)
                 Spacer()
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
             .navigationBarHidden(true)
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .onAppear {
                 focusSeedName = true
             }
@@ -130,17 +130,14 @@ extension EnterBananaSplitPasswordView {
         private var seedPhrase = ""
         private var cancelBag = CancelBag()
         private let seedsMediator: SeedsMediating
-        private let service: BananaSplitRecoveryService
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         init(
-            service: BananaSplitRecoveryService = BananaSplitRecoveryService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             qrCodeData: Binding<[String]>,
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
-            self.service = service
             self.seedsMediator = seedsMediator
             self.onCompletion = onCompletion
             _isPresented = isPresented

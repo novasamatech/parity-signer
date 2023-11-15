@@ -24,7 +24,7 @@ import io.parity.signer.domain.isDbCreatedAndOnboardingPassed
 import io.parity.signer.screens.initial.eachstartchecks.airgap.AirgapScreen
 import io.parity.signer.screens.initial.eachstartchecks.rootcheck.RootExposedScreen
 import io.parity.signer.screens.initial.eachstartchecks.screenlock.SetScreenLockScreen
-import io.parity.signer.ui.MainGraphRoutes
+import io.parity.signer.ui.rootnavigation.MainGraphRoutes
 
 
 fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostController) {
@@ -33,7 +33,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 		val context: Context = LocalContext.current
 
 		val goToNextFlow: Callback = {
-			globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 				popUpTo(0)
 			}
 		}
@@ -80,7 +80,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 					SetScreenLockScreen()
 				}
 				EachStartSubgraphScreenSteps.AIR_GAP -> {
-					AirgapScreen {
+					AirgapScreen(isInitialOnboarding = true) {
 						//go to next screen
 						goToNextFlow()
 					}

@@ -19,21 +19,21 @@ struct TCFieldName: View {
                 VStack {
                     HStack {
                         Text(value.name)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                         Spacer()
                         if hasDetails {
-                            Asset.questionCircle.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                            Image(.questionCircle)
+                                .foregroundColor(.textAndIconsDisabled)
                         }
                     }
                     if showDoc {
                         VStack(alignment: .leading) {
                             Text(Localizable.TCField.path(value.pathType))
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                             Text.markdownWithFallback(value.docsFieldName, allowsEmptyValue: true)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                             Text.markdownWithFallback(value.docsType, allowsEmptyValue: true)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                             HStack {
                                 Spacer()
                             }

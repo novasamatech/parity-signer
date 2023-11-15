@@ -20,7 +20,7 @@ struct CreateKeysForNetworksView: View {
                 viewModel: NavigationBarViewModel(
                     title: .progress(current: viewModel.step, upTo: viewModel.step),
                     leftButtons: [.init(type: .arrow, action: { mode.wrappedValue.dismiss() })],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             GeometryReader { geo in
@@ -44,7 +44,7 @@ struct CreateKeysForNetworksView: View {
                 }
             }
 
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError,
                 onDismiss: { viewModel.onErrorDismiss?() }
@@ -70,11 +70,11 @@ struct CreateKeysForNetworksView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(viewModel.title())
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
             Text(viewModel.header())
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
         }
@@ -112,14 +112,14 @@ struct CreateKeysForNetworksView: View {
             NetworkLogoIcon(networkName: network.logo)
                 .padding(.trailing, Spacing.small)
             Text(network.title.capitalized)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
             if viewModel.isSelected(network) {
-                Asset.checkmarkChecked.swiftUIImage
-                    .foregroundColor(Asset.accentPink300.swiftUIColor)
+                Image(.checkmarkChecked)
+                    .foregroundColor(.accentPink300)
             } else {
-                Asset.checkmarkUnchecked.swiftUIImage
+                Image(.checkmarkUnchecked)
             }
         }
         .contentShape(Rectangle())
@@ -134,7 +134,7 @@ struct CreateKeysForNetworksView: View {
     func selectAllNetworks() -> some View {
         HStack(alignment: .center, spacing: 0) {
             Localizable.CreateKeysForNetwork.Action.selectAll.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
         }
@@ -151,7 +151,6 @@ extension CreateKeysForNetworksView {
     enum OnCompletionAction: Equatable {
         case createKeySet(seedName: String)
         case recoveredKeySet(seedName: String)
-        case bananaSplitRecovery(seedName: String)
     }
 
     enum Mode: Equatable {
@@ -170,7 +169,6 @@ extension CreateKeysForNetworksView {
         private let createKeySetService: CreateKeySetService
         private let createKeyService: CreateDerivedKeyService
         private let recoveryKeySetService: RecoverKeySetService
-        private let bananaSplitRecoveryService: BananaSplitRecoveryService
         private let seedsMediator: SeedsMediating
         private let seedName: String
         private let seedPhrase: String
@@ -192,11 +190,11 @@ extension CreateKeysForNetworksView {
         var step: Int {
             switch mode {
             case .bananaSplit:
-                return 2
+                2
             case .createKeySet:
-                return 3
+                3
             case .recoverKeySet:
-                return 3
+                3
             }
         }
 
@@ -208,7 +206,6 @@ extension CreateKeysForNetworksView {
             createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
             createKeySetService: CreateKeySetService = CreateKeySetService(),
             recoveryKeySetService: RecoverKeySetService = RecoverKeySetService(),
-            bananaSplitRecoveryService: BananaSplitRecoveryService = BananaSplitRecoveryService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
@@ -220,7 +217,6 @@ extension CreateKeysForNetworksView {
             self.createKeyService = createKeyService
             self.createKeySetService = createKeySetService
             self.recoveryKeySetService = recoveryKeySetService
-            self.bananaSplitRecoveryService = bananaSplitRecoveryService
             self.seedsMediator = seedsMediator
             self.onCompletion = onCompletion
             _isPresented = isPresented
@@ -265,22 +261,20 @@ extension CreateKeysForNetworksView.ViewModel {
     func title() -> String {
         switch mode {
         case .recoverKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Title.recover.string
-        case .createKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Title.create.string
-        case .bananaSplit:
-            return Localizable.CreateKeysForNetwork.Label.Title.bananaSplit.string
+            Localizable.CreateKeysForNetwork.Label.Title.recover.string
+        case .createKeySet,
+             .bananaSplit:
+            Localizable.CreateKeysForNetwork.Label.Title.create.string
         }
     }
 
     func header() -> String {
         switch mode {
         case .recoverKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Header.recover.string
-        case .createKeySet:
-            return Localizable.CreateKeysForNetwork.Label.Header.create.string
-        case .bananaSplit:
-            return Localizable.CreateKeysForNetwork.Label.Header.bananaSplit.string
+            Localizable.CreateKeysForNetwork.Label.Header.recover.string
+        case .createKeySet,
+             .bananaSplit:
+            Localizable.CreateKeysForNetwork.Label.Header.create.string
         }
     }
 }
@@ -302,15 +296,14 @@ private extension CreateKeysForNetworksView.ViewModel {
         }
         switch mode {
         case .createKeySet:
-            createKeySet(seedPhrase)
-        case .recoverKeySet:
-            recoverKeySet(seedPhrase)
-        case .bananaSplit:
-            bananaSplitRecovery(seedPhrase)
+            createKeySet(seedPhrase, onComplete: .createKeySet(seedName: seedName))
+        case .recoverKeySet,
+             .bananaSplit:
+            createKeySet(seedPhrase, onComplete: .recoveredKeySet(seedName: seedName))
         }
     }
 
-    func recoverKeySet(_ seedPhrase: String) {
+    func createKeySet(_ seedPhrase: String, onComplete: CreateKeysForNetworksView.OnCompletionAction) {
         seedsMediator.createSeed(
             seedName: seedName,
             seedPhrase: seedPhrase,
@@ -324,54 +317,7 @@ private extension CreateKeysForNetworksView.ViewModel {
             switch result {
             case .success:
                 self.isPresented = false
-                self.onCompletion(.recoveredKeySet(seedName: self.seedName))
-            case let .failure(error):
-                self.onErrorDismiss = { self.isPresented = false }
-                self.errorViewModel = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
-            }
-        }
-    }
-
-    func createKeySet(_ seedPhrase: String) {
-        seedsMediator.createSeed(
-            seedName: seedName,
-            seedPhrase: seedPhrase,
-            shouldCheckForCollision: false
-        )
-        createKeySetService.confirmKeySetCreation(
-            seedName: seedName,
-            seedPhrase: seedPhrase,
-            networks: selectedNetworks
-        ) { result in
-            switch result {
-            case .success:
-                self.isPresented = false
-                self.onCompletion(.createKeySet(seedName: self.seedName))
-            case let .failure(error):
-                self.errorViewModel = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
-            }
-        }
-    }
-
-    func bananaSplitRecovery(_ seedPhrase: String) {
-        bananaSplitRecoveryService.startBananaSplitRecover(seedName)
-        seedsMediator.createSeed(
-            seedName: seedName,
-            seedPhrase: seedPhrase,
-            shouldCheckForCollision: false
-        )
-        bananaSplitRecoveryService.completeBananaSplitRecovery(seedPhrase)
-        createKeyService.createDerivedKeys(
-            seedName,
-            seedPhrase,
-            networks: selectedNetworks
-        ) { result in
-            switch result {
-            case .success:
-                self.isPresented = false
-                self.onCompletion(.bananaSplitRecovery(seedName: self.seedName))
+                self.onCompletion(onComplete)
             case let .failure(error):
                 self.onErrorDismiss = { self.isPresented = false }
                 self.errorViewModel = .alertError(message: error.localizedDescription)

@@ -7,12 +7,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.panels.BottomBar
-import io.parity.signer.components.panels.BottomBarState
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.settings.logs.LogsScreenModel
 import io.parity.signer.screens.settings.logs.items.LogItem
 import io.parity.signer.screens.settings.logs.items.LogItemDate
@@ -21,7 +19,7 @@ import io.parity.signer.screens.settings.logs.items.LogsListEntryModel
 @Composable
 fun LogsScreen(
 	model: LogsScreenModel,
-	rootNavigator: Navigator,
+	coreNavController: NavController,
 	onMenu: Callback,
 	onBack: Callback,
 	onLogClicked: (UInt) -> Unit,
@@ -46,11 +44,6 @@ fun LogsScreen(
 				}
 			}
 		}
-		BottomBar(
-			navigator = rootNavigator,
-			state = BottomBarState.SETTINGS,
-			skipRememberCameraParent = true
-		)
 	}
 }
 

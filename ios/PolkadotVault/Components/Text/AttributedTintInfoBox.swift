@@ -15,14 +15,14 @@ struct AttributedTintInfoBox: View {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer().frame(width: Spacing.large)
-            Asset.helpOutline.swiftUIImage
-                .foregroundColor(Asset.accentPink300.swiftUIColor)
+            Image(.helpOutline)
+                .foregroundColor(.accentPink300)
         }
         .padding(Spacing.medium)
         .font(PrimaryFont.bodyM.font)
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .foregroundColor(Asset.accentPink300Fill8.swiftUIColor)
+                .foregroundColor(.accentPink300Fill8)
         )
     }
 }

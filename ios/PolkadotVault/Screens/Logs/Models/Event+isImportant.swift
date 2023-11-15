@@ -1,5 +1,5 @@
 //
-//  Event+isWarning.swift
+//  Event+isImportant.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 02/12/2022.
@@ -18,9 +18,9 @@ extension Event {
              .warning,
              .wrongPassword,
              .messageSignError:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

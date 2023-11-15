@@ -15,13 +15,12 @@ struct SettingsRowView: View {
             Text(renderable.title)
                 .font(PrimaryFont.titleS.font)
                 .foregroundColor(
-                    renderable.isDestructive ? Asset.accentRed400.swiftUIColor : Asset.textAndIconsPrimary
-                        .swiftUIColor
+                    renderable.isDestructive ? .accentRed400 : .textAndIconsPrimary
                 )
             Spacer()
             if renderable.hasDetails {
-                Asset.chevronRight.swiftUIImage
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                Image(.chevronRight)
+                    .foregroundColor(.textAndIconsTertiary)
             }
         }
         .padding(.horizontal, Spacing.large)

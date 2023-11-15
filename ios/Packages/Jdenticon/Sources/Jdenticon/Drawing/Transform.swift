@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal class Transform {
+class Transform {
     let x_t: CGFloat
     let y_t: CGFloat
     let size_t: CGFloat

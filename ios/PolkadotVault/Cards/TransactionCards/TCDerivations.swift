@@ -48,17 +48,17 @@ struct TCDerivations: View {
             // Root key
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 Text(keySet.seedName)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.titleS.font)
                 Text(keySet.address)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.bodyM.font)
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.top, Spacing.medium)
             // Derived key header
             Text(Localizable.ImportKeys.Label.Title.derived(keySet.keys.count))
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .font(PrimaryFont.bodyM.font)
                 .padding(.top, Spacing.medium)
                 .padding(.horizontal, Spacing.medium)
@@ -88,18 +88,18 @@ struct TCDerivations: View {
                 NetworkIdenticon(
                     identicon: preview.identicon,
                     network: preview.networkTitle,
-                    background: Asset.fill6Solid.swiftUIColor,
+                    background: .fill6Solid,
                     size: Heights.identiconSmall
                 )
                 pathView(preview)
                     .font(PrimaryFont.bodyM.font)
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Text(preview.address)
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .multilineTextAlignment(.leading)
             if let networkTitle = preview.networkTitle {
                 NetworkCapsuleView(network: networkTitle)
@@ -151,7 +151,7 @@ struct TCDerivations: View {
     private func pathView(_ renderable: DerivedKeysSetRenderable.DerivedKeyRenderable) -> some View {
         if renderable.derivationPath.isEmpty {
             Localizable.ImportKeys.Label.emptyPath.text
-                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .foregroundColor(.textAndIconsDisabled)
         } else if renderable.isPassworded {
             Text(
                 "\(renderable.displayablePath)\(Image(.lock))"
@@ -212,27 +212,27 @@ extension TCDerivations {
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.networkMissing)
+                        error.contains(.networkMissing)
                     } else {
-                        return false
+                        false
                     }
                 }
             isKeySetMissing = value
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.keySetMissing)
+                        error.contains(.keySetMissing)
                     } else {
-                        return false
+                        false
                     }
                 }
             isPathInBadFormat = value
                 .flatMap(\.derivedKeys)
                 .contains {
                     if case let .invalid(error) = $0.status {
-                        return error.contains(.badFormat)
+                        error.contains(.badFormat)
                     } else {
-                        return false
+                        false
                     }
                 }
         }

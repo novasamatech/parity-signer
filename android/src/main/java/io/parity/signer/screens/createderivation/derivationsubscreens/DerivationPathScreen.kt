@@ -21,7 +21,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -70,7 +69,6 @@ fun DerivationPathScreen(
 		passwordNotMatch = false
 	}
 
-	val focusManager = LocalFocusManager.current
 	val pathFocusRequester = remember { FocusRequester() }
 	val passwordFocusRequester = remember { FocusRequester() }
 
@@ -80,7 +78,6 @@ fun DerivationPathScreen(
 			passwordNotMatch = true
 		} else {
 			onDone(path.value.text)
-			focusManager.clearFocus(true)
 		}
 	}
 
@@ -296,15 +293,13 @@ fun DerivationPathScreen(
 				.padding(top = 8.dp, bottom = 8.dp)
 				.padding(horizontal = 24.dp)
 				.clickable(onClick = {
-					focusManager.clearFocus()
 					onDerivationHelp()
 				})
 		)
 	}
 
-	DisposableEffect(Unit) {
+	LaunchedEffect(Unit) {
 		pathFocusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 

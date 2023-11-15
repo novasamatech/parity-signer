@@ -19,10 +19,10 @@ struct FullscreenModal<ModalContent: View>: ViewModifier {
 }
 
 extension View {
-    func fullScreenModal<Content: View>(
+    func fullScreenModal(
         isPresented: Binding<Bool>,
         onDismiss: @escaping () -> Void = {},
-        @ViewBuilder modalContent: @escaping () -> Content
+        @ViewBuilder modalContent: @escaping () -> some View
     ) -> some View {
         modifier(FullscreenModal(
             isPresented: isPresented,

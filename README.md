@@ -132,9 +132,11 @@ sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
 sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
 ```
 
-**6.** Open the `PolkadotVault.xcodeproj` project from the `ios` folder in your Xcode. Project features two schemes:
+**6.** Open the `PolkadotVault.xcodeproj` project from the `ios` folder in your Xcode. Project features three schemes:
 - `PolkadotVault` - used for deployments and running production-ready app on your devices
 - `PolkadotVault-Dev` - development scheme that can be used to simulate offline mode without turning off WiFi on your Mac if you are using simulator.
+- `PolkadotVault-QA` - scheme that is used for TestFlight distribution of QA builds
+
 To run project, select one of the schemes and click `Run` (Cmd+R)
 
 **Note:** If you are using `PolkadotVault` scheme, the first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac, hence use of `PolkadotVault-Dev` is recommended for both simulator and device development.

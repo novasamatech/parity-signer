@@ -8,7 +8,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import io.parity.signer.domain.Callback
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
+fun NavGraphBuilder.networkHelpersCoreSubgraph(
+	navController: NavController,
+) {
+	networkHelpersSubgraph(
+		routePath = CoreUnlockedNavSubgraph.networkHelpers,
+		onScanClicked = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+		navController = navController,
+	)
+}
 
 fun NavGraphBuilder.networkHelpersSubgraph(
 	routePath: String,

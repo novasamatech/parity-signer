@@ -32,18 +32,18 @@ extension Event {
              .wrongPassword,
              .messageSignError,
              .messageSigned:
-            return .basic
+            .basic
         case .identityAdded,
              .identityRemoved,
              .secretWasExported,
              .networkVerifierSet,
              .metadataSigned,
              .typesSigned:
-            return .bottomDetails
+            .bottomDetails
         case .transactionSignError:
-            return .fullDetails
+            .fullDetails
         case .transactionSigned:
-            return .fullDetails
+            .fullDetails
         }
     }
 }

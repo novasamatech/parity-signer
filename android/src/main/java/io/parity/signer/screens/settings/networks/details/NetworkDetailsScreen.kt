@@ -1,10 +1,21 @@
 package io.parity.signer.screens.settings.networks.details
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -19,30 +30,33 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.components.base.ScreenHeader
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.components.networkicon.NetworkIcon
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.EmptyNavigator
-import io.parity.signer.domain.FakeNavigator
-import io.parity.signer.domain.Navigator
 import io.parity.signer.screens.scan.transaction.transactionElements.TCNameValueOppositeElement
-import io.parity.signer.ui.theme.*
-import io.parity.signer.uniffi.Action
+import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.SignerTypeface
+import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.pink300
+import io.parity.signer.ui.theme.red500
+import io.parity.signer.ui.theme.textSecondary
+import io.parity.signer.ui.theme.textTertiary
 
 @Composable
 fun NetworkDetailsScreen(
     model: NetworkDetailsModel,
-    rootNavigator: Navigator,
+    onBack: Callback,
     onMenu: Callback,
     onAddNetwork: Callback,
-    onRemoveMetadataCallback: (version: String) -> Unit,
+		onSignMetadata: (metadataSpecVersion: String) -> Unit,
+    onRemoveMetadataCallback: (metadataSpecVersion: String) -> Unit,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeader(
 			title = null,
-			onBack = { rootNavigator.backAction() },
+			onBack = onBack,
 			onMenu = onMenu,
 		)
 		Column(
@@ -145,13 +159,7 @@ fun NetworkDetailsScreen(
 						)
 						SignerDivider(sidePadding = 0.dp)
 						//sign metadata
-						Row(Modifier.clickable {
-							FakeNavigator().navigate(
-								Action.MANAGE_METADATA,
-								metadata.specsVersion
-							)
-							rootNavigator.navigate(Action.SIGN_METADATA)
-						}) {
+						Row(Modifier.clickable(onClick = {onSignMetadata(metadata.specsVersion)})) {
 							Text(
 								text = stringResource(R.string.network_details_metadata_sign_field_label),
 								style = SignerTypeface.BodyL,
@@ -250,7 +258,7 @@ private fun VerifierContent(verifier: VerifierModel) {
 					color = MaterialTheme.colors.textTertiary
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				IdentIconImage(identIcon = verifier.identicon)
+				IdentIconImage(identicon = verifier.identicon)
 			}
 			SignerDivider(sidePadding = 0.dp)
 			TCNameValueOppositeElement(
@@ -287,9 +295,10 @@ private fun PreviewNetworkDetailsScreenSmall() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}
@@ -310,9 +319,10 @@ private fun PreviewNetworkDetailsScreen() {
 	SignerNewTheme {
 		NetworkDetailsScreen(
 			model,
-			rootNavigator = EmptyNavigator(),
+			onBack = {},
 			onMenu = {},
 			onRemoveMetadataCallback = { _ -> },
+			onSignMetadata = {},
 			onAddNetwork = { },
 		)
 	}

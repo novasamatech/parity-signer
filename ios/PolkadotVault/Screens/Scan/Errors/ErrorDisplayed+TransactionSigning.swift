@@ -11,23 +11,27 @@ extension ErrorDisplayed {
     var transactionError: TransactionError {
         switch self {
         case .DbNotInitialized:
-            return .generic("")
+            .generic("")
         case let .LoadMetaUnknownNetwork(name):
-            return .metadataForUnknownNetwork(name: name)
+            .metadataForUnknownNetwork(name: name)
         case let .MetadataKnown(name, version):
-            return .metadataAlreadyAdded(name: name, version: String(version))
+            .metadataAlreadyAdded(name: name, version: String(version))
         case .MutexPoisoned:
-            return .generic("")
+            .generic("")
         case let .SpecsKnown(name, encryption):
-            return .networkAlreadyAdded(name: name, encryption: encryption.rawValue)
+            .networkAlreadyAdded(name: name, encryption: encryption.rawValue)
         case let .UnknownNetwork(genesisHash, encryption):
-            return .unknownNetwork(genesisHash: genesisHash.formattedAsString, encryption: encryption.rawValue)
+            .unknownNetwork(genesisHash: genesisHash.formattedAsString, encryption: encryption.rawValue)
         case let .MetadataOutdated(name, have, want):
-            return .outdatedMetadata(name: name, currentVersion: String(have), expectedVersion: String(want))
+            .outdatedMetadata(name: name, currentVersion: String(have), expectedVersion: String(want))
         case let .NoMetadata(name):
-            return .noMetadataForNetwork(name: name)
+            .noMetadataForNetwork(name: name)
         case let .Str(errorMessage):
-            return .generic(errorMessage)
+            .generic(errorMessage)
+        case .WrongPassword:
+            .generic(Localizable.ErrorDisplayed.wrongPassword.string)
+        case .DbSchemaMismatch:
+            .generic("")
         }
     }
 }
@@ -47,19 +51,19 @@ extension ErrorBottomModalViewModel {
     static func transactionError(for transactionError: TransactionError) -> ErrorBottomModalViewModel {
         switch transactionError {
         case let .generic(message):
-            return ErrorBottomModalViewModel.alertError(message: message)
+            ErrorBottomModalViewModel.alertError(message: message)
         case let .metadataForUnknownNetwork(name):
-            return ErrorBottomModalViewModel.metadataForUnknownNetwork(name)
+            ErrorBottomModalViewModel.metadataForUnknownNetwork(name)
         case let .networkAlreadyAdded(name, _):
-            return ErrorBottomModalViewModel.networkAlreadyAdded(name)
+            ErrorBottomModalViewModel.networkAlreadyAdded(name)
         case let .metadataAlreadyAdded(name, version):
-            return ErrorBottomModalViewModel.metadataAlreadyAdded(name, version)
+            ErrorBottomModalViewModel.metadataAlreadyAdded(name, version)
         case let .outdatedMetadata(name, currentVersion, expectedVersion):
-            return ErrorBottomModalViewModel.outdatedMetadata(name, currentVersion, expectedVersion)
+            ErrorBottomModalViewModel.outdatedMetadata(name, currentVersion, expectedVersion)
         case .unknownNetwork:
-            return ErrorBottomModalViewModel.signingUnknownNetwork()
+            ErrorBottomModalViewModel.signingUnknownNetwork()
         case let .noMetadataForNetwork(name):
-            return ErrorBottomModalViewModel.noMetadataForNetwork(name)
+            ErrorBottomModalViewModel.noMetadataForNetwork(name)
         }
     }
 }

@@ -43,4 +43,7 @@ pub enum Error {
 
     #[error("No seed phrase")]
     NoSeedPhrase,
+
+    #[error("No networks attached to the address with path `{0}`")]
+    NoNetwork(String),
 }

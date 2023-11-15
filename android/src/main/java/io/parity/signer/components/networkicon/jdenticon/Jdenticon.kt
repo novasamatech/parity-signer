@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -56,7 +57,7 @@ fun Jdenticon(
 		Image(
 			painter = painter,
 			contentDescription = stringResource(R.string.description_identicon),
-			modifier = modifier
+			modifier = Modifier
 				.size(size.div(sqrt(2f)))
 		)
 	}
@@ -82,7 +83,13 @@ private fun PreviewJdenticon() {
 		val seed_name = "8PegJD6VsjWwinrP6AfgNqejWYdJ8KqF4xutpyq7AdFJ3W5"
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
 			Jdenticon(seed_name, 48.dp)
-			Jdenticon(seed_name, 32.dp)
+			Jdenticon(seed_name, 32.dp,)
+			Jdenticon(
+				seed_name, 32.dp,
+				modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				),
+			)
 		}
 	}
 }

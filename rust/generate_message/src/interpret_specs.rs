@@ -61,7 +61,7 @@ pub fn interpret_properties(
         TokenFetch::Single(token) => {
             // single unit value and single decimals value, override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredSingle)?;
+                Err(SpecsError::OverrideIgnoredSingle)?;
             }
             (token.decimals, token.unit)
         }
@@ -79,7 +79,7 @@ pub fn interpret_properties(
         TokenFetch::None => {
             // override impossible
             if optional_token_override.is_some() {
-                return Err(SpecsError::OverrideIgnoredNone)?;
+                Err(SpecsError::OverrideIgnoredNone)?;
             }
             println!("Network has no token. By default, decimals value will be set to 0, and unit value will be set to UNIT. To improve this behavior, please file a ticket.");
             (0, String::from("UNIT"))
@@ -118,10 +118,10 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
                             if prefix_from_meta == d {
                                 d
                             } else {
-                                return Err(SpecsError::Base58PrefixMismatch {
+                                Err(SpecsError::Base58PrefixMismatch {
                                     specs: d,
                                     meta: prefix_from_meta,
-                                })?;
+                                })?
                             }
                         }
 
@@ -131,28 +131,22 @@ fn base58prefix(x: &Map<String, Value>, optional_prefix_from_meta: Option<u16>) 
 
                     // `u64` value does not fit into `u16` base58 prefix format,
                     // this is an error
-                    Err(_) => {
-                        return Err(SpecsError::Base58PrefixFormatNotSupported {
-                            value: a.to_string(),
-                        })?;
-                    }
+                    Err(_) => Err(SpecsError::Base58PrefixFormatNotSupported {
+                        value: a.to_string(),
+                    })?,
                 },
 
                 // base58 prefix value could not be presented as `u64` number,
                 // this is an error
-                None => {
-                    return Err(SpecsError::Base58PrefixFormatNotSupported {
-                        value: a.to_string(),
-                    })?;
-                }
+                None => Err(SpecsError::Base58PrefixFormatNotSupported {
+                    value: a.to_string(),
+                })?,
             },
 
             // base58 prefix value is not a number, this is an error
-            _ => {
-                return Err(SpecsError::Base58PrefixFormatNotSupported {
-                    value: a.to_string(),
-                })?;
-            }
+            _ => Err(SpecsError::Base58PrefixFormatNotSupported {
+                value: a.to_string(),
+            })?,
         },
 
         // no base58 prefix fetched in `system_properties` RPC call

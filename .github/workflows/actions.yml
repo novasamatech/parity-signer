@@ -14,24 +14,29 @@ jobs:
     steps:
 
       - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
+        uses:                 styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
         with:
           access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
-        uses:                 actions/checkout@v3.6.0
+        uses:                 actions/checkout@v4.1.1
         with:
           fetch-depth:        50
           submodules:         'recursive'
 
+      - name:                 Setup Ruby
+        uses:                 ruby/setup-ruby@v1
+        with:
+          ruby-version:       '2.7'
+          bundler-cache:      true
+
       - name:                 Setup - Xcode
-        run:                  sudo xcode-select -switch '/Applications/Xcode_14.3.app/Contents/Developer' && /usr/bin/xcodebuild -version
+        run:                  sudo xcode-select -switch '/Applications/Xcode_15.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
 
       - name:                 Install dependencies
         run:                  |
           brew install swiftgen
           brew install swiftformat
-          brew install xcbeautify
 
       - name: Get cached Swift Packages managed by Xcode
         uses: actions/cache@v3
@@ -41,23 +46,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name:                 Install Rust aarch64-apple-ios target
-        uses:                 actions-rs/toolchain@v1.0.7
+      - name:                 Install Rust targets
+        uses:                 dtolnay/rust-toolchain@stable
         with:
-          profile:            minimal
-          toolchain:          stable
-          target:             aarch64-apple-ios
+          targets:            x86_64-apple-ios,aarch64-apple-ios
           components:         rust-std
-          override:           true
-
-      - name:                 Install Rust x86_64-apple-ios target
-        uses:                 actions-rs/toolchain@v1.0.7
-        with:
-          profile:            minimal
-          toolchain:          stable
-          target:             x86_64-apple-ios
-          components:         rust-std
-          override:           true
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -67,7 +60,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:                 Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           workspaces:         rust -> rust/target
 
@@ -75,10 +68,4 @@ jobs:
         shell:                bash
         run:                  |
           cd ios
-          xcodebuild \
-          -project PolkadotVault.xcodeproj \
-          -scheme PolkadotVault \
-          -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 14' \
-          test \
-          | xcbeautify
+          bundle exec fastlane run_unit_tests

@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 
 enum OnboardingState: Equatable {
-    case overview
     case terms
     case airgap
     case screenshots
@@ -19,7 +18,7 @@ enum OnboardingState: Equatable {
 }
 
 final class OnboardingStateMachine: ObservableObject {
-    @Published var currentState: OnboardingState = .overview
+    @Published var currentState: OnboardingState = .terms
     private let onboardingMediator: OnboardingMediator
 
     init(
@@ -31,14 +30,12 @@ final class OnboardingStateMachine: ObservableObject {
     @ViewBuilder
     func currentView() -> some View {
         switch currentState {
-        case .overview:
-            OnboardingOverviewView(viewModel: .init(onNextTap: { self.onOverviewFinishTap() }))
         case .terms:
-            OnboardingAgreementsView(viewModel: .init(onNextTap: { self.onAgreementNextTap() }))
+            OnboardingAgreementsView(viewModel: .init { self.onAgreementNextTap() })
         case .airgap:
-            OnboardingAirgapView(viewModel: .init(onNextTap: { self.onAirgapNextTap() }))
+            NoAirgapView(viewModel: .init(mode: .onboarding) { self.onAirgapNextTap() })
         case .screenshots:
-            OnboardingScreenshotsView(viewModel: .init(onNextTap: { self.onScreenshotNextTap() }))
+            OnboardingScreenshotsView(viewModel: .init { self.onScreenshotNextTap() })
         case .setUpNetworksIntro:
             SetUpNetworksIntroView(
                 viewModel: .init(
@@ -96,7 +93,6 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func finishOnboarding() {
-        currentState = .overview
         onboardingMediator.onboard()
     }
 }

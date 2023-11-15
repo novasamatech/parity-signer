@@ -2784,7 +2784,7 @@ fn parse_dd_transaction_1() {
         },
         order: 2,
     };
-    let output = decode_payload(&line).unwrap();
+    let output = decode_payload(&line, true).unwrap();
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
@@ -3123,7 +3123,7 @@ fn parse_dd_transaction_2() {
     };
     let network_info_known = westend_spec();
 
-    let action = decode_payload(&line).unwrap();
+    let action = decode_payload(&line, true).unwrap();
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &action {
@@ -3301,7 +3301,7 @@ fn parse_dd_transaction_3() {
         },
     };
     let network_info_known = westend_spec();
-    let output = decode_payload(&line).unwrap();
+    let output = decode_payload(&line, true).unwrap();
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
@@ -3335,7 +3335,7 @@ fn parse_dd_transaction_no_ket_set() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let derivation_path = hex::encode("//Alice".encode());
     let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}ac0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480f00c06e31d91001750365010f00c06e31d910013223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423ea8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cde143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
-    let output = decode_payload(&line).unwrap();
+    let output = decode_payload(&line, true).unwrap();
     let no_seeds = HashMap::new();
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
         let result = parse_dd_transaction(&db, &data[0], &no_seeds);
@@ -3356,7 +3356,7 @@ fn parse_dd_transaction_wrong_metadata() {
 
     let derivation_path = hex::encode("//Alice".encode());
     let line = format!("530105{ALICE_ROOT_PUBLIC}{derivation_path}a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
-    let output = decode_payload(&line).unwrap();
+    let output = decode_payload(&line, true).unwrap();
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {

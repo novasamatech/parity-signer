@@ -8,6 +8,7 @@ use parity_scale_codec::Decode;
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
+
 use definitions::navigation::DecodeSequenceResult;
 
 pub mod cards;
@@ -70,7 +71,11 @@ fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<Transactio
 }
 
 /// Decode content of payload
-pub fn decode_payload(payload: &str) -> Result<DecodeSequenceResult> {
+/// `enable_dynamic_derivations` is a feature flag
+pub fn decode_payload(
+    payload: &str,
+    enable_dynamic_derivations: bool,
+) -> Result<DecodeSequenceResult> {
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
             a
@@ -87,8 +92,14 @@ pub fn decode_payload(payload: &str) -> Result<DecodeSequenceResult> {
         return Err(Error::NotSubstrate(data_hex[..2].to_string()));
     }
 
+    if !enable_dynamic_derivations {
+        return Ok(DecodeSequenceResult::Other {
+            s: payload.to_string(),
+        });
+    }
+
     match &data_hex[4..6] {
-        "04" => decode_transaction_bulk(data_hex),
+        "04" => decode_transaction_bulk(data_hex, enable_dynamic_derivations),
         "05" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
             s: vec![data_hex.to_string()],
         }),
@@ -130,7 +141,10 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
     }
 }
 
-fn decode_transaction_bulk(payload: &str) -> Result<DecodeSequenceResult> {
+fn decode_transaction_bulk(
+    payload: &str,
+    enable_dynamic_derivations: bool,
+) -> Result<DecodeSequenceResult> {
     let decoded_data = unhex(payload)?;
 
     let bulk = TransactionBulk::decode(&mut &decoded_data[3..])?;
@@ -141,7 +155,7 @@ fn decode_transaction_bulk(payload: &str) -> Result<DecodeSequenceResult> {
             for t in &b.encoded_transactions {
                 let encoded = hex::encode(t);
                 let encoded = "53".to_string() + &encoded;
-                match decode_payload(&encoded)? {
+                match decode_payload(&encoded, enable_dynamic_derivations)? {
                     DecodeSequenceResult::DynamicDerivationTransaction { s } => {
                         transactions.extend(s);
                     }

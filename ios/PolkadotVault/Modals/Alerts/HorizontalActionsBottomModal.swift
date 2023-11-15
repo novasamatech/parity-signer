@@ -100,7 +100,7 @@ struct HorizontalActionsBottomModal: View {
                             .font(PrimaryFont.bodyL.font)
                             .lineSpacing(Spacing.extraExtraSmall)
                             .multilineTextAlignment(viewModel.alignment == .center ? .center : .leading)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                     }
                     HStack {
                         SecondaryButton(

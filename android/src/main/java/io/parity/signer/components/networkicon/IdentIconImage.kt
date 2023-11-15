@@ -21,14 +21,14 @@ import io.parity.signer.uniffi.Identicon
  */
 @Composable
 fun IdentIconImage(
-	identIcon: Identicon,
+	identicon: Identicon,
 	modifier: Modifier = Modifier,
 	size: Dp = 28.dp
 ) {
-	when (identIcon) {
+	when (identicon) {
 		is Identicon.Blockies -> {
 			BlockiesIcon(
-				seed = identIcon.identity,
+				seed = identicon.identity,
 				preferedSize = size,
 				modifier = modifier,
 			)
@@ -36,13 +36,14 @@ fun IdentIconImage(
 
 		is Identicon.Dots -> {
 			DotIcon(
-				seed = identIcon.identity,
+				seed = identicon.identity,
 				size = size,
 				modifier = modifier,
 			)
 		}
+
 		is Identicon.Jdenticon -> {
-			Jdenticon(seed = identIcon.identity, size = size, modifier = modifier)
+			Jdenticon(seed = identicon.identity, size = size, modifier = modifier)
 		}
 	}
 }
@@ -81,6 +82,22 @@ private fun PreviewIdentIcon() {
 			IdentIconImage(iconDot, size = 56.dp)
 			IdentIconImage(iconBlockies, size = 56.dp)
 			IdentIconImage(iconJdenticon, size = 56.dp)
+
+			IdentIconImage(
+				iconDot, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
+			IdentIconImage(
+				iconBlockies, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
+			IdentIconImage(
+				iconJdenticon, modifier = Modifier.padding(
+					top = 16.dp, bottom = 16.dp, start = 16.dp, end = 12.dp
+				), size = 32.dp
+			)
 		}
 	}
 }

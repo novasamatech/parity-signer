@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,6 +35,7 @@ import io.parity.signer.ui.theme.red500
 import io.parity.signer.ui.theme.textTertiary
 import io.parity.signer.uniffi.MEnterPassword
 
+
 @Composable
 fun EnterPassword(
 	data: EnterPasswordModel,
@@ -45,20 +45,17 @@ fun EnterPassword(
 	var password by rememberSaveable { mutableStateOf("") }
 	var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	val canProceed = password.isNotBlank()
 
 	Column(
-		modifier = Modifier
-			.imePadding()
+		modifier = Modifier.imePadding()
 	) {
 		EnterPasswordHeader(
 			onClose = onClose,
 			onProceed = {
 				proceed(password)
-				focusManager.clearFocus(true)
 			},
 			isEnabled = canProceed
 		)
@@ -98,7 +95,6 @@ fun EnterPassword(
 					onDone = {
 						if (canProceed) {
 							proceed(password)
-							focusManager.clearFocus(true)
 						}
 					}
 				),
@@ -140,9 +136,8 @@ fun EnterPassword(
 		}
 	}
 
-	DisposableEffect(data) {
+	LaunchedEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 

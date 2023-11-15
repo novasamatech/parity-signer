@@ -29,6 +29,9 @@ enum Heights {
     static let keyCellContainer: CGFloat = 72
     /// Height for `Identicon` when used in list collections
     static let identiconInCell: CGFloat = 36
+    static let identiconInManageKeySet: CGFloat = 40
+
+    static let identiconRootKeyDetails: CGFloat = 56
     /// Height for `Identicon` when used as inline icon
     static let identiconSmall: CGFloat = 16
     static let identiconInAddDerivedKey: CGFloat = 40
@@ -78,6 +81,7 @@ enum Heights {
 
     static let navigationBarProgressViewHeight: CGFloat = 6
     static let navigationBarProgressViewWidth: CGFloat = 40
+    static let manageKeySetSelectionIcon: CGFloat = 32
 }
 
 enum Sizes {
@@ -85,14 +89,15 @@ enum Sizes {
     static let xmarkButtonDiameter: CGFloat = 32
     /// Size for left-aligned icons within `MenuButton` / `ActionSheetButton`, 30pt
     static let actionSheetIcon: CGFloat = 30
+    static let actionSheetCircleIcon: CGFloat = 40
+    static let checkmarkCircleButton: CGFloat = 32
     /// Size for seed word position label
     static let seedWordPositionWidth: CGFloat = 18
     /// Diameter for ">" button in circle, 28pt
     static let chevronCircleButton: CGFloat = 28
     static let rightChevronContainerSize: CGFloat = 28
     static let roundedQuestionmark: CGFloat = 24
-    /// Diameter for connectivity alert button, 56pt
-    static let connectivityAlertDiameter: CGFloat = 56
     static let pointCircle: CGFloat = 32
     static let signSpecsIdenticonSize: CGFloat = 36
+    static let chevronDownKeyDetails: CGFloat = 16
 }

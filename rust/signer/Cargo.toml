@@ -20,6 +20,7 @@ definitions = { path = "../definitions", default-features = false }
 navigator = { path = "../navigator", default-features = false }
 qr_reader_phone = { path = "../qr_reader_phone" }
 transaction_parsing = { path = "../transaction_parsing" }
+transaction_signing = { path = "../transaction_signing" }
 parser = { path = "../parser" }
 qrcode_static = { path = "../qrcode_static" }
 

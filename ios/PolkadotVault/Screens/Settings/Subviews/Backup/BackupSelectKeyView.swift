@@ -9,7 +9,6 @@ import SwiftUI
 
 struct BackupSelectKeyView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -22,13 +21,13 @@ struct BackupSelectKeyView: View {
                         action: { presentationMode.wrappedValue.dismiss() }
                     )],
                     rightButtons: [.init(type: .empty)],
-                    backgroundColor: Asset.backgroundPrimary.swiftUIColor
+                    backgroundColor: .backgroundPrimary
                 )
             )
             ScrollView {
                 Localizable.Settings.SelectKey.header.text
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
-                    .font(PrimaryFont.captionM.font)
+                    .foregroundColor(.textAndIconsPrimary)
+                    .font(PrimaryFont.titleL.font)
                     .padding(.horizontal, Spacing.large)
                     .padding(.vertical, Spacing.medium)
                 LazyVStack(alignment: .leading, spacing: 0) {
@@ -40,7 +39,7 @@ struct BackupSelectKeyView: View {
                 }
             }
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingBackupModal,
             onDismiss: { viewModel.seedPhraseToPresent = .init(keyName: "", seedPhrase: .init(seedPhrase: "")) }
@@ -51,35 +50,21 @@ struct BackupSelectKeyView: View {
             )
             .clearModalBackground()
         }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingConnectivityAlert
-        ) {
-            ErrorBottomModal(
-                viewModel: connectivityMediator.isConnectivityOn ? .connectivityOn() : .connectivityWasOn(
-                    continueAction: viewModel.onConnectivityWarningTap()
-                ),
-                isShowingBottomAlert: $viewModel.isPresentingConnectivityAlert
-            )
-            .clearModalBackground()
-        }
-        .onAppear {
-            viewModel.use(connectivityMediator: connectivityMediator)
-        }
     }
 
     @ViewBuilder
     func seedNameView(_ seedName: String) -> some View {
         HStack(alignment: .center) {
             Text(seedName)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
-            Asset.chevronRight.swiftUIImage
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            Image(.chevronRight)
+                .foregroundColor(.textAndIconsTertiary)
         }
         .padding(.horizontal, Spacing.medium)
         .frame(height: Heights.settingsSelectKeyEntryHeight)
-        .background(Asset.fill6.swiftUIColor)
+        .background(.fill6)
         .cornerRadius(CornerRadius.small)
         .contentShape(Rectangle())
         .onTapGesture { viewModel.onSeedNameTap(seedName) }
@@ -89,45 +74,20 @@ struct BackupSelectKeyView: View {
 extension BackupSelectKeyView {
     final class ViewModel: ObservableObject {
         @Published var isPresentingBackupModal = false
-        @Published var isPresentingConnectivityAlert = false
         @Published var seedPhraseToPresent: SettingsBackupViewModel = .init(
             keyName: "",
             seedPhrase: .init(seedPhrase: "")
         )
-        private var awaitingSeedName: String?
-        private weak var connectivityMediator: ConnectivityMediator!
         let seedsMediator: SeedsMediating
-        private let warningStateMediator: WarningStateMediator
 
         init(
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.seedsMediator = seedsMediator
-            self.warningStateMediator = warningStateMediator
-        }
-
-        func use(connectivityMediator: ConnectivityMediator) {
-            self.connectivityMediator = connectivityMediator
         }
 
         func onSeedNameTap(_ seedName: String) {
-            if connectivityMediator.isConnectivityOn || warningStateMediator.alert {
-                isPresentingConnectivityAlert = true
-                awaitingSeedName = seedName
-            } else {
-                presentBackupModal(seedName)
-            }
-        }
-
-        func onConnectivityWarningTap() {
-            warningStateMediator.resetConnectivityWarnings()
-            isPresentingConnectivityAlert = false
-            guard let awaitingSeedName else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.presentBackupModal(awaitingSeedName)
-                self.isPresentingBackupModal = true
-            }
+            presentBackupModal(seedName)
         }
 
         private func presentBackupModal(_ seedName: String) {
@@ -138,7 +98,6 @@ extension BackupSelectKeyView {
                 )
             )
             isPresentingBackupModal = true
-            awaitingSeedName = nil
         }
     }
 }

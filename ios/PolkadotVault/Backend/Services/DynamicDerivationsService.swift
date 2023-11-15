@@ -9,17 +9,11 @@ import Foundation
 
 final class DynamicDerivationsService {
     private let backendService: BackendService
-    private let callQueue: Dispatching
-    private let callbackQueue: Dispatching
 
     init(
-        backendService: BackendService = BackendService(),
-        callQueue: Dispatching = DispatchQueue(label: "DynamicDerivationsService", qos: .userInitiated),
-        callbackQueue: Dispatching = DispatchQueue.main
+        backendService: BackendService = BackendService()
     ) {
         self.backendService = backendService
-        self.callQueue = callQueue
-        self.callbackQueue = callbackQueue
     }
 
     func getDynamicDerivationsPreview(
@@ -37,19 +31,15 @@ final class DynamicDerivationsService {
         payload: [String],
         completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
     ) {
-        callQueue.async {
-            let result: Result<MSignedTransaction, TransactionError>
-            do {
-                let transaction: MSignedTransaction = try signDdTransaction(payload: payload, seeds: seedPhrases)
-                result = .success(transaction)
-            } catch let errorDisplayed as ErrorDisplayed {
-                result = .failure(errorDisplayed.transactionError)
-            } catch {
-                result = .failure(.generic(error.backendDisplayError))
+        backendService.performCall({
+            try signDdTransaction(payload: payload, seeds: seedPhrases)
+        }, completion: { (result: Result<MSignedTransaction, ErrorDisplayed>) in
+            switch result {
+            case let .success(transaction):
+                completion(.success(transaction))
+            case let .failure(errorDisplayed):
+                completion(.failure(errorDisplayed.transactionError))
             }
-            self.callbackQueue.async {
-                completion(result)
-            }
-        }
+        })
     }
 }

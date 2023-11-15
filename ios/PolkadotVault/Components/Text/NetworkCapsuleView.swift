@@ -12,11 +12,11 @@ struct NetworkCapsuleView: View {
 
     var body: some View {
         Text(network.capitalized)
-            .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+            .foregroundColor(.textAndIconsTertiary)
             .font(PrimaryFont.captionM.font)
             .padding([.top, .bottom], Spacing.extraExtraSmall)
             .padding(.horizontal, Spacing.extraSmall)
-            .background(Asset.fill12.swiftUIColor)
+            .background(.fill12)
             .clipShape(Capsule())
     }
 }

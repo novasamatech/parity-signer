@@ -13,14 +13,13 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -48,25 +47,22 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
-	userInput: String,
+	rawUserInput: String,
 	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape = RoundedCornerShape(innerRound)
 
-	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
-
-	val userInputValueInternal = " " + userInput
 
 	//workaround for //https://issuetracker.google.com/issues/160257648 and https://issuetracker.google.com/issues/235576056 - update to new TextField
 	//for now need to keep this intermediate state
 	val seedWord = remember { mutableStateOf(TextFieldValue(" ")) }
 	seedWord.value = TextFieldValue(
-		text = userInputValueInternal,
+		text = rawUserInput,
 		//to always keep position after artificially added " "
-		selection = TextRange(userInputValueInternal.length)
+		selection = TextRange(rawUserInput.length)
 	)
 
 	FlowRow(
@@ -82,12 +78,14 @@ fun EnterSeedPhraseBox(
 		enteredWords.onEachIndexed { index, word ->
 			EnterSeedPhraseWord(index = index + 1, word = word)
 		}
-		val shouldShowPlaceholder = enteredWords.isEmpty() && userInput.isEmpty()
+		val shouldShowPlaceholder = enteredWords.isEmpty() && rawUserInput.isEmpty()
 		BasicTextField(
 			textStyle = TextStyle(color = MaterialTheme.colors.primary),
 			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
 			onValueChange = {
-				onEnteredChange(it.text)
+				if (it.text != seedWord.value.text) {
+					onEnteredChange(it.text)
+				}
 				seedWord.value = it
 			},
 			cursorBrush = SolidColor(MaterialTheme.colors.primary),
@@ -112,9 +110,8 @@ fun EnterSeedPhraseBox(
 
 	DisableScreenshots()
 	KeepScreenOn()
-	DisposableEffect(Unit) {
+	LaunchedEffect(Unit) {
 		focusRequester.requestFocus()
-		onDispose { focusManager.clearFocus() }
 	}
 }
 

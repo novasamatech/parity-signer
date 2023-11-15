@@ -9,6 +9,8 @@ interface ErrorDisplayed {
     MetadataOutdated(string name, u32 have, u32 want);
     UnknownNetwork(H256 genesis_hash, Encryption encryption);
     NoMetadata(string name);
+    WrongPassword();
+    DbSchemaMismatch();
 };
 
 [Error]
@@ -696,7 +698,19 @@ namespace signer {
     MNewSeedBackup print_new_seed([ByRef] string new_seed_name);
 
     [Throws=ErrorDisplayed]
+    void check_db_version();
+
+    [Throws=ErrorDisplayed]
     void create_key_set([ByRef] string seed_name, [ByRef] string seed_phrase, sequence<string> networks);
+
+    [Throws=ErrorDisplayed]
+    MSignSufficientCrypto get_keys_for_signing();
+
+    [Throws=ErrorDisplayed]
+    MSufficientCryptoReady sign_metadata_with_key([ByRef] string network_key, [ByRef] string metadata_specs_version, [ByRef] string signing_address_key, [ByRef] string seed_phrase, string? password);
+
+    [Throws=ErrorDisplayed]
+    MSufficientCryptoReady sign_network_spec_with_key([ByRef] string network_key, [ByRef] string signing_address_key, [ByRef] string seed_phrase, string? password);
 };
 
 dictionary MKeysNew {

@@ -26,6 +26,7 @@ mod ffi_types;
 
 use crate::ffi_types::*;
 use db_handling::identities::{import_all_addrs, inject_derivations_has_pwd};
+use db_handling::{Error as DbHandlingError, Error};
 use definitions::keyring::AddressKey;
 use lazy_static::lazy_static;
 use navigator::Error as NavigatorError;
@@ -39,6 +40,7 @@ use std::{
 use transaction_parsing::dynamic_derivations::process_dynamic_derivations;
 use transaction_parsing::entry_to_transactions_with_decoding;
 use transaction_parsing::Error as TxParsingError;
+use transaction_signing::SufficientContent;
 
 lazy_static! {
     static ref DB: Arc<RwLock<Option<Db>>> = Arc::new(RwLock::new(None));
@@ -86,6 +88,10 @@ pub enum ErrorDisplayed {
     NoMetadata {
         name: String,
     },
+    /// Provided password is incorrect
+    WrongPassword,
+    /// Database schema mismatch
+    DbSchemaMismatch,
 }
 
 impl From<NavigatorError> for ErrorDisplayed {
@@ -110,7 +116,7 @@ impl From<NavigatorError> for ErrorDisplayed {
                     ref errors,
                 } => {
                     if let Some((want, parser::Error::WrongNetworkVersion { in_metadata, .. })) =
-                        errors.get(0)
+                        errors.first()
                     {
                         Self::MetadataOutdated {
                             name: network_name.to_string(),
@@ -133,6 +139,18 @@ impl From<NavigatorError> for ErrorDisplayed {
                 },
                 _ => Self::Str { s: format!("{e}") },
             },
+            NavigatorError::TransactionSigning(transaction_signing::Error::WrongPassword) => {
+                Self::WrongPassword
+            }
+            _ => Self::Str { s: format!("{e}") },
+        }
+    }
+}
+
+impl From<DbHandlingError> for ErrorDisplayed {
+    fn from(e: DbHandlingError) -> Self {
+        match &e {
+            Error::DbSchemaMismatch { .. } => Self::DbSchemaMismatch,
             _ => Self::Str { s: format!("{e}") },
         }
     }
@@ -568,6 +586,56 @@ fn create_key_set(
 ) -> anyhow::Result<(), ErrorDisplayed> {
     db_handling::identities::create_key_set(&get_db()?, seed_name, seed_phrase, networks)
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+fn check_db_version() -> anyhow::Result<(), ErrorDisplayed> {
+    db_handling::helpers::assert_db_version(&get_db()?).map_err(ErrorDisplayed::from)
+}
+
+fn get_keys_for_signing() -> Result<MSignSufficientCrypto, ErrorDisplayed> {
+    let identities = db_handling::interface_signer::print_all_identities(&get_db()?)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))?;
+    Ok(MSignSufficientCrypto { identities })
+}
+
+fn sign_metadata_with_key(
+    network_key: &str,
+    metadata_specs_version: &str,
+    signing_address_key: &str,
+    seed_phrase: &str,
+    password: Option<String>,
+) -> Result<MSufficientCryptoReady, ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    let version = metadata_specs_version
+        .parse::<u32>()
+        .map_err(|e| format!("{e}"))?;
+    let address_key = AddressKey::from_hex(signing_address_key).map_err(|e| format!("{e}"))?;
+    navigator::sign_sufficient_content(
+        &get_db()?,
+        &address_key,
+        SufficientContent::LoadMeta(network_key, version),
+        seed_phrase,
+        &password.unwrap_or("".to_owned()),
+    )
+    .map_err(|e| e.into())
+}
+
+fn sign_network_spec_with_key(
+    network_key: &str,
+    signing_address_key: &str,
+    seed_phrase: &str,
+    password: Option<String>,
+) -> Result<MSufficientCryptoReady, ErrorDisplayed> {
+    let network_key = NetworkSpecsKey::from_hex(network_key).map_err(|e| format!("{e}"))?;
+    let address_key = AddressKey::from_hex(signing_address_key).map_err(|e| format!("{e}"))?;
+    navigator::sign_sufficient_content(
+        &get_db()?,
+        &address_key,
+        SufficientContent::AddSpecs(network_key),
+        seed_phrase,
+        &password.unwrap_or("".to_owned()),
+    )
+    .map_err(|e| e.into())
 }
 
 /// Must be called once to initialize logging from Rust in development mode.

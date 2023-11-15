@@ -34,14 +34,14 @@ struct AddKeySetUpNetworksStepTwoView: View {
                         // Header
                         Localizable.Onboarding.SetUpNetworks.Step2.Label.step.text
                             .font(PrimaryFont.captionM.font)
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                            .foregroundColor(.textAndIconsSecondary)
                             .multilineTextAlignment(.leading)
                             .padding(.horizontal, Spacing.large)
                             .padding(.top, Spacing.medium)
                             .padding(.bottom, Spacing.extraExtraSmall)
                         Localizable.Onboarding.SetUpNetworks.Step2.Label.title.text
                             .font(PrimaryFont.titleL.font)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .padding(.horizontal, Spacing.large)
                             .padding(.bottom, Spacing.large)
                         // Tutorial
@@ -58,7 +58,7 @@ struct AddKeySetUpNetworksStepTwoView: View {
                 minWidth: geo.size.width,
                 minHeight: geo.size.height
             )
-            .background(Asset.backgroundSystem.swiftUIColor)
+            .background(.backgroundSystem)
             .fullScreenModal(
                 isPresented: $viewModel.isShowingQRScanner,
                 onDismiss: viewModel.onQRScannerDismiss
@@ -76,11 +76,11 @@ struct AddKeySetUpNetworksStepTwoView: View {
     func pointCircle(_ number: String) -> some View {
         ZStack(alignment: .center) {
             Circle()
-                .foregroundColor(Asset.backgroundPrimary.swiftUIColor)
+                .foregroundColor(.backgroundPrimary)
                 .frame(width: Sizes.pointCircle)
             Text(number)
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
     }
 
@@ -91,12 +91,12 @@ struct AddKeySetUpNetworksStepTwoView: View {
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                 Localizable.Onboarding.SetUpNetworks.Step2.Label.Step1.one.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                 Text(Localizable.setUpNetworkStepTwoStepPartTwo())
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .font(PrimaryFont.bodyM.font)
                 Text(Localizable.setUpNetworkStepTwoStepPartThree())
-                    .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                    .foregroundColor(.textAndIconsSecondary)
                     .font(PrimaryFont.bodyM.font)
             }
             Spacer()
@@ -112,7 +112,7 @@ struct AddKeySetUpNetworksStepTwoView: View {
             pointCircle("2")
             Localizable.Onboarding.SetUpNetworks.Step2.Label.step2.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
             Spacer()
         }
         .padding(Spacing.medium)

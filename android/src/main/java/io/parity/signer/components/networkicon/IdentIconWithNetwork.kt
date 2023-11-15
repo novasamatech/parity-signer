@@ -41,7 +41,7 @@ fun IdentIconWithNetwork(
 		Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 			val cutoutSize = size / 2
 			IdentIconImage(
-				identIcon = identicon,
+				identicon = identicon,
 				modifier = Modifier.clip(SubIconCutShape(cutoutSize)),
 				size = size
 			)

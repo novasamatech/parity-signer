@@ -11,19 +11,19 @@ extension Event {
     var displayValue: String? {
         switch self {
         case let .generalVerifierSet(value):
-            return value.show()
+            value.show()
         case let .identityAdded(value),
              let .identityRemoved(value),
              let .secretWasExported(value):
-            return value.seedName + value.path
+            value.seedName + value.path
         case let .metadataAdded(value),
              let .metadataRemoved(value):
-            return value.name + " version " + String(value.version)
+            value.name + " version " + String(value.version)
         case let .networkSpecsAdded(value),
              let .networkSpecsRemoved(value):
-            return value.network.specs.title
+            value.network.specs.title
         case let .networkVerifierSet(value):
-            return value.validCurrentVerifier == .general ?
+            value.validCurrentVerifier == .general ?
                 "general" :
                 "custom" + " for network with genesis hash " + value.genesisHash.formattedAsString
         case let .seedCreated(text),
@@ -31,21 +31,21 @@ extension Event {
              let .seedNameWasShown(text),
              let .systemEntry(text),
              let .userEntry(text):
-            return text
+            text
         case let .networkSpecsSigned(value):
-            return value.specsToSend.title
+            value.specsToSend.title
         case let .metadataSigned(value):
-            return value.name + String(value.version)
+            value.name + String(value.version)
         case let .transactionSignError(value),
              let .transactionSigned(value):
-            return value.userComment
+            value.userComment
         case let .messageSignError(value),
              let .messageSigned(value):
-            return value.userComment
+            value.userComment
         case .wrongPassword:
-            return Localizable.HistoryCard.WrongPassword.subtitle.string
+            Localizable.HistoryCard.WrongPassword.subtitle.string
         default:
-            return nil
+            nil
         }
     }
 }

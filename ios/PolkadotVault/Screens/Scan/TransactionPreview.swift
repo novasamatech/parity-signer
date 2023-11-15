@@ -42,7 +42,7 @@ struct TransactionPreview: View {
         .onAppear {
             viewModel.onAppear()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .bottomEdgeOverlay(
             overlayView:
             TransactionDetailsView(
@@ -106,7 +106,7 @@ struct TransactionPreview: View {
                 if isLogNoteVisible {
                     VStack(alignment: .leading) {
                         Localizable.TransactionSign.Action.note.text
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.bodyL.font)
                         TextField("", text: $comment)
                             .primaryTextFieldStyle(
@@ -122,7 +122,7 @@ struct TransactionPreview: View {
                                 isLogNoteVisible = true
                             }
                         },
-                        icon: Asset.add.swiftUIImage,
+                        icon: Image(.addLarge),
                         text: Localizable.TransactionSign.Action.note.string
                     )
                 }
@@ -185,7 +185,7 @@ struct TransactionPreview: View {
                 // Header
                 Localizable.TransactionSign.Label.signCode.text
                     .font(PrimaryFont.bodyL.font)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .padding(.leading, Spacing.extraSmall)
                 // QR Code container
                 VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -213,15 +213,15 @@ struct TransactionPreview: View {
     func title(_ transactionsCount: Int, previewType: MTransaction.TransactionPreviewType?) -> String {
         switch previewType {
         case .addNetwork:
-            return Localizable.TransactionSign.Label.Header.network.string
+            Localizable.TransactionSign.Label.Header.network.string
         case .metadata:
-            return Localizable.TransactionSign.Label.Header.metadata.string
+            Localizable.TransactionSign.Label.Header.metadata.string
         case let .importKeys(keysCount):
-            return keysCount == 1 ?
+            keysCount == 1 ?
                 Localizable.ImportKeys.Label.Title.single.string :
                 Localizable.ImportKeys.Label.Title.multiple(keysCount)
         default:
-            return transactionsCount == 1 ?
+            transactionsCount == 1 ?
                 Localizable.TransactionSign.Label.Header.single.string :
                 Localizable.TransactionSign.Label.Header.multiple(transactionsCount)
         }

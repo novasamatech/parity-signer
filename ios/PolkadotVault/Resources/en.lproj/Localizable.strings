@@ -79,24 +79,23 @@
 "SEED PHRASE" = "Secret Recovery Phrase";
 "RecoverSeedPhrase.Action.Next" = "Next";
 "RecoverSeedPhrase.Label.Title" = "Enter a Secret Recovery Phrase";
-"RecoverSeedPhrase.Label.Header" = "Enter a 24-word phrase you were given when you created your key set";
+"RecoverSeedPhrase.Label.Header" = "Enter a phrase you were given when you created your key set";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Title" = "Please enter the correct Secret Recovery phrase";
 "RecoverSeedPhrase.Error.IncorrectPhrase.Message" = "Please edit your secret recovery phrase and try again.";
 
 // Sign Specs
 "SignSpecsList.Label.Title" = "Select Key for Signing";
-"SignSpecsDetails.Label.Title" = "Sign Transaction";
+"SignSpecsDetails.Label.Title.Metadata" = "Sign Metadata";
+"SignSpecsDetails.Label.Title.Specs" = "Sign Specs";
 
 "SignSpecsDetails.Label.NetworkMetadataSignature" = "Signature for metadata update %@ version %@";
 "SignSpecsDetails.Label.TypesSignature" = "Signature for types";
 "SignSpecsDetails.Label.NetworkSpecSignature" = "Signature for network specs update\nFor network: %@\nSpecs key: %@";
-"SignSpecsDetails.Label.ScanQRCode" = "Scan QR code to Sign Transaction";
+"SignSpecsDetails.Label.ScanQRCode.Metadata" = "Scan QR code to Sign Metadata";
+"SignSpecsDetails.Label.ScanQRCode.Specs" = "Scan QR code to Sign Specs";
+
 "SignSpecsDetails.Label.Sign" = "Sign With";
 "SignSpecsDetails.Action.Done" = "Done";
-
-"TabBar.Keys" = "Key Sets";
-"TabBar.Scanner" = "Scanner";
-"TabBar.Settings" = "Settings";
 
 "KeySets.Title" = "Key Sets";
 "KeySets.Action.Add" = "Add Key Set";
@@ -134,12 +133,11 @@
 "KeyDetails.Overlay.Action.SelectAll" = "Select All";
 "KeyDetails.Overlay.Action.Export" = "Export";
 "KeyDetails.Root.Label.PublicKey" = "Public key";
+"KeyDetails.Root.Action.Close" = "Close";
 "KeyDetails.Error.NoNetworks.Title" = "No Networks Available";
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
 
-"PublicKeyDetails.Label.Title" = "Public Key";
-"PublicKeyDetails.Label.Subtitle" = "Derived Key";
 "PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
@@ -169,14 +167,6 @@
 "PublicKeyDetailsModal.Confirmation.Action.Remove" = "Remove Key";
 "PublicKeyDetailsModal.Confirmation.Snackbar" = "Key Has Been Removed";
 
-"Connectivity.Label.Title" = "Network Connected";
-"Connectivity.Label.Content" = "Polkadot Vault detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.";
-"Connectivity.Action.Ok" = "Got It";
-"PastConnectivity.Label.Title" = "Network Was Connected!";
-"PastConnectivity.Label.Content" = "Your Polkadot Vault device has connected to a WIFI, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use.";
-"PastConnectivity.Action.Back" = "Go Back";
-"PastConnectivity.Action.Continue" = "Acknowledge and Proceed";
-
 "BackupModal.Label.Secret" = "Secret Recovery Phrase";
 "BackupModal.Label.Derived" = "Derived keys";
 "BackupModal.Label.QRCode" = "Backup with QR Code";
@@ -194,6 +184,9 @@
 "Error.Service.Label.Prefix" = "Internal service error.";
 "Error.Service.Label.Message" = "Rust backend operation failed, please try again.\nInternal error description: %@";
 "Error.Service.Label.Suffix" = "Report an issue to Polkadot Vault team via Github at: https://github.com/paritytech/parity-signer/";
+
+"Error.FeatureNotAvailable.Title" = "Feature Disabled";
+"Error.FeatureNotAvailable.Message" = "This feature is not available in current build version. Please contact Polkadot Vault team if you require build with this feature.";
 
 "KeysExport.KeySets.Label.Header" = "Export %@ %@";
 "KeysExport.KeySets.Label.Header.Suffix.Single" = "Key";
@@ -343,7 +336,6 @@
 "Settings.Label.Networks" = "Networks";
 "Settings.Label.Logs" = "Logs";
 "Settings.Label.Verifier" = "Verifier Certificate";
-"Settings.Label.Backup" = "Backup Secret Phrase";
 "Settings.Label.Policy" = "Privacy Policy";
 "Settings.Label.Terms" = "Terms of Service";
 "Settings.Label.Version" = "App version %@";
@@ -453,14 +445,14 @@
 "EnterBananaSplitPasswordView.Action.Next" = "Next";
 
 "CreateDerivedKey.Label.Title" = "Create Derived Key";
-"CreateDerivedKey.Label.Subtitle" = "Step 1 / 2";
 "CreateDerivedKey.Label.Header" = "Select Network";
 "CreateDerivedKey.Label.Footer.Network" = "Haven’t found a network needed?\nLearn more about how to set up networks";
 "CreateDerivedKey.Label.Network.Title" = "Choose Network";
 "CreateDerivedKey.Label.Network.OnAny" = "Allow use on any network";
+"CreateDerivedKey.Action.Create" = "Create Key";
+"CreateDerivedKey.Action.AddCustom" = "Add Custom Derivation Path";
 
 "CreateDerivedKey.Modal.Path.Title" = "Create Derived Key";
-"CreateDerivedKey.Modal.Path.Subtitle" = "Step 2 / 2";
 "CreateDerivedKey.Modal.Path.Header" = "Derivation Path Name";
 "CreateDerivedKey.Modal.Path.Action.Navigation" = "Done";
 "CreateDerivedKey.Modal.Path.Action.SoftPath" = " / ";
@@ -507,34 +499,36 @@
 "Error.DevicePincodeRequired.Label.Subtitle" = "Any operation in Polkadot Vault requires passcode confirmation. Using the application without a password is not allowed.";
 "Error.DevicePincodeRequired.Label.Step1" = "On iPhone models with Face ID, go to Settings > Face ID & Passcode. On earlier iPhone models, go to Touch ID & Passcode.";
 "Error.DevicePincodeRequired.Label.Step2" = "Tap Turn Passcode On";
-
 "Error.DevicePincodeRequired.Action.Settings" = "Go to Settings";
+"Error.PrivateKeyQRCodeService.NoKeyDetails" = "Key Details data not available.";
+"Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
+"Error.PrivateKeyQRCodeService.BackupUnavailable" = "Seed phrase backup not available.";
+
+"Error.ApplicationUpdateRequired.Label.Title" = "Upgrade your Polkadot Vault according\n to the requirements";
+"Error.ApplicationUpdateRequired.Label.Subtitle" = "The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements.";
+"Error.ApplicationUpdateRequired.Label.Info" = "Find the latest Polkadot Vault upgrade information here paritytech.github.io/parity-signer/tutorials/Upgrading.html";
+"Error.ApplicationUpdateRequired.Label.Info.Highlight" = "paritytech.github.io/parity-signer/tutorials/Upgrading.html";
+"Error.ApplicationUpdateRequired.Action.Backup" = "Backup Secret Phrase";
+
 
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
-
-"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
-"OnboardingOverview.Action.Skip" = "Skip";
-"OnboardingOverview.Action.Continue" = "Continue";
-"OnboardingOverview.Label.Header" = "Welcome to Polkadot Vault";
-"OnboardingOverview.Label.Step1" = "Turn Your Smartphone\nInto a Hardware Wallet";
-"OnboardingOverview.Label.Step2" = "Generate and Store\nMultiple Private Keys";
-"OnboardingOverview.Label.Step3" = "Sign Transactions While Keeping Your Private Keys Offline";
-"OnboardingOverview.Label.Step4" = "Add New Networks and Update Them Without Breaking the Air Gap";
 
 "Onboarding.Screenshots.Label.Title" = "Please confirm you understand the risks of screenshots";
 "Onboarding.Screenshots.Label.Content" = "Taking and storing screenshots with private information may lead to losing funds";
 "Onboarding.Screenshots.Label.Confirmation" = "I'm aware of the risks involved in taking screenshots";
 "Onboarding.Screenshots.Action.Next" = "Next";
 
-"Onboarding.Airgap.Label.Title" = "Set Up\nAir Gap Mode";
-"Onboarding.Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
-"Onboarding.Airgap.Label.Airplane" = "Enable Airplane Mode";
-"Onboarding.Airgap.Label.Wifi" = "Turn off WiFi Connection";
-"Onboarding.Airgap.Label.Cables" = "Disconnect all cables";
-"Onboarding.Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
-"Onboarding.Airgap.Action.Next" = "Next";
+"Airgap.Label.Title.Setup" = "Set Up\nAir Gap Mode";
+"Airgap.Label.Title.Broken" = "Please Enable\nAir Gap Mode";
+"Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
+"Airgap.Label.Airplane" = "Enable Airplane Mode";
+"Airgap.Label.Wifi" = "Turn off WiFi Connection";
+"Airgap.Label.Cables" = "Disconnect all cables";
+"Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
+"Airgap.Action.Next" = "Next";
+"Airgap.Action.Done" = "Done";
 
 "Onboarding.SetUpNetworks.Label.Title" = "Set Up Networks On Which You Will Sign Transactions";
 "Onboarding.SetUpNetworks.Label.Content" = "Polkadot Vault is a fully Decentralised wallet, which means users have to manage networks themselves. Follow the tutorial to learn more.";
@@ -585,8 +579,6 @@
 "CreateKeysForNetwork.Label.Header.Create" = "Choose networks for the keys to be created";
 "CreateKeysForNetwork.Label.Title.Recover" = "Recover Keys";
 "CreateKeysForNetwork.Label.Header.Recover" = "Choose networks for the keys to be recovered";
-"CreateKeysForNetwork.Label.Title.BananaSplit" = "Recover Keys";
-"CreateKeysForNetwork.Label.Header.BananaSplit" = "Choose networks for the keys to be recovered";
 "CreateKeysForNetwork.Label.Footer" = "Please note that keys with custom named derivation path name can be created from the key set screen separately.";
 "CreateKeysForNetwork.Error.DerivedKeyForNetwork" = "Derived key for %@ could not be created: %@";
 "CreateKeysForNetwork.Action.SelectAll" = "Select All";
@@ -611,8 +603,10 @@
 "SelectKeySetsForNetworkKey.Snackbar.KeysCreated" = "Derived Keys have been created";
 
 "ErrorDisplayed.DbNotInitialized" = "Database not initialized";
+"ErrorDisplayed.DbSchemaMismatch" = "Database scheme has been updated. Please do a fresh app install";
 "ErrorDisplayed.MutexPoisoned" = "Mutex poisoned";
 "ErrorDisplayed.InvalidType" = "Unexpected backend response type";
+"ErrorDisplayed.WrongPassword" = "Wrong Password";
 
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
 "AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
@@ -626,3 +620,14 @@
 "AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
 "AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
 "AddDerivedKeys.Modal.Action.Cancel" = "Cancel";
+
+"ManageKeySets.Label.Header" = "Key Sets";
+"ManageKeySets.Label.DerivedKeys.single" = "%@ Key";
+"ManageKeySets.Label.DerivedKeys.plural" = "%@ Keys";
+"ManageKeySets.Action.Add" = "Add new Key Set";
+"ManageKeySets.Action.Recover" = "Recover Key Set";
+
+"NoKeySets.Label.Header" = "Welcome to\nPolkadot Vault";
+"NoKeySets.Label.Subheader" = "Add a new key set or recover an existing one by entering the secret recovery phrase to get started";
+"NoKeySets.Action.Add" = "Add new Key Set";
+"NoKeySets.Action.Recover" = "Recover Key Set";

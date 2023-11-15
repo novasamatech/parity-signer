@@ -5,84 +5,88 @@
 //  Created by Krzysztof Rodak on 05/08/2022.
 //
 
+import Combine
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @EnvironmentObject private var connectivityMediator: ConnectivityMediator
     @EnvironmentObject private var navigation: NavigationCoordinator
-    @EnvironmentObject private var appState: AppState
     @StateObject var viewModel: ViewModel
-    @State private var isShowingQRScanner: Bool = false
 
     var body: some View {
-        ZStack {
-            if viewModel.selectedTab == .keys {
-                KeySetList(viewModel: .init(tabBarViewModel: tabBarViewModel()))
-            }
-            if viewModel.selectedTab == .settings {
-                SettingsView(viewModel: .init(tabBarViewModel: tabBarViewModel()))
-            }
-        }
-        .animation(.default, value: AnimationDuration.standard)
-        .fullScreenModal(
-            isPresented: $viewModel.isShowingQRScanner,
-            onDismiss: viewModel.onQRScannerDismiss
-        ) {
-            CameraView(
+        switch viewModel.viewState {
+        case let .keyDetails(initialKeyName):
+            KeyDetailsView(
                 viewModel: .init(
-                    isPresented: $viewModel.isShowingQRScanner
+                    initialKeyName: initialKeyName,
+                    onDeleteCompletion: viewModel.updateViewState
                 )
             )
-        }
-        .fullScreenModal(
-            isPresented: $navigation.genericError.isPresented
-        ) {
-            ErrorBottomModal(
-                viewModel: .alertError(message: navigation.genericError.errorMessage),
-                isShowingBottomAlert: $navigation.genericError.isPresented
+            .fullScreenModal(
+                isPresented: $navigation.genericError.isPresented
+            ) {
+                ErrorBottomModal(
+                    viewModel: .alertError(message: navigation.genericError.errorMessage),
+                    isShowingBottomAlert: $navigation.genericError.isPresented
+                )
+                .clearModalBackground()
+            }
+            .bottomSnackbar(
+                viewModel.snackbarViewModel,
+                isPresented: $viewModel.isSnackbarPresented
             )
-            .clearModalBackground()
+        case .noKeys:
+            NoKeySetsView(viewModel: .init(onCompletion: viewModel.onKeySetAddCompletion(_:)))
+        case .loading:
+            EmptyView()
         }
-        .onAppear {
-            viewModel.use(appState: appState)
-        }
-    }
-
-    private func tabBarViewModel() -> TabBarView.ViewModel {
-        .init(
-            selectedTab: $viewModel.selectedTab,
-            onQRCodeTap: viewModel.onQRCodeTap,
-            onKeysTap: viewModel.onKeysTap,
-            onSettingsTap: viewModel.onSettingsTap
-        )
     }
 }
 
 extension AuthenticatedScreenContainer {
+    enum ViewState {
+        case loading
+        case keyDetails(String)
+        case noKeys
+    }
+
     final class ViewModel: ObservableObject {
-        private weak var appState: AppState!
+        @Published var viewState: ViewState = .loading
+        @Published var isSnackbarPresented: Bool = false
+        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        private let seedsMediator: SeedsMediating
+        private let cancelBag = CancelBag()
 
-        @Published var selectedTab: Tab = .keys
-        @Published var isShowingQRScanner: Bool = false
-
-        func use(appState: AppState) {
-            self.appState = appState
+        init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
+            self.seedsMediator = seedsMediator
+            updateViewState()
+            seedsMediator.seedNamesPublisher
+                .sink { [weak self] _ in
+                    self?.updateViewState()
+                }
+                .store(in: cancelBag)
         }
 
-        func onQRCodeTap() {
-            isShowingQRScanner = true
+        func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            updateViewState()
+            let message: String = switch completionAction {
+            case let .createKeySet(seedName):
+                Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName):
+                Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+            }
+            snackbarViewModel = .init(
+                title: message,
+                style: .info
+            )
+            isSnackbarPresented = true
         }
 
-        func onKeysTap() {
-            selectedTab = .keys
-        }
-
-        func onSettingsTap() {
-            selectedTab = .settings
-        }
-
-        func onQRScannerDismiss() {
-            appState.userData.keyListRequiresUpdate = true
+        func updateViewState() {
+            if let initialKeyName = seedsMediator.seedNames.first {
+                viewState = .keyDetails(initialKeyName)
+            } else {
+                viewState = .noKeys
+            }
         }
     }
 }

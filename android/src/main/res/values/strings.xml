@@ -289,8 +289,10 @@
 	<string name="root_exposed_title">Please try again with not Rooted device</string>
 	<string name="root_exposed_description">We’ve detected that this Device Has Been Rooted and Isn’t Safe to Use. Please try again with another device</string>
 	<string name="airgap_onboarding_disconnect_cable_header">Disconnect all cables</string>
-	<string name="airgap_onboarding_title">Set Up Air Gap Mode</string>
-	<string name="airgap_onboarding_subtitle">Please Follow these steps to enable Air Gap mode and keep it enabled all the time</string>
+	<string name="airgap_onboarding_title_onboarding">Set Up Air Gap Mode</string>
+	<string name="airgap_onboarding_subtitle_onboarding">Please Follow these steps to enable Air Gap mode and keep it enabled all the time</string>
+	<string name="airgap_onboarding_title">Please Enable Air Gap Mode</string>
+	<string name="airgap_onboarding_subtitle">Please follow these steps to enable Air Gap mode and keep it permanently enabled.</string>
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
@@ -394,7 +396,7 @@
 	<string name="recovert_key_set_name_hint">Key Set Name Visible Only to You</string>
 	<string name="new_key_set_name_placeholder">Enter Key Set Name</string>
 	<string name="recover_key_set_phrase_title">Enter a Secret Recovery Phrase</string>
-	<string name="recover_key_set_phrase_subtitle">Enter a 24-word phrase you were given when you created your key set</string>
+	<string name="recover_key_set_phrase_subtitle">Enter seed phrase you were given when you created your key set</string>
 	<string name="enter_seed_phease_box_placeholder">Enter Secret Recovery Phrase</string>
 	<string name="key_set_has_been_recovered_toast">"%1$s Key Set Has Been Recovered"</string>
 	<string name="key_set_has_been_created_toast">"%1$s Key Set Has Been Created"</string>
@@ -427,7 +429,28 @@
 	<string name="confirm_dynamic_derivation_header">Please confirm derived key import with authorisation</string>
 	<string name="confirm_dynamic_derivation_message">Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.</string>
 	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
-
+  <string name="sign_specs_keys_list_title">Select key for signing specs</string>
+	<string name="sign_specs_result_title">Specs signature</string>
+  <string name="error_state_screen_title">Error state screen</string>
+	<string name="error_state_screen_verbose_subtitle">Verbose details:</string>
+	<string name="sign_spes_result_specs_lable">Specs</string>
+	<string name="sign_specs_load_metadata_label">Metadata for %1$s with version %2$s</string>
+	<string name="sign_specs_load_types_label">Types %1$s</string>
+	<string name="sign_specs_error_signing_title">Error in signing specs</string>
+	<string name="attempts_exceeded_title">Attempts exceeded</string>
+	<string name="attempts_exceeded_message">Many password attempts failed</string>
+	<string name="generic_close_button">Close</string>
+  <string name="description_check_botton">Check botton</string>
+	<string name="description_scan_icon">Scan icon</string>
+  <string name="derivation_create_fast_cta">Create Key</string>
+	<string name="derivation_create_advanced_cta">Add Custom Derivation Path</string>
+	<string name="error_wrong_version_title">Upgrade your Polkadot Vault according the requirements</string>
+	<string name="error_wrong_version_description">"The new version has been installed with the air gap break. Your keys are safe, to continue using Polkadot Vault, you must upgrade your app according to the requirements. "</string>
+	<string name="error_wrong_version_backup_cta">Backup Secret Phrase</string>
+	<string name="error_version_helper_link">paritytech.github.io/parity-signer/tutorials/Upgrading.html</string>
+	<string name="error_version_helper_description">"Find the latest Polkadot Vault upgrade information here "</string>
+	<string name="fallback_recovery_phrase_title">Select Key Set</string>
+	<string name="fallback_recovery_phrase_description">Select a key set you want to Expose a Secret Recovery Phrase for</string>
 
 </resources>
 

@@ -162,7 +162,7 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
         .into_iter()
         .partition(|(_, address)| address.is_root());
 
-    let root = root.get(0).map(|root| {
+    let root = root.first().map(|root| {
         let address = Address {
             has_pwd: false,
             path: String::new(),
@@ -291,7 +291,7 @@ pub fn first_network(database: &sled::Db) -> Result<Option<OrderedNetworkSpecs>>
         return Err(Error::NoNetworksAvailable);
     }
     networks.sort_by(|a, b| a.order.cmp(&b.order));
-    Ok(networks.get(0).cloned())
+    Ok(networks.first().cloned())
 }
 
 /// Prepare export key screen struct [`MKeyDetails`].

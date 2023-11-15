@@ -14,7 +14,7 @@ struct OnboardingAgreementsView: View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.Onboarding.Agreements.Label.title.text
                 .font(PrimaryFont.titleXL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.top, Spacing.extraExtraLarge)
                 .padding(.bottom, Spacing.medium)
                 .padding(.horizontal, Spacing.large)
@@ -23,8 +23,8 @@ struct OnboardingAgreementsView: View {
                     Localizable.Onboarding.Agreements.Label.privacyCell.text
                         .padding(.leading, Spacing.medium)
                     Spacer()
-                    Asset.chevronRight.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Image(.chevronRight)
+                        .foregroundColor(.textAndIconsTertiary)
                         .padding(.trailing, Spacing.medium)
                 }
                 .frame(height: Heights.onboardingAgreementRecord)
@@ -38,8 +38,8 @@ struct OnboardingAgreementsView: View {
                     Localizable.Onboarding.Agreements.Label.toSCell.text
                         .padding(.leading, Spacing.medium)
                     Spacer()
-                    Asset.chevronRight.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Image(.chevronRight)
+                        .foregroundColor(.textAndIconsTertiary)
                         .padding(.trailing, Spacing.medium)
                 }
                 .frame(height: Heights.onboardingAgreementRecord)
@@ -48,21 +48,21 @@ struct OnboardingAgreementsView: View {
                     viewModel.onTermsOfServiceTap()
                 }
             }
-            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+            .foregroundColor(.textAndIconsPrimary)
             .font(PrimaryFont.titleS.font)
             .containerBackground(CornerRadius.small)
             .padding(Spacing.medium)
             Spacer()
             HStack(spacing: Spacing.small) {
                 if viewModel.isCheckboxSelected {
-                    Asset.checkboxChecked.swiftUIImage
-                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    Image(.checkboxChecked)
+                        .foregroundColor(.accentPink300)
                 } else {
-                    Asset.checkboxEmpty.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    Image(.checkboxEmpty)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
                 Localizable.Onboarding.Agreements.Label.confirmation.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyL.font)
             }
             .contentShape(Rectangle())
@@ -79,7 +79,7 @@ struct OnboardingAgreementsView: View {
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.large)
         }
-        .background(Asset.backgroundSystem.swiftUIColor)
+        .background(.backgroundSystem)
         .fullScreenModal(isPresented: $viewModel.isPresentingTermsOfService) {
             TermsOfServiceView(viewModel: .init(onBackTap: { viewModel.isPresentingTermsOfService = false }))
         }

@@ -16,11 +16,11 @@ struct StrokeContainerBackground: ViewModifier {
         var backgroundColor: Color {
             switch self {
             case .standard:
-                return Asset.fill6.swiftUIColor
+                .fill6
             case .error:
-                return Asset.accentRed300.swiftUIColor.opacity(0.12)
+                .accentRed300.opacity(0.12)
             case .actionableInfo:
-                return Asset.accentPink12.swiftUIColor
+                .accentPink12
             }
         }
     }
@@ -32,7 +32,7 @@ struct StrokeContainerBackground: ViewModifier {
         content
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                    .stroke(.fill12, lineWidth: 1)
                     .background(state.backgroundColor)
                     .cornerRadius(cornerRadius)
             )

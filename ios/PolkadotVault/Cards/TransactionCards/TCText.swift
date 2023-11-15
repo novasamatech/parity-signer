@@ -12,7 +12,7 @@ struct TCText: View {
     var body: some View {
         HStack {
             Text(AttributedString.build(fromDocs: text) ?? AttributedString(text))
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).font(PrimaryFont.bodyL.font)
+                .foregroundColor(.textAndIconsPrimary).font(PrimaryFont.bodyL.font)
             Spacer()
         }
     }

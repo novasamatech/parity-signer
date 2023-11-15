@@ -6,6 +6,7 @@
 //
 
 import QRCode
+import SwiftUI
 import UIKit
 
 final class QRCodeImageGenerator {
@@ -38,7 +39,7 @@ extension QRCodeImageGenerator.Style {
         case .public:
             doc.design.foregroundColor(UIColor.black.cgColor)
         case .private:
-            doc.design.foregroundColor(Asset.accentPink500.color.cgColor)
+            doc.design.foregroundColor(UIColor(Color(.accentPink500)).cgColor)
         }
     }
 }

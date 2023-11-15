@@ -13,6 +13,7 @@ enum NavigationButton {
     case xmark
     case more
     case plus
+    case settings
     case action(LocalizedStringKey)
     case activeAction(LocalizedStringKey, Binding<Bool>)
     case questionmark
@@ -49,7 +50,7 @@ struct NavigationBarViewModel {
         title: NavigationBarTitle = .empty,
         leftButtons: [NavigationButtonModel] = [],
         rightButtons: [NavigationButtonModel] = [],
-        backgroundColor: Color = Asset.backgroundPrimary.swiftUIColor
+        backgroundColor: Color = .backgroundPrimary
     ) {
         self.title = title
         self.leftButtons = leftButtons
@@ -99,27 +100,32 @@ struct NavigationBarView: View {
         case .arrow:
             NavbarButton(
                 action: button.action,
-                icon: Asset.arrowBack.swiftUIImage
+                icon: Image(.arrowBack)
             )
         case .xmark:
             NavbarButton(
                 action: button.action,
-                icon: Asset.xmarkButton.swiftUIImage
+                icon: Image(.xmarkButton)
             )
         case .more:
             NavbarButton(
                 action: button.action,
-                icon: Asset.moreDots.swiftUIImage
+                icon: Image(.moreDots)
+            )
+        case .settings:
+            NavbarButton(
+                action: button.action,
+                icon: Image(.tabbarSettings)
             )
         case .plus:
             NavbarButton(
                 action: button.action,
-                icon: Asset.plus.swiftUIImage
+                icon: Image(ImageResource.plus)
             )
         case .questionmark:
             NavbarButton(
                 action: button.action,
-                icon: Asset.navbarQuestion.swiftUIImage
+                icon: Image(.navbarQuestion)
             )
         case let .action(title):
             NavbarActionButton(
@@ -146,16 +152,16 @@ struct NavigationBarView: View {
                 VStack {
                     Text(title)
                         .font(PrimaryFont.titleS.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                        .foregroundColor(.textAndIconsPrimary).lineLimit(1)
                 }
             case let .subtitle(title, subtitle):
                 VStack {
                     Text(title)
                         .font(PrimaryFont.titleS.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor).lineLimit(1)
+                        .foregroundColor(.textAndIconsPrimary).lineLimit(1)
                     Text(subtitle)
                         .font(PrimaryFont.captionM.font)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                 }
             case let .progress(current, upTo):
                 progressView(current, upTo: upTo)
@@ -177,7 +183,7 @@ struct NavigationBarView: View {
         RoundedRectangle(cornerRadius: CornerRadius.extraLarge)
             .frame(width: Heights.navigationBarProgressViewWidth, height: Heights.navigationBarProgressViewHeight)
             .foregroundColor(
-                isActive ? Asset.pink500.swiftUIColor : Asset.fill12.swiftUIColor
+                isActive ? .pink500 : .fill12
             )
     }
 }

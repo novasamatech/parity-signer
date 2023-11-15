@@ -11,11 +11,12 @@ import io.parity.signer.bottomsheets.password.toEnterPasswordModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.domain.backend.ScanFlowInteractor
+import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.UniffiResult
-import io.parity.signer.domain.backend.mapError
 import io.parity.signer.domain.storage.RepoResult
 import io.parity.signer.domain.storage.SeedRepository
-import io.parity.signer.screens.scan.errors.TransactionErrorModel
+import io.parity.signer.screens.scan.errors.LocalErrorSheetModel
 import io.parity.signer.screens.scan.errors.toBottomSheetModel
 import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository
 import io.parity.signer.screens.scan.importderivations.ImportDerivedKeysRepository.ImportDerivedKeyError
@@ -48,7 +49,9 @@ private const val TAG = "ScanViewModelTag"
  */
 class ScanViewModel : ViewModel() {
 
-	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+	private val scanFlowInteractor = ScanFlowInteractor()
+	private val uniffiInteractor: UniffiInteractor =
+		ServiceLocator.uniffiInteractor
 	private val seedRepository: SeedRepository by lazy { ServiceLocator.activityScope!!.seedRepository }
 	private val importKeysRepository: ImportDerivedKeysRepository by lazy {
 		ImportDerivedKeysRepository(seedRepository)
@@ -58,15 +61,13 @@ class ScanViewModel : ViewModel() {
 
 	var transactions: MutableStateFlow<TransactionsState?> =
 		MutableStateFlow(null)
-	var signature: MutableStateFlow<MSignatureReady?> =
-		MutableStateFlow(null)
+	var signature: MutableStateFlow<MSignatureReady?> = MutableStateFlow(null)
 	var bananaSplitPassword: MutableStateFlow<List<String>?> =
 		MutableStateFlow(null)
-	var dynamicDerivations: MutableStateFlow<DdPreview?> =
-		MutableStateFlow(null)
+	var dynamicDerivations: MutableStateFlow<DdPreview?> = MutableStateFlow(null)
 	var passwordModel: MutableStateFlow<EnterPasswordModel?> =
 		MutableStateFlow(null)
-	val transactionError: MutableStateFlow<TransactionErrorModel?> =
+	val transactionError: MutableStateFlow<LocalErrorSheetModel?> =
 		MutableStateFlow(null)
 	val errorWrongPassword = MutableStateFlow<Boolean>(false)
 
@@ -79,8 +80,7 @@ class ScanViewModel : ViewModel() {
 			return
 		}
 		transactionIsInProgress.value = true
-		val navigateResponse =
-			uniffiInteractor.performTransaction(payload)
+		val navigateResponse = scanFlowInteractor.performTransaction(payload)
 
 		when (navigateResponse) {
 			is OperationResult.Err -> {
@@ -93,8 +93,8 @@ class ScanViewModel : ViewModel() {
 				val transactions: List<MTransaction> =
 					(screenData as? ScreenData.Transaction)?.f ?: run {
 						Log.e(
-							TAG, "Error in getting transaction from qr payload, " +
-								"screenData is $screenData, navigation resp is $navigateResponse"
+							TAG,
+							"Error in getting transaction from qr payload, " + "screenData is $screenData, navigation resp is $navigateResponse"
 						)
 						clearState()
 						return
@@ -102,10 +102,8 @@ class ScanViewModel : ViewModel() {
 
 				// Handle transactions with just error payload
 				if (transactions.all { it.isDisplayingErrorOnly() }) {
-					transactionError.value = TransactionErrorModel(
-						context = context,
-						details = transactions.joinToString("\n") { it.transactionIssues() }
-					)
+					transactionError.value = LocalErrorSheetModel(context = context,
+						details = transactions.joinToString("\n") { it.transactionIssues() })
 					fakeNavigator.navigate(Action.GO_BACK) //fake call
 					clearState()
 					return
@@ -113,9 +111,9 @@ class ScanViewModel : ViewModel() {
 
 				when (transactions.firstOrNull()?.ttype) {
 					TransactionType.SIGN -> {
-						val seedNames = transactions
-							.filter { it.ttype == TransactionType.SIGN }
-							.mapNotNull { it.authorInfo?.address?.seedName }
+						val seedNames =
+							transactions.filter { it.ttype == TransactionType.SIGN }
+								.mapNotNull { it.authorInfo?.address?.seedName }
 						val actionResult = signTransaction("", seedNames)
 
 						//password protected key, show password
@@ -142,7 +140,7 @@ class ScanViewModel : ViewModel() {
 						fakeNavigator.navigate(Action.GO_BACK)
 						when (transactions.dominantImportError()) {
 							DerivedKeyError.BadFormat -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_bad_format_title),
 									subtitle = context.getString(R.string.scan_screen_error_bad_format_message),
 								)
@@ -151,7 +149,7 @@ class ScanViewModel : ViewModel() {
 							}
 
 							DerivedKeyError.KeySetMissing -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_missing_key_set_title),
 									subtitle = context.getString(R.string.scan_screen_error_missing_key_set_message),
 								)
@@ -160,7 +158,7 @@ class ScanViewModel : ViewModel() {
 							}
 
 							DerivedKeyError.NetworkMissing -> {
-								transactionError.value = TransactionErrorModel(
+								transactionError.value = LocalErrorSheetModel(
 									title = context.getString(R.string.scan_screen_error_missing_network_title),
 									subtitle = context.getString(R.string.scan_screen_error_missing_network_message),
 								)
@@ -183,25 +181,23 @@ class ScanViewModel : ViewModel() {
 											val updatedKeys = result.result
 											val newTransactionsState =
 												updateTransactionsWithImportDerivations(
-													transactions = transactions,
-													updatedKeys = updatedKeys
+													transactions = transactions, updatedKeys = updatedKeys
 												)
 											this.transactions.value =
 												TransactionsState(newTransactionsState)
 										}
 
 										is RepoResult.Failure -> {
-											Toast.makeText(
-												/* context = */ context,
-												/* text = */
-												context.getString(R.string.import_derivations_failure_update_toast),
-												/* duration = */ Toast.LENGTH_LONG
+											Toast.makeText(                        /* context = */
+												context,                        /* text = */
+												context.getString(R.string.import_derivations_failure_update_toast),                        /* duration = */
+												Toast.LENGTH_LONG
 											).show()
 											clearState()
 										}
 									}
 								} else {
-									transactionError.value = TransactionErrorModel(
+									transactionError.value = LocalErrorSheetModel(
 										title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 										subtitle = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_message),
 									)
@@ -224,8 +220,7 @@ class ScanViewModel : ViewModel() {
 	}
 
 	suspend fun performDynamicDerivationPayload(
-		payload: String,
-		context: Context
+		payload: String, context: Context
 	) {
 		when (val phrases = seedRepository.getAllSeeds()) {
 			is RepoResult.Failure -> {
@@ -241,7 +236,7 @@ class ScanViewModel : ViewModel() {
 
 				when (previewDynDerivations) {
 					is UniffiResult.Error -> {
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.dymanic_derivation_error_custom_title),
 							subtitle = previewDynDerivations.error.message ?: "",
 						)
@@ -256,8 +251,7 @@ class ScanViewModel : ViewModel() {
 	}
 
 	suspend fun performDynamicDerivationTransaction(
-		payload: List<String>,
-		context: Context
+		payload: List<String>, context: Context
 	) {
 		when (val phrases = seedRepository.getAllSeeds()) {
 			is RepoResult.Failure -> {
@@ -269,11 +263,13 @@ class ScanViewModel : ViewModel() {
 
 			is RepoResult.Success -> {
 				val dynDerivations =
-					uniffiInteractor.signDynamicDerivationsTransactions(phrases.result, payload)
+					uniffiInteractor.signDynamicDerivationsTransactions(
+						phrases.result, payload
+					)
 
 				when (dynDerivations) {
 					is UniffiResult.Error -> {
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.scan_screen_error_derivation_no_keys_and_no_errors_title),
 							subtitle = dynDerivations.error.message ?: "",
 						)
@@ -281,7 +277,8 @@ class ScanViewModel : ViewModel() {
 
 					is UniffiResult.Success -> {
 						signature.value = dynDerivations.result.signature
-						transactions.value = TransactionsState(dynDerivations.result.transaction)
+						transactions.value =
+							TransactionsState(dynDerivations.result.transaction)
 					}
 				}
 			}
@@ -289,8 +286,7 @@ class ScanViewModel : ViewModel() {
 	}
 
 	private fun updateTransactionsWithImportDerivations(
-		transactions: List<MTransaction>,
-		updatedKeys: List<SeedKeysPreview>
+		transactions: List<MTransaction>, updatedKeys: List<SeedKeysPreview>
 	): List<MTransaction> = transactions.map { transaction ->
 		if (transaction.hasImportableKeys()) {
 			transaction.content.importingDerivations =
@@ -319,37 +315,37 @@ class ScanViewModel : ViewModel() {
 	}
 
 	fun createDynamicDerivations(
-		toImport: DdKeySet,
-		context: Context
+		toImport: DdKeySet, context: Context
 	) {
 		viewModelScope.launch {
 			if (toImport.derivations.isNotEmpty()) {
 				val result = importKeysRepository.createDynamicDerivationKeys(
-					seedName = toImport.seedName,
-					keysToImport = toImport.derivations
+					seedName = toImport.seedName, keysToImport = toImport.derivations
 				)
 
 				clearState()
 				when (result) {
 					is OperationResult.Err -> {
 						val errorMessage = when (result.error) {
-							is ImportDerivedKeyError.KeyNotImported ->
-								result.error.keyToError.joinToString(separator = "\n") {
-									context.getString(
-										R.string.dymanic_derivation_error_custom_message,
-										it.path,
-										it.errorLocalized
-									)
-								}
+							is ImportDerivedKeyError.KeyNotImported -> result.error.keyToError.joinToString(
+								separator = "\n"
+							) {
+								context.getString(
+									R.string.dymanic_derivation_error_custom_message,
+									it.path,
+									it.errorLocalized
+								)
+							}
 
-							is ImportDerivedKeyError.NoKeysImported ->
-								result.error.errors.joinToString(separator = "\n")
+							is ImportDerivedKeyError.NoKeysImported -> result.error.errors.joinToString(
+								separator = "\n"
+							)
 
 							ImportDerivedKeyError.AuthFailed -> {
 								context.getString(R.string.auth_failed_message)
 							}
 						}
-						transactionError.value = TransactionErrorModel(
+						transactionError.value = LocalErrorSheetModel(
 							title = context.getString(R.string.dymanic_derivation_error_custom_title),
 							subtitle = errorMessage,
 						)
@@ -357,7 +353,8 @@ class ScanViewModel : ViewModel() {
 
 					is OperationResult.Ok -> {
 						Toast.makeText(
-							context, context.getString(R.string.create_derivations_success),
+							context,
+							context.getString(R.string.create_derivations_success),
 							Toast.LENGTH_SHORT
 						).show()
 					}
@@ -366,7 +363,8 @@ class ScanViewModel : ViewModel() {
 				//list of derivations is empty
 				clearState()
 				Toast.makeText(
-					context, context.getString(R.string.create_derivations_empty),
+					context,
+					context.getString(R.string.create_derivations_empty),
 					Toast.LENGTH_SHORT
 				).show()
 			}
@@ -374,8 +372,7 @@ class ScanViewModel : ViewModel() {
 	}
 
 	private fun areSeedKeysTheSameButUpdated(
-		originalKey: SeedKeysPreview,
-		resultKey: SeedKeysPreview
+		originalKey: SeedKeysPreview, resultKey: SeedKeysPreview
 	): Boolean =
 		originalKey.name == resultKey.name && resultKey.derivedKeys.all { derKey ->
 			originalKey.derivedKeys.any { it.derivationPath == derKey.derivationPath }
@@ -390,22 +387,19 @@ class ScanViewModel : ViewModel() {
 
 		when (importResult) {
 			is RepoResult.Success -> {
-				Toast.makeText(
-					/* context = */ context,
-					/* text = */ context.resources.getQuantityString(
+				Toast.makeText(          /* context = */ context,          /* text = */
+					context.resources.getQuantityString(
 						R.plurals.import_derivations_success_keys_imported,
 						derivedKeysCount,
 						derivedKeysCount,
-					), /* duration = */ Toast.LENGTH_LONG
+					), /* duration = */
+					Toast.LENGTH_LONG
 				).show()
 			}
 
 			is RepoResult.Failure -> {
-				Toast.makeText(
-					/* context = */ context,
-					/* text = */
-					context.getString(R.string.import_derivations_failure_toast),
-					/* duration = */
+				Toast.makeText(          /* context = */ context,          /* text = */
+					context.getString(R.string.import_derivations_failure_toast),          /* duration = */
 					Toast.LENGTH_LONG
 				).show()
 			}
@@ -416,16 +410,7 @@ class ScanViewModel : ViewModel() {
 
 
 	fun ifHasStateThenClear(): Boolean {
-		return if (
-			transactions.value != null
-			|| signature.value != null
-			|| passwordModel.value != null
-			|| transactionError.value != null
-			|| transactionIsInProgress.value
-			|| errorWrongPassword.value
-			|| bananaSplitPassword.value != null
-			|| dynamicDerivations.value != null
-		) {
+		return if (transactions.value != null || signature.value != null || passwordModel.value != null || transactionError.value != null || transactionIsInProgress.value || errorWrongPassword.value || bananaSplitPassword.value != null || dynamicDerivations.value != null) {
 			clearState()
 			true
 		} else {
@@ -455,27 +440,25 @@ class ScanViewModel : ViewModel() {
 			}
 
 			is RepoResult.Success -> {
-				uniffiInteractor.navigate(
-					Action.GO_FORWARD,
+				scanFlowInteractor.continueSigningTransaction(
 					comment,
-					phrases.result
-				).mapError()
+					phrases.result,
+				)
 			}
 		}
 	}
 
 	suspend fun handlePasswordEntered(password: String) {
 		val navigateResponse =
-			uniffiInteractor.navigate(Action.GO_FORWARD, password)
+			scanFlowInteractor.handlePasswordEntered(password)
 		val actionResult =
-			(navigateResponse as? OperationResult.Ok)?.result
-				?: run {
-					Log.e(
-						TAG, "Error in entering password for a key, " +
-							"navigation resp is $navigateResponse"
-					)
-					return
-				}
+			(navigateResponse as? OperationResult.Ok)?.result ?: run {
+				Log.e(
+					TAG,
+					"Error in entering password for a key, " + "navigation resp is $navigateResponse"
+				)
+				return
+			}
 
 		when (val modalData = actionResult.modalData) {
 			// If navigation returned `enterPassword`, it means password is invalid
@@ -497,8 +480,7 @@ class ScanViewModel : ViewModel() {
 			else -> {
 				Log.e(
 					TAG,
-					"Password is entered for transaction, but neither new password or signature is passed! Should not happen" +
-						"actionResult is $actionResult"
+					"Password is entered for transaction, but neither new password or signature is passed! Should not happen" + "actionResult is $actionResult"
 				)
 			}
 		}

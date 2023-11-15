@@ -23,28 +23,11 @@ import androidx.navigation.compose.composable
 import io.parity.signer.R
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.ui.MainGraphRoutes
-import io.parity.signer.ui.NAVIGATION_TAG
+import io.parity.signer.ui.rootnavigation.MainGraphRoutes
+import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
-
-
-/**
- * Initial screen so we won't ask token/password rightaway
- */
-fun NavGraphBuilder.initialUnlockAppScreenFlow(globalNavController: NavHostController) {
-	composable(route = MainGraphRoutes.initialUnlockRoute) {
-		UnlockAppAuthScreen {
-			globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
-				popUpTo(0)
-			}
-		}
-		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "initial unlock screen opened")
-		}
-	}
-}
 
 
 @Composable
@@ -81,9 +64,10 @@ fun UnlockAppAuthScreen(onUnlockClicked: Callback) {
 			textAlign = TextAlign.Center,
 		)
 		Spacer(modifier = Modifier.padding(top = 40.dp))
-		PrimaryButtonWide(label = stringResource(R.string.unlock_app_button),) {
-			onUnlockClicked()
-		}
+		PrimaryButtonWide(
+			label = stringResource(R.string.unlock_app_button),
+			onClicked = onUnlockClicked,
+		)
 		Spacer(Modifier.weight(0.5f))
 	}
 }
@@ -99,5 +83,7 @@ fun UnlockAppAuthScreen(onUnlockClicked: Callback) {
 )
 @Composable
 private fun PreviewUnlockAppAuthScreen() {
-	UnlockAppAuthScreen {}
+	SignerNewTheme {
+		UnlockAppAuthScreen {}
+	}
 }

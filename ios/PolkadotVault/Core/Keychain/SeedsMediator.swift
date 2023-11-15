@@ -5,6 +5,7 @@
 //  Created by Krzysztof Rodak on 25/08/2022.
 //
 
+import Combine
 import Foundation
 
 enum KeychainError: Error {
@@ -21,6 +22,8 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
+    var seedNamesPublisher: AnyPublisher<[String], Never> { get }
+
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
@@ -72,6 +75,9 @@ final class SeedsMediator: SeedsMediating {
     private let databaseMediator: DatabaseMediating
     private let authenticationStateMediator: AuthenticatedStateMediator
     @Published var seedNames: [String] = []
+    var seedNamesPublisher: AnyPublisher<[String], Never> {
+        $seedNames.eraseToAnyPublisher()
+    }
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
@@ -99,9 +105,6 @@ final class SeedsMediator: SeedsMediating {
         case let .success(payload):
             seedNames = payload.seeds
             authenticationStateMediator.authenticated = true
-            if !firstRun {
-                attemptToUpdate(seedNames: seedNames)
-            }
         case .failure:
             authenticationStateMediator.authenticated = false
         }
@@ -125,7 +128,6 @@ final class SeedsMediator: SeedsMediating {
         case .success:
             seedNames.append(seedName)
             seedNames.sort()
-            attemptToUpdate(seedNames: seedNames)
             return true
         case .failure:
             return false
@@ -196,7 +198,6 @@ final class SeedsMediator: SeedsMediating {
             seedNames = seedNames
                 .filter { $0 != seedName }
                 .sorted()
-            attemptToUpdate(seedNames: seedNames)
             return true
         case .failure:
             return false
@@ -230,15 +231,5 @@ final class SeedsMediator: SeedsMediating {
     func removeStalledSeeds() {
         _ = keychainAccessAdapter.removeAllSeeds()
         seedNames = []
-    }
-}
-
-private extension SeedsMediator {
-    func attemptToUpdate(seedNames: [String]) {
-        do {
-            try updateSeedNames(seedNames: seedNames)
-        } catch {
-            authenticationStateMediator.authenticated = false
-        }
     }
 }

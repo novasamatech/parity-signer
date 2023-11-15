@@ -9,7 +9,7 @@ edition = "2021"
 frame-metadata = {version = "16.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
-parity-scale-codec = {version = "3.6.5", features = ["derive"]}
+parity-scale-codec = {version = "3.6.8", features = ["derive"]}
 sc-executor-common = {git = "https://github.com/paritytech/substrate"}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
@@ -18,7 +18,8 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
-thiserror = "1.0.48"
+thiserror = "1.0.50"
+constants = {path = "../constants"}
 
 [features]
 default = []

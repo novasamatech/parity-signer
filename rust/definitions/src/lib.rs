@@ -45,3 +45,4 @@ pub mod navigation;
 pub mod derivations;
 
 pub mod dynamic_derivations;
+pub mod schema_version;

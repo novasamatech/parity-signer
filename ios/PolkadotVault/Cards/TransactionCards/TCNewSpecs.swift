@@ -1,5 +1,5 @@
 //
-//  TCAddNewNetwork.swift
+//  TCNewSpecs.swift
 //  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 21.10.2021.
@@ -13,7 +13,7 @@ struct TCAddNewNetwork: View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.Transaction.AddNetwork.Label.header.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                .foregroundColor(.textAndIconsSecondary)
                 .padding(.leading, Spacing.medium)
                 .padding(.bottom, Spacing.extraSmall)
             VStack(alignment: .leading, spacing: Spacing.small) {
@@ -23,16 +23,16 @@ struct TCAddNewNetwork: View {
                 rowWrapper(Localizable.Transaction.AddNetwork.Label.unit.string, value.unit)
                 VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                     Localizable.Transaction.AddNetwork.Label.genesisHash.text
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                     Text(value.genesisHash.formattedAsString)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                     Divider()
                 }
                 rowWrapper(Localizable.Transaction.AddNetwork.Label.crypto.string, value.encryption.rawValue)
                 rowWrapper(Localizable.Transaction.AddNetwork.Label.spec.string, value.name)
                 HStack {
                     Text(Localizable.Transaction.AddNetwork.Label.logo.string)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                     Spacer()
                     NetworkLogoIcon(networkName: value.logo)
                 }
@@ -51,10 +51,10 @@ struct TCAddNewNetwork: View {
     ) -> some View {
         HStack {
             Text(key)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
             Spacer()
             Text(value)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
         if !isLast {
             Divider()

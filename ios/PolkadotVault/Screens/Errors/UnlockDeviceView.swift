@@ -13,16 +13,16 @@ struct UnlockDeviceView: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
-            Asset.lockOpen.swiftUIImage
+            Image(.lockOpen)
                 .padding(.bottom, Spacing.extraExtraLarge)
             Localizable.Error.LockedDevice.Label.title.text
                 .font(PrimaryFont.titleL.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .padding(.horizontal, Spacing.x3Large)
                 .padding(.bottom, Spacing.medium)
             Localizable.Error.LockedDevice.Label.subtitle.text
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.extraExtraLarge)
                 .padding(.bottom, Spacing.extraExtraLarge)
             PrimaryButton(
@@ -34,26 +34,22 @@ struct UnlockDeviceView: View {
             Spacer()
         }
         .multilineTextAlignment(.center)
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
     }
 }
 
 extension UnlockDeviceView {
     final class ViewModel: ObservableObject {
         private let seedsMediator: SeedsMediating
-        private let warningStateMediator: WarningStateMediator
 
         init(
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            warningStateMediator: WarningStateMediator = ServiceLocator.warningStateMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
         ) {
             self.seedsMediator = seedsMediator
-            self.warningStateMediator = warningStateMediator
         }
 
         func onUnlockTap() {
             seedsMediator.refreshSeeds()
-            warningStateMediator.updateWarnings()
         }
     }
 }

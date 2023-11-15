@@ -10,7 +10,6 @@ import SwiftUI
 
 struct VerifierCertificateView: View {
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -32,18 +31,18 @@ struct VerifierCertificateView: View {
                     VStack(spacing: Spacing.small) {
                         VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                             Localizable.Transaction.Verifier.Label.key.text
-                                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                .foregroundColor(.textAndIconsTertiary)
                             Text(content.publicKey)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                         }
                         Divider()
                         VStack(alignment: .leading) {
                             HStack {
                                 Localizable.Transaction.Verifier.Label.crypto.text
-                                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsTertiary)
                                 Spacer()
                                 Text(content.encryption)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                             }
                         }
                     }
@@ -55,7 +54,7 @@ struct VerifierCertificateView: View {
                 HStack {
                     Text(Localizable.VerifierCertificate.Action.remove.string)
                         .font(PrimaryFont.titleS.font)
-                        .foregroundColor(Asset.accentRed400.swiftUIColor)
+                        .foregroundColor(.accentRed400)
                     Spacer()
                 }
                 .contentShape(Rectangle())
@@ -69,7 +68,7 @@ struct VerifierCertificateView: View {
         }.onReceive(viewModel.dismissViewRequest) { _ in
             presentationMode.wrappedValue.dismiss()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(isPresented: $viewModel.isPresentingRemoveConfirmation) {
             VerticalActionsBottomModal(
                 viewModel: .removeGeneralVerifier,

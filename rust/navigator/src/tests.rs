@@ -53,13 +53,14 @@ use pretty_assertions::assert_eq;
 use sp_core::sr25519::Public;
 use tempfile::tempdir;
 use transaction_parsing::{decode_payload, prepare_derivations_preview};
+use transaction_signing::SufficientContent;
 
 use crate::{
     handle_dd_sign, keys_by_seed_name,
     navstate::State,
-    sign_dd_transaction,
+    sign_dd_transaction, sign_sufficient_content,
     states::{SignResult, TransactionState},
-    Action,
+    Action, Error,
 };
 
 const ALICE: [u8; 32] = [
@@ -6186,7 +6187,7 @@ fn test_sign_dd_transaction() {
     let payload =
         "530105".to_string() + alice_public_root + &derivation_path + tx + WESTEND_GENESIS;
 
-    let transaction = match decode_payload(&payload).expect("decode payload") {
+    let transaction = match decode_payload(&payload, true).expect("decode payload") {
         DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
         _ => panic!("Unexpected payload type"),
     };
@@ -6233,7 +6234,7 @@ fn test_bulk_dd_signing() {
         encoded_transactions,
     });
     let bulk_payload = hex::encode([&[0x53, 0xff, 0x04], bulk.encode().as_slice()].concat());
-    let transactions = match decode_payload(&bulk_payload).expect("decode payload") {
+    let transactions = match decode_payload(&bulk_payload, true).expect("decode payload") {
         DecodeSequenceResult::DynamicDerivationTransaction { s: v } => v,
         _ => panic!("Unexpected payload type"),
     };
@@ -6256,4 +6257,91 @@ fn test_bulk_dd_signing() {
     }
 
     fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn test_sign_metadata() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
+    let westend_genesis =
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//westend",
+        &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
+    )
+    .unwrap();
+
+    let network_version = 9150;
+    let network_key = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    let network_spec_key = NetworkSpecsKey::from_hex(network_key).unwrap();
+    let address_key = AddressKey::from_parts(
+        &hex::decode("3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34").unwrap(),
+        &Encryption::Sr25519,
+        Some(westend_genesis),
+    )
+    .expect("address key");
+
+    let result = sign_sufficient_content(
+        &db,
+        &address_key,
+        SufficientContent::LoadMeta(network_spec_key, network_version),
+        ALICE_SEED_PHRASE,
+        "",
+    );
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_sign_metadata_passworded() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold_nav_test(&db).unwrap();
+    let westend_genesis =
+        H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//westend///password123",
+        &NetworkSpecsKey::from_parts(&westend_genesis, &Encryption::Sr25519),
+    )
+    .unwrap();
+    let network_version = 9150;
+    let network_key = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    let network_spec_key = NetworkSpecsKey::from_hex(network_key).unwrap();
+    let address_key = AddressKey::from_parts(
+        &hex::decode("b6df7b569953a39eb872e913c0eecd48a5ac16a5ad9751c652eeb0729df1e114").unwrap(),
+        &Encryption::Sr25519,
+        Some(westend_genesis),
+    )
+    .expect("address key");
+
+    let result = sign_sufficient_content(
+        &db,
+        &address_key,
+        SufficientContent::LoadMeta(network_spec_key.clone(), network_version),
+        ALICE_SEED_PHRASE,
+        "",
+    );
+    assert!(matches!(
+        result,
+        Err(Error::TransactionSigning(
+            transaction_signing::Error::WrongPassword
+        ))
+    ));
+
+    let result = sign_sufficient_content(
+        &db,
+        &address_key,
+        SufficientContent::LoadMeta(network_spec_key, network_version),
+        ALICE_SEED_PHRASE,
+        "password123",
+    );
+    assert!(result.is_ok());
 }

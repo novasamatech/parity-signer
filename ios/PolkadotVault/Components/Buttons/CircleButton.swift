@@ -1,5 +1,5 @@
 //
-//  CloseModalButton.swift
+//  CircleButton.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 05/09/2022.
@@ -23,9 +23,9 @@ struct CloseModalButton: View {
                 ZStack {
                     Circle()
                         .frame(width: Sizes.xmarkButtonDiameter, height: Sizes.xmarkButtonDiameter, alignment: .center)
-                        .foregroundColor(Asset.fill18.swiftUIColor)
-                    Asset.xmarkButton.swiftUIImage
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.fill6)
+                    Image(.xmarkButton)
+                        .foregroundColor(.textAndIconsPrimary)
                 }
             }
         )

@@ -13,7 +13,6 @@ struct ExportKeysSelectionModal: View {
     }
 
     @StateObject var viewModel: ViewModel
-    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         FullScreenRoundedModal(
@@ -27,7 +26,7 @@ struct ExportKeysSelectionModal: View {
                     // Header with X button
                     HStack {
                         Text(selectionTitle)
-                            .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                            .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
                         CloseModalButton(action: viewModel.cancelAction)
@@ -49,7 +48,7 @@ struct ExportKeysSelectionModal: View {
                         // Select All
                         Button(action: { viewModel.selectAll() }) {
                             Localizable.KeyDetails.Overlay.Action.selectAll.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                .foregroundColor(.accentPink300)
                                 .font(PrimaryFont.labelL.font)
                         }
                         .padding(.leading, Spacing.medium)
@@ -57,7 +56,7 @@ struct ExportKeysSelectionModal: View {
                         // Export
                         Button(action: viewModel.onExport) {
                             Localizable.KeyDetails.Overlay.Action.export.text
-                                .foregroundColor(Asset.accentPink300.swiftUIColor)
+                                .foregroundColor(.accentPink300)
                                 .font(PrimaryFont.labelL.font)
                         }
                         .padding(.trailing, Spacing.medium)
@@ -74,26 +73,26 @@ struct ExportKeysSelectionModal: View {
             NetworkIdenticon(
                 identicon: key.viewModel.identicon,
                 network: key.viewModel.network,
-                background: Asset.backgroundPrimary.swiftUIColor,
+                background: .backgroundPrimary,
                 size: Heights.identiconInCell
             )
             .padding(.top, Spacing.extraExtraSmall)
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                 fullPath(key.viewModel)
-                    .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                    .foregroundColor(.textAndIconsTertiary)
                     .font(PrimaryFont.captionM.font)
                 Text(key.viewModel.base58.truncateMiddle())
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyL.font)
                     .lineLimit(1)
             }
             Spacer()
             VStack(alignment: .center) {
                 if viewModel.isSelected(key) {
-                    Asset.checkmarkChecked.swiftUIImage
-                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                    Image(.checkmarkChecked)
+                        .foregroundColor(.accentPink300)
                 } else {
-                    Asset.checkmarkUnchecked.swiftUIImage
+                    Image(.checkmarkUnchecked)
                 }
             }
             .frame(minHeight: .zero, maxHeight: .infinity)
@@ -121,14 +120,16 @@ struct ExportKeysSelectionModal: View {
         LazyVStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: Spacing.small) {
-                    IdenticonView(identicon: viewModel.rootIdenticon)
+                    if let rootIdenticon = viewModel.rootIdenticon {
+                        IdenticonView(identicon: rootIdenticon)
+                    }
                     Text(viewModel.rootKey.truncateMiddle())
                         .font(PrimaryFont.bodyL.font)
                         .lineLimit(1)
                     Spacer()
-                    Asset.checkmarkChecked.swiftUIImage
+                    Image(.checkmarkChecked)
                 }
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.medium)
             }
             .frame(height: Heights.exportKeysSelectionCellHeight)
@@ -145,12 +146,11 @@ struct ExportKeysSelectionModal: View {
     var selectionTitle: String {
         let localizable = Localizable.KeyDetails.Overlay.Label.self
         let itemsCount = viewModel.selectedKeys.count + 1
-        let result: String
-        switch itemsCount {
+        let result: String = switch itemsCount {
         case 1:
-            result = localizable.title(String(itemsCount), localizable.Key.single.string)
+            localizable.title(String(itemsCount), localizable.Key.single.string)
         default:
-            result = localizable.title(String(itemsCount), localizable.Key.plural.string)
+            localizable.title(String(itemsCount), localizable.Key.plural.string)
         }
         return result
     }
@@ -166,14 +166,14 @@ extension ExportKeysSelectionModal {
         private let onCompletion: (OnCompletionAction) -> Void
         @Published var animateBackground: Bool = false
         @Published var rootKey: String
-        @Published var rootIdenticon: Identicon
+        @Published var rootIdenticon: Identicon?
         @Published var derivedKeys: [DerivedKeyRowModel]
         @Published var selectedKeys: [DerivedKeyRowModel] = []
         @Binding var isPresented: Bool
 
         init(
             rootKey: String,
-            rootIdenticon: Identicon,
+            rootIdenticon: Identicon?,
             derivedKeys: [DerivedKeyRowModel],
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
@@ -235,7 +235,6 @@ extension ExportKeysSelectionModal {
                     onCompletion: { _ in }
                 )
             )
-            .environmentObject(AppState.preview)
         }
     }
 #endif

@@ -41,9 +41,9 @@ import io.parity.signer.components.NetworkLabelWithIcon
 import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.sharedcomponents.ShowBase58Collapsible
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.EmptyNavigator
 import io.parity.signer.domain.KeyDetailsModel
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.intoImageBitmap
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -64,7 +64,8 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun KeyDetailsPublicKeyScreen(
 	model: KeyDetailsModel,
-	rootNavigator: Navigator,
+	onBack: Callback,
+	onMenu: Callback,
 ) {
 	Column(Modifier.background(MaterialTheme.colors.background)) {
 		ScreenHeaderClose(
@@ -74,8 +75,8 @@ fun KeyDetailsPublicKeyScreen(
 			} else {
 				stringResource(id = R.string.key_details_public_export_derived_subtitle)
 			},
-			onClose = { rootNavigator.backAction() },
-			onMenu = { rootNavigator.navigate(Action.RIGHT_BUTTON_ACTION) }
+			onClose = onBack,
+			onMenu = onMenu,
 		)
 		Box(modifier = Modifier.weight(1f)) {
 			Column(
@@ -188,7 +189,9 @@ private fun BottomKeyPlate(
 				style = SignerTypeface.BodyL,
 				color = MaterialTheme.colors.textTertiary
 			)
-			Spacer(modifier = Modifier.padding(start = 16.dp).weight(1f))
+			Spacer(modifier = Modifier
+				.padding(start = 16.dp)
+				.weight(1f))
 			val path = model.address.cardBase.path
 			Text(
 				text = path.ifEmpty {
@@ -270,7 +273,7 @@ private fun PreviewKeyDetailsScreenDerived() {
 	val mockModel = KeyDetailsModel.createStubDerived()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
+			KeyDetailsPublicKeyScreen(mockModel, {}, {},)
 		}
 	}
 }
@@ -289,7 +292,7 @@ private fun PreviewKeyDetailsScreenRoot() {
 	val mockModel = KeyDetailsModel.createStubRoot()
 	SignerNewTheme {
 		Box(modifier = Modifier.size(350.dp, 700.dp)) {
-			KeyDetailsPublicKeyScreen(mockModel, EmptyNavigator())
+			KeyDetailsPublicKeyScreen(mockModel, {}, {},)
 		}
 	}
 }

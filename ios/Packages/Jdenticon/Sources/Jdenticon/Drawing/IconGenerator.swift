@@ -8,7 +8,7 @@
 import CoreGraphics
 import Foundation
 
-internal class IconGenerator {
+class IconGenerator {
     private var _hash: String
     private let _renderer: Renderer
 
@@ -114,11 +114,10 @@ internal class IconGenerator {
         rotationIndex: Int?,
         positions: [[Int]]
     ) {
-        var r: Int
-        if let rotationIndex = rotationIndex {
-            r = Int(String(_hash[_hash.index(_hash.startIndex, offsetBy: rotationIndex)]), radix: 16) ?? 0
+        var r: Int = if let rotationIndex {
+            Int(String(_hash[_hash.index(_hash.startIndex, offsetBy: rotationIndex)]), radix: 16) ?? 0
         } else {
-            r = 0
+            0
         }
 
         let shape =

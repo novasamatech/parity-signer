@@ -14,10 +14,6 @@ struct PolkadotVaultApp: App {
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
 
-    init() {
-        AppLaunchMediator().finaliseInitialisation()
-    }
-
     var body: some Scene {
         WindowGroup {
             if jailbreakDetectionPublisher.isJailbroken {
@@ -28,10 +24,9 @@ struct PolkadotVaultApp: App {
                     onboarding: OnboardingStateMachine()
                 )
                 .font(PrimaryFont.bodyL.font)
-                .background(Asset.backgroundPrimary.swiftUIColor)
+                .background(.backgroundPrimary)
                 .environmentObject(navigation)
                 .environmentObject(connectivityMediator)
-                .environmentObject(ServiceLocator.appState)
                 .environmentObject(jailbreakDetectionPublisher)
                 .environmentObject(applicationStatePublisher)
             }

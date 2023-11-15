@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import UIKit
 
 extension Localizable {
@@ -16,12 +17,12 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         attributedString.addAttribute(
             .foregroundColor,
-            value: Asset.textAndIconsTertiary.color,
+            value: Color(.textAndIconsTertiary),
             range: NSRange(location: 0, length: mainText.count)
         )
 
         let range = (mainText as NSString).range(of: highlightedText)
-        attributedString.setAttributes([.foregroundColor: Asset.accentPink300.color], range: range)
+        attributedString.setAttributes([.foregroundColor: UIColor(.accentPink300)], range: range)
 
         return AttributedString(attributedString)
     }
@@ -43,15 +44,15 @@ extension Localizable {
         let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
         let rangePartThree = (mainText as NSString).range(of: highlightedPartThree)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartOne
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartTwo
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.textAndIconsTertiary.color],
+            [.foregroundColor: UIColor(.textAndIconsTertiary)],
             range: rangePartThree
         )
         attributedString.addAttributes(
@@ -79,15 +80,15 @@ extension Localizable {
         let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
         let rangePartThree = (mainText as NSString).range(of: highlightedPartThree)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartOne
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartTwo
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.textAndIconsTertiary.color],
+            [.foregroundColor: UIColor(.textAndIconsTertiary)],
             range: rangePartThree
         )
         attributedString.addAttributes(
@@ -115,15 +116,15 @@ extension Localizable {
         let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
         let rangePartThree = (mainText as NSString).range(of: highlightedPartThree)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartOne
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartTwo
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.textAndIconsTertiary.color],
+            [.foregroundColor: UIColor(.textAndIconsTertiary)],
             range: rangePartThree
         )
         attributedString.addAttributes(
@@ -150,15 +151,15 @@ extension Localizable {
         let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
         let rangePartThree = (mainText as NSString).range(of: highlightedPartThree)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartOne
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartTwo
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.textAndIconsTertiary.color],
+            [.foregroundColor: UIColor(.textAndIconsTertiary)],
             range: rangePartThree
         )
         attributedString.addAttributes(
@@ -175,7 +176,7 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         attributedString.addAttribute(
             .foregroundColor,
-            value: Asset.accentPink300.color,
+            value: UIColor(.accentPink300),
             range: NSRange(location: 0, length: mainText.count)
         )
         attributedString.addAttribute(
@@ -194,11 +195,11 @@ extension Localizable {
         let rangePartOne = (mainText as NSString).range(of: highlightedPartOne)
         let rangePartTwo = (mainText as NSString).range(of: highlightedPartTwo)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartOne
         )
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: rangePartTwo
         )
         attributedString.addAttribute(
@@ -215,7 +216,7 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         let highlightedRange = (mainText as NSString).range(of: highlightedPart)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: highlightedRange
         )
         return AttributedString(attributedString)
@@ -227,7 +228,7 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         let highlightedRange = (mainText as NSString).range(of: highlightedPart)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: highlightedRange
         )
         return AttributedString(attributedString)
@@ -239,7 +240,7 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         let highlightedRange = (mainText as NSString).range(of: highlightedPart)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: highlightedRange
         )
         return AttributedString(attributedString)
@@ -251,9 +252,22 @@ extension Localizable {
         let attributedString = NSMutableAttributedString(string: mainText)
         let highlightedRange = (mainText as NSString).range(of: highlightedPart)
         attributedString.setAttributes(
-            [.foregroundColor: Asset.accentPink300.color],
+            [.foregroundColor: UIColor(.accentPink300)],
             range: highlightedRange
         )
         return AttributedString(attributedString)
+    }
+
+    static func applicationUpdateRequiredInfo() -> AttributedString {
+        var attributedString = AttributedString(
+            Localizable.Error.ApplicationUpdateRequired.Label.info.string,
+            attributes: .init([.font: PrimaryFont.bodyL.font])
+        )
+        if let range = attributedString
+            .range(of: Localizable.Error.ApplicationUpdateRequired.Label.Info.highlight.string) {
+            attributedString[range].foregroundColor = Color(.accentPink300)
+            attributedString[range].font = PrimaryFont.titleS.font
+        }
+        return attributedString
     }
 }

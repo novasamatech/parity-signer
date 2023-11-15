@@ -1,5 +1,5 @@
 //
-//  MTransaction+Summary.swift
+//  TransactionSummaryModels.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 20/11/2022.

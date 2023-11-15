@@ -25,8 +25,8 @@ struct LogNoteModal: View {
                     Button(
                         action: viewModel.onCancelTap
                     ) {
-                        Asset.xmarkButtonMedium.swiftUIImage
-                            .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        Image(.xmarkButtonMedium)
+                            .foregroundColor(.textAndIconsSecondary)
                             .frame(
                                 width: Heights.navigationButton,
                                 height: Heights.navigationButton,
@@ -46,23 +46,23 @@ struct LogNoteModal: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Localizable.LogsList.Modal.AddNote.Label.title.text
                         .font(PrimaryFont.titleM.font)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .padding(.bottom, Spacing.medium)
                     Localizable.LogsList.Modal.AddNote.Label.header.text
                         .font(PrimaryFont.bodyM.font)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .padding(.bottom, Spacing.small)
                     TextEditor(text: $viewModel.note)
                         .frame(minHeight: Heights.minTextEditorHeight, maxHeight: Heights.maxTextEditorHeight)
                         .hiddenTextEditorBackground()
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                         .font(PrimaryFont.bodyL.font)
                         .autocorrectionDisabled()
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
                         .submitLabel(.return)
                         .padding(.horizontal, Spacing.small)
-                        .background(Asset.fill6.swiftUIColor)
+                        .background(.fill6)
                         .cornerRadius(CornerRadius.small)
                         .submitLabel(.done)
                         .focused($focused)
@@ -70,7 +70,7 @@ struct LogNoteModal: View {
                 .padding(.horizontal, Spacing.large)
                 .padding(.bottom, Spacing.small)
             }
-            .background(Asset.backgroundTertiary.swiftUIColor)
+            .background(.backgroundTertiary)
         }
         .onAppear {
             focused = true
@@ -115,10 +115,10 @@ extension LogNoteModal {
                 guard let self else { return }
                 switch result {
                 case .success:
-                    self.isPresented = false
+                    isPresented = false
                 case let .failure(error):
-                    self.presentableError = .init(title: error.description)
-                    self.isPresentingError = true
+                    presentableError = .init(title: error.description)
+                    isPresentingError = true
                 }
             }
         }

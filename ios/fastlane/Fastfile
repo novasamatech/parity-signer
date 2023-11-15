@@ -1,7 +1,8 @@
 opt_out_usage
 default_platform(:ios)
 
-ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "5"
+ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "10"
+ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
 
 platform :ios do
   # imports
@@ -11,30 +12,54 @@ platform :ios do
 
   # shared variables
   main_target = "PolkadotVault"
-  main_scheme = "PolkadotVault"
-  configuration = "Release"
-  desc "Runs unit tests for main scheme"
+
+  test_scheme = "PolkadotVault-Dev"
+
+  distribution_scheme = "PolkadotVault"
+  distribution_configuration = "Release"
+
+  distribution_qa_scheme = "PolkadotVault-QA"
+  distribution_qa_configuration = "QA"
+
+  desc "Runs unit tests for development scheme"
   desc "Example usage: fastlane run_unit_tests"
   lane :run_unit_tests do
     test_build(
-      scheme:main_scheme
+      scheme:test_scheme
     )
   end
 
-  desc "Distribute new iOS build through TestFlight"
-  desc "Example usage: fastlane distribute_testflight"
-  lane :distribute_testflight do
+  desc "Distribute new iOS production build through TestFlight"
+  desc "Example usage: fastlane distribute_production_testflight"
+  lane :distribute_production_testflight do
     load_asc_api_key
     prepare_code_signing
     build_release(
-      scheme:main_scheme,
+      scheme:distribution_scheme,
       target:main_target,
-      configuration:configuration
+      configuration:distribution_configuration
     )
     upload_testflight(
-      scheme:main_scheme,
+      scheme:distribution_scheme,
       target:main_target,
-      configuration:configuration
+      configuration:distribution_configuration
+    )
+  end
+
+  desc "Distribute new iOS QA build through TestFlight"
+  desc "Example usage: fastlane distribute_qa_testflight"
+  lane :distribute_qa_testflight do
+    load_asc_api_key
+    prepare_code_signing
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration
+    )
+    upload_testflight(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration
     )
   end
 end

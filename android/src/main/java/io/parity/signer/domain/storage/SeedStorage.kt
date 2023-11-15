@@ -13,6 +13,8 @@ import io.parity.signer.domain.FeatureOption
 import io.parity.signer.uniffi.historySeedWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 /**
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.StateFlow
 class SeedStorage {
 
 	private val _lastKnownSeedNames = MutableStateFlow(arrayOf<String>())
-	val lastKnownSeedNames: StateFlow<Array<String>> = _lastKnownSeedNames
+	val lastKnownSeedNames: StateFlow<Array<String>> =
+		_lastKnownSeedNames.asStateFlow()
 	val isStrongBoxProtected: Boolean
 		get() = masterKey.isStrongBoxBacked
 
@@ -56,12 +59,18 @@ class SeedStorage {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
 				.setRequestStrongBoxBacked(true)
-				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
+				.setUserAuthenticationRequired(
+					true,
+					MasterKey.getDefaultAuthenticationValidityDurationSeconds()
+				)
 				.build()
 		} else {
 			MasterKey.Builder(appContext)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setUserAuthenticationRequired(true, MasterKey.getDefaultAuthenticationValidityDurationSeconds())
+				.setUserAuthenticationRequired(
+					true,
+					MasterKey.getDefaultAuthenticationValidityDurationSeconds()
+				)
 				.build()
 		}
 
@@ -96,6 +105,9 @@ class SeedStorage {
 	/**
 	 * Add seed, encrypt it, and create default accounts
 	 *
+	 * Don't forget to call tell rust seed names -so getSeedNames()
+	 * called and last known elements updated
+	 *
 	 * @throws UserNotAuthenticatedException
 	 */
 	fun addSeed(
@@ -112,6 +124,10 @@ class SeedStorage {
 		with(sharedPreferences.edit()) {
 			putString(seedName, seedPhrase)
 			apply()
+		}
+
+		_lastKnownSeedNames.update { lastState ->
+			lastState + seedName
 		}
 	}
 
@@ -140,10 +156,16 @@ class SeedStorage {
 	}
 
 	/**
+	 * Don't forget to call tell rust seed names -so getSeedNames()
+	 * called and last known elements updated
+	 *
 	 * @throws [UserNotAuthenticatedException]
 	 */
 	fun removeSeed(seedName: String) {
 		sharedPreferences.edit().remove(seedName).apply()
+		_lastKnownSeedNames.update { lastState ->
+			lastState.filter { it != seedName }.toTypedArray()
+		}
 	}
 
 	/**
@@ -152,7 +174,6 @@ class SeedStorage {
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
-
 
 
 }

@@ -15,14 +15,14 @@ struct AttributedInfoBoxView: View {
             Text(text)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer().frame(maxWidth: Spacing.medium)
-            Asset.helpOutline.swiftUIImage
-                .foregroundColor(Asset.accentPink300.swiftUIColor)
+            Image(.helpOutline)
+                .foregroundColor(.accentPink300)
         }
         .padding()
         .font(PrimaryFont.bodyM.font)
         .background(
             RoundedRectangle(cornerRadius: CornerRadius.small)
-                .stroke(Asset.fill12.swiftUIColor, lineWidth: 1)
+                .stroke(.fill12, lineWidth: 1)
                 .cornerRadius(CornerRadius.small)
         )
     }

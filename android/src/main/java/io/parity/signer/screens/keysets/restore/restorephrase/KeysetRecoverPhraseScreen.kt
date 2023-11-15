@@ -29,15 +29,16 @@ fun KeysetRecoverPhraseScreen(
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
+	modifier: Modifier = Modifier,
 ) {
 	Column(
-		Modifier
+		modifier
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 			.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeaderProgressWithButton(
-			canProceed = model.readySeed != null,
+			canProceed = model.validSeed,
 			currentStep = 2,
 			allSteps = 3,
 			btnText = stringResource(R.string.button_next),
@@ -60,8 +61,8 @@ fun KeysetRecoverPhraseScreen(
 				.padding(top = 8.dp, bottom = 2.dp),
 		)
 		EnterSeedPhraseBox(
-			enteredWords = model.draft,
-			userInput = model.userInput,
+			enteredWords = model.enteredWords,
+			rawUserInput = model.rawUserInput,
 			modifier = Modifier
 				.padding(horizontal = 16.dp)
 				.padding(top = 8.dp, bottom = 12.dp),

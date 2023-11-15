@@ -21,15 +21,15 @@ struct TCCall: View {
                     HStack {
                         TCNamedValueCard(name: Localizable.TCName.method.string, value: value.methodName)
                         if !value.docs.isEmpty {
-                            Asset.questionCircle.swiftUIImage
-                                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                            Image(.questionCircle)
+                                .foregroundColor(.textAndIconsDisabled)
                         }
                     }
                     if showDoc {
                         withAnimation {
                             VStack(alignment: .leading) {
                                 Text.markdownWithFallback(value.docs)
-                                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                    .foregroundColor(.textAndIconsPrimary)
                                 HStack {
                                     Spacer()
                                 }

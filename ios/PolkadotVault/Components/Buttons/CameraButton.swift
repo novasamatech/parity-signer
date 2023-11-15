@@ -10,7 +10,7 @@ import SwiftUI
 struct CameraButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .foregroundColor(Asset.navbarIcon.swiftUIColor)
+            .foregroundColor(.navbarIcon)
             .frame(
                 width: Heights.navigationButton,
                 height: Heights.navigationButton,
@@ -37,10 +37,10 @@ struct CameraButton: View {
     var body: some View {
         Button(action: action) {
             icon
-                .foregroundColor(isPressed ? Asset.accentPink500.swiftUIColor : .white)
+                .foregroundColor(isPressed ? .accentPink500 : .white)
         }
         .buttonStyle(CameraButtonStyle())
-        .background(isPressed ? Asset.accentForegroundText.swiftUIColor : Asset.fill30LightOnly.swiftUIColor)
+        .background(isPressed ? .accentForegroundText : .fill30LightOnly)
         .clipShape(Circle())
     }
 }
@@ -51,15 +51,15 @@ struct CameraButton: View {
             VStack(alignment: .leading, spacing: 10) {
                 CameraButton(
                     action: {},
-                    icon: Asset.xmarkButton.swiftUIImage
+                    icon: Image(.xmarkButton)
                 )
                 CameraButton(
                     action: {},
-                    icon: Asset.torchOff.swiftUIImage
+                    icon: Image(.torchOff)
                 )
                 CameraButton(
                     action: {},
-                    icon: Asset.torchOff.swiftUIImage,
+                    icon: Image(.torchOff),
                     isPressed: Binding<Bool>.constant(true)
                 )
             }

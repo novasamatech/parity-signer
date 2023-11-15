@@ -8,7 +8,7 @@ use std::{convert::TryInto, str::FromStr};
 
 use constants::{
     test_values::{alice_sr_alice, empty_png, types_known, westend_9000, westend_9010},
-    ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
+    ADDRTREE, ALICE_SEED_PHRASE, METATREE, SCHEMA_VERSION, SPECSTREE,
 };
 use db_handling::Error;
 use defaults::default_chainspecs;
@@ -66,6 +66,7 @@ use definitions::dynamic_derivations::{
 use definitions::helpers::multisigner_to_public;
 use definitions::navigation::MAddressCard;
 
+use db_handling::helpers::assert_db_version;
 use tempfile::tempdir;
 
 fn westend_genesis() -> H256 {
@@ -2113,7 +2114,7 @@ fn test_dynamic_derivations() {
     let derivation = result
         .key_set
         .derivations
-        .get(0)
+        .first()
         .expect("dynamic derivations is missing from result");
     assert_eq!(derivation.path, "//dd");
     assert_eq!(
@@ -2126,7 +2127,7 @@ fn test_dynamic_derivations() {
         DynamicDerivationsAddressResponse::V1(r) => {
             let key_set = r.addr;
             assert_eq!(key_set.dynamic_derivations.len(), 2);
-            let derivation_1 = key_set.dynamic_derivations.get(0).unwrap();
+            let derivation_1 = key_set.dynamic_derivations.first().unwrap();
             assert_eq!(derivation_1.derivation_path, "//dd");
             assert_eq!(
                 derivation_1.public_key,
@@ -2159,4 +2160,38 @@ fn test_dynamic_derivations() {
             );
         }
     }
+}
+
+#[test]
+fn test_assert_db_version() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    assert!(assert_db_version(&db).is_ok());
+}
+
+#[test]
+fn test_assert_empty_db_version() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    assert!(matches!(
+        assert_db_version(&db),
+        Err(Error::DbSchemaMismatch { found: 0, .. })
+    ));
+}
+
+#[test]
+fn test_assert_wrong_db_version() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    let mut batch = Batch::default();
+    batch.insert(SCHEMA_VERSION, u32::MAX.to_be_bytes().to_vec());
+    TrDbCold::new().set_settings(batch).apply(&db).unwrap();
+    assert!(matches!(
+        assert_db_version(&db),
+        Err(Error::DbSchemaMismatch {
+            found: u32::MAX,
+            ..
+        })
+    ));
 }

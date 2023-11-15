@@ -13,12 +13,12 @@ jobs:
     runs-on:            ubuntu-22.04
     steps:
       - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
+        uses:           styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
         with:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.6.0
+        uses:           actions/checkout@v4.1.1
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -29,11 +29,7 @@ jobs:
           sudo apt-get install -y clang libclang-dev libopencv-dev
 
       - name:           Install Rust stable toolchain
-        uses:           actions-rs/toolchain@v1
-        with:
-          profile:      minimal
-          toolchain:    stable
-          override:     true
+        uses:           dtolnay/rust-toolchain@stable
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -55,7 +51,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:           Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           workspaces:   rust -> rust/target
 
@@ -79,12 +75,12 @@ jobs:
     # if: github.ref == ' refs/head/main'
     steps:
       - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # 0.11.0
+        uses:           styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
         with:
           access_token: ${{ github.token }}
 
       - name:           Checkout Sources
-        uses:           actions/checkout@v3.6.0
+        uses:           actions/checkout@v4.1.1
         with:
           fetch-depth:  50
           submodules:   'recursive'
@@ -96,11 +92,7 @@ jobs:
           sudo apt-get install -y clang libclang-dev libopencv-dev
 
       - name:           Install Rust stable toolchain
-        uses:           actions-rs/toolchain@v1
-        with:
-          profile:      minimal
-          toolchain:    stable
-          override:     true
+        uses:           dtolnay/rust-toolchain@stable
 
       - name:                 Install uniffi_bindgen
         uses:                 actions-rs/install@v0.1
@@ -122,7 +114,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@e207df5d269b42b69c8bc5101da26f7d31feddb4 # v2.6.2
+        uses:           Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           workspaces:   rust -> rust/target
 

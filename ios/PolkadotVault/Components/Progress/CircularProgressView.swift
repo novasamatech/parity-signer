@@ -19,16 +19,16 @@ struct CircularCountdownViewModel {
         size: 32,
         lineWidth: 2.5,
         backgroundColor: .clear,
-        foregroundColor: Asset.accentPink300.swiftUIColor,
-        foregroundFontColor: Asset.textAndIconsPrimary.swiftUIColor
+        foregroundColor: .accentPink300,
+        foregroundFontColor: .textAndIconsPrimary
     )
     /// Circular progress view configuration to be used in `Snackbar` component
     static let snackbarCountdown = CircularCountdownViewModel(
         size: 32,
         lineWidth: 2.5,
         backgroundColor: .clear,
-        foregroundColor: Asset.accentPink300.swiftUIColor,
-        foregroundFontColor: Asset.accentForegroundText.swiftUIColor
+        foregroundColor: .accentPink300,
+        foregroundFontColor: .accentForegroundText
     )
 }
 
@@ -110,7 +110,7 @@ struct CircularProgressView: View {
                 lastApplicationState = updatedState
                 switch updatedState {
                 case .active:
-                    guard let moveToBackgroundDate = moveToBackgroundDate else { return }
+                    guard let moveToBackgroundDate else { return }
                     let timePassed = Date().timeIntervalSince(moveToBackgroundDate)
                     counter = max(0, counter - timePassed)
                     if counter < 0 {

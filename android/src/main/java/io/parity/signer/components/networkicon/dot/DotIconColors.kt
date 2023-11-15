@@ -22,7 +22,7 @@ internal object DotIconColors {
 		val idPrep: UByteArray = black2b.digest(seedInBytes).toUByteArray()
 
 		val id: UByteArray = idPrep
-			.mapIndexed { index, byte -> (byte - zeros[index]).toUByte() }
+			.mapIndexed { index, bytes -> (bytes - zeros[index]).toUByte() }
 			.toUByteArray()
 
 		// this comment from Rust code

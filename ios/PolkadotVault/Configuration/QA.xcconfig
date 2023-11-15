@@ -1,0 +1,11 @@
+//
+//  QA.xcconfig
+//  PolkadotVault
+//
+//  Created by Krzysztof Rodak on 09/11/2023.
+//
+
+APP_RUNTIME_MODE = qa
+DYNAMIC_DERIVATIONS_ENABLED = true
+PRODUCT_NAME = Vault QA
+PRODUCT_MODULE_NAME = PolkadotVault

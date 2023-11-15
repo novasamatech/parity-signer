@@ -33,8 +33,8 @@ public final class IdenticonColorsGenerator {
     func deriveColors(from inputData: [UInt8]) -> [Color] {
         let zeroBytes = Array(repeating: UInt8(0), count: Constants.arrayZeroBytesLength)
 
-        guard let hashedInput = try? Blake2.hash(.b2b, size: Constants.byteHashLength, bytes: inputData),
-              let hashedZeroBytes = try? Blake2.hash(.b2b, size: Constants.byteHashLength, bytes: zeroBytes) else {
+        guard let hashedInput = try? Blake2b.hash(size: Constants.byteHashLength, data: inputData),
+              let hashedZeroBytes = try? Blake2b.hash(size: Constants.byteHashLength, data: zeroBytes) else {
             return []
         }
 

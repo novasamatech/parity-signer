@@ -16,11 +16,11 @@ struct FullScreenRoundedModal<Content: View>: View {
         func inset(_ value: CGFloat) -> CGFloat {
             switch self {
             case .full:
-                return value
+                value
             case .partial:
-                return value / 2.0
+                value / 2.0
             case .none:
-                return 0.0
+                0.0
             }
         }
     }
@@ -70,7 +70,7 @@ struct FullScreenRoundedModal<Content: View>: View {
                     .padding(.top, Spacing.medium)
                     .padding(.horizontal, 0)
                     .padding(.bottom, safeAreaInsetsMode.inset(safeAreaInsets.bottom))
-                    .background(Asset.backgroundTertiary.swiftUIColor)
+                    .background(.backgroundTertiary)
                     .cornerRadius(radius: CornerRadius.medium, corners: [.topLeft, .topRight])
             }
         }

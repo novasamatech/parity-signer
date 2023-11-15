@@ -39,6 +39,9 @@ pub enum Error {
     #[error("Database error. Internal error. {0}")]
     DbError(#[from] sled::Error),
 
+    #[error("Database schema version mismatch. Expected v{expected}, found v{found}.")]
+    DbSchemaMismatch { expected: u32, found: u32 },
+
     /// Temporary database entry in `TRANSACTION` tree of the Vault database
     /// under the key `STUB`, used to store the update data awaiting for the
     /// user approval.
@@ -64,16 +67,6 @@ pub enum Error {
         hex::encode(.0.key()),
     )]
     CustomVerifierIsGeneral(VerifierKey),
-
-    /// User tried to interact with previously disabled network.
-    ///
-    /// Associated data is the [`VerifierKey`] of the network.
-    #[error(
-        "Network with genesis hash {} is disabled. It could be enabled \
-        again only after complete wipe and re-installation of Vault.",
-        hex::encode(.0.genesis_hash()),
-    )]
-    DeadVerifier(VerifierKey),
 
     /// Network has no entry for
     /// [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) under

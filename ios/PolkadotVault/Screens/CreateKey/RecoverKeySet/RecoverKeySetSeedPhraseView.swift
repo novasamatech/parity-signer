@@ -8,6 +8,13 @@
 import SwiftUI
 
 struct RecoverKeySetSeedPhraseView: View {
+    private enum Constants {
+        static let capsuleContainerID = "capsuleContainerID"
+        static let keyboardAnimationDelay = 0.33
+        static let viewAnimationDelay = 0.6
+        static let tapCapsuleGestureDelay = 0.1
+    }
+
     @StateObject var viewModel: ViewModel
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @FocusState private var focus: Bool
@@ -27,31 +34,38 @@ struct RecoverKeySetSeedPhraseView: View {
                     )]
                 )
             )
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Localizable.RecoverSeedPhrase.Label.title.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.titleL.font)
-                        .padding(.top, Spacing.extraSmall)
-                    Localizable.RecoverSeedPhrase.Label.header.text
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
-                        .font(PrimaryFont.bodyL.font)
-                        .padding(.vertical, Spacing.extraSmall)
-                    HStack {
-                        Spacer()
+            ScrollViewReader { scrollViewProxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Localizable.RecoverSeedPhrase.Label.title.text
+                            .foregroundColor(.textAndIconsPrimary)
+                            .font(PrimaryFont.titleL.font)
+                            .padding(.top, Spacing.extraSmall)
+                        Localizable.RecoverSeedPhrase.Label.header.text
+                            .foregroundColor(.textAndIconsPrimary)
+                            .font(PrimaryFont.bodyL.font)
+                            .padding(.vertical, Spacing.extraSmall)
+                        HStack {
+                            Spacer()
+                        }
                     }
-                }
-                .padding(.top, Spacing.extraExtraSmall)
-                .padding(.bottom, Spacing.medium)
-                .padding(.horizontal, Spacing.large)
-                VStack(alignment: .leading, spacing: 0) {
+                    .padding(.top, Spacing.extraExtraSmall)
+                    .padding(.bottom, Spacing.medium)
+                    .padding(.horizontal, Spacing.large)
                     VStack(alignment: .leading, spacing: 0) {
                         WrappingHStack(models: viewModel.seedPhraseGrid) { gridElement in
                             switch gridElement {
                             case let .seedPhraseElement(element):
                                 seedPhraseCapsule(element)
                             case .input:
-                                recoveryTextInput()
+                                recoveryTextInput(scrollViewProxy)
+                                    .onAppear {
+                                        /// #2088 In order to make sure that we don't try to focus textfield
+                                        /// before it actually renders, we need to trigger it with delay
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.viewAnimationDelay) {
+                                            focus = true
+                                        }
+                                    }
                             }
                         }
                         .padding(.leading, Spacing.extraSmall)
@@ -61,6 +75,11 @@ struct RecoverKeySetSeedPhraseView: View {
                     }
                     .frame(minHeight: 156)
                     .containerBackground(CornerRadius.small)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        /// #2065 Enable to focus `recoveryTextInput` when tapping anywhere within input rectangle
+                        focus = true
+                    }
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.small)
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -68,37 +87,38 @@ struct RecoverKeySetSeedPhraseView: View {
                             Spacer()
                                 .frame(width: Spacing.large, height: Spacing.large)
                             ForEach(viewModel.guesses, id: \.self) { guess in
-                                guessCapsule(guess)
+                                guessCapsule(guess, scrollViewProxy: scrollViewProxy)
                             }
                             Spacer()
                                 .frame(width: Spacing.large - Spacing.extraExtraSmall, height: Spacing.large)
                         }
                     }
                     .frame(height: 36)
+                    .padding(.bottom, Spacing.small)
+                    .id(Constants.capsuleContainerID)
+                    NavigationLink(
+                        destination:
+                        CreateKeysForNetworksView(
+                            viewModel: viewModel.createDerivedKeys()
+                        )
+                        .navigationBarHidden(true),
+                        isActive: $viewModel.isPresentingDetails
+                    ) { EmptyView() }
+                }
+                .onAppear {
+                    viewModel.onAppear()
+                }
+                .background(.backgroundPrimary)
+                .fullScreenModal(
+                    isPresented: $viewModel.isPresentingError
+                ) {
+                    ErrorBottomModal(
+                        viewModel: viewModel.presentableError,
+                        isShowingBottomAlert: $viewModel.isPresentingError
+                    )
+                    .clearModalBackground()
                 }
             }
-            .onAppear {
-                focus = true
-                viewModel.onAppear()
-            }
-            .background(Asset.backgroundPrimary.swiftUIColor)
-            .fullScreenModal(
-                isPresented: $viewModel.isPresentingError
-            ) {
-                ErrorBottomModal(
-                    viewModel: viewModel.presentableError,
-                    isShowingBottomAlert: $viewModel.isPresentingError
-                )
-                .clearModalBackground()
-            }
-            NavigationLink(
-                destination:
-                CreateKeysForNetworksView(
-                    viewModel: viewModel.createDerivedKeys()
-                )
-                .navigationBarHidden(true),
-                isActive: $viewModel.isPresentingDetails
-            ) { EmptyView() }
         }
     }
 
@@ -106,12 +126,12 @@ struct RecoverKeySetSeedPhraseView: View {
     func seedPhraseCapsule(_ element: SeedPhraseElement) -> some View {
         HStack(alignment: .center, spacing: Spacing.extraExtraSmall) {
             Text(element.position)
-                .foregroundColor(Asset.textAndIconsDisabled.swiftUIColor)
+                .foregroundColor(.textAndIconsDisabled)
                 .frame(minWidth: Sizes.seedWordPositionWidth, alignment: .trailing)
                 .lineLimit(1)
                 .padding(.leading, Spacing.extraSmall)
             Text(element.word)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .lineLimit(1)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.trailing, Spacing.small)
@@ -124,10 +144,18 @@ struct RecoverKeySetSeedPhraseView: View {
     }
 
     @ViewBuilder
-    func recoveryTextInput() -> some View {
+    func recoveryTextInput(_ scrollViewProxy: ScrollViewProxy) -> some View {
         TextField(
             "",
-            text: $viewModel.userInput
+            text: $viewModel.userInput,
+            onEditingChanged: { isEditing in
+                guard isEditing else { return }
+                /// #2088 Autoscroll to make guess words visible when textfield is focused
+                /// (i.e. after user tapped return and then tapped textfield again)
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.keyboardAnimationDelay) {
+                    scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
+                }
+            }
         )
         .focused($focus)
         .inlineTextFieldStyle(text: $viewModel.userInput)
@@ -135,24 +163,27 @@ struct RecoverKeySetSeedPhraseView: View {
             viewModel.onUserInput(word)
         })
         .frame(minWidth: 50, maxWidth: 100)
-        .onAppear {
-            focus = true
-        }
         .padding(.bottom, Spacing.extraExtraSmall)
         .padding(.trailing, Spacing.extraExtraSmall)
     }
 
     @ViewBuilder
-    func guessCapsule(_ guess: String) -> some View {
+    func guessCapsule(_ guess: String, scrollViewProxy: ScrollViewProxy) -> some View {
         Text(guess)
-            .foregroundColor(Asset.accentPink300.swiftUIColor)
+            .foregroundColor(.accentPink300)
             .font(PrimaryFont.labelS.font)
             .padding([.top, .bottom], Spacing.extraSmall)
             .padding(.horizontal, Spacing.small)
-            .background(Asset.accentPink12.swiftUIColor)
+            .background(.accentPink12)
             .clipShape(Capsule())
             .onTapGesture {
                 viewModel.onGuessTap(guess)
+                /// #2088 As tapping on guess words updates view, we need to do autoscroll with minor delay
+                /// This handles edge case if user would tap guess word when it's not fully visible,
+                /// We should still autoscroll then
+                DispatchQueue.main.asyncAfter(deadline: .now() + Constants.tapCapsuleGestureDelay) {
+                    scrollViewProxy.scrollTo(Constants.capsuleContainerID, anchor: .bottom)
+                }
             }
             .padding(.trailing, Spacing.extraExtraSmall)
     }
@@ -176,9 +207,9 @@ extension RecoverKeySetSeedPhraseView {
         var id: UUID {
             switch self {
             case let .seedPhraseElement(element):
-                return element.id
+                element.id
             case let .input(input):
-                return input.id
+                input.id
             }
         }
     }
@@ -187,7 +218,7 @@ extension RecoverKeySetSeedPhraseView {
 extension RecoverKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
         private enum Constants {
-            static let emptyCharacter = "\u{200B}"
+            static let invisibleNonEmptyCharacter = "\u{200B}"
         }
 
         private let seedsMediator: SeedsMediating
@@ -200,14 +231,15 @@ extension RecoverKeySetSeedPhraseView {
         @Published var isPresentingDetails: Bool = false
         @Published var isValidSeedPhrase: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
-        @Published var userInput: String = Constants.emptyCharacter
+        @Published var userInput: String = Constants.invisibleNonEmptyCharacter
         @Published var guesses: [String] = []
+        @Published var keyboardHeight: CGFloat = 0.0
 
         private var seedPhraseDraft: [String] = [] {
             didSet {
                 regenerateGrid()
                 validateSeedPhrase()
-                userInput = Constants.emptyCharacter
+                userInput = Constants.invisibleNonEmptyCharacter
                 updateGuesses("")
             }
         }
@@ -257,9 +289,22 @@ extension RecoverKeySetSeedPhraseView {
         func onUserInput(_ word: String) {
             guard !shouldSkipUpdate else { return }
             shouldSkipUpdate = true
+            // User input is empty and invisible character was deleted
+            // This means that backspace was tapped, we should delete last saved word
             if word.isEmpty {
                 seedPhraseDraft = Array(seedPhraseDraft.dropLast(1))
-                userInput = Constants.emptyCharacter
+                userInput = Constants.invisibleNonEmptyCharacter
+                // User added " " while typing, we should check guess words or delete whitespace
+            } else if word.hasSuffix(" ") {
+                let exactWord = String(word.dropFirst().dropLast(1))
+                // If there is a match, add this word and clear user input
+                if guesses.contains(exactWord) {
+                    seedPhraseDraft.append(exactWord)
+                    // If there is no match, we should remove added whitespace
+                } else {
+                    userInput = exactWord
+                }
+                // User just added new character, generate new guesses
             } else {
                 updateGuesses(String(word.dropFirst()))
             }

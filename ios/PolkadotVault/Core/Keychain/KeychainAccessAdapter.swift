@@ -112,7 +112,7 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
         var item: CFTypeRef?
         let query = queryProvider.query(for: .search(seedName: seedName))
         let osStatus = SecItemCopyMatching(query, &item)
-        if osStatus == errSecSuccess,
+        if osStatus == errSecSuccess || osStatus == errSecItemNotFound,
            let itemAsData = item as? Data,
            let result = String(data: itemAsData, encoding: .utf8) {
             return .success(result)

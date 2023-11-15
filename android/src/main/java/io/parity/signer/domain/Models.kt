@@ -1,6 +1,7 @@
 package io.parity.signer.domain
 
 import io.parity.signer.components.sharedcomponents.KeyCardModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.ui.helpers.PreviewData
 import io.parity.signer.uniffi.*
 import java.util.*
@@ -9,13 +10,12 @@ import java.util.*
  * reflection of uniffi models so compose will work properly
  */
 
-
 /**
  * Local copy of shared [MKeys] class
  */
 data class KeySetDetailsModel(
 	val keysAndNetwork: List<KeyAndNetworkModel>,
-	val root: KeyModel?,
+	val root: KeyModel,
 ) {
 	companion object {
 		fun createStub(): KeySetDetailsModel = KeySetDetailsModel(
@@ -35,15 +35,25 @@ data class KeySetDetailsModel(
 				),
 			),
 			root = KeyModel.createStub()
-				.copy(path = "//polkadot"),
+				.copy(path = "//polkadot", identicon = PreviewData.Identicon.jdenticonIcon),
 		)
 	}
 }
 
-fun MKeysNew.toKeySetDetailsModel() = KeySetDetailsModel(
-	keysAndNetwork = set.map { it.toKeyAndNetworkModel() },
-	root = root?.toKeysModel(),
-)
+
+fun MKeysNew.toKeySetDetailsModel(): OperationResult<KeySetDetailsModel, ErrorDisplayed> {
+	return if (root == null) {
+		OperationResult.Err(ErrorDisplayed.Str("Key Set is missing in DB or storage inconsistent"))
+	} else {
+		OperationResult.Ok(
+			KeySetDetailsModel(
+				keysAndNetwork = set.map { it.toKeyAndNetworkModel() },
+				root = root!!.toKeysModel(),
+			)
+		)
+	}
+}
+
 
 data class KeyAndNetworkModel(
 	val key: KeyModel,
@@ -126,9 +136,9 @@ fun MNetworkCard.toNetworkBasicModel() = NetworkBasicModel(
 /**
  * Local copy of shared [MSeeds] class
  */
-data class KeySetsSelectModel(val keys: List<KeySetModel>)
+data class KeySetsListModel(val keys: List<KeySetModel>)
 
-fun MSeeds.toKeySetsSelectModel() = KeySetsSelectModel(
+fun MSeeds.toKeySetsSelectModel() = KeySetsListModel(
 	seedNameCards.map { it.toSeedModel() }
 )
 
@@ -145,7 +155,7 @@ data class KeySetModel(
 		fun createStub(name: String? = null, number: Int? = null) =
 			KeySetModel(
 				name ?: "first seed name",
-				PreviewData.Identicon.dotIcon,
+				PreviewData.Identicon.jdenticonIcon,
 				listOf("westend", "some"),
 				number?.toUInt() ?: 1.toUInt()
 			)
@@ -292,13 +302,13 @@ fun MmNetwork.toNetworkModel(): NetworkModel = NetworkModel(
 )
 
 
-data class VerifierDetailsModels(
+data class VerifierDetailsModel(
 	val publicKey: String,
 	val identicon: Identicon,
 	val encryption: String,
 ) {
 	companion object {
-		fun createStub() = VerifierDetailsModels(
+		fun createStub() = VerifierDetailsModel(
 			publicKey = "5DCmwXp8XLzSMUyE4uhJMKV4vwvsWqqBYFKJq38CW53VHEVq",
 			identicon = PreviewData.Identicon.dotIcon,
 			encryption = "sr25519",
@@ -306,7 +316,7 @@ data class VerifierDetailsModels(
 	}
 }
 
-fun MVerifierDetails.toVerifierDetailsModels() = VerifierDetailsModels(
+fun MVerifierDetails.toVerifierDetailsModel() = VerifierDetailsModel(
 	publicKey = publicKey,
 	identicon = identicon,
 	encryption = encryption,

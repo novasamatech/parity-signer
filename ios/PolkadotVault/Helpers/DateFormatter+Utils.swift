@@ -1,5 +1,5 @@
 //
-//  Date+Utils.swift
+//  DateFormatter+Utils.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 02/12/2022.

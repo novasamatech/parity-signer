@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.sp
 import io.parity.signer.R
 import io.parity.signer.components.networkicon.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
+import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.KeyDetailsModel
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.NetworkInfoModel
 import io.parity.signer.domain.abbreviateString
@@ -42,44 +44,34 @@ import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.Identicon
 import io.parity.signer.uniffi.MAddressCard
+import io.parity.signer.uniffi.MKeyDetails
 import java.util.*
 
 
 @Composable
 fun KeyCard(model: KeyCardModel) {
-	Column(
+	Row(
 		Modifier
 			.fillMaxWidth()
-			.padding(16.dp)
+			.padding(16.dp),
+		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			Column(Modifier.weight(1f)) {
-				if (model.cardBase.path.isNotEmpty()) {
-					KeyPath(model.cardBase.path, model.cardBase.hasPassword)
-					Spacer(Modifier.padding(top = 4.dp))
-				}
-				Text(
-					model.cardBase.seedName,
-					color = MaterialTheme.colors.primary,
-					style = SignerTypeface.LabelS,
-				)
+		IdentIconWithNetwork(
+			identicon = model.cardBase.identIcon,
+			networkLogoName = model.network,
+			size = 36.dp,
+			modifier = Modifier.padding(end = 12.dp)
+		)
+		Column() {
+			if (model.cardBase.path.isNotEmpty()) {
+				KeyPath(model.cardBase.path, model.cardBase.hasPassword)
 			}
-			IdentIconWithNetwork(
-				identicon = model.cardBase.identIcon,
-				networkLogoName = model.network,
-				size = 36.dp,
-				modifier = Modifier.padding(start = 24.dp)
+			Text(
+				model.cardBase.base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.BodyL,
+				maxLines = 1,
 			)
-		}
-		Spacer(Modifier.padding(top = 10.dp))
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			ShowBase58Collapsible(
-				base58 = model.cardBase.base58,
-				modifier = Modifier
-					.weight(1f)
-					.padding(end = 24.dp)
-			)
-			NetworkLabel(model.network)
 		}
 	}
 }
@@ -100,18 +92,24 @@ fun NetworkLabel(networkName: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun KeySeedCard(seedTitle: String, base58: String) {
-	Column(
+fun KeySeedCard(identicon: Identicon, base58: String) {
+	Row(
 		Modifier
 			.fillMaxWidth()
-			.padding(16.dp)
+			.padding(16.dp),
+		verticalAlignment = Alignment.CenterVertically,
 	) {
-		Text(
-			seedTitle,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.LabelS,
+		IdentIconImage(
+			identicon = identicon,
+			modifier = Modifier.padding(end = 12.dp),
+			size = 36.dp,
 		)
-		ShowBase58Collapsible(base58)
+		Text(
+			base58.abbreviateString(BASE58_STYLE_ABBREVIATE),
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyL,
+			maxLines = 1,
+		)
 	}
 }
 
@@ -376,7 +374,7 @@ private fun PreviewNetworkLabel() {
 private fun PreviewKeySeedCard() {
 	SignerNewTheme {
 		KeySeedCard(
-			seedTitle = "Seed title",
+			identicon = PreviewData.Identicon.jdenticonIcon,
 			base58 = KeyCardModel.createStub().cardBase.base58,
 		)
 	}

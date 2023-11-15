@@ -431,3 +431,12 @@ extension DdPreview {
         isSomeNetworkMissing: true
     )
 }
+
+extension MRawKey {
+    static let stub: MRawKey = .init(
+        address: .stub,
+        addressKey: "addressKey",
+        publicKey: "publicKey",
+        networkLogo: "polkadot"
+    )
+}

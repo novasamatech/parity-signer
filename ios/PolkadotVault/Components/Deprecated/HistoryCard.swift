@@ -16,18 +16,18 @@ struct HistoryCard: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                if let timestamp = timestamp, !timestamp.isEmpty {
+                if let timestamp, !timestamp.isEmpty {
                     Text(timestamp)
-                        .foregroundColor(Asset.textAndIconsSecondary.swiftUIColor)
+                        .foregroundColor(.textAndIconsSecondary)
                         .font(PrimaryFont.captionM.font)
                 }
                 Text(line1)
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyM.font)
                     .tracking(0.1)
-                if let line2 = line2 {
+                if let line2 {
                     Text(line2)
-                        .foregroundColor(Asset.accentPink300.swiftUIColor)
+                        .foregroundColor(.accentPink300)
                         .font(PrimaryFont.captionM.font)
                 }
             }
@@ -35,6 +35,6 @@ struct HistoryCard: View {
         }
         .padding(8)
         .cornerRadius(8)
-        .background(danger ? Asset.accentRed300.swiftUIColor.opacity(0.3) : Asset.backgroundSecondary.swiftUIColor)
+        .background(danger ? .accentRed300.opacity(0.3) : .backgroundSecondary)
     }
 }

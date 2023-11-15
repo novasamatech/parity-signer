@@ -119,28 +119,6 @@ struct ErrorBottomModalViewModel {
         )
     }
 
-    static func connectivityOn(_ action: @escaping @autoclosure () -> Void = {}()) -> ErrorBottomModalViewModel {
-        ErrorBottomModalViewModel(
-            icon: Asset.wifiOn.swiftUIImage,
-            title: Localizable.Connectivity.Label.title.string,
-            content: Localizable.Connectivity.Label.content.string,
-            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
-        )
-    }
-
-    static func connectivityWasOn(
-        backAction: @escaping @autoclosure () -> Void = {}(),
-        continueAction: @escaping @autoclosure () -> Void
-    ) -> ErrorBottomModalViewModel {
-        ErrorBottomModalViewModel(
-            icon: Asset.wifiWasOn.swiftUIImage,
-            title: Localizable.PastConnectivity.Label.title.string,
-            content: Localizable.PastConnectivity.Label.content.string,
-            primaryAction: .init(label: Localizable.PastConnectivity.Action.back.key, action: backAction),
-            tertiaryAction: .init(label: Localizable.PastConnectivity.Action.continue.key, action: continueAction)
-        )
-    }
-
     static func alertError(
         message: String,
         _ action: @escaping @autoclosure () -> Void = {}()
@@ -186,6 +164,16 @@ struct ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
             title: Localizable.RecoverSeedPhrase.Error.IncorrectPhrase.title.string,
             content: Localizable.RecoverSeedPhrase.Error.IncorrectPhrase.message.string,
+            secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
+        )
+    }
+
+    static func featureNotAvailable(
+        _ action: @escaping @autoclosure () -> Void = {}()
+    ) -> ErrorBottomModalViewModel {
+        ErrorBottomModalViewModel(
+            title: Localizable.Error.FeatureNotAvailable.title.string,
+            content: Localizable.Error.FeatureNotAvailable.message.string,
             secondaryAction: .init(label: Localizable.ErrorModal.Action.ok.key, action: action)
         )
     }

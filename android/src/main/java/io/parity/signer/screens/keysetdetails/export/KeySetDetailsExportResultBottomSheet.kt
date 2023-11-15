@@ -29,9 +29,7 @@ import io.parity.signer.components.sharedcomponents.KeyCardModel
 import io.parity.signer.components.sharedcomponents.KeySeedCard
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.KeySetDetailsModel
-import io.parity.signer.domain.submitErrorState
 import io.parity.signer.ui.theme.SignerNewTheme
-import io.parity.signer.ui.theme.backgroundTertiary
 import io.parity.signer.ui.theme.fill6
 
 @Composable
@@ -40,72 +38,61 @@ fun KeySetDetailsExportResultBottomSheet(
 	selectedKeys: Set<String>,
 	onClose: Callback,
 ) {
-	//preconditions
-	if (model.root == null) {
-		//todo key details
-		submitErrorState(
-			"KeySetDetailsExport desont' work without root and " +
-				"root is missing, returning and it's ugly user experience, should be " +
-				"impossible to navigate here "
+	Column() {
+		val keysToExport = selectedKeys.size + 1 // + root key
+		BottomSheetHeader(
+			title = pluralStringResource(
+				id = R.plurals.key_export_title,
+				count = keysToExport,
+				keysToExport,
+			),
+			onCloseClicked = onClose
 		)
-		onClose()
-	} else {
-		Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
-			val keysToExport = selectedKeys.size + 1 // + root key
-			BottomSheetHeader(
-				title = pluralStringResource(
-					id = R.plurals.key_export_title,
-					count = keysToExport,
-					keysToExport,
-				),
-				onCloseClicked = onClose
-			)
-			val plateShape =
-				RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
-			//scrollable part
-			Column(
-				modifier = Modifier
-					.verticalScroll(rememberScrollState())
-					.weight(weight = 1f, fill = false)
-					.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-					.background(MaterialTheme.colors.fill6, plateShape)
-			) {
-				if (LocalInspectionMode.current) {
-					AnimatedQrKeysInfo(
-						input = Unit,
-						provider = EmptyAnimatedQrKeysProvider(),
-						modifier = Modifier.padding(8.dp)
-					)
-				} else {
-					AnimatedQrKeysInfo(
-						input = KeySetDetailsExportService.GetQrCodesListRequest(
-							seedName = model.root.seedName,
-							keys = model.keysAndNetwork.map { it.key }
-								.filter { selectedKeys.contains(it.addressKey) }),
-						provider = KeySetDetailsExportService(),
-						modifier = Modifier.padding(8.dp)
-					)
-				}
-				NotificationFrameText(message = stringResource(id = R.string.key_set_export_description_content))
-				KeySeedCard(
-					seedTitle = model.root.seedName,
-					base58 = model.root.base58,
+		val plateShape =
+			RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
+		//scrollable part
+		Column(
+			modifier = Modifier
+				.verticalScroll(rememberScrollState())
+				.weight(weight = 1f, fill = false)
+				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				.background(MaterialTheme.colors.fill6, plateShape)
+		) {
+			if (LocalInspectionMode.current) {
+				AnimatedQrKeysInfo(
+					input = Unit,
+					provider = EmptyAnimatedQrKeysProvider(),
+					modifier = Modifier.padding(8.dp)
 				)
-				SignerDivider()
-				val seedList = selectedKeys.toList()
-				for (i in 0..seedList.lastIndex) {
-					val seed = seedList[i]
-					val keyModel = model.keysAndNetwork
-						.first { it.key.addressKey == seed }
-					KeyCard(
-						KeyCardModel.fromKeyModel(
-							keyModel.key,
-							keyModel.network
-						),
-					)
-					if (i != seedList.lastIndex) {
-						SignerDivider()
-					}
+			} else {
+				AnimatedQrKeysInfo(
+					input = KeySetDetailsExportService.GetQrCodesListRequest(
+						seedName = model.root.seedName,
+						keys = model.keysAndNetwork.map { it.key }
+							.filter { selectedKeys.contains(it.addressKey) }),
+					provider = KeySetDetailsExportService(),
+					modifier = Modifier.padding(8.dp)
+				)
+			}
+			NotificationFrameText(message = stringResource(id = R.string.key_set_export_description_content))
+			KeySeedCard(
+				model.root.identicon,
+				base58 = model.root.base58,
+			)
+			SignerDivider()
+			val seedList = selectedKeys.toList()
+			for (i in 0..seedList.lastIndex) {
+				val seed = seedList[i]
+				val keyModel = model.keysAndNetwork
+					.first { it.key.addressKey == seed }
+				KeyCard(
+					KeyCardModel.fromKeyModel(
+						keyModel.key,
+						keyModel.network
+					),
+				)
+				if (i != seedList.lastIndex) {
+					SignerDivider()
 				}
 			}
 		}

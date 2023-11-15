@@ -1,5 +1,5 @@
 //
-//  TCNamedValueCard.swift
+//  TCNameValueTemplate.swift
 //  Polkadot Vault
 //
 //  Created by Alexander Slesarev on 7.1.2022.
@@ -25,26 +25,26 @@ struct TCNamedValueCard: View {
     var body: some View {
         if valueInSameLine {
             HStack(alignment: .top, spacing: Spacing.extraSmall) {
-                if let name = name {
+                if let name {
                     Text(name)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
-                if let value = value {
+                if let value {
                     Text(value)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                 }
                 Spacer()
             }
             .font(PrimaryFont.bodyL.font)
         } else {
             VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
-                if let name = name, name.isEmpty == false {
+                if let name, name.isEmpty == false {
                     Text(name)
-                        .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                        .foregroundColor(.textAndIconsTertiary)
                 }
-                if let value = value, value.isEmpty == false {
+                if let value, value.isEmpty == false {
                     Text(value)
-                        .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                        .foregroundColor(.textAndIconsPrimary)
                 }
                 HStack {
                     Spacer()

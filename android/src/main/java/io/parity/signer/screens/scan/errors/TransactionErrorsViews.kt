@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
@@ -32,10 +31,13 @@ import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.*
 
-
+/**
+ * Bottom sheet created to show Transaction errors in scan flow,
+ * but used to show errors in a bottoms sheets in other places as well
+ */
 @Composable
-fun TransactionErrorBottomSheet(
-	error: TransactionErrorModel,
+fun LocalErrorBottomSheet(
+	error: LocalErrorSheetModel,
 	onOk: Callback
 ) {
 	Column(
@@ -198,7 +200,7 @@ private fun getDescriptionForUpdateMetadata(): List<AnnotatedString> {
 	)
 }
 
-data class TransactionErrorModel(
+data class LocalErrorSheetModel(
 	val title: String,
 	val subtitle: String,
 	val description: String? = null,
@@ -239,7 +241,7 @@ private fun PreviewTransactionErrorBottomSheet() {
 	SignerNewTheme {
 		val model =
 			TransactionError.MetadataForUnknownNetwork("Westend").toBottomSheetModel()
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}
@@ -259,11 +261,11 @@ private fun PreviewTransactionErrorBottomSheetCustom() {
 	SignerNewTheme {
 		val context = LocalContext.current
 		val model =
-			TransactionErrorModel(
+			LocalErrorSheetModel(
 				context = context,
 				details = "Bad input data. Metadata for westend9330 is already in the database."
 			)
-		TransactionErrorBottomSheet(
+		LocalErrorBottomSheet(
 			error = model, onOk = {}
 		)
 	}

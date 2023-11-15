@@ -1,7 +1,6 @@
 package io.parity.signer.screens.initial.splash
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,8 +11,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import io.parity.signer.screens.initial.WaitingScreen
-import io.parity.signer.ui.MainGraphRoutes
-import io.parity.signer.ui.NAVIGATION_TAG
+import io.parity.signer.ui.rootnavigation.MainGraphRoutes
 
 
 /**
@@ -28,7 +26,6 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		val viewModel: SplashScreenViewModel = viewModel()
 		val context = LocalContext.current
 		LaunchedEffect(Unit) {
-			Log.d(NAVIGATION_TAG, "Splash screen opened")
 			if (viewModel.shouldShowOnboarding(context)) {
 				globalNavController.navigate(MainGraphRoutes.firstTimeOnboarding) {
 					popUpTo(0)
@@ -38,7 +35,7 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 					popUpTo(0)
 				}
 			} else {
-				globalNavController.navigate(MainGraphRoutes.initialUnlockRoute) {
+				globalNavController.navigate(MainGraphRoutes.mainScreenRoute) {
 					popUpTo(0)
 				}
 			}

@@ -105,6 +105,9 @@ pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 /// Key in settings tree [`SETTREE`] for Vault danger status
 pub const DANGER: &[u8] = b"dangerous_encounter";
 
+/// Key in settings tree [`SETTREE`] for Vault database schema version
+pub const SCHEMA_VERSION: &[u8] = b"schema_version";
+
 /// Key in transactions tree [`TRANSACTION`] for updates data
 pub const STUB: &[u8] = b"stub";
 
@@ -188,3 +191,9 @@ pub const FPS_DEN: u16 = 15;
 
 /// Width of the QR code border, in QR code dots
 pub const BORDER: i32 = 4;
+
+/// Current database schema version
+pub const LIVE_SCHEMA_VERSION: u32 = 1;
+
+/// Feature flag to disable dynamic derivations
+pub const ENABLE_DYNAMIC_DERIVATIONS: bool = true;

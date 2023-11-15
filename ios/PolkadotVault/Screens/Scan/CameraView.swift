@@ -49,12 +49,12 @@ struct CameraView: View {
                         HStack(spacing: Spacing.small) {
                             CameraButton(
                                 action: viewModel.dismissView,
-                                icon: Asset.xmarkButton.swiftUIImage
+                                icon: Image(.xmarkButton)
                             )
                             Spacer()
                             CameraButton(
                                 action: { model.toggleTorch() },
-                                icon: Asset.torchOff.swiftUIImage,
+                                icon: Image(.torchOff),
                                 isPressed: $model.isTorchOn
                             )
                         }
@@ -67,7 +67,7 @@ struct CameraView: View {
                                 .aspectRatio(1.0, contentMode: .fit)
                                 .blendMode(.destinationOut)
                                 .overlay(
-                                    Asset.cameraOverlay.swiftUIImage
+                                    Image(.cameraOverlay)
                                         .resizable(resizingMode: .stretch)
                                         .padding(-Spacing.extraExtraSmall)
                                 )
@@ -82,14 +82,14 @@ struct CameraView: View {
                                 .font(PrimaryFont.bodyL.font)
                                 .multilineTextAlignment(.center)
                         }
-                        .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                        .foregroundColor(.accentForegroundText)
                         .frame(width: UIScreen.main.bounds.width * 0.86, alignment: .center)
                         Spacer()
                     }
                     if viewModel.isScanningMultiple, !model.multipleTransactions.isEmpty {
                         VStack(spacing: 0) {
                             multipleTransactionOverlay
-                            Asset.backgroundSecondaryDarkOnly.swiftUIColor
+                            Color(.backgroundSecondaryDarkOnly)
                                 .frame(height: safeAreaInsets.bottom)
                         }
                         .transition(.move(edge: .bottom))
@@ -115,7 +115,7 @@ struct CameraView: View {
         .onDisappear {
             model.shutdown()
         }
-        .background(Asset.backgroundPrimary.swiftUIColor)
+        .background(.backgroundPrimary)
         .fullScreenModal(
             isPresented: $viewModel.isPresentingTransactionPreview
         ) {
@@ -216,14 +216,14 @@ struct CameraView: View {
         HStack(alignment: .center) {
             Text(signText())
                 .font(PrimaryFont.titleS.font)
-                .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                .foregroundColor(.accentForegroundText)
                 .padding(.top, Spacing.medium)
             Spacer()
             CapsuleButton(
                 action: {
                     viewModel.onMultipleTransactionSign(model.multipleTransactions)
                 },
-                icon: Asset.arrowForward.swiftUIImage,
+                icon: Image(.arrowForward),
                 title: Localizable.Scanner.Action.sign.string
             )
             .padding(.top, Spacing.extraSmall)
@@ -231,7 +231,7 @@ struct CameraView: View {
         .padding(.leading, Spacing.medium)
         .padding(.trailing, Spacing.extraSmall)
         .frame(height: Heights.bottomBarHeight)
-        .background(Asset.backgroundSecondaryDarkOnly.swiftUIColor)
+        .background(.backgroundSecondaryDarkOnly)
     }
 
     func signText() -> String {
@@ -301,19 +301,21 @@ extension CameraView {
         private let scanService: ScanTabService
         private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
-
+        private let runtimePropertiesProvider: RuntimePropertiesProviding
         private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService(),
-            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService()
+            dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService(),
+            runtimePropertiesProvider: RuntimePropertiesProviding = RuntimePropertiesProvider()
         ) {
             _isPresented = isPresented
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
+            self.runtimePropertiesProvider = runtimePropertiesProvider
         }
 
         func use(cameraModel: CameraService) {
@@ -325,11 +327,21 @@ extension CameraView {
             isInTransactionProgress = true
             switch payload.type {
             case .dynamicDerivations:
+                guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
+                    return
+                }
                 startDynamicDerivationsFlow(payload.payload.first ?? "")
+            case .dynamicDerivationsTransaction:
+                guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
+                    presentableError = .featureNotAvailable()
+                    isPresentingError = true
+                    return
+                }
+                startDynamicDerivationsTransactionFlow(payload.payload)
             case .transaction:
                 startTransactionSigningFlow(payload.payload.first ?? "")
-            case .dynamicDerivationsTransaction:
-                startDynamicDerivationsTransactionFlow(payload.payload)
             }
         }
 
@@ -400,13 +412,11 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
-            let message: String
-            switch completionAction {
+            let message: String = switch completionAction {
             case let .createKeySet(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
-            case let .recoveredKeySet(seedName),
-                 let .bananaSplitRecovery(seedName):
-                message = Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+            case let .recoveredKeySet(seedName):
+                Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
             }
             snackbarViewModel = .init(
                 title: message,

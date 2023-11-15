@@ -47,9 +47,9 @@ struct EnterKeySetNameView: View {
                     isActive: $viewModel.isPresentingDetails
                 ) { EmptyView() }
             }
-            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationViewStyle(.stack)
             .navigationBarHidden(true)
-            .background(Asset.backgroundPrimary.swiftUIColor)
+            .background(.backgroundPrimary)
             .fullScreenModal(
                 isPresented: $viewModel.isPresentingError
             ) {
@@ -66,11 +66,11 @@ struct EnterKeySetNameView: View {
     func mainContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Localizable.NewSeed.Name.Label.title.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleL.font)
                 .padding(.top, Spacing.extraSmall)
             Localizable.NewSeed.Name.Label.header.text
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.bodyL.font)
                 .padding(.vertical, Spacing.extraSmall)
             TextField("", text: $viewModel.seedName)
@@ -89,7 +89,7 @@ struct EnterKeySetNameView: View {
                 }
                 .padding(.vertical, Spacing.medium)
             Localizable.NewSeed.Name.Label.footer.text
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
                 .font(PrimaryFont.captionM.font)
             Spacer()
         }

@@ -9,11 +9,14 @@ use db_handling::identities::{export_key_set_addrs, SignaturesBulk, SignaturesBu
 use lazy_static::lazy_static;
 use sp_runtime::MultiSignature;
 use std::{collections::HashMap, sync::Mutex};
-use transaction_signing::{create_signature, SignatureAndChecksum, SignatureType};
+use transaction_signing::{
+    create_signature, sign_content, SignatureAndChecksum, SignatureType, SufficientContent,
+};
 
 use definitions::navigation::{
-    ActionResult, ExportedSet, MKeysInfoExport, MKeysNew, MSignatureReady, MSignedTransaction,
-    MTransaction, QrData, TransactionAction, TransactionSignAction, TransactionType,
+    ActionResult, Address, ExportedSet, MAddressCard, MKeysInfoExport, MKeysNew, MSignatureReady,
+    MSignedTransaction, MSufficientCryptoReady, MTransaction, QrData, TransactionAction,
+    TransactionSignAction, TransactionType,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -22,6 +25,10 @@ mod error;
 
 mod actions;
 pub use actions::Action;
+use db_handling::helpers::get_address_details;
+use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth};
+use definitions::keyring::AddressKey;
+
 pub mod alerts;
 pub mod modals;
 mod navstate;
@@ -198,4 +205,52 @@ pub fn keys_by_seed_name(database: &sled::Db, seed_name: &str) -> Result<MKeysNe
     Ok(db_handling::interface_signer::keys_by_seed_name(
         database, seed_name,
     )?)
+}
+
+pub fn sign_sufficient_content(
+    database: &sled::Db,
+    address_key: &AddressKey,
+    sufficient_content: SufficientContent,
+    seed_phrase: &str,
+    pwd_entry: &str,
+) -> Result<MSufficientCryptoReady> {
+    let address_details = get_address_details(database, address_key)?;
+    let multisigner = address_key.multi_signer();
+    let (sufficient, content) = sign_content(
+        database,
+        multisigner,
+        &address_details,
+        sufficient_content,
+        seed_phrase,
+        pwd_entry,
+    )?;
+    let network_key = address_details
+        .network_id
+        .as_ref()
+        .ok_or(Error::NoNetwork(address_details.path.clone()))?;
+    let network_specs = db_handling::helpers::get_network_specs(database, network_key)?.specs;
+    let base58 = print_multisigner_as_base58_or_eth(
+        multisigner,
+        Some(network_specs.base58prefix),
+        network_specs.encryption,
+    );
+    Ok(MSufficientCryptoReady {
+        author_info: MAddressCard {
+            base58,
+            address_key: hex::encode(address_key.key()),
+            address: Address {
+                path: address_details.path.clone(),
+                has_pwd: address_details.has_pwd,
+                identicon: make_identicon_from_multisigner(
+                    multisigner,
+                    address_details.identicon_style(),
+                ),
+                seed_name: address_details.seed_name,
+                secret_exposed: address_details.secret_exposed,
+            },
+        },
+        sufficient,
+        content,
+        network_logo: Some(network_specs.logo),
+    })
 }

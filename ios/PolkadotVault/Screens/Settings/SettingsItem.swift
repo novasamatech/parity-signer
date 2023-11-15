@@ -11,7 +11,6 @@ enum SettingsItem: Equatable, Hashable, CaseIterable {
     case logs
     case networks
     case verifier
-    case backup
     case privacyPolicy
     case termsAndConditions
     case wipe
@@ -21,19 +20,17 @@ extension SettingsItem {
     var title: String {
         switch self {
         case .logs:
-            return Localizable.Settings.Label.logs.string
+            Localizable.Settings.Label.logs.string
         case .networks:
-            return Localizable.Settings.Label.networks.string
+            Localizable.Settings.Label.networks.string
         case .verifier:
-            return Localizable.Settings.Label.verifier.string
-        case .backup:
-            return Localizable.Settings.Label.backup.string
+            Localizable.Settings.Label.verifier.string
         case .privacyPolicy:
-            return Localizable.Settings.Label.policy.string
+            Localizable.Settings.Label.policy.string
         case .termsAndConditions:
-            return Localizable.Settings.Label.terms.string
+            Localizable.Settings.Label.terms.string
         case .wipe:
-            return Localizable.Settings.Label.wipe.string
+            Localizable.Settings.Label.wipe.string
         }
     }
 

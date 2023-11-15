@@ -40,7 +40,7 @@ struct SettingsBackupModal: View {
                     HStack {
                         VStack(alignment: .leading, spacing: Spacing.extraExtraSmall) {
                             Text(viewModel.keyName)
-                                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                                .foregroundColor(.textAndIconsPrimary)
                                 .font(PrimaryFont.titleS.font)
                         }
                         Spacer()
@@ -79,7 +79,7 @@ struct SettingsBackupModal: View {
             // Seed phrase
             HStack {
                 Localizable.Settings.BackupModal.Label.header.text
-                    .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                    .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyL.font)
                 Spacer()
             }

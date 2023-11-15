@@ -9,16 +9,13 @@ import Foundation
 
 final class ConnectivityMediator: ObservableObject {
     private let connectivityMonitor: ConnectivityMonitoring
-    private let databaseMediator: DatabaseMediating
 
     @Published private(set) var isConnectivityOn: Bool = false
 
     init(
-        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble(),
-        databaseMediator: DatabaseMediating = DatabaseMediator()
+        connectivityMonitor: ConnectivityMonitoring = ConnectivityMonitoringAssembler().assemble()
     ) {
         self.connectivityMonitor = connectivityMonitor
-        self.databaseMediator = databaseMediator
         setUpConnectivityMonitoring()
     }
 }
@@ -26,11 +23,8 @@ final class ConnectivityMediator: ObservableObject {
 private extension ConnectivityMediator {
     func setUpConnectivityMonitoring() {
         connectivityMonitor.startMonitoring { [weak self] isConnected in
-            guard let self = self else { return }
-            if isConnected, self.databaseMediator.isDatabaseAvailable() {
-                try? historyDeviceWasOnline()
-            }
-            self.isConnectivityOn = isConnected
+            guard let self else { return }
+            isConnectivityOn = isConnected
         }
     }
 }

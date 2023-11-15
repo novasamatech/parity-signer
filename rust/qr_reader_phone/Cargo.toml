@@ -10,8 +10,8 @@ edition = "2018"
 hex = "0.4.3"
 raptorq = "1.7.0"
 nom = "7.1.3"
-thiserror = "1.0.48"
-
+thiserror = "1.0.50"
+constants = {path = "../constants"}
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
 transaction_parsing = { path = "../transaction_parsing" }
 definitions = {path = "../definitions", default-features = false}

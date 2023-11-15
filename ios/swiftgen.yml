@@ -20,8 +20,3 @@ strings:
           output: Localizable.swift
           params:
             enumName: Localizable
-xcassets:
-  - inputs: ./PolkadotVault/Resources/Assets.xcassets
-    outputs:
-      templateName: swift5
-      output: Assets.swift

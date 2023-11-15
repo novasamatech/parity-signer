@@ -43,9 +43,9 @@ struct Snackbar: View {
         var tintColor: Color {
             switch self {
             case .info:
-                return Asset.fill12Solid.swiftUIColor
+                .fill12Solid
             case .warning:
-                return Asset.accentRed400.swiftUIColor
+                .accentRed400
             }
         }
     }
@@ -62,7 +62,7 @@ struct Snackbar: View {
         HStack {
             Text(viewModel.title)
                 .font(PrimaryFont.bodyL.font)
-                .foregroundColor(Asset.accentForegroundText.swiftUIColor)
+                .foregroundColor(.accentForegroundText)
                 .padding(.horizontal, Spacing.medium)
                 .lineSpacing(Spacing.extraSmall)
                 .multilineTextAlignment(.leading)

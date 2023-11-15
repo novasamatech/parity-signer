@@ -15,14 +15,14 @@ extension View {
     ) -> some View {
         placeholder(when: shouldShow, alignment: alignment) {
             Text(text)
-                .foregroundColor(Asset.textAndIconsTertiary.swiftUIColor)
+                .foregroundColor(.textAndIconsTertiary)
         }
     }
 
-    private func placeholder<Content: View>(
+    private func placeholder(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content
+        @ViewBuilder placeholder: () -> some View
     ) -> some View {
         ZStack(alignment: alignment) {
             placeholder().opacity(shouldShow ? 1 : 0)

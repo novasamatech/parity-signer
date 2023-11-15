@@ -1,5 +1,5 @@
 //
-//  TransactionCardSet+TransactionCards.swift
+//  MTransaction+TransactionCards.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 14/11/2022.
@@ -104,22 +104,22 @@ extension MTransaction {
     var previewType: TransactionPreviewType {
         switch ttype {
         case .importDerivations:
-            return .importKeys(keysCount: importableKeysCount)
+            .importKeys(keysCount: importableKeysCount)
         case .stub:
-            return sortedValueCards().compactMap {
+            sortedValueCards().compactMap {
                 switch $0.card {
                 case let .metaCard(record):
-                    return TransactionPreviewType.metadata(network: record.specname, version: record.specsVersion)
+                    TransactionPreviewType.metadata(network: record.specname, version: record.specsVersion)
                 case let .newSpecsCard(spec):
-                    return TransactionPreviewType.addNetwork(network: spec.name)
+                    TransactionPreviewType.addNetwork(network: spec.name)
                 default:
-                    return nil
+                    nil
                 }
             }.first ?? .unknown
         case .sign:
-            return .transfer
+            .transfer
         default:
-            return .unknown
+            .unknown
         }
     }
 }

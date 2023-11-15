@@ -15,7 +15,7 @@ struct TCNetworkInfo: View {
             NetworkLogoIcon(networkName: content.networkLogo)
             Text(content.networkTitle)
                 .font(PrimaryFont.labelM.font)
-                .foregroundColor(Asset.textAndIconsPrimary.swiftUIColor)
+                .foregroundColor(.textAndIconsPrimary)
         }
         .frame(height: 36)
         .padding(.horizontal)

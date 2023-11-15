@@ -39,7 +39,7 @@ tailrec fun Throwable.findErrorDisplayed(): ErrorDisplayed? {
 
 fun ErrorDisplayed.toTransactionError(): TransactionError {
 	return when (this) {
-		is ErrorDisplayed.DbNotInitialized -> TransactionError.Generic("")
+		is ErrorDisplayed.DbNotInitialized -> TransactionError.Generic("Db Not Initialized. Unreachable state here.")
 		is ErrorDisplayed.LoadMetaUnknownNetwork -> TransactionError.MetadataForUnknownNetwork(
 			name
 		)
@@ -52,7 +52,7 @@ fun ErrorDisplayed.toTransactionError(): TransactionError {
 			currentVersion = have,
 			expectedVersion = want
 		)
-		is ErrorDisplayed.MutexPoisoned -> TransactionError.Generic("")
+		is ErrorDisplayed.MutexPoisoned -> TransactionError.Generic("Mutex Poisoned. Unreachable state.")
 		is ErrorDisplayed.NoMetadata -> TransactionError.NoMetadataForNetwork(name)
 		is ErrorDisplayed.SpecsKnown -> TransactionError.NetworkAlreadyAdded(
 			name,
@@ -63,6 +63,8 @@ fun ErrorDisplayed.toTransactionError(): TransactionError {
 			genesisHash = genesisHash.toUByteArray().toByteArray().encodeHex(),
 			encryption = encryption.name
 		)
+		is ErrorDisplayed.WrongPassword -> TransactionError.Generic("Wrong Password")
+		is ErrorDisplayed.DbSchemaMismatch -> TransactionError.Generic("DB inconsistent state. Updated old app and got that far? DB flush required.")
 	}
 }
 
