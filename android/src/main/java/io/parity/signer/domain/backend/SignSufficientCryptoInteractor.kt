@@ -1,19 +1,10 @@
 package io.parity.signer.domain.backend
 
-import io.parity.signer.domain.FakeNavigator
-import io.parity.signer.domain.NavigationError
-import io.parity.signer.domain.Navigator
-import io.parity.signer.screens.scan.errors.findErrorDisplayed
 import io.parity.signer.screens.settings.networks.signspecs.SignSpecsListModel
 import io.parity.signer.screens.settings.networks.signspecs.SignSpecsResultModel
 import io.parity.signer.screens.settings.networks.signspecs.toSignSpecsListModel
 import io.parity.signer.screens.settings.networks.signspecs.toSignSpecsResultModel
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ActionResult
-import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ErrorDisplayed
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.backendAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
