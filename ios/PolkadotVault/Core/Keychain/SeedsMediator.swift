@@ -105,9 +105,6 @@ final class SeedsMediator: SeedsMediating {
         case let .success(payload):
             seedNames = payload.seeds
             authenticationStateMediator.authenticated = true
-            if !firstRun {
-                attemptToUpdate(seedNames: seedNames)
-            }
         case .failure:
             authenticationStateMediator.authenticated = false
         }
@@ -131,7 +128,6 @@ final class SeedsMediator: SeedsMediating {
         case .success:
             seedNames.append(seedName)
             seedNames.sort()
-            attemptToUpdate(seedNames: seedNames)
             return true
         case .failure:
             return false
@@ -202,7 +198,6 @@ final class SeedsMediator: SeedsMediating {
             seedNames = seedNames
                 .filter { $0 != seedName }
                 .sorted()
-            attemptToUpdate(seedNames: seedNames)
             return true
         case .failure:
             return false
@@ -236,15 +231,5 @@ final class SeedsMediator: SeedsMediating {
     func removeStalledSeeds() {
         _ = keychainAccessAdapter.removeAllSeeds()
         seedNames = []
-    }
-}
-
-private extension SeedsMediator {
-    func attemptToUpdate(seedNames: [String]) {
-        do {
-            try updateSeedNames(seedNames: seedNames)
-        } catch {
-            authenticationStateMediator.authenticated = false
-        }
     }
 }
