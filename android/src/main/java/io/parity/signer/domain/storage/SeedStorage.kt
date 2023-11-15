@@ -126,9 +126,9 @@ class SeedStorage {
 			apply()
 		}
 
-//		_lastKnownSeedNames.update { lastState ->
-//			lastState + seedName
-//		}
+		_lastKnownSeedNames.update { lastState ->
+			lastState + seedName
+		}
 	}
 
 	/**
@@ -163,9 +163,9 @@ class SeedStorage {
 	 */
 	fun removeSeed(seedName: String) {
 		sharedPreferences.edit().remove(seedName).apply()
-//		_lastKnownSeedNames.update { lastState ->
-//			lastState.filter { it != seedName }.toTypedArray()
-//		}
+		_lastKnownSeedNames.update { lastState ->
+			lastState.filter { it != seedName }.toTypedArray()
+		}
 	}
 
 	/**

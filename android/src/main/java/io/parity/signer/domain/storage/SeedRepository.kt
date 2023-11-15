@@ -170,7 +170,6 @@ class SeedRepository(
 		navigator: Navigator
 	) {
 		storage.addSeed(seedName, seedPhrase)
-		tellRustSeedNames()
 		//createRoots is fake and should always be true. It's added for educational reasons
 		val alwaysCreateRoots = "true"
 		navigator.navigate(
@@ -221,7 +220,6 @@ class SeedRepository(
 	) {
 		storage.addSeed(seedName, seedPhrase)
 		try {
-			tellRustSeedNames()
 			createKeySet(seedName, seedPhrase, networks)
 		} catch (e: ErrorDisplayed) {
 			submitErrorState("error in add seed $e")
@@ -240,7 +238,6 @@ class SeedRepository(
 			AuthResult.AuthSuccess -> {
 				try {
 					storage.removeSeed(seedName)
-					tellRustSeedNames()
 					when (val remove = uniffiInteractor.removeKeySet(seedName)) {
 						is UniffiResult.Error -> OperationResult.Err(remove.error)
 						is UniffiResult.Success -> OperationResult.Ok(Unit)
@@ -258,20 +255,6 @@ class SeedRepository(
 				OperationResult.Err(Exception("remove seed auth error $authResult"))
 			}
 		}
-	}
-
-
-	/**
-	 * Refresh seed names list
-	 * should be called within authentication envelope
-	 * authentication.authenticate(activity) {refreshSeedNames()}
-	 * which is somewhat asynchronous
-	 *
-	 * todo dmitry we don't need to tell rust names - remove it when not using state machine
-	 */
-	private fun tellRustSeedNames() {
-		val allNames = storage.getSeedNames()
-		updateSeedNames(allNames.toList())
 	}
 
 	private fun getSeedPhrasesDangerous(seedNames: List<String>): RepoResult<String> {
