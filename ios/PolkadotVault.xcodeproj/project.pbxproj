@@ -370,7 +370,7 @@
 		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
 		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
 		2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpecPlain.swift; sourceTree = "<group>"; };
-		2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Polkadot Vault Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE72BBE26A588C7002BB752 /* Vault Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vault Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* PolkadotVaultApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolkadotVaultApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
 		2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -809,7 +809,7 @@
 		2DE72BBF26A588C7002BB752 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */,
+				2DE72BBE26A588C7002BB752 /* Vault Dev.app */,
 				2DE72BCF26A588C9002BB752 /* PolkadotVaultTests.xctest */,
 			);
 			name = Products;
@@ -1894,7 +1894,7 @@
 				6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */,
 			);
 			productName = PolkadotVault;
-			productReference = 2DE72BBE26A588C7002BB752 /* Polkadot Vault Dev.app */;
+			productReference = 2DE72BBE26A588C7002BB752 /* Vault Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2DE72BCE26A588C9002BB752 /* PolkadotVaultTests */ = {
@@ -2610,7 +2610,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault Dev";
 			};
 			name = Debug;
 		};
@@ -2633,7 +2633,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault Dev";
 			};
 			name = Release;
 		};
@@ -2750,7 +2750,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "PolkadotVaultTests/PolkadotVaultTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Polkadot Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Polkadot Vault Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vault Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vault Dev";
 			};
 			name = QA;
 		};
