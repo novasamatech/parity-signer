@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -13,11 +14,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import io.parity.signer.R
+import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.toKeyDetailsModel
@@ -108,33 +114,58 @@ fun KeyDetailsScreenSubgraph(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				ConfirmExportPrivateKeyMenu(
 					onExportPrivate = {
-						menuNavController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
-							popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+						if (model.address.cardBase.hasPassword) {
+							menuNavController.navigate(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
+								popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+							}
+						} else {
+							menuNavController.navigate(
+								KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.destination(
+									null
+								)
+							) {
+								popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+							}
 						}
 					},
 					onClose = closeAction,
 				)
 			}
 		}
-		composable(KeyPublicDetailsMenuSubgraph.keyMenuExportResult) {
+		composable(
+			KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.route,
+			arguments = listOf(
+				navArgument(KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.password) {
+					type = NavType.StringType
+					nullable = true
+				}
+			)
+		) {
+			val password =
+				it.arguments?.getString(KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.password)
+
 			val privateModel: MutableState<OperationResult<PrivateKeyExportModel, Any>?> =
 				remember(model) {
 					mutableStateOf(null)
 				}
 
-			//don't forget to pass password in this parameter in future
-			LaunchedEffect(key1 = model) {
-				privateModel.value = vm.getPrivateExportKey(model)
+			LaunchedEffect(key1 = model, key2 = password) {
+				privateModel.value = vm.getPrivateExportKey(
+					model = model,
+					password = password
+				)
+			}
+
+			DisposableEffect(key1 = model, key2 = password) {
+				onDispose { vm.clearExportResultState() }
 			}
 
 			when (val model = privateModel.value) {
 				is OperationResult.Err -> {
-					// #1533
-					// navigate to KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport
 					val context = LocalContext.current
 					Toast.makeText(
 						context,
-						"For passworded keys export not yet supported, ${model.error}",
+						"Error, ${model.error}",
 						Toast.LENGTH_LONG
 					).show()
 					closeAction()
@@ -153,7 +184,53 @@ fun KeyDetailsScreenSubgraph(
 			}
 		}
 		composable(KeyPublicDetailsMenuSubgraph.keyMenuPasswordForExport) {
-			//todo handle keyMenuExportResult #1533 issue
+			val passwordModel =
+				remember { mutableStateOf(vm.createPasswordModel(model)) }
+			val context = LocalContext.current
+			BottomSheetWrapperRoot(onClosedAction = closeAction) {
+				EnterPassword(
+					data = passwordModel.value,
+					proceed = { password ->
+						vm.viewModelScope.launch {
+							when (val reply =
+								vm.tryPassword(model, passwordModel.value, password)) {
+								ExportTryPasswordReply.ErrorAttemptsExceeded -> {
+									Toast.makeText(
+										context,
+										context.getString(R.string.attempts_exceeded_title),
+										Toast.LENGTH_LONG
+									).show()
+									closeAction()
+								}
+
+								ExportTryPasswordReply.ErrorAuthWrong -> {
+									Toast.makeText(
+										context,
+										context.getString(R.string.auth_failed_message),
+										Toast.LENGTH_LONG
+									).show()
+									closeAction()
+								}
+
+								is ExportTryPasswordReply.OK -> {
+									menuNavController.navigate(
+										KeyPublicDetailsMenuSubgraph.KeyMenuExportResult.destination(
+											reply.password
+										)
+									) {
+										popUpTo(KeyPublicDetailsMenuSubgraph.empty)
+									}
+								}
+
+								is ExportTryPasswordReply.UpdatePassword -> {
+									passwordModel.value = reply.model
+								}
+							}
+						}
+					},
+					onClose = closeAction
+				)
+			}
 		}
 	}
 }
@@ -164,6 +241,17 @@ private object KeyPublicDetailsMenuSubgraph {
 	const val keyMenuGeneral = "key_menu_general"
 	const val keyMenuDelete = "key_menu_delete"
 	const val keyMenuExportConfirmation = "key_menu_export"
-	const val keyMenuExportResult = "key_private_export_result"
+
+	object KeyMenuExportResult {
+		private const val baseRoute = "key_private_export_result"
+		internal const val password = "password_arg" //optional
+		const val route = "$baseRoute?$password={$password}"
+		fun destination(passwordValue: String?): String {
+			val result =
+				if (passwordValue == null) baseRoute else "${baseRoute}?${password}=${passwordValue}"
+			return result
+		}
+	}
+
 	const val keyMenuPasswordForExport = "key_private_export_password"
 }

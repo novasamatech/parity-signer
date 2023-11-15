@@ -35,6 +35,7 @@ import io.parity.signer.components.networkicon.IdentIconWithNetwork
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.networkicon.IdentIconImage
 import io.parity.signer.domain.BASE58_STYLE_ABBREVIATE
+import io.parity.signer.domain.KeyDetailsModel
 import io.parity.signer.domain.KeyModel
 import io.parity.signer.domain.NetworkInfoModel
 import io.parity.signer.domain.abbreviateString
@@ -43,6 +44,7 @@ import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.Identicon
 import io.parity.signer.uniffi.MAddressCard
+import io.parity.signer.uniffi.MKeyDetails
 import java.util.*
 
 
