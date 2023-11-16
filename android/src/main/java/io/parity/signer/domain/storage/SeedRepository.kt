@@ -6,15 +6,12 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
-import io.parity.signer.domain.Navigator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.createKeySet
-import io.parity.signer.uniffi.updateSeedNames
 
 
 class SeedRepository(
@@ -118,65 +115,6 @@ class SeedRepository(
 			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
 			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
 		}
-	}
-
-	/**
-	 * Add seed, encrypt it, and create default accounts
-	 *
-	 * @return if was successfully added
-	 */
-	@Deprecated("use the one without navigator below")
-	suspend fun addSeed(
-		seedName: String,
-		seedPhrase: String,
-		navigator: Navigator,
-		isOptionalAuth: Boolean,
-	): Boolean {
-		// Check if seed name already exists
-		if (isSeedPhraseCollision(seedPhrase)) {
-			return false
-		}
-
-		try {
-			if (isOptionalAuth) {
-				addSeedDangerous(seedName, seedPhrase, navigator)
-				return true
-			} else {
-				throw UserNotAuthenticatedException()
-			}
-		} catch (e: UserNotAuthenticatedException) {
-			return when (val authResult = authentication.authenticate(activity)) {
-				AuthResult.AuthSuccess -> {
-					addSeedDangerous(seedName, seedPhrase, navigator)
-					true
-				}
-
-				AuthResult.AuthError,
-				AuthResult.AuthFailed,
-				AuthResult.AuthUnavailable -> {
-					Log.e(TAG, "auth error - $authResult")
-					false
-				}
-			}
-		} catch (e: java.lang.Exception) {
-			Log.e(TAG, e.toString())
-			return false
-		}
-	}
-
-	private fun addSeedDangerous(
-		seedName: String,
-		seedPhrase: String,
-		navigator: Navigator
-	) {
-		storage.addSeed(seedName, seedPhrase)
-		//createRoots is fake and should always be true. It's added for educational reasons
-		val alwaysCreateRoots = "true"
-		navigator.navigate(
-			action = Action.GO_FORWARD,
-			details = alwaysCreateRoots,
-			seedPhrase = seedPhrase
-		)
 	}
 
 	suspend fun addSeed(
