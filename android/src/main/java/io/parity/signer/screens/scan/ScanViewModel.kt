@@ -440,7 +440,7 @@ class ScanViewModel : ViewModel() {
 			}
 
 			is RepoResult.Success -> {
-				scanFlowInteractor.continueSigningTransaction(
+				scanFlowInteractor.continuePerformTransaction(
 					comment,
 					phrases.result,
 				)

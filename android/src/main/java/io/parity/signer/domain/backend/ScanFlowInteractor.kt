@@ -44,7 +44,7 @@ class ScanFlowInteractor {
 		navigator.navigate(Action.NAVBAR_SCAN)
 	}
 
-	suspend fun continueSigningTransaction(
+	suspend fun continuePerformTransaction(
 		comment: String,
 		seedPhrases: String
 	): ActionResult? {
