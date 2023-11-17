@@ -42,8 +42,6 @@
 		2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */; };
 		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
 		6D019968289C937600F4C317 /* AuthenticatedScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */; };
-		6D019972289D183200F4C317 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019970289CA13000F4C317 /* Navigation.swift */; };
-		6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */; };
 		6D019974289D183B00F4C317 /* UInt8+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */; };
 		6D01997E289D238700F4C317 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D01997D289D238700F4C317 /* Localizable.swift */; };
 		6D03118F2937269100C38F61 /* TransactionErrorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D03118E2937269100C38F61 /* TransactionErrorsView.swift */; };
@@ -113,11 +111,8 @@
 		6D52E3AF2946FF5400AD72F0 /* NetworkSelectionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52E3AE2946FF5400AD72F0 /* NetworkSelectionModal.swift */; };
 		6D52E3B12946FF5E00AD72F0 /* NetworkLogoIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52E3B02946FF5E00AD72F0 /* NetworkLogoIcon.swift */; };
 		6D55F286292CF2F800871896 /* StrokeContainerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D55F285292CF2F800871896 /* StrokeContainerBackground.swift */; };
-		6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */; };
 		6D57DC4D289D652400005C63 /* Dispatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4C289D652400005C63 /* Dispatching.swift */; };
-		6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */; };
 		6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */; };
-		6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D57DC53289D6CE900005C63 /* NavigationTests.swift */; };
 		6D57DC66289E524800005C63 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D57DC57289E524800005C63 /* Localizable.strings */; };
 		6D57DC67289E524800005C63 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6D57DC59289E524800005C63 /* Assets.xcassets */; };
 		6D57DC69289E524800005C63 /* swiftui-strings-template.stencil in Resources */ = {isa = PBXBuildFile; fileRef = 6D57DC5D289E524800005C63 /* swiftui-strings-template.stencil */; };
@@ -381,8 +376,6 @@
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		6D019964289BF7D000F4C317 /* UInt8+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt8+Formatting.swift"; sourceTree = "<group>"; };
 		6D019967289C937600F4C317 /* AuthenticatedScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedScreenContainer.swift; sourceTree = "<group>"; };
-		6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
-		6D019970289CA13000F4C317 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		6D01997D289D238700F4C317 /* Localizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
 		6D03118E2937269100C38F61 /* TransactionErrorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionErrorsView.swift; sourceTree = "<group>"; };
 		6D042AF12901B3FB00B3F4F7 /* QRCodeImageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeImageGenerator.swift; sourceTree = "<group>"; };
@@ -455,11 +448,8 @@
 		6D52E3AE2946FF5400AD72F0 /* NetworkSelectionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSelectionModal.swift; sourceTree = "<group>"; };
 		6D52E3B02946FF5E00AD72F0 /* NetworkLogoIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogoIcon.swift; sourceTree = "<group>"; };
 		6D55F285292CF2F800871896 /* StrokeContainerBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrokeContainerBackground.swift; sourceTree = "<group>"; };
-		6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendNavigationAdapter.swift; sourceTree = "<group>"; };
 		6D57DC4C289D652400005C63 /* Dispatching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatching.swift; sourceTree = "<group>"; };
-		6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinatorTests.swift; sourceTree = "<group>"; };
 		6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionResult+Generate.swift"; sourceTree = "<group>"; };
-		6D57DC53289D6CE900005C63 /* NavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTests.swift; sourceTree = "<group>"; };
 		6D57DC58289E524800005C63 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6D57DC59289E524800005C63 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6D57DC5D289E524800005C63 /* swiftui-strings-template.stencil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "swiftui-strings-template.stencil"; sourceTree = "<group>"; };
@@ -907,9 +897,6 @@
 		6D01996D289CA11500F4C317 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
-				6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */,
-				6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */,
-				6D019970289CA13000F4C317 /* Navigation.swift */,
 				6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */,
 			);
 			path = Navigation;
@@ -1142,15 +1129,6 @@
 			path = NetworkSelection;
 			sourceTree = "<group>";
 		};
-		6D57DC4E289D667000005C63 /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-				6D57DC4F289D667800005C63 /* NavigationCoordinatorTests.swift */,
-				6D57DC53289D6CE900005C63 /* NavigationTests.swift */,
-			);
-			path = Navigation;
-			sourceTree = "<group>";
-		};
 		6D57DC56289E524800005C63 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1242,7 +1220,6 @@
 			isa = PBXGroup;
 			children = (
 				6D8AF88028BCC4BF00CF0AB2 /* Keychain */,
-				6D57DC4E289D667000005C63 /* Navigation */,
 				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
 			);
@@ -2202,7 +2179,6 @@
 				6D7DF6542987ADEF00A8438E /* OnboardingState.swift in Sources */,
 				6D16685D28F5C15C008C664A /* CameraVideoOutputDelegate.swift in Sources */,
 				6D36CBB72A557E660001BB31 /* AddDerivedKeysData.swift in Sources */,
-				6D57DC4B289D614F00005C63 /* BackendNavigationAdapter.swift in Sources */,
 				6DC5643528B69355003D540B /* AccessControlProvidingAssembler.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				6DC9C486294B7F57000E6899 /* NetworkSelectionSettings.swift in Sources */,
@@ -2308,7 +2284,6 @@
 				6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */,
 				6DF07ADE29C1062300C01DE8 /* SetUpNetworksIntroView.swift in Sources */,
 				6D91F3EE28C16163007560F5 /* CircularProgressView.swift in Sources */,
-				6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */,
 				6DF3CFEC29936F41002DF203 /* EnterKeySetNameView.swift in Sources */,
 				6DF91F4029C06B70000A6BB2 /* VerifierValue+Show.swift in Sources */,
 				6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */,
@@ -2349,7 +2324,6 @@
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */,
 				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
-				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2361,13 +2335,11 @@
 				6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */,
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
-				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
-				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

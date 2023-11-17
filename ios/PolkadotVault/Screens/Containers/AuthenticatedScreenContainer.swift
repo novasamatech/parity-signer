@@ -9,7 +9,6 @@ import Combine
 import SwiftUI
 
 struct AuthenticatedScreenContainer: View {
-    @EnvironmentObject private var navigation: NavigationCoordinator
     @StateObject var viewModel: ViewModel
 
     var body: some View {
@@ -21,15 +20,6 @@ struct AuthenticatedScreenContainer: View {
                     onDeleteCompletion: viewModel.updateViewState
                 )
             )
-            .fullScreenModal(
-                isPresented: $navigation.genericError.isPresented
-            ) {
-                ErrorBottomModal(
-                    viewModel: .alertError(message: navigation.genericError.errorMessage),
-                    isShowingBottomAlert: $navigation.genericError.isPresented
-                )
-                .clearModalBackground()
-            }
             .bottomSnackbar(
                 viewModel.snackbarViewModel,
                 isPresented: $viewModel.isSnackbarPresented

@@ -502,36 +502,37 @@ extension CameraView {
 
 private extension CameraView.ViewModel {
     func startTransactionSigningFlow(_ payload: String) {
-        switch scanService.performTransaction(with: payload) {
-        case let .success(actionResult):
-            // Handle transactions with just error payload
-            guard case let .transaction(transactions) = actionResult.screenData else { return }
-            if transactions.allSatisfy(\.isDisplayingErrorOnly) {
-                presentableError = .transactionSigningError(
-                    message: transactions
-                        .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
-                )
+        scanService.performTransaction(with: payload) { result in
+            switch result {
+            case let .success(actionResult):
+                // Handle transactions with just error payload
+                guard case let .transaction(transactions) = actionResult.screenData else { return }
+                if transactions.allSatisfy(\.isDisplayingErrorOnly) {
+                    presentableError = .transactionSigningError(
+                        message: transactions
+                            .reduce("") { $0 + $1.transactionIssues() + ($1 == transactions.last ? "\n" : "") }
+                    )
+                    isPresentingError = true
+                    return
+                }
+                // Handle rest of transactions with optional error payload
+                // Type is assumed based on first error
+                let firstTransaction = transactions.first
+                switch firstTransaction?.ttype {
+                case .sign:
+                    continueTransactionSignature(transactions)
+                case .importDerivations:
+                    continueImportDerivedKeys(transactions)
+                default:
+                    // Transaction with error
+                    // Transaction that does not require signing (i.e. adding network or metadata)
+                    self.transactions = transactions
+                    isPresentingTransactionPreview = true
+                }
+            case let .failure(error):
+                presentableError = ErrorBottomModalViewModel.transactionError(for: error)
                 isPresentingError = true
-                scanService.resetNavigationState()
-                return
             }
-            // Handle rest of transactions with optional error payload
-            // Type is assumed based on first error
-            let firstTransaction = transactions.first
-            switch firstTransaction?.ttype {
-            case .sign:
-                continueTransactionSignature(transactions)
-            case .importDerivations:
-                continueImportDerivedKeys(transactions)
-            default:
-                // Transaction with error
-                // Transaction that does not require signing (i.e. adding network or metadata)
-                self.transactions = transactions
-                isPresentingTransactionPreview = true
-            }
-        case let .failure(error):
-            presentableError = ErrorBottomModalViewModel.transactionError(for: error)
-            isPresentingError = true
         }
     }
 
@@ -565,7 +566,6 @@ private extension CameraView.ViewModel {
                             }
                     )
                     self.isPresentingError = true
-                    self.scanService.resetNavigationState()
                     return
                 }
                 self.transactions = signedTransaction.transaction
@@ -583,7 +583,6 @@ private extension CameraView.ViewModel {
 
 extension CameraView.ViewModel {
     func continueImportDerivedKeys(_ transactions: [MTransaction]) {
-        scanService.resetNavigationState()
         if let importError = transactions.dominantImportError {
             switch importError {
             case .networkMissing:
