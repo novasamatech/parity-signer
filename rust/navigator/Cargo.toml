@@ -14,7 +14,7 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 thiserror = "1.0.50"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
-zeroize = { version = "1.6.1", features = ["std"] }
+zeroize = { version = "1.7.0", features = ["std"] }
 qrcode_rtx = { path = "../qrcode_rtx" }
 parity-scale-codec = "3.6.8"
 sled = "0.34"
