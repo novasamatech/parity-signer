@@ -99,7 +99,7 @@ final class SeedsMediator: SeedsMediating {
         refreshSeeds(firstRun: true)
     }
 
-    private func refreshSeeds(firstRun: Bool) {
+    private func refreshSeeds(firstRun _: Bool) {
         let result = keychainAccessAdapter.fetchSeedNames()
         switch result {
         case let .success(payload):

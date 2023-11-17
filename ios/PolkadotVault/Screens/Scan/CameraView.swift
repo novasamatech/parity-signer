@@ -26,7 +26,7 @@ struct CameraView: View {
                 }
                 .onChange(of: model.total) { total in
                     progressViewModel.total = total
-                    if total > 1, viewModel.isPresentingProgressSnackbar == false, !viewModel.isScanningMultiple {
+                    if total > 1, viewModel.isPresentingProgressSnackbar == false {
                         viewModel.isPresentingProgressSnackbar = true
                     }
                     if total <= 1 {
@@ -85,14 +85,6 @@ struct CameraView: View {
                         .foregroundColor(.accentForegroundText)
                         .frame(width: UIScreen.main.bounds.width * 0.86, alignment: .center)
                         Spacer()
-                    }
-                    if viewModel.isScanningMultiple, !model.multipleTransactions.isEmpty {
-                        VStack(spacing: 0) {
-                            multipleTransactionOverlay
-                            Color(.backgroundSecondaryDarkOnly)
-                                .frame(height: safeAreaInsets.bottom)
-                        }
-                        .transition(.move(edge: .bottom))
                     }
                 }
                 .compositingGroup()
@@ -212,37 +204,6 @@ struct CameraView: View {
         )
     }
 
-    var multipleTransactionOverlay: some View {
-        HStack(alignment: .center) {
-            Text(signText())
-                .font(PrimaryFont.titleS.font)
-                .foregroundColor(.accentForegroundText)
-                .padding(.top, Spacing.medium)
-            Spacer()
-            CapsuleButton(
-                action: {
-                    viewModel.onMultipleTransactionSign(model.multipleTransactions)
-                },
-                icon: Image(.arrowForward),
-                title: Localizable.Scanner.Action.sign.string
-            )
-            .padding(.top, Spacing.extraSmall)
-        }
-        .padding(.leading, Spacing.medium)
-        .padding(.trailing, Spacing.extraSmall)
-        .frame(height: Heights.bottomBarHeight)
-        .background(.backgroundSecondaryDarkOnly)
-    }
-
-    func signText() -> String {
-        let key = Localizable.Scanner.Label.self
-        let suffix = (
-            model.multipleTransactions.count > 1 ? key.SignMultiple.Suffix.plural : key.SignMultiple.Suffix
-                .single
-        ).string
-        return key.signMultiple(model.multipleTransactions.count, suffix)
-    }
-
     func selectKeySetsForNetworkViewModel() -> SelectKeySetsForNetworkKeyView.ViewModel {
         .init(
             networkName: viewModel.networkName,
@@ -265,7 +226,6 @@ extension CameraView {
     final class ViewModel: ObservableObject {
         // Overlay presentation
         @Published var isPresentingProgressSnackbar: Bool = false
-        @Published var isScanningMultiple: Bool = false
         @Published var header: String = Localizable.Scanner.Label.Scan.Main.header.string
         @Published var message: String = Localizable.Scanner.Label.Scan.Main.message.string
 
@@ -481,7 +441,6 @@ extension CameraView {
         }
 
         private func resumeCamera() {
-            cameraModel?.multipleTransactions = []
             cameraModel?.start()
             clearTransactionState()
         }
@@ -623,39 +582,7 @@ private extension CameraView.ViewModel {
     }
 }
 
-// MARK: - Mutliple Transactions mode
-
-extension CameraView.ViewModel {
-    func onMultipleTransactionSign(_ payloads: [String]) {
-        var transactions: [MTransaction] = []
-        for payload in payloads {
-            if case let .success(actionResult) = scanService.performTransaction(with: payload) {
-                if case let .transaction(value) = actionResult.screenData {
-                    transactions += value
-                }
-            }
-        }
-        self.transactions = transactions
-        isPresentingTransactionPreview = true
-    }
-
-    func onScanMultipleTap(model: CameraService) {
-        model.multipleTransactions = []
-        model.isMultipleTransactionMode.toggle()
-        isScanningMultiple.toggle()
-        updateTexts()
-    }
-}
-
 private extension CameraView.ViewModel {
-    func updateTexts() {
-        let key = Localizable.Scanner.Label.Scan.self
-        withAnimation {
-            header = (isScanningMultiple ? key.Multiple.header : key.Main.header).string
-            message = (isScanningMultiple ? key.Multiple.message : key.Main.message).string
-        }
-    }
-
     func sign(transactions: [MTransaction]) -> ActionResult? {
         let seedNames = transactions.compactMap { $0.authorInfo?.address.seedName }
         let seedPhrasesDictionary = seedsMediator.getSeeds(seedNames: Set(seedNames))
