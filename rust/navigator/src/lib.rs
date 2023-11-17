@@ -78,8 +78,13 @@ pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Result<()> {
     Ok(())
 }
 
+
+///todo dmitry add function to get transaction type and validate. It exeists - it's
+/// todo decode_sequence - but we need to add types from TransactionAction there
+/// for Example - for banana split and dyn derivations use specific function, or get_transaction() for rest
+
 /// Generate transaction from qr codes assembled data
-///
+/// todo dmitry support all types from above todo or make many functions for each transaction type
 pub fn get_transaction(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
 	//return mtransaction data??? to know which keys used to sign and transaction action
     Ok(TransactionState::new(database, details_str)?.action()?)
