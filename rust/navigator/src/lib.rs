@@ -79,16 +79,23 @@ pub fn init_navigation(db: sled::Db, seed_names: Vec<String>) -> Result<()> {
 }
 
 /// Generate transaction from qr codes assembled data
-pub fn get_transaction(database: &sled::Db, details_str: &str) -> Result<TransactionState> {
-    Ok(TransactionState::new(database, details_str)?)
+pub fn get_transaction(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
+	//return mtransaction data??? to know which keys used to sign and transaction action
+    Ok(TransactionState::new(database, details_str)?.action()?)
 }
 
+//todo validate password for key function create
+
+/// all passwords should be validated separately before and here we just signing
+/// transaction, that can be bulk, and expecting that error should never ocure
 pub fn sign_transaction(database: &sled::Db,
-												transaction_state: TransactionState,
-												password: Option<&str>,) -> Result<()> {
+												//list of seeds if needed,
+												transaction_state: TransactionAction,
+												password: Option<&str>,//todo pass passwords for keys
+												) -> Result<()> {
 	match transaction_state.action() {
 		transaction_parsing::TransactionAction::Sign { .. } => {
-			let mut new = transactionState.clone();
+			let mut new = transaction_state.clone();
 			new.update_seeds(secret_seed_phrase);
 			match password {
 				None => {}
@@ -125,6 +132,7 @@ pub fn sign_transaction(database: &sled::Db,
 			u: checksum,
 			stub: stub_nav,
 		} => match transaction_signing::handle_stub(&self.db, *checksum) {
+			//todo check when we actually executing this actions in state machine. Not when transaction signing happening looks like
 			Ok(()) => match stub_nav {
 				transaction_parsing::StubNav::AddSpecs {
 					n: network_specs_key,
