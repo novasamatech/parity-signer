@@ -198,15 +198,10 @@
 
 "Scanner.Label.Scan.Main.Header" = "Scan QR code";
 "Scanner.Label.Scan.Main.Message" = "Sign transaction, add network or update metadata";
-"Scanner.Label.Scan.Multiple.Header" = "Scan Multiple QR codes";
-"Scanner.Label.Scan.Multiple.Message" = "Press the Sign button when you’re done scanning";
 "Scanner.Action.Cancel" = "Cancel";
 "Scanner.Action.Sign" = "Sign";
 "Scanner.Label.Progress" = "%d / %d complete";
 "Scanner.Label.Multipart" = "Scanning";
-"Scanner.Label.SignMultiple" = "Sign %d %@";
-"Scanner.Label.SignMultiple.Suffix.single" = "Transaction";
-"Scanner.Label.SignMultiple.Suffix.plural" = "Transactions";
 
 "TransactionPreview.Label.Title" = "Transaction Details";
 "TransactionPreview.Action.UnlockSign" = "Unlock key and sign";
