@@ -711,6 +711,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     MSufficientCryptoReady sign_network_spec_with_key([ByRef] string network_key, [ByRef] string signing_address_key, [ByRef] string seed_phrase, string? password);
+
+    [Throws=ErrorDisplayed]
+    boolean assert_account_password([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string password);
 };
 
 dictionary MKeysNew {

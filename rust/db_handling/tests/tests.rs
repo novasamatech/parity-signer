@@ -32,7 +32,8 @@ use definitions::{
 };
 
 use db_handling::identities::{
-    create_key_set, dynamic_derivations_response, process_dynamic_derivations_v1,
+    assert_account_password, create_key_set, dynamic_derivations_response, get_all_addresses,
+    process_dynamic_derivations_v1,
 };
 use db_handling::{
     cold_default::{
@@ -2194,4 +2195,47 @@ fn test_assert_wrong_db_version() {
             ..
         })
     ));
+}
+
+#[test]
+fn test_assert_account_password() {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(&dbname).unwrap();
+    populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
+
+    let westend_hex = "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    let westend_specs_key = NetworkSpecsKey::from_hex(westend_hex).unwrap();
+    create_key_set(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        vec![westend_hex.to_string()],
+    )
+    .unwrap();
+    let address_key = AddressKey::from_parts(
+        &hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(),
+        &Encryption::Sr25519,
+        None,
+    )
+    .unwrap();
+    assert!(assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "").unwrap());
+
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        "//Alice///password",
+        &westend_specs_key,
+    )
+    .unwrap();
+
+    let ms = get_all_addresses(&db)
+        .unwrap()
+        .into_iter()
+        .find(|(_, a)| a.path == "//Alice")
+        .unwrap()
+        .0;
+    let address_key = AddressKey::new(ms, Some(westend_genesis()));
+    assert!(!assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "wrong_pass").unwrap());
+    assert!(assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "password").unwrap());
 }

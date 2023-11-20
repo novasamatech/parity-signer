@@ -354,6 +354,18 @@ fn full_address_to_multisigner(
     multisigner_result
 }
 
+pub fn assert_account_password(
+    database: &sled::Db,
+    address_key: &AddressKey,
+    seed_phrase: &str,
+    password: &str,
+) -> Result<bool> {
+    let address = get_address_details(database, address_key)?;
+    let full_address = format!("{}{}///{}", seed_phrase, address.path, password);
+    let expected = full_address_to_multisigner(full_address, address.encryption)?;
+    Ok(&expected == address_key.multi_signer())
+}
+
 /// Return seed name for the given key
 fn find_seed_name_for_multisigner(
     database: &sled::Db,
