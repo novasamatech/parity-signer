@@ -17,19 +17,21 @@ final class ApplicationStatePublisher: ObservableObject {
     @Published var applicationState: ApplicationState = .active
 
     private let cancelBag = CancelBag()
+    private let notificationCenter: NotificationCenter
 
-    init() {
+    init(notificationCenter: NotificationCenter = NotificationCenter.default) {
+        self.notificationCenter = notificationCenter
         subscribe()
     }
 
     private func subscribe() {
-        NotificationCenter.default
+        notificationCenter
             .publisher(for: UIApplication.willResignActiveNotification)
             .sink { [weak self] _ in
                 self?.applicationState = .inactive
             }
             .store(in: cancelBag)
-        NotificationCenter.default
+        notificationCenter
             .publisher(for: UIApplication.didBecomeActiveNotification)
             .sink { [weak self] _ in
                 self?.applicationState = .active
