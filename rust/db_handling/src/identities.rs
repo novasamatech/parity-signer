@@ -354,7 +354,7 @@ fn full_address_to_multisigner(
     multisigner_result
 }
 
-pub fn assert_account_password(
+pub fn validate_key_password(
     database: &sled::Db,
     address_key: &AddressKey,
     seed_phrase: &str,

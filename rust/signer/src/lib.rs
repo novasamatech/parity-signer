@@ -598,19 +598,14 @@ fn get_keys_for_signing() -> Result<MSignSufficientCrypto, ErrorDisplayed> {
     Ok(MSignSufficientCrypto { identities })
 }
 
-fn assert_account_password(
+fn validate_key_password(
     address_key: &str,
     seed_phrase: &str,
     password: &str,
 ) -> Result<bool, ErrorDisplayed> {
     let address_key = AddressKey::from_hex(address_key).map_err(|e| format!("{e}"))?;
-    db_handling::identities::assert_account_password(
-        &get_db()?,
-        &address_key,
-        seed_phrase,
-        password,
-    )
-    .map_err(|e| e.into())
+    db_handling::identities::validate_key_password(&get_db()?, &address_key, seed_phrase, password)
+        .map_err(|e| e.into())
 }
 
 fn sign_metadata_with_key(

@@ -32,8 +32,8 @@ use definitions::{
 };
 
 use db_handling::identities::{
-    assert_account_password, create_key_set, dynamic_derivations_response, get_all_addresses,
-    process_dynamic_derivations_v1,
+    create_key_set, dynamic_derivations_response, get_all_addresses,
+    process_dynamic_derivations_v1, validate_key_password,
 };
 use db_handling::{
     cold_default::{
@@ -2198,7 +2198,7 @@ fn test_assert_wrong_db_version() {
 }
 
 #[test]
-fn test_assert_account_password() {
+fn test_validate_key_password() {
     let dbname = tempdir().unwrap();
     let db = sled::open(&dbname).unwrap();
     populate_cold_no_metadata(&db, Verifier { v: None }).unwrap();
@@ -2218,7 +2218,7 @@ fn test_assert_account_password() {
         None,
     )
     .unwrap();
-    assert!(assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "").unwrap());
+    assert!(validate_key_password(&db, &address_key, ALICE_SEED_PHRASE, "").unwrap());
 
     try_create_address(
         &db,
@@ -2236,6 +2236,6 @@ fn test_assert_account_password() {
         .unwrap()
         .0;
     let address_key = AddressKey::new(ms, Some(westend_genesis()));
-    assert!(!assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "wrong_pass").unwrap());
-    assert!(assert_account_password(&db, &address_key, ALICE_SEED_PHRASE, "password").unwrap());
+    assert!(!validate_key_password(&db, &address_key, ALICE_SEED_PHRASE, "wrong_pass").unwrap());
+    assert!(validate_key_password(&db, &address_key, ALICE_SEED_PHRASE, "password").unwrap());
 }
