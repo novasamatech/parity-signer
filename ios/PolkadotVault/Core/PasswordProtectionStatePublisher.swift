@@ -18,20 +18,23 @@ extension LAContext: LAContextProtocol {}
 final class PasswordProtectionStatePublisher: ObservableObject {
     @Published var isProtected: Bool = true
     private var cancelBag = CancelBag()
-    private let context: LAContextProtocol
+    private let notificationCenter: NotificationCenter
 
-    init(context: LAContextProtocol = LAContext()) {
-        self.context = context
-        updateProtectionStatus()
-        NotificationCenter.default
-            .publisher(for: UIApplication.willEnterForegroundNotification)
-            .sink { [weak self] _ in self?.updateProtectionStatus() }
+    init(
+        context: LAContextProtocol = LAContext(),
+        notificationCenter: NotificationCenter = NotificationCenter.default
+    ) {
+        self.notificationCenter = notificationCenter
+        updateProtectionStatus(context: context)
+
+        notificationCenter.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in self?.updateProtectionStatus(context: context) }
             .store(in: cancelBag)
     }
 
-    private func updateProtectionStatus() {
+    private func updateProtectionStatus(context: LAContextProtocol) {
         Future { promise in
-            let isPasswordProtected = self.context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+            let isPasswordProtected = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
             promise(.success(isPasswordProtected))
         }
         .receive(on: DispatchQueue.main)

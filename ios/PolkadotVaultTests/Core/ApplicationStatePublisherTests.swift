@@ -26,21 +26,33 @@ final class ApplicationStatePublisherTests: XCTestCase {
     }
 
     func testApplicationState_WhenBecomesInactive_ShouldBeInactive() {
+        // Given
+        let expectation = expectation(description: "Notification is received")
+
         // When
         notificationCenter.post(name: UIApplication.willResignActiveNotification, object: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            expectation.fulfill()
+        }
 
         // Then
+        waitForExpectations(timeout: 2)
         XCTAssertEqual(subject.applicationState, .inactive)
     }
 
     func testApplicationState_WhenBecomesActive_ShouldBeActive() {
         // Given
+        let expectation = expectation(description: "Notification is received")
         notificationCenter.post(name: UIApplication.willResignActiveNotification, object: nil)
 
         // When
         notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            expectation.fulfill()
+        }
 
         // Then
+        waitForExpectations(timeout: 2)
         XCTAssertEqual(subject.applicationState, .active)
     }
 }
