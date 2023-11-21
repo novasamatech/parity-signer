@@ -75,11 +75,6 @@ fun RootNavigationGraph(
 			firstTimeOnlyOnboarding(
 				routePath = MainGraphRoutes.firstTimeOnboarding,
 				navController = navController,
-				onNextStepsNavigate = {
-					navController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
-						popUpTo(0)
-					}
-				},
 			)
 			enableEachStartAppFlow(navController)
 			mainSignerAppFlow(navController)
@@ -99,14 +94,19 @@ object MainGraphRoutes {
 fun NavGraphBuilder.firstTimeOnlyOnboarding(
 	routePath: String,
 	navController: NavHostController,
-	onNextStepsNavigate: Callback,
 ) {
 	navigation(
 		route = routePath,
 		startDestination = FirstTimeOnboarding.termsConsentRoute,
 	) {
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
-			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
+			TermsConsentScreenFull(
+				navigateNextScreen = {
+					navController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
+						popUpTo(0)
+					}
+				},
+			)
 		}
 	}
 }
