@@ -18,10 +18,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import io.parity.signer.domain.Callback
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
-import io.parity.signer.screens.initial.explanation.OnboardingExplanationScreenFull
 import io.parity.signer.screens.initial.splash.splashScreen
 import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import kotlinx.coroutines.delay
@@ -75,11 +73,6 @@ fun RootNavigationGraph(
 			firstTimeOnlyOnboarding(
 				routePath = MainGraphRoutes.firstTimeOnboarding,
 				navController = navController,
-				onNextStepsNavigate = {
-					navController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
-						popUpTo(0)
-					}
-				},
 			)
 			enableEachStartAppFlow(navController)
 			mainSignerAppFlow(navController)
@@ -99,14 +92,19 @@ object MainGraphRoutes {
 fun NavGraphBuilder.firstTimeOnlyOnboarding(
 	routePath: String,
 	navController: NavHostController,
-	onNextStepsNavigate: Callback,
 ) {
 	navigation(
 		route = routePath,
 		startDestination = FirstTimeOnboarding.termsConsentRoute,
 	) {
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
-			TermsConsentScreenFull(navigateNextScreen = onNextStepsNavigate)
+			TermsConsentScreenFull(
+				navigateNextScreen = {
+					navController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
+						popUpTo(0)
+					}
+				},
+			)
 		}
 	}
 }
