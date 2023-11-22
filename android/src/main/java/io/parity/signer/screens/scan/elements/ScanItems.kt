@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -32,12 +33,12 @@ fun CameraMultiSignIcon(
 ) {
 	Box(
 		modifier = modifier
-            .size(32.dp)
-            .clickable(onClick = onClick)
-            .background(
-                if (isEnabled) Color.White else MaterialTheme.colors.fill30,
-                CircleShape
-            ),
+			.size(32.dp)
+			.clickable(onClick = onClick)
+			.background(
+				if (isEnabled) Color.White else MaterialTheme.colors.fill30,
+				CircleShape
+			),
 		contentAlignment = Alignment.Center,
 	) {
 		Image(
@@ -60,12 +61,12 @@ internal fun CameraLightIcon(
 ) {
 	Box(
 		modifier = modifier
-            .size(40.dp)
-            .clickable(onClick = onClick)
-            .background(
-                if (isEnabled) Color.White else MaterialTheme.colors.forcedFill30,
-                CircleShape
-            ),
+			.size(40.dp)
+			.clip(CircleShape)
+			.clickable(onClick = onClick)
+			.background(
+				if (isEnabled) Color.White else MaterialTheme.colors.forcedFill30
+			),
 		contentAlignment = Alignment.Center,
 	) {
 		Image(

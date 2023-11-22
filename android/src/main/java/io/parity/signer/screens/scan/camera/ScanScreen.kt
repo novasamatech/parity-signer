@@ -104,7 +104,7 @@ fun ScanScreen(
 					.statusBarsPadding()
 					.padding(top = 4.dp)
 			)
-			ScanHeader(onClose = onClose)
+			ScanHeader(onClose = onClose, viewModel = viewModel)
 
 			Spacer(modifier = Modifier.weight(1f))
 			val capturedCpy = captured
