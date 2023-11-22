@@ -417,7 +417,7 @@
 	<string name="create_derivation_title">Create Derived Key</string>
 	<string name="public_key_bottom_sheet_label">Public key</string>
 	<string name="add_derived_keys_screen_title">Add Derived Keys</string>
-	<string name="add_derived_keys_screen_subtitle">Сheck the keys and scan QR code into Omni Wallet app</string>
+	<string name="add_derived_keys_screen_subtitle">Сheck the keys and scan QR code into the app</string>
 	<string name="add_derived_keys_screen_scan_qr_code">Scan QR code to add the keys</string>
 	<string name="generic_clear_selection">Clear</string>
 	<string name="network_filters_header">Filter keys by network</string>
