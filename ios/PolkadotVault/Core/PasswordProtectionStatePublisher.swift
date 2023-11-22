@@ -9,21 +9,31 @@ import Combine
 import LocalAuthentication
 import UIKit
 
+protocol LAContextProtocol {
+    func canEvaluatePolicy(_ policy: LAPolicy, error: NSErrorPointer) -> Bool
+}
+
+extension LAContext: LAContextProtocol {}
+
 final class PasswordProtectionStatePublisher: ObservableObject {
     @Published var isProtected: Bool = true
     private var cancelBag = CancelBag()
+    private let notificationCenter: NotificationCenter
 
-    init() {
-        updateProtectionStatus()
-        NotificationCenter.default
-            .publisher(for: UIApplication.willEnterForegroundNotification)
-            .sink { [weak self] _ in self?.updateProtectionStatus() }
+    init(
+        context: LAContextProtocol = LAContext(),
+        notificationCenter: NotificationCenter = NotificationCenter.default
+    ) {
+        self.notificationCenter = notificationCenter
+        updateProtectionStatus(context: context)
+
+        notificationCenter.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in self?.updateProtectionStatus(context: context) }
             .store(in: cancelBag)
     }
 
-    private func updateProtectionStatus() {
+    private func updateProtectionStatus(context: LAContextProtocol) {
         Future { promise in
-            let context = LAContext()
             let isPasswordProtected = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
             promise(.success(isPasswordProtected))
         }

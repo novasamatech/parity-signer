@@ -76,44 +76,6 @@ final class NavigationCoordinatorTests: XCTestCase {
 
 // MARK: - Mocks
 
-final class DispatchingMock: Dispatching {
-    var shouldPerformAsyncWork = true
-    var asyncAfterReceivedFlags: [DispatchWorkItemFlags] = []
-    var syncCallsCount = 0
-    var asyncCallsCount = 0
-    var asyncAfterCallsCount = 0
-
-    func async(execute work: @escaping @convention(block) () -> Void) {
-        asyncCallsCount += 1
-        guard shouldPerformAsyncWork else { return }
-        work()
-    }
-
-    func asyncAfter(deadline _: DispatchTime, execute work: @escaping @convention(block) () -> Void) {
-        asyncAfterCallsCount += 1
-        guard shouldPerformAsyncWork else { return }
-        work()
-    }
-
-    func asyncAfter(deadline _: DispatchTime, flags: DispatchWorkItemFlags, execute work: @escaping () -> Void) {
-        asyncAfterCallsCount += 1
-        asyncAfterReceivedFlags.append(flags)
-        guard shouldPerformAsyncWork else { return }
-        work()
-    }
-
-    func sync<T>(flags _: DispatchWorkItemFlags, execute work: () throws -> T) rethrows -> T {
-        syncCallsCount += 1
-        return try work()
-    }
-
-    func sync<T>(execute work: () throws -> T) rethrows -> T {
-        syncCallsCount += 1
-
-        return try work()
-    }
-}
-
 final class BackendNavigationPerformingMock: BackendNavigationPerforming {
     var performBackendActionCallsCount = 0
     var performBackendReceivedAction: [Action] = []

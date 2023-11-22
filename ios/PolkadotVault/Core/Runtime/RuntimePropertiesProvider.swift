@@ -28,14 +28,11 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
     }
 
     private let appInformationContainer: ApplicationInformationContaining.Type
-    private let processInfo: ProcessInfoProtocol
 
     init(
-        appInformationContainer: ApplicationInformationContaining.Type = ApplicationInformation.self,
-        processInfo: ProcessInfoProtocol = ProcessInfo.processInfo
+        appInformationContainer: ApplicationInformationContaining.Type = ApplicationInformation.self
     ) {
         self.appInformationContainer = appInformationContainer
-        self.processInfo = processInfo
     }
 
     var runtimeMode: ApplicationRuntimeMode {
