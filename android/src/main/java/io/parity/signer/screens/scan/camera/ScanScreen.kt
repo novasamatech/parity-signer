@@ -96,7 +96,7 @@ fun ScanScreen(
 			.fillMaxSize(1f)
 			.background(MaterialTheme.colors.background)
 	) {
-		CameraViewPermission(viewModel)
+		CameraViewWithPermission(viewModel)
 		CameraBottomText()
 		Column() {
 			Spacer(
@@ -151,7 +151,7 @@ private fun CameraBottomText() {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun CameraViewPermission(viewModel: CameraViewModel) {
+private fun CameraViewWithPermission(viewModel: CameraViewModel) {
 	if (LocalInspectionMode.current) return
 
 	val rationalShown = remember {
