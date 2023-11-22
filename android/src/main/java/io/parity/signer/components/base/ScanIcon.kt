@@ -13,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -52,6 +53,7 @@ fun ScanIcon(
 	Box(
 		modifier = modifier
 			.size(72.dp)
+			.clip(CircleShape)
 			.clickable(onClick = onClick)
 			.border(6.dp, MaterialTheme.colors.primary, CircleShape)
 			.background(MaterialTheme.colors.background),

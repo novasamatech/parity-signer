@@ -90,10 +90,8 @@ internal fun CameraCloseIcon(
 		modifier = Modifier
 			.size(40.dp)
 			.clickable(onClick = onCloseClicked)
-			.background(
-				MaterialTheme.colors.forcedFill30,
-				CircleShape
-			),
+			.clip(CircleShape)
+			.background(MaterialTheme.colors.forcedFill30),
 		contentAlignment = Alignment.Center,
 	) {
 		Image(
