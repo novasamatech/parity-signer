@@ -58,7 +58,6 @@ struct SettingsView: View {
             )
             .clearModalBackground()
         }
-        .environment(\.rootPresentationMode, $viewModel.isDetailsPresented)
     }
 
     @ViewBuilder

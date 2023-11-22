@@ -82,7 +82,6 @@
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
 		6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */; };
 		6D2D245728CF5C5200862726 /* PublicKeyActionsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */; };
-		6D2E66FD29DFFC1E000CE788 /* RootPresentationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */; };
 		6D30228329D183BE0074CDDF /* SignSpecEnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D30228229D183BE0074CDDF /* SignSpecEnterPasswordModal.swift */; };
 		6D31E7C22A404B4900BF9D9B /* AddKeysForNetworkModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D31E7C12A404B4900BF9D9B /* AddKeysForNetworkModal.swift */; };
 		6D31E7C42A404C4A00BF9D9B /* UnknownNetworkIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D31E7C32A404C4A00BF9D9B /* UnknownNetworkIcon.swift */; };
@@ -128,7 +127,6 @@
 		6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */; };
 		6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */; };
 		6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */; };
-		6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */; };
 		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
 		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
 		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
@@ -216,6 +214,12 @@
 		6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */; };
 		6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */; };
 		6DAA6CB329BF7155002329A8 /* OnboardingMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */; };
+		6DAFCAF82B0A360600DDD165 /* CameraPermissionHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAF72B0A360600DDD165 /* CameraPermissionHandlerTests.swift */; };
+		6DAFCAFA2B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAF92B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift */; };
+		6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAFC2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift */; };
+		6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */; };
+		6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */; };
+		6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */; };
 		6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */; };
 		6DB39AA92A45C909004B8FAA /* TransparentHelpBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */; };
 		6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */; };
@@ -424,7 +428,6 @@
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
 		6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyView.swift; sourceTree = "<group>"; };
 		6D2D245628CF5C5200862726 /* PublicKeyActionsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyActionsModal.swift; sourceTree = "<group>"; };
-		6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPresentationMode.swift; sourceTree = "<group>"; };
 		6D30228229D183BE0074CDDF /* SignSpecEnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecEnterPasswordModal.swift; sourceTree = "<group>"; };
 		6D31E7C12A404B4900BF9D9B /* AddKeysForNetworkModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeysForNetworkModal.swift; sourceTree = "<group>"; };
 		6D31E7C32A404C4A00BF9D9B /* UnknownNetworkIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownNetworkIcon.swift; sourceTree = "<group>"; };
@@ -470,7 +473,6 @@
 		6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMonitorProtocol.swift; sourceTree = "<group>"; };
 		6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapter.swift; sourceTree = "<group>"; };
 		6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvider.swift; sourceTree = "<group>"; };
-		6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfoProtocol.swift; sourceTree = "<group>"; };
 		6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PolkadotVaultTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
 		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
@@ -556,6 +558,12 @@
 		6DA9DAE829E5831C009CC12C /* ManageNetworkDetailsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageNetworkDetailsService.swift; sourceTree = "<group>"; };
 		6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatedStateMediator.swift; sourceTree = "<group>"; };
 		6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediator.swift; sourceTree = "<group>"; };
+		6DAFCAF72B0A360600DDD165 /* CameraPermissionHandlerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandlerTests.swift; sourceTree = "<group>"; };
+		6DAFCAF92B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccessAdapterTests.swift; sourceTree = "<group>"; };
+		6DAFCAFC2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProviderTests.swift; sourceTree = "<group>"; };
+		6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediatorTests.swift; sourceTree = "<group>"; };
+		6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatePublisherTests.swift; sourceTree = "<group>"; };
+		6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectionStatePublisherTests.swift; sourceTree = "<group>"; };
 		6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDerivedKeysView.swift; sourceTree = "<group>"; };
 		6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentHelpBox.swift; sourceTree = "<group>"; };
 		6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCapsuleView.swift; sourceTree = "<group>"; };
@@ -910,7 +918,6 @@
 				6D57DC4A289D614F00005C63 /* BackendNavigationAdapter.swift */,
 				6D01996E289CA12100F4C317 /* NavigationCoordinator.swift */,
 				6D019970289CA13000F4C317 /* Navigation.swift */,
-				6D2E66FC29DFFC1E000CE788 /* RootPresentationMode.swift */,
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -1193,7 +1200,6 @@
 		6D5801CE28991301006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				6DA501D5290BECB60096DA4E /* Data */,
 				6DEFB52B28FEC94000762219 /* QRCode */,
 				6D6ACA3F28F0B383002FB03A /* Camera */,
 				6DC5643128B68FB2003D540B /* Keychain */,
@@ -1212,7 +1218,6 @@
 			isa = PBXGroup;
 			children = (
 				6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */,
-				6D5801D828991F48006C41D8 /* ProcessInfoProtocol.swift */,
 				6DBD21F1289A74EE005D539B /* FileManagingProtocol.swift */,
 				6DBD21F3289A77DE005D539B /* BundleProtocol.swift */,
 				6D57DC4C289D652400005C63 /* Dispatching.swift */,
@@ -1241,10 +1246,14 @@
 		6D5801DA2899235C006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6DAFCAFB2B0AE86C00DDD165 /* Runtime */,
+				6DAFCAF62B0A360600DDD165 /* Camera */,
 				6D8AF88028BCC4BF00CF0AB2 /* Keychain */,
 				6D57DC4E289D667000005C63 /* Navigation */,
 				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
+				6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */,
+				6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1254,6 +1263,7 @@
 			children = (
 				6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */,
 				6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */,
+				6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */,
 			);
 			path = Connectivity;
 			sourceTree = "<group>";
@@ -1426,6 +1436,7 @@
 			children = (
 				6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */,
 				6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */,
+				6DAFCAF92B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift */,
 			);
 			path = Keychain;
 			sourceTree = "<group>";
@@ -1558,11 +1569,20 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		6DA501D5290BECB60096DA4E /* Data */ = {
+		6DAFCAF62B0A360600DDD165 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				6DAFCAF72B0A360600DDD165 /* CameraPermissionHandlerTests.swift */,
 			);
-			path = Data;
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		6DAFCAFB2B0AE86C00DDD165 /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				6DAFCAFC2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift */,
+			);
+			path = Runtime;
 			sourceTree = "<group>";
 		};
 		6DB39AA22A4579CF004B8FAA /* DynamicDerivations */ = {
@@ -2249,7 +2269,6 @@
 				6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */,
 				6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */,
 				6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */,
-				6D2E66FD29DFFC1E000CE788 /* RootPresentationMode.swift in Sources */,
 				6DED2AB52A405DD300EF1C49 /* SelectKeySetsForNetworkKeyView.swift in Sources */,
 				6D33EE312A9F47F7005F3827 /* KeyDetailsView+EmptyState.swift in Sources */,
 				6D14F978293480A900F8EF44 /* InfoBoxView.swift in Sources */,
@@ -2348,7 +2367,6 @@
 				6DFE588D297A72B1002BFDBF /* JailbreakDetectionPublisher.swift in Sources */,
 				6D42793728DB147800C141DC /* PrivateKeyQRCodeService.swift in Sources */,
 				6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */,
-				6D5801D928991F48006C41D8 /* ProcessInfoProtocol.swift in Sources */,
 				6D019972289D183200F4C317 /* Navigation.swift in Sources */,
 				6DC33723295ACF2D0067284B /* CornerRadiusModifier.swift in Sources */,
 			);
@@ -2360,15 +2378,21 @@
 			files = (
 				6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */,
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
+				6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
+				6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
+				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
+				6DAFCAF82B0A360600DDD165 /* CameraPermissionHandlerTests.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
+				6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */,
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
+				6DAFCAFA2B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
