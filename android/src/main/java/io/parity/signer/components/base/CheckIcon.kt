@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,13 +32,13 @@ fun CheckIcon(
 	Box(
 		modifier = modifier
 			.size(size)
+			.clip(CircleShape)
 			.run {
 				if (noBackground) {
 					this
 				} else {
 					background(
 						MaterialTheme.colors.fill18,
-						CircleShape
 					)
 				}
 			},

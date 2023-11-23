@@ -120,8 +120,8 @@ internal fun TransparentCutoutLayout(
 internal fun ScanHeader(
 	modifier: Modifier = Modifier,
 	onClose: Callback,
+	viewModel: CameraViewModel,
 ) {
-	val viewModel: CameraViewModel = viewModel()
 	val torchEnabled by viewModel.isTorchEnabled.collectAsStateWithLifecycle()
 	Row(
 		modifier
