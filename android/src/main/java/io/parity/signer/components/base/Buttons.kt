@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +52,7 @@ fun PrimaryButton(
 ) {
 	Box(
 		modifier = modifier
+			.clip(RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)))
 			.run {
 				if (isEnabled) {
 					clickable(onClick = onClicked)
@@ -88,6 +90,7 @@ fun PrimaryButtonGreyDisabled(
 ) {
 	Column(
 		modifier = modifier
+			.clip(RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)))
 			.run {
 				if (isEnabled) {
 					clickable(onClick = onClicked)
@@ -147,6 +150,7 @@ private fun SecondaryButton(
 ) {
 	Column(
 		modifier = modifier
+			.clip(RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)))
 			.clickable(onClick = onClicked)
 			.run {
 				if (withBackground) {
