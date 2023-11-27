@@ -41,7 +41,7 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
     }
 
     private func initialiseOnboardedUserRun(_ completion: @escaping (Result<Void, ServiceError>) -> Void) {
-        seedsMediator.initialRefreshSeeds()
+        seedsMediator.refreshSeeds()
         backendService.performCall({
             try initNavigation(dbname: self.databaseMediator.databaseName, seedNames: self.seedsMediator.seedNames)
         }, completion: completion)
