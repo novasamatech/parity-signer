@@ -602,7 +602,7 @@
 "ErrorDisplayed.WrongPassword" = "Wrong Password";
 
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
-"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
+"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into the app";
 "AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
 "AddDerivedKeys.Action.Done" = "Done";
 "AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
