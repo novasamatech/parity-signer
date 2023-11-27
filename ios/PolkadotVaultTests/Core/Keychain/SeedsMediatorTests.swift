@@ -158,10 +158,16 @@ final class SeedsMediatorTests: XCTestCase {
 
     func testGetSeedBackup_Success() {
         // Given
-        let seedName = "Seed1"
+        let seedName = "Seed3"
         let seedBackup = "BackupData"
         keychainAccessAdapterMock.retrieveSeedReturnValue = .success(seedBackup)
-
+        let databaseMediator = DatabaseMediator()
+        databaseMediator.recreateDatabaseFile()
+        try? initNavigation(
+            dbname: databaseMediator.databaseName,
+            seedNames: seedsMediator.seedNames
+        )
+        try? historyInitHistoryWithCert()
         // When
         let result = seedsMediator.getSeedBackup(seedName: seedName)
 
