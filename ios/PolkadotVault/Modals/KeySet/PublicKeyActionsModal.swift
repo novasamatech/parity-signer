@@ -49,8 +49,8 @@ struct PublicKeyActionsModal: View {
                         text: Localizable.PublicKeyDetailsModal.Action.delete.key,
                         style: .destructive
                     )
-                    EmptyButton(
-                        action: animateDismissal(),
+                    ActionButton(
+                        action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )

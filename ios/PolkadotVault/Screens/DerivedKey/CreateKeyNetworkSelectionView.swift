@@ -43,14 +43,15 @@ struct CreateKeyNetworkSelectionView: View {
                 }
                 Spacer()
                 VStack(alignment: .center, spacing: Spacing.small) {
-                    PrimaryButton(
+                    ActionButton(
                         action: viewModel.didTapCreate,
                         text: Localizable.CreateDerivedKey.Action.create.key,
                         style: .primary()
                     )
-                    EmptyButton(
-                        action: viewModel.didTapAddCustom(),
-                        text: Localizable.CreateDerivedKey.Action.addCustom.key
+                    ActionButton(
+                        action: viewModel.didTapAddCustom,
+                        text: Localizable.CreateDerivedKey.Action.addCustom.key,
+                        style: .emptyPrimary()
                     )
                 }
                 .padding(.horizontal, Spacing.large)

@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct ActionModel {
+struct ActionModel: Equatable {
     let label: LocalizedStringKey
     let action: () -> Void
 
-    static func == (lhs: ActionModel, rhs: ActionModel) -> Bool {
+    static func ==(lhs: ActionModel, rhs: ActionModel) -> Bool {
         lhs.label == rhs.label
     }
 }
@@ -88,21 +88,24 @@ struct ErrorBottomModal: View {
                     }
                     VStack {
                         if let primaryAction = viewModel.primaryAction {
-                            PrimaryButton(
+                            ActionButton(
                                 action: { animateDismissal(primaryAction.action()) },
-                                text: primaryAction.label
+                                text: primaryAction.label,
+                                style: .primary()
                             )
                         }
                         if let secondaryAction = viewModel.secondaryAction {
-                            SecondaryButton(
-                                action: animateDismissal(secondaryAction.action()),
-                                text: secondaryAction.label
+                            ActionButton(
+                                action: { animateDismissal(secondaryAction.action()) },
+                                text: secondaryAction.label,
+                                style: .secondary()
                             )
                         }
                         if let tertiaryAction = viewModel.tertiaryAction {
-                            EmptyButton(
-                                action: animateDismissal(tertiaryAction.action()),
-                                text: tertiaryAction.label
+                            ActionButton(
+                                action: { animateDismissal(tertiaryAction.action()) },
+                                text: tertiaryAction.label,
+                                style: .emptyPrimary()
                             )
                         }
                     }

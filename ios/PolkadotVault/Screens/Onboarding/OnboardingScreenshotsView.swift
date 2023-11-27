@@ -64,7 +64,7 @@ struct OnboardingScreenshotsView: View {
                     }
                     .padding(.horizontal, Spacing.extraLarge)
                     .padding(.bottom, Spacing.extraSmall)
-                    PrimaryButton(
+                    ActionButton(
                         action: viewModel.onDoneTap,
                         text: Localizable.Onboarding.Screenshots.Action.next.key,
                         style: .primary(isDisabled: $viewModel.isActionDisabled)

@@ -26,14 +26,15 @@ struct AddKeysForNetworkModal: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.center)
                     VStack(alignment: .center, spacing: Spacing.extraSmall) {
-                        PrimaryButton(
+                        ActionButton(
                             action: { animateDismissal(viewModel.onCreateTap) },
                             text: Localizable.AddKeysForNetworkModal.Action.accept.key,
                             style: .primary()
                         )
-                        EmptyButton(
-                            action: animateDismissal(viewModel.onCancelTap),
-                            text: Localizable.AddKeysForNetworkModal.Action.cancel.key
+                        ActionButton(
+                            action: { animateDismissal(viewModel.onCancelTap) },
+                            text: Localizable.AddKeysForNetworkModal.Action.cancel.key,
+                            style: .emptyPrimary()
                         )
                     }
                 }

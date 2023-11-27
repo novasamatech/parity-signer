@@ -30,7 +30,7 @@ struct CreateKeysForNetworksView: View {
                         networkSelection()
                         footer()
                         Spacer()
-                        PrimaryButton(
+                        ActionButton(
                             action: viewModel.onDoneTap,
                             text: Localizable.CreateKeysForNetwork.Action.create.key,
                             style: .primary()
