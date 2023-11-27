@@ -121,7 +121,6 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
-"KeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
@@ -138,7 +137,6 @@
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
 
-"PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
 "PublicKeyDetails.Label.Network" = "Network";
@@ -604,7 +602,6 @@
 "ErrorDisplayed.WrongPassword" = "Wrong Password";
 
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
-"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
 "AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
 "AddDerivedKeys.Action.Done" = "Done";
 "AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
