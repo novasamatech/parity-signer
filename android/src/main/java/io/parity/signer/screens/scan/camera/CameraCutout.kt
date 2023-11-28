@@ -28,7 +28,7 @@ import io.parity.signer.ui.theme.forcedFill40
 import io.parity.signer.ui.theme.pink500
 
 
-object ScanConstants{
+object ScanConstants {
 	val CLIP_SIDE_PADDING = 40.dp
 }
 
@@ -38,7 +38,6 @@ internal fun TransparentCutoutLayout(
 ) {
 
 	val sidePaddingInPX: Float
-
 	with(LocalDensity.current) {
 		sidePaddingInPX = ScanConstants.CLIP_SIDE_PADDING.toPx()
 	}
@@ -49,7 +48,7 @@ internal fun TransparentCutoutLayout(
 
 	Canvas(modifier = modifier.fillMaxSize()) {
 
-		val offsetInPx = (size.height/2) - (size.width/2)
+		val topOffsetInPx = (size.height / 2) - (size.width / 2)
 		val canvasWidth = size.width
 		val smallestSide = minOf(size.height, size.width)
 		val sideInPx = smallestSide - 2 * sidePaddingInPX
@@ -65,7 +64,7 @@ internal fun TransparentCutoutLayout(
 			drawRoundRect(
 				topLeft = Offset(
 					x = topLeftClipX,
-					y = offsetInPx
+					y = topOffsetInPx
 				),
 				size = Size(sideInPx, sideInPx),
 				cornerRadius = CornerRadius(roundClip.toPx(), roundClip.toPx()),
@@ -80,7 +79,7 @@ internal fun TransparentCutoutLayout(
 			drawRoundRect(
 				topLeft = Offset(
 					x = topLeftClipX,
-					y = offsetInPx,
+					y = topOffsetInPx,
 				),
 				size = Size(sideInPx, sideInPx),
 				cornerRadius = CornerRadius(roundClip.toPx(), roundClip.toPx()),
@@ -91,7 +90,7 @@ internal fun TransparentCutoutLayout(
 			drawRect(
 				topLeft = Offset(
 					x = topLeftClipX - frameThikness, //to overcover full width
-					y = offsetInPx + sideInPx / 3
+					y = topOffsetInPx + sideInPx / 3
 				),
 				size = Size(
 					width = sideInPx + frameThikness * 2,
@@ -104,7 +103,7 @@ internal fun TransparentCutoutLayout(
 			drawRect(
 				topLeft = Offset(
 					x = topLeftClipX + sideInPx / 3,
-					y = offsetInPx - frameThikness
+					y = topOffsetInPx - frameThikness
 				),
 				size = Size(sideInPx / 3, sideInPx + frameThikness * 2),
 				color = Color.Transparent,

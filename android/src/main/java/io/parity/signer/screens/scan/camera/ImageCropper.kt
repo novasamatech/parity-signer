@@ -5,20 +5,21 @@ import android.graphics.Rect
 import android.media.Image
 import android.util.Log
 import androidx.camera.core.ImageProxy
+import androidx.compose.ui.unit.Density
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21
 
 
 private const val TAG = "ImageCropper"
 
-class ImageCropper {
+class ImageCropper(val dencity: Density) {
 
 	var wasLogged = false //todo dmitry
 
 	@androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
-	fun convert(imageProxy: ImageProxy): InputImage {
+	fun getCuttedImage(imageProxy: ImageProxy): InputImage {
 		val mediaImage = imageProxy.image
-		if (mediaImage != null && mediaImage.format == ImageFormat.YUV_420_888) {
+		return if (mediaImage != null && mediaImage.format == ImageFormat.YUV_420_888) {
 			if (!wasLogged) {
 				Log.d(TAG, "proper type of camera, cropping for recognition enabled")
 				wasLogged = true
@@ -35,7 +36,7 @@ class ImageCropper {
 			}
 		} else {
 			if (!wasLogged) {
-				Log.e(TAG, "wrong format, it is ${mediaImage.format}, cropping disabled ")
+				Log.e(TAG, "wrong format, it is ${mediaImage?.format}, cropping disabled ")
 				wasLogged = true
 			}
 			InputImage.fromMediaImage(

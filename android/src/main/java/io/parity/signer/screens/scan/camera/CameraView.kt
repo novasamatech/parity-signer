@@ -40,10 +40,10 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 		factory = { context ->
 			val executor = ContextCompat.getMainExecutor(context)
 			val previewView = PreviewView(context).apply {
-				this.scaleType = PreviewView.ScaleType.FILL_CENTER
+				this.scaleType = PreviewView.ScaleType.FIT_CENTER
 				layoutParams = ViewGroup.LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT,
 				)
 			}
 			// mlkit docs: The default option is not recommended because it tries
@@ -72,6 +72,8 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 					.build()
 					.apply {
 						setAnalyzer(executor) { imageProxy ->
+							val crop = imageProxy.cropRect
+
 							//todo dmitry crop image
 							viewModel.processFrame(barcodeScanner, imageProxy)
 						}
