@@ -174,6 +174,4 @@ class SeedStorage {
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
-
-
 }

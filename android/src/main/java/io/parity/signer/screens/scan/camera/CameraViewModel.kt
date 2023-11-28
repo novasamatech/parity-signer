@@ -66,6 +66,7 @@ class CameraViewModel() : ViewModel() {
 			imageProxy.image!!,
 			imageProxy.imageInfo.rotationDegrees,
 		)
+		//todo dmitry remove above
 
 		barcodeScanner.process(inputImage)
 			.addOnSuccessListener { barcodes ->
@@ -187,5 +188,10 @@ class CameraViewModel() : ViewModel() {
 		_dynamicDerivationPayload.value = null
 		_dynamicDerivationTransactionPayload.value = null
 		resetScanValues()
+	}
+
+	private fun cropImage(image: ImageProxy) {
+
+//		todo dmitry as in https://stackoverflow.com/questions/63390243/is-there-a-way-to-crop-image-imageproxy-before-passing-to-mlkits-analyzer
 	}
 }

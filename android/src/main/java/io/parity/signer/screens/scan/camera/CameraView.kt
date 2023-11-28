@@ -72,6 +72,7 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 					.build()
 					.apply {
 						setAnalyzer(executor) { imageProxy ->
+							//todo dmitry crop image
 							viewModel.processFrame(barcodeScanner, imageProxy)
 						}
 					}
@@ -127,3 +128,5 @@ internal fun CameraViewInternal(viewModel: CameraViewModel) {
 		},
 	)
 }
+
+
