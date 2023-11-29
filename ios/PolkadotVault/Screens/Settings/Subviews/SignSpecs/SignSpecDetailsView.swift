@@ -44,9 +44,10 @@ struct SignSpecDetails: View {
                         )
                     )
                     .padding(.horizontal, Spacing.large)
-                    SecondaryButton(
-                        action: viewModel.onBackTap(),
-                        text: Localizable.SignSpecsDetails.Action.done.key
+                    ActionButton(
+                        action: viewModel.onBackTap,
+                        text: Localizable.SignSpecsDetails.Action.done.key,
+                        style: .secondary()
                     )
                     .padding(.horizontal, Spacing.large)
                     .padding(.top, Spacing.extraExtraLarge)

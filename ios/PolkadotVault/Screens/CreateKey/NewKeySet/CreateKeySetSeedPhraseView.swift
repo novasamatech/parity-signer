@@ -62,7 +62,7 @@ struct CreateKeySetSeedPhraseView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.extraSmall)
                         Spacer()
-                        PrimaryButton(
+                        ActionButton(
                             action: viewModel.onCreateTap,
                             text: Localizable.NewSeed.Backup.Action.create.key,
                             style: .primary(isDisabled: .constant(!viewModel.confirmBackup))

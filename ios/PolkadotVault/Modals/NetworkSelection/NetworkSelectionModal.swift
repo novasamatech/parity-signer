@@ -40,11 +40,12 @@ struct NetworkSelectionModal: View {
 
                     // Bottom actions
                     HStack(spacing: Spacing.extraSmall) {
-                        SecondaryButton(
-                            action: viewModel.resetAction(),
-                            text: Localizable.NetworkFilter.Action.reset.key
+                        ActionButton(
+                            action: viewModel.resetAction,
+                            text: Localizable.NetworkFilter.Action.reset.key,
+                            style: .secondary()
                         )
-                        PrimaryButton(
+                        ActionButton(
                             action: viewModel.doneAction,
                             text: Localizable.NetworkFilter.Action.done.key,
                             style: .primary()

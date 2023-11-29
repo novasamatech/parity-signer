@@ -83,7 +83,7 @@ struct NoAirgapView: View {
                     .padding(.horizontal, Spacing.medium)
                     .padding(.vertical, Spacing.extraSmall)
                     Spacer()
-                    PrimaryButton(
+                    ActionButton(
                         action: viewModel.onDoneTap,
                         text: viewModel.actionTitle,
                         style: .primary(isDisabled: $viewModel.isActionDisabled)

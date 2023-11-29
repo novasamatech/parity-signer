@@ -128,8 +128,8 @@ struct AddKeySetUpNetworksStepTwoView: View {
                 Localizable.Onboarding.SetUpNetworks.Step2.Label.step3.text
                     .font(PrimaryFont.bodyL.font)
             }
-            SecondaryButton(
-                action: viewModel.onScanTap(),
+            ActionButton(
+                action: viewModel.onScanTap,
                 text: Localizable.Onboarding.SetUpNetworks.Step2.Label.Step3.action.key,
                 style: .secondary()
             )

@@ -60,14 +60,15 @@ struct VerticalActionsBottomModal: View {
                             .foregroundColor(.textAndIconsSecondary)
                     }
                     VStack {
-                        PrimaryButton(
+                        ActionButton(
                             action: { animateDismissal(mainAction()) },
                             text: viewModel.mainActionLabel,
                             style: viewModel.mainActionStyle
                         )
-                        SecondaryButton(
-                            action: animateDismissal(dismissAction()),
-                            text: viewModel.dismissActionLabel
+                        ActionButton(
+                            action: { animateDismissal(dismissAction()) },
+                            text: viewModel.dismissActionLabel,
+                            style: .secondary()
                         )
                     }
                     .padding(.top, Spacing.extraSmall)

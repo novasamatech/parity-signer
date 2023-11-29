@@ -25,7 +25,7 @@ struct UnlockDeviceView: View {
                 .foregroundColor(.textAndIconsTertiary)
                 .padding(.horizontal, Spacing.extraExtraLarge)
                 .padding(.bottom, Spacing.extraExtraLarge)
-            PrimaryButton(
+            ActionButton(
                 action: viewModel.onUnlockTap,
                 text: Localizable.Error.LockedDevice.Action.unlock.key,
                 style: .primary()

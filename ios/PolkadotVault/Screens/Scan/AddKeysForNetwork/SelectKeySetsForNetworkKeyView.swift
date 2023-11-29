@@ -30,11 +30,12 @@ struct SelectKeySetsForNetworkKeyView: View {
                         }
                     }
                     HStack(spacing: Spacing.extraSmall) {
-                        SecondaryButton(
-                            action: viewModel.onCancelTap(),
-                            text: Localizable.SelectKeySetsForNetworkKey.Action.cancel.key
+                        ActionButton(
+                            action: viewModel.onCancelTap,
+                            text: Localizable.SelectKeySetsForNetworkKey.Action.cancel.key,
+                            style: .secondary()
                         )
-                        PrimaryButton(
+                        ActionButton(
                             action: viewModel.onDoneTap,
                             text: Localizable.SelectKeySetsForNetworkKey.Action.create.key,
                             style: .primary(isDisabled: .constant(viewModel.selectedSeedNames.isEmpty))

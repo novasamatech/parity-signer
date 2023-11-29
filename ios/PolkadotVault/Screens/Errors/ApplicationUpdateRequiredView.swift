@@ -42,7 +42,7 @@ struct ApplicationUpdateRequiredView: View {
                     .strokeContainerBackground()
                     .padding(.horizontal, Spacing.large)
                     .padding(.bottom, Spacing.extraLarge)
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onBackupTap,
                     text: Localizable.Error.ApplicationUpdateRequired.Action.backup.key,
                     style: .primary()

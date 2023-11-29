@@ -48,9 +48,10 @@ struct DerivationMethodsInfoView: View {
                             Localizable.CreateDerivedKey.InfoModal.DerivationMethods.Password.content.text
                                 .foregroundColor(.textAndIconsSecondary)
                                 .font(PrimaryFont.bodyM.font)
-                            SecondaryButton(
-                                action: viewModel.animateDismissal(),
-                                text: Localizable.CreateDerivedKey.InfoModal.DerivationMethods.action.key
+                            ActionButton(
+                                action: viewModel.animateDismissal,
+                                text: Localizable.CreateDerivedKey.InfoModal.DerivationMethods.action.key,
+                                style: .secondary()
                             )
                         }
                         .padding(.horizontal, Spacing.large)

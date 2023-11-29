@@ -33,16 +33,18 @@ struct ExportPrivateKeyWarningModal: View {
                         .font(PrimaryFont.bodyL.font)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, Spacing.small)
-                    PrimaryButton(
+                    ActionButton(
                         action: {
                             shouldPresentExportKeysModal.toggle()
                             animateDismissal()
                         },
-                        text: Localizable.KeyExportWarning.Action.export.key
+                        text: Localizable.KeyExportWarning.Action.export.key,
+                        style: .primary()
                     )
-                    EmptyButton(
-                        action: animateDismissal(),
-                        text: Localizable.KeyExportWarning.Action.cancel.key
+                    ActionButton(
+                        action: animateDismissal,
+                        text: Localizable.KeyExportWarning.Action.cancel.key,
+                        style: .emptyPrimary()
                     )
                 }
                 .padding(.horizontal, Spacing.large)

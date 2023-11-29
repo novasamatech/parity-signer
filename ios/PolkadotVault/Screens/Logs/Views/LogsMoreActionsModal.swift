@@ -32,8 +32,8 @@ struct LogsMoreActionsModal: View {
                         text: Localizable.LogsList.More.Action.clear.key,
                         style: .destructive
                     )
-                    EmptyButton(
-                        action: animateDismissal(),
+                    ActionButton(
+                        action: { animateDismissal() },
                         text: Localizable.LogsList.More.Action.cancel.key,
                         style: .emptySecondary()
                     )

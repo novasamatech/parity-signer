@@ -29,15 +29,15 @@ struct SetUpNetworksIntroView: View {
             // Networks preview
             Image(.networkPreviewIcons)
             Spacer()
-            PrimaryButton(
+            ActionButton(
                 action: viewModel.onSetUpTap,
                 text: Localizable.Onboarding.SetUpNetworks.Action.setUp.key,
                 style: .primary()
             )
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.extraSmall)
-            SecondaryButton(
-                action: viewModel.onLaterTap(),
+            ActionButton(
+                action: viewModel.onLaterTap,
                 text: Localizable.Onboarding.SetUpNetworks.Action.later.key,
                 style: .secondary()
             )

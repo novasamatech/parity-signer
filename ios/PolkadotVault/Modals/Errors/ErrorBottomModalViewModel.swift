@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct ErrorBottomModalViewModel {
-    struct Step {
+struct ErrorBottomModalViewModel: Equatable {
+    struct Step: Equatable {
         let step: String
         let content: AttributedString
     }
