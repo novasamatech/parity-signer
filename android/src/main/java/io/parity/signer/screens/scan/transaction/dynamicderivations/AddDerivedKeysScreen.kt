@@ -128,6 +128,8 @@ internal fun AddDerivedKeysScreen(
 
 @Composable
 private fun KeysetItemDerivedItem(model: DdKeySet) {
+	if (model.derivations.isEmpty()) return //empty keyset - don't show whole section
+
 	Column(
 		modifier = Modifier
 			.padding(horizontal = 16.dp, vertical = 4.dp)
