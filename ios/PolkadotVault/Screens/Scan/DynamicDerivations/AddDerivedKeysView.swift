@@ -17,7 +17,7 @@ struct AddDerivedKeysView: View {
             // Navigation Bar
             NavigationBarView(
                 viewModel: NavigationBarViewModel(
-                    leftButtons: [.init(type: .arrow, action: viewModel.onBackTap)],
+                    leftButtons: [.init(type: .xmark, action: viewModel.onBackTap)],
                     backgroundColor: .backgroundPrimary
                 )
             )
@@ -27,11 +27,12 @@ struct AddDerivedKeysView: View {
                         mainContent()
                         errorsSection()
                         keySets()
-                        qrCodeFooter()
+                        qrCodeSection()
+                        infoBoxSection()
                         Spacer()
-                        SecondaryButton(
-                            action: viewModel.onDoneTap(),
-                            text: Localizable.AddDerivedKeys.Action.done.key,
+                        ActionButton(
+                            action: viewModel.onMainActionTap(),
+                            text: Localizable.AddDerivedKeys.Action.main.key,
                             style: .secondary()
                         )
                         .padding(Spacing.large)
@@ -54,12 +55,12 @@ struct AddDerivedKeysView: View {
             .clearModalBackground()
         }
         .fullScreenModal(
-            isPresented: $viewModel.isPresentingAddKeysConfirmation
+            isPresented: $viewModel.isPresentingAddKeysCancelation
         ) {
-            VerticalActionsBottomModal(
-                viewModel: .confirmDerivedKeysCreation,
-                mainAction: viewModel.onConfirmTap(),
-                isShowingBottomAlert: $viewModel.isPresentingAddKeysConfirmation
+            HorizontalActionsBottomModal(
+                viewModel: .cancelAddingDerivedKeys,
+                mainAction: viewModel.onAddCancelationTap(),
+                isShowingBottomAlert: $viewModel.isPresentingAddKeysCancelation
             )
             .clearModalBackground()
         }
@@ -157,10 +158,10 @@ struct AddDerivedKeysView: View {
     }
 
     @ViewBuilder
-    func qrCodeFooter() -> some View {
+    func qrCodeSection() -> some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
             // Header
-            Localizable.AddDerivedKeys.Label.footer.text
+            Localizable.AddDerivedKeys.Label.qrCodeHeader.text
                 .font(PrimaryFont.bodyL.font)
                 .foregroundColor(.textAndIconsPrimary)
             // QR Code container
@@ -174,6 +175,20 @@ struct AddDerivedKeysView: View {
                 )
             }
             .containerBackground()
+        }
+        .padding(.horizontal, Spacing.large)
+        .padding(.top, Spacing.large)
+    }
+
+    @ViewBuilder
+    func infoBoxSection() -> some View {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            // Header
+            Localizable.AddDerivedKeys.Label.infoBoxHeader.text
+                .font(PrimaryFont.bodyL.font)
+                .foregroundColor(.textAndIconsPrimary)
+            // Info Box
+            ActionableInfoBoxView(renderable: .init(text: Localizable.AddDerivedKeys.Label.infobox.string), action: nil)
         }
         .padding(.horizontal, Spacing.large)
         .padding(.top, Spacing.large)
@@ -193,7 +208,7 @@ extension AddDerivedKeysView {
         private let seedsMediator: SeedsMediating
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
-        @Published var isPresentingAddKeysConfirmation: Bool = false
+        @Published var isPresentingAddKeysCancelation: Bool = false
         @Published var isPresentingDerivationPath: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
@@ -214,15 +229,29 @@ extension AddDerivedKeysView {
             self.onCompletion = onCompletion
         }
 
-        func onDoneTap() {
-            if !dynamicDerivationsPreview.keySet.derivations.isEmpty {
-                isPresentingAddKeysConfirmation = true
-            } else {
+        func onMainActionTap() {
+            if dynamicDerivationsPreview.keySet.derivations.isEmpty {
                 onSuccess()
+            } else {
+                continueCreation()
             }
         }
 
-        func onConfirmTap() {
+        func onAddCancelationTap() {
+            isPresented = false
+            onCompletion(.onCancel)
+        }
+
+        func onBackTap() {
+            isPresentingAddKeysCancelation = true
+        }
+
+        private func onSuccess() {
+            isPresented = false
+            onCompletion(.onDone)
+        }
+
+        private func continueCreation() {
             derivedKeysService.createDerivedKeys(
                 dynamicDerivationsPreview.keySet.seedName,
                 seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
@@ -236,16 +265,6 @@ extension AddDerivedKeysView {
                     self?.isPresentingError = true
                 }
             }
-        }
-
-        func onBackTap() {
-            isPresented = false
-            onCompletion(.onCancel)
-        }
-
-        private func onSuccess() {
-            isPresented = false
-            onCompletion(.onDone)
         }
     }
 }
