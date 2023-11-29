@@ -15,6 +15,14 @@ struct HorizontalActionsBottomModalViewModel {
     var mainActionStyle: ActionButtonStyle = .primaryDestructive()
     var alignment: HorizontalAlignment = .center
 
+    static let cancelAddingDerivedKeys = HorizontalActionsBottomModalViewModel(
+        title: Localizable.AddDerivedKeys.Modal.Label.title.string,
+        content: Localizable.AddDerivedKeys.Modal.Label.content.string,
+        dismissActionLabel: Localizable.AddDerivedKeys.Modal.Action.cancel.key,
+        mainActionLabel: Localizable.AddDerivedKeys.Modal.Action.main.key,
+        mainActionStyle: .primary()
+    )
+
     static let forgetKeySet = HorizontalActionsBottomModalViewModel(
         title: Localizable.KeySetsModal.Confirmation.Label.title.string,
         content: Localizable.KeySetsModal.Confirmation.Label.content.string,

@@ -10,6 +10,10 @@ import SwiftUI
 struct ActionModel {
     let label: LocalizedStringKey
     let action: () -> Void
+
+    static func == (lhs: ActionModel, rhs: ActionModel) -> Bool {
+        lhs.label == rhs.label
+    }
 }
 
 struct ErrorBottomModal: View {
