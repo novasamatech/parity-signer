@@ -417,7 +417,7 @@
 	<string name="create_derivation_title">Create Derived Key</string>
 	<string name="public_key_bottom_sheet_label">Public key</string>
 	<string name="add_derived_keys_screen_title">Add Derived Keys</string>
-	<string name="add_derived_keys_screen_subtitle">Сheck the keys and scan QR code into the app</string>
+	<string name="add_derived_keys_screen_subtitle">Сheck the keys, scan QR code into the app and confirm adding keys by pressing the button below</string>
 	<string name="add_derived_keys_screen_scan_qr_code">Scan QR code to add the keys</string>
 	<string name="generic_clear_selection">Clear</string>
 	<string name="network_filters_header">Filter keys by network</string>
@@ -451,6 +451,9 @@
 	<string name="error_version_helper_description">"Find the latest Polkadot Vault upgrade information here "</string>
 	<string name="fallback_recovery_phrase_title">Select Key Set</string>
 	<string name="fallback_recovery_phrase_description">Select a key set you want to Expose a Secret Recovery Phrase for</string>
+	<string name="add_derived_keys_screen_cta">Confirm and Add Keys</string>
+	<string name="add_derived_keys_screen_alert_title">Confirm by entering the PIN code</string>
+	<string name="add_derived_keys_screen_alert_content">To finalize the addition of keys to the key set, please confirm that you have scanned the QR code back into the app by entering the PIN code.</string>
 
 </resources>
 

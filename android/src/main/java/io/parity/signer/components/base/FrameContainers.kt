@@ -14,6 +14,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -106,6 +107,40 @@ fun NotificationFrameTextImportant(
 	}
 }
 
+
+@Composable
+fun NotificationFrameTextAlert(
+	message: String,
+	modifier: Modifier = Modifier,
+) {
+	val innerShape =
+		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
+	Row(
+		modifier = modifier
+			.border(
+				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
+				innerShape
+			)
+	) {
+		Text(
+			text = message,
+			color = MaterialTheme.colors.textTertiary,
+			style = SignerTypeface.BodyM,
+			modifier = Modifier
+				.weight(1f)
+				.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+		)
+		Icon(
+			imageVector = Icons.Outlined.Info,
+			contentDescription = null,
+			tint = MaterialTheme.colors.pink300,
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(start = 18.dp, end = 18.dp)
+		)
+	}
+}
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -119,19 +154,24 @@ fun NotificationFrameTextImportant(
 private fun PreviewFrameContainers() {
 	SignerNewTheme {
 		Column(
-			modifier = Modifier.size(300.dp),
+			modifier = Modifier,
 		) {
 			NotificationFrameText(message = stringResource(id = R.string.key_set_export_description_content))
 			SignerDivider()
 			NotificationFrameTextImportant(
 				message = stringResource(id = R.string.key_set_export_description_content),
-				modifier = Modifier.padding(horizontal = 8.dp),
+				modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
 			)
 			SignerDivider()
 			NotificationFrameTextImportant(
 				message = stringResource(id = R.string.key_set_export_description_content),
 				modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
 				withBorder = false
+			)
+			SignerDivider()
+			NotificationFrameTextAlert(
+				message = stringResource(id = R.string.key_set_export_description_content),
+				modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
 			)
 		}
 	}

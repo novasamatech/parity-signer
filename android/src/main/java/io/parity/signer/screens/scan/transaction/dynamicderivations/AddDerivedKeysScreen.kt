@@ -21,9 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
+import io.parity.signer.components.base.NotificationFrameTextAlert
 import io.parity.signer.components.base.NotificationFrameTextImportant
+import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.ScreenHeader
-import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
@@ -117,9 +118,22 @@ internal fun AddDerivedKeysScreen(
 			)
 		}
 
-		SecondaryButtonWide(
-			label = stringResource(R.string.transaction_action_done),
-			withBackground = true,
+		Text(
+			text = stringResource(R.string.add_derived_keys_screen_alert_title),
+			color = MaterialTheme.colors.primary,
+			style = SignerTypeface.BodyL,
+			modifier = Modifier
+				.padding(horizontal = 24.dp)
+				.padding(top = 16.dp, bottom = 8.dp),
+		)
+		NotificationFrameTextAlert(
+			message = stringResource(R.string.add_derived_keys_screen_alert_content),
+			modifier = Modifier.padding(horizontal = 16.dp),
+		)
+
+		PrimaryButtonWide(
+			label = stringResource(R.string.add_derived_keys_screen_cta),
+			isEnabled = model.keySet.derivations.isNotEmpty(),
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
 			onClicked = onDone,
 		)
