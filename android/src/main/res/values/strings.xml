@@ -426,9 +426,9 @@
 	<string name="dymanic_derivation_error_some_network_missing">"Some keys can not be imported until their networks are added. Please add missing networks and their metadata. "</string>
 	<string name="dymanic_derivation_error_custom_message">Derived key %1$s could not be created: %2$s</string>
 	<string name="dymanic_derivation_error_custom_title">There was an issue importing keys.</string>
-	<string name="confirm_dynamic_derivation_header">Please confirm derived key import with authorisation</string>
-	<string name="confirm_dynamic_derivation_message">Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.</string>
-	<string name="confirm_dynamic_derivation_cta">Confirm with authorisation</string>
+	<string name="confirm_dynamic_derivation_header">Discard adding keys?</string>
+	<string name="confirm_dynamic_derivation_message">"Keys won't be added if you close the screen. If you still want to add keys, press the 'Confirm and Add Keys' button at the bottom of the screen."</string>
+	<string name="confirm_dynamic_derivation_cta">Discard</string>
   <string name="sign_specs_keys_list_title">Select key for signing specs</string>
 	<string name="sign_specs_result_title">Specs signature</string>
   <string name="error_state_screen_title">Error state screen</string>

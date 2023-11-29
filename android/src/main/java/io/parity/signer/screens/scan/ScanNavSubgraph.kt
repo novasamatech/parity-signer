@@ -103,7 +103,7 @@ fun ScanNavSubgraph(
 	} else if (dynamicDerivationsData != null) {
 		AddDynamicDerivationScreenFull(
 			model = dynamicDerivationsData,
-			onBack = scanViewModel::clearState,
+			onClose = scanViewModel::clearState,
 			onDone = {
 				scanViewModel.createDynamicDerivations(
 					dynamicDerivationsData.keySet,
