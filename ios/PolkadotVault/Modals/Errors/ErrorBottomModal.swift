@@ -11,7 +11,7 @@ struct ActionModel: Equatable {
     let label: LocalizedStringKey
     let action: () -> Void
 
-    static func ==(lhs: ActionModel, rhs: ActionModel) -> Bool {
+    static func == (lhs: ActionModel, rhs: ActionModel) -> Bool {
         lhs.label == rhs.label
     }
 }
