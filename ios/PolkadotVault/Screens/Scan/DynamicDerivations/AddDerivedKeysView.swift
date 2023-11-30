@@ -33,7 +33,10 @@ struct AddDerivedKeysView: View {
                         ActionButton(
                             action: viewModel.onMainActionTap,
                             text: Localizable.AddDerivedKeys.Action.main.key,
-                            style: .secondary()
+                            style: .primary(isDisabled: .constant(
+                                viewModel.dynamicDerivationsPreview.keySet.derivations
+                                    .isEmpty
+                            ))
                         )
                         .padding(Spacing.large)
                     }
@@ -103,27 +106,31 @@ struct AddDerivedKeysView: View {
                 viewModel.dataModel.keySets,
                 id: \.keySetName
             ) { keySet in
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    Text(keySet.keySetName)
-                        .font(PrimaryFont.titleS.font)
-                        .foregroundColor(.textAndIconsPrimary)
-                        .multilineTextAlignment(.leading)
-                        .padding(Spacing.medium)
-                    Divider()
-                        .padding(.horizontal, Spacing.medium)
-                    ForEach(
-                        keySet.derivedKeys,
-                        id: \.base58
-                    ) { key in
-                        derivedKey(for: key)
-                        if key != keySet.derivedKeys.last {
-                            Divider()
-                                .padding(.horizontal, Spacing.medium)
+                if !keySet.derivedKeys.isEmpty {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        Text(keySet.keySetName)
+                            .font(PrimaryFont.titleS.font)
+                            .foregroundColor(.textAndIconsPrimary)
+                            .multilineTextAlignment(.leading)
+                            .padding(Spacing.medium)
+                        Divider()
+                            .padding(.horizontal, Spacing.medium)
+                        ForEach(
+                            keySet.derivedKeys,
+                            id: \.base58
+                        ) { key in
+                            derivedKey(for: key)
+                            if key != keySet.derivedKeys.last {
+                                Divider()
+                                    .padding(.horizontal, Spacing.medium)
+                            }
                         }
                     }
+                    .containerBackground()
+                    .padding(.bottom, Spacing.extraSmall)
+                } else {
+                    EmptyView()
                 }
-                .containerBackground()
-                .padding(.bottom, Spacing.extraSmall)
             }
         }
         .padding(.horizontal, Spacing.medium)
@@ -203,7 +210,7 @@ extension AddDerivedKeysView {
 
     final class ViewModel: ObservableObject {
         private let onCompletion: (OnCompletionAction) -> Void
-        private let dynamicDerivationsPreview: DdPreview
+        let dynamicDerivationsPreview: DdPreview
         private let derivedKeysService: CreateDerivedKeyService
         private let seedsMediator: SeedsMediating
         let dataModel: AddDerivedKeysData
@@ -238,17 +245,25 @@ extension AddDerivedKeysView {
         }
 
         func onAddCancelationTap() {
-            isPresented = false
-            onCompletion(.onCancel)
+            onCancel()
         }
 
         func onBackTap() {
-            isPresentingAddKeysCancelation = true
+            if dynamicDerivationsPreview.keySet.derivations.isEmpty {
+                onCancel()
+            } else {
+                isPresentingAddKeysCancelation = true
+            }
         }
 
         private func onSuccess() {
             isPresented = false
             onCompletion(.onDone)
+        }
+
+        private func onCancel() {
+            isPresented = false
+            onCompletion(.onCancel)
         }
 
         private func continueCreation() {
