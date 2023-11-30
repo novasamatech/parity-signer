@@ -24,7 +24,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameTextAlert
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.ScreenHeader
+import io.parity.signer.components.base.ScreenHeaderClose
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.qrcode.AnimatedQrKeysInfo
 import io.parity.signer.components.qrcode.EmptyAnimatedQrKeysProvider
@@ -46,15 +46,15 @@ import io.parity.signer.uniffi.QrData
 internal fun AddDerivedKeysScreen(
 	model: DdPreview,
 	modifier: Modifier = Modifier,
-	onBack: Callback,
+	onCack: Callback,
 	onDone: Callback,
 ) {
-	BackHandler(onBack = onBack)
+	BackHandler(onBack = onCack)
 	Column(
 		modifier = modifier.verticalScroll(rememberScrollState()),
 	) {
-		ScreenHeader(
-			onBack = onBack,
+		ScreenHeaderClose(
+			onClose = onCack,
 			title = null,
 			modifier = Modifier.padding(horizontal = 8.dp)
 		)
@@ -219,7 +219,7 @@ private fun PreviewAddDerivedKeysScreen() {
 	SignerNewTheme {
 		AddDerivedKeysScreen(
 			model = ddPreviewcreateStub(),
-			onBack = {},
+			onCack = {},
 			onDone = {},
 		)
 	}

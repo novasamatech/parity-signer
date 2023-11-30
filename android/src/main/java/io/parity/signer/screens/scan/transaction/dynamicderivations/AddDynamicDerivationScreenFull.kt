@@ -22,7 +22,7 @@ fun AddDynamicDerivationScreenFull(
 	AddDerivedKeysScreen(
 		model = model,
 		modifier = Modifier.statusBarsPadding(),
-		onBack = { confirmCloseState.value = true },
+		onCack = { confirmCloseState.value = true },
 		onDone = onDone,
 	)
 
