@@ -14,15 +14,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.parity.signer.R
-import io.parity.signer.components.base.PrimaryButtonWide
-import io.parity.signer.components.base.SecondaryButtonWide
+import io.parity.signer.components.base.RowButtonsBottomSheet
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textSecondary
 
 @Composable
-internal fun AddDDConfirmBottomSheet(
+internal fun AddDDConfirmCloseBottomSheet(
 	onConfirm: Callback,
 	onCancel: Callback,
 ) {
@@ -33,7 +32,6 @@ internal fun AddDDConfirmBottomSheet(
 			.padding(start = sidePadding, end = sidePadding),
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-
 		Text(
 			text = stringResource(R.string.confirm_dynamic_derivation_header),
 			color = MaterialTheme.colors.primary,
@@ -42,24 +40,18 @@ internal fun AddDDConfirmBottomSheet(
 			modifier = Modifier.padding(top = 24.dp)
 		)
 		Text(
-			modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
+			modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
 			text = stringResource(R.string.confirm_dynamic_derivation_message),
 			color = MaterialTheme.colors.textSecondary,
 			style = SignerTypeface.BodyL,
 			textAlign = TextAlign.Center,
 		)
-
-		PrimaryButtonWide(
-			label = stringResource(R.string.confirm_dynamic_derivation_cta),
-			onClicked = onConfirm,
-			modifier = Modifier.padding(bottom = 8.dp)
-		)
-
-		SecondaryButtonWide(
-			label = stringResource(R.string.generic_cancel),
-			withBackground = true,
-			onClicked = onCancel,
-			modifier = Modifier.padding(bottom = 24.dp)
+		RowButtonsBottomSheet(
+			labelCancel = stringResource(R.string.generic_cancel),
+			labelCta = stringResource(R.string.confirm_dynamic_derivation_cta),
+			onClickedCancel = onCancel,
+			onClickedCta = onConfirm,
+			modifier = Modifier.padding(vertical = 16.dp),
 		)
 	}
 }
@@ -77,6 +69,6 @@ internal fun AddDDConfirmBottomSheet(
 @Composable
 private fun PreviewConfirmExportPrivateKeyMenu() {
 	SignerNewTheme {
-		AddDDConfirmBottomSheet({}, {})
+		AddDDConfirmCloseBottomSheet({}, {})
 	}
 }
