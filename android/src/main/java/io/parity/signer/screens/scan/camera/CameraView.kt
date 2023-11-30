@@ -28,8 +28,9 @@ import java.util.concurrent.TimeUnit
 internal fun CameraViewInternal(viewModel: CameraViewModel) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val context = LocalContext.current
-	val cameraProviderFuture =
-		remember { ProcessCameraProvider.getInstance(context) }
+	val cameraProviderFuture = remember {
+		ProcessCameraProvider.getInstance(context)
+	}
 	val coroutineScope = rememberCoroutineScope()
 	val configuration = LocalConfiguration.current
 	val backgroundExecutor = remember {

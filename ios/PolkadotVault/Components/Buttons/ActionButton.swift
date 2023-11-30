@@ -72,7 +72,7 @@ struct ActionButton: View {
     private var style: ActionButtonStyle
 
     init(
-        action: @escaping @autoclosure () -> Void,
+        action: @escaping () -> Void,
         text: LocalizedStringKey,
         style: ActionButtonStyle
     ) {

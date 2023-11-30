@@ -39,8 +39,8 @@ struct KeyDetailsActionsModal: View {
                         text: Localizable.KeySetsModal.Action.delete.key,
                         style: .destructive
                     )
-                    EmptyButton(
-                        action: animateDismissal(),
+                    ActionButton(
+                        action: { animateDismissal() },
                         text: Localizable.AddKeySet.Button.cancel.key,
                         style: .emptySecondary()
                     )

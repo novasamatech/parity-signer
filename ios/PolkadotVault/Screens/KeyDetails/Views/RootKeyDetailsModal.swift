@@ -69,10 +69,10 @@ struct RootKeyDetailsModal: View {
                     }
                     .padding(.horizontal, Spacing.medium)
                     .padding(.top, Spacing.medium)
-                    // Close
-                    SecondaryButton(
-                        action: animateDismissal(),
-                        text: Localizable.KeyDetails.Root.Action.close.key
+                    ActionButton(
+                        action: animateDismissal,
+                        text: Localizable.KeyDetails.Root.Action.close.key,
+                        style: .secondary()
                     )
                     .padding(Spacing.large)
                 }

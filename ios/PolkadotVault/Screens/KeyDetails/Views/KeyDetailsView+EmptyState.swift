@@ -16,7 +16,7 @@ extension KeyDetailsView {
                 .foregroundColor(.textAndIconsPrimary)
                 .padding(.top, Spacing.large)
                 .padding(.horizontal, Spacing.componentSpacer)
-            PrimaryButton(
+            ActionButton(
                 action: viewModel.onCreateDerivedKeyTap,
                 text: Localizable.KeyDetails.Label.EmptyState.action.key,
                 style: .secondary()

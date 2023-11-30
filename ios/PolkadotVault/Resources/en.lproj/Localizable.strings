@@ -121,7 +121,6 @@
 "AddKeySet.Button.Recover" = "Recover Key Set";
 
 "KeyDetails.Label.Derived" = "Derived keys";
-"KeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "KeyDetails.Label.EmptyState.Header" = "Key Set Has No Derived Keys";
 "KeyDetails.Label.EmptyState.Action" = "Create Derived Key";
 
@@ -138,7 +137,6 @@
 "KeyDetails.Error.NoNetworks.Message" = "In order to create derived key, you need to add some networks first. Use \"Scan\" tab to scan network metadata first and try again.";
 
 
-"PublicKeyDetails.Label.ImportedKey" = "Imported from Omni Wallet";
 "PublicKeyDetails.Label.Keys" = "%@ Keys";
 "PublicKeyDetails.Label.KeySetName" = "Key Set Name";
 "PublicKeyDetails.Label.Network" = "Network";
@@ -604,16 +602,19 @@
 "ErrorDisplayed.WrongPassword" = "Wrong Password";
 
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
-"AddDerivedKeys.Label.Header" = "Сheck the keys and scan QR code into Omni Wallet app";
-"AddDerivedKeys.Label.Footer" = "Scan QR code to add the keys";
-"AddDerivedKeys.Action.Done" = "Done";
+"AddDerivedKeys.Label.Header" = "Сheck the keys, scan QR code into the app and confirm adding keys by pressing the button below";
+"AddDerivedKeys.Label.QRCodeHeader" = "Scan the QR code into the app";
+"AddDerivedKeys.Label.InfoBoxHeader" = "Confirm by entering the PIN code";
+"AddDerivedKeys.Label.Infobox" = "To finalize the addition of keys to the key set, please confirm that you have scanned the QR code back into the app by entering the PIN code.";
+"AddDerivedKeys.Action.Main" = "Confirm and Add Keys";
 "AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
 "AddDerivedKeys.Error.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Content" = "Derived key %@ could not be created: %@";
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Title" = "There was an issue importing keys.";
-"AddDerivedKeys.Modal.Label.Title" = "Please confirm derived key import with the PIN code";
-"AddDerivedKeys.Modal.Label.Content" = "Please confirm that you scanned the QR code back into the app. Once confirmed, the imported key will be added to the key set.";
-"AddDerivedKeys.Modal.Action.Confirm" = "Confirm with PIN code";
+
+"AddDerivedKeys.Modal.Label.Title" = "Discard adding keys?";
+"AddDerivedKeys.Modal.Label.Content" = "Keys won't be added if you close the screen. If you still want to add keys, press the 'Confirm and Add Keys' button at the bottom of the screen.";
+"AddDerivedKeys.Modal.Action.Main" = "Discard";
 "AddDerivedKeys.Modal.Action.Cancel" = "Cancel";
 
 "ManageKeySets.Label.Header" = "Key Sets";

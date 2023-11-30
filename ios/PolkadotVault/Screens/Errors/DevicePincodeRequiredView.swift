@@ -50,7 +50,7 @@ struct DevicePincodeRequired: View {
             .strokeContainerBackground()
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.extraExtraLarge)
-            PrimaryButton(
+            ActionButton(
                 action: viewModel.onOpenTap,
                 text: Localizable.Error.DevicePincodeRequired.Action.settings.key,
                 style: .primary()

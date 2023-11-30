@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-enum KeychainError: Error {
+enum KeychainError: Error, Equatable {
     case fetchError
     case checkError
     case saveError(message: String)
@@ -22,14 +22,11 @@ protocol SeedsMediating: AnyObject {
     ///
     /// This should be turned to `private` in future refactors
     var seedNames: [String] { get set }
-    var seedNamesPublisher: AnyPublisher<[String], Never> { get }
 
     /// Get all seed names from secure storage
     ///
     /// This is also used as generic auth request operation that will lock the app on failure
     func refreshSeeds()
-    /// Get all seed names from secure storage without sending update to Rust
-    func initialRefreshSeeds()
     /// Saves a seed within Keychain and adjust app state
     /// - Parameters:
     ///   - seedName: seed name
@@ -62,22 +59,13 @@ protocol SeedsMediating: AnyObject {
 
 /// Class handling all seeds-related operations that require access to Keychain
 /// As this class contains logic related to UI state and data handling,
-/// it should not interact with Keychain directly through injected dependencies
-///
-/// Old documentation below for reference, will be removed later:
-/// Seeds management operations - these mostly rely on secure enclave
-/// Seeds are stored in Keychain - it has SQL-like api but is backed by secure enclave
-/// IMPORTANT! The keys in Keychain are not removed on app uninstall!
-/// Remember to wipe the app with wipe button in settings.
+/// it should not interact with Keychain directly, but through injected dependencies
 final class SeedsMediator: SeedsMediating {
     private let queryProvider: KeychainQueryProviding
     private let keychainAccessAdapter: KeychainAccessAdapting
     private let databaseMediator: DatabaseMediating
     private let authenticationStateMediator: AuthenticatedStateMediator
     @Published var seedNames: [String] = []
-    var seedNamesPublisher: AnyPublisher<[String], Never> {
-        $seedNames.eraseToAnyPublisher()
-    }
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
@@ -92,14 +80,6 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func refreshSeeds() {
-        refreshSeeds(firstRun: false)
-    }
-
-    func initialRefreshSeeds() {
-        refreshSeeds(firstRun: true)
-    }
-
-    private func refreshSeeds(firstRun _: Bool) {
         let result = keychainAccessAdapter.fetchSeedNames()
         switch result {
         case let .success(payload):

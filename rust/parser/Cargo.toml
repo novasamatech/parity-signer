@@ -13,7 +13,7 @@ frame-metadata = { version = "16.0.0", default-features = false, features = ["st
 hex = "0.4.3"
 lazy_static = "1.4.0"
 num-bigint = "0.4.4"
-parity-scale-codec = {version = "3.6.8", features = ["derive", "bit-vec"]}
+parity-scale-codec = {version = "3.6.9", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
 regex = "1.10.2"
 scale-info = "2.10.0"

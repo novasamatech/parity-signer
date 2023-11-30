@@ -71,7 +71,7 @@ struct OnboardingAgreementsView: View {
             }
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.extraLarge)
-            PrimaryButton(
+            ActionButton(
                 action: viewModel.onDoneTap,
                 text: Localizable.Onboarding.Agreements.Action.accept.key,
                 style: .primary(isDisabled: $viewModel.isActionDisabled)

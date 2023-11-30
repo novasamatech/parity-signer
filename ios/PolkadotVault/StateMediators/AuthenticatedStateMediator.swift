@@ -7,6 +7,6 @@
 
 import Foundation
 
-final class AuthenticatedStateMediator: ObservableObject {
+class AuthenticatedStateMediator: ObservableObject {
     @Published var authenticated: Bool = false
 }

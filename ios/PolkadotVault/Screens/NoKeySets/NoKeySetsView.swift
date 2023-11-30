@@ -27,12 +27,12 @@ struct NoKeySetsView: View {
             .padding(.horizontal, Spacing.extraLarge)
             .padding(.bottom, Spacing.flexibleComponentSpacer)
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onAddTap,
                     text: Localizable.NoKeySets.Action.add.key,
                     style: .primary()
                 )
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onRecoverTap,
                     text: Localizable.NoKeySets.Action.recover.key,
                     style: .secondary()
