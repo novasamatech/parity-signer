@@ -32,8 +32,8 @@ struct NetworkSettingsDetailsActionModal: View {
                         text: Localizable.Settings.NetworkDetails.More.Action.delete.key,
                         style: .destructive
                     )
-                    EmptyButton(
-                        action: animateDismissal(),
+                    ActionButton(
+                        action: { animateDismissal() },
                         text: Localizable.LogsList.More.Action.cancel.key,
                         style: .emptySecondary()
                     )

@@ -31,7 +31,7 @@ struct AddDerivedKeysView: View {
                         infoBoxSection()
                         Spacer()
                         ActionButton(
-                            action: viewModel.onMainActionTap(),
+                            action: viewModel.onMainActionTap,
                             text: Localizable.AddDerivedKeys.Action.main.key,
                             style: .secondary()
                         )

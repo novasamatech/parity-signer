@@ -22,7 +22,6 @@ struct NavbarButtonStyle: ButtonStyle {
 struct NavbarButton: View {
     private let action: () -> Void
     private let icon: Image
-
     @State var isDisabled: Bool
 
     init(

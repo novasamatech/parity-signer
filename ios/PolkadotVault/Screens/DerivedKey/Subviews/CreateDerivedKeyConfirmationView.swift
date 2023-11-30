@@ -61,7 +61,7 @@ struct CreateDerivedKeyConfirmationView: View {
                         viewModel.toggleCheckbox()
                     }
                     .padding(.bottom, Spacing.large)
-                    PrimaryButton(
+                    ActionButton(
                         action: viewModel.onDoneTap,
                         text: Localizable.CreateDerivedKey.Modal.Confirmation.action.key,
                         style: .primary(isDisabled: $viewModel.isActionDisabled)

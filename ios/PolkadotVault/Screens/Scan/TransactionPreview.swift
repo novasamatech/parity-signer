@@ -145,19 +145,19 @@ struct TransactionPreview: View {
             switch transactionType {
             case .sign,
                  .read:
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onDoneTap,
                     text: Localizable.TransactionPreview.Action.done.key,
                     style: .secondary()
                 )
             case .stub:
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onApproveTap,
                     text: Localizable.TransactionPreview.Action.approve.key,
                     style: .primary()
                 )
             case .importDerivations:
-                PrimaryButton(
+                ActionButton(
                     action: viewModel.onImportKeysTap,
                     text: Localizable.ImportKeys.Action.import.key,
                     style: .primary()
@@ -167,9 +167,10 @@ struct TransactionPreview: View {
                 EmptyView()
             }
             if ![.done, .sign, .read].contains(transactionType) {
-                EmptyButton(
-                    action: viewModel.onCancelTap(),
-                    text: Localizable.TransactionPreview.Action.cancel.key
+                ActionButton(
+                    action: viewModel.onCancelTap,
+                    text: Localizable.TransactionPreview.Action.cancel.key,
+                    style: .emptyPrimary()
                 )
             }
         }
