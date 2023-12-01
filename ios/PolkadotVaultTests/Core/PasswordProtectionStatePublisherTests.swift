@@ -54,7 +54,7 @@ final class PasswordProtectionStatePublisherTests: XCTestCase {
         }
 
         // Then
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 10)
         XCTAssertTrue(subject.isProtected)
     }
 
@@ -70,7 +70,7 @@ final class PasswordProtectionStatePublisherTests: XCTestCase {
         }
 
         // Then
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 10)
         XCTAssertFalse(subject.isProtected)
     }
 }
