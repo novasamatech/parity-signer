@@ -53,6 +53,7 @@ class KeysetRecoverViewModel : ViewModel() {
 			} else {
 				//valid word input handling
 				val input = rawUserInput.trim()
+					.lowercase() // word could be capitalized by keyboard autocompletion
 				val guessing = getGuessWords(input)
 				if (rawUserInput.endsWith(KeysetRecoverModel.SPACE_CHARACTER)) {
 					if (guessing.contains(input)) {
