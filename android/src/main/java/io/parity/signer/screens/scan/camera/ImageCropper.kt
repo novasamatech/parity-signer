@@ -26,17 +26,20 @@ class ImageCropper(val dencity: Density) {
 			}
 			//todo dmitry calculate crop rect
 			croppedNV21(mediaImage, imageProxy.cropRect).let { byteArray ->
-					InputImage.fromByteArray(
-						byteArray,
-						imageProxy.cropRect.width(),
-						imageProxy.cropRect.height(),
-						imageProxy.imageInfo.rotationDegrees,
-						IMAGE_FORMAT_NV21,
-					)
+				InputImage.fromByteArray(
+					byteArray,
+					imageProxy.cropRect.width(),
+					imageProxy.cropRect.height(),
+					imageProxy.imageInfo.rotationDegrees,
+					IMAGE_FORMAT_NV21,
+				)
 			}
 		} else {
 			if (!wasLogged) {
-				Log.e(TAG, "wrong format, it is ${mediaImage?.format}, cropping disabled ")
+				Log.e(
+					TAG,
+					"wrong format, it is ${mediaImage?.format}, cropping disabled "
+				)
 				wasLogged = true
 			}
 			InputImage.fromMediaImage(
@@ -61,7 +64,11 @@ class ImageCropper(val dencity: Density) {
 		return cropByteArray(nv21, mediaImage.width, cropRect)
 	}
 
-	private fun cropByteArray(array: ByteArray, imageWidth: Int, cropRect: Rect): ByteArray {
+	private fun cropByteArray(
+		array: ByteArray,
+		imageWidth: Int,
+		cropRect: Rect
+	): ByteArray {
 		val croppedArray = ByteArray(cropRect.width() * cropRect.height())
 		var i = 0
 		array.forEachIndexed { index, byte ->

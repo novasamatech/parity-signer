@@ -16,6 +16,8 @@ object ImageCropperCompose {
 
 			//todo dmitry calculate what to crop taking rotation into account.
 //		and move this logic into our usual cropper or even cache it.
-		val min =
+//		val min =
+//		todo remove below
+		return Rect(0,0,0,0)
 	}
 }
