@@ -116,21 +116,7 @@ If you get errors like `cargo: feature X is required`, it most likely means you 
 
 **5.** Install dependencies
 Currently most of iOS tooling is integrated via [Homebrew](https://brew.sh) to avoid use of [CocoaPods](https://cocoapods.org).
-
-Before running project for the first time, run the following in the console
-
-```bash
-brew install swiftgen
-brew install swiftformat
-brew install swiftlint
-```
-
-If you are using M1 machine, it might be necessary to run following commands for XCode's Build Phases to run tooling correctly:
-```
-sudo ln -s /opt/homebrew/bin/swiftgen /usr/local/bin/swiftgen
-sudo ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat
-sudo ln -s /opt/homebrew/bin/swiftlint /usr/local/bin/swiftlint
-```
+They will install on the first run, you should see installation confirmation in Xcode Build Log.
 
 **6.** Open the `PolkadotVault.xcodeproj` project from the `ios` folder in your Xcode. Project features three schemes:
 - `PolkadotVault` - used for deployments and running production-ready app on your devices
