@@ -809,7 +809,6 @@
 				2DE72BD226A588C9002BB752 /* PolkadotVaultTests */,
 				2DE72BBF26A588C7002BB752 /* Products */,
 				2DE72C0B26A992D9002BB752 /* Frameworks */,
-				6DF7146C2A555CB300F6A527 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -862,7 +861,6 @@
 		2DE72BD226A588C9002BB752 /* PolkadotVaultTests */ = {
 			isa = PBXGroup;
 			children = (
-				6DDD38B42B1346BB000D2B62 /* Screens */,
 				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
 				6DC2EDFA2B1196D700298F00 /* Backend */,
 				6DBD21FE289A8C67005D539B /* Helpers */,
@@ -1845,13 +1843,6 @@
 				6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */,
 			);
 			path = CreateKey;
-			sourceTree = "<group>";
-		};
-		6DF7146C2A555CB300F6A527 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		6DF91F3B29C06AF6000A6BB2 /* StateMediators */ = {
