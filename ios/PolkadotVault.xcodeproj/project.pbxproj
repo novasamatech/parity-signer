@@ -2054,7 +2054,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\nif [ $ACTION != \"indexbuild\" ]; then\n    if which swiftformat >/dev/null; then\n        swiftformat .\n    else\n        echo \"warning: swiftformat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\n    fi\nfi\n";
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    if which swiftformat >/dev/null; then\n        brew upgrade swiftformat\n        swiftformat .\n    else\n        echo \"warning: Swiftformat not installed. Attempting to install via Homebrew...\"\n\n        # Install Homebrew if not already installed\n        if ! which brew >/dev/null; then\n            echo \"Installing Homebrew...\"\n            /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n        fi\n\n        # Install SwiftFormat\n        echo \"Installing SwiftFormat...\"\n        brew install swiftformat\n\n        # Check for M1 chipset and create symlink if necessary\n        if [[ `uname -m` == 'arm64' ]]; then\n            echo \"M1 chipset detected. Creating necessary symlink for SwiftFormat...\"\n            ln -s /opt/homebrew/bin/swiftformat /usr/local/bin/swiftformat\n        fi\n\n        # Verify installation\n        if which swiftformat >/dev/null; then\n            echo \"SwiftFormat installed successfully.\"\n            swiftformat .\n        else\n            echo \"error: Failed to install SwiftFormat. Please install manually from https://github.com/nicklockwood/SwiftFormat\"\n        fi\n    fi\nfi\n";
 		};
 		6DDEF13528AE65D7004CA2FD /* Build libsigner.a */ = {
 			isa = PBXShellScriptBuildPhase;
