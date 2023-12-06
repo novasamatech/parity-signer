@@ -7,8 +7,3 @@
 
 import Foundation
 @testable import PolkadotVault
-
-final class RuntimePropertiesProvidingMock: RuntimePropertiesProviding {
-    var runtimeMode: PolkadotVault.ApplicationRuntimeMode = .debug
-    var dynamicDerivationsEnabled: Bool = true
-}

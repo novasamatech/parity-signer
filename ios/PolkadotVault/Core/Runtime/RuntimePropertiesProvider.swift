@@ -12,6 +12,7 @@ enum ApplicationRuntimeMode: String, Equatable {
     case debug
 }
 
+// sourcery: AutoMockable
 /// Protocol that provides access to app process properties
 protocol RuntimePropertiesProviding: AnyObject {
     var runtimeMode: ApplicationRuntimeMode { get }
