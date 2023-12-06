@@ -1,0 +1,9 @@
+sources:
+  include:
+    - PolkadotVault
+  exclude:
+    - PolkadotVault/Packages
+templates:
+  - PolkadotVault/Resources/Templates/Sourcery
+output:
+  PolkadotVaultTests/Generated
