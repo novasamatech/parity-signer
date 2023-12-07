@@ -1,0 +1,107 @@
+{% macro swiftifyMethodName name parameters%}{{name|replace:"(","_"|replace:")",""|replace:":","_"|replace:"`",""|snakeToCamelCase|lowerFirstWord}}{%if name|hasPrefix:"use" %}{%if parameters.count > 0 %}{%if not parameters.first.argumentLabel %}{{parameters.first.name|upperFirstLetter}}{% endif %}{% endif %}{% endif %}{% endmacro %}
+{% macro swiftyMethodName name %}{{name|replace:"(","_"|replace:")",""|replace:":","_"|replace:"`",""|snakeToCamelCase|lowerFirstWord}}{%if name|hasPrefix:"use" %}{%if parameters.count > 0 %}{%if not parameters.first.argumentLabel %}{% endif %}{% endif %}{% endif %}{% endmacro %}
+{% macro methodClosureName method %}{% call swiftifyMethodName method.selectorName method.parameters %}Closure{% endmacro %}
+{% macro underlyingMockedVariableName variable %}underlying{{ variable.name|upperFirstLetter }}{% endmacro %}
+{% macro mockedVariableName variable %}{{ variable.name }}{% endmacro %}
+{% macro strippedTypeName parameter %}{{ parameter.typeName|replace:"@escaping","" }}{% endmacro %}
+
+{# Generate methods parameters  #}
+{% macro methodReceivedParameters method %}
+{% if method.parameters.count != 0 %}
+    {% for parameter in method.parameters %}
+        {% call swiftyMethodName method.selectorName%}Received{{ parameter.name|upperFirstLetter }}.append({{parameter.name}})
+    {% endfor %}
+{% endif %}
+{% endmacro %}
+
+{% macro methodClosureCallParameters method %}{% for param in method.parameters %}{{ param.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endmacro %}
+
+{% macro methodReceivedArgumentsType method %}({% for param in method.parameters %}{{ param.name }}: {% if param.typeAttributes.escaping %}{{ param.unwrappedTypeName }}{% else %}{{ param.typeName }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}){% endmacro %}
+
+{# Generates mock methods and related variables  #}
+
+{% macro mockMethods %}
+
+{% for method in type.allMethods|!definedInExtension| %}
+{# Generate CallsCount  #}
+{% if not method.isInitializer %}
+    {% if method.isStatic %}static {% endif %}var {% call swiftifyMethodName method.selectorName method.parameters %}CallsCount = 0
+{% endif %}
+{# Generate ThrowableError  #}
+{% if method.throws %}
+    {% if method.isStatic and not method.isInitializer %}static {% endif %}var {% call swiftifyMethodName method.selectorName method.parameters %}ThrowableError: Error?
+{% endif %}
+{# Generate Received variables  #}
+{% if method.parameters.count != 0 %}
+    {% for parameter in method.parameters %}
+    {% if method.isStatic and not method.isInitializer %}static {% endif %}var {% call swiftyMethodName method.selectorName%}Received{{ parameter.name|upperFirstLetter }}: [{% call strippedTypeName parameter %}] = []
+    {% endfor %}
+{% endif %}
+{# Generate return variable  #}
+{% if not method.returnTypeName.isVoid and not method.isInitializer %}
+    {% if method.isStatic %}static {% endif %}var {% call swiftifyMethodName method.selectorName method.parameters%}ReturnValue: {{ method.returnTypeName }}{% if not method.isOptionalReturnType %}!{% endif %}
+{% endif %}
+{% endfor %}
+{# Generate method body with references to variables created above  #}
+{% for method in type.allMethods|!definedInExtension %}
+
+{% if method.isInitializer %}
+    required {{ method.name }} {
+    {% call methodReceivedParameters method %}
+        {% call methodClosureName method %}?({% call methodClosureCallParameters method %})
+}
+{% else %}
+    {% if method.isStatic %}static {% endif %}func {{ method.name }}{{ ' throws' if method.throws }}{% if not method.returnTypeName.isVoid %} -> {{ method.returnTypeName }}{% endif %} {
+        {% call swiftifyMethodName method.selectorName method.parameters %}CallsCount += 1
+            {% call methodReceivedParameters method %}
+{% if method.throws %}
+        if let error = {% call swiftifyMethodName method.selectorName method.parameters%}ThrowableError {
+            throw error
+        }
+{% endif %}
+{% if method.returnTypeName.isVoid %}
+{% else %}
+        return {% call swiftifyMethodName method.selectorName method.parameters%}ReturnValue{% if method.unwrappedReturnTypeName == "Any" %} as Any {% endif %}
+{% endif %}
+    }
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{# Generate variables code #}
+
+{% macro mockOptionalVariable variable %}
+    {% if variable.isStatic %}static {% endif %}var {% call mockedVariableName variable %}: {{ variable.typeName }}
+{% endmacro %}
+
+{% macro mockNonOptionalArrayOrDictionaryVariable variable %}
+    {% if variable.isStatic %}static {% endif %}var {% call mockedVariableName variable %}: {{ variable.typeName }} = {% if variable.isArray %}[]{% elif variable.isDictionary %}[:]{% endif %}
+{% endmacro %}
+
+{% macro mockNonOptionalVariable variable %}
+    {% if variable.isStatic %}static {% endif %}var {% call mockedVariableName variable %}: {{ variable.typeName }} {
+        get { return {% call underlyingMockedVariableName variable %} }
+        set(value) { {% call underlyingMockedVariableName variable %} = value }
+    }
+    {% if variable.isStatic %}static {% endif %}var {% call underlyingMockedVariableName variable %}: {{ variable.typeName }}{% if not variable.isOptional %}!{% endif %}
+{% endmacro %}
+
+{# Generate results and move them to individual files #}
+
+{% for type in types.protocols where type.based.AutoMockable or type|annotated:"AutoMockable" %}
+{% if type.name != "AutoMockable" %}
+// sourcery:file:AutoMockable/AutoMockable+{{ type.name[0] }}
+final class {{ type.name }}Mock: {{ type.name }} {
+{% for variable in type.allVariables|!definedInExtension %}
+    {% if variable.isOptional %}
+        {% call mockOptionalVariable variable %}
+    {% elif variable.isArray or variable.isDictionary %}
+        {% call mockNonOptionalArrayOrDictionaryVariable variable %}
+    {% else %}
+        {% call mockNonOptionalVariable variable %}
+    {% endif %}
+{% endfor %}
+{% call mockMethods %}
+}
+// sourcery:end
+{% endif %}{% endfor %}

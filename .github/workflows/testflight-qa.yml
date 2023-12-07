@@ -30,7 +30,7 @@ jobs:
       - name:                 Install dependencies
         run:                  |
           brew install swiftgen
-          brew install swiftformat
+          brew install sourcery
 
       - name: Get cached Swift Packages managed by Xcode
         uses: actions/cache@v3
