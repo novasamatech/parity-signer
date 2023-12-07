@@ -214,7 +214,7 @@ private fun PreviewDeriveKeyNetworkMenu() {
 	repeat(10) {
 		networks.add(
 			NetworkModel(
-				key = "0",
+				key = "$it",
 				logo = "polkadot",
 				title = "Polkadot$it",
 				pathId = "polkadot$it",
@@ -225,6 +225,41 @@ private fun PreviewDeriveKeyNetworkMenu() {
 		DeriveKeyNetworkSelectScreen(
 			networks = networks,
 			preselectd = networks[1],
+			onClose = {},
+			onAdvancePath = {},
+			onFastCreate = {},
+			onNetworkHelp = {},
+		)
+	}
+}
+
+
+@Preview(
+	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
+	showBackground = true, backgroundColor = 0xFFFFFFFF,
+)
+@Preview(
+	name = "dark", group = "general",
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true, backgroundColor = 0xFF000000,
+)
+@Composable
+private fun PreviewDeriveKeyNetworkNoSelection() {
+	val networks = mutableListOf<NetworkModel>()
+	repeat(2) {
+		networks.add(
+			NetworkModel(
+				key = "$it",
+				logo = "polkadot",
+				title = "Polkadot$it",
+				pathId = "polkadot$it",
+			)
+		)
+	}
+	SignerNewTheme {
+		DeriveKeyNetworkSelectScreen(
+			networks = networks,
+			preselectd = null,
 			onClose = {},
 			onAdvancePath = {},
 			onFastCreate = {},
