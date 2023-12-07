@@ -12,11 +12,11 @@ Wipe the phone to factory state. This is good time to install newer version of o
 
 ### Set up phone
 
-Before installing the Vault, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Vault are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentication protocol. Other than that, you might want to select dark mode (Vault remains dark for historic reasons).
+Before installing the Vault, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Vault are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentication protocol.
 
 ### Install Vault
 
-Download signed application through application store or from github. Make sure the signature is valid! Install the app. Do not start the app just yet!
+Download signed application through application store or from [github releases](https://github.com/paritytech/parity-signer/releases). Make sure the signature is valid! Install the app. Do not start the app just yet!
 
 ### Disable network
 
