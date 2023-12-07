@@ -44,7 +44,6 @@ struct ActionButtonStyle: ButtonStyle {
         ActionButtonStyle(
             backgroundColor: .fill18,
             foregroundColor: isDisabled.wrappedValue ? .textAndIconsDisabled : .textAndIconsPrimary,
-
             isDisabled: isDisabled
         )
     }
@@ -52,7 +51,7 @@ struct ActionButtonStyle: ButtonStyle {
     static func emptyPrimary(isDisabled: Binding<Bool> = Binding<Bool>.constant(false)) -> ActionButtonStyle {
         ActionButtonStyle(
             backgroundColor: .clear,
-            foregroundColor: .textAndIconsPrimary,
+            foregroundColor: isDisabled.wrappedValue ? .textAndIconsDisabled : .textAndIconsPrimary,
             isDisabled: isDisabled
         )
     }
