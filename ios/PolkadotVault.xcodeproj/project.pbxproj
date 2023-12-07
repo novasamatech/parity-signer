@@ -774,7 +774,6 @@
 				6D52E3A12946C19F00AD72F0 /* Settings */,
 				6DA2ACA32939D20F00AAEADC /* Logs */,
 				6D199C9D292A8CF300E79113 /* Scan */,
-				6DCC572428D8C0290014278A /* Backup */,
 				6D2D245028CE5F0E00862726 /* PublicKey */,
 				6DC5643E28B929E0003D540B /* KeyDetails */,
 				6D019966289C936800F4C317 /* Containers */,
@@ -1745,13 +1744,6 @@
 			path = KeyDetails;
 			sourceTree = "<group>";
 		};
-		6DCC572428D8C0290014278A /* Backup */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Backup;
-			sourceTree = "<group>";
-		};
 		6DCC572528D8C0410014278A /* Backup */ = {
 			isa = PBXGroup;
 			children = (
@@ -2233,6 +2225,7 @@
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+J.generated.swift",
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+K.generated.swift",
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+L.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+M.generated.swift",
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+N.generated.swift",
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+O.generated.swift",
 				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+P.generated.swift",
