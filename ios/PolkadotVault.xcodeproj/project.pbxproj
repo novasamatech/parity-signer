@@ -276,6 +276,33 @@
 		6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */; };
 		6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */; };
 		6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */; };
+		6DE48E2E2B1EB97C003094D5 /* AutoMockableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */; };
+		6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */; };
+		6DE48E7F2B1F0B96003094D5 /* AutoMockable+Z.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E652B1F0B95003094D5 /* AutoMockable+Z.generated.swift */; };
+		6DE48E802B1F0B96003094D5 /* AutoMockable+P.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E662B1F0B95003094D5 /* AutoMockable+P.generated.swift */; };
+		6DE48E812B1F0B96003094D5 /* AutoMockable+G.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E672B1F0B95003094D5 /* AutoMockable+G.generated.swift */; };
+		6DE48E822B1F0B96003094D5 /* AutoMockable+J.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E682B1F0B95003094D5 /* AutoMockable+J.generated.swift */; };
+		6DE48E832B1F0B96003094D5 /* AutoMockable+C.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E692B1F0B95003094D5 /* AutoMockable+C.generated.swift */; };
+		6DE48E842B1F0B96003094D5 /* AutoMockable+K.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6A2B1F0B95003094D5 /* AutoMockable+K.generated.swift */; };
+		6DE48E852B1F0B96003094D5 /* AutoMockable+U.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6B2B1F0B95003094D5 /* AutoMockable+U.generated.swift */; };
+		6DE48E862B1F0B96003094D5 /* AutoMockable+F.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6C2B1F0B95003094D5 /* AutoMockable+F.generated.swift */; };
+		6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6D2B1F0B95003094D5 /* AutoMockable+E.generated.swift */; };
+		6DE48E882B1F0B96003094D5 /* AutoMockable+N.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6E2B1F0B95003094D5 /* AutoMockable+N.generated.swift */; };
+		6DE48E892B1F0B96003094D5 /* AutoMockable+M.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E6F2B1F0B95003094D5 /* AutoMockable+M.generated.swift */; };
+		6DE48E8A2B1F0B96003094D5 /* AutoMockable+V.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E702B1F0B95003094D5 /* AutoMockable+V.generated.swift */; };
+		6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E712B1F0B95003094D5 /* AutoMockable+I.generated.swift */; };
+		6DE48E8C2B1F0B96003094D5 /* AutoMockable+R.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E722B1F0B95003094D5 /* AutoMockable+R.generated.swift */; };
+		6DE48E8D2B1F0B96003094D5 /* AutoMockable+S.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E732B1F0B95003094D5 /* AutoMockable+S.generated.swift */; };
+		6DE48E8E2B1F0B96003094D5 /* AutoMockable+B.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E742B1F0B95003094D5 /* AutoMockable+B.generated.swift */; };
+		6DE48E8F2B1F0B96003094D5 /* AutoMockable+Y.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E752B1F0B95003094D5 /* AutoMockable+Y.generated.swift */; };
+		6DE48E902B1F0B96003094D5 /* AutoMockable+A.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E762B1F0B95003094D5 /* AutoMockable+A.generated.swift */; };
+		6DE48E912B1F0B96003094D5 /* AutoMockable+H.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E772B1F0B95003094D5 /* AutoMockable+H.generated.swift */; };
+		6DE48E922B1F0B96003094D5 /* AutoMockable+T.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E782B1F0B95003094D5 /* AutoMockable+T.generated.swift */; };
+		6DE48E932B1F0B96003094D5 /* AutoMockable+W.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E792B1F0B95003094D5 /* AutoMockable+W.generated.swift */; };
+		6DE48E942B1F0B96003094D5 /* AutoMockable+O.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7A2B1F0B95003094D5 /* AutoMockable+O.generated.swift */; };
+		6DE48E952B1F0B96003094D5 /* AutoMockable+Q.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7B2B1F0B95003094D5 /* AutoMockable+Q.generated.swift */; };
+		6DE48E962B1F0B96003094D5 /* AutoMockable+D.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7C2B1F0B95003094D5 /* AutoMockable+D.generated.swift */; };
+		6DE48E972B1F0B96003094D5 /* AutoMockable+L.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7D2B1F0B95003094D5 /* AutoMockable+L.generated.swift */; };
 		6DE67D05298AA4270042415A /* BackupSelectKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */; };
 		6DE67D07298AB7B80042415A /* SettingsBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
@@ -623,6 +650,34 @@
 		6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Regular.ttf"; sourceTree = "<group>"; };
 		6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Bold.ttf"; sourceTree = "<group>"; };
 		6DDF439B29879D3900881AFF /* SecondaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryFont.swift; sourceTree = "<group>"; };
+		6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoMockableHeader.swift; sourceTree = "<group>"; };
+		6DE48E2D2B1EB97C003094D5 /* initial_setup.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = initial_setup.sh; sourceTree = "<group>"; };
+		6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+X.generated.swift"; sourceTree = "<group>"; };
+		6DE48E652B1F0B95003094D5 /* AutoMockable+Z.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+Z.generated.swift"; sourceTree = "<group>"; };
+		6DE48E662B1F0B95003094D5 /* AutoMockable+P.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+P.generated.swift"; sourceTree = "<group>"; };
+		6DE48E672B1F0B95003094D5 /* AutoMockable+G.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+G.generated.swift"; sourceTree = "<group>"; };
+		6DE48E682B1F0B95003094D5 /* AutoMockable+J.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+J.generated.swift"; sourceTree = "<group>"; };
+		6DE48E692B1F0B95003094D5 /* AutoMockable+C.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+C.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6A2B1F0B95003094D5 /* AutoMockable+K.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+K.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6B2B1F0B95003094D5 /* AutoMockable+U.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+U.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6C2B1F0B95003094D5 /* AutoMockable+F.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+F.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6D2B1F0B95003094D5 /* AutoMockable+E.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+E.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6E2B1F0B95003094D5 /* AutoMockable+N.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+N.generated.swift"; sourceTree = "<group>"; };
+		6DE48E6F2B1F0B95003094D5 /* AutoMockable+M.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+M.generated.swift"; sourceTree = "<group>"; };
+		6DE48E702B1F0B95003094D5 /* AutoMockable+V.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+V.generated.swift"; sourceTree = "<group>"; };
+		6DE48E712B1F0B95003094D5 /* AutoMockable+I.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+I.generated.swift"; sourceTree = "<group>"; };
+		6DE48E722B1F0B95003094D5 /* AutoMockable+R.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+R.generated.swift"; sourceTree = "<group>"; };
+		6DE48E732B1F0B95003094D5 /* AutoMockable+S.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+S.generated.swift"; sourceTree = "<group>"; };
+		6DE48E742B1F0B95003094D5 /* AutoMockable+B.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+B.generated.swift"; sourceTree = "<group>"; };
+		6DE48E752B1F0B95003094D5 /* AutoMockable+Y.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+Y.generated.swift"; sourceTree = "<group>"; };
+		6DE48E762B1F0B95003094D5 /* AutoMockable+A.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+A.generated.swift"; sourceTree = "<group>"; };
+		6DE48E772B1F0B95003094D5 /* AutoMockable+H.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+H.generated.swift"; sourceTree = "<group>"; };
+		6DE48E782B1F0B95003094D5 /* AutoMockable+T.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+T.generated.swift"; sourceTree = "<group>"; };
+		6DE48E792B1F0B95003094D5 /* AutoMockable+W.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+W.generated.swift"; sourceTree = "<group>"; };
+		6DE48E7A2B1F0B95003094D5 /* AutoMockable+O.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+O.generated.swift"; sourceTree = "<group>"; };
+		6DE48E7B2B1F0B95003094D5 /* AutoMockable+Q.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+Q.generated.swift"; sourceTree = "<group>"; };
+		6DE48E7C2B1F0B95003094D5 /* AutoMockable+D.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+D.generated.swift"; sourceTree = "<group>"; };
+		6DE48E7D2B1F0B95003094D5 /* AutoMockable+L.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+L.generated.swift"; sourceTree = "<group>"; };
 		6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSelectKeyView.swift; sourceTree = "<group>"; };
 		6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackupModal.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
@@ -719,7 +774,6 @@
 				6D52E3A12946C19F00AD72F0 /* Settings */,
 				6DA2ACA32939D20F00AAEADC /* Logs */,
 				6D199C9D292A8CF300E79113 /* Scan */,
-				6DCC572428D8C0290014278A /* Backup */,
 				6D2D245028CE5F0E00862726 /* PublicKey */,
 				6DC5643E28B929E0003D540B /* KeyDetails */,
 				6D019966289C936800F4C317 /* Containers */,
@@ -863,8 +917,9 @@
 			children = (
 				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
 				6DC2EDFA2B1196D700298F00 /* Backend */,
-				6DBD21FE289A8C67005D539B /* Helpers */,
 				6D5801DA2899235C006C41D8 /* Core */,
+				6DE48E292B1EB94B003094D5 /* Generated */,
+				6DBD21FE289A8C67005D539B /* Helpers */,
 				2DE72BD526A588C9002BB752 /* Info.plist */,
 			);
 			path = PolkadotVaultTests;
@@ -1689,13 +1744,6 @@
 			path = KeyDetails;
 			sourceTree = "<group>";
 		};
-		6DCC572428D8C0290014278A /* Backup */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Backup;
-			sourceTree = "<group>";
-		};
 		6DCC572528D8C0410014278A /* Backup */ = {
 			isa = PBXGroup;
 			children = (
@@ -1751,6 +1799,57 @@
 				6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */,
 			);
 			path = Buttons;
+			sourceTree = "<group>";
+		};
+		6DE48E292B1EB94B003094D5 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				6DE48E2A2B1EB951003094D5 /* AutoMockable */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		6DE48E2A2B1EB951003094D5 /* AutoMockable */ = {
+			isa = PBXGroup;
+			children = (
+				6DE48E762B1F0B95003094D5 /* AutoMockable+A.generated.swift */,
+				6DE48E742B1F0B95003094D5 /* AutoMockable+B.generated.swift */,
+				6DE48E7C2B1F0B95003094D5 /* AutoMockable+D.generated.swift */,
+				6DE48E6D2B1F0B95003094D5 /* AutoMockable+E.generated.swift */,
+				6DE48E692B1F0B95003094D5 /* AutoMockable+C.generated.swift */,
+				6DE48E6C2B1F0B95003094D5 /* AutoMockable+F.generated.swift */,
+				6DE48E772B1F0B95003094D5 /* AutoMockable+H.generated.swift */,
+				6DE48E712B1F0B95003094D5 /* AutoMockable+I.generated.swift */,
+				6DE48E7D2B1F0B95003094D5 /* AutoMockable+L.generated.swift */,
+				6DE48E6F2B1F0B95003094D5 /* AutoMockable+M.generated.swift */,
+				6DE48E672B1F0B95003094D5 /* AutoMockable+G.generated.swift */,
+				6DE48E682B1F0B95003094D5 /* AutoMockable+J.generated.swift */,
+				6DE48E6A2B1F0B95003094D5 /* AutoMockable+K.generated.swift */,
+				6DE48E6E2B1F0B95003094D5 /* AutoMockable+N.generated.swift */,
+				6DE48E7A2B1F0B95003094D5 /* AutoMockable+O.generated.swift */,
+				6DE48E7B2B1F0B95003094D5 /* AutoMockable+Q.generated.swift */,
+				6DE48E722B1F0B95003094D5 /* AutoMockable+R.generated.swift */,
+				6DE48E732B1F0B95003094D5 /* AutoMockable+S.generated.swift */,
+				6DE48E782B1F0B95003094D5 /* AutoMockable+T.generated.swift */,
+				6DE48E662B1F0B95003094D5 /* AutoMockable+P.generated.swift */,
+				6DE48E6B2B1F0B95003094D5 /* AutoMockable+U.generated.swift */,
+				6DE48E702B1F0B95003094D5 /* AutoMockable+V.generated.swift */,
+				6DE48E792B1F0B95003094D5 /* AutoMockable+W.generated.swift */,
+				6DE48E752B1F0B95003094D5 /* AutoMockable+Y.generated.swift */,
+				6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */,
+				6DE48E652B1F0B95003094D5 /* AutoMockable+Z.generated.swift */,
+				6DE48E2B2B1EB956003094D5 /* Scripts */,
+			);
+			path = AutoMockable;
+			sourceTree = "<group>";
+		};
+		6DE48E2B2B1EB956003094D5 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */,
+				6DE48E2D2B1EB97C003094D5 /* initial_setup.sh */,
+			);
+			path = Scripts;
 			sourceTree = "<group>";
 		};
 		6DE67D03298AA41D0042415A /* Backup */ = {
@@ -1921,6 +2020,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE72BE626A588C9002BB752 /* Build configuration list for PBXNativeTarget "PolkadotVaultTests" */;
 			buildPhases = (
+				6DE48E282B1EB932003094D5 /* Run Sourcery */,
 				2DE72BCB26A588C9002BB752 /* Sources */,
 				2DE72BCC26A588C9002BB752 /* Frameworks */,
 				2DE72BCD26A588C9002BB752 /* Resources */,
@@ -2096,6 +2196,53 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    bash $PROJECT_DIR/scripts/generate_database.sh\nfi\n";
+		};
+		6DE48E282B1EB932003094D5 /* Run Sourcery */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/sourcery.yml",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh",
+			);
+			name = "Run Sourcery";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+A.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+B.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+C.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+D.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+E.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+F.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+G.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+H.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+I.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+J.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+K.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+L.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+M.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+N.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+O.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+P.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Q.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+R.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+S.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+T.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+U.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+V.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+W.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+X.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Y.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Z.generated.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    sourcery --config \"${SRCROOT}/sourcery.yml\" && bash \"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2374,24 +2521,51 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */,
+				6DE48E822B1F0B96003094D5 /* AutoMockable+J.generated.swift in Sources */,
+				6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */,
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
+				6DE48E912B1F0B96003094D5 /* AutoMockable+H.generated.swift in Sources */,
 				6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */,
+				6DE48E8E2B1F0B96003094D5 /* AutoMockable+B.generated.swift in Sources */,
+				6DE48E832B1F0B96003094D5 /* AutoMockable+C.generated.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
+				6DE48E8D2B1F0B96003094D5 /* AutoMockable+S.generated.swift in Sources */,
+				6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */,
+				6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */,
+				6DE48E8A2B1F0B96003094D5 /* AutoMockable+V.generated.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
+				6DE48E8F2B1F0B96003094D5 /* AutoMockable+Y.generated.swift in Sources */,
 				6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */,
+				6DE48E842B1F0B96003094D5 /* AutoMockable+K.generated.swift in Sources */,
+				6DE48E962B1F0B96003094D5 /* AutoMockable+D.generated.swift in Sources */,
+				6DE48E932B1F0B96003094D5 /* AutoMockable+W.generated.swift in Sources */,
+				6DE48E2E2B1EB97C003094D5 /* AutoMockableHeader.swift in Sources */,
+				6DE48E902B1F0B96003094D5 /* AutoMockable+A.generated.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
 				6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */,
+				6DE48E812B1F0B96003094D5 /* AutoMockable+G.generated.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
+				6DE48E922B1F0B96003094D5 /* AutoMockable+T.generated.swift in Sources */,
+				6DE48E892B1F0B96003094D5 /* AutoMockable+M.generated.swift in Sources */,
+				6DE48E7F2B1F0B96003094D5 /* AutoMockable+Z.generated.swift in Sources */,
 				6DAFCAF82B0A360600DDD165 /* CameraPermissionHandlerTests.swift in Sources */,
+				6DE48E952B1F0B96003094D5 /* AutoMockable+Q.generated.swift in Sources */,
+				6DE48E802B1F0B96003094D5 /* AutoMockable+P.generated.swift in Sources */,
+				6DE48E8C2B1F0B96003094D5 /* AutoMockable+R.generated.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
+				6DE48E882B1F0B96003094D5 /* AutoMockable+N.generated.swift in Sources */,
 				6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */,
+				6DE48E862B1F0B96003094D5 /* AutoMockable+F.generated.swift in Sources */,
+				6DE48E942B1F0B96003094D5 /* AutoMockable+O.generated.swift in Sources */,
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6DC2EDFC2B1196DF00298F00 /* BackendServiceTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,
+				6DE48E972B1F0B96003094D5 /* AutoMockable+L.generated.swift in Sources */,
+				6DE48E852B1F0B96003094D5 /* AutoMockable+U.generated.swift in Sources */,
 				6DAFCAFA2B0AE5C000DDD165 /* KeychainAccessAdapterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

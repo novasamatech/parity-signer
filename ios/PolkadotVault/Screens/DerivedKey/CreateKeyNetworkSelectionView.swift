@@ -46,12 +46,12 @@ struct CreateKeyNetworkSelectionView: View {
                     ActionButton(
                         action: viewModel.didTapCreate,
                         text: Localizable.CreateDerivedKey.Action.create.key,
-                        style: .primary()
+                        style: .primary(isDisabled: .constant(viewModel.networkSelection == nil))
                     )
                     ActionButton(
                         action: viewModel.didTapAddCustom,
                         text: Localizable.CreateDerivedKey.Action.addCustom.key,
-                        style: .emptyPrimary()
+                        style: .emptyPrimary(isDisabled: .constant(viewModel.networkSelection == nil))
                     )
                 }
                 .padding(.horizontal, Spacing.large)
@@ -150,7 +150,7 @@ extension CreateKeyNetworkSelectionView {
         let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
         @Published var networks: [MmNetwork] = []
-        @Published var networkSelection: MmNetwork!
+        @Published var networkSelection: MmNetwork?
 
         // Tutorial
         @Published var isNetworkTutorialPresented: Bool = false
@@ -180,15 +180,16 @@ extension CreateKeyNetworkSelectionView {
             self.networkService = networkService
             self.createKeyService = createKeyService
             self.onCompletion = onCompletion
-            updateNetworks(true)
+            updateNetworks()
             listenToChanges()
         }
 
         func selectNetwork(_ network: MmNetwork) {
-            networkSelection = network
+            networkSelection = networkSelection == network ? nil : network
         }
 
         func didTapCreate() {
+            guard let networkSelection else { return }
             createKeyService.createDefaultDerivedKey(keySet, keyName, networkSelection) { result in
                 switch result {
                 case .success:
@@ -212,7 +213,7 @@ extension CreateKeyNetworkSelectionView {
             .init(
                 seedName: seedName,
                 keySet: keySet,
-                networkSelection: networkSelection,
+                networkSelection: networkSelection!,
                 onComplete: onKeyCreationComplete
             )
         }
@@ -220,13 +221,10 @@ extension CreateKeyNetworkSelectionView {
 }
 
 private extension CreateKeyNetworkSelectionView.ViewModel {
-    func updateNetworks(_ preselect: Bool) {
+    func updateNetworks() {
         networkService.getNetworks {
             if case let .success(networks) = $0 {
                 self.networks = networks
-                if preselect {
-                    self.networkSelection = networks.first
-                }
             }
         }
     }
@@ -239,7 +237,7 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
     func listenToChanges() {
         $isNetworkTutorialPresented.sink { [weak self] isPresented in
             guard let self, !isPresented else { return }
-            updateNetworks(false)
+            updateNetworks()
         }
         .store(in: cancelBag)
     }
