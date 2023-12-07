@@ -2214,15 +2214,42 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/sourcery.yml",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh",
 			);
 			name = "Run Sourcery";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+A.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+B.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+C.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+D.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+E.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+F.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+G.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+H.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+I.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+J.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+K.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+L.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+N.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+O.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+P.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Q.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+R.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+S.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+T.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+U.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+V.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+W.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+X.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Y.generated.swift",
+				"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/AutoMockable+Z.generated.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n   export PATH=\"$PATH:/opt/homebrew/bin\"\n   sourcery --config \"${SRCROOT}/sourcery.yml\" && bash \"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh\"\nfi\n";
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    sourcery --config \"${SRCROOT}/sourcery.yml\" && bash \"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
