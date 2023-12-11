@@ -6,6 +6,7 @@ import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import kotlin.math.min
 
 
 object ImageCropperCompose {
@@ -16,6 +17,7 @@ object ImageCropperCompose {
 		val screenHeight = configuration.screenHeightDp.dp
 		val screenWidth = configuration.screenWidthDp.dp
 
+		//we don't know
 		val (photoHeight, photoWIdth) = if (image.imageInfo.rotationDegrees == 90 || image.imageInfo.rotationDegrees == 270) {
 			// need to rotate image
 			Pair(image.image?.height, image.image?.width)
@@ -26,6 +28,27 @@ object ImageCropperCompose {
 		if (photoHeight == null || photoWIdth == null) {
 			return null
 		}
+
+		val screenMinSize = min(screenHeight.value, screenWidth.value)
+		val screenRation: Float
+
+		/**
+		 * Usual case is we have horisontal camera view, vertical phone, and camera
+		 * square frame in center of the phone for qr code
+		 * But can be any relations and we can get camerain put rotated.
+		 *
+		 *   ____________________________
+		 *   |       "          "       |
+		 *   |       "          "       |
+		 *   |       "  ''''''' "       |
+		 *   |       "  '     ' "       |
+		 *   |       "  '     ' "       |
+		 *   |       "  ''''''' "       |
+		 *   |       "          "       |
+		 *   |       "          "       |
+		 *   ____________________________
+		 */
+
 
 		//todo dmitry check that forther logic if we changed rotation here
 
