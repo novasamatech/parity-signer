@@ -7,6 +7,20 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol RecoverKeySetServicing: AnyObject {
+    func updateGuessWords(
+        userInput: String,
+        _ completion: @escaping (Result<[String], ServiceError>) -> Void
+    )
+    func validate(
+        seedPhrase: String,
+        _ completion: @escaping (Result<Bool, ServiceError>) -> Void
+    )
+}
+
+extension RecoverKeySetService: RecoverKeySetServicing {}
+
 final class RecoverKeySetService {
     private let backendService: BackendService
 
@@ -18,7 +32,7 @@ final class RecoverKeySetService {
 
     func updateGuessWords(
         userInput: String,
-        completion: @escaping (Result<[String], ServiceError>) -> Void
+        _ completion: @escaping (Result<[String], ServiceError>) -> Void
     ) {
         backendService.performCall({
             seedPhraseGuessWords(userInput: userInput)
@@ -27,7 +41,7 @@ final class RecoverKeySetService {
 
     func validate(
         seedPhrase: String,
-        completion: @escaping (Result<Bool, ServiceError>) -> Void
+        _ completion: @escaping (Result<Bool, ServiceError>) -> Void
     ) {
         backendService.performCall({
             validateSeedPhrase(seedPhrase: seedPhrase)

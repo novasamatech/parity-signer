@@ -7,6 +7,27 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol KeyDetailsActionServicing: AnyObject {
+    func performBackupSeed(
+        seedName: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+
+    func publicKey(
+        addressKey: String,
+        networkSpecsKey: String,
+        _ completion: @escaping (Result<MKeyDetails, ServiceError>) -> Void
+    )
+
+    func forgetKeySet(
+        seedName: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+}
+
+extension KeyDetailsActionService: KeyDetailsActionServicing {}
+
 final class KeyDetailsActionService {
     private let backendService: BackendService
 

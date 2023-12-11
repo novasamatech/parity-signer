@@ -7,6 +7,7 @@
 
 import Security
 
+// sourcery: AutoMockable
 /// Protocol for generating access control when accessing Keychain
 protocol AccessControlProviding: AnyObject {
     /// Creates access control

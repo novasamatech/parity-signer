@@ -18,6 +18,7 @@ enum KeychainQuery {
     case restoreQuery(seedName: String, finalSeedPhrase: Data, accessControl: SecAccessControl)
 }
 
+// sourcery: AutoMockable
 /// Protocol that provides access to query payload
 protocol KeychainQueryProviding: AnyObject {
     /// Generates payload query for given query type with given input

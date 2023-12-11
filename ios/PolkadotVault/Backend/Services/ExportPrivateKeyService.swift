@@ -7,6 +7,16 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol ExportPrivateKeyServicing: AnyObject {
+    func exportPrivateKey(
+        _ keyDetails: MKeyDetails,
+        completion: @escaping (Result<ExportPrivateKeyViewModel, ServiceError>) -> Void
+    )
+}
+
+extension ExportPrivateKeyService: ExportPrivateKeyServicing {}
+
 final class ExportPrivateKeyService {
     private let seedsMediator: SeedsMediating
     private let backendService: BackendService

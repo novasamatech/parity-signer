@@ -7,6 +7,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 /// Protocol reflecting `Bundle` functionality
 protocol BundleProtocol: AnyObject {
     /// Returns the file URL for the resource identified by the specified name and file extension.

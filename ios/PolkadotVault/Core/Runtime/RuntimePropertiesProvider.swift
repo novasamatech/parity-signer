@@ -47,6 +47,7 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
 
 extension ApplicationInformation: ApplicationInformationContaining {}
 
+// sourcery: AutoMockable
 protocol ApplicationInformationContaining {
     static var dynamicDerivationsEnabled: String { get }
     static var appRuntimeMode: String { get }
