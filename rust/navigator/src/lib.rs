@@ -254,3 +254,34 @@ pub fn sign_sufficient_content(
         network_logo: Some(network_specs.logo),
     })
 }
+
+/// Encode secret into BananaSplit shares
+pub fn banana_split_encode(
+    secret: &str,
+    title: &str,
+    passphrase: &str,
+    total_shards: u32,
+    required_shards: u32,
+) -> Result<Vec<QrData>> {
+    banana_recovery::encrypt(
+        secret,
+        title,
+        passphrase,
+        total_shards as usize,
+        required_shards as usize,
+    )
+    .map_err(Error::BananaSplit)
+    .map(|shares| {
+        shares
+            .into_iter()
+            .map(|share| QrData::Regular {
+                data: share.into_bytes(),
+            })
+            .collect()
+    })
+}
+
+/// Generate random BananaSplit passphrase
+pub fn banana_split_passphrase(n: u32) -> String {
+    banana_recovery::generate(n as usize)
+}

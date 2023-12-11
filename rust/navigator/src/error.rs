@@ -46,4 +46,7 @@ pub enum Error {
 
     #[error("No networks attached to the address with path `{0}`")]
     NoNetwork(String),
+
+    #[error(transparent)]
+    BananaSplit(#[from] banana_recovery::Error),
 }
