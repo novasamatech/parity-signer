@@ -361,13 +361,15 @@ extension KeyDetailsView.ViewModel {
 
 private extension KeyDetailsView.ViewModel {
     func tryToPresentBackupModal() {
-        switch exportPrivateKeyService.backupViewModel(keysData) {
-        case let .success(backupModal):
-            self.backupModal = backupModal
-            isShowingBackupModal = true
-        case let .failure(error):
-            presentableError = .alertError(message: error.message)
-            isPresentingError = true
+        exportPrivateKeyService.backupViewModel(keysData) { result in
+            switch result {
+            case let .success(backupModal):
+                self.backupModal = backupModal
+                self.isShowingBackupModal = true
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.message)
+                self.isPresentingError = true
+            }
         }
     }
 

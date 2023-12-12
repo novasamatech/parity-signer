@@ -210,13 +210,13 @@ extension KeyDetailsPublicKeyView {
 
     final class ViewModel: ObservableObject {
         let addressKey: String
-        private let publicKeyDetailsService: PublicKeyDetailsService
-        private let exportPrivateKeyService: ExportPrivateKeyService
-        private let keyDetailsService: KeyDetailsActionService
+        private let publicKeyDetailsService: PublicKeyDetailsServicing
+        private let exportPrivateKeyService: ExportPrivateKeyServicing
+        private let keyDetailsService: KeyDetailsActionServicing
 
         @Published var keyDetails: MKeyDetails
         @Published var exportPrivateKeyViewModel: ExportPrivateKeyViewModel!
-        @Published var renderable: KeyDetailsPublicKeyViewModel
+        @Published var renderable: KeyDetailsPublicKeyViewRenderable
         @Published var isShowingRemoveConfirmation = false
         @Published var isShowingActionSheet = false
         @Published var isPresentingExportKeysWarningModal = false
@@ -241,9 +241,9 @@ extension KeyDetailsPublicKeyView {
         init(
             keyDetails: MKeyDetails,
             addressKey: String,
-            publicKeyDetailsService: PublicKeyDetailsService = PublicKeyDetailsService(),
-            exportPrivateKeyService: ExportPrivateKeyService = ExportPrivateKeyService(),
-            keyDetailsService: KeyDetailsActionService = KeyDetailsActionService(),
+            publicKeyDetailsService: PublicKeyDetailsServicing = PublicKeyDetailsService(),
+            exportPrivateKeyService: ExportPrivateKeyServicing = ExportPrivateKeyService(),
+            keyDetailsService: KeyDetailsActionServicing = KeyDetailsActionService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             _keyDetails = .init(initialValue: keyDetails)
@@ -252,11 +252,11 @@ extension KeyDetailsPublicKeyView {
             self.exportPrivateKeyService = exportPrivateKeyService
             self.keyDetailsService = keyDetailsService
             self.onCompletion = onCompletion
-            _renderable = .init(initialValue: KeyDetailsPublicKeyViewModel(keyDetails))
+            _renderable = .init(initialValue: KeyDetailsPublicKeyViewRenderable(keyDetails))
         }
 
         func onMoreButtonTap() {
-            isShowingActionSheet.toggle()
+            isShowingActionSheet = true
         }
 
         func checkForActionsPresentation() {
@@ -274,15 +274,15 @@ extension KeyDetailsPublicKeyView {
                 }
             }
             if shouldPresentRemoveConfirmationModal {
-                shouldPresentRemoveConfirmationModal.toggle()
-                isShowingRemoveConfirmation.toggle()
+                shouldPresentRemoveConfirmationModal = false
+                isShowingRemoveConfirmation = true
             }
         }
 
         func onWarningDismissal() {
             guard shouldPresentExportKeysModal else { return }
-            shouldPresentExportKeysModal.toggle()
-            isPresentingExportKeysModal.toggle()
+            shouldPresentExportKeysModal = false
+            isPresentingExportKeysModal = true
         }
 
         func onExportKeysDismissal() {
@@ -294,7 +294,7 @@ extension KeyDetailsPublicKeyView {
                 switch result {
                 case let .success(keyDetails):
                     self.keyDetails = keyDetails
-                    self.renderable = KeyDetailsPublicKeyViewModel(keyDetails)
+                    self.renderable = KeyDetailsPublicKeyViewRenderable(keyDetails)
                 case let .failure(error):
                     self.presentableError = .alertError(message: error.localizedDescription)
                     self.isPresentingError = true

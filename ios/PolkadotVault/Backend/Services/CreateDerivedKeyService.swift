@@ -64,6 +64,47 @@ enum ImportDerivedKeyError: Error {
     }
 }
 
+// sourcery: AutoMockable
+protocol CreateDerivedKeyServicing: AnyObject {
+    func createDefaultDerivedKey(
+        _ keySet: MKeysNew,
+        _ keyName: String,
+        _ network: MmNetwork,
+        completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+    func createDerivedKeys(
+        _ seedName: String,
+        _ seedPhrase: String,
+        networks: [MmNetwork],
+        completion: @escaping (Result<Void, CreateDerivedKeyError>) -> Void
+    )
+    func createDerivedKey(
+        _ seedName: String,
+        _ path: String,
+        _ network: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+    func createDerivedKeyForKeySets(
+        _ seedNames: [String],
+        _ networkName: String,
+        _ completion: @escaping (Result<Void, CreateDerivedKeyForKeySetsError>) -> Void
+    )
+    func createDerivedKeys(
+        _ seedName: String,
+        _ seedPhrase: String,
+        keysToImport: [DdDetail],
+        completion: @escaping (Result<Void, ImportDerivedKeyError>) -> Void
+    )
+    func checkForCollision(
+        _ seedName: String,
+        _ path: String,
+        _ network: String,
+        completion: @escaping (Result<DerivationCheck, ServiceError>) -> Void
+    )
+}
+
+extension CreateDerivedKeyService: CreateDerivedKeyServicing {}
+
 final class CreateDerivedKeyService {
     private let backendService: BackendService
     private let seedsMediator: SeedsMediating
