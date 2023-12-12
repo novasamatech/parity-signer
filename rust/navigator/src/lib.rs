@@ -255,7 +255,7 @@ pub fn sign_sufficient_content(
     })
 }
 
-/// Encode secret into BananaSplit shares
+/// Encode secret into Banana Split shares
 pub fn banana_split_encode(
     secret: &str,
     title: &str,
@@ -281,7 +281,7 @@ pub fn banana_split_encode(
     })
 }
 
-/// Generate random BananaSplit passphrase
+/// Generate random Banana Split passphrase
 pub fn banana_split_passphrase(n: u32) -> String {
     banana_recovery::generate(n as usize)
 }

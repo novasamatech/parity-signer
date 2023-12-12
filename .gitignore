@@ -85,6 +85,7 @@ android/debug
 # iOS
 ios/PolkadotVault/Database/Database/*
 ios/PolkadotVault/Generated
+*.generated.swift
 
 # rust
 rust/target

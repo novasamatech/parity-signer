@@ -608,7 +608,7 @@ fn validate_key_password(
         .map_err(|e| e.into())
 }
 
-/// Create BananaSplit shares from secret
+/// Create Banana Split shares from secret
 fn bs_encrypt(
     secret: &str,
     title: &str,
@@ -620,7 +620,7 @@ fn bs_encrypt(
         .map_err(|e| ErrorDisplayed::from(e.to_string()))
 }
 
-/// Generate BananaSplit passphrase
+/// Generate Banana Split passphrase
 fn bs_generate_passphrase(n: u32) -> String {
     navigator::banana_split_passphrase(n)
 }
