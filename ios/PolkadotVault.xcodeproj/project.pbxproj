@@ -101,7 +101,7 @@
 		6D476A1B29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D476A1A29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift */; };
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
-		6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift */; };
+		6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift */; };
 		6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */; };
 		6D4F779929CAECA500374C83 /* SignSpecsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779829CAECA500374C83 /* SignSpecsListView.swift */; };
 		6D4F779B29CAF55200374C83 /* SignSpecDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */; };
@@ -177,7 +177,6 @@
 		6D8973A52A08E18C0046A2F3 /* ScanTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */; };
 		6D8973A72A08E6550046A2F3 /* GeneralVerifierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */; };
 		6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */; };
-		6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */; };
 		6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */; };
 		6D8F813C2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8F813B2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift */; };
 		6D91F3EE28C16163007560F5 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3ED28C16163007560F5 /* CircularProgressView.swift */; };
@@ -265,6 +264,8 @@
 		6DD9FF1628C8B85300FB6195 /* HorizontalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */; };
 		6DD9FF1928C8C9B000FB6195 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD9FF1828C8C9AF00FB6195 /* Animations.swift */; };
 		6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B12B11C3C2000D2B62 /* SeedsMediatorTests.swift */; };
+		6DDD38B72B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B62B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift */; };
+		6DDD38B92B134ADF000D2B62 /* MKeyDetails+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */; };
 		6DDD73732940471900F04CE7 /* Event+AdditionalValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD73722940471900F04CE7 /* Event+AdditionalValue.swift */; };
 		6DDD73752940496800F04CE7 /* LogEntryRenderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD73742940496800F04CE7 /* LogEntryRenderable.swift */; };
 		6DDD73782940498000F04CE7 /* LogEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD73772940498000F04CE7 /* LogEntryView.swift */; };
@@ -303,6 +304,7 @@
 		6DE48E952B1F0B96003094D5 /* AutoMockable+Q.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7B2B1F0B95003094D5 /* AutoMockable+Q.generated.swift */; };
 		6DE48E962B1F0B96003094D5 /* AutoMockable+D.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7C2B1F0B95003094D5 /* AutoMockable+D.generated.swift */; };
 		6DE48E972B1F0B96003094D5 /* AutoMockable+L.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E7D2B1F0B95003094D5 /* AutoMockable+L.generated.swift */; };
+		6DE48E992B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E982B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift */; };
 		6DE67D05298AA4270042415A /* BackupSelectKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */; };
 		6DE67D07298AB7B80042415A /* SettingsBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */; };
 		6DE8466E28BF73E40051346A /* DerivedKeyRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */; };
@@ -474,7 +476,7 @@
 		6D476A1A29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddKeySetUpNetworksStepTwoView.swift; sourceTree = "<group>"; };
 		6D4C0751289AC36100B2EE48 /* Fonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		6D4C0757289BD95500B2EE48 /* SFSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbols.swift; sourceTree = "<group>"; };
-		6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyViewModel.swift; sourceTree = "<group>"; };
+		6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyViewRenderable.swift; sourceTree = "<group>"; };
 		6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyDetailsService.swift; sourceTree = "<group>"; };
 		6D4F779829CAECA500374C83 /* SignSpecsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecsListView.swift; sourceTree = "<group>"; };
 		6D4F779A29CAF55200374C83 /* SignSpecDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecDetailsView.swift; sourceTree = "<group>"; };
@@ -549,7 +551,6 @@
 		6D8973A42A08E18C0046A2F3 /* ScanTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTabService.swift; sourceTree = "<group>"; };
 		6D8973A62A08E6550046A2F3 /* GeneralVerifierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralVerifierService.swift; sourceTree = "<group>"; };
 		6D8AF88128BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessControlProvidingAssemblerTests.swift; sourceTree = "<group>"; };
-		6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvidingMock.swift; sourceTree = "<group>"; };
 		6D8AF88928BCC60600CF0AB2 /* KeychainQueryProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainQueryProviderTests.swift; sourceTree = "<group>"; };
 		6D8F813B2994C64E000ED0BA /* ErrorDisplayed+TransactionSigning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorDisplayed+TransactionSigning.swift"; sourceTree = "<group>"; };
 		6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyModal.swift; sourceTree = "<group>"; };
@@ -637,6 +638,8 @@
 		6DD9FF1528C8B85300FB6195 /* HorizontalActionsBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActionsBottomModal.swift; sourceTree = "<group>"; };
 		6DD9FF1828C8C9AF00FB6195 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		6DDD38B12B11C3C2000D2B62 /* SeedsMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedsMediatorTests.swift; sourceTree = "<group>"; };
+		6DDD38B62B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyViewModelTests.swift; sourceTree = "<group>"; };
+		6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Generate.swift"; sourceTree = "<group>"; };
 		6DDD73722940471900F04CE7 /* Event+AdditionalValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+AdditionalValue.swift"; sourceTree = "<group>"; };
 		6DDD73742940496800F04CE7 /* LogEntryRenderable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryRenderable.swift; sourceTree = "<group>"; };
 		6DDD73772940498000F04CE7 /* LogEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryView.swift; sourceTree = "<group>"; };
@@ -678,6 +681,7 @@
 		6DE48E7B2B1F0B95003094D5 /* AutoMockable+Q.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+Q.generated.swift"; sourceTree = "<group>"; };
 		6DE48E7C2B1F0B95003094D5 /* AutoMockable+D.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+D.generated.swift"; sourceTree = "<group>"; };
 		6DE48E7D2B1F0B95003094D5 /* AutoMockable+L.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+L.generated.swift"; sourceTree = "<group>"; };
+		6DE48E982B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QRCodeAddressFooterViewModel+Generate.swift"; sourceTree = "<group>"; };
 		6DE67D04298AA4270042415A /* BackupSelectKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSelectKeyView.swift; sourceTree = "<group>"; };
 		6DE67D06298AB7B80042415A /* SettingsBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackupModal.swift; sourceTree = "<group>"; };
 		6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedKeyRowModel.swift; sourceTree = "<group>"; };
@@ -915,6 +919,8 @@
 		2DE72BD226A588C9002BB752 /* PolkadotVaultTests */ = {
 			isa = PBXGroup;
 			children = (
+				6DDD38B42B1346BB000D2B62 /* Screens */,
+				6DDD38B32B12D711000D2B62 /* Mocks */,
 				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
 				6DC2EDFA2B1196D700298F00 /* Backend */,
 				6D5801DA2899235C006C41D8 /* Core */,
@@ -1113,7 +1119,7 @@
 			isa = PBXGroup;
 			children = (
 				6D2D245128CE5F2D00862726 /* KeyDetailsPublicKeyView.swift */,
-				6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift */,
+				6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift */,
 			);
 			path = PublicKey;
 			sourceTree = "<group>";
@@ -1500,7 +1506,6 @@
 			isa = PBXGroup;
 			children = (
 				6DBD2201289A8E1F005D539B /* ErrorMock.swift */,
-				6D8AF88528BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -1770,6 +1775,31 @@
 				6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */,
 			);
 			path = Alerts;
+			sourceTree = "<group>";
+		};
+		6DDD38B32B12D711000D2B62 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */,
+				6DE48E982B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		6DDD38B42B1346BB000D2B62 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				6DDD38B52B1346C0000D2B62 /* PublicKey */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		6DDD38B52B1346C0000D2B62 /* PublicKey */ = {
+			isa = PBXGroup;
+			children = (
+				6DDD38B62B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift */,
+			);
+			path = PublicKey;
 			sourceTree = "<group>";
 		};
 		6DDD73762940497500F04CE7 /* Views */ = {
@@ -2333,7 +2363,7 @@
 				6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */,
 				6D1F077F2A9CA24F006BA85E /* RecoverKeySetService.swift in Sources */,
 				6D52E3A72946C45100AD72F0 /* SettingsItem.swift in Sources */,
-				6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewModel.swift in Sources */,
+				6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */,
 				6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */,
@@ -2520,13 +2550,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D8AF88628BCC53B00CF0AB2 /* RuntimePropertiesProvidingMock.swift in Sources */,
 				6DE48E822B1F0B96003094D5 /* AutoMockable+J.generated.swift in Sources */,
 				6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */,
 				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
 				6DE48E912B1F0B96003094D5 /* AutoMockable+H.generated.swift in Sources */,
 				6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */,
 				6DE48E8E2B1F0B96003094D5 /* AutoMockable+B.generated.swift in Sources */,
+				6DE48E992B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift in Sources */,
 				6DE48E832B1F0B96003094D5 /* AutoMockable+C.generated.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
 				6DE48E8D2B1F0B96003094D5 /* AutoMockable+S.generated.swift in Sources */,
@@ -2548,6 +2578,8 @@
 				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */,
+				6DDD38B72B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift in Sources */,
+				6DDD38B92B134ADF000D2B62 /* MKeyDetails+Generate.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6DE48E922B1F0B96003094D5 /* AutoMockable+T.generated.swift in Sources */,
 				6DE48E892B1F0B96003094D5 /* AutoMockable+M.generated.swift in Sources */,

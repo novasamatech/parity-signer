@@ -7,6 +7,13 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol GetManagedNetworksServicing: AnyObject {
+    func getNetworks(
+        _ completion: @escaping (Result<[MmNetwork], ServiceError>) -> Void
+    )
+}
+
 final class GetManagedNetworksService {
     private let backendService: BackendService
 

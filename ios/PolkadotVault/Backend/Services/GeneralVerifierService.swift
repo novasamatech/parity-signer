@@ -7,6 +7,15 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol GeneralVerifierServicing: AnyObject {
+    func getGeneralVerifier(
+        _ completion: @escaping (Result<MVerifierDetails, ServiceError>) -> Void
+    )
+}
+
+extension GeneralVerifierService: GeneralVerifierServicing {}
+
 final class GeneralVerifierService {
     private let backendService: BackendService
 

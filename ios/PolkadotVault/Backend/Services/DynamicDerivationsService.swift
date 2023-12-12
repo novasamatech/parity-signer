@@ -7,6 +7,22 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol DynamicDerivationsServicing: AnyObject {
+    func getDynamicDerivationsPreview(
+        for seedPhrases: [String: String],
+        payload: String,
+        completion: @escaping (Result<DdPreview, ServiceError>) -> Void
+    )
+    func signDynamicDerivationsTransaction(
+        for seedPhrases: [String: String],
+        payload: [String],
+        completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
+    )
+}
+
+extension DynamicDerivationsService: DynamicDerivationsServicing {}
+
 final class DynamicDerivationsService {
     private let backendService: BackendService
 

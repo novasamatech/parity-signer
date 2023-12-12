@@ -7,6 +7,21 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol ExportKeySetServicing: AnyObject {
+    func exportRootWithDerivedKeys(
+        seedName: String,
+        keys: [MKeyAndNetworkCard],
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    )
+    func exportRoot(
+        seedName: String,
+        _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
+    )
+}
+
+extension ExportKeySetService: ExportKeySetServicing {}
+
 final class ExportKeySetService {
     private let backendService: BackendService
 

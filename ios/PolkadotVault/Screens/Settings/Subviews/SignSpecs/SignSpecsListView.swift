@@ -191,7 +191,7 @@ extension SignSpecsListView {
 
 private extension SignSpecsListView.ViewModel {
     func loadData() {
-        service.signSpecList(networkKey) { [weak self] result in
+        service.signSpecList { [weak self] result in
             guard let self else { return }
             switch result {
             case let .success(content):

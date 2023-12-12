@@ -1,5 +1,5 @@
 //
-//  KeyDetailsPublicKeyViewModel.swift
+//  KeyDetailsPublicKeyViewRenderable.swift
 //  PolkadotVault
 //
 //  Created by Krzysztof Rodak on 26/04/2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct KeyDetailsPublicKeyViewModel: Equatable {
+struct KeyDetailsPublicKeyViewRenderable: Equatable {
     let qrCodes: [[UInt8]]
     let footer: QRCodeAddressFooterViewModel
     let isKeyExposed: Bool

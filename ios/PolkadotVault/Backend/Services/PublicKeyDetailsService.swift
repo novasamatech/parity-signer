@@ -7,6 +7,17 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol PublicKeyDetailsServicing: AnyObject {
+    func forgetSingleKey(
+        address: String,
+        networkSpecsKey: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+}
+
+extension PublicKeyDetailsService: PublicKeyDetailsServicing {}
+
 final class PublicKeyDetailsService {
     private let backendService: BackendService
 
