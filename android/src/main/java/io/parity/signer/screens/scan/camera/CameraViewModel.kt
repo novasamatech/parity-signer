@@ -1,6 +1,7 @@
 package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
+import android.os.Trace
 import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageProxy
@@ -60,7 +61,7 @@ class CameraViewModel() : ViewModel() {
 		barcodeScanner: BarcodeScanner,
 		imageProxy: ImageProxy
 	) {
-
+		Trace.beginSection("process frame")
 		if (imageProxy.image == null) return
 		val inputImage = InputImage.fromMediaImage(
 			imageProxy.image!!,
@@ -69,6 +70,7 @@ class CameraViewModel() : ViewModel() {
 
 		barcodeScanner.process(inputImage)
 			.addOnSuccessListener { barcodes ->
+				Trace.beginSection("process frame vault code")
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
 					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
@@ -97,11 +99,13 @@ class CameraViewModel() : ViewModel() {
 						}
 					}
 				}
+				Trace.endSection()
 			}
 			.addOnFailureListener {
 				Log.e("scanVM", "Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
+				Trace.endSection()
 				imageProxy.close()
 			}
 	}
