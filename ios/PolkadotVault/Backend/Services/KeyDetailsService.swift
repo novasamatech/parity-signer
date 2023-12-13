@@ -7,6 +7,16 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol KeyDetailsServicing: AnyObject {
+    func getKeys(
+        for seedName: String,
+        _ completion: @escaping (Result<MKeysNew, ServiceError>) -> Void
+    )
+}
+
+extension KeyDetailsService: KeyDetailsServicing {}
+
 final class KeyDetailsService {
     private let backendService: BackendService
 

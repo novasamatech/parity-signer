@@ -17,6 +17,36 @@ enum SpecSignError: Error {
     case error(ServiceError)
 }
 
+// sourcery: AutoMockable
+protocol ManageNetworkDetailsServicing: AnyObject {
+    func getNetworkDetails(
+        _ networkKey: String,
+        _ completion: @escaping (Result<MNetworkDetails, ServiceError>) -> Void
+    )
+    func signSpecList(
+        _ completion: @escaping (Result<MSignSufficientCrypto, ServiceError>) -> Void
+    )
+    func signSpec(
+        _ type: SpecSignType,
+        _ networkKey: String,
+        signingAddressKey: String,
+        seedPhrase: String,
+        password: String?,
+        _ completion: @escaping (Result<MSufficientCryptoReady, SpecSignError>) -> Void
+    )
+    func deleteNetwork(
+        _ networkKey: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+    func deleteNetworkMetadata(
+        _ networkKey: String,
+        _ specsVersion: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+}
+
+extension ManageNetworkDetailsService: ManageNetworkDetailsServicing {}
+
 final class ManageNetworkDetailsService {
     private let backendService: BackendService
     private let callQueue: Dispatching
@@ -42,7 +72,6 @@ final class ManageNetworkDetailsService {
     }
 
     func signSpecList(
-        _: String,
         _ completion: @escaping (Result<MSignSufficientCrypto, ServiceError>) -> Void
     ) {
         backendService.performCall({
