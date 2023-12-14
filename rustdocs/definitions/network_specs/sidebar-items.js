@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CurrentVerifier","ValidCurrentVerifier","VerifierValue"],"struct":["NetworkProperties","NetworkSpecs","OrderedNetworkSpecs","ShortSpecs","Verifier"]};

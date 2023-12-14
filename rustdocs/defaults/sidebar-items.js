@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_VERIFIER_PUBLIC"],"enum":["Error"],"fn":["default_address_book","default_chainspecs","default_chainspecs_to_send","default_general_verifier","default_types_content","default_types_vec","default_verifiers","nav_test_metadata","release_metadata","test_metadata"],"type":["Result"]};

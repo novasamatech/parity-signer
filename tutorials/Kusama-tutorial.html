@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Kusama-tutorial - Polkadot-Vault</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> About Polkadot Vault</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../about/FAQ.html"><strong aria-hidden="true">1.1.</strong> FAQ</a></li><li class="chapter-item expanded "><a href="../about/Security-And-Privacy.html"><strong aria-hidden="true">1.2.</strong> Security-And-Privacy</a></li><li class="chapter-item expanded "><a href="../tutorials/Hierarchical-Deterministic-Key-Derivation.html"><strong aria-hidden="true">1.3.</strong> Hierarchical-Deterministic-Key-Derivation</a></li><li class="chapter-item expanded "><a href="../about/Changelog.html"><strong aria-hidden="true">1.4.</strong> Changelog</a></li></ol></li><li class="chapter-item expanded "><a href="../tutorials/SUMMARY.html"><strong aria-hidden="true">2.</strong> User Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../tutorials/Start.html"><strong aria-hidden="true">2.1.</strong> Start</a></li><li class="chapter-item expanded "><a href="../tutorials/Upgrading.html"><strong aria-hidden="true">2.2.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../tutorials/Add-New-Network.html"><strong aria-hidden="true">2.3.</strong> Add New Network</a></li><li class="chapter-item expanded "><a href="../tutorials/Kusama-tutorial.html" class="active"><strong aria-hidden="true">2.4.</strong> Kusama-tutorial</a></li><li class="chapter-item expanded "><a href="../tutorials/Recover-Account-Polkadotjs.html"><strong aria-hidden="true">2.5.</strong> Recover-Account-Polkadotjs</a></li></ol></li><li class="chapter-item expanded "><a href="../development/Development.html"><strong aria-hidden="true">3.</strong> Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../development/Build.html"><strong aria-hidden="true">3.1.</strong> Build</a></li><li class="chapter-item expanded "><a href="../development/Vault-Structure.html"><strong aria-hidden="true">3.2.</strong> Vault structure</a></li><li class="chapter-item expanded "><a href="../development/Troubleshooting.html"><strong aria-hidden="true">3.3.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../development/Rustdocs.html"><strong aria-hidden="true">3.4.</strong> Rust docs</a></li><li class="chapter-item expanded "><a href="../development/UOS.html"><strong aria-hidden="true">3.5.</strong> Universal offline signature</a></li><li class="chapter-item expanded "><a href="../development/Ecosystem.html"><strong aria-hidden="true">3.6.</strong> Vault ecosystem</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Polkadot-Vault</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="polkadot-vault-tutorial-with-polkadot-js-apps"><a class="header" href="#polkadot-vault-tutorial-with-polkadot-js-apps">Polkadot Vault tutorial with Polkadot-js apps</a></h1>
+<p>This tutorial will walk you through setting up a Kusama account with the Polkadot Vault Android or iOS App and then use this account together with <a href="https://polkadot.js.org/apps/">Polkadot-js apps</a> to see your balance and transfer funds or perform any extrinsic from this account.</p>
+<ul>
+<li>Notice: The UI may be variant for different versions, but the functionalities are the same in <code>v4</code> version.</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<ul>
+<li><a href="#1-get-parity-signer-mobile-application">1. Get Polkadot Vault mobile application</a></li>
+<li><a href="#2-setup-or-recover-an-account">2. Setup or recover an identity</a>
+<ul>
+<li><a href="#create-an-account">Create an identity</a></li>
+<li><a href="#recover-an-account-with-your-recovery-phrase">Recover an identity with your recovery phrase</a></li>
+</ul>
+</li>
+<li><a href="#3-add-parity-signers-account-to-polkadot-js-apps">3. Add Polkadot Vault's account to Polkadot-js apps</a></li>
+<li><a href="#4-sign-a-transaction">4. Sign a transaction</a></li>
+</ul>
+<h2 id="1-get-polkadot-vault-mobile-application"><a class="header" href="#1-get-polkadot-vault-mobile-application">1. Get Polkadot Vault mobile application</a></h2>
+<h3 id="device-security"><a class="header" href="#device-security">Device security</a></h3>
+<p>Polkadot Vault is meant to be used offline. The mobile device used to run Polkadot Vault will hold valuable information that needs to be kept securely stored. It is therefore advised to:</p>
+<ul>
+<li>Get a Polkadot Vault dedicated mobile device.</li>
+<li>Make a factory reset.</li>
+<li>Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).</li>
+<li>Do not use any biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.</li>
+<li>Once Polkadot Vault has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.</li>
+<li>Only charge the phone using a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.</li>
+</ul>
+<p>Please find more info <a href="#Polkadot-Vault-Mobile-App">here</a> about the Polkadot Vault application.</p>
+<h3 id="install-polkadot-vault-mobile-application"><a class="header" href="#install-polkadot-vault-mobile-application">Install Polkadot Vault mobile application</a></h3>
+<p>Install Polkadot Vault making sure that it originated from <strong>Parity Technologies</strong></p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=io.parity.signer">Android</a></li>
+<li><a href="https://itunes.apple.com/us/app/parity-signer/id1218174838">iOS</a></li>
+</ul>
+<h2 id="2-setup-or-recover-an-identity"><a class="header" href="#2-setup-or-recover-an-identity">2. Setup or recover an Identity</a></h2>
+<p>When launching the app for the first time, no identity has been set up yet. At this stage, you will either want to create an identity directly from your mobile device or recover an identity previously created.</p>
+<h3 id="create-an-identity"><a class="header" href="#create-an-identity">Create an identity</a></h3>
+<p>Tap on the <code>Create</code> button, and give a name to this identity.</p>
+<p>In the next step, your recovery phrase will be presented to you. Think of it as a master key. If you lose it, you lose your money.
+<strong>Write this recovery phrase down and store it in a safe place</strong>.
+If your phone gets stolen/broken/forgotten this will be the only way to <a href="#recover-an-account-with-your-recovery-phrase">recover your account</a>.</p>
+<p>You will then be asked to choose a pin code. This pin will be needed later on to unlock your account to manage the identity or sign a transaction.</p>
+<p>The next screen will allow you to select a network to generate an account.
+If you choose an Ethereum network, the related Ethereum account will be generated for the identity,</p>
+<p>If you choose a Substrate network (like Kusama), you will first create a root account, and then you will be able to derive more accounts with specified paths and names. The name can be changed later on, but once the path is set, it can not be changed. More information about path derivation see <a href="#Polkadot-Vault-Hierarchical-Deterministic-Key-Derivation">here</a>.</p>
+<p>For each derived account, you will be able to see the address and its related QR code.</p>
+<p><img src="images/Polkadot-Vault-apps-0.png" alt="create account" /></p>
+<h3 id="recover-an-identity-with-your-recovery-phrase"><a class="header" href="#recover-an-identity-with-your-recovery-phrase">Recover an identity with your recovery phrase</a></h3>
+<p>If you already have an account created with either Polkadot Vault or any other wallet, you can recover it by doing so:</p>
+<ul>
+<li>Tap on the top right side user icon, and choose <code> + Add Identity</code>.</li>
+<li>Input the new identity name and tap the <code>Recover Identity</code> button.</li>
+<li>Type in the recovery phrase, word suggestion helps you prevent any typo. The field will turn red if the recovery phrase is not a <code>bip39</code>.</li>
+<li>Tap <code>Recover Identity</code>.</li>
+<li>Select a PIN number and confirm it by typing it again.</li>
+<li>Identity generated, now you can select the network to create the first account.</li>
+</ul>
+<p>NOTICE: For <code>V3</code> user, after recovering the seed phrase of Kusama account, the account will appear as an identity root account aside with identity name in the network selection screen.</p>
+<h2 id="3-add-polkadot-vaults-account-to-polkadot-js-apps"><a class="header" href="#3-add-polkadot-vaults-account-to-polkadot-js-apps">3. Add Polkadot Vault's account to Polkadot-js apps</a></h2>
+<p>To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Polkadot Vault, you will need to get some KSMs on this account first. Polkadot-js apps allows you to manage your Vault account seamlessly.</p>
+<ul>
+<li>Visit <a href="https://polkadot.js.org/apps/">Polkadot-js apps</a> website.</li>
+<li>Go to <code>Accounts</code> from the left sidebar.</li>
+<li>Click on <code>Add via QR</code> button in the top right-hand corner.</li>
+<li>It will ask for the webcam permission for you to scan the Polkadot Vault's account QR code, accept it.</li>
+<li>On Polkadot Vault, choose on the account you want to copy the address of.</li>
+<li>Scan the QR code displayed on your phone with your computer's webcam. Make sure the QR code is fully displayed on your mobile's screen.</li>
+<li>You can now name this account on Polkadot-js apps.</li>
+</ul>
+<h3 id="4-sign-a-transaction"><a class="header" href="#4-sign-a-transaction">4. Sign a transaction</a></h3>
+<p>Assuming that your Polkadot Vault account now has funds, you will be able to send some funds securely to anyone, without transferring your private key, and without needing any internet connection on your mobile phone.</p>
+<ul>
+<li>On Polkadot-js apps, click on the <code>send</code> button next to your account.</li>
+<li>On Polkadot-js apps, enter the address of the account you want to send funds to. Make sure to try with a small amount of money first before sending larger amounts.</li>
+<li>Click on <code>Make Transfer</code></li>
+<li>Review the transaction, you can add tip to this transaction.</li>
+<li>Click on <code>Scan via QR Code</code> when you're done.</li>
+</ul>
+<p><img src="images/Polkadot-Vault-apps-tx-workflow.png" alt="Polkadot Vault Polkadot send transaction" /></p>
+<p>You will now be presented with a QR code that represents the transaction. Since this transaction is sending funds from your Polkadot Vault mobile app account, only this account (sitting on your phone) can sign and authorize this transaction. This is what we'll do in the next steps:</p>
+<ul>
+<li>From the Polkadot Vault account overview, tap the scan button on the top right and scan the QR code presented by the Polkadot-js apps website.</li>
+<li>Review the transaction addresses and the amount to send on your phone. The amount and addresses must match what you've entered in apps. If you got phished, this is where you can realize it and reject the transaction.</li>
+<li>Once you're sure, scroll down and click <code>Sign Transaction</code> to enter your pin and get the QR code of the scanned transaction.</li>
+</ul>
+<p><img src="images/Polkadot-Vault-apps-1.png" alt="Sign Polkadot apps transaction" /></p>
+<p>Your phone has now <em>signed the transaction offline</em> using your Polkadot Vault account private key. The QR code that is now displayed on your phone represents a signed transaction that can be broadcasted. We will do this in the next steps:</p>
+<ul>
+<li>On Polkadot-js apps, click on <code>Scan Signature QR</code>, this will ask to turn on your webcam again.</li>
+<li>Face your phone's display to your webcam for the website to be able to read the signed transaction.</li>
+<li>Your transaction is sent automatically.</li>
+<li>Congrats you just sent funds from an air-gapped account :)</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../tutorials/Add-New-Network.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../tutorials/Recover-Account-Polkadotjs.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../tutorials/Add-New-Network.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../tutorials/Recover-Account-Polkadotjs.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script>
+            window.playground_line_numbers = true;
+        </script>
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js"></script>
+        <script src="../editor.js"></script>
+        <script src="../mode-rust.js"></script>
+        <script src="../theme-dawn.js"></script>
+        <script src="../theme-tomorrow_night.js"></script>
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

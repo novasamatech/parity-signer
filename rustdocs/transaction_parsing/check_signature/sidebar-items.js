@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["pass_crypto"],"struct":["InfoPassedCrypto"]};

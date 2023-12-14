@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["constants","db_handling","defaults","definitions","generate_message","navigator","parser","printing_balance","qr_reader_pc","qr_reader_phone","qrcode_rtx","qrcode_static","signer","transaction_parsing","transaction_signing"];

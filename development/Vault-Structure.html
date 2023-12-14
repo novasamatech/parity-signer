@@ -1,0 +1,587 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Vault structure - Polkadot-Vault</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> About Polkadot Vault</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../about/FAQ.html"><strong aria-hidden="true">1.1.</strong> FAQ</a></li><li class="chapter-item expanded "><a href="../about/Security-And-Privacy.html"><strong aria-hidden="true">1.2.</strong> Security-And-Privacy</a></li><li class="chapter-item expanded "><a href="../tutorials/Hierarchical-Deterministic-Key-Derivation.html"><strong aria-hidden="true">1.3.</strong> Hierarchical-Deterministic-Key-Derivation</a></li><li class="chapter-item expanded "><a href="../about/Changelog.html"><strong aria-hidden="true">1.4.</strong> Changelog</a></li></ol></li><li class="chapter-item expanded "><a href="../tutorials/SUMMARY.html"><strong aria-hidden="true">2.</strong> User Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../tutorials/Start.html"><strong aria-hidden="true">2.1.</strong> Start</a></li><li class="chapter-item expanded "><a href="../tutorials/Upgrading.html"><strong aria-hidden="true">2.2.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../tutorials/Add-New-Network.html"><strong aria-hidden="true">2.3.</strong> Add New Network</a></li><li class="chapter-item expanded "><a href="../tutorials/Kusama-tutorial.html"><strong aria-hidden="true">2.4.</strong> Kusama-tutorial</a></li><li class="chapter-item expanded "><a href="../tutorials/Recover-Account-Polkadotjs.html"><strong aria-hidden="true">2.5.</strong> Recover-Account-Polkadotjs</a></li></ol></li><li class="chapter-item expanded "><a href="../development/Development.html"><strong aria-hidden="true">3.</strong> Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../development/Build.html"><strong aria-hidden="true">3.1.</strong> Build</a></li><li class="chapter-item expanded "><a href="../development/Vault-Structure.html" class="active"><strong aria-hidden="true">3.2.</strong> Vault structure</a></li><li class="chapter-item expanded "><a href="../development/Troubleshooting.html"><strong aria-hidden="true">3.3.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../development/Rustdocs.html"><strong aria-hidden="true">3.4.</strong> Rust docs</a></li><li class="chapter-item expanded "><a href="../development/UOS.html"><strong aria-hidden="true">3.5.</strong> Universal offline signature</a></li><li class="chapter-item expanded "><a href="../development/Ecosystem.html"><strong aria-hidden="true">3.6.</strong> Vault ecosystem</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Polkadot-Vault</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="vault-structure"><a class="header" href="#vault-structure">Vault structure</a></h1>
+<h2 id="architectural-structure"><a class="header" href="#architectural-structure">Architectural structure</a></h2>
+<p>On top level, Vault consists of following parts:</p>
+<ol>
+<li>Rust backend core</li>
+<li>FFI interface</li>
+<li>Native frontend</li>
+<li>Database</li>
+</ol>
+<h3 id="rust-backend"><a class="header" href="#rust-backend">Rust backend</a></h3>
+<p>There are 3 actual endpoints in <code>rust</code> folder: <code>signer</code>, which is source of
+library used for Vault itself; <code>generate_message</code>, which is used to update
+Vault repo with new built-in network information and to generate
+over-the-airgap updates; and <code>qr_reader_pc</code> which is a minimalistic app to parse
+qr codes that we had to write since there was no reasonably working alternative.</p>
+<p>Sub-folders of the <code>rust</code> folder:</p>
+<ul>
+<li><code>constants</code> — constant values defined for the whole workspace.</li>
+<li><code>db_handling</code> — all database-related operations for Vault and
+<code>generate_message</code> tool. Most of the business logic is contained here.</li>
+<li><code>defaults</code> — built-in and test data for database</li>
+<li><code>definitions</code> — objects used across the workspace are defined here</li>
+<li><code>files</code> — contains test files and is used for build and update generation
+processes. Most contents are gitignored.</li>
+<li><code>generate_message</code> — tool to generate over-the-airgap updates and maintain
+network info database on hot side</li>
+<li><code>navigator</code> — navigation for Vault app; it is realized in rust to unify app
+behavior across the platforms</li>
+<li><code>parser</code> - parses signable transactions. This is internal logic for
+<code>transaction_parsing</code> that is used when signable transaction is identified, but
+it could be used as a standalone lib for the same purpose.</li>
+<li><code>printing_balance</code> — small lib to render tokens with proper units</li>
+<li><code>qr_reader_pc</code> — small standalone PC app to parse QR codes in Vault
+ecosystem. Also is capable of parsing multiframe payloads (theoretically, in
+practice it is not feasible due to PC webcam low performance)</li>
+<li><code>qr_reader_phone</code> — logic to parse QR payloads in Vault</li>
+<li><code>qrcode_rtx</code> — multiframe erasure-encoded payload generator for signer update
+QR animation.</li>
+<li><code>qrcode_static</code> — generation of static qr codes used all over the workspace</li>
+<li><code>signer</code> — FFI interface crate to generate bindings that bridge native code
+and rust backend</li>
+<li><code>transaction_parsing</code> — high-level parser for all QR payloads sent into Vault</li>
+<li><code>transaction_signing</code> — all operations that could be performed when user
+accepts payload parsed with <code>transaction_parsing</code></li>
+</ul>
+<h3 id="ffi-interface"><a class="header" href="#ffi-interface">FFI interface</a></h3>
+<p>For interfacing rust code and native interface we use
+<a href="https://mozilla.github.io/uniffi-rs/">uniffi</a> framework. It is a framework
+intended to aid building cross-platform software in Rust especially for the
+cases of re-using components written in Rust in the smartphone application
+development contexts. Other than Vault itself one of the most notable users of
+the <code>uniffi</code> framework are the <a href="https://github.com/mozilla/application-services/">Mozilla Application Services</a></p>
+<p><code>uniffi</code> framework provides a way for the developer to define a clear and a
+typesafe <code>FFI</code> interface between components written in <code>Rust</code> and languages such
+as <code>Kotlin</code> and <code>Swift</code>. This approach leads to a much more robust architecture
+than implementing a homegrown FFI with, say, passing JSON-serialized data back
+and forth between <code>Kotlin</code> and <code>Rust</code> code. Here is why.</p>
+<p>Suppose the application needs to pass a following structure through FFI from
+<code>Kotlin</code> to <code>Rust</code> or back:</p>
+<pre><code class="language-rust noplaypen">#[derive(Serialize, Deserialize)]
+ struct Address { street:String, city: String, }</code></pre>
+<p>This would mean that on the <code>Kotlin</code> side of the FFI there would have to be some
+way of turning this type from JSON into a <code>Kotlin</code> type. It may be some sort of
+scheme or even a manual JSON value-by-key data extraction.</p>
+<p>Now suppose this struct is changed by adding and removing some fields:</p>
+<pre><code class="language-rust noplaypen">#[derive(Serialize, Deserialize)]
+ struct Address { country: String, city: String, index: usize, }</code></pre>
+<p>After this change on a Rust-side the developer would have to <em>remember</em> to
+reflect these changes on the <code>Kotlin</code> and <code>Swift</code> sides and if that is not done
+there is a chance that it will not be caught in build-time by CI. It is quite
+hard to remember everything and having a guarantee that such things would be
+caught at compile time is much better than not having this sort of guarantee.
+One of the things <code>uniffi</code> solves is exactly this: it provides compile-time
+guarantees of typesafety.</p>
+<p>The other concern with the JSON serialization approach is performance. As long
+as small objects are transferred back and forth it is no trouble encoding them
+into strings.  But suppose the application requires transferring bigger blobs of
+binary data such as <code>png</code> images or even some metadata files. Using JSON would
+force the developer to encode such blobs as <code>Strings</code> before passing them into
+FFI and decoding them back into binary blobs on the other side of the FFI.
+<code>uniffi</code> helps to avoid this also.</p>
+<h3 id="native-frontend"><a class="header" href="#native-frontend">Native frontend</a></h3>
+<p>Native frontends are made separately for each supported platform. To keep things
+uniform, interfaces are made as simple as possible and as much code is written
+in unified Rust component, as possible. Yet, platform-specific functions,
+including runtime management and threading, are also accessed through native
+framework. The structure of native frontend follows modern (2022) reactive
+design pattern of View-Action-Model triad. Thus, all backend is located in data
+model section, along with few native business logic components.</p>
+<p>It is important to note, that native navigation is <strong>not</strong> used, as due to
+subtle differences in its seemingly uniform design across platforms. Navigation
+is instead implemented on Rust side and, as an additional advantage, is tested
+there at lower computational cost for CI pipelines.</p>
+<h3 id="database"><a class="header" href="#database">Database</a></h3>
+<p>For storage of all data except secrets, a sled database is used. Choice of db
+was based on its lightweightness, reliability, portability.</p>
+<p><a href="../rustdocs/db_handling/cold_default/index.html">Vault database structure</a></p>
+<h2 id="functional-structure"><a class="header" href="#functional-structure">Functional structure</a></h2>
+<p>Vault has the following systems:</p>
+<ul>
+<li>Secure key management</li>
+<li>Signing</li>
+<li>Transaction parsing</li>
+<li>Transaction visualization</li>
+<li>Airgap data transfer</li>
+<li>Airgap updating</li>
+<li>Network detector</li>
+<li>Logging</li>
+<li>Self-signing updating capability</li>
+<li>UI</li>
+</ul>
+<p>These systems are located in different parts the app and some of them rely on
+hot-side infrastructure. The general design goal was to isolate as much as
+possible in easily maintainable Rust code and keep only necessary functions in
+native side. Currently, those include:</p>
+<ul>
+<li>Hardware secret storage: we rely on hardware designer's KMS in accordance with
+best practices</li>
+<li>Network detector: network operations are limited by OS and we try to keep
+network access permissions for the app to minimum while still maintaining
+simple breach detection</li>
+<li>Camera: currently image capture and recognition systems implementations in
+native environments by far surpass 3rd party ones. This might change in the
+future, but at least image capture will be managed by OS to maintain platform
+compatibility.</li>
+<li>UI: we use native frameworks and components for rendering and user interaction
+for best look and feel of the app.</li>
+</ul>
+<h3 id="secure-key-management"><a class="header" href="#secure-key-management">Secure key management</a></h3>
+<p>Keypairs used in Vault are generated from secret seed phrase, derivation path
+and optional secret password, in accordance with specifications described in
+<strong>subkey manual</strong> using code imported directly from substrate codebase for best
+conformance.</p>
+<h4 id="secret-seed-phrase-storage"><a class="header" href="#secret-seed-phrase-storage">Secret seed phrase storage</a></h4>
+<p>Secret seed phrase is stored as a string in devices original KMS. It is
+symmetrically encrypted with a strong key that either is stored in a
+hardware-protected keyring or uses biometric data (in case of legacy android
+devices without strongbox system). Secrets access is managed by operating
+system's built-in authorization interface. Authorization is required for
+creation of seeds, access to seeds and removal of seeds. One particular special
+case is addition of the first seed on iOS platform, that does not trigger
+authorization mechanism as the storage is empty at this moment; this is in
+agreement with iOS key management system design and potentially leads to a
+threat of attacker replacing a single key by adding it to empty device; this
+attack is countered by authorization on seed removal.</p>
+<p>Thus, secret seeds source of truth is KMS. To synchronize the rest of the app,
+list of seed identifiers is sent to backend on app startup and on all events
+related to changes in this list by calling <code>update_seed_names(Vec&lt;String&gt;)</code>.</p>
+<p>Random seed generator and seed recovery tools are implemented in Rust. These
+are the only 2 cases where seed originates not in KMS.</p>
+<h4 id="derivation-path-management"><a class="header" href="#derivation-path-management">Derivation path management</a></h4>
+<p>The most complex part of key management is storage of derivation strings and
+public keys. Improper handling here may lead to user's loss of control over
+their assets.</p>
+<p>Key records are stored as strings in database associated with secret seed
+identifiers, crypto algorithm, and list of allowed networks. Public key and its
+cryptographic algorithm are used to deterministically generate database record
+key - thus by design distinct key entries directly correspond to addresses on
+chain.</p>
+<p>Creation of new records requires generation of public keys through derivation
+process, thus secret seed should be queried - so adding items to this database
+requires authentication.</p>
+<p>Substrate keys could be natively used across all networks supporting their
+crypto algorithm. This may lead to accidental re-use of keys; thus it is not
+forbidden by the app, but networks are isolated unless user explicitly expresses
+desire to enable key in given network. From user side, it is abstracted into
+creation of independent addresses; however, real implementation stores addresses
+with public keys as storage keys and thus does not distinguish between networks.
+To isolate networks, each key stores a field with a list of allowed networks,
+and when user &quot;creates&quot; address with the same pubkey as already existing one, it
+is just another network added to the list of networks.</p>
+<p>Keys could be imported through QR code created by <code>generate_message</code> tool
+(<a href="../rustdocs/generate_message/index.html#derivations-import">instructions</a>). A
+plaintext newline-separated list of derivations should be supplied to the tool
+along with network identifier; the import thus is bound to certain network,
+however, it is not bound to any particular seed - user can select any of
+created seeds and, after authorization, create keys with given paths. Bulk
+import of password-protected keys is forbidden at the moment.</p>
+<h4 id="optional-password"><a class="header" href="#optional-password">Optional password</a></h4>
+<p>Optional password (part of derivation path after <code>///</code>) is never stored, only
+addresses that have password in their derivation path are marked. Thus, password
+is queried every time it is needed with a tool separate from OS authentication
+interface, but together with authentication screen, as password is always used
+with a secret seed phrase.</p>
+<h4 id="memory-safety-in-secure-key-management"><a class="header" href="#memory-safety-in-secure-key-management">Memory safety in secure key management</a></h4>
+<p>All memory handles by native framework relies on native framework's memory
+protection mechanisms (JVM virtualization and Swift isolation and garbage
+collection). However, when secrets are processed in Rust, no inherent designed
+memory safety features are available. To prevent secrets remaining in memory
+after their use, <code>zeroize</code> library is used. Also, <strong>describe string destruction
+protocol or fix it</strong></p>
+<h3 id="signing"><a class="header" href="#signing">Signing</a></h3>
+<p>Every payload to be signed is first extracted from transfer payload in agreement
+with UOS specification and polkadot-js implementation. Only payloads that could
+be parsed and visualized somehow could be signed to avoid blind signing - thus
+on parser error no signable payload is produced and signing procedure is not
+initiated.</p>
+<p>When signable payload is ready, it is stored in TRANSACTION tree while
+user makes decision on whether to sign it. While in storage, database checksum
+is monitored for changes.</p>
+<p>Signing uses private key generated from KMS-protected secret seed phrase,
+derivation string and optional password. Signing operation itself is imported
+directly from substrate codebase as dependency.</p>
+<p>Signing event or its failure is logged and signature wrapped in UOS format is
+presented as a qr static image on the phone.</p>
+<h3 id="transaction-parsing"><a class="header" href="#transaction-parsing">Transaction parsing</a></h3>
+<p>Transaction parsing process is described in <a href="./UOS.html#transaction">UOS format documentation</a></p>
+<h3 id="transaction-visualization"><a class="header" href="#transaction-visualization">Transaction visualization</a></h3>
+<p>Signable transaction is decomposed into hierarchical cards for clarity. All
+possible scale-decodable types are assigned to generalized visualization
+patterns (&quot;transaction cards&quot;) with some types having special visualizations
+(<code>balance</code> formatted with proper decimals and units, identicons added to
+identities, etc.). Each card is assigned <code>order</code> and <code>indent</code> that allow the
+cards to be shown in a lazy view environment. Thus, any networks that have
+minimal metadata requirements should be decodable and visualizable.</p>
+<p>Some cards also include documentation entries fetched from metadata. Those could
+be expanded in UI on touch.</p>
+<p>Thus, user has opportunity to read the whole transaction before signing.</p>
+<h3 id="airgap-data-transfer"><a class="header" href="#airgap-data-transfer">Airgap data transfer</a></h3>
+<p>Transactions are encoded in accordance to UOS standard in QR codes. QR codes can
+be sent into Vault - through static frames or dynamic multiframe animations -
+and back - only as static frames. QR codes are decoded through native image
+recognition system and decoded through rust backend; output QR codes are
+generated in png format by backend. There are 2 formats of multiframe QR codes:
+legacy multiframe and <code>raptorq</code> multiframe. Legacy multiframe format requires
+all frames in animation to be collected and is thus unpractical for larger
+payloads. RaptorQ multiframe format allows any subset of frames to be collected
+and thus allows large payloads to be transferred effortlessly.</p>
+<p>Fast multiframe transfer works efficiently at 30 fps. Typical large payloads
+contain up to 200 frames at current state of networks. This can be theoretically
+performed in under 10 seconds; practically this works in under 1 minute.</p>
+<h3 id="airgap-updating"><a class="header" href="#airgap-updating">Airgap updating</a></h3>
+<p>Vault can download new networks and metadata updates from QR data. To prevent
+malicious updates from compromising security, a system of certificates is
+implemented. </p>
+<p>Updates could be generated by any user; they can also be distributed in signed form to delegate validity check job to trusted parties. These trusted parties should sign metadata with their asymmetric key - certificate - and they become verifiers once their update is uploaded to Vault. There are 2 tiers of certificates - &quot;general&quot; and &quot;custom&quot;, with the first allowing more comfortable use of Vault at cost of only one general verifier allowed.</p>
+<p>Rules about verifier certificates are designed around simplicity of security protocol: one trusted party becomes main source of trust and updates generated by it are just accepted. If that party does not have all required updates available, other party can be added as custom verifier. That verifier is not allowed to change specs at will and suspicious activity by custom verifier would interfere with network usage thus stopping user from doing potentially harmful stuff. This allows less strenuous security policy on user side.</p>
+<p>It is important to note that certificates could not be effectively revoked considering airgapped nature of the app, thus it is recommended to keep their keys on airgapped Vault devices if updates signed by these certificates are distributed publicly.</p>
+<p><a href="./UOS.html#update">More on certificates</a></p>
+<h3 id="network-detector"><a class="header" href="#network-detector">Network detector</a></h3>
+<p>An additional security feature is network detector. When the app is on, it runs
+in the background (on low-priority thread) and attempts to monitor the network
+availability. This detector is implemented differently on different platforms
+and has different features and limitations; however, it does not and could not
+provide full connectivity monitoring and proper maintaining of airgap is
+dependent on user. Vault device should always be kept in airplane mode and all
+other connectivity should be disabled.</p>
+<p>The basic idea of network detection alertness is that when network connectivity
+is detected, 3 things happen:</p>
+<ol>
+<li>Event is logged in history</li>
+<li>Visual indication of network status is presented to user (shield in corner of
+screen and message in alert activated by the shield)</li>
+<li>Certain Vault functions are disabled (user authentication, seed and key
+creation, etc.) - features that bring secret material into active app memory
+from storage</li>
+</ol>
+<p>When network connectivity is lost, only visual indication changes. To restore
+clean state of Vault, user should acknowledge safety alert by pressing on
+shield icon, reading and accepting the warning. Upon acknowledging, it is logged
+in history, visual indication changes to green and all normal Vault functions
+are restored.</p>
+<h4 id="network-detector-in-ios"><a class="header" href="#network-detector-in-ios">Network detector in iOS</a></h4>
+<p>Airplane mode detection in iOS is forbidden and may lead to expulsion of the app
+from the App Store. Thus, detector relies on probing network interfaces. If any
+network interface is up, network alert is triggered.</p>
+<h4 id="network-detector-in-android"><a class="header" href="#network-detector-in-android">Network detector in Android</a></h4>
+<p>Network detector is triggered directly by airplane mode change event.</p>
+<h4 id="bluetooth-nfc-etc"><a class="header" href="#bluetooth-nfc-etc">Bluetooth, NFC, etc,</a></h4>
+<p>Other possible network connectivity methods are not monitored. Even though it is
+possible to add detectors for them, accessing their status will require the app
+to request corresponding permissions form OS, thus reducing app's isolation and
+decreasing overall security - first, by increasing chance of leak in breach
+event, and second, by making corrupt fake app that leaks information through
+network appear more normal. Furthermore, there is information that network might
+be connected through cable in some devices in airplane mode; there was no
+research on what debugging through cable is capable of for devices in airplane
+mode. Thus, network detector is a convenience too and should not be relied on as
+sole source of security; user is responsible for device isolation.</p>
+<h3 id="logging"><a class="header" href="#logging">Logging</a></h3>
+<p>All events that happen in Vault are logged by backend in history tree of
+database. From user interface, all events are presented in chronological order
+on log screen. On the same screen, history checksum could be seen and custom
+text entries could be added to database. Checksum uses time added to history
+records in computation and is therefore impractical to forge.</p>
+<p>Events presented on log screen are colored to distinguish &quot;normal&quot; and
+&quot;dangerous&quot; events. Shown records give minimal important information about the
+event. On click, detailed info screen is shown, where all events happened at the
+same time are presented in detail (including transactions, that are decoded for
+review if metadata is still available).</p>
+<p>Log could also be erased for privacy; erasure event is logged and becomes the
+first event in recorded history.</p>
+<h3 id="self-signing-updating-capability"><a class="header" href="#self-signing-updating-capability">Self-signing updating capability</a></h3>
+<p>Vault can sign network and metadata updates that could be used for other
+signers. User can select any update component present in Vault and any key
+available for any network and generate a qr code which, upon decoding, can be
+used by <code>generate_message</code> or similar tool to generate over-the-airgap update.
+<a href="./UOS.html">See detailed documentation</a></p>
+<p>This feature was designed for elegance, but it is quite useful to maintain
+update signing key for large update distribution centers, for it allows to
+securely store secret certificate key that could not be practically revoked if
+compromised.</p>
+<h3 id="ui"><a class="header" href="#ui">UI</a></h3>
+<p>User interface is organized through View-Action-DataModel abstraction.</p>
+<h4 id="view"><a class="header" href="#view">View</a></h4>
+<p>Vault visual representation is abstracted in 3 visual layers placed on top of
+each other: <code>screen</code>, <code>modal</code> and <code>alert</code>. This structure is mostly an
+adaptation of iOS design guidelines, as android native UI is much flexible and
+it is easier to adopt it to iOS design patterns than vice versa. Up to one of
+each component could be presented simultaneously. Screen component is always
+present in the app, but sometimes it is fully or partially blocked by other
+components.</p>
+<p>Modals and alerts are dismissed on <code>goBack</code> action, screens have complex
+navigation rules. Modals require user to take action and interrupt flow. Alerts
+are used for short information interruptions, like error messages or
+confirmations.</p>
+<p>In addition to these, header bar is always present on screen and footer bar is
+presented in some cases. Footer bar always has same structure and only allows
+navigation to one of navigation roots. Top bar might contain back button, screen
+name, and extra menu button; status indicator is always shown on top bar.</p>
+<h4 id="action"><a class="header" href="#action">Action</a></h4>
+<p>Almost all actions available to user are in fact handled by single operation -
+<code>action()</code> backend function, that is called through <code>pushButton</code> native
+interface. In native side, this operation is debounced by time. On rust side,
+actions are performed on static mutex storing app state; on blocked mutex
+actions is ignored, as well as impossible actions that are not allowed in
+current state of navigation. Thus, state of the app is protected against
+undefined concurrency effects by hardware button-like behavior of <code>action()</code>.</p>
+<p>Most actions lead to change of shown combination of screen, modal and alert; but
+some actions - for example, those involving keyboard input - alter contents of a
+UI component. In most cases, all parameters of UI components are passed as
+states (more or less similar concept on all platforms) and frontend framework
+detects updates and seamlessly performs proper rendering.</p>
+<p>Action accepts 3 parameters: action type (enum), action data (<code>&amp;str</code>), secret data
+(<code>&amp;str</code>). Secret data is used to transfer secret information and care is taken to
+always properly zeroize its contents; on contrary, action data could contain
+large strings and is optimized normally.</p>
+<h4 id="data-model"><a class="header" href="#data-model">Data model</a></h4>
+<p>Data model as seen by native UI consists of 3 parts: secret seed content,
+network detection state and screen contents. Secret seed content consists of
+list of seed names that are used as handles to fetch secret material from secure
+storage. Network detection state is a 4-state variable that describes current
+network detection state (safe state, network is currently detected, network was
+detected before, error state). The rest of data model is a black box in Rust.</p>
+<p>From Rust side, model is generated by <code>navigation</code> crate. The state of the app
+is stored in lazy static <code>State</code> object and sufficient information required for
+View rendering is generated into <code>ActionResult</code> object that is sent into native
+layer on each action update.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../development/Build.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../development/Troubleshooting.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../development/Build.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../development/Troubleshooting.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script>
+            window.playground_line_numbers = true;
+        </script>
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js"></script>
+        <script src="../editor.js"></script>
+        <script src="../mode-rust.js"></script>
+        <script src="../theme-dawn.js"></script>
+        <script src="../theme-tomorrow_night.js"></script>
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

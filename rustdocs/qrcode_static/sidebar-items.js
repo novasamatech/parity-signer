@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DataType"],"fn":["png_qr","png_qr_from_string"]};

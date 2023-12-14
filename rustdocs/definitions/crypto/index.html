@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Encryption-related types with public information"><title>definitions::crypto - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="definitions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../definitions/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../../definitions/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Module crypto</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#enums">Enums</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">definitions</a>::<wbr><a class="mod" href="#">crypto</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/definitions/crypto.rs.html#1-205">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Encryption-related types with public information</p>
+<p>Vault supports all three encryption algorithms currently used by the
+Substrate: <code>Ed25519</code>, <code>Sr25519</code>, and <code>Ecdsa</code>.</p>
+<p>In addition to <a href="https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html"><code>MultiSigner</code></a>
+and <a href="https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSignature.html"><code>MultiSignature</code></a>,
+Vault uses similarly structured enums <a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a> with only encryption
+algorithm information and <a href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> with encryption, public key
+and data signature combined.</p>
+<p>Networks are expected to use certain encryption algorithm <a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a>.
+This is reflected in <a href="../network_specs/struct.OrderedNetworkSpecs.html" title="struct definitions::network_specs::OrderedNetworkSpecs"><code>OrderedNetworkSpecs</code></a>
+and in <a href="../network_specs/struct.NetworkSpecs.html" title="struct definitions::network_specs::NetworkSpecs"><code>NetworkSpecs</code></a>
+field <code>encryption</code>, and also in corresponding database keys
+<a href="../keyring/struct.NetworkSpecsKey.html" title="struct definitions::keyring::NetworkSpecsKey"><code>NetworkSpecsKey</code></a>.
+In principle, network could support more than one encryption algorithm,
+in this case there would be more than one database entry for the network
+specs with different keys.<br />
+Default networks (Polkadot, Kusama, and Westend) all operate with <code>Sr25519</code>
+encryption.</p>
+<p>Each address in Vault has an associated encryption algorithm
+<a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a>. This is reflected in <a href="../users/struct.AddressDetails.html" title="struct definitions::users::AddressDetails"><code>AddressDetails</code></a>
+field <code>encryption</code> and in corresponding database key
+<a href="../keyring/struct.AddressKey.html" title="struct definitions::keyring::AddressKey"><code>AddressKey</code></a>. Address is associated with a
+network, and only matching <a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a> is allowed.
+Address is generated from seed phrase and derivation, public keys produced
+for different encryption algorithms with same seed phrase and derivation
+are totally different.</p>
+<p>Both general verifier and each individual network
+<a href="../network_specs/enum.CurrentVerifier.html" title="enum definitions::network_specs::CurrentVerifier"><code>CurrentVerifier</code></a> also have
+associated <a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a>. Encryption algorithm used by verifiers could be
+different from the one used by the network they are verifying, it is used
+only to check the validity of the signed update.</p>
+<p>Vault receives Substrate transactions starting in hexadecimal recording
+with <code>53xxyy</code> where <code>xx</code> corresponds to the encryption type.</p>
+<p>Possible signature schemes are:</p>
+<ul>
+<li><code>00</code> for <code>Ed25519</code></li>
+<li><code>01</code> for <code>Sr25519</code></li>
+<li><code>02</code> for <code>Ecdsa</code></li>
+</ul>
+<p>To be able to sign transaction in Vault, address producing transaction
+must be associated with declared encryption algorithm and with transaction
+network with. Also, transaction network must have entry in the database
+having declared encryption algorithm.</p>
+<p>Updating transaction, in addition to three variants above, also may be
+unsigned, with <code>ff</code> as an encryption piece. <code>ff</code> means only that no
+signature is provided, it has no corresponding value in <a href="enum.Encryption.html" title="enum definitions::crypto::Encryption"><code>Encryption</code></a>.</p>
+<p><a href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> is a construction that could be created in Vault
+and exported through static QR code. It contains encryption algorithm,
+public key and corresponding signature for some data. Data could be network
+specs, network metadata, or types information, that is loaded into Vault.
+The information in <a href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> is sufficient to verify the updating
+payload validity elsewhere.</p>
+<p>This way Vault user can produce verified updating transactions with
+own signatures.</p>
+<p><a href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> could be used by the hot-side client to generate QR
+codes with updating payloads signed by an address from Vault.</p>
+<p>Vault keeps track of the generated <a href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> QR codes in
+history log.  </p>
+</div></details><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Encryption.html" title="enum definitions::crypto::Encryption">Encryption</a></div><div class="desc docblock-short">Encryption algorithm</div></li><li><div class="item-name"><a class="enum" href="enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto">SufficientCrypto</a></div><div class="desc docblock-short">Data sufficient to generate signed update</div></li></ul></section></div></main></body></html>

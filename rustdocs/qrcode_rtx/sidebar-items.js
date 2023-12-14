@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["make_data_packs","make_pretty_qr","transform_into_qr_apng"]};

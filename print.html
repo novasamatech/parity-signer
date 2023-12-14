@@ -1,0 +1,2088 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Polkadot-Vault</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> About Polkadot Vault</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="about/FAQ.html"><strong aria-hidden="true">1.1.</strong> FAQ</a></li><li class="chapter-item expanded "><a href="about/Security-And-Privacy.html"><strong aria-hidden="true">1.2.</strong> Security-And-Privacy</a></li><li class="chapter-item expanded "><a href="tutorials/Hierarchical-Deterministic-Key-Derivation.html"><strong aria-hidden="true">1.3.</strong> Hierarchical-Deterministic-Key-Derivation</a></li><li class="chapter-item expanded "><a href="about/Changelog.html"><strong aria-hidden="true">1.4.</strong> Changelog</a></li></ol></li><li class="chapter-item expanded "><a href="tutorials/SUMMARY.html"><strong aria-hidden="true">2.</strong> User Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="tutorials/Start.html"><strong aria-hidden="true">2.1.</strong> Start</a></li><li class="chapter-item expanded "><a href="tutorials/Upgrading.html"><strong aria-hidden="true">2.2.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="tutorials/Add-New-Network.html"><strong aria-hidden="true">2.3.</strong> Add New Network</a></li><li class="chapter-item expanded "><a href="tutorials/Kusama-tutorial.html"><strong aria-hidden="true">2.4.</strong> Kusama-tutorial</a></li><li class="chapter-item expanded "><a href="tutorials/Recover-Account-Polkadotjs.html"><strong aria-hidden="true">2.5.</strong> Recover-Account-Polkadotjs</a></li></ol></li><li class="chapter-item expanded "><a href="development/Development.html"><strong aria-hidden="true">3.</strong> Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="development/Build.html"><strong aria-hidden="true">3.1.</strong> Build</a></li><li class="chapter-item expanded "><a href="development/Vault-Structure.html"><strong aria-hidden="true">3.2.</strong> Vault structure</a></li><li class="chapter-item expanded "><a href="development/Troubleshooting.html"><strong aria-hidden="true">3.3.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="development/Rustdocs.html"><strong aria-hidden="true">3.4.</strong> Rust docs</a></li><li class="chapter-item expanded "><a href="development/UOS.html"><strong aria-hidden="true">3.5.</strong> Universal offline signature</a></li><li class="chapter-item expanded "><a href="development/Ecosystem.html"><strong aria-hidden="true">3.6.</strong> Vault ecosystem</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Polkadot-Vault</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="./tutorials/images/logo-parity-signer.svg" alt="Polkadot Vault" /></p>
+<div align="center">
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="./res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="./res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="./res/app-store-badge.png" width="150"></a><br><br>
+</div>
+<h1 id="polkadot-vault---turn-your-smartphone-into-a-hardware-wallet"><a class="header" href="#polkadot-vault---turn-your-smartphone-into-a-hardware-wallet">Polkadot Vault - Turn your smartphone into a hardware wallet</a></h1>
+<p>Polkadot Vault is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as &quot;cold storage&quot;.</p>
+<p>You can create accounts in Substrate-based networks, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.</p>
+<p>You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.</p>
+<p><strong>Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our <a href="./about/Security-And-Privacy.html">wiki</a> for more details.</strong></p>
+<p>Have a look at the tutorial on our wiki to learn how to use <a href="./tutorials/Kusama-tutorial.html">Polkadot Vault together with Polkadot-js app</a>.</p>
+<p>Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.</p>
+<h2 id="key-features"><a class="header" href="#key-features">Key features</a></h2>
+<ul>
+<li>This is not a complete crypto wallet in itself. The Vault does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a <strong>cold wallet</strong> app that only stores keys, reads and signs messages. It should always be used with <strong>hot wallet</strong> like <a href="https://polkadot.js.org/apps">polkadot.js</a>.</li>
+<li>The Vault alone does not make your accounts secure. <strong>You must maintain security yourself</strong>. Airgap should be only part of your security protocol, improper use of Vault could still lead to loss of funds and/or secrets.</li>
+<li>When properly used, Vault provides best achievable security with Substrate networks to-date.</li>
+</ul>
+<h2 id="system-requirements"><a class="header" href="#system-requirements">System requirements</a></h2>
+<p>Currently Vault is available only for iOS. Android version is coming soon.</p>
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
+<p><strong>These tutorials and docs are heavily outdated at the moment, please use them as references or help improving</strong></p>
+<p>If you are upgrading from older version of Vault, please see <a href="./about/Changelog.html">changelog</a> and <a href="./tutorials/Upgrading.html">upgrading Vault</a></p>
+<p>Please note that the Vault app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.</p>
+<p><a href="./tutorials/Start.html">Getting started guide</a></p>
+<h3 id="user-guides"><a class="header" href="#user-guides">User Guides</a></h3>
+<ul>
+<li><a href="./tutorials/Start.html">Start</a></li>
+<li><a href="./tutorials/Upgrading.html">Upgrading</a></li>
+<li><a href="./tutorials/Add-New-Network.html">Add New Network</a></li>
+<li><a href="./tutorials/Kusama-tutorial.html">Kusama-tutorial</a></li>
+<li><a href="./tutorials/Recover-Account-Polkadotjs.html">Recover-Account-Polkadotjs</a></li>
+</ul>
+<h3 id="about"><a class="header" href="#about">About</a></h3>
+<ul>
+<li><a href="./README.html">About Polkadot Vault</a></li>
+<li><a href="./about/FAQ.html">FAQ</a></li>
+<li><a href="./about/Security-And-Privacy.html">Security-And-Privacy</a></li>
+<li><a href="./tutorials/Hierarchical-Deterministic-Key-Derivation.html">Hierarchical-Deterministic-Key-Derivation</a></li>
+</ul>
+<h3 id="legacy-versions"><a class="header" href="#legacy-versions">Legacy versions</a></h3>
+<p>Older versions of this app could be useful for development, however, they are not safe for use in production. They are available at following branches:</p>
+<ul>
+<li><a href="https://github.com/paritytech/parity-signer/tree/legacy-4.5.3">Last public release with React Native</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/tree/legacy-4.6.2">Non-ascii characters fix and some transaction parsing</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/tree/legacy-metadataRN">Metadata types import and message parsing in RN</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/tree/legacy-rust">Rust backend with RN frontend</a></li>
+</ul>
+<h2 id="license"><a class="header" href="#license">License</a></h2>
+<p>Polkadot-Vault is <a href="LICENSE">GPL 3.0 licensed</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<ul>
+<li><a href="about/FAQ.html#about">About</a></li>
+<li><a href="about/FAQ.html#networks">Networks</a></li>
+<li><a href="about/FAQ.html#seeds-and-keys">Seeds and keys</a></li>
+</ul>
+<h2 id="about-1"><a class="header" href="#about-1">About</a></h2>
+<h3 id="what-is-vault"><a class="header" href="#what-is-vault">What is Vault?</a></h3>
+<p>Vault is an app for an air-gapped device, it turns an offline device — usually a smartphone — into a secure hardware wallet. Vault offers you a way to securely generate, store, manage and use your blockchain credentials.</p>
+<h3 id="should-i-use-vault"><a class="header" href="#should-i-use-vault">Should I use Vault?</a></h3>
+<p>Vault is optimized for the highest security requirements. If you already manage many accounts on multiple networks, Vault is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Vault as intuitive as possible; get in touch via <a href="mailto:signer@parity.io">signer@parity.io</a> or <a href="https://github.com/paritytech/parity-signer/issues">GitHub Issues</a> if you can help us get there!</p>
+<h3 id="how-does-an-offline-device-communicate-with-the-outside-world"><a class="header" href="#how-does-an-offline-device-communicate-with-the-outside-world">How does an offline device communicate with the outside world?</a></h3>
+<p>Communication happens through scanning and generating QR codes. Scanned with Vault input-QRs interact with keys stored in Vault to, generate response-QRs on behalf of those keys. Usually, input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.</p>
+<h3 id="how-do-i-keep-my-keys-secure"><a class="header" href="#how-do-i-keep-my-keys-secure">How do I keep my keys secure?</a></h3>
+<p>Vault is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend backing up your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called <a href="https://bs.parity.io/">Banana Split</a>.</p>
+<h3 id="how-do-i-know-i-am-not-interacting-with-malicious-apps-or-actors"><a class="header" href="#how-do-i-know-i-am-not-interacting-with-malicious-apps-or-actors">How do I know I am not interacting with malicious apps or actors?</a></h3>
+<p>The Vault does not interact with a network. The app itself does not have a way to check if an app or an account you're interacting with is malicious. 
+If you use Vault with PolkadotJS Browser Extension, PolkadotJS Apps, or Signer Component Browser Extension they will rely on a community-driven curated list of potentially less-than-honest operators: <a href="https://polkadot.js.org/phishing/#"><a href="https://polkadot.js.org/phishing/#">https://polkadot.js.org/phishing/#</a></a> to prevent you from interacting with certain sites and addresses. However, there are no limitations on the use of Vault with other tools.</p>
+<h3 id="i-want-to-play-with-vault-to-get-a-better-feeling-of-how-it-works-is-there-a-way-to-do-it-without-spending-valuable-tokens"><a class="header" href="#i-want-to-play-with-vault-to-get-a-better-feeling-of-how-it-works-is-there-a-way-to-do-it-without-spending-valuable-tokens">I want to play with Vault to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?</a></h3>
+<p>Yes. In Vault, you should add a key for an address on Westend network and request test tokens for that address, see the step-by-step guide on <a href="https://wiki.polkadot.network/docs/learn-DOT#getting-westies">Polkadot Network Wiki</a>. </p>
+<p>You can use test tokens in the same way you would use value-bearing tokens.</p>
+<p>For example with <a href="https://polkadot.js.org/apps/">PolkadotJS Apps</a> you can create a transaction on behalf of your account, generate a signature with Vault and submit it to the network. All of this without keys ever leaving your offline device.</p>
+<h2 id="networks"><a class="header" href="#networks">Networks</a></h2>
+<h3 id="what-networks-does-vault-support"><a class="header" href="#what-networks-does-vault-support">What networks does Vault support?</a></h3>
+<p>From-the-shelf Polkadot Vault supports Polkadot, Kusama, and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand the capability of Polkadot Vault.</p>
+<h3 id="how-can-i-update-metadata-version-for-a-network"><a class="header" href="#how-can-i-update-metadata-version-for-a-network">How can I update metadata version for a network?</a></h3>
+<p>Parity verifies and publishes recent metadata versions on <a href="https://metadata.parity.io/">Metadata Update Portal</a>. With off-the-shelf Vault you can scan one of the multipart QR-&quot;movies&quot; same way you scan transaction QR:<br />
+in Vault open scanner, scan the QR for the respective network and accept new metadata.</p>
+<p>Currently, <a href="https://metadata.parity.io/">Metadata Update Portal</a> follows Polkadot, Kusama, and Westend network metadata updates. Parity is open to collaboration with participants of other networks and is currently exploring safe and more decentralized ways of publishing verified metadata.</p>
+<p>If you want to update networks that you've added manually, please follow the <a href="about/../tutorials/Add-New-Network.html#add-network-metadata">Add Metadata</a> steps in <a href="about/../tutorials/Add-New-Network.html">Add New Network</a> guide.</p>
+<h3 id="why-do-i-need-to-update-network-metadata-versions-at-all"><a class="header" href="#why-do-i-need-to-update-network-metadata-versions-at-all">Why do I need to update network metadata versions at all?</a></h3>
+<p>It's a safety feature. Substrate-based blockchain networks can be updated and otherwise changed; without recent metadata version of a network Vault won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Vault is an app for an air-gapped device, you have to update the network version by using camera.</p>
+<h3 id="how-can-i-add-a-new-network-to-vault"><a class="header" href="#how-can-i-add-a-new-network-to-vault">How can I add a new network to Vault?</a></h3>
+<p>Parity verifies and publishes network specs on <a href="https://metadata.parity.io/">Metadata Update Portal</a>. To add one of the listed networks, in <a href="https://metadata.parity.io/">Metadata Update Portal</a> click &quot;Chain Specs&quot;, scan the network specs QR same way you scan transaction QR: in Vault open scanner, scan the QR and accept new network spec. Then scan the multipart QR-&quot;movie&quot; containing recent metadata for this network.</p>
+<h3 id="can-i-add-a-network-that-does-not-have-network-specs-and-metadata-qr-published-anywhere"><a class="header" href="#can-i-add-a-network-that-does-not-have-network-specs-and-metadata-qr-published-anywhere">Can I add a network that does not have network specs and metadata QR published anywhere?</a></h3>
+<p>Yes. Follow the <a href="about/../tutorials/Add-New-Network.html">Add New Network</a> step-by-step guide.</p>
+<p>Currently, the process requires you to have <a href="https://www.rust-lang.org/tools/install">rust</a>, <a href="https://docs.substrate.io/v3/tools/subkey/#installation">subkey</a> and <a href="https://github.com/paritytech/parity-signer">parity-signer repository</a> on your machine.</p>
+<h2 id="seeds-and-keys"><a class="header" href="#seeds-and-keys">Seeds and keys</a></h2>
+<h3 id="can-i-import-my-keys-from-polkadotjs-apps-or-extension-to-polkadot-vault"><a class="header" href="#can-i-import-my-keys-from-polkadotjs-apps-or-extension-to-polkadot-vault">Can I import my keys from <code>polkadot{.js}</code> apps or extension to Polkadot Vault?</a></h3>
+<p>Yes. Keys are compatible between <code>polkadot{.js}</code> and Polkadot Vault, except for the keys generated with Ledger (<code>BIP39</code>). To import seed keys into Polkadot Vault, you need to know:</p>
+<ol>
+<li>Seed phrase<br />
+<em>It should always be backed up in paper!</em></li>
+<li>Network you are adding address to and whether Polkadot Vault installed on your device has metadata for the respective network.<br />
+<em>If (2) is not one of the default built-in networks, you will need to add network yourself or find a distribution center for adding networks.</em></li>
+<li>Derivation path<br />
+<em>Only if you are importing a derived key, usually keys generated with <code>polkadot{.js}</code> are seed keys.</em></li>
+</ol>
+<p>In Polkadot Vault go to Keys, then press &quot;Plus&quot; icon in the top right of the screen, select &quot;Recover seed&quot;, enter display name to identify your seed, press &quot;Next&quot;, enter the seed phrase. Done, you've got your seed key imported!<br />
+If you are importing a derived key select the seed from which your key is derived, select account's network, press &quot;Plus&quot; icon next to &quot;Derived keys&quot;, enter your derivation path.</p>
+<h3 id="what-is-the-difference-between-seed-key-and-derived-key-why-should-i-use-derived-keys"><a class="header" href="#what-is-the-difference-between-seed-key-and-derived-key-why-should-i-use-derived-keys">What is the difference between seed key and derived key? Why should I use derived keys?</a></h3>
+<p>A seed key is a single key pair generated from a seed phrase. You can “grow” as many derived keys from a single seed by adding derivation paths to your seed phrase.</p>
+<p>Learn more about types of derivation paths on <a href="https://docs.substrate.io/v3/tools/subkey/#hd-key-derivation">substrate.io</a>.</p>
+<p>Derivation path is sensitive information, but knowing the derivation path is not enough to recover a key. Derived keys cannot be backed up without both of the ingredients: seed phrase (can be shared between multiple keys) and a derivation path (unique for each of the keys “grown” from that seed).</p>
+<p>The main reason to use derived keys is how easy it is to back up (and restore from a backup) a derivation path compared to seed phrase.</p>
+<h3 id="what-is-an-identicon-the-image-next-to-my-keys"><a class="header" href="#what-is-an-identicon-the-image-next-to-my-keys">What is an identicon, the image next to my keys?</a></h3>
+<p>An identicon is a visual hash of a public key — a unique picture generated from your public key. The same public key should have the same identicon regardless of the application. It is a good tool to distinguish quickly between keys. However, when interacting with keys, i.g. verifying a recipient of a transaction, do not rely only on identicons, it is better to check the full public address.</p>
+<h3 id="how-can-i-rename-one-of-my-seeds"><a class="header" href="#how-can-i-rename-one-of-my-seeds">How can I rename one of my seeds?</a></h3>
+<p>Due to security considerations, you cannot rename a seed. Please back up the seed and derived keys, remove it and add the seed again with a new name instead.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="security-and-privacy"><a class="header" href="#security-and-privacy">Security and Privacy</a></h1>
+<h2 id="device-security"><a class="header" href="#device-security">Device security</a></h2>
+<p>Polkadot Vault is built to be used offline. The mobile device used to run the app will hold important information that needs to be kept securely stored. It is therefore advised to:</p>
+<ul>
+<li>Get a separate mobile device.</li>
+<li>Make a factory reset.</li>
+<li>Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).</li>
+<li>Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.</li>
+<li>Once the app has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.</li>
+<li>Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.</li>
+</ul>
+<h2 id="how-to-get-it-and-use-it"><a class="header" href="#how-to-get-it-and-use-it">How to get it and use it?</a></h2>
+<h3 id="install-the-app"><a class="header" href="#install-the-app">Install the app</a></h3>
+<p>The app is available in beta for Android and iOS :</p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=io.parity.signer">Android Play store</a></li>
+<li><a href="https://itunes.apple.com/us/app/parity-signer/id1218174838">iOS app store</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/releases">Signed APK from GitHub</a></li>
+</ul>
+<p>Please double check carefully the origin of the app, and make sure that the company distributing it is <strong>Parity Technologies</strong>. Usual security advice apply to this air-gapped wallet: </p>
+<ul>
+<li>When creating an account using Polkadot Vault Mobile app, make sure to write down the recovery phrase and store it in safe places.</li>
+<li>Always double check the information of the transactions you are about to sign or send.</li>
+<li>Make sure to first transfer a small amount of Ether with the app and verify that everything is working as expected before transferring larger amounts of Ether.</li>
+</ul>
+<h2 id="how-to-update-polkadot-vault-securely"><a class="header" href="#how-to-update-polkadot-vault-securely">How to update Polkadot Vault securely</a></h2>
+<p>Once Polkadot Vault is installed, your device should never go online. This would put your private keys at threat. To update, you will need to :</p>
+<ol>
+<li>Make sure you possess the recovery phrase for each of your accounts. You can find it on Polkadot Vault by :</li>
+</ol>
+<ul>
+<li><code>v4.0</code> choosing an identity &gt; click the user icon at the top right &gt; “Show Recovery Phrase”</li>
+<li><code>v2.2</code> tapping an account &gt; 3 dots menu at the top right &gt; “Backup Recovery Phrase”</li>
+<li><code>v2.0</code> tapping an account &gt; tap on the account address &gt;   “Backup Recovery Phrase”</li>
+</ul>
+<ol start="2">
+<li>Factory reset the device.</li>
+<li>Enable full-disk encryption on the device and set a strong password (might not be on by default, for example for older Android devices).</li>
+<li>Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.</li>
+<li>Install Polkadot Vault from the Apple store or Android store or download the APK from Polkadot Vault's Github repository (make sure you are on the right website and verify the checksum)</li>
+<li>Once the app has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth, and any other connection ability the device has.</li>
+<li>Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.</li>
+<li>Recover your accounts.</li>
+</ol>
+<h2 id="what-data-does-it-collect"><a class="header" href="#what-data-does-it-collect">What data does it collect?</a></h2>
+<p>None, it's as simple as that. The Polkadot Vault Mobile Android and iOS apps do not send any sort of data to Parity Technologies or any partner and work completely offline once installed.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="polkadot-vault-accounts-management"><a class="header" href="#polkadot-vault-accounts-management">Polkadot Vault Accounts Management</a></h1>
+<p>Polkadot Vault <code>v4</code> has introduced the Hierarchical Deterministic Key Derivation (HDKD) feature for Substrate networks. This article explains how to use this feature.</p>
+<ul>
+<li>Notice: The UI may be variant for different versions, but the functionalities are the same in <code>v4</code> version.</li>
+</ul>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>Seed is the starting point for generating accounts. The seed itself does not have any network affiliation. For Substrate networks, generating a new accounts means entering a derivation path and choosing a network. With this feature, you can manage as many accounts as needed with just one seed phrase safely stored.</p>
+<h2 id="key-generation"><a class="header" href="#key-generation">Key Generation</a></h2>
+<h3 id="create-an-account-for-a-substrate-based-network"><a class="header" href="#create-an-account-for-a-substrate-based-network">Create an account for a Substrate based network.</a></h3>
+<p>Key generation also refers to accounts creation, with your created Identity:</p>
+<ul>
+<li>Go to key manager and create a new seed or select an existing one</li>
+<li>Choose a network</li>
+<li>Tap on any key</li>
+<li>Tap <code>Derive</code> or <code>N+1</code> Button</li>
+<li>In path derivation screen, input any path and name you like (or accept naming suggestion)</li>
+<li>(optional) type password</li>
+<li>Tap <code>Derive</code> Button</li>
+<li>Done, you can start using new address.</li>
+</ul>
+<h3 id="the-form-of-path"><a class="header" href="#the-form-of-path">The form of path</a></h3>
+<p>Paths also refer to the chain codes which described in <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki/"></a>, though it is different from BIP-32 style:</p>
+<ul>
+<li><strong>Soft</strong> derivation starts with a single slash, like: <code>/soft</code></li>
+<li><strong>Hard</strong> derivation starts with a double slash, like: <code>//hard</code></li>
+</ul>
+<p>Users are able to create any combination of hard derivation with <code>//</code> and/or soft derivation with <code>/</code>.</p>
+<p>The encoded string are limited to 32 Bytes.</p>
+<p>For technical information about the soft and hard derivations on Substrate, please refer to introduction <a href="https://github.com/paritytech/parity-signer/wiki/HDKD-on-Parity-Signer#hdkd-general-on-substrate">here</a>.</p>
+<p>Path also could contain optional <strong>password</strong>; in Subkey standard password is prefixed with <code>///</code>. However, for convenience, Vault device has separate password entry field with password confirmation, thus do not add <code>///</code> to derivation field, it will result in error - instead omit <code>///</code> and type password into its' special field. It will not be stored on the device and will be required for any operation that requires private key of the account. There is no way to restore this password if it is lost so please back it up carefully.</p>
+<h3 id="further-notes"><a class="header" href="#further-notes">Further notes</a></h3>
+<ul>
+<li>With the same <code>BIP32</code> seed users could create keys under different networks.</li>
+<li>Each derived account is bound to certain networks, which prevents it to be misused in another network until it is explicitly added for that network as well. Root account is available for all networks by default.</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References:</a></h2>
+<ol>
+<li><a href="https://github.com/w3f/schnorrkel"><a href="https://github.com/w3f/schnorrkel">https://github.com/w3f/schnorrkel</a></a></li>
+<li><a href="https://wiki.polkadot.network/docs/en/learn-keys"><a href="https://wiki.polkadot.network/docs/en/learn-keys">https://wiki.polkadot.network/docs/en/learn-keys</a></a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="changelog"><a class="header" href="#changelog">Changelog</a></h1>
+<h2 id="501"><a class="header" href="#501">5.0.1</a></h2>
+<p>Android version release, minor fixes</p>
+<h2 id="new-in-version-500"><a class="header" href="#new-in-version-500">New in version 5.0.0</a></h2>
+<h3 id="architecture"><a class="header" href="#architecture">Architecture</a></h3>
+<p>No more typescript or react native. Backend is completely in Rust, frontend is in native.</p>
+<h3 id="building"><a class="header" href="#building">Building</a></h3>
+<h4 id="dependencies"><a class="header" href="#dependencies">Dependencies</a></h4>
+<p>Number of dependencies was greatly reduced; no npm/yarn/nodejs/cocoapods, etc. All dependencies are handled by:</p>
+<ul>
+<li>Cargo (rust packages)</li>
+<li>Xcode (only default iOS frameworks are used)</li>
+<li>Gradle</li>
+</ul>
+<h4 id="rust-backend"><a class="header" href="#rust-backend">Rust backend</a></h4>
+<p>Rust libraries were moved back into the repository. Crypto functions are imported from Substrate. All logic and most of storage is written in Rust. An important hack here is that <code>rust/signer</code> crate has 2 versions of Cargo.toml for android and iOS architectures, as target library features could not be adjusted by normal means.</p>
+<h4 id="native-frontend"><a class="header" href="#native-frontend">Native frontend</a></h4>
+<p>Frontend for both iOS and Android re-written in native frameworks. Thus, standard out-of-the-box build scripts could be used for building once Rust libraries are built and linked</p>
+<h3 id="features"><a class="header" href="#features">Features</a></h3>
+<h4 id="secure-seed-storage"><a class="header" href="#secure-seed-storage">Secure seed storage</a></h4>
+<p>Secrets are stored in devices' encrypted storage and some effort is made to prevent them leaking in system memory. Thus, all is as safe as the phone is - the same credentials used for unlocking the phone are used to unlock seeds. User is responsible to keep them adequate.</p>
+<h4 id="transaction-preview"><a class="header" href="#transaction-preview">Transaction preview</a></h4>
+<p>Transactions content is shown before signing; no hash signing is allowed, but signing messages is possible.</p>
+<h4 id="history-feature"><a class="header" href="#history-feature">History feature</a></h4>
+<p>The Vault now logs all operations it performs. It it important to remember that this is not log of account operations, but log of device history. This history could be cleared if needed, but not modified by other means. Detected presence of network connection is also logged.</p>
+<h4 id="n1-derivation"><a class="header" href="#n1-derivation">N+1 derivation</a></h4>
+<p>Much requested feature that makes Vault automatically increment numbered seeds on creation.</p>
+<h4 id="network-and-metadata-updates"><a class="header" href="#network-and-metadata-updates">Network and metadata updates</a></h4>
+<p>All network data updates now could be performed through scanning QR codes. Whenever some update is needed, most probably you should just scan some QR video. Don't worry about skipped frames, it's fountain code so you only need enough frames.</p>
+<p>All updates could be signed, and signing key will be trusted on first use, so Vault device should be linked to single source of authority on correct metadata.</p>
+<h4 id="key-re-use-in-different-networks"><a class="header" href="#key-re-use-in-different-networks">Key re-use in different networks</a></h4>
+<p>Keys could be used only in one network. Need to re-use key in another network? Just create key with the same derivation path in that network to allow re-use and it will work.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="user-guides-1"><a class="header" href="#user-guides-1">User Guides</a></h1>
+<ul>
+<li><a href="tutorials/./Start.html">Start</a></li>
+<li><a href="tutorials/./Upgrading.html">Upgrading</a></li>
+<li><a href="tutorials/./Add-New-Network.html">Add New Network</a></li>
+<li><a href="tutorials/./Kusama-tutorial.html">Kusama tutorial</a></li>
+<li><a href="tutorials/./Recover-Account-Polkadotjs.html">Recover Account-Polkadotjs</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="starting-with-vault"><a class="header" href="#starting-with-vault">Starting with Vault</a></h1>
+<p>This is suggested usage pattern; you should adjust it to your security protocol if you are certain you know what you are doing.</p>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<h3 id="factory-reset-the-phone"><a class="header" href="#factory-reset-the-phone">Factory reset the phone</a></h3>
+<p>The Vault should be installed in most secure environment possible. To achieve that, the phone should be reset to factory state.</p>
+<p>Wipe the phone to factory state. This is good time to install newer version of operating system if you like. Make sure your system is genuine by all means provided by OS vendor.</p>
+<h3 id="set-up-phone"><a class="header" href="#set-up-phone">Set up phone</a></h3>
+<p>Before installing the Vault, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Vault are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentication protocol.</p>
+<h3 id="install-vault"><a class="header" href="#install-vault">Install Vault</a></h3>
+<p>Download signed application through application store or from <a href="https://github.com/paritytech/parity-signer/releases">github releases</a>. Make sure the signature is valid! Install the app. Do not start the app just yet!</p>
+<h3 id="disable-network"><a class="header" href="#disable-network">Disable network</a></h3>
+<p>Before starting the Vault, you should make sure that network is disabled. Many operating systems allow only partial network monitoring; although there are network detection features in Vault, they are limited and only have informational function. <strong>User is responsible for maintaining airgapped state!</strong> The simplest way to disable connectivity is setting the phone in airplane mode. Advanced users might want to use physical methods to further protect the phone from connections. Perform all preparations before starting the Vault app!</p>
+<h2 id="first-start"><a class="header" href="#first-start">First start</a></h2>
+<p>When you first launch Vault, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Vault is ready for use. It could <a href="tutorials/./Add-New-Network.html">import network data</a> or <a href="tutorials/./Kusama-tutorial.html">read transactions</a>, but to sign anything you need to create keys.</p>
+<!-- TODO for advanced users: If you would like to replace general verifier certificate (link to explanation?), this is time to do it, as that operation will wipe all data from Vault - something like this might be useful here" -->
+<h3 id="create-keys"><a class="header" href="#create-keys">Create keys</a></h3>
+<p>Open key manager by tapping bottom left symbol. On fresh start you will be prompted to create seed (otherwise you could always create more seeds by tapping <code>New seed</code> button in Key Manager). Enter any convenient seed name (it does not matter anything and is not used anywhere except for this particulat Vault device) and - if you would like to use custom seed phrase - switch to recovery mode and type the seed phrase. Custom seed phrase should be used only to recover or import existing key(s), do not input custom seed phrase unless it is properly random! <strong>Security of your accounts relies on randomness of seed phrase</strong>. If you are generating new seed phrase, use built-in random generator and do not input a custom seed phrase.</p>
+<p>Once you click <code>create</code> button, you will be prompted to authenticate yourself. This will happen every time cruptographic engine of the phone is used to handle seeds - on all creations, backups, derivations and signatures and in some OS versions on starting the Vault.</p>
+<p>You will see the created secret seed. Please back it up on paper and store it in safe place. If you lose your Vault device or it will become non-functional, you will be able to recover your keys using this seed phrase. Anyone could recover your keys with knowledge of this phrase. If you lose this seed phrase, though, <strong>it will be impossible to recover your keys</strong>. You can check the seed phrase anytime in Settings menu, but make sure that it is backed up at all times.</p>
+<p>Once you dismiss seed phrase backup screen, the seed and some associated keys will be created. For every network known to the Vault, a network root derivation key will be generated, hard-derived from seed phrase with network name. A root key will be generated and made available in all networks. <strong>Do not use the root key unless you know what you do!</strong>.</p>
+<p>To learn more on key generation, read <a href="https://substrate.dev/docs/en/knowledgebase/integrate/subkey">subkey specifications</a> that Vault follows tightly and <a href="tutorials/./Hierarchical-Deterministic-Key-Derivation.html">Vault key management</a>.</p>
+<h3 id="export-public-key"><a class="header" href="#export-public-key">Export public key</a></h3>
+<p>Once you have a keypair you would like to use, you should first export it to hot wallet. Tap the key and select <code>Export</code> button. You will see the export QR code you can use with hot wallet.</p>
+<p>Details on <a href="tutorials/./Kusama-tutorial.html">signing with Pokadot.js Apps</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="upgrading-vault"><a class="header" href="#upgrading-vault">Upgrading Vault</a></h1>
+<p>First of all, you need to be certain you want to upgrade Vault. Starting from <code>v5</code>, all network information could be downloaded through QR codes and upgrades are needed only to add new software features.</p>
+<h2 id="preparation-to-upgrade"><a class="header" href="#preparation-to-upgrade">Preparation to upgrade</a></h2>
+<h3 id="back-up-your-keys"><a class="header" href="#back-up-your-keys">Back up your keys</a></h3>
+<p>Make sure your keys are backed up - you should have all seed phrases and derivations recorded somewhere. Once you proceed to the next step, there is <strong>no way to recover</strong> lost information.</p>
+<p>Make sure to back up all keys for all networks you use. Ideally you should already have some kind of backup, make sure it is up to date.</p>
+<h3 id="wipe-vault-device"><a class="header" href="#wipe-vault-device">Wipe Vault device</a></h3>
+<p>Once you are certain that you have backed up everything, open settings, select <code>Wipe all data</code> button and confirm your action. All data in the Vault will be factory reset; congratulations!</p>
+<h3 id="factory-reset-the-phone-1"><a class="header" href="#factory-reset-the-phone-1">Factory reset the phone</a></h3>
+<p>When the Vault is removed, wipe the phone to factory state. This is good time to install newer version of operating system if you like. Make sure your system is genuine by all means provided by OS vendor.</p>
+<h3 id="set-up-phone-1"><a class="header" href="#set-up-phone-1">Set up phone</a></h3>
+<p>Before installing the Vault, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Vault are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentication protocol. Other than that, you might want to select dark mode (Vault remains dark for historic reasons)</p>
+<h3 id="install-vault-1"><a class="header" href="#install-vault-1">Install Vault</a></h3>
+<p>Download signed application through application store or from github. Make sure the signature is valid! Install the app. Do not start the app just yet!</p>
+<h3 id="disable-network-1"><a class="header" href="#disable-network-1">Disable network</a></h3>
+<p>Before starting the Vault, you should make sure that network is disabled. Many operating systems allow only partial network monitoring; although there are network detection features in Vault, they are limited and only have informational function. <strong>User is responsible for maintaining airgapped state!</strong> The simplest way to disable connectivity is setting the phone in airplane mode. Advanced users might want to use physical methods to further protect the phone from connections. Perform all preparations before starting the Vault app!</p>
+<h3 id="start-the-vault"><a class="header" href="#start-the-vault">Start the Vault</a></h3>
+<p>Start the app. Read and accept information provided on launch. Congratulations! The app is ready to use now, however it does not have any keys and only few basic built-in networks. Proceed with <a href="tutorials/../tutorials/Start.html">setting up keys</a> and <a href="tutorials/../tutorials/Add-New-Network.html">adding new networks</a>.</p>
+<!--TODO Feel free to use built-in Westend test network to try things out. Get test tokens at #westend_faucet:matrix.org or something along the lines-->
+<div style="break-before: page; page-break-before: always;"></div><h1 id="add-new-network"><a class="header" href="#add-new-network">Add New Network</a></h1>
+<p>Polkadot Vault supports adding any substrate-based networks or updating an existing network via QR code.</p>
+<p>After you've installed <a href="tutorials/Add-New-Network.html#Prerequisites">required software</a>, you need to add <em>Network's Specs</em> to Vault and add <em>Network Metadata</em> for this network, so that Vault is able to decode, and you could read and verify transactions you are signing on this network.</p>
+<p>If you need to update metadata for already existing network you only need to update <em>Network Metadata</em>.
+Off-the-shelf Vault comes with networks that you can update by scanning a multipart QR codes that contain recent metadata for these networks at <a href="https://metadata.parity.io/">Metadata Update Portal</a>.</p>
+<p><em>Network Specs</em></p>
+<ol>
+<li><a href="tutorials/Add-New-Network.html#get-network-spec">Get</a></li>
+<li><a href="tutorials/Add-New-Network.html#sign-network-spec">Sign</a></li>
+<li><a href="tutorials/Add-New-Network.html#feed-network-spec-into-signer">Feed into Vault</a></li>
+</ol>
+<p><em>Network Metadata</em></p>
+<ol start="4">
+<li><a href="tutorials/Add-New-Network.html#get-network-metadata">Get</a></li>
+<li><a href="tutorials/Add-New-Network.html#sign-network-metadata">Sign</a></li>
+<li><a href="tutorials/Add-New-Network.html#feed-network-metadata-into-signer">Feed into Vault</a></li>
+</ol>
+<h3 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"/>
+Network details
+<ul>
+<li><input disabled="" type="checkbox"/>
+RPC endpoint (websocket URL)<br />
+<em>Hint: You can RPC endpoints for some of the public networks e.g. in <a href="https://github.com/polkadot-js/apps/tree/master/packages/apps-config/src/endpoints">polkadot-js/apps repository</a></em></li>
+<li><input disabled="" type="checkbox"/>
+Encryption algorithm</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+<a href="https://www.rust-lang.org/tools/install">rust</a></li>
+<li><input disabled="" type="checkbox"/>
+a clone of <a href="https://github.com/paritytech/parity-signer">parity-signer repository</a></li>
+<li><input disabled="" type="checkbox"/>
+<a href="https://docs.substrate.io/v3/tools/subkey/#installation">subkey</a></li>
+<li><input disabled="" type="checkbox"/>
+Dedicated keypair specifically for signing updates<br />
+<em>Please make sure you have a backup <code>&lt;secret-phrase&gt;</code> and <code>Public key (hex)</code> of this keypair. You will be able to update a network only with metadata that is signed with the same keypair as network specs. You can generate it with any tool of your choice, e.g with <a href="https://docs.substrate.io/v3/tools/subkey/#installation">subkey</a>:</em> <code>subkey generate</code>.</li>
+</ul>
+<!-- "TODO suggested strategy to handle this keypair: password 
+derivation, dedicated signer -->
+<br/>
+<hr />
+<br/>
+<p>Let's get started!</p>
+<h2 id="add-network-specs"><a class="header" href="#add-network-specs">Add Network Specs</a></h2>
+<h3 id="get-network-specs"><a class="header" href="#get-network-specs">Get Network Specs</a></h3>
+<p>In <code>parity-signer/rust/generate_message</code></p>
+<pre><code>cargo run add-specs -u &lt;network-ws-url&gt; --encryption &lt;crypto&gt;
+
+</code></pre>
+<pre><code>// e.g.
+cargo run add-specs -u wss://statemint-rpc.polkadot.io --encryption sr25519
+
+</code></pre>
+<p>For networks supporting several tokens:</p>
+<pre><code>cargo run add-specs -d -u &lt;network-ws-url&gt; --encryption &lt;crypto&gt; --token-decimals &lt;decimals&gt; --token-unit &lt;SYMBOL&gt;
+
+</code></pre>
+<pre><code>// e.g.
+cargo run add-specs -d -u wss://karura-rpc-0.aca-api.network --encryption sr25519 --token-decimals 12 --token-unit KAR
+
+</code></pre>
+<br/>
+<p>Now your <code>&lt;specs-file&gt;</code> is in <code>parity-signer/rust/files/for_signing</code>.</p>
+<p><em>Hint: you can read more about <a href="https://github.com/paritytech/parity-signer/blob/master/rust/generate_message/src/lib.rs">interface with hot database</a> if you want to maintain it.</em></p>
+<!-- TODO more about hot database, suggested use of hot database" -->
+<h3 id="sign-network-spec"><a class="header" href="#sign-network-spec">Sign Network Spec</a></h3>
+<h4 id="get-signature"><a class="header" href="#get-signature">Get signature</a></h4>
+<p>In <code>parity-signer/rust/files/for_signing</code></p>
+<pre><code>cat &lt;spec-file&gt; | subkey sign --suri &lt;seed-phrase-and-derivation&gt;
+</code></pre>
+<pre><code>// e.g.
+cat sign_me_add_specs_statemint_sr25519 | subkey sign --suri &quot;bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice&quot;
+</code></pre>
+<p>This will return a <code>&lt;signature&gt;</code> you need to make a signed QR.</p>
+<h4 id="make-signed-qr"><a class="header" href="#make-signed-qr">Make signed QR</a></h4>
+<p>In <code>parity-signer/rust/generate_message</code></p>
+<pre><code>cargo run --release make --goal qr --crypto &lt;crypto&gt; --msg add-specs --payload &lt;spec-file&gt; --verifier-hex &lt;public-key&gt; --signature-hex &lt;signature&gt;
+</code></pre>
+<pre><code>// e.g.
+cargo run --release make --goal qr --crypto sr25519 --msg add-specs --payload sign_me_add_specs_statemint_sr25519 --verifier-hex 0x927c307614dba6ec42f84411cc1e93c6579893859ce5a7ac3d8c2fb1649d1542 --signature-hex fa3ed5e1156d3d51349cd9bb4257387d8e32d49861c0952eaff1c2d982332e13afa8856bb6dfc684263aa3570499e067d4d78ea2dfa7a9b85e8ea273d3a81a86
+</code></pre>
+<br/>
+<p>Now your <code>&lt;spec-qr&gt;</code> is in <code>parity-signer/rust/files/signed</code></p>
+<h3 id="feed-network-specs-into-vault"><a class="header" href="#feed-network-specs-into-vault">Feed Network Specs into Vault</a></h3>
+<p>In Vault open scanner, scan your <code>&lt;spec-qr&gt;</code> and approve chain specs.</p>
+<br/>
+<h2 id="add-network-metadata"><a class="header" href="#add-network-metadata">Add Network Metadata</a></h2>
+<h3 id="get-network-metadata"><a class="header" href="#get-network-metadata">Get Network Metadata</a></h3>
+<p>In <code>parity-signer/rust/generate_message</code></p>
+<pre><code>cargo run load-metadata -d -u `&lt;network-ws-url&gt;`
+</code></pre>
+<pre><code>// e.g.
+cargo run load-metadata -d -u wss://statemint-rpc.polkadot.io
+</code></pre>
+<br/>
+<p>This will fetch fresh <code>&lt;metadata_file&gt;</code>, update the database with it, and - most relevant to us currently - generate file with message body in <code>parity-signer/rust/files/for_signing</code>.</p>
+<h3 id="sign-network-metadata"><a class="header" href="#sign-network-metadata">Sign Network Metadata</a></h3>
+<h4 id="get-signature-1"><a class="header" href="#get-signature-1">Get Signature</a></h4>
+<p>In <code>parity-signer/rust/files/for_signing</code></p>
+<pre><code>cat &lt;metadata-file&gt; | subkey sign --suri &lt;seed-phrase-and-derivation&gt;
+</code></pre>
+<pre><code>// e.g.
+cat sign_me_load_metadata_statemintV800 | subkey sign --suri &quot;bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice&quot;
+</code></pre>
+<h4 id="make-signed-qr-1"><a class="header" href="#make-signed-qr-1">Make signed QR</a></h4>
+<p>In <code>parity-signer/rust/generate_message</code></p>
+<pre><code>cargo run --release make --goal qr --crypto &lt;crypto&gt; --msg load-metadata --payload &lt;metadata-file&gt; --verifier-hex &lt;public-key&gt; --signature-hex &lt;signature&gt;
+</code></pre>
+<pre><code>// e.g.
+cargo run --release make --goal qr --crypto sr25519 --msg load-metadata --payload sign_me_load-metadata_statemintV800 --verifier-hex 0x927c307614dba6ec42f84411cc1e93c6579893859ce5a7ac3d8c2fb1649d1542 --signature-hex 6a8f8dab854bec99bd8534102a964a4e71f4370683e7ff116c84d7e8d5cb344efd3b90d27059b7c8058f5c4a5230b792009c351a16c007237921bcae2ede2d84
+</code></pre>
+<p>This QR might take some time to be generated. After it is finished you can find your <code>&lt;metadata-qr&gt;</code> in <code>parity-signer/rust/files/signed</code>. It is a multipart QR-&quot;movie&quot;, if your image viewer does not render it correctly, we suggest to open it in a browser.</p>
+<h3 id="feed-network-metadata-into-vault"><a class="header" href="#feed-network-metadata-into-vault">Feed Network Metadata into Vault</a></h3>
+<p>In Vault open scanner, scan your <code>&lt;metadata-qr&gt;</code> and accept new metadata.</p>
+<br/>
+<hr />
+<br/>
+<p>Congratulations! You've fetched network specs, signed them, fed them into Vault, fetched recent metadata for the network, signed and fed it into Vault as well. Now you are ready to safely sign transactions on this network.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="polkadot-vault-tutorial-with-polkadot-js-apps"><a class="header" href="#polkadot-vault-tutorial-with-polkadot-js-apps">Polkadot Vault tutorial with Polkadot-js apps</a></h1>
+<p>This tutorial will walk you through setting up a Kusama account with the Polkadot Vault Android or iOS App and then use this account together with <a href="https://polkadot.js.org/apps/">Polkadot-js apps</a> to see your balance and transfer funds or perform any extrinsic from this account.</p>
+<ul>
+<li>Notice: The UI may be variant for different versions, but the functionalities are the same in <code>v4</code> version.</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<ul>
+<li><a href="tutorials/Kusama-tutorial.html#1-get-parity-signer-mobile-application">1. Get Polkadot Vault mobile application</a></li>
+<li><a href="tutorials/Kusama-tutorial.html#2-setup-or-recover-an-account">2. Setup or recover an identity</a>
+<ul>
+<li><a href="tutorials/Kusama-tutorial.html#create-an-account">Create an identity</a></li>
+<li><a href="tutorials/Kusama-tutorial.html#recover-an-account-with-your-recovery-phrase">Recover an identity with your recovery phrase</a></li>
+</ul>
+</li>
+<li><a href="tutorials/Kusama-tutorial.html#3-add-parity-signers-account-to-polkadot-js-apps">3. Add Polkadot Vault's account to Polkadot-js apps</a></li>
+<li><a href="tutorials/Kusama-tutorial.html#4-sign-a-transaction">4. Sign a transaction</a></li>
+</ul>
+<h2 id="1-get-polkadot-vault-mobile-application"><a class="header" href="#1-get-polkadot-vault-mobile-application">1. Get Polkadot Vault mobile application</a></h2>
+<h3 id="device-security-1"><a class="header" href="#device-security-1">Device security</a></h3>
+<p>Polkadot Vault is meant to be used offline. The mobile device used to run Polkadot Vault will hold valuable information that needs to be kept securely stored. It is therefore advised to:</p>
+<ul>
+<li>Get a Polkadot Vault dedicated mobile device.</li>
+<li>Make a factory reset.</li>
+<li>Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).</li>
+<li>Do not use any biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.</li>
+<li>Once Polkadot Vault has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.</li>
+<li>Only charge the phone using a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.</li>
+</ul>
+<p>Please find more info <a href="tutorials/Kusama-tutorial.html#Polkadot-Vault-Mobile-App">here</a> about the Polkadot Vault application.</p>
+<h3 id="install-polkadot-vault-mobile-application"><a class="header" href="#install-polkadot-vault-mobile-application">Install Polkadot Vault mobile application</a></h3>
+<p>Install Polkadot Vault making sure that it originated from <strong>Parity Technologies</strong></p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=io.parity.signer">Android</a></li>
+<li><a href="https://itunes.apple.com/us/app/parity-signer/id1218174838">iOS</a></li>
+</ul>
+<h2 id="2-setup-or-recover-an-identity"><a class="header" href="#2-setup-or-recover-an-identity">2. Setup or recover an Identity</a></h2>
+<p>When launching the app for the first time, no identity has been set up yet. At this stage, you will either want to create an identity directly from your mobile device or recover an identity previously created.</p>
+<h3 id="create-an-identity"><a class="header" href="#create-an-identity">Create an identity</a></h3>
+<p>Tap on the <code>Create</code> button, and give a name to this identity.</p>
+<p>In the next step, your recovery phrase will be presented to you. Think of it as a master key. If you lose it, you lose your money.
+<strong>Write this recovery phrase down and store it in a safe place</strong>.
+If your phone gets stolen/broken/forgotten this will be the only way to <a href="tutorials/Kusama-tutorial.html#recover-an-account-with-your-recovery-phrase">recover your account</a>.</p>
+<p>You will then be asked to choose a pin code. This pin will be needed later on to unlock your account to manage the identity or sign a transaction.</p>
+<p>The next screen will allow you to select a network to generate an account.
+If you choose an Ethereum network, the related Ethereum account will be generated for the identity,</p>
+<p>If you choose a Substrate network (like Kusama), you will first create a root account, and then you will be able to derive more accounts with specified paths and names. The name can be changed later on, but once the path is set, it can not be changed. More information about path derivation see <a href="tutorials/Kusama-tutorial.html#Polkadot-Vault-Hierarchical-Deterministic-Key-Derivation">here</a>.</p>
+<p>For each derived account, you will be able to see the address and its related QR code.</p>
+<p><img src="tutorials/images/Polkadot-Vault-apps-0.png" alt="create account" /></p>
+<h3 id="recover-an-identity-with-your-recovery-phrase"><a class="header" href="#recover-an-identity-with-your-recovery-phrase">Recover an identity with your recovery phrase</a></h3>
+<p>If you already have an account created with either Polkadot Vault or any other wallet, you can recover it by doing so:</p>
+<ul>
+<li>Tap on the top right side user icon, and choose <code> + Add Identity</code>.</li>
+<li>Input the new identity name and tap the <code>Recover Identity</code> button.</li>
+<li>Type in the recovery phrase, word suggestion helps you prevent any typo. The field will turn red if the recovery phrase is not a <code>bip39</code>.</li>
+<li>Tap <code>Recover Identity</code>.</li>
+<li>Select a PIN number and confirm it by typing it again.</li>
+<li>Identity generated, now you can select the network to create the first account.</li>
+</ul>
+<p>NOTICE: For <code>V3</code> user, after recovering the seed phrase of Kusama account, the account will appear as an identity root account aside with identity name in the network selection screen.</p>
+<h2 id="3-add-polkadot-vaults-account-to-polkadot-js-apps"><a class="header" href="#3-add-polkadot-vaults-account-to-polkadot-js-apps">3. Add Polkadot Vault's account to Polkadot-js apps</a></h2>
+<p>To be able to follow this tutorial and interact with the Blockchain from a freshly created account on Polkadot Vault, you will need to get some KSMs on this account first. Polkadot-js apps allows you to manage your Vault account seamlessly.</p>
+<ul>
+<li>Visit <a href="https://polkadot.js.org/apps/">Polkadot-js apps</a> website.</li>
+<li>Go to <code>Accounts</code> from the left sidebar.</li>
+<li>Click on <code>Add via QR</code> button in the top right-hand corner.</li>
+<li>It will ask for the webcam permission for you to scan the Polkadot Vault's account QR code, accept it.</li>
+<li>On Polkadot Vault, choose on the account you want to copy the address of.</li>
+<li>Scan the QR code displayed on your phone with your computer's webcam. Make sure the QR code is fully displayed on your mobile's screen.</li>
+<li>You can now name this account on Polkadot-js apps.</li>
+</ul>
+<h3 id="4-sign-a-transaction"><a class="header" href="#4-sign-a-transaction">4. Sign a transaction</a></h3>
+<p>Assuming that your Polkadot Vault account now has funds, you will be able to send some funds securely to anyone, without transferring your private key, and without needing any internet connection on your mobile phone.</p>
+<ul>
+<li>On Polkadot-js apps, click on the <code>send</code> button next to your account.</li>
+<li>On Polkadot-js apps, enter the address of the account you want to send funds to. Make sure to try with a small amount of money first before sending larger amounts.</li>
+<li>Click on <code>Make Transfer</code></li>
+<li>Review the transaction, you can add tip to this transaction.</li>
+<li>Click on <code>Scan via QR Code</code> when you're done.</li>
+</ul>
+<p><img src="tutorials/images/Polkadot-Vault-apps-tx-workflow.png" alt="Polkadot Vault Polkadot send transaction" /></p>
+<p>You will now be presented with a QR code that represents the transaction. Since this transaction is sending funds from your Polkadot Vault mobile app account, only this account (sitting on your phone) can sign and authorize this transaction. This is what we'll do in the next steps:</p>
+<ul>
+<li>From the Polkadot Vault account overview, tap the scan button on the top right and scan the QR code presented by the Polkadot-js apps website.</li>
+<li>Review the transaction addresses and the amount to send on your phone. The amount and addresses must match what you've entered in apps. If you got phished, this is where you can realize it and reject the transaction.</li>
+<li>Once you're sure, scroll down and click <code>Sign Transaction</code> to enter your pin and get the QR code of the scanned transaction.</li>
+</ul>
+<p><img src="tutorials/images/Polkadot-Vault-apps-1.png" alt="Sign Polkadot apps transaction" /></p>
+<p>Your phone has now <em>signed the transaction offline</em> using your Polkadot Vault account private key. The QR code that is now displayed on your phone represents a signed transaction that can be broadcasted. We will do this in the next steps:</p>
+<ul>
+<li>On Polkadot-js apps, click on <code>Scan Signature QR</code>, this will ask to turn on your webcam again.</li>
+<li>Face your phone's display to your webcam for the website to be able to read the signed transaction.</li>
+<li>Your transaction is sent automatically.</li>
+<li>Congrats you just sent funds from an air-gapped account :)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="recover-account-from-polkadotjs"><a class="header" href="#recover-account-from-polkadotjs">Recover Account from PolkadotJS</a></h1>
+<p>The default behavior on Polkadot Vault and <a href="https://polkadot.js.org/apps/">PolkadotJS Apps</a> is a little different. This tutorial will walk you through recovering an account on Polkadot Vault from PolkadotJS Apps.</p>
+<ul>
+<li>Notice: The UI may be variant for different versions, but the functionalities are the same in <code>v4</code> version.</li>
+</ul>
+<h2 id="get-the-mnemonic-phrase-and-path"><a class="header" href="#get-the-mnemonic-phrase-and-path">Get the mnemonic phrase and path</a></h2>
+<p>When creating an account on PolkadotJS, it will give you a mnemonic phrase on the beginning without any key derivation. You can change it if you click <code>Advanced creation options</code> button, here you can specify any path you like, leave it as an empty string if you do not want changes.</p>
+<p><img src="tutorials/./images/Polkadotjs-Create-Account.png" alt="Create Account on PolkadotJS Apps" /></p>
+<h2 id="recover-identity-with-mnemonic-phrase"><a class="header" href="#recover-identity-with-mnemonic-phrase">Recover identity with mnemonic phrase</a></h2>
+<p>On Polkadot Vault, each mnemonic phrase represents an identity, every account starts with an identity, and identity could derive infinite accounts from it. So firstly let's recover the identity from the mnemonic phrase.</p>
+<p><img src="tutorials/./images/Recover-Identity.png" alt="recover the identity" />.</p>
+<p>After tapping one network from the list, you will have the default account created for this network with a default path (as on the above image, <code>//polkadot</code>), <strong>but this one is different from the one created from Polkadot.js Apps</strong>, because the paths are different. </p>
+<h2 id="create-the-account-by-path"><a class="header" href="#create-the-account-by-path">create the account by path</a></h2>
+<p>On Polkadot Vault, accounts are grouped by different networks, and the accounts generated by the default way are always prefixed with the network name. For example, <code>//polkadot//fund</code> or <code>//polkadot//staking</code>. So to recover an account with an arbitrary path, we need tap Add Network Account -&gt; Create Custom Path. </p>
+<p><img src="tutorials/./images/Recover-Path.png" alt="Recover Account" /></p>
+<p>Here We can input the path from PolkadotJS Apps, if you do not have a specific path, then just leave it empty. And then after we choose the network, we will have the same account as we created from PolkadotJS Apps.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="development"><a class="header" href="#development">Development</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="build"><a class="header" href="#build">Build</a></h1>
+<p>First and foremost, make sure you have the latest <a href="https://www.rust-lang.org/tools/install">Rust</a> installed in your system. Nothing will work without Rust.</p>
+<p>If you get errors like <code>cargo: feature X is required</code>, it most likely means you have an old version of Rust. Update it by running <code>rustup update stable</code>.</p>
+<h2 id="ios"><a class="header" href="#ios">iOS</a></h2>
+<p><strong>1.</strong> You probably already have <a href="https://developer.apple.com/xcode/">Xcode</a> installed if you are reading this. If not, go get it. </p>
+<p><strong>2.</strong> Compile the core Rust library first:</p>
+<pre><code>cd scripts &amp;&amp; ./build.sh ios
+</code></pre>
+<p><strong>3.</strong> Open the <code>NativeSigner.xcodeproj</code> project from the <code>ios</code> folder in your Xcode and click Run (<code>Cmd+R</code>).</p>
+<p><strong>4.</strong> The first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac (yes, this is an official apple-recommended way).</p>
+<p>However, we strongly recommend that you use a real device for development, as some important parts (e.g. camera) may not work in the simulator.</p>
+<h2 id="android"><a class="header" href="#android">Android</a></h2>
+<p><strong>1.</strong> Download <a href="https://developer.android.com/studio">Android Studio</a>.</p>
+<p><strong>2.</strong> Open the project from the <code>android</code> directory.</p>
+<p><strong>3.</strong> Install NDK. Go to <code>File -&gt; Project Structure -&gt; SDK Location</code>. Next to the &quot;Android NDK location&quot; section, click &quot;Download Android NDK&quot; button.</p>
+<p>We highly recommend you to update all existing plugins and SDK's for Kotlin, Gradle, etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart Android Studio after that. This can save you many hours on Stackoverflow trying to fix random errors like &quot;NDK not found&quot;.</p>
+<p><strong>4.</strong> Connect your device or create a virtual one. Open <code>Tools -&gt; Device Manager</code> and create a new phone simulator with the latest Android.</p>
+<p><strong>5. (macOS)</strong> Specify path to <code>python</code> in <code>local.properties</code>.</p>
+<p><code>rust.pythonCommand=python3</code></p>
+<p><strong>6.</strong> Run the project (<code>Ctrl+R</code>). It should build the Rust core library automatically.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="vault-structure"><a class="header" href="#vault-structure">Vault structure</a></h1>
+<h2 id="architectural-structure"><a class="header" href="#architectural-structure">Architectural structure</a></h2>
+<p>On top level, Vault consists of following parts:</p>
+<ol>
+<li>Rust backend core</li>
+<li>FFI interface</li>
+<li>Native frontend</li>
+<li>Database</li>
+</ol>
+<h3 id="rust-backend-1"><a class="header" href="#rust-backend-1">Rust backend</a></h3>
+<p>There are 3 actual endpoints in <code>rust</code> folder: <code>signer</code>, which is source of
+library used for Vault itself; <code>generate_message</code>, which is used to update
+Vault repo with new built-in network information and to generate
+over-the-airgap updates; and <code>qr_reader_pc</code> which is a minimalistic app to parse
+qr codes that we had to write since there was no reasonably working alternative.</p>
+<p>Sub-folders of the <code>rust</code> folder:</p>
+<ul>
+<li><code>constants</code> — constant values defined for the whole workspace.</li>
+<li><code>db_handling</code> — all database-related operations for Vault and
+<code>generate_message</code> tool. Most of the business logic is contained here.</li>
+<li><code>defaults</code> — built-in and test data for database</li>
+<li><code>definitions</code> — objects used across the workspace are defined here</li>
+<li><code>files</code> — contains test files and is used for build and update generation
+processes. Most contents are gitignored.</li>
+<li><code>generate_message</code> — tool to generate over-the-airgap updates and maintain
+network info database on hot side</li>
+<li><code>navigator</code> — navigation for Vault app; it is realized in rust to unify app
+behavior across the platforms</li>
+<li><code>parser</code> - parses signable transactions. This is internal logic for
+<code>transaction_parsing</code> that is used when signable transaction is identified, but
+it could be used as a standalone lib for the same purpose.</li>
+<li><code>printing_balance</code> — small lib to render tokens with proper units</li>
+<li><code>qr_reader_pc</code> — small standalone PC app to parse QR codes in Vault
+ecosystem. Also is capable of parsing multiframe payloads (theoretically, in
+practice it is not feasible due to PC webcam low performance)</li>
+<li><code>qr_reader_phone</code> — logic to parse QR payloads in Vault</li>
+<li><code>qrcode_rtx</code> — multiframe erasure-encoded payload generator for signer update
+QR animation.</li>
+<li><code>qrcode_static</code> — generation of static qr codes used all over the workspace</li>
+<li><code>signer</code> — FFI interface crate to generate bindings that bridge native code
+and rust backend</li>
+<li><code>transaction_parsing</code> — high-level parser for all QR payloads sent into Vault</li>
+<li><code>transaction_signing</code> — all operations that could be performed when user
+accepts payload parsed with <code>transaction_parsing</code></li>
+</ul>
+<h3 id="ffi-interface"><a class="header" href="#ffi-interface">FFI interface</a></h3>
+<p>For interfacing rust code and native interface we use
+<a href="https://mozilla.github.io/uniffi-rs/">uniffi</a> framework. It is a framework
+intended to aid building cross-platform software in Rust especially for the
+cases of re-using components written in Rust in the smartphone application
+development contexts. Other than Vault itself one of the most notable users of
+the <code>uniffi</code> framework are the <a href="https://github.com/mozilla/application-services/">Mozilla Application Services</a></p>
+<p><code>uniffi</code> framework provides a way for the developer to define a clear and a
+typesafe <code>FFI</code> interface between components written in <code>Rust</code> and languages such
+as <code>Kotlin</code> and <code>Swift</code>. This approach leads to a much more robust architecture
+than implementing a homegrown FFI with, say, passing JSON-serialized data back
+and forth between <code>Kotlin</code> and <code>Rust</code> code. Here is why.</p>
+<p>Suppose the application needs to pass a following structure through FFI from
+<code>Kotlin</code> to <code>Rust</code> or back:</p>
+<pre><code class="language-rust noplaypen">#[derive(Serialize, Deserialize)]
+ struct Address { street:String, city: String, }</code></pre>
+<p>This would mean that on the <code>Kotlin</code> side of the FFI there would have to be some
+way of turning this type from JSON into a <code>Kotlin</code> type. It may be some sort of
+scheme or even a manual JSON value-by-key data extraction.</p>
+<p>Now suppose this struct is changed by adding and removing some fields:</p>
+<pre><code class="language-rust noplaypen">#[derive(Serialize, Deserialize)]
+ struct Address { country: String, city: String, index: usize, }</code></pre>
+<p>After this change on a Rust-side the developer would have to <em>remember</em> to
+reflect these changes on the <code>Kotlin</code> and <code>Swift</code> sides and if that is not done
+there is a chance that it will not be caught in build-time by CI. It is quite
+hard to remember everything and having a guarantee that such things would be
+caught at compile time is much better than not having this sort of guarantee.
+One of the things <code>uniffi</code> solves is exactly this: it provides compile-time
+guarantees of typesafety.</p>
+<p>The other concern with the JSON serialization approach is performance. As long
+as small objects are transferred back and forth it is no trouble encoding them
+into strings.  But suppose the application requires transferring bigger blobs of
+binary data such as <code>png</code> images or even some metadata files. Using JSON would
+force the developer to encode such blobs as <code>Strings</code> before passing them into
+FFI and decoding them back into binary blobs on the other side of the FFI.
+<code>uniffi</code> helps to avoid this also.</p>
+<h3 id="native-frontend-1"><a class="header" href="#native-frontend-1">Native frontend</a></h3>
+<p>Native frontends are made separately for each supported platform. To keep things
+uniform, interfaces are made as simple as possible and as much code is written
+in unified Rust component, as possible. Yet, platform-specific functions,
+including runtime management and threading, are also accessed through native
+framework. The structure of native frontend follows modern (2022) reactive
+design pattern of View-Action-Model triad. Thus, all backend is located in data
+model section, along with few native business logic components.</p>
+<p>It is important to note, that native navigation is <strong>not</strong> used, as due to
+subtle differences in its seemingly uniform design across platforms. Navigation
+is instead implemented on Rust side and, as an additional advantage, is tested
+there at lower computational cost for CI pipelines.</p>
+<h3 id="database"><a class="header" href="#database">Database</a></h3>
+<p>For storage of all data except secrets, a sled database is used. Choice of db
+was based on its lightweightness, reliability, portability.</p>
+<p><a href="development/../rustdocs/db_handling/cold_default/index.html">Vault database structure</a></p>
+<h2 id="functional-structure"><a class="header" href="#functional-structure">Functional structure</a></h2>
+<p>Vault has the following systems:</p>
+<ul>
+<li>Secure key management</li>
+<li>Signing</li>
+<li>Transaction parsing</li>
+<li>Transaction visualization</li>
+<li>Airgap data transfer</li>
+<li>Airgap updating</li>
+<li>Network detector</li>
+<li>Logging</li>
+<li>Self-signing updating capability</li>
+<li>UI</li>
+</ul>
+<p>These systems are located in different parts the app and some of them rely on
+hot-side infrastructure. The general design goal was to isolate as much as
+possible in easily maintainable Rust code and keep only necessary functions in
+native side. Currently, those include:</p>
+<ul>
+<li>Hardware secret storage: we rely on hardware designer's KMS in accordance with
+best practices</li>
+<li>Network detector: network operations are limited by OS and we try to keep
+network access permissions for the app to minimum while still maintaining
+simple breach detection</li>
+<li>Camera: currently image capture and recognition systems implementations in
+native environments by far surpass 3rd party ones. This might change in the
+future, but at least image capture will be managed by OS to maintain platform
+compatibility.</li>
+<li>UI: we use native frameworks and components for rendering and user interaction
+for best look and feel of the app.</li>
+</ul>
+<h3 id="secure-key-management"><a class="header" href="#secure-key-management">Secure key management</a></h3>
+<p>Keypairs used in Vault are generated from secret seed phrase, derivation path
+and optional secret password, in accordance with specifications described in
+<strong>subkey manual</strong> using code imported directly from substrate codebase for best
+conformance.</p>
+<h4 id="secret-seed-phrase-storage"><a class="header" href="#secret-seed-phrase-storage">Secret seed phrase storage</a></h4>
+<p>Secret seed phrase is stored as a string in devices original KMS. It is
+symmetrically encrypted with a strong key that either is stored in a
+hardware-protected keyring or uses biometric data (in case of legacy android
+devices without strongbox system). Secrets access is managed by operating
+system's built-in authorization interface. Authorization is required for
+creation of seeds, access to seeds and removal of seeds. One particular special
+case is addition of the first seed on iOS platform, that does not trigger
+authorization mechanism as the storage is empty at this moment; this is in
+agreement with iOS key management system design and potentially leads to a
+threat of attacker replacing a single key by adding it to empty device; this
+attack is countered by authorization on seed removal.</p>
+<p>Thus, secret seeds source of truth is KMS. To synchronize the rest of the app,
+list of seed identifiers is sent to backend on app startup and on all events
+related to changes in this list by calling <code>update_seed_names(Vec&lt;String&gt;)</code>.</p>
+<p>Random seed generator and seed recovery tools are implemented in Rust. These
+are the only 2 cases where seed originates not in KMS.</p>
+<h4 id="derivation-path-management"><a class="header" href="#derivation-path-management">Derivation path management</a></h4>
+<p>The most complex part of key management is storage of derivation strings and
+public keys. Improper handling here may lead to user's loss of control over
+their assets.</p>
+<p>Key records are stored as strings in database associated with secret seed
+identifiers, crypto algorithm, and list of allowed networks. Public key and its
+cryptographic algorithm are used to deterministically generate database record
+key - thus by design distinct key entries directly correspond to addresses on
+chain.</p>
+<p>Creation of new records requires generation of public keys through derivation
+process, thus secret seed should be queried - so adding items to this database
+requires authentication.</p>
+<p>Substrate keys could be natively used across all networks supporting their
+crypto algorithm. This may lead to accidental re-use of keys; thus it is not
+forbidden by the app, but networks are isolated unless user explicitly expresses
+desire to enable key in given network. From user side, it is abstracted into
+creation of independent addresses; however, real implementation stores addresses
+with public keys as storage keys and thus does not distinguish between networks.
+To isolate networks, each key stores a field with a list of allowed networks,
+and when user &quot;creates&quot; address with the same pubkey as already existing one, it
+is just another network added to the list of networks.</p>
+<p>Keys could be imported through QR code created by <code>generate_message</code> tool
+(<a href="development/../rustdocs/generate_message/index.html#derivations-import">instructions</a>). A
+plaintext newline-separated list of derivations should be supplied to the tool
+along with network identifier; the import thus is bound to certain network,
+however, it is not bound to any particular seed - user can select any of
+created seeds and, after authorization, create keys with given paths. Bulk
+import of password-protected keys is forbidden at the moment.</p>
+<h4 id="optional-password"><a class="header" href="#optional-password">Optional password</a></h4>
+<p>Optional password (part of derivation path after <code>///</code>) is never stored, only
+addresses that have password in their derivation path are marked. Thus, password
+is queried every time it is needed with a tool separate from OS authentication
+interface, but together with authentication screen, as password is always used
+with a secret seed phrase.</p>
+<h4 id="memory-safety-in-secure-key-management"><a class="header" href="#memory-safety-in-secure-key-management">Memory safety in secure key management</a></h4>
+<p>All memory handles by native framework relies on native framework's memory
+protection mechanisms (JVM virtualization and Swift isolation and garbage
+collection). However, when secrets are processed in Rust, no inherent designed
+memory safety features are available. To prevent secrets remaining in memory
+after their use, <code>zeroize</code> library is used. Also, <strong>describe string destruction
+protocol or fix it</strong></p>
+<h3 id="signing"><a class="header" href="#signing">Signing</a></h3>
+<p>Every payload to be signed is first extracted from transfer payload in agreement
+with UOS specification and polkadot-js implementation. Only payloads that could
+be parsed and visualized somehow could be signed to avoid blind signing - thus
+on parser error no signable payload is produced and signing procedure is not
+initiated.</p>
+<p>When signable payload is ready, it is stored in TRANSACTION tree while
+user makes decision on whether to sign it. While in storage, database checksum
+is monitored for changes.</p>
+<p>Signing uses private key generated from KMS-protected secret seed phrase,
+derivation string and optional password. Signing operation itself is imported
+directly from substrate codebase as dependency.</p>
+<p>Signing event or its failure is logged and signature wrapped in UOS format is
+presented as a qr static image on the phone.</p>
+<h3 id="transaction-parsing"><a class="header" href="#transaction-parsing">Transaction parsing</a></h3>
+<p>Transaction parsing process is described in <a href="development/./UOS.html#transaction">UOS format documentation</a></p>
+<h3 id="transaction-visualization"><a class="header" href="#transaction-visualization">Transaction visualization</a></h3>
+<p>Signable transaction is decomposed into hierarchical cards for clarity. All
+possible scale-decodable types are assigned to generalized visualization
+patterns (&quot;transaction cards&quot;) with some types having special visualizations
+(<code>balance</code> formatted with proper decimals and units, identicons added to
+identities, etc.). Each card is assigned <code>order</code> and <code>indent</code> that allow the
+cards to be shown in a lazy view environment. Thus, any networks that have
+minimal metadata requirements should be decodable and visualizable.</p>
+<p>Some cards also include documentation entries fetched from metadata. Those could
+be expanded in UI on touch.</p>
+<p>Thus, user has opportunity to read the whole transaction before signing.</p>
+<h3 id="airgap-data-transfer"><a class="header" href="#airgap-data-transfer">Airgap data transfer</a></h3>
+<p>Transactions are encoded in accordance to UOS standard in QR codes. QR codes can
+be sent into Vault - through static frames or dynamic multiframe animations -
+and back - only as static frames. QR codes are decoded through native image
+recognition system and decoded through rust backend; output QR codes are
+generated in png format by backend. There are 2 formats of multiframe QR codes:
+legacy multiframe and <code>raptorq</code> multiframe. Legacy multiframe format requires
+all frames in animation to be collected and is thus unpractical for larger
+payloads. RaptorQ multiframe format allows any subset of frames to be collected
+and thus allows large payloads to be transferred effortlessly.</p>
+<p>Fast multiframe transfer works efficiently at 30 fps. Typical large payloads
+contain up to 200 frames at current state of networks. This can be theoretically
+performed in under 10 seconds; practically this works in under 1 minute.</p>
+<h3 id="airgap-updating"><a class="header" href="#airgap-updating">Airgap updating</a></h3>
+<p>Vault can download new networks and metadata updates from QR data. To prevent
+malicious updates from compromising security, a system of certificates is
+implemented. </p>
+<p>Updates could be generated by any user; they can also be distributed in signed form to delegate validity check job to trusted parties. These trusted parties should sign metadata with their asymmetric key - certificate - and they become verifiers once their update is uploaded to Vault. There are 2 tiers of certificates - &quot;general&quot; and &quot;custom&quot;, with the first allowing more comfortable use of Vault at cost of only one general verifier allowed.</p>
+<p>Rules about verifier certificates are designed around simplicity of security protocol: one trusted party becomes main source of trust and updates generated by it are just accepted. If that party does not have all required updates available, other party can be added as custom verifier. That verifier is not allowed to change specs at will and suspicious activity by custom verifier would interfere with network usage thus stopping user from doing potentially harmful stuff. This allows less strenuous security policy on user side.</p>
+<p>It is important to note that certificates could not be effectively revoked considering airgapped nature of the app, thus it is recommended to keep their keys on airgapped Vault devices if updates signed by these certificates are distributed publicly.</p>
+<p><a href="development/./UOS.html#update">More on certificates</a></p>
+<h3 id="network-detector"><a class="header" href="#network-detector">Network detector</a></h3>
+<p>An additional security feature is network detector. When the app is on, it runs
+in the background (on low-priority thread) and attempts to monitor the network
+availability. This detector is implemented differently on different platforms
+and has different features and limitations; however, it does not and could not
+provide full connectivity monitoring and proper maintaining of airgap is
+dependent on user. Vault device should always be kept in airplane mode and all
+other connectivity should be disabled.</p>
+<p>The basic idea of network detection alertness is that when network connectivity
+is detected, 3 things happen:</p>
+<ol>
+<li>Event is logged in history</li>
+<li>Visual indication of network status is presented to user (shield in corner of
+screen and message in alert activated by the shield)</li>
+<li>Certain Vault functions are disabled (user authentication, seed and key
+creation, etc.) - features that bring secret material into active app memory
+from storage</li>
+</ol>
+<p>When network connectivity is lost, only visual indication changes. To restore
+clean state of Vault, user should acknowledge safety alert by pressing on
+shield icon, reading and accepting the warning. Upon acknowledging, it is logged
+in history, visual indication changes to green and all normal Vault functions
+are restored.</p>
+<h4 id="network-detector-in-ios"><a class="header" href="#network-detector-in-ios">Network detector in iOS</a></h4>
+<p>Airplane mode detection in iOS is forbidden and may lead to expulsion of the app
+from the App Store. Thus, detector relies on probing network interfaces. If any
+network interface is up, network alert is triggered.</p>
+<h4 id="network-detector-in-android"><a class="header" href="#network-detector-in-android">Network detector in Android</a></h4>
+<p>Network detector is triggered directly by airplane mode change event.</p>
+<h4 id="bluetooth-nfc-etc"><a class="header" href="#bluetooth-nfc-etc">Bluetooth, NFC, etc,</a></h4>
+<p>Other possible network connectivity methods are not monitored. Even though it is
+possible to add detectors for them, accessing their status will require the app
+to request corresponding permissions form OS, thus reducing app's isolation and
+decreasing overall security - first, by increasing chance of leak in breach
+event, and second, by making corrupt fake app that leaks information through
+network appear more normal. Furthermore, there is information that network might
+be connected through cable in some devices in airplane mode; there was no
+research on what debugging through cable is capable of for devices in airplane
+mode. Thus, network detector is a convenience too and should not be relied on as
+sole source of security; user is responsible for device isolation.</p>
+<h3 id="logging"><a class="header" href="#logging">Logging</a></h3>
+<p>All events that happen in Vault are logged by backend in history tree of
+database. From user interface, all events are presented in chronological order
+on log screen. On the same screen, history checksum could be seen and custom
+text entries could be added to database. Checksum uses time added to history
+records in computation and is therefore impractical to forge.</p>
+<p>Events presented on log screen are colored to distinguish &quot;normal&quot; and
+&quot;dangerous&quot; events. Shown records give minimal important information about the
+event. On click, detailed info screen is shown, where all events happened at the
+same time are presented in detail (including transactions, that are decoded for
+review if metadata is still available).</p>
+<p>Log could also be erased for privacy; erasure event is logged and becomes the
+first event in recorded history.</p>
+<h3 id="self-signing-updating-capability"><a class="header" href="#self-signing-updating-capability">Self-signing updating capability</a></h3>
+<p>Vault can sign network and metadata updates that could be used for other
+signers. User can select any update component present in Vault and any key
+available for any network and generate a qr code which, upon decoding, can be
+used by <code>generate_message</code> or similar tool to generate over-the-airgap update.
+<a href="development/./UOS.html">See detailed documentation</a></p>
+<p>This feature was designed for elegance, but it is quite useful to maintain
+update signing key for large update distribution centers, for it allows to
+securely store secret certificate key that could not be practically revoked if
+compromised.</p>
+<h3 id="ui"><a class="header" href="#ui">UI</a></h3>
+<p>User interface is organized through View-Action-DataModel abstraction.</p>
+<h4 id="view"><a class="header" href="#view">View</a></h4>
+<p>Vault visual representation is abstracted in 3 visual layers placed on top of
+each other: <code>screen</code>, <code>modal</code> and <code>alert</code>. This structure is mostly an
+adaptation of iOS design guidelines, as android native UI is much flexible and
+it is easier to adopt it to iOS design patterns than vice versa. Up to one of
+each component could be presented simultaneously. Screen component is always
+present in the app, but sometimes it is fully or partially blocked by other
+components.</p>
+<p>Modals and alerts are dismissed on <code>goBack</code> action, screens have complex
+navigation rules. Modals require user to take action and interrupt flow. Alerts
+are used for short information interruptions, like error messages or
+confirmations.</p>
+<p>In addition to these, header bar is always present on screen and footer bar is
+presented in some cases. Footer bar always has same structure and only allows
+navigation to one of navigation roots. Top bar might contain back button, screen
+name, and extra menu button; status indicator is always shown on top bar.</p>
+<h4 id="action"><a class="header" href="#action">Action</a></h4>
+<p>Almost all actions available to user are in fact handled by single operation -
+<code>action()</code> backend function, that is called through <code>pushButton</code> native
+interface. In native side, this operation is debounced by time. On rust side,
+actions are performed on static mutex storing app state; on blocked mutex
+actions is ignored, as well as impossible actions that are not allowed in
+current state of navigation. Thus, state of the app is protected against
+undefined concurrency effects by hardware button-like behavior of <code>action()</code>.</p>
+<p>Most actions lead to change of shown combination of screen, modal and alert; but
+some actions - for example, those involving keyboard input - alter contents of a
+UI component. In most cases, all parameters of UI components are passed as
+states (more or less similar concept on all platforms) and frontend framework
+detects updates and seamlessly performs proper rendering.</p>
+<p>Action accepts 3 parameters: action type (enum), action data (<code>&amp;str</code>), secret data
+(<code>&amp;str</code>). Secret data is used to transfer secret information and care is taken to
+always properly zeroize its contents; on contrary, action data could contain
+large strings and is optimized normally.</p>
+<h4 id="data-model"><a class="header" href="#data-model">Data model</a></h4>
+<p>Data model as seen by native UI consists of 3 parts: secret seed content,
+network detection state and screen contents. Secret seed content consists of
+list of seed names that are used as handles to fetch secret material from secure
+storage. Network detection state is a 4-state variable that describes current
+network detection state (safe state, network is currently detected, network was
+detected before, error state). The rest of data model is a black box in Rust.</p>
+<p>From Rust side, model is generated by <code>navigation</code> crate. The state of the app
+is stored in lazy static <code>State</code> object and sufficient information required for
+View rendering is generated into <code>ActionResult</code> object that is sent into native
+layer on each action update.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h1>
+<h2 id="rust-side-builds-but-app-crashes-on-start-android-or-complains-about-symbols-not-found-ios"><a class="header" href="#rust-side-builds-but-app-crashes-on-start-android-or-complains-about-symbols-not-found-ios">Rust side builds but app crashes on start (Android) or complains about symbols not found (iOS)</a></h2>
+<p>One common reason for this is inconsistency in <code>uniffi</code> version - make sure that installed version matches one stated in Cargo.toml</p>
+<h2 id="build-for-android-fails-on-macos-build-for-ios-fails-on-linux"><a class="header" href="#build-for-android-fails-on-macos-build-for-ios-fails-on-linux">Build for Android fails on macOS, build for iOS fails on linux</a></h2>
+<p>This is a known issue, does not seem to be solvable at the moment. Please use 2 machines, as we do.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="links-to-rust-docs-of-the-apps"><a class="header" href="#links-to-rust-docs-of-the-apps">Links to rust docs of the apps</a></h1>
+<ul>
+<li><a href="development/../rustdocs/signer/index.html">Polkadot Vault</a></li>
+<li><a href="development/../rustdocs/navigator/index.html">Navigation</a></li>
+<li><a href="development/../rustdocs/parser/index.html">Transaction parser</a></li>
+<li><a href="development/../rustdocs/db_handling/index.html">Data handling logic</a></li>
+<li><a href="development/../rustdocs/generate_message/index.html"><code>generate message</code></a></li>
+<li><a href="development/../rustdocs/qr_reader_pc/index.html"><code>qr_reader_pc</code></a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="scope"><a class="header" href="#scope">Scope</a></h1>
+<p>This document provides an interpretation of the UOS format used by Polkadot Vault. The upstream version of the published format has diverged significantly from the actual implementation, so this document represents the current state of the UOS format that is compatible with Polkadot Vault. It only applies to networks compatible with Polkadot Vault, i.e. Substrate-based networks. The document also describes special payloads used to maintain a Polkadot Vault instance.</p>
+<p>Therefore, this document effectively describes the input and output format for QR codes used by Polkadot Vault.</p>
+<h1 id="terminology"><a class="header" href="#terminology">Terminology</a></h1>
+<p>The Vault receives information over an air-gap as QR codes. These codes are read as <code>u8</code> vectors and must always be parsed by the Vault before use.</p>
+<p>QR codes can contain information that a user wants to sign with one of the Vault keys, or they may contain update information to ensure smooth operation of the Vault without the need for a reset or connection to the network.</p>
+<h2 id="qr-code-content-types"><a class="header" href="#qr-code-content-types">QR code content types</a></h2>
+<ol>
+<li>Transaction/extrinsic - a single transaction that is to be signed</li>
+<li>Bulk transactions - a set of transactions that are to be signed in a single
+session</li>
+<li>Message - a message that is to be signed with a key</li>
+<li>Chain metadata: up-to-date metadata allows the Vault to read transactions content</li>
+<li>Chain specs: adds new network to the Vault</li>
+<li>Metadata types: is used to update older versions runtime metadata (<code>V13</code> and below)</li>
+<li>Key derivations: is used to import and export Vault key paths</li>
+</ol>
+<h1 id="qr-code-structure"><a class="header" href="#qr-code-structure">QR code structure</a></h1>
+<p>QR code envelope has the following structure:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">QR code prefix</th><th style="text-align: left">content</th><th style="text-align: left">ending spacer</th><th style="text-align: left">padding</th></tr></thead><tbody>
+<tr><td style="text-align: left">4 bits</td><td style="text-align: left">byte-aligned content</td><td style="text-align: left">4 bits</td><td style="text-align: left">remainder</td></tr>
+</tbody></table>
+</div>
+<p>QR code prefix always starts with <code>0x4</code> symbol indicating &quot;raw&quot; encoding.</p>
+<p>Subsequent 2 bytes encode content length. Using this number, QR code parser can
+instantly extract content and disregard the rest of QR code.</p>
+<p>Actual content is shifted by half-byte, otherwise it is a normal byte sequence.</p>
+<h2 id="multiframe-qr"><a class="header" href="#multiframe-qr">Multiframe QR</a></h2>
+<p>The information transferred through QR channel into Vault is always enveloped
+in multiframe packages (although minimal number of multiframe packages is 1).
+There are two standards for the multiframe: <code>RaptorQ</code> erasure coding and legacy
+non-erasure multiframe. The type of envelope is determined by the first bit of
+the QR code data: <code>0</code> indicates legacy multiframe, <code>1</code> indicates <code>RaptorQ</code></p>
+<h5 id="raptorq-multipart-payload"><a class="header" href="#raptorq-multipart-payload"><em>RaptorQ multipart payload</em></a></h5>
+<p><a href="https://en.wikipedia.org/wiki/Raptor_code#RaptorQ_code">RaptorQ</a> (<code>RFC6330</code>) is
+a variable rate (fountain) erasure code protocol with <a href="https://github.com/cberner/raptorq">reference implementation
+in Rust</a></p>
+<p>Wrapping content in <code>RaptorQ</code> protocol allows for arbitrary amounts of data to be
+transferred reliably within reasonable time. It is recommended to wrap all
+payloads into this type of envelope.</p>
+<p>Each QR code in <code>RaptorQ</code> encoded multipart payload contains following parts:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">bytes <code>[0..4]</code></th><th style="text-align: left">bytes <code>[4..]</code></th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>0x80000000</code> || <code>payload_size</code></td><td style="text-align: left"><code>RaptorQ serialized packet</code></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li><code>payload_size</code> <strong>MUST</strong> contain payload size in bytes, represented as
+big-endian 32-bit unsigned integer.</li>
+<li><code>payload_size</code> <strong>MUST NOT</strong> exceed <code>7FFFFFFF</code></li>
+<li><code>payload_size</code> <strong>MUST</strong> be identical in all codes encoding the payload</li>
+<li><code>payload_size</code> and <code>RaptorQ serialized packet</code> <strong>MUST</strong> be stored by the Cold
+Vault, in no particular order, until their amount is sufficient to decode
+the payload.</li>
+<li>Hot Wallet <strong>MUST</strong> continuously loop through all the frames showing each
+frame for at least 1/30 seconds (recommended frame rate: 4 FPS).</li>
+<li>Cold Vault <strong>MUST</strong> be able to start scanning the Multipart Payload <em>at any
+frame</em>.</li>
+<li>Cold Vault <strong>MUST NOT</strong> expect the frames to come in any particular order.</li>
+<li>Cold Vault <strong>SHOULD</strong> show a progress indicator of how many frames it has
+successfully scanned out of the estimated minimum required amount.</li>
+<li>Hot Wallet <strong>SHOULD</strong> generate sufficient number of recovery frames
+(recommended overhead: 100%; minimal reasonable overhead: square root of
+number of packets).</li>
+<li>Payloads fitting in 1 frame <strong>SHOULD</strong> be shown without recovery frames as
+static image.</li>
+</ul>
+<p>Once sufficient number of frames is collected, they could be processed into
+single payload and treated as data vector (&quot;QR code content&quot;).</p>
+<h5 id="legacy-multipart-payload"><a class="header" href="#legacy-multipart-payload"><em>Legacy Multipart Payload</em></a></h5>
+<p>In real implementation, the Polkadot Vault ecosystem generalized all payloads as
+multipart messages. </p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">bytes position</th><th style="text-align: left"><code>[0]</code></th><th style="text-align: left"><code>[1..3]</code></th><th style="text-align: left"><code>[3..5]</code></th><th style="text-align: left"><code>[5..]</code></th></tr></thead><tbody>
+<tr><td style="text-align: left">content</td><td style="text-align: left"><code>00</code></td><td style="text-align: left"><code>frame_count</code></td><td style="text-align: left"><code>frame_index</code></td><td style="text-align: left"><code>data</code></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li><code>frame</code> <strong>MUST</strong> the number of current frame, '0000' represented as
+big-endian 16-bit unsigned integer.</li>
+<li><code>frame_count</code> <strong>MUST</strong> the total number of frames, represented as big-endian
+16-bit unsigned integer.</li>
+<li><code>part_data</code> <strong>MUST</strong> be stored by the Cold Vault, ordered by <code>frame</code> number,
+until all frames are scanned.</li>
+<li>Hot Wallet <strong>MUST</strong> continuously loop through all the frames showing each
+frame for about 2 seconds.</li>
+<li>Cold Vault <strong>MUST</strong> be able to start scanning the Multipart Payload <em>at any
+frame</em>.</li>
+<li>Cold Vault <strong>MUST NOT</strong> expect the frames to come in any particular order.</li>
+<li>Cold Vault <strong>SHOULD</strong> show a progress indicator of how many frames it has
+successfully scanned out of the total count.</li>
+</ul>
+<p>Once all frames are combined, the <code>part_data</code> must be concatenated into a
+single binary blob and treated as data vector (&quot;QR code content&quot;).</p>
+<h2 id="informative-content-of-qr-code"><a class="header" href="#informative-content-of-qr-code">Informative content of QR code</a></h2>
+<p>Every QR code content starts with a prelude <code>[0x53, 0x&lt;encryption code&gt;, 0x&lt;payload code&gt;]</code>.</p>
+<p><code>0x53</code> is always expected and indicates Substrate-related content.</p>
+<p><code>&lt;encryption code&gt;</code> for signables indicates encryption algorithm that will be
+used to generate the signature:</p>
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>Ed25519</td>
+    </tr>
+    <tr>
+        <td><code>0x01</code></td>
+        <td>Sr25519</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>Ecdsa</td>
+    </tr>
+</table>
+<p><code>&lt;encryption code&gt;</code> for updates indicates encryption algorithm that was used to
+sign the update:</p>
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>Ed25519</td>
+    </tr>
+    <tr>
+        <td><code>0x01</code></td>
+        <td>Sr25519</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>Ecdsa</td>
+    </tr>
+    <tr>
+        <td><code>0xff</code></td>
+        <td>unsigned</td>
+    </tr>
+</table>
+<p>Derivations import and testing are always unsigned, with <code>&lt;encryption code&gt;</code>
+always <code>0xff</code>.</p>
+<p>Vault supports following <code>&lt;payload code&gt;</code> variants:</p>
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>legacy mortal transaction</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>transaction (both mortal and immortal)</td>
+    </tr>
+    <tr>
+        <td><code>0x03</code></td>
+        <td>message</td>
+    </tr>
+    <tr>
+        <td><code>0x04</code></td>
+        <td>bulk transactions</td>
+    </tr>
+    <tr>
+        <td><code>0x80</code></td>
+        <td>load metadata update</td>
+    </tr>
+    <tr>
+        <td><code>0x81</code></td>
+        <td>load types update</td>
+    </tr>
+    <tr>
+        <td><code>0xc1</code></td>
+        <td>add specs update</td>
+    </tr>
+    <tr>
+        <td><code>0xde</code></td>
+        <td>derivations import</td>
+    </tr>
+</table>
+<p>Note: old UOS specified <code>0x00</code> as mortal transaction and <code>0x02</code> as immortal one,
+but currently both mortal and immortal transactions from polkadot-js are <code>0x02</code>.</p>
+<h2 id="shared-qr-code-processing-sequence"><a class="header" href="#shared-qr-code-processing-sequence">Shared QR code processing sequence:</a></h2>
+<ol>
+<li>Read QR code, try interpreting it, and get the hexadecimal string from into
+Rust (hexadecimal string is getting changed to raw bytes soon).
+If QR code is not processable, nothing happens and the scanner keeps trying to
+catch a processable one.</li>
+<li>Analyze prelude: is it Substrate? is it a known payload type? If not, Vault
+always produces an error and suggests to scan supported payload.</li>
+</ol>
+<p>Further processing is done based on the payload type.</p>
+<h2 id="transaction"><a class="header" href="#transaction">Transaction</a></h2>
+<p>Transaction has the following structure:</p>
+<table>
+    <tr>
+        <td>prelude</td><td>public key</td><td>SCALE-encoded call data</td><td>SCALE-encoded extensions</td><td>network genesis hash</td>
+    </tr>
+</table>
+<p>Public key is the key that can sign the transaction. Its length depends on the
+<code>&lt;encryption code&gt;</code> declared in transaction prelude:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Encryption</th><th style="text-align: left">Public key length, bytes</th></tr></thead><tbody>
+<tr><td style="text-align: left">Ed25519</td><td style="text-align: left">32</td></tr>
+<tr><td style="text-align: left">Sr25519</td><td style="text-align: left">32</td></tr>
+<tr><td style="text-align: left">Ecdsa</td><td style="text-align: left">33</td></tr>
+</tbody></table>
+</div>
+<p>Call data is <code>Vec&lt;u8&gt;</code> representation of transaction content. Call data must be
+parsed by Vault prior to signature generation and becomes a part of signed
+blob. Within transaction, the call data is SCALE-encoded, i.e. effectively is
+prefixed with compact of its length in bytes.</p>
+<p>Extensions contain data additional to the call data, and also are part of a
+signed blob. Typical extensions are Era, Nonce, metadata version, etc.
+Extensions content and order, in principle, can vary between the networks and
+metadata versions.</p>
+<p>Network genesis hash determines the network in which the transaction is created.
+At the moment genesis hash is fixed-length 32 bytes.</p>
+<p>Thus, the transaction structure could also be represented as:</p>
+<table>
+    <tr>
+        <td>prelude</td><td>public key</td><td>compact of call data length</td><td><b>call data</b></td><td><b>SCALE-encoded extensions</b></td><td>network genesis hash</td>
+    </tr>
+</table>
+<p>Bold-marked transaction pieces are used in the blob for which the signature is
+produced. If the blob is short, 257 bytes or below, the signature is produced
+for it as is. For blobs longer than 257 bytes, 32 byte hash (<code>blake2_256</code>) is
+signed instead. This is inherited from earlier Vault versions, and is currently
+compatible with polkadot-js.</p>
+<h3 id="transaction-parsing-sequence"><a class="header" href="#transaction-parsing-sequence">Transaction parsing sequence</a></h3>
+<ol>
+<li>
+<p>Cut the QR data and get:</p>
+<ul>
+<li>encryption (single <code>u8</code> from prelude)</li>
+<li>transaction author public key, its length matching the encryption (32 or
+33 <code>u8</code> immediately after the prelude)</li>
+<li>network genesis hash (32 <code>u8</code> at the end)</li>
+<li>SCALE-encoded call data and SCALE-encoded extensions as a combined blob
+(everything that remains in between the transaction author public kay and
+the network genesis hash)</li>
+</ul>
+<p>If the data length is insufficient, Vault produces an error and suggests to
+load non-damaged transaction.</p>
+</li>
+<li>
+<p>Search the Vault database for the network specs (from the network genesis
+hash and encryption).</p>
+<p>If the network specs are not found, Vault shows:</p>
+<ul>
+<li>public key and encryption of the transaction author key</li>
+<li>error message, that suggests to add network with found genesis hash</li>
+</ul>
+</li>
+<li>
+<p>Search the Vault database for the address key (from the transaction author
+public key and encryption). Vault will try to interpret and display the
+transaction in any case. Signing will be possible only if the parsing is
+successful and the address key is known to Vault and is extended to the network
+in question.</p>
+<ul>
+<li>
+<p>Address key not found. Signing not possible. Output shows:</p>
+<ul>
+<li>public key and encryption of the transaction author key</li>
+<li>call and extensions parsing result</li>
+<li>warning message, that suggests to add the address into Vault</li>
+</ul>
+</li>
+<li>
+<p>Address key is found, but it is not extended to the network used. Signing
+not possible. Output shows:</p>
+<ul>
+<li>detailed author key information (base58 representation, identicon,
+address details such as address being passworded etc)</li>
+<li>call and extensions parsing result</li>
+<li>warning message, that suggests extending the address into the network
+used</li>
+</ul>
+</li>
+<li>
+<p>Address key is found and is extended to the network used. Vault will
+proceed to try and interpret the call and extensions. Detailed author
+information will be shown regardless of the parsing outcome.
+The signing will be allowed only if the parsing is successful.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Separate the call and extensions. Call is prefixed by its length compact,
+the compact is cut off, the part with length that was indicated in the compact
+goes into call data, the part that remains goes into extensions data.</p>
+<p>If no compact is found or the length is insufficient, Vault produces an
+error that call and extensions could not be separated.</p>
+</li>
+<li>
+<p>Get the metadata set from the Vault database, by the network name from the
+network specs. Metadata is used to interpret extensions and then the call
+itself.</p>
+<p>If there are no metadata entries for the network at all, Vault produces an
+error and asks to load the metadata.</p>
+<p><code>RuntimeMetadata</code> versions supported by Vault are <code>V12</code>, <code>V13</code>, and <code>V14</code>.
+The crucial feature of the <code>V14</code> is that the metadata contains the description
+of the types used in the call and extensions production. <code>V12</code> and <code>V13</code> are
+legacy versions and provide only text identifiers for the types, and in order to
+use them, the supplemental types information is needed.</p>
+</li>
+<li>
+<p>Process the extensions.</p>
+<p>Vault already knows in which network the transaction was made, but does not
+yet know the metadata version. Metadata version must be one of the signable
+extensions. At the same time, the extensions and their order are recorded in the
+network metadata. Thus, all metadata entries from the set are checked, from
+newest to oldest, in an attempt to find metadata that both decodes the
+extensions and has a version that matches the metadata version decoded from the
+extensions.</p>
+<p>If processing extensions with a single metadata entry results in an error,
+the next metadata entry is tried. The errors would be displayed to user only if
+all attempts with existing metadata have failed.</p>
+<p>Typically, the extensions are quite stable in between the metadata versions
+and in between the networks, however, they can be and sometimes are different.</p>
+<p>In legacy metadata (<code>RuntimeMetadata</code> version being <code>V12</code> and <code>V13</code>)
+extensions have identifiers only, and in Vault the extensions for <code>V12</code> and
+<code>V13</code> are hardcoded as:</p>
+<ul>
+<li><code>Era</code> era</li>
+<li><code>Compact(u64)</code> nonce</li>
+<li><code>Compact(u128)</code> tip</li>
+<li><code>u32</code> metadata version</li>
+<li><code>u32</code> tx version</li>
+<li><code>H256</code> genesis hash</li>
+<li><code>H256</code> block hash</li>
+</ul>
+<p>If the extensions could not be decoded as the standard set or not all
+extensions blob is used, the Vault rejects this metadata version and adds error
+into the error set.</p>
+<p>Metadata <code>V14</code> has extensions with both identifiers and properly described
+types, and Vault decodes extensions as they are recorded in the metadata. For
+this,
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.ExtrinsicMetadata.html"><code>ExtrinsicMetadata</code></a>
+part of the metadata
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html"><code>RuntimeMetadataV14</code></a>
+is used. Vector <code>signed_extensions</code> in <code>ExtrinsicMetadata</code> is scanned twice,
+first for types in <code>ty</code> of the
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.SignedExtensionMetadata.html"><code>SignedExtensionMetadata</code></a>
+and then for types in <code>additional_signed</code> of the <code>SignedExtensionMetadata</code>. The
+types, when resolved through the types database from the metadata, allow to cut
+correct length blobs from the whole SCALE-encoded extensions blob and decode
+them properly.</p>
+<p>If any of these small decodings fails, the metadata version gets rejected by
+the Vault and an error is added to the error set. Same happens if after all
+extensions are scanned, some part of extensions blob remains unused.</p>
+<p>There are some special extensions that must be treated separately. The
+<code>identifier</code> in <code>SignedExtensionMetadata</code> and <code>ident</code> segment of the type
+<a href="https://docs.rs/scale-info/latest/scale_info/struct.Path.html"><code>Path</code></a>
+are used to trigger types interpretation as specially treated extensions. Each
+<code>identifier</code> is encountered twice, once for <code>ty</code> scan, and once for
+<code>additional_signed</code> scan. In some cases only one of those types has non-empty
+content, in some cases it is both. To distinguish the two, the type-associated
+path is used, which points to where the type is defined in Substrate code.
+Type-associated path has priority over the identifier.</p>
+<p>Path triggers:</p>
+<p>| Path | Type is interpreted as |
+| :- | :- |
+| <code>Era</code> | <code>Era</code> |
+| <code>CheckNonce</code> | <code>Nonce</code> |
+| <code>ChargeTransactionPayment</code> | tip, gets displayed as balance with decimals and unit corresponding to the network specs |</p>
+<p>Identifier triggers, are used if the path trigger was not activated:</p>
+<p>| Identifier | Type, if not empty and if there is no path trigger, is interpreted as | Note |
+| :- | :- | :- |
+| <code>CheckSpecVersion</code> | metadata version | gets checked with the metatada version from the metadata |
+| <code>CheckTxVersion</code> | tx version | |
+| <code>CheckGenesis</code> | network genesis hash | must match the genesis hash that was cut from the tail of the transaction |
+| <code>CheckMortality</code> | block hash | must match the genesis hash if the transaction is immortal; <code>Era</code> has same identifier, but is distinguished by the path |
+| <code>CheckNonce</code> | nonce | |
+| <code>ChargeTransactionPayment</code> | tip, gets displayed as balance with decimals and unit corresponding to the network specs |</p>
+<p>If the extension is not a special case, it is displayed as normal parser
+output and does not participate in deciding if the transaction could be signed.</p>
+<p>After all extensions are processed, the decoding must yield following
+extensions:</p>
+<ul>
+<li>exactly one <code>Era</code></li>
+<li>exactly one <code>Nonce</code> &lt;- this is not so currently, fix it</li>
+<li>exactly one <code>BlockHash</code></li>
+<li>exactly one <code>GenesisHash</code> &lt;- this is not so currently, fix it</li>
+<li>exactly one metadata version</li>
+</ul>
+<p>If the extension set is different, this results in Vault error for this
+particular metadata version, this error goes into error set.</p>
+<p>The extensions in the metadata are checked on the metadata loading step,
+long before any transactions are even produced. Metadata with incomplete
+extensions causes a warning on <code>load_metadata</code> update generation step, and
+another one when an update with such metadata gets loaded into Vault.
+Nevertheless, such metadata loading into Vault is allowed, as there could be
+other uses for metadata except signable transaction signing. Probably.</p>
+<p>If the metadata version in extensions does not match the metadata version
+of the metadata used, this results in Vault error for this particular metadata
+version, this error goes into error set.</p>
+<p>If the extensions are completely decoded, with correct set of the special
+extensions and the metadata version from the extensions match the metadata
+version of the metadata used, the extensions are considered correctly parsed,
+and Vault can proceed to the call decoding.</p>
+<p>If all metadata entries from the Vault database were tested and no suitable
+solution is found, Vault produces an error stating that all attempts to decode
+extensions have failed. This could be used by variety of reasons (see above),
+but so far the most common one observed was users having the metadata in Vault
+not up-to-date with the metadata on chain. Thus, the error must have a
+recommendation to update the metadata first.</p>
+</li>
+<li>
+<p>Process the call data.</p>
+<p>After the metadata with correct version is established, it is used to parse
+the call data itself. Each call begins with <code>u8</code> pallet index, this is the
+decoding entry point.</p>
+<p>For <code>V14</code> metadata the correct pallet is found in the set of available ones
+in <code>pallets</code> field of
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.RuntimeMetadataV14.html"><code>RuntimeMetadataV14</code></a>,
+by <code>index</code> field in corresponding
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletMetadata.html"><code>PalletMetadata</code></a>.
+The <code>calls</code> field of this <code>PalletMetadata</code>, if it is <code>Some(_)</code>, contains
+<a href="https://docs.rs/frame-metadata/latest/frame_metadata/v14/struct.PalletCallMetadata.html"><code>PalletCallMetadata</code></a>
+that provides the available calls enum described in <code>types</code> registry of the
+<code>RuntimeMetadataV14</code>. For each type in the registry, including this calls enum,
+encoded data size is determined, and the decoding is done according to the type.</p>
+<p>For <code>V12</code> and <code>V13</code> metadata the correct pallet is also found by scanning
+the available pallets and searching for correct pallet index. Then the call is
+found using the call index (second <code>u8</code> of the call data). Each call has
+associated set of argument names and argument types, however, the argument type
+is just a text identifier. The type definitions are not in the metadata and
+transactions decoding requires supplemental types information. By default, the
+Vault contains types information that was constructed for Westend when Westend
+was still using <code>V13</code> metadata and it was so far reasonably sufficient for
+simple transactions parsing. If the Vault does not find the type information in
+the database <strong>and</strong> has to decode the transaction using <code>V12</code> or <code>V13</code>
+metadata, error is produced, indicating that there are no types. Elsewise, for
+each encountered argument type the encoded data size is determined, and the
+decoding is done according to the argument type.</p>
+<p>There are types requiring special display:</p>
+<ul>
+<li>calls (for cases when a call contains other calls)</li>
+<li>numbers that are processed as the balances</li>
+</ul>
+<p>Calls in <code>V14</code> parsing are distinguished by <code>Call</code> in <code>ident</code> segment of the
+type <a href="https://docs.rs/scale-info/latest/scale_info/struct.Path.html"><code>Path</code></a>.
+Calls in <code>V12</code> and <code>V13</code> metadata are distinguished by any element of the set
+of calls type identifiers in string argument type.</p>
+<p>At the moment the numbers that should be displayed as balance in
+transactions with <code>V14</code> metadata are determined by the type name <code>type_name</code> of
+the corresponding
+<a href="https://docs.rs/scale-info/latest/scale_info/struct.Field.html"><code>Field</code></a>
+being:</p>
+<ul>
+<li><code>Balance</code></li>
+<li><code>T::Balance</code></li>
+<li><code>BalanceOf&lt;T&gt;</code></li>
+<li><code>ExtendedBalance</code></li>
+<li><code>BalanceOf&lt;T, I&gt;</code></li>
+<li><code>DepositBalance</code></li>
+<li><code>PalletBalanceOf&lt;T&gt;</code></li>
+</ul>
+<p>Similar identifiers are used in <code>V12</code> and <code>V13</code>, the checked value is the
+string argument type itself.</p>
+<p>There could be other instances when the number should be displayed as
+balance. However, sometimes the balance is <strong>not</strong> the balance in the units
+in the network specs, for example in the <code>assets</code> pallet. See issue
+<a href="https://github.com/paritytech/parity-signer/issues/1050">#1050</a> and comments
+there for details.</p>
+<p>If no errors were encountered while parsing and all call data was used in
+the process, the transaction is considered parsed and is displayed to the user,
+either ready for signing (if all other checks have passed) or as read-only.</p>
+</li>
+<li>
+<p>If the user chooses to sign the transaction, the Vault produces QR code with
+signature, that should be read back into the hot side. As soon as the signature
+QR code is generated, the Vault considers the transaction signed.</p>
+<p>All signed transactions are entered in the history log, and could be seen
+and decoded again from the history log. Transactions not signed by the user do
+not go in the history log.</p>
+<p>If the key used for the transaction is passworded, user has three attempts
+to enter the password correctly. Each incorrect password entry is reflected in
+the history.</p>
+<p>In the time interval between Vault displaying the parsed transaction and
+the user approving it, the transaction details needed to generate the signature
+and history log details are temporarily stored in the database. The temporary
+storage gets cleared each time before and after use. Vault extracts the stored
+transaction data only if the database checksum stored in navigator state is
+same as the current checksum of the database. If the password is entered
+incorrectly, the database is updated with &quot;wrong password&quot; history entry, and
+the checksum in the state gets updated accordingly. Eventually, all transaction
+info can and will be moved into state itself and temporary storage will not be
+used.</p>
+</li>
+</ol>
+<h3 id="example"><a class="header" href="#example">Example</a></h3>
+<p>Alice makes transfer to Bob in Westend network.</p>
+<p>Transaction:</p>
+<p><code>530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e</code></p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Part</th><th style="text-align: left">Meaning</th><th style="text-align: left">Byte position</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>53</code></td><td style="text-align: left">Substrate-related content</td><td style="text-align: left">0</td></tr>
+<tr><td style="text-align: left"><code>01</code></td><td style="text-align: left">Sr25519 encryption algorithm</td><td style="text-align: left">1</td></tr>
+<tr><td style="text-align: left"><code>02</code></td><td style="text-align: left">Transaction</td><td style="text-align: left">2</td></tr>
+<tr><td style="text-align: left"><code>d435..a27d</code><sup class="footnote-reference"><a href="#1">1</a></sup></td><td style="text-align: left">Alice public key</td><td style="text-align: left">3..=34</td></tr>
+<tr><td style="text-align: left"><code>a404..4817</code><sup class="footnote-reference"><a href="#2">2</a></sup></td><td style="text-align: left">SCALE-encoded call data</td><td style="text-align: left">35..=76</td></tr>
+<tr><td style="text-align: left"><code>a4</code></td><td style="text-align: left">Compact call data length, 41</td><td style="text-align: left">35</td></tr>
+<tr><td style="text-align: left"><code>0403..4817</code><sup class="footnote-reference"><a href="#3">3</a></sup></td><td style="text-align: left">Call data</td><td style="text-align: left">36..=76</td></tr>
+<tr><td style="text-align: left"><code>04</code></td><td style="text-align: left">Pallet index 4 in metadata, entry point for decoding</td><td style="text-align: left">36</td></tr>
+<tr><td style="text-align: left"><code>b501..3f33</code><sup class="footnote-reference"><a href="#4">4</a></sup></td><td style="text-align: left">Extensions</td><td style="text-align: left">77..=153</td></tr>
+<tr><td style="text-align: left"><code>e143..423e</code><sup class="footnote-reference"><a href="#5">5</a></sup></td><td style="text-align: left">Westend genesis hash</td><td style="text-align: left">154..=185</td></tr>
+</tbody></table>
+</div>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><code>d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</code></p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p><code>a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817</code></p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">3</sup>
+<p><code>0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817</code></p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">4</sup>
+<p><code>b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33</code></p>
+</div>
+<div class="footnote-definition" id="5"><sup class="footnote-definition-label">5</sup>
+<p><code>e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e</code></p>
+</div>
+<h4 id="call-content-is-parsed-using-westend-metadata-in-this-particular-case-westend9010"><a class="header" href="#call-content-is-parsed-using-westend-metadata-in-this-particular-case-westend9010">Call content is parsed using Westend metadata, in this particular case westend9010</a></h4>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Call part</th><th style="text-align: left">Meaning</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>04</code></td><td style="text-align: left">Pallet index 4 (<code>Balances</code>) in metadata, entry point for decoding</td></tr>
+<tr><td style="text-align: left"><code>03</code></td><td style="text-align: left">Method index 3 in pallet 4 (<code>transfer_keep_alive</code>), search in metadata what the method contains. Here it is <code>MultiAddress</code> for transfer destination and <code>Compact(u128)</code> balance.</td></tr>
+<tr><td style="text-align: left"><code>00</code></td><td style="text-align: left">Enum variant in <code>MultiAddress</code>, <code>AccountId</code></td></tr>
+<tr><td style="text-align: left"><code>8eaf..6a48</code><sup class="footnote-reference"><a href="#6">6</a></sup></td><td style="text-align: left">Associated <code>AccountId</code> data, Bob public key</td></tr>
+<tr><td style="text-align: left"><code>0700e8764817</code></td><td style="text-align: left"><code>Compact(u128)</code> balance. Amount paid: 100000000000 or, with Westend decimals and unit, 100.000000000 mWND.</td></tr>
+</tbody></table>
+</div>
+<div class="footnote-definition" id="6"><sup class="footnote-definition-label">6</sup>
+<p><code>8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</code></p>
+</div>
+<h4 id="extensions-content"><a class="header" href="#extensions-content">Extensions content</a></h4>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Extensions part</th><th style="text-align: left">Meaning</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>b501</code></td><td style="text-align: left">Era: phase 27, period 64</td></tr>
+<tr><td style="text-align: left"><code>b8</code></td><td style="text-align: left">Nonce: 46</td></tr>
+<tr><td style="text-align: left"><code>00</code></td><td style="text-align: left">Tip: 0 pWND</td></tr>
+<tr><td style="text-align: left"><code>32230000</code></td><td style="text-align: left">Metadata version: 9010</td></tr>
+<tr><td style="text-align: left"><code>05000000</code></td><td style="text-align: left">Tx version: 5</td></tr>
+<tr><td style="text-align: left"><code>e143..423e</code><sup class="footnote-reference"><a href="#7">7</a></sup></td><td style="text-align: left">Westend genesis hash</td></tr>
+<tr><td style="text-align: left"><code>538a..3f33</code><sup class="footnote-reference"><a href="#8">8</a></sup></td><td style="text-align: left">Block hash</td></tr>
+</tbody></table>
+</div>
+<div class="footnote-definition" id="7"><sup class="footnote-definition-label">7</sup>
+<p><code>e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e</code></p>
+</div>
+<div class="footnote-definition" id="8"><sup class="footnote-definition-label">8</sup>
+<p><code>538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33</code></p>
+</div>
+<h2 id="message"><a class="header" href="#message">Message</a></h2>
+<p>Message has the following structure:</p>
+<table>
+    <tr>
+        <td>prelude</td>
+        <td>public key</td>
+        <td><code>[u8]</code> slice</td>
+        <td>network genesis hash</td>
+    </tr>
+</table>
+<p><code>[u8]</code> slice is represented as String if all bytes are valid UTF-8. If not all
+bytes are valid UTF-8, the Vault produces an error.</p>
+<p>It is critical that the message payloads are always clearly distinguishable from
+the transaction payloads, i.e. it is never possible to trick user to sign
+transaction posing as a message.</p>
+<p>Current proposal is to enable message signing only with Sr25519 encryption
+algorithm, with designated signing context, different from the signing context
+used for transactions signing.</p>
+<h2 id="bulk-transactions"><a class="header" href="#bulk-transactions">Bulk transactions</a></h2>
+<p>Bulk transactions is a SCALE-encoded <code>TransactionBulk</code> structure that consists of concatenated <code>Vec&lt;u8&gt;</code> transactions.</p>
+<p>Bulking is a way to sign multiple translations at once and reduce the number of QR codes to scan.</p>
+<p>Bulk transactions are processed in exactly the same way as single transactions.</p>
+<h2 id="update"><a class="header" href="#update">Update</a></h2>
+<p>Update has following general structure:</p>
+<table>
+    <tr>
+        <td>prelude</td><td>verifier public key (if signed)</td><td>update payload</td><td>signature (if signed)</td><td>reserved tail</td>
+    </tr>
+</table>
+<p>Note that the <code>verifier public key</code> and <code>signature</code> parts appear only in signed
+uploads. Preludes <code>[0x53, 0xff, 0x&lt;payload code&gt;]</code> are followed by the update
+payload.</p>
+<p>Every time user receives an unsigned update, the Vault displays a warning that
+the update is not verified. Generally, the use of unsigned updates is
+discouraged.</p>
+<p>For update signing it is recommended to use a dedicated key, not used for
+transactions. This way, if the signed data was not really the update data, but
+something else posing as the update data, the signature produced could not do
+any damage.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Encryption</th><th style="text-align: left">Public key length, bytes</th><th style="text-align: left">Signature length, bytes</th></tr></thead><tbody>
+<tr><td style="text-align: left">Ed25519</td><td style="text-align: left">32</td><td style="text-align: left">64</td></tr>
+<tr><td style="text-align: left">Sr25519</td><td style="text-align: left">32</td><td style="text-align: left">64</td></tr>
+<tr><td style="text-align: left">Ecdsa</td><td style="text-align: left">33</td><td style="text-align: left">65</td></tr>
+<tr><td style="text-align: left">no encryption</td><td style="text-align: left">0</td><td style="text-align: left">0</td></tr>
+</tbody></table>
+</div>
+<p><code>reserved tail</code> currently is not used and is expected to be empty. It could be
+used later if the multisignatures are introduced for the updates. Expecting
+<code>reserved tail</code> in update processing is done to keep code continuity in case
+multisignatures introduction ever happens.</p>
+<p>Because of the <code>reserved tail</code>, the <code>update payload</code> length has to be always
+exactly declared, so that the <code>update payload</code> part could be cut correctly from
+the update.</p>
+<p>Detailed description of the update payloads and form in which they are used in
+update itself and for generating update signature, could be found in Rust module
+<code>definitions::qr_transfers</code>.</p>
+<h3 id="add_specs-update-payload-payload-code-c1"><a class="header" href="#add_specs-update-payload-payload-code-c1"><code>add_specs</code> update payload, payload code <code>c1</code></a></h3>
+<p>Introduces a new network to Vault, i.e. adds network specs to the Vault
+database.</p>
+<p>Update payload is <code>ContentAddSpecs</code> in <code>to_transfer()</code> form, i.e. <strong>double</strong>
+SCALE-encoded <code>NetworkSpecsToSend</code> (second SCALE is to have the exact payload
+length).</p>
+<p>Payload signature is generated for SCALE-encoded <code>NetworkSpecsToSend</code>.</p>
+<p>Network specs are stored in dedicated <code>SPECSTREE</code> tree of the Vault database.
+Network specs identifier is <code>NetworkSpecsKey</code>, a key built from encryption used
+by the network and the network genesis hash. There could be networks with
+multiple encryption algorithms supported, thus the encryption is part of the
+key.</p>
+<p>Some elements of the network specs could be slightly different for networks with
+the same genesis hash and different encryptions. There are:</p>
+<ul>
+<li>
+<p>Invariant specs, identical between all different encryptions:</p>
+<ul>
+<li>name (network name as it appears in metadata)</li>
+<li>base58 prefix</li>
+</ul>
+<p>The reason is that the network name is and the base58 prefix can be a part
+of the network metadata, and the network metadata is not encryption-specific.</p>
+</li>
+<li>
+<p>Specs static for given encryption, that should not change over time once set:</p>
+<ul>
+<li>decimals</li>
+<li>unit</li>
+</ul>
+<p>To replace these, the user would need to remove the network and add it
+again, i.e. it won't be possible to do by accident.</p>
+</li>
+<li>
+<p>Flexible display-related and convenience specs, that can change and could be
+changed by simply loading new ones over the old ones:</p>
+<ul>
+<li>color and secondary color (both currently not used, but historically are
+there and may return at some point)</li>
+<li>logo</li>
+<li>path (default derivation path for network, <code>//&lt;network_name&gt;</code>)</li>
+<li>title (network title as it gets displayed in the Vault)</li>
+</ul>
+</li>
+</ul>
+<h3 id="load_metadata-update-payload-payload-code-80"><a class="header" href="#load_metadata-update-payload-payload-code-80"><code>load_metadata</code> update payload, payload code <code>80</code></a></h3>
+<p>Loads metadata for a network already known to Vault, i.e. for a network with
+network specs in the Vault database.</p>
+<p>Update payload is <code>ContentLoadMeta</code> in <code>to_transfer()</code> form, and consists of
+concatenated SCALE-encoded metadata <code>Vec&lt;u8&gt;</code> and network genesis hash (H256,
+always 32 bytes).</p>
+<p>Same blob is used to generate the signature.</p>
+<p>Network metadata is stored in dedicated <code>METATREE</code> tree of the Vault database.
+Network metadata identifier in is <code>MetaKey</code>, a key built from the network name
+and network metadata version.</p>
+<h3 id="metadata-suitable-for-vault"><a class="header" href="#metadata-suitable-for-vault">Metadata suitable for Vault</a></h3>
+<p>Network metadata that can get into Vault and can be used by Vault only if it
+complies with following requirements:</p>
+<ul>
+<li>metadata vector starts with <code>b&quot;meta&quot;</code> prelude</li>
+<li>part of the metadata vector after <code>b&quot;meta&quot;</code> prelude is decodable as <a href="https://docs.rs/frame-metadata/latest/frame_metadata/enum.RuntimeMetadata.html"><code>RuntimeMetadata</code></a></li>
+<li><code>RuntimeMetadata</code> version of the metadata is <code>V12</code>, <code>V13</code> or <code>V14</code></li>
+<li>Metadata has <code>System</code> pallet</li>
+<li>There is <code>Version</code> constant in <code>System</code> pallet</li>
+<li><code>Version</code> is decodable as <a href="https://paritytech.github.io/substrate/master/sp_version/struct.RuntimeVersion.html"><code>RuntimeVersion</code></a></li>
+<li>If the metadata contains base58 prefix, it must be decodable as <code>u16</code> or <code>u8</code></li>
+</ul>
+<p>Additionally, if the metadata <code>V14</code> is received, its associated extensions will
+be scanned and user will be warned if the extensions are incompatible with
+transactions signing.</p>
+<p>Also in case of the metadata <code>V14</code> the type of the encoded data stored in the
+<code>Version</code> constant is also stored in the metadata types registry and in
+principle could be different from <code>RuntimeVersion</code> above. At the moment, the
+type of the <code>Version</code> is hardcoded, and any other types would not be processed
+and would get rejected with an error.</p>
+<h3 id="load_types-update-payload-payload-code-81"><a class="header" href="#load_types-update-payload-payload-code-81"><code>load_types</code> update payload, payload code <code>81</code></a></h3>
+<p>Load types information.</p>
+<p>Type information is needed to decode transactions made in networks with metadata
+RuntimeMetadata version <code>V12</code> or <code>V13</code>.</p>
+<p>Most of the networks are already using RuntimeMetadata version V14, which has
+types information incorporated in the metadata itself.</p>
+<p>The <code>load_types</code> update is expected to become obsolete soon.</p>
+<p>Update payload is <code>ContentLoadTypes</code> in <code>to_transfer()</code>, i.e. <strong>double</strong>
+SCALE-encoded <code>Vec&lt;TypeEntry&gt;</code> (second SCALE is to have the exact payload
+length).</p>
+<p>Payload signature is generated for SCALE-encoded <code>Vec&lt;TypeEntry&gt;</code>.</p>
+<p>Types information is stored in <code>SETTREE</code> tree of the Vault database, under key
+<code>TYPES</code>.</p>
+<h3 id="verifiers"><a class="header" href="#verifiers">Verifiers</a></h3>
+<p>Vault can accept both verified and non-verified updates, however, information
+once verified can not be replaced or updated by a weaker verifier without full
+Vault reset.</p>
+<p>A verifier could be <code>Some(_)</code> with corresponding public key inside or <code>None</code>.
+All verifiers for the data follow trust on first use principle.</p>
+<p>Vault uses:</p>
+<ul>
+<li>a single general verifier</li>
+<li>a network verifier for each of the networks introduced to the Vault</li>
+</ul>
+<p>General verifier information is stored in <code>SETTREE</code> tree of the Vault database,
+under key <code>GENERALVERIFIER</code>. General verifier is always set to a value, be it
+<code>Some(_)</code> or <code>None</code>. Removing the general verifier means setting it to <code>None</code>.
+If no general verifier entry is found in the database, the database is
+considered corrupted and the Vault must be reset.</p>
+<p>Network verifier information is stored in dedicated <code>VERIFIERS</code> tree of the
+Vault database. Network verifier identifier is <code>VerifierKey</code>, a key built from
+the network genesis hash. Same network verifier is used for network specs with
+any encryption algorithm and for network metadata. Network verifier could be
+valid or invalid. Valid network verifier could be general or custom. Verifiers
+installed as a result of an update are always valid. Invalid network verifier
+blocks the use of the network unless the Vault is reset, it appears if user
+marks custom verifier as no longer trusted.</p>
+<p>Updating verifier could cause some data verified by the old verifier to be
+removed, to avoid confusion regarding which verifier has signed the data
+currently stored in the database. The data removed is called &quot;hold&quot;, and user
+receives a warning if accepting new update would cause hold data to be removed.</p>
+<h4 id="general-verifier"><a class="header" href="#general-verifier">General verifier</a></h4>
+<p>General verifier is the strongest and the most reliable verifier known to the
+Vault. General verifier could sign all kinds of updates. By default the Vault
+uses Parity-associated key as general verifier, but users can remove it and set
+their own. There could be only one general verifier at any time.</p>
+<p>General verifier could be removed only by complete wipe of the Vault, through
+<code>Remove general certificate</code> button in the Settings. This will reset the Vault
+database to the default content and set the general verifier as <code>None</code>, that
+will be updated to the first verifier encountered by the Vault.</p>
+<p>Expected usage for this is that the user removes old general verifier and
+immediately afterwards loads an update from the preferred source, thus setting
+the general verifier to the user-preferred value.</p>
+<p>General verifier can be updated from <code>None</code> to <code>Some(_)</code> by accepting a verified
+update. This would result in removing &quot;general hold&quot;, i.e.:</p>
+<ul>
+<li>all network data (network specs and metadata) for the networks for which the
+verifier is set to the general one</li>
+<li>types information</li>
+</ul>
+<p>General verifier could not be changed from <code>Some(_)</code> to another, different
+<code>Some(_)</code> by simply accepting updates.</p>
+<p>Note that if the general verifier is <code>None</code>, none of the custom verifiers could
+be <code>Some(_)</code>. Similarly, if the verifier is recorded as custom in the database,
+its value can not be the same as the value of the general verifier. If found,
+those situations indicate the database corruption.</p>
+<h4 id="custom-verifiers"><a class="header" href="#custom-verifiers">Custom verifiers</a></h4>
+<p>Custom verifiers could be used for network information that was verified, but
+not with the general verifier. There could be as many as needed custom verifiers
+at any time. Custom verifier is considered weaker than the general verifier.</p>
+<p>Custom verifier set to <code>None</code> could be updated to:</p>
+<ul>
+<li>Another custom verifier set to <code>Some(_)</code></li>
+<li>General verifier</li>
+</ul>
+<p>Custom verifier set to <code>Some(_)</code> could be updated to general verifier.</p>
+<p>These verifier updates can be done by accepting an update signed by a new
+verifier.</p>
+<p>Any of the custom network verifier updates would result in removing &quot;hold&quot;, i.e.
+all network specs entries (for all encryption algorithms on file) and all
+network metadata entries.</p>
+<h3 id="common-update-processing-sequence"><a class="header" href="#common-update-processing-sequence">Common update processing sequence:</a></h3>
+<ol>
+<li>
+<p>Cut the QR data and get:</p>
+<ul>
+<li>encryption used by verifier (single <code>u8</code> from prelude)</li>
+<li>(only if the update is signed, i.e. the encryption is <strong>not</strong> <code>0xff</code>)
+update verifier public key, its length matching the encryption (32 or
+33 <code>u8</code> immediately after the prelude)</li>
+<li>concatenated update payload, verifier signature (only if the update is
+signed) and reserved tail.</li>
+</ul>
+<p>If the data length is insufficient, Vault produces an error and suggests to
+load non-damaged update.</p>
+</li>
+<li>
+<p>Using the payload type from the prelude, determine the update payload length
+and cut payload from the concatenated verifier signature and reserved tail.</p>
+<p>If the data length is insufficient, Vault produces an error and suggests to
+load non-damaged update.</p>
+</li>
+<li>
+<p>(only if the update is signed, i.e. the encryption is <strong>not</strong> <code>0xff</code>)
+Cut verifier signature, its length matching the encryption (64 or 65 <code>u8</code>
+immediately after the update payload). Remaining data is reserved tail,
+currently it is not used.</p>
+<p>If the data length is insufficient, Vault produces an error and suggests to
+load non-damaged update.</p>
+</li>
+<li>
+<p>Verify the signature for the payload. If this fails, Vault produces an error
+indicating that the update has invalid signature.</p>
+</li>
+</ol>
+<h3 id="add_specs-processing-sequence"><a class="header" href="#add_specs-processing-sequence"><code>add_specs</code> processing sequence</a></h3>
+<ol>
+<li>
+<p>Update payload is transformed into <code>ContentAddSpecs</code> and the incoming
+<code>NetworkSpecsToSend</code> are retrieved, or the Vault produces an error indicating
+that the <code>add_specs</code> payload is damaged.</p>
+</li>
+<li>
+<p>Vault checks that there is no change in invariant specs occurring.</p>
+<p>If there are entries in the <code>SPECSTREE</code> of the Vault database with same
+genesis hash as in newly received specs (the encryption not necessarily
+matches), the Vault checks that the name and base58 prefix in the received
+specs are same as in the specs already in the Vault database.</p>
+</li>
+<li>
+<p>Vault checks the verifier entry for the received genesis hash.</p>
+<p>If there are no entries, i.e. the network is altogether new to the Vault,
+the specs could be added into the database. During the same database transaction
+the network verifier is set up:</p>
+<p>| <code>add_specs</code> update verification | General verifier in Vault database | Action |
+| :- | :- | :- |
+| unverified, <code>0xff</code> update encryption code | <code>None</code> or <code>Some(_)</code> | (1) set network verifier to custom, <code>None</code> (regardless of the general verifier); (2) add specs |
+| verified by <code>a</code> | <code>None</code> | (1) set network verifier to general; (2) set general verifier to <code>Some(a)</code>, process the general hold; (3) add specs |
+| verified by <code>a</code> | <code>Some(b)</code> | (1) set network verifier to custom, <code>Some(a)</code>; (2) add specs |
+| verified by <code>a</code> | <code>Some(a)</code> | (1) set network verifier to general; (2) add specs |</p>
+<p>If there are entries, i.e. the network was known to the Vault at some
+point after the last Vault reset, the network verifier in the database and the
+verifier of the update are compared. The specs could be added in the database if</p>
+<ol>
+<li>there are no verifier mismatches encountered (i.e. verifier same or
+stronger)</li>
+<li>received data causes no change in specs static for encryption</li>
+<li>the specs are not yet in the database in exactly same form</li>
+</ol>
+<p>Note that if the exactly same specs as already in the database are received
+with <strong>updated</strong> verifier and the user accepts the update, the verifier will get
+updated and the specs will stay in the database.</p>
+<p>| <code>add_specs</code> update verification | Network verifier in Vault database | General verifier in Vault database | Action |
+| :- | :- | :- | :- |
+| unverified, <code>0xff</code> update encryption code | custom, <code>None</code> | <code>None</code> | accept specs if good |
+| unverified, <code>0xff</code> update encryption code | custom, <code>None</code> | <code>Some(a)</code> | accept specs if good |
+| unverified, <code>0xff</code> update encryption code | general | <code>None</code> | accept specs if good |
+| unverified, <code>0xff</code> update encryption code | general | <code>Some(a)</code> | error: update should have been signed by <code>a</code> |
+| verified by <code>a</code> | custom, <code>None</code> | <code>None</code> | (1) change network verifier to general, process the network hold; (2) set general verifier to <code>Some(a)</code>, process the general hold; (3) accept specs if good |
+| verified by <code>a</code> | custom, <code>None</code> | <code>Some(a)</code> | (1) change network verifier to general, process the network hold; (2) accept specs if good |
+| verified by <code>a</code> | custom, <code>None</code> | <code>Some(b)</code> | (1) change network verifier to custom, <code>Some(a)</code>, process the network hold; (2) accept specs if good |
+| verified by <code>a</code> | custom, <code>Some(a)</code> | <code>Some(b)</code> | accept specs if good |
+| verified by <code>a</code> | custom, <code>Some(b)</code> | <code>Some(a)</code> | (1) change network verifier to general, process the network hold; (2) accept specs if good |
+| verified by <code>a</code> | custom, <code>Some(b)</code> | <code>Some(c)</code> | error: update should have been signed by <code>b</code> or <code>c</code> |</p>
+<p>Before the <code>NetworkSpecsToSend</code> are added in the <code>SPECSTREE</code>, they get
+transformed into <code>NetworkSpecs</code>, and have the <code>order</code> field (display order in
+Vault network lists) added. Each new network specs entry gets added in the end
+of the list.</p>
+</li>
+</ol>
+<h3 id="load_meta-processing-sequence"><a class="header" href="#load_meta-processing-sequence"><code>load_meta</code> processing sequence</a></h3>
+<ol>
+<li>
+<p>Update payload is transformed into <code>ContentLoadMeta</code>, from which the metadata
+and the genesis hash are retrieved, or the Vault produces an error indicating
+that the <code>load_metadata</code> payload is damaged.</p>
+</li>
+<li>
+<p>Vault checks that the received metadata fulfills all Vault metadata
+requirements outlined <a href="development/UOS.html#metadata-suitable-for-signer">above</a>. Otherwise an
+error is produced indicating that the received metadata is invalid.</p>
+<p>Incoming <code>MetaValues</code> are produced, that contain network name, network
+metadata version and optional base58 prefix (if it is recorded in the metadata).</p>
+</li>
+<li>
+<p>Network genesis hash is used to generate <code>VerifierKey</code> and check if the
+network has an established network verifier in the Vault database. If there
+is no network verifier associated with genesis hash, an error is produced,
+indicating that the network metadata could be loaded only for networks
+introduced to Vault.</p>
+</li>
+<li>
+<p><code>SPECSTREE</code> tree of the Vault database is scanned in search of entries with
+genesis hash matching the one received in payload.</p>
+<p>Vault accepts <code>load_metadata</code> updates only for the networks that have at
+least one network specs entry in the database.</p>
+<p>Note that if the verifier in step (3) above is found, it not necessarily
+means that the specs are found (for example, if a network verified by general
+verifier was removed by user).</p>
+<p>If the specs are found, the Vault checks that the network name and, if
+present, base58 prefix from the received metadata match the ones in network
+specs from the database. If the values do not match, the Vault produces an
+error.</p>
+</li>
+<li>
+<p>Vault compares the verifier of the received update and the verifier for the
+network from the database. The update verifier must be exactly the same as the
+verifier already in the database. If there is mismatch, Vault produces an
+error, indication that the <code>load_metadata</code> update for the network must be signed
+by the specified verifier (general or custom) or unsigned.</p>
+</li>
+<li>
+<p>If the update has passed all checks above, the Vault searches for the
+metadata entry in the <code>METATREE</code> of the Vault database, using network name and
+version from update to produce <code>MetaKey</code>.</p>
+<p>If the key is not found in the database, the metadata could be added.</p>
+<p>If the key is found in the database and metadata is <strong>exactly the same</strong>,
+the Vault produces an error indicating that the metadata is already in the
+database. This is expected to be quite common outcome.</p>
+<p>If the key is found in the database and the metadata is <strong>different</strong>, the
+Vault produces an error. Metadata must be not acceptable. This situation can
+occur if there was a silent metadata update or if the metadata is corrupted.</p>
+</li>
+</ol>
+<h3 id="load_types-processing-sequence"><a class="header" href="#load_types-processing-sequence"><code>load_types</code> processing sequence</a></h3>
+<ol>
+<li>
+<p>Update payload is transformed into <code>ContentLoadTypes</code>, from which the types
+description vector <code>Vec&lt;TypeEntry&gt;</code> is retrieved, or the Vault produces an
+error indicating that the <code>load_types</code> payload is damaged.</p>
+</li>
+<li>
+<p><code>load_types</code> updates must be signed by the general verifier.</p>
+<p>| <code>load_types</code> update verification | General verifier in Vault database | Action |
+| :- | :- | :- |
+| unverified, <code>0xff</code> update encryption code | <code>None</code> | load types if the types are not yet in the database |
+| verified by <code>a</code> | <code>None</code> | (1) set general verifier to <code>Some(a)</code>, process the general hold; (2) load types, warn if the types are the same as before |
+| verified by <code>a</code> | <code>Some(b)</code> | reject types, error indicates that <code>load_types</code> requires general verifier signature |
+| verified by <code>a</code> | <code>Some(a)</code> | load types if the types are not yet in the database |</p>
+<p>If the <code>load_types</code> verifier is same as the general verifier in the database
+and the types are same as the types in the database, the Vault produces an
+error indicating that the types are already known.</p>
+<p>Each time the types are loaded, the Vault produces a warning. <code>load_types</code>
+is rare and quite unexpected operation.</p>
+</li>
+</ol>
+<h2 id="derivations-import-payload-code-de"><a class="header" href="#derivations-import-payload-code-de">Derivations import, payload code <code>de</code></a></h2>
+<p>Derivations import has the following structure:</p>
+<table>
+    <tr>
+        <td>prelude</td><td>derivations import payload</td>
+    </tr>
+</table>
+<p>Derivations import payload is a SCALE-encoded <code>ExportAddrs</code> structure.</p>
+<p>It does <em>not</em> contain any private keys or seed phrases.</p>
+<p><code>ExportAddrs</code> structure holds the following information about each key:</p>
+<ul>
+<li>name and public key of the seed the derived key belongs to</li>
+<li><code>ss58</code> address of the derived key (<code>h160</code> for ethereum based chains)</li>
+<li>derivation path</li>
+<li>encryption type</li>
+<li>genesis hash of the network the key is used in</li>
+</ul>
+<p>When processing derivations import, all data after prelude is transformed into
+<code>ExportAddrs</code>. Network genesis hash, encryption and derivations set are
+derived from it, or the Vault produces a warning indicating that the derivation
+import payload is corrupted.</p>
+<p>Vault checks that the network for which the derivations are imported has
+network specs in the Vault database. If not, a warning is produced.</p>
+<p>Vault checks that the derivation set contains only valid derivations. If any
+derivation is unsuitable, a warning is produced indicating this.</p>
+<p>If the user accepts the derivations import, Vault generates a key for each valid
+derivation.</p>
+<p>If one of the derived keys already exists, it gets ignored, i.e. no error is
+produced.</p>
+<p>If there are two derivations with identical path within the payload, only one
+derived key is created.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="vault-ecosystem"><a class="header" href="#vault-ecosystem">Vault ecosystem</a></h1>
+<p>Vault repository contains 3 tools that are part of Vault ecosystem</p>
+<ul>
+<li><a href="https://github.com/paritytech/parity-signer">Polkadot Vault app</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/tree/master/rust/generate_message"><code>generate_message</code> network data management tool</a></li>
+<li><a href="https://github.com/paritytech/parity-signer/tree/master/rust/generate_message"><code>qr_reader_pc</code> qr scanner app for PC</a></li>
+</ul>
+<p>Greater Vault ecosystem:</p>
+<ul>
+<li><a href="https://github.com/paritytech/metadata-portal">metadata portal</a></li>
+<li><a href="https://github.com/paritytech/parity-signer-companion">Signer companion</a></li>
+<li><a href="https://github.com/polkadot-js/apps">polkadot-js libraries for QR code data transfer</a></li>
+<li><a href="https://github.com/varovainen/parity-signer/blob/2022-05-25-uos/docs/src/development/UOS.md">UOS interface specification</a> - since no tools support original upstream specification, here is standard interpretation that is used in Vault.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+        <script>
+            window.playground_line_numbers = true;
+        </script>
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="ace.js"></script>
+        <script src="editor.js"></script>
+        <script src="mode-rust.js"></script>
+        <script src="theme-dawn.js"></script>
+        <script src="theme-tomorrow_night.js"></script>
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

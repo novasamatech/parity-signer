@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["TokenFetch"],"fn":["check_specs","interpret_properties"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error","StubNav","TransactionAction"],"fn":["decode_payload","prepare_derivations_preview","produce_output"],"mod":["cards","check_signature","dynamic_derivations","parse_transaction"],"type":["Result"]};

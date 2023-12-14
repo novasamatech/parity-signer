@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error"],"fn":["default_cold_release","default_hot"],"mod":["cold_default","db_transactions","helpers","identities","interface_signer","manage_history"],"type":["Result"]};

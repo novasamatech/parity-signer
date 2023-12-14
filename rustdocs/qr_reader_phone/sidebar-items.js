@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error"],"fn":["decode_sequence","get_length","get_payload"],"mod":["process_payload"],"type":["Result"]};

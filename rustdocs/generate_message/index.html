@@ -1,0 +1,889 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate is intended to support the Vault from the active (non air-gapped) side."><title>generate_message - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="generate_message" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../generate_message/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../generate_message/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate generate_message</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Aliases</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">generate_message</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/generate_message/lib.rs.html#1-1138">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate is intended to support the
+<a href="https://github.com/paritytech/parity-signer">Vault</a> from the active
+(non air-gapped) side.</p>
+<p>This crate is mainly used to:</p>
+<ul>
+<li>fetch network data through RPC calls</li>
+<li>prepare Vault update and derivation import payloads</li>
+<li>generate Vault update QR codes, either signed or unsigned, and
+derivations import QR codes, to be scanned into Vault</li>
+<li>maintain the <code>hot</code> database on the network-connected device, to store and
+manage the data that went into update QR codes</li>
+<li>maintain Vault default network metadata set in <code>defaults</code> crate and
+prepare the <code>cold</code> database for the Vault release</li>
+</ul>
+<h2 id="supported-vault-updates"><a href="#supported-vault-updates">Supported Vault updates</a></h2>
+<p>Crate <code>generate_message</code> can generate and the Vault can accept following
+updates:</p>
+<ul>
+<li><code>add-specs</code>, to add a new network (i.e. the network specs) into the Vault</li>
+<li><code>load-metadata</code>, to load into the Vault the network metadata, for
+networks that already have corresponding network specs entry in the Vault
+database</li>
+<li><code>load-types</code>, to load types information (it is used to support the
+transactions parsing in networks with legacy metadata, <code>RuntimeMetadata</code>
+version below <code>V14</code>)</li>
+</ul>
+<p>Updates are assembled as <code>Vec&lt;u8&gt;</code> and could be transformed into:</p>
+<ul>
+<li><code>PNG</code> QR codes, static or dynamic multiframe depending on the data size</li>
+<li>hex-encoded string (for tests)</li>
+</ul>
+<p>Information in <code>add-specs</code>, <code>load-metadata</code> and <code>load-types</code> could be either
+signed or unsigned. Using signed updates is strongly encouraged.</p>
+<p>Update has following general structure:</p>
+<table>
+    <tr>
+        <td>prelude <code>[0x53, 0x<encryption code>, 0x<payload code>]</code></td>
+        <td>verifier public key (if signed)</td>
+        <td>update payload</td>
+        <td>signature (if signed)</td>
+        <td>reserved tail, currently empty</td>
+    </tr>
+</table>
+<p><code>&lt;encryption code&gt;</code> indicates encryption algorithm that was used
+to sign the update:</p>
+<table>
+    <tr>
+        <td><code>0x00</code></td>
+        <td>Ed25519</td>
+    </tr>
+    <tr>
+        <td><code>0x01</code></td>
+        <td>Sr25519</td>
+    </tr>
+    <tr>
+        <td><code>0x02</code></td>
+        <td>Ecdsa</td>
+    </tr>
+    <tr>
+        <td><code>0xff</code></td>
+        <td>unsigned</td>
+    </tr>
+</table>
+<p>Update payloads content is described in <a href="../definitions/qr_transfers/index.html" title="mod definitions::qr_transfers">definitions::qr_transfers</a>.</p>
+<table>
+    <tr>
+        <th>update payload</th>
+        <th>update content type</th>
+        <th>data signed, <code>to_sign</code> form</th>
+        <th>data in payload, <code>to_transfer</code> form</th>
+    </tr>
+    <tr>
+        <td><code>add_specs</code></td>
+        <td><code>ContentAddSpecs</code></td>
+        <td>SCALE encoded <code>NetworkSpecs</code></td>
+        <td>double SCALE encoded <code>NetworkSpecs</code></td>
+    </tr>
+    <tr>
+        <td><code>load_metadata</code></td>
+        <td><code>ContentLoadMeta</code></td>
+        <td>concatenated SCALE encoded metadata vector and network genesis hash</td>
+        <td>concatenated SCALE encoded metadata vector and network genesis hash</td>
+    </tr>
+    <tr>
+        <td><code>load_types</code></td>
+        <td><code>ContentLoadTypes</code></td>
+        <td>SCALE encoded <code>Vec&ltTypeEntry&gt</code></td>
+        <td>double SCALE encoded <code>Vec&ltTypeEntry&gt</code></td>
+    </tr>
+</table>
+<p>Note that the update payloads are build in such a way that the length of
+the payload always could be easily found, thus allowing to separate update
+payload, signature and reserved tail in Vault when accepting the update.
+The tail is reserved to future-proof the updates if the multi-signing is
+ever implemented for them. Currently the tail is empty.</p>
+<h2 id="updates-generation"><a href="#updates-generation">Updates generation</a></h2>
+<p>Updates are generated in following stages:</p>
+<ol>
+<li>make update payload</li>
+<li>(optional) make signature for update payload</li>
+<li>make update QR code (optionally signed), that could be scanned into
+Vault</li>
+</ol>
+<p>Steps (1) and (3) are done in <code>generate_message</code>, the signature is produced
+in other tools, except the test “signed” updates with Alice as a verifier,
+when the signature is produced while making QR code during step (3).</p>
+<p>Signature could be produced with Subkey or with Vault. For update signing
+it is recommended to use a dedicated key, not used for transactions. This
+way, if the signed data was not really the update data, but something else
+posing as the update data, the signature produced could not do any damage.</p>
+<p>If the Vault is used to produce the signature, it should be a dedicated
+Vault with no verifier or weak key verifier for the network: before the
+signature is produced, an unsigned or easily signed update must be loaded
+into Vault.</p>
+<h2 id="available-commands"><a href="#available-commands">Available commands</a></h2><h3 id="display-content-of-the-metadata-metatree-tree-of-the-hot-database"><a href="#display-content-of-the-metadata-metatree-tree-of-the-hot-database">Display content of the metadata <code>METATREE</code> tree of the hot database</a></h3>
+<p><code>$ cargo run show metadata</code></p>
+<p>Prints for each entry in hot database <a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a>
+tree:</p>
+<ul>
+<li>network name</li>
+<li>network metadata version</li>
+<li>hexadecimal metadata hash</li>
+<li>hexadecimal block hash for the block at which the metadata was fetched</li>
+</ul>
+<p>Note that for each network a maximum of 2 metadata entries is stored in the
+hot database at any time.</p>
+<h3 id="display-content-of-the-address-book-address_book-tree-of-the-hot-database"><a href="#display-content-of-the-address-book-address_book-tree-of-the-hot-database">Display content of the address book <code>ADDRESS_BOOK</code> tree of the hot database</a></h3>
+<p><code>$ cargo run show networks</code></p>
+<p>Prints for each entry in hot database
+<a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a> tree:</p>
+<ul>
+<li>address book title for the network <code>&lt;network_name&gt;-&lt;network_encryption&gt;</code>,
+used only to distinguish between address book entries</li>
+<li>URL address at which RPC calls are made for the network</li>
+<li>network encryption</li>
+<li>additional marker that the network is a default one, i.e. entry has not
+changed since the database generation</li>
+<li>network title as it will be displayed in Vault, from
+<a href="../definitions/network_specs/struct.NetworkSpecs.html" title="struct definitions::network_specs::NetworkSpecs"><code>NetworkSpecs</code></a></li>
+</ul>
+<h3 id="show-network-specs-for-a-network-as-recorded-in-the-hot-database"><a href="#show-network-specs-for-a-network-as-recorded-in-the-hot-database">Show network specs for a network, as recorded in the hot database</a></h3>
+<p><code>$ cargo run show specs &lt;ADDRESS BOOK TITLE&gt;</code></p>
+<p>Prints network address book title and corresponding
+<a href="../definitions/network_specs/struct.NetworkSpecs.html" title="struct definitions::network_specs::NetworkSpecs"><code>NetworkSpecs</code></a>
+from <a href="../constants/constant.SPECSTREEPREP.html" title="constant constants::SPECSTREEPREP"><code>SPECSTREEPREP</code></a> tree of the hot
+database.</p>
+<h4 id="example"><a href="#example">Example</a></h4>
+<p><code>$ cargo run show specs westend-sr25519</code></p>
+<h3 id="check-external-file-with-hex-encoded-metadata"><a href="#check-external-file-with-hex-encoded-metadata">Check external file with hex-encoded metadata</a></h3>
+<p><code>$ cargo run show check-file &lt;METADATA FILE&gt;</code></p>
+<p>Asserts that:</p>
+<ul>
+<li>the file contains valid metadata, with retrievable network name and
+version</li>
+<li>if the metadata for same network name and version is in the hot
+database, it completely matches the one from the file</li>
+</ul>
+<h4 id="example-1"><a href="#example-1">Example</a></h4>
+<p><code>$ cargo run show check-file &quot;../defaults/release_metadata/kusama9230&quot;</code></p>
+<h3 id="show-metadata-fetch-block-history-from-meta_history-tree-of-the-hot-database"><a href="#show-metadata-fetch-block-history-from-meta_history-tree-of-the-hot-database">Show metadata fetch block history from <code>META_HISTORY</code> tree of the hot database</a></h3>
+<p><code>$ cargo run show block-history</code></p>
+<p>Prints block hashes at which the network metadata was fetched as it first
+got in the database. If the metadata is from <code>.wasm</code> file, there is no entry
+until a proper metadata fetch from a node is done with some associated block
+hash.</p>
+<p><a href="../constants/constant.META_HISTORY.html" title="constant constants::META_HISTORY"><code>META_HISTORY</code></a> tree stores all block hashes that
+were ever encountered on successful new metadata fetch, and clears only on
+the database reset.</p>
+<p>Block hashes could be useful should silent metadata updates (metadata change
+with no version bump) happen again.</p>
+<h3 id="prepare-add_specs-update-payload"><a href="#prepare-add_specs-update-payload">Prepare <code>add_specs</code> update payload</a></h3>
+<p><code>$ cargo run add-specs [OPTIONS] &lt;-d|-f|-k|-p|-t&gt; &lt;--all|--name &lt;NAME&gt;|--url &lt;ADDRESS&gt;&gt;</code></p>
+<p>A file is generated in dedicated <a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> to
+(optionally) be signed and later be transformed into <code>add_specs</code> update
+QR. Output file name is <code>sign_me_add_specs_&lt;network_name&gt;_&lt;encryption&gt;</code>.</p>
+<p>Setting keys that could be used in command line (maximum one):</p>
+<ul>
+<li><code>-d</code>: do <strong>not</strong> update the database, make RPC calls, and produce
+output files</li>
+<li><code>-f</code>: do <strong>not</strong> run RPC calls, produce output files using data already in
+the database</li>
+<li><code>-p</code>: update or check database through RPC calls, do <strong>not</strong> produce any
+output files</li>
+<li><code>-t</code> (no setting key defaults here): update or check database through RPC
+calls, produce output files</li>
+</ul>
+<table>
+    <tr>
+        <th>setting key</th>
+        <th>hot database update</th>
+        <th>RPC calls</th>
+        <th>output update payload</th>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td>-</td>
+        <td>+</td>
+        <td>+</td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td>-</td>
+        <td>-</td>
+        <td>+</td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td>+</td>
+        <td>+</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><code>-t</code></td>
+        <td>+</td>
+        <td>+</td>
+        <td>+</td>
+    </tr>
+</table>
+<p>Reference keys (exactly only one has to be used):</p>
+<ul>
+<li><code>--all</code>: all networks with entries in the
+<a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a> tree of the hot database</li>
+<li><code>--name</code> followed by single network address book title: for a network with
+existing record in the <a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a></li>
+<li><code>--url</code> followed by single URL address: reserved for networks with no
+record yet in the <a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a></li>
+</ul>
+<p><code>--all</code> key could be used with <code>--pass-errors</code> key, to stop processing after first
+error.</p>
+<p><code>--encryption</code> key to override specifying encryption algorithm supported by the
+network is optional for <code>--name</code> reference key (since there is already an entry in
+the database with specified encryption) and mandatory for <code>--url</code> reference key.
+Supported variants are:</p>
+<ul>
+<li><code>ed25519</code></li>
+<li><code>sr25519</code></li>
+<li><code>ecdsa</code></li>
+</ul>
+<p>Sequence invoking token override could be used when processing an
+individual network that has multiple allowed decimals and unit values
+retrieved as arrays of equal size. To override token, key <code>--token-decimals</code>
+followed by <code>u8</code> decimals value and key <code>--token-unit</code> <code>String</code> unit value is used.
+By default, if no token override in provided, such networks have <code>0u8</code> decimals
+and <code>UNIT</code> unit set up.</p>
+<p>Title override could be used when processing an individual network, to set
+the title under which the network will be displayed in Vault, should the
+<code>add-specs</code> payload be accepted. Non-default networks, if the title override
+is not specified, have title <code>&lt;network_name&gt;-&lt;network_encryption&gt;</code>.</p>
+<p>Not all setting and reference key combinations are compatible, and not all
+overrides are supported. Users are encouraged to comment if they need some
+other than current key combinations available.</p>
+<table>
+    <tr>
+        <th>setting key</th>
+        <th>reference key</th>
+        <th>reference argument</th>
+        <th>encryption override</th>
+        <th>token override</th>
+        <th>title override</th>
+        <th>action</th>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td><code>-u</code></td>
+        <td><code>url_address</code></td>
+        <td>mandatory</td>
+        <td>possible, if token array fetched</td>
+        <td>possible</td>
+        <td>- make RPC calls<br>
+            - apply overrides<br>
+            - make payload file<br>
+            Note: database is <b>not</b> used
+        </td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td colspan="3">blocked</td>
+        <td>- get all network specs entries from the database<br>
+            - make payload file(s)<br>
+            Note: only the data from the database is used
+        </td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td><code>-n</code></td>
+        <td><code>address_book_title</code></td>
+        <td>possible</td>
+        <td>blocked, no way to check that the token override is reasonable</td>
+        <td>possible</td>
+        <td>- get address book entry for <code>address_book_title</code><br>
+            - get corresponding network specs entry<br>
+            - apply overrides<br>
+            - make payload file<br>
+            Note: only the data from the database and override(s) are used
+        </td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td><code>-n</code></td>
+        <td><code>address_book_title</code></td>
+        <td>possible</td>
+        <td>possible, if token array fetched</td>
+        <td>possible</td>
+        <td>- get address book entry for <code>address_book_title</code><br>
+            - get corresponding network specs entry<br>
+            - make RPC calls, check that the entry remains correct<br>
+            - apply overrides<br>
+            - update database
+        </td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td><code>-u</code></td>
+        <td><code>url_address</code></td>
+        <td>mandatory</td>
+        <td>possible, if token array fetched</td>
+        <td>possible</td>
+        <td>- make RPC calls<br>
+            - apply overrides<br>
+            - update database<br>
+            Note: reserved for networks with no entries in the database
+        </td>
+    </tr>
+    <tr>
+        <td><code>-t</code> or none declared</td>
+        <td><code>-n</code></td>
+        <td><code>address_book_title</code></td>
+        <td>possible</td>
+        <td>possible, if token array fetched</td>
+        <td>possible</td>
+        <td>- get address book entry for <code>address_book_title</code><br>
+            - get corresponding network specs entry<br>
+            - make RPC calls, check that the entry remains correct<br>
+            - apply overrides<br>
+            - update database if needed<br>
+            - make payload file
+        </td>
+    </tr>
+    <tr>
+        <td><code>-t</code> or none declared</td>
+        <td><code>-u</code></td>
+        <td><code>url_address</code></td>
+        <td>mandatory</td>
+        <td>possible, if token array fetched</td>
+        <td>possible</td>
+        <td>- make RPC calls<br>
+            - apply overrides<br>
+            - update database if needed<br>
+            - make payload file<br>
+            Note: reserved for networks with no entries in the database
+        </td>
+    </tr>
+</table>
+<h4 id="examples"><a href="#examples">Examples</a></h4>
+<p>Make <code>add_specs</code> update payload for a known network from the hot database:</p>
+<p><code>$ cargo run add-specs --name westend-sr25519</code></p>
+<p>Make <code>add-specs</code> update payload for a new network:</p>
+<p><code>$ cargo run add-specs -d -u wss://rococo-rpc.polkadot.io --encryption sr25519 --title Rococo</code></p>
+<p>Make <code>add-specs</code> update payload for a new network with token set:</p>
+<p><code>$ cargo run add-specs -d -u wss://acala.polkawallet.io --encryption sr25519 --token-decimals 12 --token-unit ACA --title Acala</code></p>
+<h3 id="prepare-load_metadata-update-payload"><a href="#prepare-load_metadata-update-payload">Prepare <code>load_metadata</code> update payload</a></h3>
+<p><code>$ cargo run load-metadata [OPTIONS] &lt;-d|-f|-k|-p|-t&gt;</code></p>
+<p>A file is generated in dedicated <a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> to
+(optionally) be signed and later be transformed into <code>load_metadata</code>
+update QR. Output file name is
+<code>sign_me_load_metadata_&lt;network_name&gt;V&lt;version&gt;</code>.</p>
+<p>Setting keys that could be used in command line (maximum one):</p>
+<ul>
+<li><code>-d</code>: do <strong>not</strong> update the database, make RPC calls, and produce
+output files</li>
+<li><code>-f</code>: do <strong>not</strong> run RPC calls, produce output files from database as
+it is</li>
+<li><code>-k</code>: update database through RPC calls, produce output files only for
+<strong>new</strong> database entries</li>
+<li><code>-p</code>: update database through RPC calls, do <strong>not</strong> produce any output
+files</li>
+<li><code>-t</code> (no setting key defaults here): update database through RPC
+calls, produce output files</li>
+</ul>
+<table>
+    <tr>
+        <th>setting key</th>
+        <th>hot database update</th>
+        <th>RPC calls</th>
+        <th>output update payload</th>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td>-</td>
+        <td>+</td>
+        <td>+</td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td>-</td>
+        <td>-</td>
+        <td>+</td>
+    </tr>
+    <tr>
+        <td><code>-k</code></td>
+        <td>+</td>
+        <td>+</td>
+        <td>only new entries</td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td>+</td>
+        <td>+</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><code>-t</code></td>
+        <td>+</td>
+        <td>+</td>
+        <td>+</td>
+    </tr>
+</table>
+<p>Network metadata updates quite often, compared to <code>add-specs</code> command there
+is also setting key <code>-k</code> to print only the data that was not in the hot
+database before the fetch.</p>
+<p>Reference keys (exactly only one has to be used):</p>
+<ul>
+<li><code>-a,--all</code>: all networks with entries in the
+<a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a> tree of the hot database</li>
+<li><code>-n,--name</code> followed by single network name: for a network with existing
+record in the <a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a></li>
+<li><code>-u,--url</code> followed by single URL address: reserved for networks with no
+record yet in the <a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a></li>
+</ul>
+<p><code>-a</code> key could be used with <code>--pass-errors</code> key, to stop processing after first
+error.</p>
+<p><code>load-metadata</code> has no overrides available. Not all setting and reference
+key combinations are compatible, and not all overrides are supported. Users
+are encouraged to comment if they need some other than current key
+combinations available.</p>
+<table>
+    <tr>
+        <th>setting key</th>
+        <th>reference key</th>
+        <th>reference argument</th>
+        <th>action</th>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td>- get all URL addresses <b>from the database</b><br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - make payload file(s)<br>
+            Note: database is needed to get URL addresses
+        </td>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td><code>-n</code></td>
+        <td><code>network_name</code></td>
+        <td>- get URL address <b>from the database</b> for the <code>network_name</code><br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - make payload file<br>
+            Note: database is needed to get URL address
+        </td>
+    </tr>
+    <tr>
+        <td><code>-d</code></td>
+        <td><code>-u</code></td>
+        <td><code>url_address</code></td>
+        <td>- make RPC calls<br>
+            - make payload file<br>
+            Note: database is <b>not</b> used
+        </td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td>- get all metadata entries from the database<br>
+            - make payload file(s)
+        </td>
+    </tr>
+    <tr>
+        <td><code>-f</code></td>
+        <td><code>-n</code></td>
+        <td><code>network_name</code></td>
+        <td>- get all metadata entries for the <code>network_name</code> from the database<br>
+            - make payload file(s)
+        </td>
+    </tr>
+    <tr>
+        <td><code>-k</code></td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td>- get all URL addresses from the database<br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed<br>
+            - make payload file for each new entry
+        </td>
+    </tr>
+    <tr>
+        <td><code>-k</code></td>
+        <td><code>-n</code></td>
+        <td><code>network_name</code></td>
+        <td>- get URL address from the database for the <code>network_name</code><br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed<br>
+            - make payload file if the entry is new
+        </td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td>- get all URL addresses from the database<br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed
+        </td>
+    </tr>
+    <tr>
+        <td><code>-p</code></td>
+        <td><code>-n</code></td>
+        <td><code>network_name</code></td>
+        <td>- get URL address from the database for the <code>network_name</code><br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed
+        </td>
+    </tr>
+    <tr>
+        <td><code>-t</code> or none declared</td>
+        <td><code>-a</code></td>
+        <td></td>
+        <td>- get all URL addresses from the database<br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed<br>
+            - make payload file(s)
+        </td>
+    </tr>
+    <tr>
+        <td><code>-t</code> or none declared</td>
+        <td><code>-n</code></td>
+        <td><code>network_name</code></td>
+        <td>- get URL address from the database for the <code>network_name</code><br>
+            - make RPC calls<br>
+            - verify name, genesis hash, base58 prefix<br>
+            - update the database if needed<br>
+            - make payload file
+        </td>
+    </tr>
+</table>
+<h4 id="examples-1"><a href="#examples-1">Examples</a></h4>
+<p>Check metadata updates and make <code>load_metadata</code> update payloads for latest
+metadata for all known networks:</p>
+<p><code>$ cargo run load-metadata -a</code></p>
+<p>Make <code>load_metadata</code> update payload for a network not in the database:</p>
+<p><code>$ cargo run load-metadata -d -u wss://rococo-rpc.polkadot.io</code></p>
+<h3 id="prepare-load_types-update-payload"><a href="#prepare-load_types-update-payload">Prepare <code>load_types</code> update payload</a></h3>
+<p><code>$ cargo run load-types</code></p>
+<p>A file is generated in dedicated <a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> to
+(optionally) be signed and later be transformed into <code>load_types</code> update QR.
+Output file name is <code>sign_me_load_types</code>.</p>
+<h3 id="generate-update-qr-andor-hexadecimal-string-file"><a href="#generate-update-qr-andor-hexadecimal-string-file">Generate update QR and/or hexadecimal string file</a></h3>
+<p>Raw <code>[u8]</code> update payloads, as prepared by <code>add_specs</code>, <code>load_metadata</code> or
+<code>load_types</code> commands get transformed into update QR codes (to be scanned
+into the Vault) or textfiles with hexadecimal data (for tests).</p>
+<p>There are two commands for generating updates: <code>make</code> and <code>sign</code>.</p>
+<p>Command <code>make</code> is used to generate:</p>
+<ul>
+<li>signed updates with a valid signature, associated public key and
+encryption algorithm</li>
+<li>test signed updates, i.e. updates signed by a key with
+<a href="../constants/constant.ALICE_SEED_PHRASE.html" title="constant constants::ALICE_SEED_PHRASE">Alice seed phrase</a> and derivation <code>//Alice</code>,
+with encryption algorithm chosen by user, for tests</li>
+<li>unsigned updates</li>
+</ul>
+<p>Signature for <code>make</code> command is generated for contents of raw <code>[u8]</code> update
+payload file using, for example, Subkey.</p>
+<p>Command <code>sign</code> is used to generate signed updates with a valid
+<a href="../definitions/crypto/enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> produced by
+Vault. Vault exports <code>SufficientCrypto</code> produced for one of its keys
+as a static QR code, this QR code content goes into command line.</p>
+<p>Update QR and/or hexadecimal string file are produced in
+<a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.</p>
+<p>Keys and most arguments (except file paths) are not case-sensitive.</p>
+<p>The validity of the signature or <code>SufficientCrypto</code>, if provided, is checked
+before assembling update.</p>
+<p>The payload is checked to be valid, with decodeable content. If default
+output file name is used, it is generated based on the payload content.</p>
+<table>
+    <tr>
+        <th><code>msg</code></th>
+        <th>default update file name</th>
+    </tr>
+    <tr>
+        <td><code>add-specs</code></td>
+        <td><code>add_specs_&ltnetwork_name&gt-&ltnetwork_encryption&gt</code></td>
+    </tr>
+    <tr>
+        <td><code>load-metadata</code></td>
+        <td><code>load_metadata_&ltnetwork_name&gtV&ltmetadata_version&gt</code></td>
+    </tr>
+    <tr>
+        <td><code>load-types</code></td>
+        <td><code>load_types</code></td>
+    </tr>
+</table>
+<p>Names for Alice-signed updates have additional tail
+<code>_Alice-&lt;alice_signature_encryption&gt;</code>.</p>
+<p>Names for unsigned updates have additional tail <code>_unsigned</code>.</p>
+<h4 id="make-command"><a href="#make-command"><code>make</code> command</a></h4>
+<p><code>$ cargo run make &lt;keys&gt; &lt;arguments&gt;</code></p>
+<p>Keys to be used in command line:</p>
+<ul>
+<li>
+<p>Key <code>--goal</code> followed by the type to to generate</p>
+<ul>
+<li><code>qr</code> will generate only a png QR code</li>
+<li><code>text</code> will generate only text file with hex-encoded update.</li>
+<li>default, i.e. if goal is not provided, both QR code and text file are generated.</li>
+</ul>
+</li>
+<li>
+<p>Key <code>--crypto</code> followed by encryption used to make update signature:</p>
+<ul>
+<li><code>ed25519</code></li>
+<li><code>sr25519</code></li>
+<li><code>ecdsa</code></li>
+<li><code>none</code> if the message is not verified</li>
+</ul>
+</li>
+<li>
+<p>Key <code>--msg</code> followed by update type:</p>
+<ul>
+<li><code>load-types</code></li>
+<li><code>load-metadata</code></li>
+<li><code>add-specs</code></li>
+</ul>
+</li>
+<li>
+<p>Key <code>--verifier</code> (can be entered only if the <code>--crypto</code> argument was
+<code>ed25519</code>, <code>sr25519</code>, or <code>ecdsa</code>), followed by:</p>
+<ul>
+<li><code>Alice</code> to generate messages “verified” by
+<a href="../constants/constant.ALICE_SEED_PHRASE.html" title="constant constants::ALICE_SEED_PHRASE">Alice seed phrase</a> with derivation <code>//Alice</code></li>
+<li><code>-hex</code> followed by hex public key</li>
+<li><code>-file</code> followed by the path in dedicated <a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a>
+for file with public key as raw bytes</li>
+</ul>
+</li>
+<li>
+<p>Key <code>--payload</code> followed by file path in dedicated
+<a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> containing already generated payload as
+raw bytes</p>
+</li>
+<li>
+<p>Key <code>--signature</code> (can be entered only if the <code>--crypto</code> argument was
+<code>ed25519</code>, <code>sr25519</code>, or <code>ecdsa</code> <strong>and</strong> <code>--verifier</code> is not <code>Alice</code>),
+followed by:</p>
+<ul>
+<li><code>-hex</code> followed by hex signature</li>
+<li><code>-file</code> followed by the path in dedicated <a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a>
+for file with signature as raw bytes</li>
+</ul>
+</li>
+<li>
+<p>Optional key <code>-name</code> followed by path override for export file in
+dedicated <a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a></p>
+</li>
+</ul>
+<h4 id="sign-command"><a href="#sign-command"><code>sign</code> command</a></h4>
+<p><code>$ cargo run make &lt;keys&gt; &lt;arguments&gt;</code></p>
+<p>Keys to be used in command line:</p>
+<ul>
+<li>
+<p>Key <code>--goal</code> followed by the type to to generate</p>
+<ul>
+<li><code>qr</code> will generate only a png QR code</li>
+<li><code>text</code> will generate only text file with hex-encoded update.</li>
+<li>default, i.e. if goal is not provided, both QR code and text file are generated.</li>
+</ul>
+</li>
+<li>
+<p>Key <code>-sufficient</code> followed by:</p>
+<ul>
+<li><code>-hex</code> followed by hexadecimal string with contents of Vault-produced
+<code>SufficientCrypto</code> QR code</li>
+<li><code>-file</code> followed by file path in dedicated
+<a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> for raw bytes file with contents of
+Vault-produced <code>SufficientCrypto</code> QR code</li>
+</ul>
+</li>
+<li>
+<p>Key <code>-msg</code> followed by message type:</p>
+<ul>
+<li><code>load-types</code></li>
+<li><code>load-metadata</code></li>
+<li><code>add-specs</code></li>
+</ul>
+</li>
+<li>
+<p>Key <code>--payload</code> followed by file path in dedicated
+<a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> containing already generated payload as
+raw bytes</p>
+</li>
+<li>
+<p>Optional key <code>-name</code> followed by path override for export file in
+dedicated <a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a></p>
+</li>
+</ul>
+<p>Generating <code>SufficientCrypto</code> in Vault is suggested mainly for update
+distribution purposes. A dedicated (i.e. used only for updates signing),
+kept physically safe Vault is strongly suggested, with a dedicated key
+for updates signing. As the Vault can accept only payloads with
+verifier not weaker than the one used before, and the whole purpose of
+the process is to generate a signature for payload, it is expected that
+this isolated Vault will receive unsigned or weakly signed updates,
+thoroughly check them and export <code>SufficientCrypto</code>, so that a signed
+update could be made for other, routinely used Vault devices.</p>
+<h4 id="examples-generate-load_metadata-qr-code-for-westend-metadata-version-9200"><a href="#examples-generate-load_metadata-qr-code-for-westend-metadata-version-9200">Examples: generate <code>load_metadata</code> QR code for westend metadata version 9200.</a></h4>
+<p>Update payload <code>sign_me_load_metadata_westendV9200</code> is already in dedicated
+<a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a>.</p>
+<h5 id="make-for-external-signature"><a href="#make-for-external-signature"><code>make</code> for external signature</a></h5>
+<p><code>$ cargo run make --goal qr --crypto &lt;encryption&gt; --msg load-metadata --verifier-hex &lt;public key&gt; --payload sign_me_load_metadata_westendV9200 --signature-hex &lt;signature&gt;</code></p>
+<p>Here <code>&lt;signature&gt;</code> is hexadecimal signature generated for the contents of
+the payload file for <code>&lt;public_key&gt;</code> using <code>&lt;encryption&gt;</code> algorithm.</p>
+<p>Output file is <code>load_metadata_westendV9200</code> in
+<a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.</p>
+<p>Example:</p>
+<p><code>$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier-hex 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a --payload sign_me_load_metadata_westendV9200 --signature-hex 125717599cd057bfe6db7b111274cbda796d2543467400110552fa1c62dc087a7acefb53b68716f1e34f8af6bf13ab45d70d50655fd39483c64f3f057418748a</code></p>
+<h5 id="make-for-test-verifier-alice"><a href="#make-for-test-verifier-alice"><code>make</code> for test verifier Alice</a></h5>
+<p>Payloads signed by Alice are used for testing in Vault. The signature
+in this case is generated automatically and is not supplied in command
+line.</p>
+<p><code>$ cargo run make --goal qr --crypto &lt;encryption&gt; --msg load-metadata --verifier Alice --payload sign_me_load_metadata_westendV9200</code>.</p>
+<p>Output file is <code>load_metadata_westendV9200_Alice-&lt;encryption&gt;</code> in
+<a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.</p>
+<p>Example:</p>
+<p><code>$ cargo run make --goal qr --crypto sr25519 --msg load-metadata --verifier Alice --payload sign_me_load_metadata_westendV9200</code></p>
+<h5 id="make-with-no-signature"><a href="#make-with-no-signature"><code>make</code> with no signature</a></h5>
+<p><code>$ cargo run make --goal qr --crypto none --msg load-metadata --payload sign_me_load_metadata_westendV9200</code></p>
+<p>Output file is <code>load_metadata_westendV9200_unverified</code> in
+<a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.</p>
+<p>Example:</p>
+<p><code>$ cargo run make --goal qr --crypto none --msg load-metadata --payload sign_me_load_metadata_westendV9200</code></p>
+<h5 id="sign"><a href="#sign"><code>sign</code></a></h5>
+<p>Here <code>&lt;hex_sufficient&gt;</code> is hex-encoded data from
+<a href="../definitions/crypto/enum.SufficientCrypto.html" title="enum definitions::crypto::SufficientCrypto"><code>SufficientCrypto</code></a> QR code produced
+by the Vault.</p>
+<p><code>$ cargo run sign --goal qr --sufficient-hex &lt;hex_sufficient&gt; --msg load-metadata --payload sign_me_load_metadata_westendV9200</code></p>
+<p>Output file is <code>load_metadata_westendV9200</code> in
+<a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.</p>
+<p>Example:</p>
+<p><code>$ cargo run sign --goal qr --sufficient-hex 0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47aceef7c58b5f952b6233b8aba5beb6f0000c8ca7f7cc16b7ada7cd45026fc3f3ec2289dd90dab0dfac38dfe3be843231443ddd30a3f3bbabb5cefcd2bbcef908c --msg load-metadata --payload sign_me_load_metadata_westendV9200</code></p>
+<h3 id="remove-a-single-metadata-entry-from-the-metatree"><a href="#remove-a-single-metadata-entry-from-the-metatree">Remove a single metadata entry from the <code>METATREE</code></a></h3>
+<p><code>$ cargo run remove --name &lt;network_name&gt; --version &lt;metadata_version&gt;</code></p>
+<p>Removes only the specified entry from the <a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a>.</p>
+<p>The entry in <a href="../constants/constant.META_HISTORY.html" title="constant constants::META_HISTORY"><code>META_HISTORY</code></a> remains. Should the
+same metadata version be retrieved afterwards, the <code>META_HISTORY</code> entry will
+be updated to a block hash from more recent fetch, as the metadata from
+old block saved in the database would not be necessarily the same as the one
+being recorded in the database now.</p>
+<h3 id="remove-all-data-associated-with-a-network"><a href="#remove-all-data-associated-with-a-network">Remove all data associated with a network</a></h3>
+<p><code>$ cargo run remove --title &lt;address_book_title&gt;</code></p>
+<p>This will remove:</p>
+<ul>
+<li>address book entry
+<a href="../definitions/metadata/struct.AddressBookEntry.html" title="struct definitions::metadata::AddressBookEntry"><code>AddressBookEntry</code></a> from
+<a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a> tree</li>
+<li>network specs
+<a href="../definitions/network_specs/struct.NetworkSpecs.html" title="struct definitions::network_specs::NetworkSpecs"><code>NetworkSpecs</code></a>
+from <a href="../constants/constant.SPECSTREEPREP.html" title="constant constants::SPECSTREEPREP"><code>SPECSTREEPREP</code></a> tree</li>
+<li>all associated metadata entries from <a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a>
+if there are no other address book entries this metadata is associated
+with</li>
+<li>all associated meta block history entries from
+<a href="../constants/constant.META_HISTORY.html" title="constant constants::META_HISTORY"><code>META_HISTORY</code></a> if there are no other address book
+entries this block history entries are associated with</li>
+</ul>
+<h3 id="restore-hot-database-to-default-state"><a href="#restore-hot-database-to-default-state">Restore hot database to default state</a></h3>
+<p><code>$ cargo run restore-defaults</code></p>
+<p>Removes old hot database and generates new one with default values at
+default path <a href="../constants/constant.HOT_DB_NAME.html" title="constant constants::HOT_DB_NAME"><code>HOT_DB_NAME</code></a>.</p>
+<p>By default, hot database contains:</p>
+<ul>
+<li><a href="../constants/constant.ADDRESS_BOOK.html" title="constant constants::ADDRESS_BOOK"><code>ADDRESS_BOOK</code></a> entries for default networks</li>
+<li><a href="../constants/constant.SPECSTREEPREP.html" title="constant constants::SPECSTREEPREP"><code>SPECSTREEPREP</code></a> entries for default networks</li>
+<li>types information in <a href="../constants/constant.SETTREE.html" title="constant constants::SETTREE"><code>SETTREE</code></a></li>
+<li><strong>no</strong> metadata entries in <a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a></li>
+<li><strong>no</strong> meta block history entries in
+<a href="../constants/constant.META_HISTORY.html" title="constant constants::META_HISTORY"><code>META_HISTORY</code></a></li>
+</ul>
+<p>Default networks are Polkadot, Kusama, and Westend.</p>
+<h3 id="generate-default-cold-release-database"><a href="#generate-default-cold-release-database">Generate default cold release database</a></h3>
+<p><code>$ cargo run make-cold-release &lt;optional path&gt;</code></p>
+<p>Removes old cold release database and generates new one with default values
+(unitiniated) at user-provided path or, if no valid path is given, at
+default path <a href="../constants/constant.COLD_DB_NAME_RELEASE.html" title="constant constants::COLD_DB_NAME_RELEASE"><code>COLD_DB_NAME_RELEASE</code></a>.</p>
+<p>By default, the uninitiated cold release database contains:</p>
+<ul>
+<li><a href="../constants/constant.SPECSTREE.html" title="constant constants::SPECSTREE"><code>SPECSTREE</code></a> entries for default networks</li>
+<li><a href="../constants/constant.VERIFIERS.html" title="constant constants::VERIFIERS"><code>VERIFIERS</code></a> entries for default networks, with
+verifiers set to the general one</li>
+<li>two latest metadata versions for default networks in
+<a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a></li>
+<li>default types information and clean danger status in
+<a href="../constants/constant.SETTREE.html" title="constant constants::SETTREE"><code>SETTREE</code></a></li>
+</ul>
+<p>Note that the general verifier is not specified and history is not
+started. This will be done only in Vault itself. Before initialization,
+the cold release database could not be used by Vault.</p>
+<h3 id="transfer-metadata-from-hot-database-to-cold-release-database"><a href="#transfer-metadata-from-hot-database-to-cold-release-database">Transfer metadata from hot database to cold release database</a></h3>
+<p><code>$ cargo run transfer_meta_to_cold_release &lt;optional path&gt;</code></p>
+<p>Metadata from hot database is transferred to cold release database at
+user-provided path or, if no valid path is given, at default path
+<a href="../constants/constant.COLD_DB_NAME_RELEASE.html" title="constant constants::COLD_DB_NAME_RELEASE"><code>COLD_DB_NAME_RELEASE</code></a>.</p>
+<p>Metadata is transferred only for the networks that are known to the cold
+database, i.e. the ones having
+<a href="../definitions/network_specs/struct.OrderedNetworkSpecs.html" title="struct definitions::network_specs::OrderedNetworkSpecs"><code>OrderedNetworkSpecs</code></a> entry in
+<a href="../constants/constant.SPECSTREE.html" title="constant constants::SPECSTREE"><code>SPECSTREE</code></a>.</p>
+<h3 id="make-derivations-import-qr-andor-hexadecimal-string-file"><a href="#make-derivations-import-qr-andor-hexadecimal-string-file">Make derivations import QR and/or hexadecimal string file</a></h3>
+<p><code>$ cargo run derivations --goal &lt;GOAL&gt; --title &lt;TITLE&gt; --derivations &lt;DERIVATIONS&gt;</code></p>
+<p>Keys to be used in command line:</p>
+<ul>
+<li>
+<p><code>&lt;GOAL&gt;</code>: <code>qr</code> will generate only apng QR code, <code>text</code>
+will generate only text file with hex-encoded update. By default, i.e. if
+content key is not provided, both QR code and text file are generated.
+<code>&lt;optional_target_key&gt;</code> is expected immediately after <code>derivations</code> command,
+if at all; keys to follow could go in any order, but with argument
+immediately following the key.</p>
+</li>
+<li>
+<p>Key <code>--derivations</code> followed by file path in <code>/generate_message/</code> folder.
+File with derivations contains valid derivations, each on its own line. Only
+suitable derivations will be processed. Processed derivations are also
+printed for user to check.</p>
+</li>
+<li>
+<p>Key <code>--title</code> followed by network address book title, to indicate to
+which network the derivations belong.</p>
+</li>
+</ul>
+<p>Output file is in <code>/generate_message/</code> folder, file name would be
+<code>derivations-&lt;address_book_title&gt;</code>.</p>
+<h3 id="prepare-payload-for-load_metadata-update-from-wasm-file"><a href="#prepare-payload-for-load_metadata-update-from-wasm-file">Prepare payload for <code>load_metadata</code> update from <code>.wasm</code> file</a></h3>
+<p><code>$ cargo run unwasm [OPTIONS] --filename &lt;FILENAME&gt;</code></p>
+<p>This command extracts metadata from <code>.wasm</code> file and uses this metadata to
+produce <code>load_metadata</code> update payload. Only networks with network specs
+entries in the hot database could be processed with <code>unwasm</code> command, since
+the <code>load_metadata</code> update payload in addition to metadata requires also
+network genesis hash. <code>unwasm</code> command could be used to generate update QR
+codes before the metadata becomes accessible from the node.</p>
+<p>Network name found in the metadata is used to find
+<a href="../definitions/network_specs/struct.NetworkSpecs.html" title="struct definitions::network_specs::NetworkSpecs"><code>NetworkSpecs</code></a> for
+the network. <code>NetworkSpecs</code> are used to get genesis hash and to check
+base58 prefix, it the network metadata has base58 prefix inside.</p>
+<p>A raw bytes update payload file is generated in dedicated
+<a href="../constants/constant.FOLDER.html" title="constant constants::FOLDER"><code>FOLDER</code></a> to (optionally) be signed and later be
+transformed into <code>load_metadata</code> update QR. Update payload file name is
+<code>sign_me_load_metadata_&lt;network_name&gt;V&lt;version&gt;</code>.</p>
+<p>By default, metadata extracted from <code>.wasm</code> file is added to the database.
+Optional <code>-d</code> key could be used is database should <strong>not</strong> be updated.
+If the metadata gets entered in the database (i.e. no <code>-d</code> key used),
+<a href="../constants/constant.META_HISTORY.html" title="constant constants::META_HISTORY"><code>META_HISTORY</code></a> gets no entry. Block hash will be
+added if the same metadata is later fetched from a node.</p>
+<h3 id="make-metadata-file-for-defaults-release-metadata-set"><a href="#make-metadata-file-for-defaults-release-metadata-set">Make metadata file for <code>defaults</code> release metadata set</a></h3>
+<p><code>$ cargo run  meta-default-file --name &lt;NETWORK NAME&gt; --version &lt;NETWORK VERSION&gt;</code></p>
+<p>Produces file with hex-encoded network metadata from the hot database
+<a href="../constants/constant.METATREE.html" title="constant constants::METATREE"><code>METATREE</code></a> entry.</p>
+<p>Output file named <code>&lt;network_name&gt;&lt;metadata_version&gt;</code> is generated in
+dedicated <a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>. It contains
+hexadecimal network metadata.</p>
+<h4 id="example-2"><a href="#example-2">Example</a></h4>
+<p><code>$ cargo run meta-default-file --name westend --version 9230</code></p>
+<h3 id="make-file-with-hexadecimal-network-metadata-fetched-for-specific-block-hash-from-provided-address"><a href="#make-file-with-hexadecimal-network-metadata-fetched-for-specific-block-hash-from-provided-address">Make file with hexadecimal network metadata fetched for specific block hash from provided address</a></h3>
+<p><code>$ cargo run meta-at-block --url &lt;RPC URL&gt; --block-hash &lt;BLOCK HASH&gt;</code></p>
+<p>Output file named <code>&lt;network_name&gt;&lt;metadata_version&gt;_&lt;block_hash&gt;</code> is
+generated in dedicated <a href="../constants/constant.EXPORT_FOLDER.html" title="constant constants::EXPORT_FOLDER"><code>EXPORT_FOLDER</code></a>.
+It contains hexadecimal network metadata.</p>
+<p>This command does not address or update the hot database.</p>
+<h4 id="example-3"><a href="#example-3">Example</a></h4>
+<p><code>$ cargo run meta-at-block --url wss://westend-rpc.polkadot.io --block 780812df50c4006d1865742269fe4ca339c097e61d6279cce91ebc58f5aebada</code></p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="fetch_metadata/index.html" title="mod generate_message::fetch_metadata">fetch_metadata</a></div><div class="desc docblock-short">Fetch network information from a node using RPC calls</div></li><li><div class="item-name"><a class="mod" href="helpers/index.html" title="mod generate_message::helpers">helpers</a></div><div class="desc docblock-short">Helpers</div></li><li><div class="item-name"><a class="mod" href="interpret_specs/index.html" title="mod generate_message::interpret_specs">interpret_specs</a></div><div class="desc docblock-short">Fit network properties fetched via RPC call into data in expected format</div></li><li><div class="item-name"><a class="mod" href="parser/index.html" title="mod generate_message::parser">parser</a></div><div class="desc docblock-short">Command line parser for the client</div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Error.html" title="enum generate_message::Error">Error</a></div><div class="desc docblock-short">Generate Message error.</div></li></ul><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.full_run.html" title="fn generate_message::full_run">full_run</a></div><div class="desc docblock-short">Process incoming command as interpreted by parser.</div></li></ul><h2 id="types" class="small-section-header"><a href="#types">Type Aliases</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.Result.html" title="type generate_message::Result">Result</a></div><div class="desc docblock-short">Generate Message result.</div></li></ul></section></div></main></body></html>

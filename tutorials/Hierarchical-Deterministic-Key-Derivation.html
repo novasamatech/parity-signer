@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Hierarchical-Deterministic-Key-Derivation - Polkadot-Vault</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> About Polkadot Vault</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../about/FAQ.html"><strong aria-hidden="true">1.1.</strong> FAQ</a></li><li class="chapter-item expanded "><a href="../about/Security-And-Privacy.html"><strong aria-hidden="true">1.2.</strong> Security-And-Privacy</a></li><li class="chapter-item expanded "><a href="../tutorials/Hierarchical-Deterministic-Key-Derivation.html" class="active"><strong aria-hidden="true">1.3.</strong> Hierarchical-Deterministic-Key-Derivation</a></li><li class="chapter-item expanded "><a href="../about/Changelog.html"><strong aria-hidden="true">1.4.</strong> Changelog</a></li></ol></li><li class="chapter-item expanded "><a href="../tutorials/SUMMARY.html"><strong aria-hidden="true">2.</strong> User Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../tutorials/Start.html"><strong aria-hidden="true">2.1.</strong> Start</a></li><li class="chapter-item expanded "><a href="../tutorials/Upgrading.html"><strong aria-hidden="true">2.2.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../tutorials/Add-New-Network.html"><strong aria-hidden="true">2.3.</strong> Add New Network</a></li><li class="chapter-item expanded "><a href="../tutorials/Kusama-tutorial.html"><strong aria-hidden="true">2.4.</strong> Kusama-tutorial</a></li><li class="chapter-item expanded "><a href="../tutorials/Recover-Account-Polkadotjs.html"><strong aria-hidden="true">2.5.</strong> Recover-Account-Polkadotjs</a></li></ol></li><li class="chapter-item expanded "><a href="../development/Development.html"><strong aria-hidden="true">3.</strong> Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../development/Build.html"><strong aria-hidden="true">3.1.</strong> Build</a></li><li class="chapter-item expanded "><a href="../development/Vault-Structure.html"><strong aria-hidden="true">3.2.</strong> Vault structure</a></li><li class="chapter-item expanded "><a href="../development/Troubleshooting.html"><strong aria-hidden="true">3.3.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../development/Rustdocs.html"><strong aria-hidden="true">3.4.</strong> Rust docs</a></li><li class="chapter-item expanded "><a href="../development/UOS.html"><strong aria-hidden="true">3.5.</strong> Universal offline signature</a></li><li class="chapter-item expanded "><a href="../development/Ecosystem.html"><strong aria-hidden="true">3.6.</strong> Vault ecosystem</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Polkadot-Vault</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="polkadot-vault-accounts-management"><a class="header" href="#polkadot-vault-accounts-management">Polkadot Vault Accounts Management</a></h1>
+<p>Polkadot Vault <code>v4</code> has introduced the Hierarchical Deterministic Key Derivation (HDKD) feature for Substrate networks. This article explains how to use this feature.</p>
+<ul>
+<li>Notice: The UI may be variant for different versions, but the functionalities are the same in <code>v4</code> version.</li>
+</ul>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>Seed is the starting point for generating accounts. The seed itself does not have any network affiliation. For Substrate networks, generating a new accounts means entering a derivation path and choosing a network. With this feature, you can manage as many accounts as needed with just one seed phrase safely stored.</p>
+<h2 id="key-generation"><a class="header" href="#key-generation">Key Generation</a></h2>
+<h3 id="create-an-account-for-a-substrate-based-network"><a class="header" href="#create-an-account-for-a-substrate-based-network">Create an account for a Substrate based network.</a></h3>
+<p>Key generation also refers to accounts creation, with your created Identity:</p>
+<ul>
+<li>Go to key manager and create a new seed or select an existing one</li>
+<li>Choose a network</li>
+<li>Tap on any key</li>
+<li>Tap <code>Derive</code> or <code>N+1</code> Button</li>
+<li>In path derivation screen, input any path and name you like (or accept naming suggestion)</li>
+<li>(optional) type password</li>
+<li>Tap <code>Derive</code> Button</li>
+<li>Done, you can start using new address.</li>
+</ul>
+<h3 id="the-form-of-path"><a class="header" href="#the-form-of-path">The form of path</a></h3>
+<p>Paths also refer to the chain codes which described in <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki/"></a>, though it is different from BIP-32 style:</p>
+<ul>
+<li><strong>Soft</strong> derivation starts with a single slash, like: <code>/soft</code></li>
+<li><strong>Hard</strong> derivation starts with a double slash, like: <code>//hard</code></li>
+</ul>
+<p>Users are able to create any combination of hard derivation with <code>//</code> and/or soft derivation with <code>/</code>.</p>
+<p>The encoded string are limited to 32 Bytes.</p>
+<p>For technical information about the soft and hard derivations on Substrate, please refer to introduction <a href="https://github.com/paritytech/parity-signer/wiki/HDKD-on-Parity-Signer#hdkd-general-on-substrate">here</a>.</p>
+<p>Path also could contain optional <strong>password</strong>; in Subkey standard password is prefixed with <code>///</code>. However, for convenience, Vault device has separate password entry field with password confirmation, thus do not add <code>///</code> to derivation field, it will result in error - instead omit <code>///</code> and type password into its' special field. It will not be stored on the device and will be required for any operation that requires private key of the account. There is no way to restore this password if it is lost so please back it up carefully.</p>
+<h3 id="further-notes"><a class="header" href="#further-notes">Further notes</a></h3>
+<ul>
+<li>With the same <code>BIP32</code> seed users could create keys under different networks.</li>
+<li>Each derived account is bound to certain networks, which prevents it to be misused in another network until it is explicitly added for that network as well. Root account is available for all networks by default.</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References:</a></h2>
+<ol>
+<li><a href="https://github.com/w3f/schnorrkel"><a href="https://github.com/w3f/schnorrkel">https://github.com/w3f/schnorrkel</a></a></li>
+<li><a href="https://wiki.polkadot.network/docs/en/learn-keys"><a href="https://wiki.polkadot.network/docs/en/learn-keys">https://wiki.polkadot.network/docs/en/learn-keys</a></a></li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../about/Security-And-Privacy.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../about/Changelog.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../about/Security-And-Privacy.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../about/Changelog.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script>
+            window.playground_line_numbers = true;
+        </script>
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js"></script>
+        <script src="../editor.js"></script>
+        <script src="../mode-rust.js"></script>
+        <script src="../theme-dawn.js"></script>
+        <script src="../theme-tomorrow_night.js"></script>
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>
