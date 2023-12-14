@@ -608,6 +608,23 @@ fn validate_key_password(
         .map_err(|e| e.into())
 }
 
+/// Create Banana Split shares from secret
+fn bs_encrypt(
+    secret: &str,
+    title: &str,
+    passphrase: &str,
+    total_shards: u32,
+    required_shards: u32,
+) -> Result<Vec<QrData>, ErrorDisplayed> {
+    navigator::banana_split_encode(secret, title, passphrase, total_shards, required_shards)
+        .map_err(|e| ErrorDisplayed::from(e.to_string()))
+}
+
+/// Generate Banana Split passphrase
+fn bs_generate_passphrase(n: u32) -> String {
+    navigator::banana_split_passphrase(n)
+}
+
 fn sign_metadata_with_key(
     network_key: &str,
     metadata_specs_version: &str,
