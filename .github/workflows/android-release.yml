@@ -141,7 +141,7 @@ jobs:
           keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
 
       - name: Upload Gplay release APKs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: signer-release-signed
           path: |
