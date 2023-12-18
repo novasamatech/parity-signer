@@ -9,6 +9,7 @@ import Combine
 import LocalAuthentication
 import UIKit
 
+// sourcery: AutoMockable
 protocol LAContextProtocol {
     func canEvaluatePolicy(_ policy: LAPolicy, error: NSErrorPointer) -> Bool
 }

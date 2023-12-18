@@ -7,6 +7,7 @@
 
 import Foundation
 
+// sourcery: AutoMockable
 /// Protocol reflecting `FileManager` functionality
 protocol FileManagingProtocol: AnyObject {
     /// Returns a Boolean value that indicates whether a file or directory exists at a specified path.

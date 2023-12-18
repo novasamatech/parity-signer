@@ -7,6 +7,20 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol ImportDerivedKeysServicing: AnyObject {
+    func importDerivedKeys(
+        _ seedPreviews: [SeedKeysPreview],
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+    func updateWithSeeds(
+        _ seedPreviews: [SeedKeysPreview],
+        completion: @escaping (Result<[SeedKeysPreview], ServiceError>) -> Void
+    )
+}
+
+extension ImportDerivedKeysService: ImportDerivedKeysServicing {}
+
 final class ImportDerivedKeysService {
     private let seedsMediator: SeedsMediating
     private let backendService: BackendService

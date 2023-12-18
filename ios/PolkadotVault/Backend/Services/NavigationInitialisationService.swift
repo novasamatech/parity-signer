@@ -7,6 +7,16 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol NavigationInitialisationServicing: AnyObject {
+    func initialiseNavigation(
+        verifierRemoved: Bool,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+}
+
+extension NavigationInitialisationService: NavigationInitialisationServicing {}
+
 final class NavigationInitialisationService {
     private let seedsMediator: SeedsMediating
     private let databaseMediator: DatabaseMediating
@@ -22,7 +32,7 @@ final class NavigationInitialisationService {
         self.seedsMediator = seedsMediator
     }
 
-    func initialiseNavigation(verifierRemoved: Bool, completion: @escaping (Result<Void, ServiceError>) -> Void) {
+    func initialiseNavigation(verifierRemoved: Bool, _ completion: @escaping (Result<Void, ServiceError>) -> Void) {
         backendService.performCall({
             try initNavigation(
                 dbname: self.databaseMediator.databaseName,

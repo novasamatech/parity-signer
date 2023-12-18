@@ -7,6 +7,24 @@
 
 import Foundation
 
+// sourcery: AutoMockable
+protocol LogsServicing: AnyObject {
+    func getLogs(_ completion: @escaping (Result<MLog, ServiceError>) -> Void)
+    func getLogDetails(
+        _ logIndex: UInt32,
+        _ completion: @escaping (Result<MLogDetails, ServiceError>) -> Void
+    )
+    func cleaLogHistory(
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+    func addCommentToLogs(
+        _ userComment: String,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
+}
+
+extension LogsService: LogsServicing {}
+
 final class LogsService {
     private let backendService: BackendService
 

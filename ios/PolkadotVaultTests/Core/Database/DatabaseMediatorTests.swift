@@ -100,14 +100,14 @@ final class DatabaseMediatorTests: XCTestCase {
         subject.wipeDatabase()
 
         // Then
-        XCTAssertEqual(fileManager.removeItemAtCallsCount, 1)
-        XCTAssertEqual(fileManager.removeItemAtReceivedPath, [expectedPathUrl.path])
+        XCTAssertEqual(fileManager.removeItemAtPathCallsCount, 1)
+        XCTAssertEqual(fileManager.removeItemAtPathReceivedPath, [expectedPathUrl.path])
     }
 
     func test_wipeDatabase_whenRemoveItemThrowsError_returnsFalse() {
         // Given
         fileManager.urlForInAppropriateForCreateThrowableError = nil
-        fileManager.removeItemAtThrowableError = ErrorMock.unknown
+        fileManager.removeItemAtPathThrowableError = ErrorMock.unknown
 
         // When
         let result = subject.wipeDatabase()
@@ -239,90 +239,5 @@ final class DatabaseMediatorTests: XCTestCase {
 
         // Then
         XCTAssertTrue(result)
-    }
-}
-
-// MARK: - Mocks
-
-final class FileManagingProtocolMock: FileManagingProtocol {
-    var fileExistsAtPathCallsCount = 0
-    var fileExistsAtPathReceivedPath: [String] = []
-    var fileExistsAtPathReturnValue: Bool!
-    var removeItemAtCallsCount = 0
-    var removeItemAtThrowableError: Error?
-    var removeItemAtReceivedURL: [URL] = []
-    var removeItemAtReceivedPath: [String] = []
-    var copyItemAtToCallsCount = 0
-    var copyItemAtToThrowableError: Error?
-    var copyItemAtToReceivedSrcURL: [URL] = []
-    var copyItemAtToReceivedDstURL: [URL] = []
-    var urlForInAppropriateForCreateCallsCount = 0
-    var urlForInAppropriateForCreateThrowableError: Error?
-    var urlForInAppropriateForCreateReceivedDirectory: [FileManager.SearchPathDirectory] = []
-    var urlForInAppropriateForCreateReceivedDomain: [FileManager.SearchPathDomainMask] = []
-    var urlForInAppropriateForCreateReceivedUrl: [URL?] = []
-    var urlForInAppropriateForCreateReceivedShouldCreate: [Bool] = []
-    var urlForInAppropriateForCreateReturnValue: URL!
-
-    func fileExists(atPath path: String) -> Bool {
-        fileExistsAtPathCallsCount += 1
-        fileExistsAtPathReceivedPath.append(path)
-        return fileExistsAtPathReturnValue
-    }
-
-    func removeItem(at URL: URL) throws {
-        removeItemAtCallsCount += 1
-        removeItemAtReceivedURL.append(URL)
-        if let error = removeItemAtThrowableError {
-            throw error
-        }
-    }
-
-    func removeItem(atPath path: String) throws {
-        removeItemAtCallsCount += 1
-        removeItemAtReceivedPath.append(path)
-        if let error = removeItemAtThrowableError {
-            throw error
-        }
-    }
-
-    func copyItem(at srcURL: URL, to dstURL: URL) throws {
-        copyItemAtToCallsCount += 1
-        copyItemAtToReceivedSrcURL.append(srcURL)
-        copyItemAtToReceivedDstURL.append(dstURL)
-        if let error = copyItemAtToThrowableError {
-            throw error
-        }
-    }
-
-    func url(
-        for directory: FileManager.SearchPathDirectory,
-        in domain: FileManager.SearchPathDomainMask,
-        appropriateFor url: URL?,
-        create shouldCreate: Bool
-    ) throws -> URL {
-        urlForInAppropriateForCreateCallsCount += 1
-        urlForInAppropriateForCreateReceivedDirectory.append(directory)
-        urlForInAppropriateForCreateReceivedDomain.append(domain)
-        urlForInAppropriateForCreateReceivedUrl.append(url)
-        urlForInAppropriateForCreateReceivedShouldCreate.append(shouldCreate)
-        if let error = urlForInAppropriateForCreateThrowableError {
-            throw error
-        }
-        return urlForInAppropriateForCreateReturnValue
-    }
-}
-
-final class BundleProtocolMock: BundleProtocol {
-    var urlForResourceWithExtensionCallsCount = 0
-    var urlForResourceWithExtensionReceivedName: [String?] = []
-    var urlForResourceWithExtensionReceivedExt: [String?] = []
-    var urlForResourceWithExtensionReturnValue: URL?
-
-    func url(forResource name: String?, withExtension ext: String?) -> URL? {
-        urlForResourceWithExtensionCallsCount += 1
-        urlForResourceWithExtensionReceivedName.append(name)
-        urlForResourceWithExtensionReceivedExt.append(ext)
-        return urlForResourceWithExtensionReturnValue
     }
 }

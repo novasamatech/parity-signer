@@ -10,15 +10,15 @@ import Foundation
 import XCTest
 
 final class KeychainAccessAdapterTests: XCTestCase {
-    private var keychainQueryProviderMock: KeychainQueryProviderMock!
-    private var accessControlProviderMock: AccessControlProviderMock!
+    private var keychainQueryProviderMock: KeychainQueryProvidingMock!
+    private var accessControlProviderMock: AccessControlProvidingMock!
     private var keychainService: KeychainServiceMock!
     private var keychainAccessAdapter: KeychainAccessAdapter!
 
     override func setUp() {
         super.setUp()
-        keychainQueryProviderMock = KeychainQueryProviderMock()
-        accessControlProviderMock = AccessControlProviderMock()
+        keychainQueryProviderMock = KeychainQueryProvidingMock()
+        accessControlProviderMock = AccessControlProvidingMock()
         keychainService = KeychainServiceMock()
         keychainAccessAdapter = KeychainAccessAdapter(
             keychainService: keychainService,
@@ -39,7 +39,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         keychainService.copyMatchingReturnValue = errSecSuccess
         let seedData: [[String: Any]] = [[kSecAttrAccount as String: "Seed1"], [kSecAttrAccount as String: "Seed2"]]
         keychainService.copyMatchingData = seedData as CFTypeRef
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.fetchSeedNames()
@@ -57,7 +57,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testFetchSeedNames_EmptyResult() {
         // Given
         keychainService.copyMatchingReturnValue = errSecSuccess
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
         keychainService.copyMatchingData = [] as CFTypeRef
 
         // When
@@ -76,7 +76,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testFetchSeedNames_Failure() {
         // Given
         keychainService.copyMatchingReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.fetchSeedNames()
@@ -93,13 +93,13 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testSaveSeed_Successful() {
         // Given
         keychainService.addReturnValue = errSecSuccess
-        accessControlProviderMock.accessControlToReturn = SecAccessControlCreateWithFlags(
+        accessControlProviderMock.accessControlReturnValue = SecAccessControlCreateWithFlags(
             nil,
             kSecAttrAccessibleWhenUnlocked,
             .privateKeyUsage,
             nil
         )
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.saveSeed(with: "SeedName", seedPhrase: Data("seedPhrase".utf8))
@@ -114,13 +114,13 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testSaveSeed_FailureKeychainIssue() {
         // Given
         keychainService.addReturnValue = errSecAuthFailed
-        accessControlProviderMock.accessControlToReturn = SecAccessControlCreateWithFlags(
+        accessControlProviderMock.accessControlReturnValue = SecAccessControlCreateWithFlags(
             nil,
             kSecAttrAccessibleWhenUnlocked,
             .privateKeyUsage,
             nil
         )
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.saveSeed(with: "SeedName", seedPhrase: Data("seedPhrase".utf8))
@@ -134,7 +134,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
 
     func testSaveSeed_FailureAccessControlNotAvailable() {
         // Given
-        accessControlProviderMock.accessControlToThrow = KeychainError.accessControlNotAvailable
+        accessControlProviderMock.accessControlThrowableError = KeychainError.accessControlNotAvailable
 
         // When
         let result = keychainAccessAdapter.saveSeed(with: "SeedName", seedPhrase: Data("seedPhrase".utf8))
@@ -152,7 +152,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         let expectedSeed = "seedPhrase"
         keychainService.copyMatchingReturnValue = errSecSuccess
         keychainService.copyMatchingData = expectedSeed.data(using: .utf8) as CFTypeRef?
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
@@ -171,7 +171,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedName = "SeedName"
         keychainService.copyMatchingReturnValue = errSecItemNotFound
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
@@ -190,7 +190,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedName = "SeedName"
         keychainService.copyMatchingReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeed(with: seedName)
@@ -211,7 +211,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         ]
         keychainService.copyMatchingReturnValue = errSecSuccess
         keychainService.copyMatchingData = seedData as CFTypeRef?
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeeds(with: seedNamesToFetch)
@@ -233,7 +233,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         let seedNamesToFetch = Set(["Seed1", "Seed2"])
         keychainService.copyMatchingReturnValue = errSecSuccess
         keychainService.copyMatchingData = [] as CFTypeRef?
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeeds(with: seedNamesToFetch)
@@ -252,7 +252,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedNamesToFetch = Set(["Seed1", "Seed2"])
         keychainService.copyMatchingReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.retrieveSeeds(with: seedNamesToFetch)
@@ -268,7 +268,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedName = "SeedName"
         keychainService.deleteReturnValue = errSecSuccess
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
@@ -287,7 +287,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedName = "SeedName"
         keychainService.deleteReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
@@ -311,7 +311,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         let seedPhrase = Data("seedPhrase".utf8)
         keychainService.copyMatchingReturnValue = errSecSuccess
         keychainService.copyMatchingData = [seedPhrase] as CFTypeRef?
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.checkIfSeedPhraseAlreadyExists(seedPhrase: seedPhrase)
@@ -330,7 +330,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedPhrase = Data("seedPhrase".utf8)
         keychainService.copyMatchingReturnValue = errSecItemNotFound
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.checkIfSeedPhraseAlreadyExists(seedPhrase: seedPhrase)
@@ -349,7 +349,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Given
         let seedPhrase = Data("seedPhrase".utf8)
         keychainService.copyMatchingReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.checkIfSeedPhraseAlreadyExists(seedPhrase: seedPhrase)
@@ -364,7 +364,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testRemoveAllSeeds_WhenDeletionSuccessful_ReturnsTrue() {
         // Given
         keychainService.deleteReturnValue = errSecSuccess
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.removeAllSeeds()
@@ -377,7 +377,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testRemoveAllSeeds_WhenDeletionFails_ReturnsFalse() {
         // Given
         keychainService.deleteReturnValue = errSecAuthFailed
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.removeAllSeeds()
@@ -390,7 +390,7 @@ final class KeychainAccessAdapterTests: XCTestCase {
     func testRemoveAllSeeds_WhenItemNotFound_ReturnsTrue() {
         // Given
         keychainService.deleteReturnValue = errSecItemNotFound
-        keychainQueryProviderMock.queryReturnValue = [:] as CFDictionary
+        keychainQueryProviderMock.queryForReturnValue = [:] as CFDictionary
 
         // When
         let result = keychainAccessAdapter.removeAllSeeds()
@@ -398,35 +398,6 @@ final class KeychainAccessAdapterTests: XCTestCase {
         // Then
         XCTAssertEqual(keychainService.deleteCallsCount, 1)
         XCTAssertTrue(result)
-    }
-}
-
-// MARK: - Mocks
-
-final class KeychainQueryProviderMock: KeychainQueryProviding {
-    var queryCallsCount = 0
-    var queryReceivedQueryTypes: [KeychainQuery] = []
-    var queryReturnValue: CFDictionary!
-
-    func query(for queryType: KeychainQuery) -> CFDictionary {
-        queryCallsCount += 1
-        queryReceivedQueryTypes.append(queryType)
-        return queryReturnValue
-    }
-}
-
-final class AccessControlProviderMock: AccessControlProviding {
-    var accessControlCallsCount = 0
-    var accessControlToReturn: SecAccessControl?
-    var accessControlToThrow: Error!
-
-    func accessControl() throws -> SecAccessControl {
-        accessControlCallsCount += 1
-        if let accessControl = accessControlToReturn {
-            return accessControl
-        } else {
-            throw accessControlToThrow
-        }
     }
 }
 

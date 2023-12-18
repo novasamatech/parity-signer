@@ -38,8 +38,8 @@ extension ExportPrivateKeyViewModel {
     )
 }
 
-extension KeyDetailsPublicKeyViewModel {
-    static let stub: KeyDetailsPublicKeyViewModel = .init(
+extension KeyDetailsPublicKeyViewRenderable {
+    static let stub: KeyDetailsPublicKeyViewRenderable = .init(
         qrCodes: [Stubs.stubQRCode],
         footer: .stub,
         isKeyExposed: false,

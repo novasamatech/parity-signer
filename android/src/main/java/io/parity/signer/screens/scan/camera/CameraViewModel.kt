@@ -110,6 +110,7 @@ class CameraViewModel() : ViewModel() {
 					}
 					Trace.endSection()
 				}
+				Trace.endSection()
 			}
 			.addOnFailureListener {
 				Log.e("scanVM", "Scan failed " + it.message.toString())

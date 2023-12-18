@@ -714,6 +714,11 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     boolean validate_key_password([ByRef] string seed_name, [ByRef] string seed_phrase, [ByRef] string password);
+
+    string bs_generate_passphrase(u32 n);
+
+    [Throws=ErrorDisplayed]
+    sequence<QrData> bs_encrypt([ByRef] string secret, [ByRef] string title, [ByRef] string passphrase, u32 total_shards, u32 required_shards);
 };
 
 dictionary MKeysNew {
