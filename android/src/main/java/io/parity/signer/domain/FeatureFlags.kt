@@ -11,7 +11,6 @@ object FeatureFlags {
 			FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT -> false
 			FeatureOption.SKIP_ROOTED_CHECK_EMULATOR -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
-			FeatureOption.ENABLE_DYNAMIC_DERIVATIONS -> true // enable for debug only
 			FeatureOption.FAIL_DB_VERSION_CHECK -> false
 
 		}
@@ -23,7 +22,6 @@ object FeatureFlags {
 
 enum class FeatureOption {
 	FAIL_DB_VERSION_CHECK,
-	ENABLE_DYNAMIC_DERIVATIONS,
 	SKIP_UNLOCK_FOR_DEVELOPMENT,
 	SKIP_ROOTED_CHECK_EMULATOR,
 	EXPORT_SECRET_KEY; //unused as sample

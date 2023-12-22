@@ -139,31 +139,13 @@ class CameraViewModel() : ViewModel() {
 				}
 
 				is DecodeSequenceResult.DynamicDerivations -> {
-					if (FeatureFlags.isEnabled(FeatureOption.ENABLE_DYNAMIC_DERIVATIONS)) {
-						resetScanValues()
-						_dynamicDerivationPayload.value = payload.s
-					} else {
-						val context = ServiceLocator.appContext
-						Toast.makeText(
-							context,
-							"Dynamic derivations not supported yet",
-							Toast.LENGTH_LONG
-						).show()
-					}
+					resetScanValues()
+					_dynamicDerivationPayload.value = payload.s
 				}
 
 				is DecodeSequenceResult.DynamicDerivationTransaction -> {
-					if (FeatureFlags.isEnabled(FeatureOption.ENABLE_DYNAMIC_DERIVATIONS)) {
-						resetScanValues()
-						_dynamicDerivationTransactionPayload.value = payload.s
-					} else {
-						val context = ServiceLocator.appContext
-						Toast.makeText(
-							context,
-							"Dynamic derivations not supported yet",
-							Toast.LENGTH_LONG
-						).show()
-					}
+					resetScanValues()
+					_dynamicDerivationTransactionPayload.value = payload.s
 				}
 			}
 
