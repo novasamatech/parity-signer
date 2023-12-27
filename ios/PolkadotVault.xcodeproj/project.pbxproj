@@ -2772,7 +2772,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.3.0;
+				MARKETING_VERSION = 6.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2808,7 +2808,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.3.0;
+				MARKETING_VERSION = 6.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2851,7 +2851,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				INFOPLIST_FILE = PolkadotVaultTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2950,7 +2950,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 6.3.0;
+				MARKETING_VERSION = 6.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
