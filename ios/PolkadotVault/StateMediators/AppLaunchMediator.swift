@@ -8,7 +8,10 @@
 import Foundation
 
 protocol AppLaunchMediating: AnyObject {
-    func finaliseInitialisation(_ completion: @escaping (Result<Void, ServiceError>) -> Void)
+    func finaliseInitialisation(
+        _ isConnected: Bool,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    )
 }
 
 final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
@@ -26,9 +29,12 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
         self.backendService = backendService
     }
 
-    func finaliseInitialisation(_ completion: @escaping (Result<Void, ServiceError>) -> Void) {
+    func finaliseInitialisation(
+        _ isConnected: Bool,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    ) {
         if databaseMediator.isDatabaseAvailable() {
-            initialiseOnboardedUserRun(completion)
+            initialiseOnboardedUserRun(isConnected, completion)
         } else {
             initialiseFirstRun(completion)
         }
@@ -40,10 +46,16 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
         completion(.success(()))
     }
 
-    private func initialiseOnboardedUserRun(_ completion: @escaping (Result<Void, ServiceError>) -> Void) {
+    private func initialiseOnboardedUserRun(
+        _ isConnected: Bool,
+        _ completion: @escaping (Result<Void, ServiceError>) -> Void
+    ) {
         seedsMediator.refreshSeeds()
         backendService.performCall({
             try initNavigation(dbname: self.databaseMediator.databaseName, seedNames: self.seedsMediator.seedNames)
+            if isConnected {
+                try? historyDeviceWasOnline()
+            }
         }, completion: completion)
     }
 }

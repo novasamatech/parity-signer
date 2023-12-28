@@ -117,7 +117,7 @@ extension LogNoteModal {
                 case .success:
                     isPresented = false
                 case let .failure(error):
-                    presentableError = .init(title: error.description)
+                    presentableError = .alertError(message: error.description)
                     isPresentingError = true
                 }
             }

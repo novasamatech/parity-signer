@@ -94,7 +94,7 @@ extension MainScreenContainer {
 
 private extension MainScreenContainer.ViewModel {
     func initialiseAppRun() {
-        appLaunchMediator.finaliseInitialisation { result in
+        appLaunchMediator.finaliseInitialisation(connectivityMediator.isConnectivityOn) { result in
             switch result {
             case .success:
                 self.checkInitialState()
