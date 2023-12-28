@@ -99,13 +99,17 @@ extension LogsListView {
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
         private let logsService: LogsService
+        private let devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol
         private let renderableBuilder: LogEntryRenderableBuilder
 
         init(
             logsService: LogsService = LogsService(),
+            devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol = ServiceLocator
+                .devicePasscodeAuthenticator,
             renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
         ) {
             self.logsService = logsService
+            self.devicePasscodeAuthenticator = devicePasscodeAuthenticator
             self.renderableBuilder = renderableBuilder
         }
 
@@ -117,7 +121,7 @@ extension LogsListView {
                     self.logs = logs
                     renderables = renderableBuilder.build(logs)
                 case let .failure(error):
-                    presentableError = .init(title: error.description)
+                    presentableError = .alertError(message: error.description)
                     isPresentingError = true
                 }
             }
@@ -148,7 +152,7 @@ extension LogsListView {
                     isPresentingDetails = true
                 case let .failure(error):
                     selectedDetails = nil
-                    presentableError = .init(title: error.description)
+                    presentableError = .alertError(message: error.description)
                     isPresentingError = true
                 }
             }
@@ -159,13 +163,14 @@ extension LogsListView {
         }
 
         func clearLogsAction() {
+            guard devicePasscodeAuthenticator.authenticateUser() else { return }
             logsService.cleaLogHistory { [weak self] result in
                 guard let self else { return }
                 switch result {
                 case .success:
                     loadData()
                 case let .failure(error):
-                    presentableError = .init(title: error.description)
+                    presentableError = .alertError(message: error.description)
                     isPresentingError = true
                 }
             }

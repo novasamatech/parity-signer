@@ -17,4 +17,5 @@ enum ServiceLocator {
     static var onboardingMediator: OnboardingMediator = OnboardingMediator()
 
     static var networkColorsGenerator = UnknownNetworkColorsGenerator()
+    static var devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol = DevicePasscodeAuthenticator()
 }
