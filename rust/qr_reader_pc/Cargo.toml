@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 hex = "0.4.3"
 qr_reader_phone = {path = "../qr_reader_phone"}
-anyhow = "1.0.75"
+anyhow = "1.0.78"
 image = "0.24.7"
 quircs = "0.10.1"
 indicatif = "0.17.7"
