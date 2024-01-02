@@ -86,6 +86,7 @@ fun WrongOsVersionNotificationScreen(
 			Text(
 				modifier = Modifier
 					.fillMaxWidth(1f),
+				//todo dmitry export and pass fields
 				text = "Current Oos version is 6.0 and minimal recommended is 7 due to known vulnerabilities of old OS versions.",
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyL,
