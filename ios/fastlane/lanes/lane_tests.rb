@@ -10,8 +10,7 @@ lane :test_build do |options|
     clean: true,
     scheme: scheme,
     device: "iPhone 15",
-    xcargs: "-skipPackagePluginValidation",
-    skip_package_dependencies_resolution: true,
+    xcargs: "-skipPackagePluginValidation -skipMacroValidation",
     output_directory: "./fastlane/test_output/"
   )
 end

@@ -35,7 +35,7 @@ lane :build_release do |options|
     scheme: scheme,
     output_name: output_name,
     configuration: configuration,
-    xcargs: "-skipPackagePluginValidation",
+    xcargs: "-skipPackagePluginValidation -skipMacroValidation",
     export_options: {
       method: export_method,
       provisioningProfiles: {
