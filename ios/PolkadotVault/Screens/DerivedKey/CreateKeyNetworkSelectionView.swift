@@ -213,6 +213,7 @@ extension CreateKeyNetworkSelectionView {
             .init(
                 seedName: seedName,
                 keySet: keySet,
+                // swiftlint: disable:next force_unwrapping
                 networkSelection: networkSelection!,
                 onComplete: onKeyCreationComplete
             )
