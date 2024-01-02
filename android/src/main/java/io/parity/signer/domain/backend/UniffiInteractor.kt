@@ -18,6 +18,7 @@ import io.parity.signer.uniffi.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import java.lang.RuntimeException
 
 /**
  * Wrapper for uniffi calls into rust. Made for centralized handling errors
@@ -365,6 +366,22 @@ fun <T> UniffiResult<T>.mapError(): T? {
 		is UniffiResult.Error -> {
 			submitErrorState("uniffi interaction exception $error")
 			null
+		}
+
+		is UniffiResult.Success -> {
+			result
+		}
+	}
+}
+
+/**
+ * Dangerous cast to non error so we can see a reason in crash logs
+ */
+@Deprecated("Handle error state")
+fun <T> UniffiResult<T>.mapErrorForce(): T {
+	return when (this) {
+		is UniffiResult.Error -> {
+			throw RuntimeException("uniffi interaction exception $error")
 		}
 
 		is UniffiResult.Success -> {
