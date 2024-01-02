@@ -8,6 +8,7 @@ import Foundation
 
 enum ApplicationRuntimeMode: String, Equatable {
     case production
+    // swiftlint: disable:next identifier_name
     case qa
     case debug
 }

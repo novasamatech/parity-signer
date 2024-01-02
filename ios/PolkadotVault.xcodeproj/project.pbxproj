@@ -2058,6 +2058,7 @@
 				6DDEF12B28AE5D8F004CA2FD /* PBXBuildRule */,
 			);
 			dependencies = (
+				6D5DB5F02B43F8A700EF82AB /* PBXTargetDependency */,
 			);
 			name = PolkadotVault;
 			packageProductDependencies = (
@@ -2636,6 +2637,10 @@
 			target = 2DE72BBD26A588C7002BB752 /* PolkadotVault */;
 			targetProxy = 2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */;
 		};
+		6D5DB5F02B43F8A700EF82AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6D5DB5EF2B43F8A700EF82AB /* SwiftLintPlugin */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -3051,7 +3056,7 @@
 			repositoryURL = "https://github.com/dagronf/QRCode";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 16.0.0;
+				minimumVersion = 17.0.0;
 			};
 		};
 		6DC1EF8B2AD55E4F009A2777 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
@@ -3059,12 +3064,17 @@
 			repositoryURL = "https://github.com/realm/SwiftLint/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.53.0;
+				minimumVersion = 0.54.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6D5DB5EF2B43F8A700EF82AB /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6DC1EF8B2AD55E4F009A2777 /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
 		6D749C5B2A6871BA0064D7E5 /* Blockies */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Blockies;
