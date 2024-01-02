@@ -161,7 +161,7 @@ private extension CameraService {
                     self.shutdown()
                 }
             }
-        } catch { }
+        } catch {}
     }
 }
 
