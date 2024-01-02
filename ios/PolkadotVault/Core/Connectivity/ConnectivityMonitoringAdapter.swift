@@ -41,6 +41,9 @@ final class ConnectivityMonitoringAdapter: ObservableObject, ConnectivityMonitor
             guard isConnected != self.isConnected else { return }
             self.isConnected = isConnected
             notificationQueue.async {
+                if isConnected {
+                    try? historyDeviceWasOnline()
+                }
                 update(isConnected)
             }
         }

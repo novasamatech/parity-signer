@@ -13,6 +13,7 @@ struct PolkadotVaultApp: App {
     @StateObject var navigation = NavigationCoordinator()
     @StateObject var jailbreakDetectionPublisher = JailbreakDetectionPublisher()
     @StateObject var applicationStatePublisher = ApplicationStatePublisher()
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         WindowGroup {
