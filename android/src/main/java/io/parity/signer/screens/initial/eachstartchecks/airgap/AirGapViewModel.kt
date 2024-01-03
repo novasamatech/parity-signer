@@ -27,16 +27,15 @@ class AirGapViewModel : ViewModel() {
 		AirGapScreenState(
 			airplaneModeEnabled = false,
 			wifiDisabled = false,
-			bluetoothDisabled = false
+			bluetoothDisabled = false,
+			isAdbDisabled = false,
+			isUsbDisconnected = false,
 		)
 	)
 	val state: StateFlow<AirGapScreenState> = _state.asStateFlow()
 
+	//todo dmitry update adb and usb checks
 	var scope: CoroutineScope? = null
-
-	fun onCableCheckboxClicked() {
-		_state.update { it.copy(cablesDisconnected = !_state.value.cablesDisconnected) }
-	}
 
 	fun isAdbEnabled(context: Context): Boolean {
 		//todo dmitry check usb checks
@@ -69,7 +68,6 @@ class AirGapViewModel : ViewModel() {
 
 	fun unInit() {
 		scope?.cancel()
-		_state.update { it.copy(cablesDisconnected = false) }
 	}
 
 	fun onConfirmedAirgap() {

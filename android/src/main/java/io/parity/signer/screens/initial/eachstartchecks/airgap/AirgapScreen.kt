@@ -56,7 +56,6 @@ fun AirgapScreen(
 	AirgapScreen(
 		state = state.value,
 		isInitialOnboarding = isInitialOnboarding,
-		onCablesConfirmCheckbox = viewModel::onCableCheckboxClicked,
 		onCta = {
 			viewModel.onConfirmedAirgap()
 			onProceed()
@@ -68,7 +67,6 @@ fun AirgapScreen(
 private fun AirgapScreen(
 	state: AirGapScreenState,
 	isInitialOnboarding: Boolean,
-	onCablesConfirmCheckbox: Callback,
 	onCta: Callback,
 ) {
 	Column() {
@@ -115,9 +113,9 @@ private fun AirgapScreen(
 					SignerDivider(modifier = Modifier.padding(start = 40.dp))
 					AirgapItem(AirgapItemType.BLUETOOTH, state.bluetoothDisabled)
 					SignerDivider(modifier = Modifier.padding(start = 40.dp))
-					AirgapItem(AirgapItemType.ADB_ENABLED, false, )//todo dmitry
+					AirgapItem(AirgapItemType.ADB_ENABLED, state.isAdbDisabled)
 					SignerDivider(modifier = Modifier.padding(start = 40.dp))
-					AirgapItem(AirgapItemType.USB, false)//todo dmitry
+					AirgapItem(AirgapItemType.USB, state.isUsbDisconnected)
 				}
 			}
 		}
@@ -131,45 +129,16 @@ private fun AirgapScreen(
 	}
 }
 
-@Composable
-private fun CheckboxWithTextWithGap(
-	checked: Boolean,
-	text: String,
-	modifier: Modifier = Modifier,
-	onValueChange: (Boolean) -> Unit,
-) {
-	Row(
-		verticalAlignment = Alignment.CenterVertically,
-		modifier = modifier.toggleable(value = checked,
-			role = Role.Checkbox,
-			onValueChange = { onValueChange(it) })
-	) {
-		Box(Modifier.padding(8.dp)) {
-			CheckboxIcon(
-				checked = checked,
-				checkedColor = MaterialTheme.colors.pink500,
-				uncheckedColor = MaterialTheme.colors.primary,
-				checkmarkColor = Color.White,
-			)
-		}
-		Spacer(Modifier.width(16.dp))
-		Text(
-			text,
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-		)
-	}
-}
-
 data class AirGapScreenState(
 	val airplaneModeEnabled: Boolean,
 	val wifiDisabled: Boolean,
 	val bluetoothDisabled: Boolean,
-	val cablesDisconnected: Boolean = false, //false default
+	val isUsbDisconnected: Boolean,
+	val isAdbDisabled: Boolean,
 )
 
 private fun AirGapScreenState.isReadyToProceed() =
-	airplaneModeEnabled && wifiDisabled && bluetoothDisabled && cablesDisconnected
+	airplaneModeEnabled && wifiDisabled && bluetoothDisabled && isUsbDisconnected && isAdbDisabled
 
 @Composable
 private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
@@ -263,7 +232,9 @@ private fun PreviewAirgapScreenObnoarding() {
 			val state = AirGapScreenState(
 				airplaneModeEnabled = true,
 				wifiDisabled = false,
-				bluetoothDisabled = true
+				bluetoothDisabled = true,
+				isAdbDisabled = false,
+				isUsbDisconnected = true,
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = true,
@@ -288,7 +259,9 @@ private fun PreviewAirgapScreenBlocker() {
 			val state = AirGapScreenState(
 				airplaneModeEnabled = true,
 				wifiDisabled = false,
-				bluetoothDisabled = true
+				bluetoothDisabled = true,
+				isAdbDisabled = false,
+				isUsbDisconnected = true,
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = false,
@@ -314,7 +287,9 @@ private fun PreviewAirgapScreenSmall() {
 			val state = AirGapScreenState(
 				airplaneModeEnabled = true,
 				wifiDisabled = false,
-				bluetoothDisabled = true
+				bluetoothDisabled = true,
+				isAdbDisabled = false,
+				isUsbDisconnected = true,
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = true,
