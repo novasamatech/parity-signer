@@ -28,4 +28,4 @@ tokio = { version = "1", features = ["full"] }
 [dev-dependencies]
 assert_cmd = "2.0"
 defaults = {path = "../defaults", features = ["active"]}
-tempfile = "3.8"
+tempfile = "3.9"
