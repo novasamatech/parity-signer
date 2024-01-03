@@ -9,8 +9,8 @@ import io.parity.signer.screens.initial.termsconsent.OnBoardingViewModel
 
 class SplashScreenViewModel : ViewModel() {
 
-	fun shouldShowOnboarding(context: Context): Boolean {
-		return OnBoardingViewModel.shouldShowOnboarding(context)
+	fun shouldShowSingleRunChecks(context: Context): Boolean {
+		return OnBoardingViewModel.shouldShowSingleRunChecks(context)
 	}
 
 	fun isShouldShowAirgap(): Boolean {

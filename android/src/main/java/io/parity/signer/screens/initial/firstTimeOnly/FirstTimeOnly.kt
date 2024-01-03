@@ -1,9 +1,13 @@
 package io.parity.signer.screens.initial.firstTimeOnly
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import io.parity.signer.screens.initial.eachstartchecks.osversion.WrongOsVersionNotificationScreen
+import io.parity.signer.screens.initial.eachstartchecks.osversion.WrongOsVersionViewModel
 import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import io.parity.signer.ui.rootnavigation.MainGraphRoutes
 
@@ -14,8 +18,26 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 ) {
 	navigation(
 		route = routePath,
-		startDestination = FirstTimeOnboarding.termsConsentRoute,
+		startDestination = FirstTimeOnboarding.osVersionNotification,
 	) {
+		composable(route = FirstTimeOnboarding.osVersionNotification) {
+			val osVersionVM: WrongOsVersionViewModel = viewModel()
+			if (osVersionVM.isShouldShow()) {
+				WrongOsVersionNotificationScreen(
+					currentOSVersion = osVersionVM.getCurrentOSVersion(),
+					minimalOsVersion = osVersionVM.getMinRecommendedOsVersion(),
+					onProceed = {
+						navController.navigate(FirstTimeOnboarding.termsConsentRoute) {
+							popUpTo(0)
+						}
+					}
+				)
+			} else {
+				navController.navigate(FirstTimeOnboarding.termsConsentRoute) {
+					popUpTo(0)
+				}
+			}
+		}
 		composable(route = FirstTimeOnboarding.termsConsentRoute) {
 			TermsConsentScreenFull(
 				navigateNextScreen = {
@@ -29,6 +51,8 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 }
 
 private object FirstTimeOnboarding {
+	const val osVersionNotification = "navigation_point_"
+
 	//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
 	const val termsConsentRoute = "navigation_point_terms_consent"
 }
