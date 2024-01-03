@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class WrongOsVersionViewModel() : ViewModel() {
 
 	fun isShouldShow(): Boolean {
-		return Build.VERSION.SDK_INT >= MinRecommendedOsVersion
+		return Build.VERSION.SDK_INT < MinRecommendedOsVersion
 	}
 
 	fun getCurrentOSVersion(): String {
