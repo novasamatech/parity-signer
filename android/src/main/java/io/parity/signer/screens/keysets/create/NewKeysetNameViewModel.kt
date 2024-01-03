@@ -2,7 +2,7 @@ package io.parity.signer.screens.keysets.create
 
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.backend.mapError
+import io.parity.signer.domain.backend.UniffiResult
 import kotlinx.coroutines.runBlocking
 
 
@@ -13,9 +13,9 @@ class NewKeysetNameViewModel : ViewModel() {
 	val seedNames =
 		ServiceLocator.seedStorage.lastKnownSeedNames
 
-	fun createNewSeedPhrase(): String? {
+	fun createNewSeedPhrase(): UniffiResult<String> {
 		return runBlocking {
-			uniffi.createNewSeedPhrase().mapError()
+			uniffi.createNewSeedPhrase()
 		}
 	}
 }
