@@ -18,7 +18,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SecurityUpdate
 import androidx.compose.material.icons.outlined.SettingsBackupRestore
+import androidx.compose.material.icons.outlined.UpdateDisabled
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +67,7 @@ fun WrongOsVersionNotificationScreen(
 				.verticalScroll(rememberScrollState())
 		) {
 			Image(
-				imageVector = Icons.Outlined.SettingsBackupRestore,
+				imageVector = Icons.Outlined.SecurityUpdate,
 				contentDescription = null,
 				colorFilter = ColorFilter.tint(MaterialTheme.colors.pink500),
 				modifier = Modifier
