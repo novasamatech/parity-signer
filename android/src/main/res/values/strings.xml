@@ -454,6 +454,7 @@
 	<string name="add_derived_keys_screen_cta">Confirm and Add Keys</string>
 	<string name="add_derived_keys_screen_alert_title">Confirm by entering the PIN code</string>
 	<string name="add_derived_keys_screen_alert_content">To finalize the addition of keys to the key set, please confirm that you have scanned the QR code back into the app by entering the PIN code.</string>
+	<string name="airgap_onboarding_adb_disable">Disable ADB on the device</string>
 
 </resources>
 

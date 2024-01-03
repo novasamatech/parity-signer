@@ -1,8 +1,12 @@
 package io.parity.signer.screens.initial.eachstartchecks.airgap
 
+import android.content.Context
+import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.FeatureFlags
+import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.NetworkState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -32,6 +36,15 @@ class AirGapViewModel : ViewModel() {
 
 	fun onCableCheckboxClicked() {
 		_state.update { it.copy(cablesDisconnected = !_state.value.cablesDisconnected) }
+	}
+
+	fun isAdbEnabled(context: Context): Boolean {
+		//todo dmitry check usb checks
+		if (FeatureFlags.isEnabled(FeatureOption.SKIP_USB_CHECK)) return false
+
+		return Settings.Global.getInt(context.contentResolver,
+			Settings.Global.ADB_ENABLED, 0
+		) == 1;
 	}
 
 	fun init() {
