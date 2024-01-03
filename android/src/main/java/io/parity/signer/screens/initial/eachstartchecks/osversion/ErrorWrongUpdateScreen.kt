@@ -119,6 +119,7 @@ private fun WrongOsVersionNotificationScreenPreview() {
 	Box(modifier = Modifier.fillMaxSize()) {
 		SignerNewTheme() {
 			WrongOsVersionNotificationScreen(
+				"6.0", "7.1",
 				onProceed = {},
 			)
 		}

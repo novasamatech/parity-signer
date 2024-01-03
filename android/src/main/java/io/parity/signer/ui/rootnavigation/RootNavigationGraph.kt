@@ -13,15 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import io.parity.signer.domain.findActivity
 import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
+import io.parity.signer.screens.initial.firstTimeOnly.firstTimeOnlyOnboarding
 import io.parity.signer.screens.initial.splash.splashScreen
-import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import kotlinx.coroutines.delay
 
 
@@ -88,30 +85,5 @@ object MainGraphRoutes {
 	const val mainScreenRoute = "navigation_main_screen"
 }
 
-
-fun NavGraphBuilder.firstTimeOnlyOnboarding(
-	routePath: String,
-	navController: NavHostController,
-) {
-	navigation(
-		route = routePath,
-		startDestination = FirstTimeOnboarding.termsConsentRoute,
-	) {
-		composable(route = FirstTimeOnboarding.termsConsentRoute) {
-			TermsConsentScreenFull(
-				navigateNextScreen = {
-					navController.navigate(MainGraphRoutes.eachTimeOnboardingRoute) {
-						popUpTo(0)
-					}
-				},
-			)
-		}
-	}
-}
-
-private object FirstTimeOnboarding {
-	//	const val onboardingExplanationRoute = "navigation_onboarding_explanation"
-	const val termsConsentRoute = "navigation_point_terms_consent"
-}
 
 
