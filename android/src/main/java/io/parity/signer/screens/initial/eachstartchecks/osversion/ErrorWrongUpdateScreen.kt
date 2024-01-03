@@ -77,7 +77,7 @@ fun WrongOsVersionNotificationScreen(
 			Text(
 				modifier = Modifier
 					.fillMaxWidth(1f),
-				text = "Consider updating operation system before using vault",
+				text = stringResource(R.string.initial_screen_outdated_os_title),
 				color = MaterialTheme.colors.primary,
 				style = SignerTypeface.TitleL,
 				textAlign = TextAlign.Center,
@@ -86,8 +86,11 @@ fun WrongOsVersionNotificationScreen(
 			Text(
 				modifier = Modifier
 					.fillMaxWidth(1f),
-				//todo dmitry export and pass fields
-				text = "Current Oos version is 6.0 and minimal recommended is 7 due to known vulnerabilities of old OS versions.",
+				text = stringResource(
+					R.string.initial_screen_outdated_os_description,
+					currentOSVersion,
+					minimalOsVersion,
+				),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyL,
 				textAlign = TextAlign.Center,
