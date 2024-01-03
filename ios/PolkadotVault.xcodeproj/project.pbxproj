@@ -143,6 +143,7 @@
 		6D6430F828CB662B00342E37 /* ExportPrivateKeyModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D91F3EB28C114D1007560F5 /* ExportPrivateKeyModal.swift */; };
 		6D67F94329825D280017C278 /* JailbreakDetectedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94229825D280017C278 /* JailbreakDetectedView.swift */; };
 		6D67F94529837BB00017C278 /* UnlockDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D67F94429837BB00017C278 /* UnlockDeviceView.swift */; };
+		6D686B9C2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D686B9B2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift */; };
 		6D699FB52AA9CC7A0043B23A /* QRCodeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */; };
 		6D699FB82AA9F2680043B23A /* NoKeySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D699FB72AA9F2680043B23A /* NoKeySetsView.swift */; };
 		6D6ACA4128F0B391002FB03A /* CameraPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */; };
@@ -279,6 +280,7 @@
 		6DDF439D2987A23B00881AFF /* Unbounded-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439829879D1D00881AFF /* Unbounded-Black.ttf */; };
 		6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */; };
 		6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */; };
+		6DE07B102B450EB7001AF54C /* OnboardingMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE07B0F2B450EB7001AF54C /* OnboardingMediatorTests.swift */; };
 		6DE48E2E2B1EB97C003094D5 /* AutoMockableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */; };
 		6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */; };
 		6DE48E7F2B1F0B96003094D5 /* AutoMockable+Z.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E652B1F0B95003094D5 /* AutoMockable+Z.generated.swift */; };
@@ -521,6 +523,7 @@
 		6D6430F528CB460A00342E37 /* ServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
 		6D67F94229825D280017C278 /* JailbreakDetectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectedView.swift; sourceTree = "<group>"; };
 		6D67F94429837BB00017C278 /* UnlockDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockDeviceView.swift; sourceTree = "<group>"; };
+		6D686B9B2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePasscodeAuthenticatorTests.swift; sourceTree = "<group>"; };
 		6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeButton.swift; sourceTree = "<group>"; };
 		6D699FB72AA9F2680043B23A /* NoKeySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoKeySetsView.swift; sourceTree = "<group>"; };
 		6D6ACA4028F0B391002FB03A /* CameraPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandler.swift; sourceTree = "<group>"; };
@@ -658,6 +661,7 @@
 		6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Regular.ttf"; sourceTree = "<group>"; };
 		6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Bold.ttf"; sourceTree = "<group>"; };
 		6DDF439B29879D3900881AFF /* SecondaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryFont.swift; sourceTree = "<group>"; };
+		6DE07B0F2B450EB7001AF54C /* OnboardingMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediatorTests.swift; sourceTree = "<group>"; };
 		6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoMockableHeader.swift; sourceTree = "<group>"; };
 		6DE48E2D2B1EB97C003094D5 /* initial_setup.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = initial_setup.sh; sourceTree = "<group>"; };
 		6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+X.generated.swift"; sourceTree = "<group>"; };
@@ -924,6 +928,7 @@
 		2DE72BD226A588C9002BB752 /* PolkadotVaultTests */ = {
 			isa = PBXGroup;
 			children = (
+				6DE07B0E2B450EAF001AF54C /* StateMediators */,
 				6DDD38B42B1346BB000D2B62 /* Screens */,
 				6DDD38B32B12D711000D2B62 /* Mocks */,
 				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
@@ -1274,12 +1279,12 @@
 		6D5801CE28991301006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				6D5DB5E92B3D1A8700EF82AB /* Authentication */,
 				6D5DB5E72B3C61A200EF82AB /* AppDelegate.swift */,
 				6D6430F528CB460A00342E37 /* ServiceLocator.swift */,
 				6DFE588C297A72B1002BFDBF /* JailbreakDetectionPublisher.swift */,
 				6DFE588A297A5F09002BFDBF /* ApplicationStatePublisher.swift */,
 				6D9921B6297FB471004891B6 /* PasswordProtectionStatePublisher.swift */,
+				6D5DB5E92B3D1A8700EF82AB /* Authentication */,
 				6DEFB52B28FEC94000762219 /* QRCode */,
 				6D6ACA3F28F0B383002FB03A /* Camera */,
 				6DC5643128B68FB2003D540B /* Keychain */,
@@ -1322,11 +1327,11 @@
 		6D5801DA2899235C006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6D686B9A2B45B35B007B7642 /* Authentication */,
 				6DAFCAFB2B0AE86C00DDD165 /* Runtime */,
 				6DAFCAF62B0A360600DDD165 /* Camera */,
 				6D8AF88028BCC4BF00CF0AB2 /* Keychain */,
 				6D57DC4E289D667000005C63 /* Navigation */,
-				6DBD21FB289A83C9005D539B /* Database */,
 				6D5801DF289924A3006C41D8 /* Connectivity */,
 				6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */,
 				6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */,
@@ -1387,6 +1392,14 @@
 				6DFF33DF2AC93FE200062A09 /* ApplicationUpdateRequiredView.swift */,
 			);
 			path = Errors;
+			sourceTree = "<group>";
+		};
+		6D686B9A2B45B35B007B7642 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				6D686B9B2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift */,
+			);
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 		6D699FB62AA9F2590043B23A /* NoKeySets */ = {
@@ -1707,14 +1720,6 @@
 			path = Database;
 			sourceTree = "<group>";
 		};
-		6DBD21FB289A83C9005D539B /* Database */ = {
-			isa = PBXGroup;
-			children = (
-				6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */,
-			);
-			path = Database;
-			sourceTree = "<group>";
-		};
 		6DBD21FE289A8C67005D539B /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1853,6 +1858,15 @@
 				6D699FB42AA9CC7A0043B23A /* QRCodeButton.swift */,
 			);
 			path = Buttons;
+			sourceTree = "<group>";
+		};
+		6DE07B0E2B450EAF001AF54C /* StateMediators */ = {
+			isa = PBXGroup;
+			children = (
+				6DBD21FC289A83D0005D539B /* DatabaseMediatorTests.swift */,
+				6DE07B0F2B450EB7001AF54C /* OnboardingMediatorTests.swift */,
+			);
+			path = StateMediators;
 			sourceTree = "<group>";
 		};
 		6DE48E292B1EB94B003094D5 /* Generated */ = {
@@ -2590,6 +2604,7 @@
 				6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */,
 				6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */,
 				6DE48E8A2B1F0B96003094D5 /* AutoMockable+V.generated.swift in Sources */,
+				6D686B9C2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
 				6DE48E8F2B1F0B96003094D5 /* AutoMockable+Y.generated.swift in Sources */,
 				6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */,
@@ -2616,6 +2631,7 @@
 				6DE48E802B1F0B96003094D5 /* AutoMockable+P.generated.swift in Sources */,
 				6DE48E8C2B1F0B96003094D5 /* AutoMockable+R.generated.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
+				6DE07B102B450EB7001AF54C /* OnboardingMediatorTests.swift in Sources */,
 				6DE48E882B1F0B96003094D5 /* AutoMockable+N.generated.swift in Sources */,
 				6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */,
 				6DE48E862B1F0B96003094D5 /* AutoMockable+F.generated.swift in Sources */,

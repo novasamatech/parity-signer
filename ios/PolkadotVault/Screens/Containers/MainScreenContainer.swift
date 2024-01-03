@@ -55,7 +55,7 @@ extension MainScreenContainer {
 
     final class ViewModel: ObservableObject {
         private let authenticationStateMediator: AuthenticatedStateMediator
-        private let onboardingMediator: OnboardingMediator
+        private let onboardingMediator: OnboardingMediating
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let databaseVersionMediator: DatabaseVersionMediator
         private let appLaunchMediator: AppLaunchMediating
@@ -69,7 +69,7 @@ extension MainScreenContainer {
 
         init(
             authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator,
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
+            onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator,
             passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
             databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator(),
             appLaunchMediator: AppLaunchMediating = AppLaunchMediator(),
@@ -128,7 +128,7 @@ private extension MainScreenContainer.ViewModel {
 
     func listenToStateChanges() {
         Publishers.CombineLatest3(
-            onboardingMediator.$onboardingDone,
+            onboardingMediator.onboardingDone,
             authenticationStateMediator.$authenticated,
             passwordProtectionStatePublisher.$isProtected
         )

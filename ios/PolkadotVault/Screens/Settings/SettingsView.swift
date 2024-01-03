@@ -88,10 +88,10 @@ extension SettingsView {
         @Published var isPresentingWipeConfirmation = false
         @Published var isDetailsPresented = false
         @Published var detailScreen: SettingsItem?
-        private let onboardingMediator: OnboardingMediator
+        private let onboardingMediator: OnboardingMediating
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+            onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator
         ) {
             self.onboardingMediator = onboardingMediator
         }
@@ -127,7 +127,7 @@ extension SettingsView {
         }
 
         func wipe() {
-            onboardingMediator.onboard()
+            onboardingMediator.onboard(verifierRemoved: false)
             isPresentingWipeConfirmation = false
         }
     }

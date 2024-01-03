@@ -115,18 +115,17 @@ struct EnterBananaSplitPasswordView: View {
 extension EnterBananaSplitPasswordView {
     final class ViewModel: ObservableObject {
         @Binding var isPresented: Bool
-        @Binding var qrCodeData: [String]
         @Published var seedName: String = ""
         @Published var password: String = ""
         @Published var isNameValid: Bool = true
         @Published var isPasswordValid: Bool = true
         @Published var isActionDisabled: Bool = true
         @Published var invalidPasswordAttempts: Int = 0
-
         @Published var isPresentingDetails: Bool = false
-
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel!
+
+        private let qrCodeData: [String]
         private var seedPhrase = ""
         private var cancelBag = CancelBag()
         private let seedsMediator: SeedsMediating
@@ -135,13 +134,13 @@ extension EnterBananaSplitPasswordView {
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
-            qrCodeData: Binding<[String]>,
+            qrCodeData: [String],
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.seedsMediator = seedsMediator
             self.onCompletion = onCompletion
+            self.qrCodeData = qrCodeData
             _isPresented = isPresented
-            _qrCodeData = qrCodeData
             subscribeToUpdates()
         }
 
@@ -151,7 +150,7 @@ extension EnterBananaSplitPasswordView {
 
         func onDoneTap() {
             // If user uses 'return' on password field, we should confirm that `isActionDisable` is false, meaning we
-            // have all required data to properly resotre seed
+            // have all required data to properly restore seed
             guard !isActionDisabled else { return }
             do {
                 let result = try qrparserTryDecodeQrSequence(data: qrCodeData, password: password, cleaned: false)
@@ -219,7 +218,7 @@ extension EnterBananaSplitPasswordView {
             EnterBananaSplitPasswordView(
                 viewModel: .init(
                     isPresented: .constant(true),
-                    qrCodeData: .constant([]),
+                    qrCodeData: [],
                     onCompletion: { _ in }
                 )
             )

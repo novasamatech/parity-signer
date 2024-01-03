@@ -1,3 +1,4 @@
+import Combine
 import LocalAuthentication
 @testable import PolkadotVault
 import UIKit

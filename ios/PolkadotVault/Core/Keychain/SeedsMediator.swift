@@ -16,6 +16,7 @@ enum KeychainError: Error, Equatable {
     case accessControlNotAvailable
 }
 
+// sourcery: AutoMockable
 /// Protocol that gathers all operations related to Keychain storage
 protocol SeedsMediating: AnyObject {
     /// Accessor property for available seed names

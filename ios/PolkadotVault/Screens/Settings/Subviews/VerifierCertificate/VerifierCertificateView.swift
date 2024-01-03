@@ -95,7 +95,7 @@ extension VerifierCertificateView {
         @Published var content: MVerifierDetails?
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
-        private let onboardingMediator: OnboardingMediator
+        private let onboardingMediator: OnboardingMediating
         private let service: GeneralVerifierService
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
@@ -104,7 +104,7 @@ extension VerifierCertificateView {
         private let dismissRequest = PassthroughSubject<Void, Never>()
 
         init(
-            onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator,
+            onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator,
             service: GeneralVerifierService = GeneralVerifierService()
         ) {
             self.onboardingMediator = onboardingMediator
