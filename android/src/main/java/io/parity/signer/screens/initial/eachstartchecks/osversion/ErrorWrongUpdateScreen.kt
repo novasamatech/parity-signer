@@ -102,7 +102,7 @@ fun WrongOsVersionNotificationScreen(
 			Spacer(modifier = Modifier.padding(top = 8.dp))
 			PrimaryButtonWide(
 				modifier = Modifier.padding(vertical = 24.dp),
-				label = stringResource(R.string.error_wrong_version_backup_cta),
+				label = stringResource(R.string.onboarding_skip),
 				onClicked = onProceed,
 			)
 		}
