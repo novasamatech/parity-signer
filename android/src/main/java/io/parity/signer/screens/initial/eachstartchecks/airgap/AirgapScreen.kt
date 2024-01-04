@@ -238,7 +238,6 @@ private fun PreviewAirgapScreenObnoarding() {
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = true,
-				onCablesConfirmCheckbox = {},
 				onCta = {})
 		}
 	}
@@ -265,7 +264,6 @@ private fun PreviewAirgapScreenBlocker() {
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = false,
-				onCablesConfirmCheckbox = {},
 				onCta = {})
 		}
 	}
@@ -293,7 +291,6 @@ private fun PreviewAirgapScreenSmall() {
 			)
 			AirgapScreen(state = state,
 				isInitialOnboarding = true,
-				onCablesConfirmCheckbox = {},
 				onCta = {})
 		}
 	}

@@ -11,15 +11,18 @@ import io.parity.signer.domain.NetworkState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 
 
 class AirGapViewModel : ViewModel() {
 
+	private val appContext = ServiceLocator.appContext
 	private val networkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
 
@@ -49,18 +52,29 @@ class AirGapViewModel : ViewModel() {
 	fun init() {
 		val scope = CoroutineScope(viewModelScope.coroutineContext + Job())
 		scope.launch {
-			networkExposedStateKeeper.airPlaneModeEnabled.collect {
-				_state.value = _state.value.copy(airplaneModeEnabled = (it != false))
+			networkExposedStateKeeper.airPlaneModeEnabled.collect { newState ->
+				_state.update {it.copy(airplaneModeEnabled = (newState != false)) }
 			}
 		}
 		scope.launch {
-			networkExposedStateKeeper.bluetoothDisabledState.collect {
-				_state.value = _state.value.copy(bluetoothDisabled = (it != false))
+			networkExposedStateKeeper.bluetoothDisabledState.collect { newState ->
+				_state.update { it.copy(bluetoothDisabled = (newState != false)) }
 			}
 		}
 		scope.launch {
-			networkExposedStateKeeper.wifiDisabledState.collect {
-				_state.value = _state.value.copy(wifiDisabled = (it != false))
+			networkExposedStateKeeper.wifiDisabledState.collect { newState ->
+				_state.update { it.copy(wifiDisabled = (newState != false)) }
+			}
+		}
+		scope.launch {
+			while (true) {
+				val adbEnabled = isAdbEnabled(appContext)
+				if (_state.value.isAdbDisabled == !adbEnabled) {
+					//skip it's the same
+				} else {
+					_state.update { it.copy(isAdbDisabled = (!adbEnabled)) }
+				}
+				delay(1000) //1s
 			}
 		}
 		this.scope = scope
