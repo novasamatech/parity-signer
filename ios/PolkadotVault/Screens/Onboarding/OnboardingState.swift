@@ -19,10 +19,10 @@ enum OnboardingState: Equatable {
 
 final class OnboardingStateMachine: ObservableObject {
     @Published var currentState: OnboardingState = .terms
-    private let onboardingMediator: OnboardingMediator
+    private let onboardingMediator: OnboardingMediating
 
     init(
-        onboardingMediator: OnboardingMediator = ServiceLocator.onboardingMediator
+        onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator
     ) {
         self.onboardingMediator = onboardingMediator
     }
@@ -93,6 +93,6 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func finishOnboarding() {
-        onboardingMediator.onboard()
+        onboardingMediator.onboard(verifierRemoved: false)
     }
 }

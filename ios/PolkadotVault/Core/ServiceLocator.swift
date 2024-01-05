@@ -14,7 +14,7 @@ enum ServiceLocator {
     static var seedsMediator: SeedsMediating = SeedsMediator()
     static var connectivityMediator: ConnectivityMediator = ConnectivityMediator()
     static var authenticationStateMediator: AuthenticatedStateMediator = AuthenticatedStateMediator()
-    static var onboardingMediator: OnboardingMediator = OnboardingMediator()
+    static var onboardingMediator: OnboardingMediating = OnboardingMediator()
 
     static var networkColorsGenerator = UnknownNetworkColorsGenerator()
     static var devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol = DevicePasscodeAuthenticator()
