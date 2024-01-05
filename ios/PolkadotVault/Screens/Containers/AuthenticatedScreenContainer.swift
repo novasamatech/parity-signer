@@ -59,7 +59,7 @@ extension AuthenticatedScreenContainer {
         init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
             self.seedsMediator = seedsMediator
             updateViewState()
-            seedsMediator.seedNames.publisher
+            seedsMediator.seedNamesPublisher
                 .sink { [weak self] _ in
                     self?.updateViewState()
                 }
