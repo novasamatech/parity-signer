@@ -32,9 +32,18 @@ class NetworkExposedStateKeeper(
 		MutableStateFlow(null)
 	val bluetoothDisabledState: StateFlow<Boolean?> = _bluetoothDisabledState
 
+	//todo dmitry implement
+	private val _usbDisconnected: MutableStateFlow<Boolean?> =
+		MutableStateFlow(null)
+	val usbDisconnected: StateFlow<Boolean?> = _usbDisconnected
+
 	private val _airGapModeState: MutableStateFlow<NetworkState> =
 		MutableStateFlow(NetworkState.None)
 	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
+
+	private val isCurentlyBreached: Boolean
+		get() = airPlaneModeEnabled.value == true && wifiDisabledState.value == true
+			&& bluetoothDisabledState.value == true && usbDisconnected.value == true
 
 	init {
 		registerAirplaneBroadcastReceiver()
@@ -76,8 +85,8 @@ class NetworkExposedStateKeeper(
 		appContext.registerReceiver(receiver, intentFilter)
 	}
 
-	private fun updateGeneralAirgap(isBreached: Boolean) {
-		if (isBreached) {
+	private fun updateGeneralAirgapState() {
+		if (isCurentlyBreached) {
 			if (airGapModeState.value != NetworkState.Active) {
 				_airGapModeState.value = NetworkState.Active
 				if (appContext.isDbCreatedAndOnboardingPassed()) {
@@ -100,7 +109,7 @@ class NetworkExposedStateKeeper(
 			0
 		) == 0
 		_airplaneModeEnabled.value = !airplaneModeOff
-		updateGeneralAirgap(airplaneModeOff)
+		updateGeneralAirgapState()
 	}
 
 	private fun reactOnBluetooth() {
@@ -108,7 +117,7 @@ class NetworkExposedStateKeeper(
 			appContext.applicationContext.getSystemService(BluetoothManager::class.java)?.adapter
 		val btEnabled = bluetooth?.isEnabled == true
 		_bluetoothDisabledState.value = !btEnabled
-		updateGeneralAirgap(btEnabled)
+		updateGeneralAirgapState()
 	}
 
 	private fun registerWifiBroadcastReceiver() {
@@ -126,7 +135,7 @@ class NetworkExposedStateKeeper(
 			appContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
 		val wifiEnabled = wifi?.isWifiEnabled == true
 		_wifiDisabledState.value = !wifiEnabled
-		updateGeneralAirgap(wifiEnabled)
+		updateGeneralAirgapState()
 	}
 
 	/**
