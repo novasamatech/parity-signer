@@ -20,9 +20,9 @@ enum KeychainError: Error, Equatable {
 /// Protocol that gathers all operations related to Keychain storage
 protocol SeedsMediating: AnyObject {
     /// Accessor property for available seed names
-    ///
-    /// This should be turned to `private` in future refactors
-    var seedNames: [String] { get set }
+    var seedNames: [String] { get }
+
+    var seedNamesPublisher: AnyPublisher<[String], Never> { get }
 
     /// Get all seed names from secure storage
     ///
@@ -66,7 +66,14 @@ final class SeedsMediator: SeedsMediating {
     private let keychainAccessAdapter: KeychainAccessAdapting
     private let databaseMediator: DatabaseMediating
     private let authenticationStateMediator: AuthenticatedStateMediator
-    @Published var seedNames: [String] = []
+    var seedNamesSubject = CurrentValueSubject<[String], Never>([])
+    var seedNamesPublisher: AnyPublisher<[String], Never> {
+        seedNamesSubject.eraseToAnyPublisher()
+    }
+
+    var seedNames: [String] {
+        seedNamesSubject.value
+    }
 
     init(
         queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
@@ -84,7 +91,7 @@ final class SeedsMediator: SeedsMediating {
         let result = keychainAccessAdapter.fetchSeedNames()
         switch result {
         case let .success(payload):
-            seedNames = payload.seeds
+            seedNamesSubject.send(payload.seeds)
             authenticationStateMediator.authenticated = true
         case .failure:
             authenticationStateMediator.authenticated = false
@@ -107,8 +114,10 @@ final class SeedsMediator: SeedsMediating {
         )
         switch saveSeedResult {
         case .success:
-            seedNames.append(seedName)
-            seedNames.sort()
+            var seeds = seedNamesSubject.value
+            seeds.append(seedName)
+            seeds.sort()
+            seedNamesSubject.send(seeds)
             return true
         case .failure:
             return false
@@ -116,7 +125,7 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func checkSeedCollision(seedName: String) -> Bool {
-        seedNames.contains(seedName)
+        seedNamesSubject.value.contains(seedName)
     }
 
     func getSeedBackup(seedName: String) -> String {
@@ -165,7 +174,7 @@ final class SeedsMediator: SeedsMediating {
     }
 
     func getAllSeeds() -> [String: String] {
-        getSeeds(seedNames: Set(seedNames))
+        getSeeds(seedNames: Set(seedNamesSubject.value))
     }
 
     func removeSeed(seedName: String) -> Bool {
@@ -176,7 +185,7 @@ final class SeedsMediator: SeedsMediating {
         let result = keychainAccessAdapter.removeSeed(seedName: seedName)
         switch result {
         case .success:
-            seedNames = seedNames
+            seedNamesSubject.value = seedNamesSubject.value
                 .filter { $0 != seedName }
                 .sorted()
             return true
@@ -187,11 +196,11 @@ final class SeedsMediator: SeedsMediating {
 
     func removeAllSeeds() -> Bool {
         // Fetch seeds first, as this will trigger authentication if passcode is not cached
-        guard case .success = keychainAccessAdapter.retrieveSeeds(with: Set(seedNames)) else {
+        guard case .success = keychainAccessAdapter.retrieveSeeds(with: Set(seedNamesSubject.value)) else {
             return false
         }
         guard keychainAccessAdapter.removeAllSeeds() else { return false }
-        seedNames = []
+        seedNamesSubject.send([])
         return true
     }
 
@@ -211,6 +220,6 @@ final class SeedsMediator: SeedsMediating {
 
     func removeStalledSeeds() {
         _ = keychainAccessAdapter.removeAllSeeds()
-        seedNames = []
+        seedNamesSubject.send([])
     }
 }

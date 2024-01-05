@@ -103,7 +103,7 @@ final class SeedsMediatorTests: XCTestCase {
         let seedName = "Seed1"
         let seedPhrase = "seedPhrase"
         // Simulate collision
-        seedsMediator.seedNames = [seedPhrase]
+        seedsMediator.seedNamesSubject.value = [seedPhrase]
 
         // When
         let result = seedsMediator.createSeed(seedName: seedName, seedPhrase: seedPhrase, shouldCheckForCollision: true)
@@ -135,7 +135,7 @@ final class SeedsMediatorTests: XCTestCase {
     func testCheckSeedCollision_Exists() {
         // Given
         let existingSeedName = "Seed1"
-        seedsMediator.seedNames = [existingSeedName]
+        seedsMediator.seedNamesSubject.value = [existingSeedName]
 
         // When
         let result = seedsMediator.checkSeedCollision(seedName: existingSeedName)
@@ -147,7 +147,7 @@ final class SeedsMediatorTests: XCTestCase {
     func testCheckSeedCollision_NotExists() {
         // Given
         let nonExistingSeedName = "Seed2"
-        seedsMediator.seedNames = ["Seed1"]
+        seedsMediator.seedNamesSubject.value = ["Seed1"]
 
         // When
         let result = seedsMediator.checkSeedCollision(seedName: nonExistingSeedName)
@@ -242,7 +242,7 @@ final class SeedsMediatorTests: XCTestCase {
 
     func testGetAllSeeds() {
         // Given
-        seedsMediator.seedNames = ["Seed1", "Seed2"]
+        seedsMediator.seedNamesSubject.value = ["Seed1", "Seed2"]
         let expectedSeeds = ["Seed1": "seedData1", "Seed2": "seedData2"]
         keychainAccessAdapterMock.retrieveSeedsReturnValue = .success(expectedSeeds)
 
@@ -256,7 +256,7 @@ final class SeedsMediatorTests: XCTestCase {
     func testRemoveSeed_Successful() {
         // Given
         let seedName = "Seed1"
-        seedsMediator.seedNames = [seedName, "Seed2"]
+        seedsMediator.seedNamesSubject.value = [seedName, "Seed2"]
         keychainAccessAdapterMock.retrieveSeedReturnValue = .success("seedData")
         keychainAccessAdapterMock.removeSeedReturnValue = .success(())
 
@@ -271,7 +271,7 @@ final class SeedsMediatorTests: XCTestCase {
     func testRemoveSeed_Failure() {
         // Given
         let seedName = "Seed1"
-        seedsMediator.seedNames = [seedName, "Seed2"]
+        seedsMediator.seedNamesSubject.value = [seedName, "Seed2"]
         keychainAccessAdapterMock.retrieveSeedReturnValue = .failure(.fetchError)
 
         // When
@@ -284,7 +284,7 @@ final class SeedsMediatorTests: XCTestCase {
 
     func testRemoveAllSeeds_Successful() {
         // Given
-        seedsMediator.seedNames = ["Seed1", "Seed2"]
+        seedsMediator.seedNamesSubject.value = ["Seed1", "Seed2"]
         keychainAccessAdapterMock.retrieveSeedsReturnValue = .success(["Seed1": "seedData1", "Seed2": "seedData2"])
         keychainAccessAdapterMock.removeAllSeedsReturnValue = true
 
@@ -298,7 +298,7 @@ final class SeedsMediatorTests: XCTestCase {
 
     func testRemoveAllSeeds_Failure() {
         // Given
-        seedsMediator.seedNames = ["Seed1", "Seed2"]
+        seedsMediator.seedNamesSubject.value = ["Seed1", "Seed2"]
         keychainAccessAdapterMock.retrieveSeedsReturnValue = .failure(.fetchError)
 
         // When
@@ -348,7 +348,7 @@ final class SeedsMediatorTests: XCTestCase {
 
     func testRemoveStalledSeeds() {
         // Given
-        seedsMediator.seedNames = ["Seed1", "Seed2"]
+        seedsMediator.seedNamesSubject.value = ["Seed1", "Seed2"]
         keychainAccessAdapterMock.removeAllSeedsReturnValue = true
 
         // When
