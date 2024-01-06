@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichTextStyle
-import com.halilibo.richtext.ui.material.MaterialRichText
+import com.halilibo.richtext.ui.material.RichText
 import com.halilibo.richtext.ui.string.RichTextStringStyle
 import io.parity.signer.ui.theme.SignerNewTheme
 
@@ -22,7 +22,7 @@ fun MarkdownText(
 	onLinkClicked: ((String) -> Unit)? = null
 ) {
 	Surface() { // so onSurface will be used for text color otherwise it's default black
-		MaterialRichText(
+		RichText(
 			modifier = modifier,
 			style = RichTextStyle(
 				stringStyle = RichTextStringStyle()
