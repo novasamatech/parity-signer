@@ -129,7 +129,7 @@ struct CameraView: View {
             EnterBananaSplitPasswordView(
                 viewModel: .init(
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
-                    qrCodeData: $model.bucket,
+                    qrCodeData: model.bucket,
                     onCompletion: viewModel.onKeySetAddCompletion(_:)
                 )
             )
