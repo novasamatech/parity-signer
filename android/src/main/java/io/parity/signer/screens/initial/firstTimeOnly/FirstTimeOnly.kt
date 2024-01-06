@@ -1,13 +1,12 @@
 package io.parity.signer.screens.initial.firstTimeOnly
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import io.parity.signer.screens.initial.eachstartchecks.osversion.WrongOsVersionNotificationScreen
-import io.parity.signer.screens.initial.eachstartchecks.osversion.WrongOsVersionViewModel
+import io.parity.signer.screens.initial.eachstartchecks.osversion.OutdatedOsVersionViewModel
 import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import io.parity.signer.ui.rootnavigation.MainGraphRoutes
 
@@ -21,11 +20,10 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 		startDestination = FirstTimeOnboarding.osVersionNotification,
 	) {
 		composable(route = FirstTimeOnboarding.osVersionNotification) {
-			val osVersionVM: WrongOsVersionViewModel = viewModel()
+			val osVersionVM: OutdatedOsVersionViewModel = viewModel()
 			if (osVersionVM.isShouldShow()) {
 				WrongOsVersionNotificationScreen(
-					currentOSVersion = osVersionVM.getCurrentOSVersion(),
-					minimalOsVersion = osVersionVM.getMinRecommendedOsVersion(),
+					exposedVulnarabilities = osVersionVM.getVulnerabilities(),
 					onProceed = {
 						navController.navigate(FirstTimeOnboarding.termsConsentRoute) {
 							popUpTo(0)
