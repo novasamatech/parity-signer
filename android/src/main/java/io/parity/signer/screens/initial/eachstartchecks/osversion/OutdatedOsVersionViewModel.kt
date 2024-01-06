@@ -41,7 +41,7 @@ enum class KnownOSIssue {
 	CVE_2022_20465; // CVE-2022-20465 https://source.android.com/docs/security/bulletin/2022-11-01
 
 	override fun toString(): String = when (this) {
-		CVE_2022_20465 -> this.toString().replace('_', '-')
+		CVE_2022_20465 -> super.toString().replace('_', '-')
 	}
 }
 
