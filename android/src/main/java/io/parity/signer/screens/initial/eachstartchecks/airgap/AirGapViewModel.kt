@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Duration
 
 
 class AirGapViewModel : ViewModel() {
@@ -37,11 +36,9 @@ class AirGapViewModel : ViewModel() {
 	)
 	val state: StateFlow<AirGapScreenState> = _state.asStateFlow()
 
-	//todo dmitry update adb and usb checks
 	var scope: CoroutineScope? = null
 
-	fun isAdbEnabled(context: Context): Boolean {
-		//todo dmitry check usb checks
+	private fun isAdbEnabled(context: Context): Boolean {
 		if (FeatureFlags.isEnabled(FeatureOption.SKIP_USB_CHECK)) return false
 
 		return Settings.Global.getInt(context.contentResolver,
@@ -64,6 +61,11 @@ class AirGapViewModel : ViewModel() {
 		scope.launch {
 			networkExposedStateKeeper.wifiDisabledState.collect { newState ->
 				_state.update { it.copy(wifiDisabled = (newState != false)) }
+			}
+		}
+		scope.launch {
+			networkExposedStateKeeper.usbDisconnected.collect { newState ->
+				_state.update { it.copy(isUsbDisconnected = (newState != false)) }
 			}
 		}
 		scope.launch {
