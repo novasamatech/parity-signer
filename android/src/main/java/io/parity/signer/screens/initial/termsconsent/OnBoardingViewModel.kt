@@ -9,7 +9,7 @@ class OnBoardingViewModel : ViewModel() {
 
 
 	companion object {
-		fun shouldShowOnboarding(context: Context): Boolean {
+		fun shouldShowSingleRunChecks(context: Context): Boolean {
 			return !context.isDbCreatedAndOnboardingPassed()
 		}
 	}

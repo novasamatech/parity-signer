@@ -22,7 +22,7 @@ import io.parity.signer.domain.Callback
 
 @Composable
 fun TermsConsentScreenFull(navigateNextScreen: Callback) {
-	if (!OnBoardingViewModel.shouldShowOnboarding(LocalContext.current)) {
+	if (!OnBoardingViewModel.shouldShowSingleRunChecks(LocalContext.current)) {
 		navigateNextScreen()
 	}
 

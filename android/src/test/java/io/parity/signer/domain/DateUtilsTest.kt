@@ -44,4 +44,11 @@ class DateUtilsTest {
 		val date = DateUtils.parseLogTime("2014-11-10 13:45")!!
 		assertEquals("13:45", date.toLogTimeString())
 	}
+
+	@Test
+	fun checkAndroidVersion() {
+		val date = DateUtils.parseAndroidPatchDate("2022-01-05")
+		assertEquals(date?.get(Calendar.YEAR), 2022)
+		assertEquals(date?.get(Calendar.MONTH), Calendar.JANUARY)
+	}
 }
