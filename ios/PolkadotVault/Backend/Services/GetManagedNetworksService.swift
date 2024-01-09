@@ -14,7 +14,7 @@ protocol GetManagedNetworksServicing: AnyObject {
     )
 }
 
-final class GetManagedNetworksService {
+final class GetManagedNetworksService: GetManagedNetworksServicing {
     private let backendService: BackendService
 
     init(

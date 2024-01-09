@@ -222,6 +222,9 @@
 		6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */; };
 		6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */; };
 		6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */; };
+		6DB2E7C12B4BBAF7002387DE /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB2E7C02B4BBAF7002387DE /* SettingsViewModelTests.swift */; };
+		6DB2E7CA2B4BBF6E002387DE /* MmNetwork+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB2E7C92B4BBF6E002387DE /* MmNetwork+Generate.swift */; };
+		6DB2E7CC2B4BBF78002387DE /* MNetworkDetails+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB2E7CB2B4BBF78002387DE /* MNetworkDetails+Generate.swift */; };
 		6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */; };
 		6DB39AA92A45C909004B8FAA /* TransparentHelpBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */; };
 		6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */; };
@@ -600,6 +603,10 @@
 		6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediatorTests.swift; sourceTree = "<group>"; };
 		6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatePublisherTests.swift; sourceTree = "<group>"; };
 		6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectionStatePublisherTests.swift; sourceTree = "<group>"; };
+		6DB2E7C02B4BBAF7002387DE /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
+		6DB2E7C42B4BBC24002387DE /* BackupSelectKeyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSelectKeyViewModel.swift; sourceTree = "<group>"; };
+		6DB2E7C92B4BBF6E002387DE /* MmNetwork+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MmNetwork+Generate.swift"; sourceTree = "<group>"; };
+		6DB2E7CB2B4BBF78002387DE /* MNetworkDetails+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MNetworkDetails+Generate.swift"; sourceTree = "<group>"; };
 		6DB39AA32A4579E0004B8FAA /* AddDerivedKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDerivedKeysView.swift; sourceTree = "<group>"; };
 		6DB39AA82A45C909004B8FAA /* TransparentHelpBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentHelpBox.swift; sourceTree = "<group>"; };
 		6DB99038295E95E9001101DC /* NetworkCapsuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCapsuleView.swift; sourceTree = "<group>"; };
@@ -928,14 +935,15 @@
 		2DE72BD226A588C9002BB752 /* PolkadotVaultTests */ = {
 			isa = PBXGroup;
 			children = (
+				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
 				6DE07B0E2B450EAF001AF54C /* StateMediators */,
 				6DDD38B42B1346BB000D2B62 /* Screens */,
-				6DDD38B32B12D711000D2B62 /* Mocks */,
-				6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */,
+				6D8AF88428BCC52A00CF0AB2 /* Models+Generate */,
+				6D8AF88328BCC52000CF0AB2 /* Mocks */,
+				6DBD21FE289A8C67005D539B /* Helpers */,
 				6DC2EDFA2B1196D700298F00 /* Backend */,
 				6D5801DA2899235C006C41D8 /* Core */,
 				6DE48E292B1EB94B003094D5 /* Generated */,
-				6DBD21FE289A8C67005D539B /* Helpers */,
 				2DE72BD526A588C9002BB752 /* Info.plist */,
 			);
 			path = PolkadotVaultTests;
@@ -1495,6 +1503,7 @@
 				6D342339299615FD00F3BA27 /* MVerifier+Type.swift */,
 				6DF91F3D29C06B5F000A6BB2 /* Verifier+Show.swift */,
 				6DF91F3F29C06B70000A6BB2 /* VerifierValue+Show.swift */,
+				6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */,
 			);
 			path = RustDataExtensions;
 			sourceTree = "<group>";
@@ -1547,13 +1556,17 @@
 			path = Mocks;
 			sourceTree = "<group>";
 		};
-		6D8AF88428BCC52A00CF0AB2 /* Generate */ = {
+		6D8AF88428BCC52A00CF0AB2 /* Models+Generate */ = {
 			isa = PBXGroup;
 			children = (
+				6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */,
+				6DE48E982B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift */,
 				6DBD21FF289A8C74005D539B /* URL+Generate.swift */,
 				6D57DC51289D68B800005C63 /* ActionResult+Generate.swift */,
+				6DB2E7C92B4BBF6E002387DE /* MmNetwork+Generate.swift */,
+				6DB2E7CB2B4BBF78002387DE /* MNetworkDetails+Generate.swift */,
 			);
-			path = Generate;
+			path = "Models+Generate";
 			sourceTree = "<group>";
 		};
 		6D932CE0292E0AE3008AD883 /* Extensions */ = {
@@ -1682,6 +1695,39 @@
 			path = Runtime;
 			sourceTree = "<group>";
 		};
+		6DB2E7BF2B4BBAEA002387DE /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				6DB2E7C22B4BBC12002387DE /* Subview */,
+				6DB2E7C02B4BBAF7002387DE /* SettingsViewModelTests.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		6DB2E7C22B4BBC12002387DE /* Subview */ = {
+			isa = PBXGroup;
+			children = (
+				6DB2E7C62B4BBEA0002387DE /* NetworkSelectionSettings */,
+				6DB2E7C32B4BBC19002387DE /* Backup */,
+			);
+			path = Subview;
+			sourceTree = "<group>";
+		};
+		6DB2E7C32B4BBC19002387DE /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				6DB2E7C42B4BBC24002387DE /* BackupSelectKeyViewModel.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
+		6DB2E7C62B4BBEA0002387DE /* NetworkSelectionSettings */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = NetworkSelectionSettings;
+			sourceTree = "<group>";
+		};
 		6DB39AA22A4579CF004B8FAA /* DynamicDerivations */ = {
 			isa = PBXGroup;
 			children = (
@@ -1723,8 +1769,6 @@
 		6DBD21FE289A8C67005D539B /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				6D8AF88428BCC52A00CF0AB2 /* Generate */,
-				6D8AF88328BCC52000CF0AB2 /* Mocks */,
 				6DC2EDF82B11961800298F00 /* DateFormatterTests.swift */,
 			);
 			path = Helpers;
@@ -1806,18 +1850,10 @@
 			path = Alerts;
 			sourceTree = "<group>";
 		};
-		6DDD38B32B12D711000D2B62 /* Mocks */ = {
-			isa = PBXGroup;
-			children = (
-				6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */,
-				6DE48E982B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift */,
-			);
-			path = Mocks;
-			sourceTree = "<group>";
-		};
 		6DDD38B42B1346BB000D2B62 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				6DB2E7BF2B4BBAEA002387DE /* Settings */,
 				6DDD38B52B1346C0000D2B62 /* PublicKey */,
 			);
 			path = Screens;
@@ -1934,7 +1970,6 @@
 			children = (
 				6D78E4C62949AA5A001767A3 /* DerivedKeyExportModel.swift */,
 				6DE8466D28BF73E40051346A /* DerivedKeyRowModel.swift */,
-				6DA501D8290C1C3E0096DA4E /* MKeyAndNetworkCard+PathAndNetwork.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2604,17 +2639,21 @@
 				6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */,
 				6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */,
 				6DE48E8A2B1F0B96003094D5 /* AutoMockable+V.generated.swift in Sources */,
+				6DB2E7CA2B4BBF6E002387DE /* MmNetwork+Generate.swift in Sources */,
 				6D686B9C2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
 				6DE48E8F2B1F0B96003094D5 /* AutoMockable+Y.generated.swift in Sources */,
 				6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */,
 				6DE48E842B1F0B96003094D5 /* AutoMockable+K.generated.swift in Sources */,
 				6DE48E962B1F0B96003094D5 /* AutoMockable+D.generated.swift in Sources */,
+				6DB2E7CC2B4BBF78002387DE /* MNetworkDetails+Generate.swift in Sources */,
 				6DE48E932B1F0B96003094D5 /* AutoMockable+W.generated.swift in Sources */,
 				6DE48E2E2B1EB97C003094D5 /* AutoMockableHeader.swift in Sources */,
 				6DE48E902B1F0B96003094D5 /* AutoMockable+A.generated.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
+				6DB2E7C12B4BBAF7002387DE /* SettingsViewModelTests.swift in Sources */,
 				6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */,
+				6DB2E7C52B4BBC24002387DE /* BackupSelectKeyViewModel.swift in Sources */,
 				6DE48E812B1F0B96003094D5 /* AutoMockable+G.generated.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
