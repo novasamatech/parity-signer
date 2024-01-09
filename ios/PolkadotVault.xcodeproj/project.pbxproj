@@ -169,6 +169,7 @@
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
 		6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */; };
+		6D80EB492B4CF582009C544B /* BananaSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB482B4CF582009C544B /* BananaSplitService.swift */; };
 		6D84442428D3424F0072FBAC /* HiddenScrollContainerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */; };
 		6D850BDE292F7B4D00BA9017 /* EnterPasswordModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */; };
 		6D850BE2292F85F200BA9017 /* SecuredTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D850BE1292F85F200BA9017 /* SecuredTextField.swift */; };
@@ -552,6 +553,7 @@
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
 		6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeRootFooterView.swift; sourceTree = "<group>"; };
+		6D80EB482B4CF582009C544B /* BananaSplitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitService.swift; sourceTree = "<group>"; };
 		6D84442328D3424F0072FBAC /* HiddenScrollContainerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenScrollContainerModifier.swift; sourceTree = "<group>"; };
 		6D850BDD292F7B4D00BA9017 /* EnterPasswordModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPasswordModal.swift; sourceTree = "<group>"; };
 		6D850BE1292F85F200BA9017 /* SecuredTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuredTextField.swift; sourceTree = "<group>"; };
@@ -1110,6 +1112,7 @@
 				6DA501D3290BC55A0096DA4E /* KeyDetailsService.swift */,
 				6DB9903E2962A97E001101DC /* ImportDerivedKeysService.swift */,
 				6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */,
+				6D80EB482B4CF582009C544B /* BananaSplitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2457,6 +2460,7 @@
 				6D6430EC28CB2FDF00342E37 /* TapAndDelayDismissAnimator.swift in Sources */,
 				6DC5643028B65B9C003D540B /* AnimationDuration.swift in Sources */,
 				6DF5E7A02922DDAD00F2B5B4 /* MTransaction+TransactionCards.swift in Sources */,
+				6D80EB492B4CF582009C544B /* BananaSplitService.swift in Sources */,
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				6D33EE2F2A9F47D3005F3827 /* KeyDetailsView+Header.swift in Sources */,
 				6DAA6CB129BF482E002329A8 /* AuthenticatedStateMediator.swift in Sources */,
