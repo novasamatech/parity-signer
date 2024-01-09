@@ -87,10 +87,6 @@ extension BackupSelectKeyView {
         }
 
         func onSeedNameTap(_ seedName: String) {
-            presentBackupModal(seedName)
-        }
-
-        private func presentBackupModal(_ seedName: String) {
             seedPhraseToPresent = .init(
                 keyName: seedName,
                 seedPhrase: .init(

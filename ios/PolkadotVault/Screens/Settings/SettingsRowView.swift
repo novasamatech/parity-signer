@@ -29,8 +29,7 @@ struct SettingsRowView: View {
     }
 }
 
-struct SettingsRowRenderable: Equatable, Identifiable {
-    let id = UUID()
+struct SettingsRowRenderable: Equatable, Hashable {
     let item: SettingsItem
     let title: String
     let isDestructive: Bool
