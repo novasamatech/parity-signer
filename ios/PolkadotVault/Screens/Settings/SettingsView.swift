@@ -24,7 +24,7 @@ struct SettingsView: View {
                 )
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(viewModel.renderable.items, id: \.id) { renderable in
+                        ForEach(viewModel.renderable.items, id: \.self) { renderable in
                             SettingsRowView(renderable: renderable)
                                 .contentShape(Rectangle())
                                 .onTapGesture {

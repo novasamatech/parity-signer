@@ -95,7 +95,6 @@ private enum Constants {
         "/Library/MobileSubstrate/DynamicLibraries/LiveClock.plist",
         "/Library/MobileSubstrate/DynamicLibraries/Veency.plist",
         "/private/var/lib/apt",
-        "/private/var/lib/apt/",
         "/private/var/lib/cydia",
         "/private/var/mobile/Library/SBSettings/Themes",
         "/private/var/stash",
@@ -108,7 +107,18 @@ private enum Constants {
         "/usr/libexec/sftp-server",
         "/usr/sbin/sshd",
         "/etc/apt",
-        "/bin/bash",
-        "/Library/MobileSubstrate/MobileSubstrate.dylib"
+        "/bin/sh",
+        "/bin/su",
+        "/etc/ssh/sshd_config",
+        "/Library/MobileSubstrate/MobileSubstrate.dylib",
+        "/pguntether",
+        "/usr/bin/cycript",
+        "/usr/bin/ssh",
+        "/usr/sbin/frida-server",
+        "/var/cache/apt",
+        "/var/lib/cydia",
+        "/var/log/syslog",
+        "/var/mobile/Media/.evasi0n7_installed",
+        "/var/tmp/cydia.log"
     ]
 }
