@@ -454,7 +454,7 @@
 	<string name="add_derived_keys_screen_cta">Confirm and Add Keys</string>
 	<string name="add_derived_keys_screen_alert_title">Confirm by entering the PIN code</string>
 	<string name="add_derived_keys_screen_alert_content">To finalize the addition of keys to the key set, please confirm that you have scanned the QR code back into the app by entering the PIN code.</string>
-	<string name="initial_screen_outdated_os_title">Consider updating operation system before using vault</string>
+	<string name="initial_screen_outdated_os_title">Please update your operation system for higher security</string>
 	<string name="initial_screen_outdated_os_description">Current Android version missing important security updated, exposed to at least: %1$s. It is recommended to install vault on up to date android version.</string>
 
 </resources>
