@@ -26,7 +26,7 @@ fun NavGraphBuilder.splashScreen(globalNavController: NavHostController) {
 		val viewModel: SplashScreenViewModel = viewModel()
 		val context = LocalContext.current
 		LaunchedEffect(Unit) {
-			if (viewModel.shouldShowOnboarding(context)) {
+			if (viewModel.shouldShowSingleRunChecks(context)) {
 				globalNavController.navigate(MainGraphRoutes.firstTimeOnboarding) {
 					popUpTo(0)
 				}
