@@ -32,7 +32,7 @@ import io.parity.signer.ui.theme.pink500
 import io.parity.signer.ui.theme.textTertiary
 
 @Composable
-fun WrongOsVersionNotificationScreen(
+fun OutdatedOsVersionScreen(
 	exposedVulnarabilities: List<KnownOSIssue>,
 	onProceed: Callback
 ) {
@@ -101,7 +101,7 @@ fun WrongOsVersionNotificationScreen(
 private fun WrongOsVersionNotificationScreenPreview() {
 	Box(modifier = Modifier.fillMaxSize()) {
 		SignerNewTheme() {
-			WrongOsVersionNotificationScreen(
+			OutdatedOsVersionScreen(
 				listOf(KnownOSIssue.CVE_2022_20465),
 				onProceed = {},
 			)

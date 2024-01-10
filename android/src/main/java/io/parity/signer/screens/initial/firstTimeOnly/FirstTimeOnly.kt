@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import io.parity.signer.screens.initial.eachstartchecks.osversion.WrongOsVersionNotificationScreen
+import io.parity.signer.screens.initial.eachstartchecks.osversion.OutdatedOsVersionScreen
 import io.parity.signer.screens.initial.eachstartchecks.osversion.OutdatedOsVersionViewModel
 import io.parity.signer.screens.initial.termsconsent.TermsConsentScreenFull
 import io.parity.signer.ui.rootnavigation.MainGraphRoutes
@@ -22,7 +22,7 @@ fun NavGraphBuilder.firstTimeOnlyOnboarding(
 		composable(route = FirstTimeOnboarding.osVersionNotification) {
 			val osVersionVM: OutdatedOsVersionViewModel = viewModel()
 			if (osVersionVM.isShouldShow()) {
-				WrongOsVersionNotificationScreen(
+				OutdatedOsVersionScreen(
 					exposedVulnarabilities = osVersionVM.getVulnerabilities(),
 					onProceed = {
 						navController.navigate(FirstTimeOnboarding.termsConsentRoute) {
