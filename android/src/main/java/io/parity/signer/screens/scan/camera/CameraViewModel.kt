@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -14,9 +15,12 @@ import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class CameraViewModel() : ViewModel() {
@@ -28,7 +32,7 @@ class CameraViewModel() : ViewModel() {
 		_bananaSplitPayload.asStateFlow()
 
 	private val _pendingTransactionPayloads =
-		MutableStateFlow<Set<String>>(emptySet())
+		MutableStateFlow<HashSet<String>>(HashSet())
 	val pendingTransactionPayloads: StateFlow<Set<String>> =
 		_pendingTransactionPayloads.asStateFlow()
 
@@ -50,7 +54,7 @@ class CameraViewModel() : ViewModel() {
 	internal val captured: StateFlow<Int?> = _captured.asStateFlow()
 
 	// payload of currently scanned qr codes for multiqr transaction like metadata update.
-	private var currentMultiQrTransaction = mutableSetOf<String>()
+	private var currentMultiQrTransaction = HashSet<String>()
 
 	/**
 	 * Barcode detecting function.
@@ -70,34 +74,41 @@ class CameraViewModel() : ViewModel() {
 
 		barcodeScanner.process(inputImage)
 			.addOnSuccessListener { barcodes ->
-				Trace.beginSection("process frame vault code")
-				barcodes.forEach {
-					val payloadString = it?.rawBytes?.encodeHex()
-					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
-						if (total.value == null) {
-							try {
-								val proposeTotal =
-									qrparserGetPacketsTotal(payloadString, true).toInt()
-								if (proposeTotal == 1) {
-									decode(listOf(payloadString))
-								} else {
-									currentMultiQrTransaction += payloadString
-									_captured.value = currentMultiQrTransaction.size
-									_total.value = proposeTotal
+				viewModelScope.launch {
+					Trace.beginSection("process frame vault code")
+					barcodes.forEach {
+						val payloadString = withContext(Dispatchers.IO) {
+							it?.rawBytes?.encodeHex()
+						}
+						if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
+							if (total.value == null) {
+								try {
+									val proposeTotal =
+										qrparserGetPacketsTotal(payloadString, true).toInt()
+									if (proposeTotal == 1) {
+										decode(listOf(payloadString))
+									} else {
+										currentMultiQrTransaction += payloadString
+										_captured.value = currentMultiQrTransaction.size
+										_total.value = proposeTotal
+									}
+								} catch (e: java.lang.Exception) {
+									Log.e("scanVM", "QR sequence length estimation $e")
 								}
-							} catch (e: java.lang.Exception) {
-								Log.e("scanVM", "QR sequence length estimation $e")
-							}
-						} else {
-							currentMultiQrTransaction += payloadString
-							if ((currentMultiQrTransaction.size + 1) >= (total.value ?: 0)) {
-								decode(currentMultiQrTransaction.toList())
 							} else {
-								_captured.value = currentMultiQrTransaction.size
+								currentMultiQrTransaction += payloadString
+								if ((currentMultiQrTransaction.size + 1) >= (total.value
+										?: 0)
+								) {
+									decode(currentMultiQrTransaction.toList())
+								} else {
+									_captured.value = currentMultiQrTransaction.size
+								}
+								Log.d("scanVM", "captured " + captured.value.toString())
 							}
-							Log.d("scanVM", "captured " + captured.value.toString())
 						}
 					}
+					Trace.endSection()
 				}
 				Trace.endSection()
 			}
@@ -162,13 +173,13 @@ class CameraViewModel() : ViewModel() {
 	 * Clears camera progress
 	 */
 	fun resetScanValues() {
-		currentMultiQrTransaction = mutableSetOf()
+		currentMultiQrTransaction = HashSet()
 		_captured.value = null
 		_total.value = null
 	}
 
 	fun resetPendingTransactions() {
-		_pendingTransactionPayloads.value = emptySet()
+		_pendingTransactionPayloads.value = HashSet()
 		_bananaSplitPayload.value = null
 		_dynamicDerivationPayload.value = null
 		_dynamicDerivationTransactionPayload.value = null

@@ -2,6 +2,7 @@ package io.parity.signer.domain
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.os.Trace
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -44,7 +45,10 @@ const val BASE58_STYLE_ABBREVIATE = 8
  * Encodes number array into string
  */
 fun ByteArray.encodeHex(): String {
-	return this.joinToString(separator = "") { byte -> "%02x".format(byte) }
+	Trace.beginSection("encode hex")
+	val result = this.joinToString(separator = "") { byte -> "%02x".format(byte) }
+	Trace.endSection()
+	return result
 }
 
 fun <T, K> StateFlow<T>.mapState(
