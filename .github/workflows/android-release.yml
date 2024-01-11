@@ -47,7 +47,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
+        uses:           Swatinem/rust-cache@a22603398250b864f7190077025cf752307154dc # v2.7.2
         with:
           workspaces:   rust -> rust/target
 
@@ -109,7 +109,7 @@ jobs:
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
+        uses:           Swatinem/rust-cache@a22603398250b864f7190077025cf752307154dc # v2.7.2
         with:
           workspaces:   rust -> rust/target
 
