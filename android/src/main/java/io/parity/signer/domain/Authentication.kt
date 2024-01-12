@@ -14,14 +14,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class Authentication {
 
-
 	companion object {
 		fun canAuthenticate(context: Context): Boolean {
 			val biometricManager = BiometricManager.from(context)
 
 			return when (biometricManager.canAuthenticate(
 				BiometricManager.Authenticators.DEVICE_CREDENTIAL
-					or BiometricManager.Authenticators.BIOMETRIC_WEAK
 			)) {
 				BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
 				BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED,
@@ -63,13 +61,11 @@ class Authentication {
 				.setSubtitle(context.getString(R.string.unlock_device_subtitle))
 				.setAllowedAuthenticators(
 					BiometricManager.Authenticators.DEVICE_CREDENTIAL
-						or BiometricManager.Authenticators.BIOMETRIC_WEAK
 				)
 				.build()
 
 		when (biometricManager.canAuthenticate(
 			BiometricManager.Authenticators.DEVICE_CREDENTIAL
-				or BiometricManager.Authenticators.BIOMETRIC_WEAK
 		)) {
 			BiometricManager.BIOMETRIC_SUCCESS -> {
 
@@ -166,12 +162,11 @@ class Authentication {
 				BiometricPrompt.PromptInfo.Builder()
 					.setTitle(context.getString(R.string.unlock_device_title))
 					.setSubtitle(context.getString(R.string.unlock_device_subtitle))
-					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
 					.build()
 
 			when (biometricManager.canAuthenticate(
 				BiometricManager.Authenticators.DEVICE_CREDENTIAL
-					or BiometricManager.Authenticators.BIOMETRIC_WEAK
 			)) {
 				BiometricManager.BIOMETRIC_SUCCESS -> {
 

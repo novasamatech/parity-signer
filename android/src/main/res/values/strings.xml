@@ -279,7 +279,7 @@
 	<string name="key_sets_empty_title">You Don\'t Have Any Key Sets</string>
 	<string name="key_sets_empty_message">Add a new Key Set to Store Keys and Sign Transactions</string>
 	<string name="screen_lock_title">Set Up Screen Lock</string>
-	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin, pattern or fingerprint. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
+	<string name="screen_lock_description">Any operation in Signer requires user authentication via pin or pattern. Please enable screen lock to set up those in your android. Using the application without a screen lock is not allowed.</string>
 	<string name="screen_lock_open_settings_button">Go to Settings</string>
 	<string name="documents_terms_of_service">Terms of service</string>
 	<string name="documents_privacy_policy">Privacy policy</string>
