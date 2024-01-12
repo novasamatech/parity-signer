@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.FeatureFlags
 import io.parity.signer.domain.FeatureOption
+import io.parity.signer.domain.NetworkExposedStateKeeper
 import io.parity.signer.domain.NetworkState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class AirGapViewModel : ViewModel() {
 
 	private val appContext = ServiceLocator.appContext
-	private val networkExposedStateKeeper =
+	private val networkExposedStateKeeper: NetworkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
 
 	private val _state = MutableStateFlow<AirGapScreenState>(

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.provider.Settings
+import android.util.Log
 import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.uniffi.historyAcknowledgeWarnings
 import io.parity.signer.uniffi.historyGetWarnings
@@ -32,7 +33,6 @@ class NetworkExposedStateKeeper(
 		MutableStateFlow(null)
 	val bluetoothDisabledState: StateFlow<Boolean?> = _bluetoothDisabledState
 
-	//todo dmitry implement
 	private val _usbDisconnected: MutableStateFlow<Boolean?> =
 		MutableStateFlow(null)
 	val usbDisconnected: StateFlow<Boolean?> = _usbDisconnected
@@ -42,16 +42,14 @@ class NetworkExposedStateKeeper(
 	val airGapModeState: StateFlow<NetworkState> = _airGapModeState
 
 	private val isCurentlyBreached: Boolean
-		get() = airPlaneModeEnabled.value == true && wifiDisabledState.value == true
-			&& bluetoothDisabledState.value == true && usbDisconnected.value == true
+		get() = airPlaneModeEnabled.value == false || wifiDisabledState.value == false
+			|| bluetoothDisabledState.value == false || usbDisconnected.value == false
 
 	init {
 		registerAirplaneBroadcastReceiver()
 		registerWifiBroadcastReceiver()
 		registerBluetoothBroadcastReceiver()
-		reactOnAirplaneMode()
-		reactOnWifiAwareState()
-		reactOnBluetooth()
+		registerUsbBroadcastReceiver()
 	}
 
 	/**
@@ -73,6 +71,7 @@ class NetworkExposedStateKeeper(
 			}
 		}
 		appContext.registerReceiver(receiver, intentFilter)
+		reactOnAirplaneMode()
 	}
 
 	private fun registerBluetoothBroadcastReceiver() {
@@ -83,6 +82,20 @@ class NetworkExposedStateKeeper(
 			}
 		}
 		appContext.registerReceiver(receiver, intentFilter)
+		reactOnBluetooth()
+	}
+
+	private fun registerUsbBroadcastReceiver() {
+		val intentFilter = IntentFilter("android.hardware.usb.action.USB_STATE")
+		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+			override fun onReceive(context: Context, intent: Intent) {
+				//usb broadcast reciever todo dmitry
+				Log.e("TAGG", "usb broadcast")
+				reactOnUsb(intent)
+			}
+		}
+		val oldIntent = appContext.registerReceiver(receiver, intentFilter)
+		oldIntent?.let { reactOnUsb(it) }
 	}
 
 	private fun updateGeneralAirgapState() {
@@ -120,6 +133,28 @@ class NetworkExposedStateKeeper(
 		updateGeneralAirgapState()
 	}
 
+	private fun reactOnUsb(usbIntent: Intent) {
+		if (FeatureFlags.isEnabled(FeatureOption.SKIP_USB_CHECK)) {
+			_usbDisconnected.value = false
+			updateGeneralAirgapState()
+			return
+		}
+
+		when (usbIntent.extras?.getBoolean("connected")) {
+			true -> {
+				_usbDisconnected.value = false
+				updateGeneralAirgapState()
+			}
+			false -> {
+				_usbDisconnected.value = true
+				updateGeneralAirgapState()
+			}
+			null -> {
+				Log.d("USB", "usb action intent doesn't have connection state")
+			}
+		}
+	}
+
 	private fun registerWifiBroadcastReceiver() {
 		val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -128,6 +163,7 @@ class NetworkExposedStateKeeper(
 			}
 		}
 		appContext.registerReceiver(receiver, intentFilter)
+		reactOnWifiAwareState()
 	}
 
 	private fun reactOnWifiAwareState() {
