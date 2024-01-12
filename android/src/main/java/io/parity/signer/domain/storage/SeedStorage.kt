@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.security.keystore.UserNotAuthenticatedException
-import android.util.Log
+import timber.log.Timber
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.domain.FeatureFlags
@@ -51,7 +51,7 @@ class SeedStorage {
 			false
 		}
 
-		Log.d("strongbox available:", hasStrongbox.toString())
+		Timber.d("strongbox available:", hasStrongbox.toString())
 
 		// Init crypto for seeds:
 		// https://developer.android.com/training/articles/keystore
@@ -74,7 +74,7 @@ class SeedStorage {
 				.build()
 		}
 
-		Log.e("ENCRY", "$appContext $KEYSTORE_NAME $masterKey")
+		Timber.e("ENCRY", "$appContext $KEYSTORE_NAME $masterKey")
 		//we need to be authenticated for this
 		sharedPreferences =
 			if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {

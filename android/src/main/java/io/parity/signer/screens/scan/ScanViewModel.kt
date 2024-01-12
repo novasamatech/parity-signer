@@ -1,7 +1,7 @@
 package io.parity.signer.screens.scan
 
 import android.content.Context
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,7 +76,7 @@ class ScanViewModel : ViewModel() {
 	suspend fun performTransactionPayload(payload: String, context: Context) {
 		val fakeNavigator = FakeNavigator()
 		if (transactionIsInProgress.value) {
-			Log.e(TAG, "started transaction while it was in progress, ignoring")
+			Timber.e(TAG, "started transaction while it was in progress, ignoring")
 			return
 		}
 		transactionIsInProgress.value = true
@@ -92,7 +92,7 @@ class ScanViewModel : ViewModel() {
 				val screenData = navigateResponse.result.screenData
 				val transactions: List<MTransaction> =
 					(screenData as? ScreenData.Transaction)?.f ?: run {
-						Log.e(
+						Timber.e(
 							TAG,
 							"Error in getting transaction from qr payload, " + "screenData is $screenData, navigation resp is $navigateResponse"
 						)
@@ -224,7 +224,7 @@ class ScanViewModel : ViewModel() {
 	) {
 		when (val phrases = seedRepository.getAllSeeds()) {
 			is RepoResult.Failure -> {
-				Log.e(
+				Timber.e(
 					TAG,
 					"cannot get seeds to show import dynamic derivations ${phrases.error}"
 				)
@@ -255,7 +255,7 @@ class ScanViewModel : ViewModel() {
 	) {
 		when (val phrases = seedRepository.getAllSeeds()) {
 			is RepoResult.Failure -> {
-				Log.e(
+				Timber.e(
 					TAG,
 					"cannot get seeds to show import dynamic derivations ${phrases.error}"
 				)
@@ -435,7 +435,7 @@ class ScanViewModel : ViewModel() {
 	): ActionResult? {
 		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
 			is RepoResult.Failure -> {
-				Log.w(TAG, "signature transactions failure ${phrases.error}")
+				Timber.w(TAG, "signature transactions failure ${phrases.error}")
 				null
 			}
 
@@ -453,7 +453,7 @@ class ScanViewModel : ViewModel() {
 			scanFlowInteractor.handlePasswordEntered(password)
 		val actionResult =
 			(navigateResponse as? OperationResult.Ok)?.result ?: run {
-				Log.e(
+				Timber.e(
 					TAG,
 					"Error in entering password for a key, " + "navigation resp is $navigateResponse"
 				)
@@ -478,7 +478,7 @@ class ScanViewModel : ViewModel() {
 			}
 			//ignore the rest modals
 			else -> {
-				Log.e(
+				Timber.e(
 					TAG,
 					"Password is entered for transaction, but neither new password or signature is passed! Should not happen" + "actionResult is $actionResult"
 				)

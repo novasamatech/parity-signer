@@ -1,6 +1,6 @@
 package io.parity.signer.screens.keysetdetails
 
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -104,7 +104,7 @@ class KeySetDetailsViewModel : ViewModel() {
 
 		return when (result) {
 			null, is OperationResult.Err -> {
-				Log.d(
+				Timber.d(
 					"Keyset",
 					"wrong seed name requested or wrong last known seed getting another one"
 				)
