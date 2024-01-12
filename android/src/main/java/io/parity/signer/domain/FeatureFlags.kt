@@ -12,8 +12,7 @@ object FeatureFlags {
 			FeatureOption.SKIP_ROOTED_CHECK_EMULATOR -> false
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 			FeatureOption.FAIL_DB_VERSION_CHECK -> false
-			FeatureOption.SKIP_USB_CHECK -> false
-			//todo dmitry
+			FeatureOption.SKIP_USB_CHECK -> true
 
 		}
 	}

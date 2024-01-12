@@ -89,7 +89,6 @@ class NetworkExposedStateKeeper(
 		val intentFilter = IntentFilter("android.hardware.usb.action.USB_STATE")
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
-				//usb broadcast reciever todo dmitry
 				Log.e("TAGG", "usb broadcast")
 				reactOnUsb(intent)
 			}
