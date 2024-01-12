@@ -1,7 +1,5 @@
 package io.parity.signer.ui.rootnavigation
 
-import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -50,7 +48,6 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 				}
 				else -> {}
 			}
-Log.e("TAGG", Build.VERSION.SECURITY_PATCH)
 		} else {
 			UnlockAppAuthScreen(onUnlockClicked = mainFlowViewModel::onUnlockClicked)
 		}
