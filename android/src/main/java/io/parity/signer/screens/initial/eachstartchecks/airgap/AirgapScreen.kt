@@ -3,7 +3,6 @@ package io.parity.signer.screens.initial.eachstartchecks.airgap
 import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -26,14 +25,12 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
-import io.parity.signer.components.base.CheckboxIcon
 import io.parity.signer.components.base.PrimaryButtonWide
 import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.domain.Callback
@@ -163,7 +160,7 @@ private fun AirgapItem(type: AirgapItemType, isPassed: Boolean) {
 			AirgapItemType.WIFI -> stringResource(R.string.airgap_onboarding_wifi_header)
 			AirgapItemType.AIRPLANE_MODE -> stringResource(R.string.airgap_onboarding_airplane_mode_header)
 			AirgapItemType.BLUETOOTH -> stringResource(R.string.airgap_onboarding_bluetooth_header)
-			AirgapItemType.USB -> stringResource(R.string.airgap_onboarding_disconnect_cable_checkbox_description)
+			AirgapItemType.USB -> stringResource(R.string.airgap_onboarding_usb_disconnect_description)
 			AirgapItemType.ADB_ENABLED -> stringResource(R.string.airgap_onboarding_adb_disable)
 		}
 		Text(

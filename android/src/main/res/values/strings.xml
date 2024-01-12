@@ -296,7 +296,7 @@
 	<string name="airgap_onboarding_wifi_header">Turn off Wifi Connection</string>
 	<string name="airgap_onboarding_bluetooth_header">Turn off Bluetooth</string>
 	<string name="airgap_onboarding_airplane_mode_header">Enable Airplane Mode</string>
-	<string name="airgap_onboarding_disconnect_cable_checkbox_description">I confirm that all Cables are Disconnected</string>
+	<string name="airgap_onboarding_usb_disconnect_description">Disconnect USB connection</string>
 	<string name="settings_confirmation_wipe_all_message">Remove all data and set general verifier information blank. \n\n%1$s This operation cannot be reversed so do not proceed unless you are sure you wish to erase important verification information. In most cases, there is no need to wipe all data. Using this feature inappropriately may lead to loss of funds!</string>
 	<string name="settings_confirmation_wipe_all_message_highlited_warning">Warning:</string>
 	<string name="settings_confirmation_wipe_all_title">Wipe All Data?</string>
