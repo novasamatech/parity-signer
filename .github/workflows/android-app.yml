@@ -47,8 +47,12 @@ jobs:
           distribution: 'adopt'
           java-version: 17
 
+#todo dmitry
       - name:           Install NDK
-        run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
+#        uses: actions/checkout@v3
+        uses: nttld/setup-ndk@v1
+        with:
+           ndk-version: r25c
 
       - name:           Rust Cache
         uses:           Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
