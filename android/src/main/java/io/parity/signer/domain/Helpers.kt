@@ -1,12 +1,12 @@
 package io.parity.signer.domain
 
-import android.util.Log
+import timber.log.Timber
 import io.parity.signer.BuildConfig
 import io.parity.signer.uniffi.ErrorDisplayed
 import java.lang.RuntimeException
 
 fun submitErrorState(message: String) {
-	Log.e("error state", message)
+	Timber.e("error state", message)
 	if (BuildConfig.DEBUG) {
 		throw RuntimeException(message)
 	}

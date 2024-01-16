@@ -1,7 +1,7 @@
 package io.parity.signer.screens.settings.logs.comment
 
 import android.content.res.Configuration
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -45,7 +45,7 @@ internal fun AddLogCommentScreen(onBack: Callback) {
 			viewModel.viewModelScope.launch {
 				when (val postResult = viewModel.addLogNote(note)) {
 					is OperationResult.Err -> {
-						Log.e(TAG, "log note not added, error ${postResult.error}")
+						Timber.e(TAG, "log note not added, error ${postResult.error}")
 						Toast.makeText(
 							context,
 							context.getString(

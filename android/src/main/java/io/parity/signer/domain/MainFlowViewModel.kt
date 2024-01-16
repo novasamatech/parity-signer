@@ -2,7 +2,7 @@ package io.parity.signer.domain
 
 import android.annotation.SuppressLint
 import android.content.*
-import android.util.Log
+import timber.log.Timber
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +34,7 @@ class MainFlowViewModel() : ViewModel() {
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
-					Log.e("Signer", "Auth failed, not unlocked")
+					Timber.e("Signer", "Auth failed, not unlocked")
 				}
 			}
 		}

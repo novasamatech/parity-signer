@@ -1,7 +1,7 @@
 package io.parity.signer.domain
 
 import android.os.Bundle
-import android.util.Log
+import timber.log.Timber
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
@@ -19,7 +19,7 @@ private class NavLogger(val tag: String) :
 		destination: NavDestination,
 		arguments: Bundle?
 	) {
-		Log.d(tag, "destination is " + destination.route)
+		Timber.d(tag, "destination is " + destination.route)
 	}
 
 }

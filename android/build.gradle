@@ -116,6 +116,7 @@ dependencies {
 	implementation "com.appmattus.crypto:cryptohash:0.10.1" //black2b hash for dot icon
 	implementation "io.coil-kt:coil-compose:$coilVersion"
 	implementation "io.coil-kt:coil-svg:$coilVersion"
+	implementation 'com.jakewharton.timber:timber:5.0.1'
 	testImplementation 'junit:junit:4.13.2'
 	testImplementation "org.mockito:mockito-core:5.9.0"
 	testImplementation "androidx.test:core:1.5.0"
