@@ -5,7 +5,7 @@ Polkadot Vault is built to be used offline. The mobile device used to run the ap
 - Get a separate mobile device.
 - Make a factory reset.
 - Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
-- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.
+- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords. For example, some can be forced to unlock derive by other people.
 - Once the app has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
 - Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
 
@@ -17,7 +17,7 @@ The app is available in beta for Android and iOS :
 - [iOS app store](https://itunes.apple.com/us/app/parity-signer/id1218174838)
 - [Signed APK from GitHub](https://github.com/paritytech/parity-signer/releases)
 
-Please double check carefully the origin of the app, and make sure that the company distributing it is **Parity Technologies**. Usual security advice apply to this air-gapped wallet: 
+Please double check carefully the origin of the app, and make sure that the company distributing it is **Parity Technologies**. Usual security advice apply to this air-gapped wallet:
 - When creating an account using Polkadot Vault Mobile app, make sure to write down the recovery phrase and store it in safe places.
 - Always double check the information of the transactions you are about to sign or send.
 - Make sure to first transfer a small amount of Ether with the app and verify that everything is working as expected before transferring larger amounts of Ether.
