@@ -50,7 +50,6 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 				}
 				else -> {}
 			}
-Timber.e("TAGG", Build.VERSION.SECURITY_PATCH)
 		} else {
 			UnlockAppAuthScreen(onUnlockClicked = mainFlowViewModel::onUnlockClicked)
 		}
