@@ -54,24 +54,6 @@ extension MscNetworkInfo {
     }
 }
 
-extension Address {
-    static func generate(
-        path: String = "//polkadot//0",
-        hasPwd: Bool = false,
-        identicon: Identicon = Identicon.generate(),
-        seedName: String = "Main Key Set",
-        secretExposed: Bool = false
-    ) -> Address {
-        Address(
-            path: path,
-            hasPwd: hasPwd,
-            identicon: identicon,
-            seedName: seedName,
-            secretExposed: secretExposed
-        )
-    }
-}
-
 extension Identicon {
     static func generate(
         type: IdenticonType = .dots,
