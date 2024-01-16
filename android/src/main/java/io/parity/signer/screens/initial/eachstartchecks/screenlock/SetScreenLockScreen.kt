@@ -3,7 +3,7 @@ package io.parity.signer.screens.initial.eachstartchecks.screenlock
 import android.content.Intent
 import android.content.res.Configuration
 import android.provider.Settings
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -83,7 +83,7 @@ fun SetScreenLockScreen() {
 						null
 					)
 				} else {
-					Log.e("screen lock", "Settings activity not found")
+					Timber.e("screen lock", "Settings activity not found")
 				}
 			}
 		}

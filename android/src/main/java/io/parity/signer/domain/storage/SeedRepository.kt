@@ -1,7 +1,7 @@
 package io.parity.signer.domain.storage
 
 import android.security.keystore.UserNotAuthenticatedException
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.domain.AuthResult
@@ -67,7 +67,7 @@ class SeedRepository(
 				}
 			}
 		} catch (e: java.lang.Exception) {
-			Log.d("get seed failure", e.toString())
+			Timber.d("get seed failure", e.toString())
 			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
 			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
 		}
@@ -111,7 +111,7 @@ class SeedRepository(
 				}
 			}
 		} catch (e: java.lang.Exception) {
-			Log.d("get seed failure", e.toString())
+			Timber.d("get seed failure", e.toString())
 			Toast.makeText(activity, "get seed failure: $e", Toast.LENGTH_LONG).show()
 			RepoResult.Failure(RuntimeException("Unexpected Exception", e))
 		}
@@ -141,12 +141,12 @@ class SeedRepository(
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
-					Log.e(TAG, "auth error - $authResult")
+					Timber.e(TAG, "auth error - $authResult")
 					false
 				}
 			}
 		} catch (e: java.lang.Exception) {
-			Log.e(TAG, e.toString())
+			Timber.e(TAG, e.toString())
 			return false
 		}
 	}
@@ -181,7 +181,7 @@ class SeedRepository(
 						is UniffiResult.Success -> OperationResult.Ok(Unit)
 					}
 				} catch (e: java.lang.Exception) {
-					Log.d("remove seed error", e.toString())
+					Timber.d("remove seed error", e.toString())
 					OperationResult.Err(e)
 				}
 			}
@@ -189,7 +189,7 @@ class SeedRepository(
 			AuthResult.AuthError,
 			AuthResult.AuthFailed,
 			AuthResult.AuthUnavailable -> {
-				Log.d("remove seed auth error ", authResult.toString())
+				Timber.d("remove seed auth error ", authResult.toString())
 				OperationResult.Err(Exception("remove seed auth error $authResult"))
 			}
 		}
@@ -223,7 +223,7 @@ class SeedRepository(
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
-					Log.e(TAG, "auth error - $authResult")
+					Timber.e(TAG, "auth error - $authResult")
 					false
 				}
 			}

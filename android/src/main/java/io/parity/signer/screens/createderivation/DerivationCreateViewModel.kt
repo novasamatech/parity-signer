@@ -1,7 +1,7 @@
 package io.parity.signer.screens.createderivation
 
 import android.content.Context
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import io.parity.signer.R
@@ -157,10 +157,10 @@ class DerivationCreateViewModel : ViewModel() {
 					}
 				}
 			} else {
-				Log.e(TAG, "Seed phrase received but it's empty")
+				Timber.e(TAG, "Seed phrase received but it's empty")
 			}
 		} catch (e: java.lang.Exception) {
-			Log.e(TAG, e.toString())
+			Timber.e(TAG, e.toString())
 		}
 	}
 
