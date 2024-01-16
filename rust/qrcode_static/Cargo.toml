@@ -10,7 +10,7 @@ edition = "2018"
 anyhow = "1.0.79"
 bitvec = "1.0.1"
 constants = {path = "../constants"}
-png = "0.17.10"
+png = "0.17.11"
 qrcodegen = "1.8.0"
 
 [dev-dependencies]
