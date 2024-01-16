@@ -1,7 +1,7 @@
 package io.parity.signer.screens.settings.logs
 
 import android.content.Context
-import android.util.Log
+import timber.log.Timber
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,7 +37,7 @@ class LogsViewModel() : ViewModel() {
 			withContext(Dispatchers.IO) { uniffiInteractor.getLogs() }) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDebugDetailedDescriptionString()
-				Log.e(TAG, "Unexpected error getLogs, $error")
+				Timber.e(TAG, "Unexpected error getLogs, $error")
 				_logsState.value = CompletableResult.Err(error)
 			}
 			is UniffiResult.Success -> {
@@ -51,7 +51,7 @@ class LogsViewModel() : ViewModel() {
 			withContext(Dispatchers.IO) { uniffiInteractor.addCommentToLogs(logNote) }) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDebugDetailedDescriptionString()
-				Log.e(TAG, "Unexpected error addNote, $error")
+				Timber.e(TAG, "Unexpected error addNote, $error")
 				OperationResult.Err(error)
 			}
 			is UniffiResult.Success -> {
@@ -71,7 +71,7 @@ class LogsViewModel() : ViewModel() {
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
-					Log.d("Vault", "Can't remove logs without authentication")
+					Timber.d("Vault", "Can't remove logs without authentication")
 				}
 			}
 		}
@@ -81,7 +81,7 @@ class LogsViewModel() : ViewModel() {
 			withContext(Dispatchers.IO) { uniffiInteractor.clearLogHistory() }) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDebugDetailedDescriptionString()
-				Log.e(TAG, "Unexpected error clear logs, $error")
+				Timber.e(TAG, "Unexpected error clear logs, $error")
 				OperationResult.Err(error)
 			}
 			is UniffiResult.Success -> {
