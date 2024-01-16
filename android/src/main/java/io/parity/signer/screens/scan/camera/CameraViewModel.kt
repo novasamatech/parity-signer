@@ -2,21 +2,17 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.os.Trace
-import timber.log.Timber
-import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.FeatureFlags
-import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 
 
 class CameraViewModel() : ViewModel() {
