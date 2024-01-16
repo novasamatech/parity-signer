@@ -96,7 +96,7 @@ extension VerifierCertificateView {
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
         private let onboardingMediator: OnboardingMediating
-        private let service: GeneralVerifierService
+        private let service: GeneralVerifierServicing
         var dismissViewRequest: AnyPublisher<Void, Never> {
             dismissRequest.eraseToAnyPublisher()
         }
@@ -105,7 +105,7 @@ extension VerifierCertificateView {
 
         init(
             onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator,
-            service: GeneralVerifierService = GeneralVerifierService()
+            service: GeneralVerifierServicing = GeneralVerifierService()
         ) {
             self.onboardingMediator = onboardingMediator
             self.service = service
@@ -122,7 +122,7 @@ extension VerifierCertificateView {
             dismissRequest.send()
         }
 
-        func loadData() {
+        private func loadData() {
             service.getGeneralVerifier { result in
                 switch result {
                 case let .success(content):

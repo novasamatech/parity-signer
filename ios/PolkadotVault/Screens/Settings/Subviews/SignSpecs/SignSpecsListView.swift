@@ -117,7 +117,7 @@ extension SignSpecsListView {
     final class ViewModel: ObservableObject {
         private let networkKey: String
         private let seedsMediator: SeedsMediating
-        private let service: ManageNetworkDetailsService
+        private let service: ManageNetworkDetailsServicing
         let type: SpecSignType
         @Published var detailsContent: MSufficientCryptoReady!
         @Published var content: MSignSufficientCrypto?
@@ -137,7 +137,7 @@ extension SignSpecsListView {
             networkKey: String,
             type: SpecSignType,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: ManageNetworkDetailsService = ManageNetworkDetailsService()
+            service: ManageNetworkDetailsServicing = ManageNetworkDetailsService()
         ) {
             self.networkKey = networkKey
             self.type = type
