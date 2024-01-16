@@ -2,7 +2,7 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.os.Trace
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
@@ -86,7 +86,7 @@ class CameraViewModel() : ViewModel() {
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
-								Log.e("scanVM", "QR sequence length estimation $e")
+								Timber.e("scanVM", "QR sequence length estimation $e")
 							}
 						} else {
 							currentMultiQrTransaction += payloadString
@@ -95,14 +95,14 @@ class CameraViewModel() : ViewModel() {
 							} else {
 								_captured.value = currentMultiQrTransaction.size
 							}
-							Log.d("scanVM", "captured " + captured.value.toString())
+							Timber.d("scanVM", "captured " + captured.value.toString())
 						}
 					}
 				}
 				Trace.endSection()
 			}
 			.addOnFailureListener {
-				Log.e("scanVM", "Scan failed " + it.message.toString())
+				Timber.e("scanVM", "Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
 				Trace.endSection()
@@ -150,7 +150,7 @@ class CameraViewModel() : ViewModel() {
 			}
 
 		} catch (e: Exception) {
-			Log.e("scanVM", "Single frame decode failed $e")
+			Timber.e("scanVM", "Single frame decode failed $e")
 		}
 	}
 

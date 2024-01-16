@@ -1,7 +1,7 @@
 package io.parity.signer.domain
 
 import android.content.Context
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
@@ -44,7 +44,7 @@ class FakeNavigator : Navigator {
 		try {
 			backendAction(action, details, seedPhrase)
 		} catch (e: ErrorDisplayed) {
-			Log.e("fake navigation error", e.message ?: e.toString())
+			Timber.e("fake navigation error", e.message ?: e.toString())
 		}
 		//do nothing with result
 	}

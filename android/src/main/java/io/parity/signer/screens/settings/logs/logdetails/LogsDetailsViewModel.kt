@@ -1,6 +1,6 @@
 package io.parity.signer.screens.settings.logs.logdetails
 
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.ViewModel
 import io.parity.signer.domain.backend.CompletableResult
 import io.parity.signer.domain.backend.UniffiResult
@@ -29,7 +29,7 @@ class LogsDetailsViewModel(): ViewModel() {
 		}) {
 			is UniffiResult.Error -> {
 				val error = result.error.getDebugDetailedDescriptionString()
-                Log.e(TAG, "Unexpected error getLogs, $error")
+                Timber.e(TAG, "Unexpected error getLogs, $error")
 				_logsState.value = CompletableResult.Err(error)
 			}
 			is UniffiResult.Success -> {

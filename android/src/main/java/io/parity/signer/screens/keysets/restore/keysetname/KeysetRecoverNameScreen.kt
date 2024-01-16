@@ -1,7 +1,7 @@
 package io.parity.signer.screens.keysets.restore.keysetname
 
 import android.content.res.Configuration
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
