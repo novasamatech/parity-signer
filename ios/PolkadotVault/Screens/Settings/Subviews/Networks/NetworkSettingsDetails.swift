@@ -128,9 +128,11 @@ struct NetworkSettingsDetails: View {
                 }
             ) {
                 NetworkSettingsDetailsActionModal(
-                    isShowingActionSheet: $viewModel.isShowingActionSheet,
-                    shouldPresentRemoveNetworkConfirmation: $viewModel.shouldPresentRemoveNetworkConfirmation,
-                    shouldSignSpecs: $viewModel.shouldSignSpecs
+                    viewModel: .init(
+                        isPresented: $viewModel.isShowingActionSheet,
+                        shouldPresentRemoveNetworkConfirmation: $viewModel.shouldPresentRemoveNetworkConfirmation,
+                        shouldSignSpecs: $viewModel.shouldSignSpecs
+                    )
                 )
                 .clearModalBackground()
             }
@@ -328,7 +330,7 @@ extension NetworkSettingsDetails {
 
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let networkDetailsService: ManageNetworkDetailsService
+        private let networkDetailsService: ManageNetworkDetailsServicing
         private var metadataToDelete: MMetadataRecord?
         var dismissViewRequest: AnyPublisher<Void, Never> { dismissRequest.eraseToAnyPublisher() }
         private let dismissRequest = PassthroughSubject<Void, Never>()
@@ -345,7 +347,7 @@ extension NetworkSettingsDetails {
         @Published var specSignType: SpecSignType!
         @Published var isPresentingSignSpecList: Bool = false
         @Published var isShowingQRScanner: Bool = false
-        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
@@ -353,7 +355,7 @@ extension NetworkSettingsDetails {
         init(
             networkKey: String,
             networkDetails: MNetworkDetails,
-            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService(),
+            networkDetailsService: ManageNetworkDetailsServicing = ManageNetworkDetailsService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.networkKey = networkKey
@@ -467,10 +469,12 @@ private extension NetworkSettingsDetails.ViewModel {
 
     func listenToNavigationUpdates() {
         guard cancelBag.subscriptions.isEmpty else { return }
-        $isPresentingSignSpecList.sink { [weak self] isPresentingSignSpecList in
-            guard let self, !isPresentingSignSpecList else { return }
-            updateView()
-        }.store(in: cancelBag)
+        $isPresentingSignSpecList
+            .dropFirst()
+            .sink { [weak self] isPresentingSignSpecList in
+                guard let self, !isPresentingSignSpecList else { return }
+                updateView()
+            }.store(in: cancelBag)
     }
 }
 
