@@ -111,21 +111,21 @@ struct NetworkSelectionSettings: View {
 extension NetworkSelectionSettings {
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let service: GetManagedNetworksService
-        private let networkDetailsService: ManageNetworkDetailsService
+        private let service: GetManagedNetworksServicing
+        private let networkDetailsService: ManageNetworkDetailsServicing
         @Published var networks: [MmNetwork] = []
         @Published var selectedDetails: MNetworkDetails!
         @Published var selectedDetailsKey: String!
         @Published var isPresentingDetails = false
         @Published var isShowingQRScanner: Bool = false
-        var snackbarViewModel: SnackbarViewModel = .init(title: "")
+        @Published var snackbarViewModel: SnackbarViewModel = .init(title: "")
         @Published var isSnackbarPresented: Bool = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
 
         init(
-            service: GetManagedNetworksService = GetManagedNetworksService(),
-            networkDetailsService: ManageNetworkDetailsService = ManageNetworkDetailsService()
+            service: GetManagedNetworksServicing = GetManagedNetworksService(),
+            networkDetailsService: ManageNetworkDetailsServicing = ManageNetworkDetailsService()
         ) {
             self.service = service
             self.networkDetailsService = networkDetailsService
@@ -172,10 +172,12 @@ extension NetworkSelectionSettings {
 
 private extension NetworkSelectionSettings.ViewModel {
     func onDetailsDismiss() {
-        $isPresentingDetails.sink { [weak self] isPresented in
-            guard let self, !isPresented else { return }
-            updateNetworks()
-        }.store(in: cancelBag)
+        $isPresentingDetails
+            .dropFirst()
+            .sink { [weak self] isPresented in
+                guard let self, !isPresented else { return }
+                updateNetworks()
+            }.store(in: cancelBag)
     }
 
     func updateNetworks() {
