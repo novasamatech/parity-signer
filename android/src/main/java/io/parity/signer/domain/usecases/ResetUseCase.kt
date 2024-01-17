@@ -22,12 +22,12 @@ class ResetUseCase {
 	private val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-	fun wipeToFactoryWithAuth(onAfterWide: Callback) {
+	fun wipeToFactoryWithAuth(onAfterWipe: Callback) {
 		val authentication = ServiceLocator.authentication
 		authentication.authenticate(activity) {
 			databaseAssetsInteractor.wipe()
 			totalRefresh()
-			onAfterWide()
+			onAfterWipe()
 		}
 	}
 

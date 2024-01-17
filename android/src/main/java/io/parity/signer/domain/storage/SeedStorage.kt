@@ -10,11 +10,15 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.domain.FeatureFlags
 import io.parity.signer.domain.FeatureOption
+import io.parity.signer.domain.backend.OperationResult
+import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.historySeedWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.security.UnrecoverableKeyException
+import javax.crypto.AEADBadTagException
 
 
 /**
@@ -42,7 +46,8 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
-	fun init(appContext: Context) {
+	fun init(appContext: Context): OperationResult<Unit, ErrorDisplayed> {//todo dmitry see errors
+		//todo dmitry see errors in io/parity/signer/screens/error/ErrorStateDestination.kt:71
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			appContext
 				.packageManager
@@ -76,21 +81,36 @@ class SeedStorage {
 
 		Timber.e("ENCRY", "$appContext $KEYSTORE_NAME $masterKey")
 		//we need to be authenticated for this
-		sharedPreferences =
-			if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
-				appContext.getSharedPreferences(
-					"FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT",
-					Context.MODE_PRIVATE
-				)
-			} else {
-				EncryptedSharedPreferences(
-					appContext,
-					KEYSTORE_NAME,
-					masterKey,
-					EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-					EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-				)
+		try {
+			sharedPreferences =
+				if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
+					appContext.getSharedPreferences(
+						"FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT",
+						Context.MODE_PRIVATE
+					)
+				} else {
+					EncryptedSharedPreferences(
+						appContext,
+						KEYSTORE_NAME,
+						masterKey,
+						EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+						EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+					)
+				}
+		} catch (e: Exception) {
+			when (e) {
+				is AEADBadTagException,
+//				is android.security.KeyStoreException,//todo dmitry minapi requirement
+				is UnrecoverableKeyException -> {
+					//todo dmitry
+					return OperationResult.Err(ErrorDisplayed.Str("todo dmitry"))
+				}
+
+				else -> throw e
 			}
+		}
+
+		return OperationResult.Ok(Unit)
 	}
 
 
