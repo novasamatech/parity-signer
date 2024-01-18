@@ -61,6 +61,7 @@ fun NavGraphBuilder.mainSignerAppFlow(globalNavController: NavHostController) {
 			UnlockAppAuthScreen(onUnlockClicked = {
 				mainFlowViewModel.viewModelScope.launch {
 					mainFlowViewModel.onUnlockClicked().handleErrorAppState(
+						//todo dmitry show error in current graph, unlocked is not shown here!
 						unlockedNavController
 					)
 				}
