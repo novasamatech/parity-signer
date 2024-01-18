@@ -296,6 +296,10 @@
 		6DDF439E2987A23E00881AFF /* Unbounded-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */; };
 		6DDF439F2987A24000881AFF /* Unbounded-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DDF439929879D1D00881AFF /* Unbounded-Regular.ttf */; };
 		6DE07B102B450EB7001AF54C /* OnboardingMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE07B0F2B450EB7001AF54C /* OnboardingMediatorTests.swift */; };
+		6DE1B8322B56C54900D299C1 /* CancelBagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1B8312B56C54900D299C1 /* CancelBagTests.swift */; };
+		6DE1B8342B56C6C400D299C1 /* URLOpening.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1B8332B56C6C400D299C1 /* URLOpening.swift */; };
+		6DE1B8362B56C72700D299C1 /* ProcessInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1B8352B56C72700D299C1 /* ProcessInfoProtocol.swift */; };
+		6DE1B8382B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1B8372B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift */; };
 		6DE48E2E2B1EB97C003094D5 /* AutoMockableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */; };
 		6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */; };
 		6DE48E7F2B1F0B96003094D5 /* AutoMockable+Z.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE48E652B1F0B95003094D5 /* AutoMockable+Z.generated.swift */; };
@@ -692,6 +696,10 @@
 		6DDF439A29879D1D00881AFF /* Unbounded-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Unbounded-Bold.ttf"; sourceTree = "<group>"; };
 		6DDF439B29879D3900881AFF /* SecondaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryFont.swift; sourceTree = "<group>"; };
 		6DE07B0F2B450EB7001AF54C /* OnboardingMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMediatorTests.swift; sourceTree = "<group>"; };
+		6DE1B8312B56C54900D299C1 /* CancelBagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelBagTests.swift; sourceTree = "<group>"; };
+		6DE1B8332B56C6C400D299C1 /* URLOpening.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLOpening.swift; sourceTree = "<group>"; };
+		6DE1B8352B56C72700D299C1 /* ProcessInfoProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfoProtocol.swift; sourceTree = "<group>"; };
+		6DE1B8372B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetectionPublisherTests.swift; sourceTree = "<group>"; };
 		6DE48E2C2B1EB97C003094D5 /* AutoMockableHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoMockableHeader.swift; sourceTree = "<group>"; };
 		6DE48E2D2B1EB97C003094D5 /* initial_setup.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = initial_setup.sh; sourceTree = "<group>"; };
 		6DE48E642B1F0B95003094D5 /* AutoMockable+X.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AutoMockable+X.generated.swift"; sourceTree = "<group>"; };
@@ -1367,6 +1375,7 @@
 				6D5801DF289924A3006C41D8 /* Connectivity */,
 				6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */,
 				6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */,
+				6DE1B8372B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1554,6 +1563,8 @@
 			isa = PBXGroup;
 			children = (
 				6D80EB562B4EB117009C544B /* SignSpecsListViewModelTests.swift */,
+				6D2C78AB2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift */,
+				6D2C78AD2B56DB07006431E3 /* SignSpecEnterPasswordModalViewModelTests.swift */,
 			);
 			path = SignSpecs;
 			sourceTree = "<group>";
@@ -1680,6 +1691,8 @@
 				6DA2ACA12939CB3900AAEADC /* CancelBag.swift */,
 				6DA2ACA62939DBCE00AAEADC /* DateFormatter+Utils.swift */,
 				6DA08B9129B694A30027CFCB /* BackendConstants.swift */,
+				6DE1B8332B56C6C400D299C1 /* URLOpening.swift */,
+				6DE1B8352B56C72700D299C1 /* ProcessInfoProtocol.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1817,6 +1830,7 @@
 			isa = PBXGroup;
 			children = (
 				6DC2EDF82B11961800298F00 /* DateFormatterTests.swift */,
+				6DE1B8312B56C54900D299C1 /* CancelBagTests.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2481,6 +2495,7 @@
 				6D52E3A52946C3B400AD72F0 /* SettingsView.swift in Sources */,
 				6DA2ACA22939CB3900AAEADC /* CancelBag.swift in Sources */,
 				6DB39AA42A4579E0004B8FAA /* AddDerivedKeysView.swift in Sources */,
+				6DE1B8362B56C72700D299C1 /* ProcessInfoProtocol.swift in Sources */,
 				6DFE588F297A9F78002BFDBF /* ServiceError.swift in Sources */,
 				6D1F077F2A9CA24F006BA85E /* RecoverKeySetService.swift in Sources */,
 				6D52E3A72946C45100AD72F0 /* SettingsItem.swift in Sources */,
@@ -2626,6 +2641,7 @@
 				6DF07ADE29C1062300C01DE8 /* SetUpNetworksIntroView.swift in Sources */,
 				6D91F3EE28C16163007560F5 /* CircularProgressView.swift in Sources */,
 				6D019973289D183600F4C317 /* NavigationCoordinator.swift in Sources */,
+				6DE1B8342B56C6C400D299C1 /* URLOpening.swift in Sources */,
 				6DF3CFEC29936F41002DF203 /* EnterKeySetNameView.swift in Sources */,
 				6DF91F4029C06B70000A6BB2 /* VerifierValue+Show.swift in Sources */,
 				6D2D245228CE5F2D00862726 /* KeyDetailsPublicKeyView.swift in Sources */,
@@ -2684,6 +2700,7 @@
 				6DE48E832B1F0B96003094D5 /* AutoMockable+C.generated.swift in Sources */,
 				6D80EB542B4EB0C8009C544B /* MAddressCard+Generate.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
+				6DE1B8322B56C54900D299C1 /* CancelBagTests.swift in Sources */,
 				6DE48E8D2B1F0B96003094D5 /* AutoMockable+S.generated.swift in Sources */,
 				6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */,
 				6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */,
@@ -2711,6 +2728,7 @@
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */,
 				6DDD38B72B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift in Sources */,
+				6DE1B8382B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift in Sources */,
 				6DDD38B92B134ADF000D2B62 /* MKeyDetails+Generate.swift in Sources */,
 				6DBD2200289A8C74005D539B /* URL+Generate.swift in Sources */,
 				6DE48E922B1F0B96003094D5 /* AutoMockable+T.generated.swift in Sources */,
