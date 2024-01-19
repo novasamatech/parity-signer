@@ -14,7 +14,7 @@ import SwiftUI
 /// This struct uses `PolkadotIdenticonGenerator` to generate a unique image, based on a provided public key input,
 /// which can then be rendered within the SwiftUI view hierarchy.
 public struct PolkadotIdenticonView: View {
-    private let identiconGenerator: PolkadotIdenticonGenerator = PolkadotIdenticonGenerator()
+    private let identiconGenerator: PolkadotIdenticonGenerator = .init()
 
     /// The public key input based on which the Identicon is generated.
     /// The public key can be in one of three formats: raw binary data (`Data`), a hexadecimal string, or a base58

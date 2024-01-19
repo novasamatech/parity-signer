@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 extension Verifier {
     func show() -> String {
         switch v {

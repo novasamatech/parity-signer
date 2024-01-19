@@ -122,16 +122,17 @@ public class BlockiesImageRenderer {
 
             let number = data[index]
 
-            let blockColor: PlatformColor = switch number {
-            case 0:
-                backgroundColor
-            case 1:
-                primaryColor
-            case 2:
-                spotColor
-            default:
-                PlatformColor.black
-            }
+            let blockColor: PlatformColor =
+                switch number {
+                case 0:
+                    backgroundColor
+                case 1:
+                    primaryColor
+                case 2:
+                    spotColor
+                default:
+                    PlatformColor.black
+                }
             context.setFillColor(blockColor.cgColor)
             context.fill(CGRect(
                 x: CGFloat(col * scale * scalingFactor),

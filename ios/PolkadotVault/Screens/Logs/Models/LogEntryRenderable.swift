@@ -28,7 +28,7 @@ struct LogEntryRenderable: Equatable, Hashable, Identifiable {
 final class LogEntryRenderableBuilder {
     func build(_ logs: MLog) -> [LogEntryRenderable] {
         var lastDate: String?
-        var shouldIncludeDate: Bool = false
+        var shouldIncludeDate = false
         var result: [LogEntryRenderable] = []
         // Used to retrieve data index for navigation...
         logs.log.forEach { historyItem in
