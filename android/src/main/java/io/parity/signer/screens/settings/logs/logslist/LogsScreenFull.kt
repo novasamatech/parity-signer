@@ -1,6 +1,6 @@
 package io.parity.signer.screens.settings.logs.logslist
 
-import android.util.Log
+import timber.log.Timber
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -39,7 +39,7 @@ fun LogsScreenFull(
 	Box(Modifier.statusBarsPadding()) {
 		when (logsCurrentValue) {
 			is CompletableResult.Err -> {
-				Log.e(TAG, "error in getting logs ${logsCurrentValue.error}")
+				Timber.e(TAG, "error in getting logs ${logsCurrentValue.error}")
 				Toast.makeText(context, logsCurrentValue.error, Toast.LENGTH_LONG)
 					.show()
 				viewModel.resetValues()

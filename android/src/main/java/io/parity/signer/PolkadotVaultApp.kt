@@ -1,12 +1,14 @@
 package io.parity.signer
 
 import android.app.Application
-import android.util.Log
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.initLogging
+import timber.log.Timber
+import timber.log.Timber.*
 import java.lang.Thread.UncaughtExceptionHandler
+
 
 class PolkadotVaultApp : Application() {
 	override fun onCreate() {
@@ -15,6 +17,10 @@ class PolkadotVaultApp : Application() {
 		System.loadLibrary("signer")
 
 		initLogging("SIGNER_RUST_LOG")
+
+		if (BuildConfig.DEBUG) {
+			Timber.plant(DebugTree())
+		}
 
 		val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
 		Thread.setDefaultUncaughtExceptionHandler(
@@ -34,7 +40,7 @@ class RootExceptionHandler(
 	override fun uncaughtException(t: Thread, e: Throwable) {
 		val rustStr = findErrorDisplayedStr(e)
 		if (rustStr != null) {
-			Log.e(TAG, "Rust caused ErrorDisplay message was: ${rustStr.s}")
+			Timber.e(TAG, "Rust caused ErrorDisplay message was: ${rustStr.s}")
 			submitErrorState("rust error not handled, fix it!")
 		} else {
 			defaultHandler?.uncaughtException(t, e) ?: throw e

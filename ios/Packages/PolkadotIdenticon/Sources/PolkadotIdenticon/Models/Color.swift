@@ -28,12 +28,12 @@ struct Color: Equatable {
     /// A predefined color white with an alpha of 0, typically used as the background color.
     ///
     /// - Returns: A `Color` instance representing the background color.
-    static let backgroundColor: Color = Color(red: 255, green: 255, blue: 255, alpha: 0)
+    static let backgroundColor: Color = .init(red: 255, green: 255, blue: 255, alpha: 0)
 
     /// A predefined gray color with an alpha of 255, typically used as the foreground color.
     ///
     /// - Returns: A `Color` instance representing the foreground color.
-    static let foregroundColor: Color = Color(red: 238, green: 238, blue: 238, alpha: 255)
+    static let foregroundColor: Color = .init(red: 238, green: 238, blue: 238, alpha: 255)
 }
 
 extension Color {

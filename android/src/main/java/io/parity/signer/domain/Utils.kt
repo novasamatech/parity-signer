@@ -2,7 +2,7 @@ package io.parity.signer.domain
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +65,7 @@ fun List<UByte>.intoImageBitmap(): ImageBitmap {
 	return try {
 		BitmapFactory.decodeByteArray(picture, 0, picture.size).asImageBitmap()
 	} catch (e: java.lang.Exception) {
-		Log.d("image decoding error", e.toString())
+		Timber.d("image decoding error", e.toString())
 		ImageBitmap(1, 1)
 	}
 }

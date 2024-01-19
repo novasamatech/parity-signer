@@ -1,7 +1,7 @@
 package io.parity.signer.screens.initial
 
 import android.content.res.Configuration
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme

@@ -11,7 +11,7 @@ bitvec = "1.0.1"
 hex = "0.4.3"
 raptorq = "1.8.0"
 qrcodegen = "1.8.0"
-png = "0.17.10"
+png = "0.17.11"
 
 definitions = { path = "../definitions" }
 constants = { path = "../constants" }

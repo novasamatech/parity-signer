@@ -2,21 +2,17 @@ package io.parity.signer.screens.scan.camera
 
 import android.annotation.SuppressLint
 import android.os.Trace
-import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.dependencygraph.ServiceLocator
-import io.parity.signer.domain.FeatureFlags
-import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 
 
 class CameraViewModel() : ViewModel() {
@@ -86,7 +82,7 @@ class CameraViewModel() : ViewModel() {
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
-								Log.e("scanVM", "QR sequence length estimation $e")
+								Timber.e("scanVM", "QR sequence length estimation $e")
 							}
 						} else {
 							currentMultiQrTransaction += payloadString
@@ -95,14 +91,14 @@ class CameraViewModel() : ViewModel() {
 							} else {
 								_captured.value = currentMultiQrTransaction.size
 							}
-							Log.d("scanVM", "captured " + captured.value.toString())
+							Timber.d("scanVM", "captured " + captured.value.toString())
 						}
 					}
 				}
 				Trace.endSection()
 			}
 			.addOnFailureListener {
-				Log.e("scanVM", "Scan failed " + it.message.toString())
+				Timber.e("scanVM", "Scan failed " + it.message.toString())
 			}
 			.addOnCompleteListener {
 				Trace.endSection()
@@ -150,7 +146,7 @@ class CameraViewModel() : ViewModel() {
 			}
 
 		} catch (e: Exception) {
-			Log.e("scanVM", "Single frame decode failed $e")
+			Timber.e("scanVM", "Single frame decode failed $e")
 		}
 	}
 

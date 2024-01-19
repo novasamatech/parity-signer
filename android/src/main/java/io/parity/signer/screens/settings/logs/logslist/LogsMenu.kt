@@ -1,7 +1,7 @@
 package io.parity.signer.screens.settings.logs.logslist
 
 import android.content.res.Configuration
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth

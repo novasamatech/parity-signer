@@ -1,6 +1,6 @@
 package io.parity.signer.screens.settings.networks.signspecs
 
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
@@ -50,7 +50,7 @@ class SignSpecsViewModel : ViewModel() {
 			when (val seedResult =
 				seedRepo.getSeedPhraseForceAuth(keyModel.seedName)) {
 				is RepoResult.Failure -> {
-					Log.d(
+					Timber.d(
 						"sufficient crypto",
 						"failed to get seed to sign sufficient crypto"
 					)
