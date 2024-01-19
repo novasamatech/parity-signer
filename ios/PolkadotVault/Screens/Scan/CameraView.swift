@@ -9,9 +9,9 @@ import AVFoundation
 import SwiftUI
 
 struct CameraView: View {
-    @StateObject var model: CameraService = CameraService()
+    @StateObject var model: CameraService = .init()
     @StateObject var viewModel: ViewModel
-    @StateObject var progressViewModel: ProgressSnackbarViewModel = ProgressSnackbarViewModel()
+    @StateObject var progressViewModel: ProgressSnackbarViewModel = .init()
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     var body: some View {
@@ -372,12 +372,13 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
-            let message: String = switch completionAction {
-            case let .createKeySet(seedName):
-                Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
-            case let .recoveredKeySet(seedName):
-                Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
-            }
+            let message: String =
+                switch completionAction {
+                case let .createKeySet(seedName):
+                    Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+                case let .recoveredKeySet(seedName):
+                    Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                }
             snackbarViewModel = .init(
                 title: message,
                 style: .info

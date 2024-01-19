@@ -68,12 +68,13 @@ extension AuthenticatedScreenContainer {
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
             updateViewState()
-            let message: String = switch completionAction {
-            case let .createKeySet(seedName):
-                Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
-            case let .recoveredKeySet(seedName):
-                Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
-            }
+            let message: String =
+                switch completionAction {
+                case let .createKeySet(seedName):
+                    Localizable.CreateKeysForNetwork.Snackbar.keySetCreated(seedName)
+                case let .recoveredKeySet(seedName):
+                    Localizable.CreateKeysForNetwork.Snackbar.keySetRecovered(seedName)
+                }
             snackbarViewModel = .init(
                 title: message,
                 style: .info

@@ -10,10 +10,10 @@ import SwiftUI
 
 extension TransactionPreviewRenderable {
     init(_ transaction: MTransaction) {
-        var pallet: String = ""
-        var method: String = ""
-        var destination: String = ""
-        var value: String = ""
+        var pallet = ""
+        var method = ""
+        var destination = ""
+        var value = ""
         let methodCards = transaction.content.method?.map(\.card) ?? []
 
         for methodCard in methodCards {
