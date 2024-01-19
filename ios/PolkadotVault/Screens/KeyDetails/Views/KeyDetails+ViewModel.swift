@@ -381,15 +381,16 @@ private extension KeyDetailsView.ViewModel {
         guard let keysData else { return }
         let sortedDerivedKeys = keysData.set
             .sorted(by: { $0.key.address.path < $1.key.address.path })
-        let filteredKeys: [MKeyAndNetworkCard] = if selectedNetworks.isEmpty {
-            sortedDerivedKeys
-        } else {
-            sortedDerivedKeys.filter {
-                selectedNetworks
-                    .map(\.key)
-                    .contains($0.network.networkSpecsKey)
+        let filteredKeys: [MKeyAndNetworkCard] =
+            if selectedNetworks.isEmpty {
+                sortedDerivedKeys
+            } else {
+                sortedDerivedKeys.filter {
+                    selectedNetworks
+                        .map(\.key)
+                        .contains($0.network.networkSpecsKey)
+                }
             }
-        }
         derivedKeys = filteredKeys
             .map {
                 DerivedKeyRowModel(

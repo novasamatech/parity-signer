@@ -160,13 +160,14 @@ final class CreateDerivedKeyService {
                     occuredErrors.append((network: pathAndNetwork.network, error: displayedError.localizedDescription))
                 }
                 if let lastElement = pathAndNetworks.last, lastElement == pathAndNetwork {
-                    let result: Result<Void, CreateDerivedKeyError> = if occuredErrors.isEmpty {
-                        .success(())
-                    } else if occuredErrors.count == pathAndNetworks.count {
-                        .failure(.noKeysCreates(errors: occuredErrors.map(\.error)))
-                    } else {
-                        .failure(.keysNotCreated(occuredErrors))
-                    }
+                    let result: Result<Void, CreateDerivedKeyError> =
+                        if occuredErrors.isEmpty {
+                            .success(())
+                        } else if occuredErrors.count == pathAndNetworks.count {
+                            .failure(.noKeysCreates(errors: occuredErrors.map(\.error)))
+                        } else {
+                            .failure(.keysNotCreated(occuredErrors))
+                        }
                     completion(result)
                 }
             })
@@ -216,11 +217,12 @@ final class CreateDerivedKeyService {
                     occuredErrors.append((seedName: seedKey, error: displayedError.localizedDescription))
                 }
                 if let lastElement = seedKeys.last, lastElement == seedKey {
-                    let result: Result<Void, CreateDerivedKeyForKeySetsError> = if occuredErrors.isEmpty {
-                        .success(())
-                    } else {
-                        .failure(.keysNotCreated(occuredErrors))
-                    }
+                    let result: Result<Void, CreateDerivedKeyForKeySetsError> =
+                        if occuredErrors.isEmpty {
+                            .success(())
+                        } else {
+                            .failure(.keysNotCreated(occuredErrors))
+                        }
                     completion(result)
                 }
             })
@@ -247,13 +249,14 @@ final class CreateDerivedKeyService {
                     occuredErrors.append((key: keyToImport.path, error: displayedError.backendDisplayError))
                 }
                 if keysToImport.last == keyToImport {
-                    let result: Result<Void, ImportDerivedKeyError> = if occuredErrors.isEmpty {
-                        .success(())
-                    } else if occuredErrors.count == keysToImport.count {
-                        .failure(.noKeysImported(errors: occuredErrors.map(\.error)))
-                    } else {
-                        .failure(.keyNotImported(occuredErrors))
-                    }
+                    let result: Result<Void, ImportDerivedKeyError> =
+                        if occuredErrors.isEmpty {
+                            .success(())
+                        } else if occuredErrors.count == keysToImport.count {
+                            .failure(.noKeysImported(errors: occuredErrors.map(\.error)))
+                        } else {
+                            .failure(.keyNotImported(occuredErrors))
+                        }
                     completion(result)
                 }
             })
