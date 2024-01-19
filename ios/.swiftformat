@@ -16,6 +16,7 @@
 --enable wrapAttributes
 --enable wrapEnumCases
 --enable wrapLoopBodies
+--enable wrapSwitchCases
 --enable wrapMultilineConditionalAssignment
 --enable leadingDelimiters
 --enable modifierOrder
