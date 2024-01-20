@@ -10,9 +10,15 @@
 --exclude PolkadotVault/Generated/
 
 # rules
+--enable blankLineAfterImports
 --enable blockComments
 --enable isEmpty
+--enable wrapAttributes
 --enable wrapEnumCases
+--enable wrapLoopBodies
 --enable wrapSwitchCases
---disable redundantType
+--enable wrapMultilineConditionalAssignment
+--enable leadingDelimiters
+--enable modifierOrder
+--disable preferForLoop
 --disable wrapMultilineStatementBraces

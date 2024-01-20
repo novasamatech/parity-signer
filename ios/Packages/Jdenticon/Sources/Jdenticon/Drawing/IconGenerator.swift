@@ -114,11 +114,12 @@ class IconGenerator {
         rotationIndex: Int?,
         positions: [[Int]]
     ) {
-        var r: Int = if let rotationIndex {
-            Int(String(_hash[_hash.index(_hash.startIndex, offsetBy: rotationIndex)]), radix: 16) ?? 0
-        } else {
-            0
-        }
+        var r =
+            if let rotationIndex {
+                Int(String(_hash[_hash.index(_hash.startIndex, offsetBy: rotationIndex)]), radix: 16) ?? 0
+            } else {
+                0
+            }
 
         let shape =
             shapes[(Int(String(_hash[_hash.index(_hash.startIndex, offsetBy: index)]), radix: 16) ?? 0) % shapes
