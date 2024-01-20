@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.UniffiResult
@@ -121,33 +122,31 @@ class SeedRepository(
 		seedName: String,
 		seedPhrase: String,
 		networksKeys: List<String>
-	): Boolean {
-		//todo return operation result here and show error in UI
-		// Check if seed name already exists
+	): AuthOperationResult {
 		if (isSeedPhraseCollision(seedPhrase)) {
-			return false
+			return AuthOperationResult.Error(Exception("Seed Phrase Collision - can't proceed"))
 		}
 
 		try {
 			addSeedDangerous(seedName, seedPhrase, networksKeys)
-			return true
+			return AuthOperationResult.Success
 		} catch (e: UserNotAuthenticatedException) {
 			return when (val authResult = authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> {
 					addSeedDangerous(seedName, seedPhrase, networksKeys)
-					true
+					AuthOperationResult.Success
 				}
 
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
-					Timber.e(TAG, "auth error - $authResult")
-					false
+					Timber.w(TAG, "auth error - $authResult")
+					AuthOperationResult.AuthFailed(authResult)
 				}
 			}
 		} catch (e: java.lang.Exception) {
 			Timber.e(TAG, e.toString())
-			return false
+			return AuthOperationResult.Error(e)
 		}
 	}
 
