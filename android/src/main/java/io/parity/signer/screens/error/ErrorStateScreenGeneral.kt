@@ -74,7 +74,7 @@ internal fun ErrorStateScreen(
 				)
 			}
 		}
-//		PrimaryButtonWide(
+//		PrimaryButtonWide( todo dmitry remove?
 //			label = stringResource(R.string.button_next),
 //			modifier = Modifier.padding(24.dp),
 //			onClicked = {},

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.mapState
 import io.parity.signer.domain.storage.SeedRepository
 import io.parity.signer.domain.submitErrorState
@@ -89,14 +90,16 @@ class BananaSplitViewModel() : ViewModel() {
 	) {
 		val seedName = seedName.value
 		val seedPhrase = _seedPhrase.value!!
-		val isSaved = createKeySetUseCase.createKeySetWithNetworks(
+		val success = createKeySetUseCase.createKeySetWithNetworks(
 			seedName, seedPhrase,
 			networksKeys.toList(),
 		)
-		if (!isSaved) {
+		if (success == AuthOperationResult.Success) {
 			_isCustomErrorTerminal.value =
 				context.getString(R.string.banana_split_password_error_cannot_save_seed)
 			return
+		} else {
+			//todo dmitry show error
 		}
 		_isSuccessTerminal.value = seedName
 	}

@@ -9,6 +9,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.backend.AuthOperationResult
+import io.parity.signer.screens.error.ErrorStateDestinationState
 import io.parity.signer.screens.keysets.create.backupstepscreens.NewKeySetNetworksViewModel
 import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKeysetSelectNetworkScreenBase
 
@@ -17,6 +19,7 @@ import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKey
 fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	seedName: String,
 	seedPhrase: String,
+	showError: (ErrorStateDestinationState) -> Unit, //todo dmitry check we can go back here
 	onBack: Callback,
 	navigateOnSuccess: Callback,
 ) {
@@ -37,17 +40,28 @@ fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	val onProceedAction = {
 		networksViewModel.createKeySetWithNetworks(
 			seedName = seedName, seedPhrase = seedPhrase,
-			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
-				.toSet(),
-			onAfterCreate = { isSuccess ->
-				if (isSuccess) {
-					Toast.makeText(
-						context,
-						context.getString(R.string.key_set_has_been_recovered_toast, seedName),
-						Toast.LENGTH_LONG
-					).show()
+			networkForKeys = selected.value.mapNotNull { selected ->
+				networks.find { it.key == selected } }.toSet(),
+			onAfterCreate = { success ->
+				when (success) {
+					is AuthOperationResult.AuthFailed,
+					is AuthOperationResult.Error -> {
+						//todo dmitry make ErrorStateDestinationState from AuthOperationResult
+						showError()
+					}
+					AuthOperationResult.Success -> {
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.key_set_has_been_recovered_toast,
+								seedName
+							),
+							Toast.LENGTH_LONG
+						).show()
+						navigateOnSuccess()
+					}
 				}
-				navigateOnSuccess()
+
 			}
 		)
 	}
