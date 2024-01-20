@@ -55,6 +55,7 @@ fun NewKeySetSelectNetworkScreen(
 	seedName: String,
 	seedPhrase: String,
 	onBack: Callback,
+	showError: (AuthOperationResult) -> Unit,
 	onSuccess: Callback,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
@@ -84,15 +85,23 @@ fun NewKeySetSelectNetworkScreen(
 			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
 			onAfterCreate = { success ->
-				if (success == AuthOperationResult.Success) {
-					Toast.makeText(
-						context,
-						context.getString(R.string.key_set_has_been_created_toast, seedName),
-						Toast.LENGTH_LONG
-					).show()
-					onSuccess()
-				} else {
-					//todo dmitry handle error
+				when (success) {
+					is AuthOperationResult.AuthFailed,
+					is AuthOperationResult.Error -> {
+						showError(success)
+					}
+
+					AuthOperationResult.Success -> {
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.key_set_has_been_created_toast,
+								seedName
+							),
+							Toast.LENGTH_LONG
+						).show()
+						onSuccess()
+					}
 				}
 			}
 		)

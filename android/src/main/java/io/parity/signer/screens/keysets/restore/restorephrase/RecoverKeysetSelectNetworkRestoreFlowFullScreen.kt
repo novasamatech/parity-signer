@@ -19,7 +19,7 @@ import io.parity.signer.screens.keysets.restore.recoverkeysetnetworks.RecoverKey
 fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 	seedName: String,
 	seedPhrase: String,
-	showError: (ErrorStateDestinationState) -> Unit, //todo dmitry check we can go back here
+	showError: (AuthOperationResult) -> Unit,
 	onBack: Callback,
 	navigateOnSuccess: Callback,
 ) {
@@ -46,8 +46,7 @@ fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 				when (success) {
 					is AuthOperationResult.AuthFailed,
 					is AuthOperationResult.Error -> {
-						//todo dmitry make ErrorStateDestinationState from AuthOperationResult
-						showError()
+						showError(success)
 					}
 					AuthOperationResult.Success -> {
 						Toast.makeText(
@@ -61,7 +60,6 @@ fun RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 						navigateOnSuccess()
 					}
 				}
-
 			}
 		)
 	}

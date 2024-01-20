@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.domain.popUpToTop
 import io.parity.signer.screens.error.handleErrorAppState
@@ -107,6 +108,9 @@ fun NewKeysetSubgraph(
 					) {
 							popUpToTop(coreNavController)
 					}
+				},
+				showError = { error: AuthOperationResult ->
+					error.handleErrorAppState(coreNavController)
 				},
 				onBack = subgraphNavController::popBackStack,
 			)

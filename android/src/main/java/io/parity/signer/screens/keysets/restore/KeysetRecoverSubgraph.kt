@@ -20,8 +20,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.popUpToTop
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keysets.restore.keysetname.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowFullScreen
@@ -100,6 +102,9 @@ fun KeysetRecoverSubgraph(
 				seedName = keysetName,
 				seedPhrase = seedPhrase,
 				onBack = localNavController::popBackStack,
+				showError = { error: AuthOperationResult ->
+					error.handleErrorAppState(coreNavController)
+				},
 				navigateOnSuccess = {
 					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.KeySet.destination(
