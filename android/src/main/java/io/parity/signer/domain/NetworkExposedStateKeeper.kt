@@ -8,12 +8,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.provider.Settings
-import android.util.Log
 import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.uniffi.historyAcknowledgeWarnings
 import io.parity.signer.uniffi.historyGetWarnings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import timber.log.Timber
 
 
 class NetworkExposedStateKeeper(
@@ -89,7 +89,6 @@ class NetworkExposedStateKeeper(
 		val intentFilter = IntentFilter("android.hardware.usb.action.USB_STATE")
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
-				Log.e("TAGG", "usb broadcast")
 				reactOnUsb(intent)
 			}
 		}
@@ -134,7 +133,7 @@ class NetworkExposedStateKeeper(
 
 	private fun reactOnUsb(usbIntent: Intent) {
 		if (FeatureFlags.isEnabled(FeatureOption.SKIP_USB_CHECK)) {
-			_usbDisconnected.value = false
+			_usbDisconnected.value = true
 			updateGeneralAirgapState()
 			return
 		}
@@ -149,7 +148,7 @@ class NetworkExposedStateKeeper(
 				updateGeneralAirgapState()
 			}
 			null -> {
-				Log.d("USB", "usb action intent doesn't have connection state")
+				Timber.d("USB", "usb action intent doesn't have connection state")
 			}
 		}
 	}

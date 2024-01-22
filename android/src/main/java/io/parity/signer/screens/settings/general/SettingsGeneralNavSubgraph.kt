@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -16,14 +17,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.exposesecurity.ExposedAlert
 import io.parity.signer.domain.Callback
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.BottomSheetWrapperRoot
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
+import kotlinx.coroutines.launch
 
 
 @Composable
 internal fun SettingsGeneralNavSubgraph(
-	parentNavController: NavController,
+	coreNavController: NavController,
 ) {
 	val context = LocalContext.current
 	val vm: SettingsGeneralViewModel = viewModel()
@@ -35,19 +38,19 @@ internal fun SettingsGeneralNavSubgraph(
 
 	Box(modifier = Modifier.statusBarsPadding()) {
 		SettingsScreenGeneralView(
-			navController = parentNavController,
+			navController = coreNavController,
 			onWipeData = { menuNavController.navigate(SettingsGeneralMenu.wipe_factory) },
-			onOpenLogs = { parentNavController.navigate(SettingsNavSubgraph.logs) },
-			onShowTerms = { parentNavController.navigate(SettingsNavSubgraph.terms) },
+			onOpenLogs = { coreNavController.navigate(SettingsNavSubgraph.logs) },
+			onShowTerms = { coreNavController.navigate(SettingsNavSubgraph.terms) },
 			onShowPrivacyPolicy = {
-				parentNavController.navigate(SettingsNavSubgraph.privacyPolicy)
+				coreNavController.navigate(SettingsNavSubgraph.privacyPolicy)
 			},
-			onBackup = { parentNavController.navigate(SettingsNavSubgraph.backup) },
+			onBackup = { coreNavController.navigate(SettingsNavSubgraph.backup) },
 			onManageNetworks = {
-				parentNavController.navigate(SettingsNavSubgraph.networkList)
+				coreNavController.navigate(SettingsNavSubgraph.networkList)
 			},
 			onGeneralVerifier = {
-				parentNavController.navigate(SettingsNavSubgraph.generalVerifier)
+				coreNavController.navigate(SettingsNavSubgraph.generalVerifier)
 			},
 			onExposedClicked = { menuNavController.navigate(SettingsGeneralMenu.exposed_shield_alert) },
 			isStrongBoxProtected = vm.isStrongBoxProtected,
@@ -73,10 +76,12 @@ internal fun SettingsGeneralNavSubgraph(
 				ConfirmFactorySettingsBottomSheet(
 					onCancel = closeAction,
 					onFactoryReset = {
-						vm.wipeToFactory {
-							parentNavController.navigate(
-								CoreUnlockedNavSubgraph.KeySet.destination(null)
-							)
+						vm.viewModelScope.launch {
+							vm.wipeToFactory {
+								coreNavController.navigate(
+									CoreUnlockedNavSubgraph.KeySet.destination(null)
+								)
+							}.handleErrorAppState(coreNavController)
 						}
 					}
 				)

@@ -7,7 +7,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.usecases.ResetUseCase
+import io.parity.signer.screens.error.ErrorStateDestinationState
 import io.parity.signer.uniffi.*
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,17 +29,16 @@ class MainFlowViewModel() : ViewModel() {
 	val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-	fun onUnlockClicked() {
-		viewModelScope.launch {
-			when (authentication.authenticate(activity)) {
+	suspend fun onUnlockClicked(): OperationResult<Unit, ErrorStateDestinationState> {
+			return when (authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> resetUseCase.totalRefresh()
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
 					Timber.e("Signer", "Auth failed, not unlocked")
+					OperationResult.Ok(Unit)
 				}
 			}
-		}
 	}
 
 	val authenticated: StateFlow<Boolean> = authentication.auth

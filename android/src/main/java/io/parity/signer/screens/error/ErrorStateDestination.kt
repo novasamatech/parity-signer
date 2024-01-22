@@ -67,6 +67,11 @@ inline fun <reified T> UniffiResult<T>.handleErrorAppState(coreNavController: Na
 	return this.toOperationResult().handleErrorAppState(coreNavController)
 }
 
+data class ErrorStateDestinationState(
+	val argHeader: String,
+	val argDescription: String,
+	val argVerbose: String,
+)
 
 inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 	coreNavController: NavController
@@ -75,6 +80,13 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 		is OperationResult.Err -> {
 			coreNavController.navigate(
 				when (error) {
+					is ErrorStateDestinationState -> {
+						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
+							argHeader = error.argHeader,
+							argDescription = error.argDescription,
+							argVerbose = error.argVerbose,
+						)
+					}
 					is NavigationError -> {
 						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
 							argHeader = "Operation navigation error trying to get ${T::class.java}",
@@ -88,6 +100,7 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 							is ErrorDisplayed.DbSchemaMismatch -> {
 								CoreUnlockedNavSubgraph.errorWrongDbVersionUpdate
 							}
+
 							else -> {
 								CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
 									argHeader = "Operation error to get ${T::class.java}",

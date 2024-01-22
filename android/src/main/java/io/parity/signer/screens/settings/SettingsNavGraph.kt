@@ -29,7 +29,7 @@ import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
  * all subsequent interactions should be in modals or drop-down menus
  */
 fun NavGraphBuilder.settingsFullSubgraph(
-	navController: NavController,
+	coreNavController: NavController,
 ) {
 	navigation(
 		route = CoreUnlockedNavSubgraph.settings,
@@ -40,32 +40,32 @@ fun NavGraphBuilder.settingsFullSubgraph(
 			enterTransition = { fadeIn(animationSpec = tween(700)) },
 			exitTransition = { fadeOut(animationSpec = tween(700)) },
 		) {
-			SettingsGeneralNavSubgraph(parentNavController = navController)
+			SettingsGeneralNavSubgraph(coreNavController = coreNavController)
 		}
 		composable(SettingsNavSubgraph.terms) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				TosScreen(onBack = {
-					navController.popBackStack(SettingsNavSubgraph.home, false)
+					coreNavController.popBackStack(SettingsNavSubgraph.home, false)
 				})
 			}
 		}
 		composable(SettingsNavSubgraph.privacyPolicy) {
 			Box(modifier = Modifier.statusBarsPadding()) {
 				PpScreen(onBack = {
-					navController.popBackStack(SettingsNavSubgraph.home, false)
+					coreNavController.popBackStack(SettingsNavSubgraph.home, false)
 				})
 			}
 		}
 		composable(SettingsNavSubgraph.backup) {
-			SeedBackupIntegratedScreen(navController) {
-				navController.popBackStack(SettingsNavSubgraph.home, false)
+			SeedBackupIntegratedScreen(coreNavController) {
+				coreNavController.popBackStack(SettingsNavSubgraph.home, false)
 			}
 		}
 		logsNavigationSubgraph(
-			navController = navController,
+			navController = coreNavController,
 		)
-		networkListDestination(navController)
-		verifierSettingsDestination(navController)
+		networkListDestination(coreNavController)
+		verifierSettingsDestination(coreNavController)
 		composable(
 			route = SettingsNavSubgraph.NetworkDetails.route,
 			arguments = listOf(
@@ -78,10 +78,10 @@ fun NavGraphBuilder.settingsFullSubgraph(
 				it.arguments?.getString(SettingsNavSubgraph.NetworkDetails.networkKey)!!
 			NetworkDetailsSubgraph(
 				networkKey,
-				navController,
+				coreNavController,
 			)
 		}
-		signSpecsDestination(navController)
+		signSpecsDestination(coreNavController)
 	}
 }
 

@@ -457,6 +457,8 @@
 	<string name="initial_screen_outdated_os_title">Please update your operation system for higher security</string>
 	<string name="initial_screen_outdated_os_description">Current Android version missing important security updated, exposed to at least: %1$s. It is recommended to install vault on up to date android version.</string>
 	<string name="airgap_onboarding_adb_disable">Disable ADB on the device</string>
+    <string name="error_secure_storage_title">Couldn\'t open secure storage</string>
+	<string name="error_secure_storage_description">There was an error during opening secure storage. Possible reasons - device unlock method was changed. Error below</string>
 
 </resources>
 
