@@ -123,7 +123,7 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 			)
 		}
 		settingsFullSubgraph(
-			navController = navController,
+			coreNavController = navController,
 		)
 		networkHelpersCoreSubgraph(
 			navController = navController,

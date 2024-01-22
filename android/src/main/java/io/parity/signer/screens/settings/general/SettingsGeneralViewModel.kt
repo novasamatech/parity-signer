@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkState
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.usecases.ResetUseCase
+import io.parity.signer.screens.error.ErrorStateDestinationState
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -29,7 +31,7 @@ class SettingsGeneralViewModel: ViewModel() {
 	/**
 	 * Auth user and wipe the Vault to initial state
 	 */
-	fun wipeToFactory(onAfterWipe: Callback) {
-		resetUseCase.wipeToFactoryWithAuth(onAfterWipe)
+	suspend fun wipeToFactory(onAfterWipe: Callback): OperationResult<Unit, ErrorStateDestinationState> {
+		return resetUseCase.wipeToFactoryWithAuth(onAfterWipe)
 	}
 }

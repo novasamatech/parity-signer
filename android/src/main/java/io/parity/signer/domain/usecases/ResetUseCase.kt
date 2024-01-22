@@ -1,11 +1,16 @@
 package io.parity.signer.domain.usecases
 
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.R
 import io.parity.signer.dependencygraph.ServiceLocator
+import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.getDbNameFromContext
 import io.parity.signer.domain.isDbCreatedAndOnboardingPassed
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
+import io.parity.signer.screens.error.ErrorStateDestinationState
 import io.parity.signer.uniffi.historyInitHistoryNoCert
 import io.parity.signer.uniffi.historyInitHistoryWithCert
 import io.parity.signer.uniffi.initNavigation
@@ -22,26 +27,52 @@ class ResetUseCase {
 	private val activity: FragmentActivity
 		get() = ServiceLocator.activityScope!!.activity
 
-	fun wipeToFactoryWithAuth(onAfterWide: Callback) {
+	suspend fun wipeToFactoryWithAuth(onAfterWipe: Callback): OperationResult<Unit, ErrorStateDestinationState> {
 		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			databaseAssetsInteractor.wipe()
-			totalRefresh()
-			onAfterWide()
+		return when (authentication.authenticate(activity)) {
+			AuthResult.AuthError,
+			AuthResult.AuthFailed ,
+			AuthResult.AuthUnavailable -> {
+				Toast.makeText(
+					activity.baseContext,
+					activity.baseContext.getString(R.string.auth_failed_message),
+					Toast.LENGTH_SHORT
+				).show()
+				OperationResult.Ok(Unit)
+			}
+			AuthResult.AuthSuccess -> {
+				databaseAssetsInteractor.wipe()
+				val result = totalRefresh()
+				onAfterWipe()
+				return result
+			}
 		}
 	}
 
 	/**
 	 * Auth user and wipe Vault to state without general verifier certificate
 	 */
-	fun wipeNoGeneralCertWithAuth(onAfterWide: Callback) {
+	suspend fun wipeNoGeneralCertWithAuth(onAfterWide: Callback): OperationResult<Unit, ErrorStateDestinationState> {
 		val authentication = ServiceLocator.authentication
-		authentication.authenticate(activity) {
-			databaseAssetsInteractor.wipe()
-			databaseAssetsInteractor.copyAsset("")
-			totalRefresh()
-			historyInitHistoryNoCert()
-			onAfterWide()
+		return when (authentication.authenticate(activity)) {
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				Toast.makeText(
+					activity.baseContext,
+					activity.baseContext.getString(R.string.auth_failed_message),
+					Toast.LENGTH_SHORT
+				).show()
+				OperationResult.Ok(Unit)
+			}
+			AuthResult.AuthSuccess -> {
+				databaseAssetsInteractor.wipe()
+				databaseAssetsInteractor.copyAsset("")
+				val result = totalRefresh()
+				historyInitHistoryNoCert()
+				onAfterWide()
+				return result
+			}
 		}
 	}
 
@@ -67,14 +98,18 @@ class ResetUseCase {
 	 * This returns the app into starting state;
 	 * Do not forget to reset navigation UI state!
 	 */
-	fun totalRefresh() {
+	fun totalRefresh(): OperationResult<Unit, ErrorStateDestinationState> {
 		if (!seedStorage.isInitialized()) {
-			seedStorage.init(appContext)
+			val result = seedStorage.init(appContext)
+			if (result is OperationResult.Err) {
+				return result
+			}
 		}
 		if (!appContext.isDbCreatedAndOnboardingPassed()) {
 			initAssetsAndTotalRefresh()
 		} else {
 			totalRefreshDbExist()
 		}
+		return OperationResult.Ok(Unit)
 	}
 }

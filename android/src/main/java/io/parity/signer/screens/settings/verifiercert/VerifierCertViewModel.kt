@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.VerifierDetailsModel
+import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.usecases.ResetUseCase
+import io.parity.signer.screens.error.ErrorStateDestinationState
 
 
 class VerifierCertViewModel: ViewModel() {
@@ -16,7 +18,7 @@ class VerifierCertViewModel: ViewModel() {
 		return uniffiInteractor.getVerifierDetails()
 	}
 
-	fun wipeWithGeneralCertificate(onAfterAction: Callback) {
-		resetUseCase.wipeNoGeneralCertWithAuth(onAfterAction)
+	suspend fun wipeWithGeneralCertificate(onAfterAction: Callback): OperationResult<Unit, ErrorStateDestinationState> {
+		return resetUseCase.wipeNoGeneralCertWithAuth(onAfterAction)
 	}
 }

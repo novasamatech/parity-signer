@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.parity.signer.domain.findActivity
+import io.parity.signer.screens.error.errorStateDestination
 import io.parity.signer.screens.initial.eachstartchecks.enableEachStartAppFlow
 import io.parity.signer.screens.initial.firstTimeOnly.firstTimeOnlyOnboarding
 import io.parity.signer.screens.initial.splash.splashScreen
@@ -73,6 +74,9 @@ fun RootNavigationGraph(
 			)
 			enableEachStartAppFlow(navController)
 			mainSignerAppFlow(navController)
+			errorStateDestination( //same destination as for core graph - so we can show error outside of unlock screen
+				navController = navController,
+			)
 		}
 	}
 }
