@@ -14,7 +14,7 @@ qrcode_rtx = {path = "../qrcode_rtx", default-features = false}
 hex = {version = "0.4.3"}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.6.9", features = ["derive"]}
-regex = "1.10.2"
+regex = "1.10.3"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
