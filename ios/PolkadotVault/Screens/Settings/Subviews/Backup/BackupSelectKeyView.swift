@@ -45,8 +45,10 @@ struct BackupSelectKeyView: View {
             onDismiss: { viewModel.seedPhraseToPresent = .init(keyName: "", seedPhrase: .init(seedPhrase: "")) }
         ) {
             SettingsBackupModal(
-                isShowingBackupModal: $viewModel.isPresentingBackupModal,
-                viewModel: viewModel.seedPhraseToPresent
+                viewModel: .init(
+                    isPresented: $viewModel.isPresentingBackupModal,
+                    viewModel: viewModel.seedPhraseToPresent
+                )
             )
             .clearModalBackground()
         }
