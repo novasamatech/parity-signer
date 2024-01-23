@@ -11,7 +11,7 @@ hex = "0.4.3"
 qr_reader_phone = {path = "../qr_reader_phone"}
 anyhow = "1.0.79"
 image = "0.24.8"
-quircs = "0.10.1"
+quircs = "0.10.2"
 indicatif = "0.17.7"
 
 [dependencies.opencv]
