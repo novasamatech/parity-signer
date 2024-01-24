@@ -1,6 +1,9 @@
 package io.parity.signer.screens.error
 
+import android.content.Context
+import android.widget.Toast
 import androidx.navigation.NavController
+import io.parity.signer.R
 import io.parity.signer.domain.NavigationError
 import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.backend.OperationResult
@@ -29,6 +32,7 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 							argVerbose = error.argVerbose,
 						)
 					}
+
 					is NavigationError -> {
 						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
 							argHeader = "Operation navigation error trying to get ${T::class.java}",
@@ -71,13 +75,30 @@ inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
 }
 
 
-//todo dmitry  nope, need to create text at some level
-inline fun AuthOperationResult.handleErrorAppState(
-	coreNavController: NavController
+fun AuthOperationResult.handleErrorAppState(
+	coreNavController: NavController,
+	context: Context,
 ): Unit? {
 	return when (this) {
-		is AuthOperationResult.AuthFailed -> TODO()
-		is AuthOperationResult.Error -> TODO()
-		AuthOperationResult.Success -> TODO()
+		is AuthOperationResult.AuthFailed -> {
+			Toast.makeText(context, R.string.auth_failed_message, Toast.LENGTH_SHORT)
+				.show()
+			null
+		}
+
+		is AuthOperationResult.Error -> {
+			coreNavController.navigate(
+				CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
+					argHeader = "Operation error",
+					argDescription = exception.toString(),
+					argVerbose = exception.stackTraceToString(),
+				)
+			)
+			null
+		}
+
+		AuthOperationResult.Success -> {
+			Unit
+		}
 	}
 }

@@ -94,12 +94,10 @@ class BananaSplitViewModel() : ViewModel() {
 			seedName, seedPhrase,
 			networksKeys.toList(),
 		)
-		if (success == AuthOperationResult.Success) {
+		if (success != AuthOperationResult.Success) {
 			_isCustomErrorTerminal.value =
 				context.getString(R.string.banana_split_password_error_cannot_save_seed)
 			return
-		} else {
-			//todo dmitry show error
 		}
 		_isSuccessTerminal.value = seedName
 	}

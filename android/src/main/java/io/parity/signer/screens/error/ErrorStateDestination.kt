@@ -63,8 +63,3 @@ inline fun <reified T> UniffiResult<T>.handleErrorAppState(coreNavController: Na
 	return this.toOperationResult().handleErrorAppState(coreNavController)
 }
 
-data class ErrorStateDestinationState(
-	val argHeader: String,
-	val argDescription: String,
-	val argVerbose: String,
-)

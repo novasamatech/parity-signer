@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -97,13 +98,14 @@ fun KeysetRecoverSubgraph(
 		) {
 			val seedPhrase =
 				it.arguments?.getString(KeysetRecoverSubgraph.NetworksSelection.seedPhrase)!!
+			val context = LocalContext.current
 
 			RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 				seedName = keysetName,
 				seedPhrase = seedPhrase,
 				onBack = localNavController::popBackStack,
 				showError = { error: AuthOperationResult ->
-					error.handleErrorAppState(coreNavController)
+					error.handleErrorAppState(coreNavController, context)
 				},
 				navigateOnSuccess = {
 					coreNavController.navigate(
