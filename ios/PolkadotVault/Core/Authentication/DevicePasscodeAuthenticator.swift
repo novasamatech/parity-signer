@@ -8,6 +8,7 @@
 import Foundation
 import LocalAuthentication
 
+// sourcery: AutoMockable
 protocol DevicePasscodeAuthenticatorProtocol {
     /// This methods trigger passcode screen to authenticate user, if failed, will bring back "Unlock app" screen
     ///

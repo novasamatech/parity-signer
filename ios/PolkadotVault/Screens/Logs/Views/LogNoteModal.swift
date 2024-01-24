@@ -93,13 +93,13 @@ extension LogNoteModal {
         @Published var note: String = ""
         @Published var isActionDisabled: Bool = true
         private var cancelBag = CancelBag()
-        private let logsService: LogsService
+        private let logsService: LogsServicing
         @Published var isPresentingError: Bool = false
-        @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
+        @Published var presentableError: ErrorBottomModalViewModel!
 
         init(
             isPresented: Binding<Bool>,
-            logsService: LogsService = LogsService()
+            logsService: LogsServicing = LogsService()
         ) {
             _isPresented = isPresented
             self.logsService = logsService
