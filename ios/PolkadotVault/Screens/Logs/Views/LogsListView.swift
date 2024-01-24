@@ -98,15 +98,15 @@ extension LogsListView {
         @Published var isPresentingDetails = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .noNetworksAvailable()
-        private let logsService: LogsService
+        private let logsService: LogsServicing
         private let devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol
-        private let renderableBuilder: LogEntryRenderableBuilder
+        private let renderableBuilder: LogEntryRenderableBuilding
 
         init(
-            logsService: LogsService = LogsService(),
+            logsService: LogsServicing = LogsService(),
             devicePasscodeAuthenticator: DevicePasscodeAuthenticatorProtocol = ServiceLocator
                 .devicePasscodeAuthenticator,
-            renderableBuilder: LogEntryRenderableBuilder = LogEntryRenderableBuilder()
+            renderableBuilder: LogEntryRenderableBuilding = LogEntryRenderableBuilder()
         ) {
             self.logsService = logsService
             self.devicePasscodeAuthenticator = devicePasscodeAuthenticator
