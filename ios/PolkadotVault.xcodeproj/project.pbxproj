@@ -77,6 +77,9 @@
 		6D2779C828B3D33100570055 /* NavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2779C728B3D33100570055 /* NavigationBarView.swift */; };
 		6D2A5D0F2AA5DF47009E0C3A /* ManageKeySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */; };
 		6D2A5D112AA607C7009E0C3A /* ActionSheetCircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */; };
+		6D2C78AC2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2C78AB2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift */; };
+		6D2C78AE2B56DB07006431E3 /* SignSpecEnterPasswordModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2C78AD2B56DB07006431E3 /* SignSpecEnterPasswordModalViewModelTests.swift */; };
+		6D2C78B02B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2C78AF2B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift */; };
 		6D2D244B28CCAD4100862726 /* ExportPrivateKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */; };
 		6D2D244D28CE55A000862726 /* String+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244C28CE55A000862726 /* String+Utilities.swift */; };
 		6D2D244F28CE5C1B00862726 /* NavbarActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */; };
@@ -169,9 +172,6 @@
 		6D8045D928D0761E00237F8C /* QRCodeAddressFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */; };
 		6D8045DC28D0840F00237F8C /* MKeyDetails+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */; };
 		6D8045DE28D087D400237F8C /* QRCodeRootFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */; };
-		6D80EB4B2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB4A2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift */; };
-		6D80EB522B4EB0B8009C544B /* MSufficientCryptoReady+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB512B4EB0B8009C544B /* MSufficientCryptoReady+Generate.swift */; };
-		6D80EB542B4EB0C8009C544B /* MAddressCard+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB532B4EB0C8009C544B /* MAddressCard+Generate.swift */; };
 		6D80EB492B4CF582009C544B /* BananaSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB482B4CF582009C544B /* BananaSplitService.swift */; };
 		6D80EB4B2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB4A2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift */; };
 		6D80EB502B4EAD3E009C544B /* VerifierCertificateViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D80EB4F2B4EAD3E009C544B /* VerifierCertificateViewModelTests.swift */; };
@@ -476,6 +476,9 @@
 		6D2779C728B3D33100570055 /* NavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarView.swift; sourceTree = "<group>"; };
 		6D2A5D0E2AA5DF47009E0C3A /* ManageKeySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageKeySetsView.swift; sourceTree = "<group>"; };
 		6D2A5D102AA607C7009E0C3A /* ActionSheetCircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetCircleButton.swift; sourceTree = "<group>"; };
+		6D2C78AB2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecDetailsViewModelTests.swift; sourceTree = "<group>"; };
+		6D2C78AD2B56DB07006431E3 /* SignSpecEnterPasswordModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSpecEnterPasswordModalViewModelTests.swift; sourceTree = "<group>"; };
+		6D2C78AF2B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackupModalViewModelTests.swift; sourceTree = "<group>"; };
 		6D2D244A28CCAD4100862726 /* ExportPrivateKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPrivateKeyService.swift; sourceTree = "<group>"; };
 		6D2D244C28CE55A000862726 /* String+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Utilities.swift"; sourceTree = "<group>"; };
 		6D2D244E28CE5C1B00862726 /* NavbarActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarActionButton.swift; sourceTree = "<group>"; };
@@ -567,9 +570,6 @@
 		6D8045D828D0761E00237F8C /* QRCodeAddressFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeAddressFooterView.swift; sourceTree = "<group>"; };
 		6D8045DB28D0840F00237F8C /* MKeyDetails+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Helpers.swift"; sourceTree = "<group>"; };
 		6D8045DD28D087D400237F8C /* QRCodeRootFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeRootFooterView.swift; sourceTree = "<group>"; };
-		6D80EB4A2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingDetailsActionModalViewModelTests.swift; sourceTree = "<group>"; };
-		6D80EB512B4EB0B8009C544B /* MSufficientCryptoReady+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MSufficientCryptoReady+Generate.swift"; sourceTree = "<group>"; };
-		6D80EB532B4EB0C8009C544B /* MAddressCard+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MAddressCard+Generate.swift"; sourceTree = "<group>"; };
 		6D80EB482B4CF582009C544B /* BananaSplitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitService.swift; sourceTree = "<group>"; };
 		6D80EB4A2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSettingDetailsActionModalViewModelTests.swift; sourceTree = "<group>"; };
 		6D80EB4F2B4EAD3E009C544B /* VerifierCertificateViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierCertificateViewModelTests.swift; sourceTree = "<group>"; };
@@ -1774,6 +1774,7 @@
 			isa = PBXGroup;
 			children = (
 				6DB2E7C42B4BBC24002387DE /* BackupSelectKeyViewModelTests.swift */,
+				6D2C78AF2B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -2696,11 +2697,13 @@
 				6DE48E912B1F0B96003094D5 /* AutoMockable+H.generated.swift in Sources */,
 				6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */,
 				6DE48E8E2B1F0B96003094D5 /* AutoMockable+B.generated.swift in Sources */,
+				6D2C78AC2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift in Sources */,
 				6DE48E992B1F14A0003094D5 /* QRCodeAddressFooterViewModel+Generate.swift in Sources */,
 				6DE48E832B1F0B96003094D5 /* AutoMockable+C.generated.swift in Sources */,
 				6D80EB542B4EB0C8009C544B /* MAddressCard+Generate.swift in Sources */,
 				6D8AF88228BCC4D100CF0AB2 /* AccessControlProvidingAssemblerTests.swift in Sources */,
 				6DE1B8322B56C54900D299C1 /* CancelBagTests.swift in Sources */,
+				6D2C78AE2B56DB07006431E3 /* SignSpecEnterPasswordModalViewModelTests.swift in Sources */,
 				6DE48E8D2B1F0B96003094D5 /* AutoMockable+S.generated.swift in Sources */,
 				6DE48E872B1F0B96003094D5 /* AutoMockable+E.generated.swift in Sources */,
 				6DE48E8B2B1F0B96003094D5 /* AutoMockable+I.generated.swift in Sources */,
@@ -2739,6 +2742,7 @@
 				6DE48E952B1F0B96003094D5 /* AutoMockable+Q.generated.swift in Sources */,
 				6DE48E802B1F0B96003094D5 /* AutoMockable+P.generated.swift in Sources */,
 				6D80EB502B4EAD3E009C544B /* VerifierCertificateViewModelTests.swift in Sources */,
+				6D2C78B02B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift in Sources */,
 				6D80EB522B4EB0B8009C544B /* MSufficientCryptoReady+Generate.swift in Sources */,
 				6DE48E8C2B1F0B96003094D5 /* AutoMockable+R.generated.swift in Sources */,
 				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
