@@ -25,7 +25,12 @@ struct LogEntryRenderable: Equatable, Hashable, Identifiable {
     let navigationDetails: UInt32
 }
 
-final class LogEntryRenderableBuilder {
+// sourcery: AutoMockable
+protocol LogEntryRenderableBuilding: AnyObject {
+    func build(_ logs: MLog) -> [LogEntryRenderable]
+}
+
+final class LogEntryRenderableBuilder: LogEntryRenderableBuilding {
     func build(_ logs: MLog) -> [LogEntryRenderable] {
         var lastDate: String?
         var shouldIncludeDate = false
