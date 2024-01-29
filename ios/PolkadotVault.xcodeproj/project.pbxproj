@@ -160,6 +160,10 @@
 		6D749C622A69CE2C0064D7E5 /* PolkadotIdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */; };
 		6D755C092A6FECCD00A73E20 /* JdenticonViewPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D755C082A6FECCD00A73E20 /* JdenticonViewPreviews.swift */; };
 		6D755C0B2A6FECE000A73E20 /* Jdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D755C0A2A6FECE000A73E20 /* Jdenticon */; };
+		6D77863C2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77863B2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift */; };
+		6D77863F2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77863E2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift */; };
+		6D7786412B630116009C8E73 /* MNewSeedBackup+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7786402B630116009C8E73 /* MNewSeedBackup+Generate.swift */; };
+		6D7786462B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7786452B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift */; };
 		6D77F31F296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F31E296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift */; };
 		6D77F321296D0D4600044C7C /* GetManagedNetworksService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */; };
 		6D77F323296D4D8900044C7C /* CreateDerivedKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */; };
@@ -562,6 +566,10 @@
 		6D749C5F2A69C6020064D7E5 /* PolkadotIdenticonViewPreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolkadotIdenticonViewPreviews.swift; sourceTree = "<group>"; };
 		6D755C072A6FBB7600A73E20 /* Jdenticon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Jdenticon; sourceTree = "<group>"; };
 		6D755C082A6FECCD00A73E20 /* JdenticonViewPreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JdenticonViewPreviews.swift; sourceTree = "<group>"; };
+		6D77863B2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeysForNetworksViewModelTests.swift; sourceTree = "<group>"; };
+		6D77863E2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterKeySetNameViewModelTests.swift; sourceTree = "<group>"; };
+		6D7786402B630116009C8E73 /* MNewSeedBackup+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MNewSeedBackup+Generate.swift"; sourceTree = "<group>"; };
+		6D7786452B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeySetSeedPhraseViewModelTests.swift; sourceTree = "<group>"; };
 		6D77F31E296D0C5600044C7C /* CreateKeyNetworkSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateKeyNetworkSelectionView.swift; sourceTree = "<group>"; };
 		6D77F320296D0D4600044C7C /* GetManagedNetworksService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetManagedNetworksService.swift; sourceTree = "<group>"; };
 		6D77F322296D4D8900044C7C /* CreateDerivedKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDerivedKeyService.swift; sourceTree = "<group>"; };
@@ -856,6 +864,7 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */,
 				6D749C5E2A69C5F00064D7E5 /* Identicons */,
 				6DEB18ED2A0BAFA60013995E /* Progress */,
 				6D10EACC297114550063FB71 /* DerivationPathComponents.swift */,
@@ -1515,6 +1524,33 @@
 			path = Identicons;
 			sourceTree = "<group>";
 		};
+		6D7786392B626FB4009C8E73 /* CreateKey */ = {
+			isa = PBXGroup;
+			children = (
+				6D7786422B63060B009C8E73 /* RecoverKeySet */,
+				6D77863D2B62FF5E009C8E73 /* NewKeySet */,
+				6D77863A2B626FC0009C8E73 /* CreateKeysForNetwork */,
+			);
+			path = CreateKey;
+			sourceTree = "<group>";
+		};
+		6D77863A2B626FC0009C8E73 /* CreateKeysForNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				6D77863B2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift */,
+			);
+			path = CreateKeysForNetwork;
+			sourceTree = "<group>";
+		};
+		6D77863D2B62FF5E009C8E73 /* NewKeySet */ = {
+			isa = PBXGroup;
+			children = (
+				6D77863E2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift */,
+				6D7786452B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift */,
+			);
+			path = NewKeySet;
+			sourceTree = "<group>";
+		};
 		6D77F31D296D0C4000044C7C /* DerivedKey */ = {
 			isa = PBXGroup;
 			children = (
@@ -1628,6 +1664,7 @@
 				6D80EB532B4EB0C8009C544B /* MAddressCard+Generate.swift */,
 				6DAB52EA2B5E71FC005FDBA8 /* MLog+Generate.swift */,
 				6DAB52EC2B5E75E7005FDBA8 /* MTransactionCardSet+Generate.swift */,
+				6D7786402B630116009C8E73 /* MNewSeedBackup+Generate.swift */,
 			);
 			path = "Models+Generate";
 			sourceTree = "<group>";
@@ -1934,6 +1971,7 @@
 		6DDD38B42B1346BB000D2B62 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				6D7786392B626FB4009C8E73 /* CreateKey */,
 				6DAB52E72B5E7182005FDBA8 /* Logs */,
 				6DB2E7BF2B4BBAEA002387DE /* Settings */,
 				6DDD38B52B1346C0000D2B62 /* PublicKey */,
@@ -2124,7 +2162,6 @@
 				6DBA658A2A2656B400F04492 /* CreateKeysForNetworks */,
 				6DA08B8C29B614F20027CFCB /* RecoverKeySet */,
 				6DA08B8B29B614EA0027CFCB /* NewKeySet */,
-				6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */,
 			);
 			path = CreateKey;
 			sourceTree = "<group>";
@@ -2731,6 +2768,7 @@
 				6DB2E7CA2B4BBF6E002387DE /* MmNetwork+Generate.swift in Sources */,
 				6D686B9C2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift in Sources */,
 				6D80EB4B2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift in Sources */,
+				6D7786462B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
 				6DE48E8F2B1F0B96003094D5 /* AutoMockable+Y.generated.swift in Sources */,
 				6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */,
@@ -2745,10 +2783,12 @@
 				6DB2E7C12B4BBAF7002387DE /* SettingsViewModelTests.swift in Sources */,
 				6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */,
 				6DB2E7C52B4BBC24002387DE /* BackupSelectKeyViewModelTests.swift in Sources */,
+				6D7786412B630116009C8E73 /* MNewSeedBackup+Generate.swift in Sources */,
 				6DE48E812B1F0B96003094D5 /* AutoMockable+G.generated.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DB2E7C82B4BBEB0002387DE /* NetworkSelectionSettingsViewModelTests.swift in Sources */,
+				6D77863F2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift in Sources */,
 				6DAB52ED2B5E75E7005FDBA8 /* MTransactionCardSet+Generate.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */,
@@ -2774,6 +2814,7 @@
 				6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */,
 				6DE48E862B1F0B96003094D5 /* AutoMockable+F.generated.swift in Sources */,
 				6DE48E942B1F0B96003094D5 /* AutoMockable+O.generated.swift in Sources */,
+				6D77863C2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift in Sources */,
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6DC2EDFC2B1196DF00298F00 /* BackendServiceTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,

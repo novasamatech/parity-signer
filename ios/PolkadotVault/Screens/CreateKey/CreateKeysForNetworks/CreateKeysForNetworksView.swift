@@ -165,15 +165,15 @@ extension CreateKeysForNetworksView {
         }
 
         private let cancelBag = CancelBag()
-        private let networkService: GetManagedNetworksService
-        private let createKeySetService: CreateKeySetService
-        private let createKeyService: CreateDerivedKeyService
-        private let recoveryKeySetService: RecoverKeySetService
+        private let networkService: GetManagedNetworksServicing
+        private let createKeySetService: CreateKeySetServicing
+        private let createKeyService: CreateDerivedKeyServicing
+        private let recoveryKeySetService: RecoverKeySetServicing
         private let seedsMediator: SeedsMediating
-        private let seedName: String
-        private let seedPhrase: String
-        private let mode: Mode
-        private let onCompletion: (OnCompletionAction) -> Void
+        let seedName: String
+        let seedPhrase: String
+        let mode: Mode
+        let onCompletion: (OnCompletionAction) -> Void
         var onErrorDismiss: (() -> Void)?
 
         @Binding var isPresented: Bool
@@ -202,10 +202,10 @@ extension CreateKeysForNetworksView {
             seedName: String,
             seedPhrase: String,
             mode: Mode,
-            networkService: GetManagedNetworksService = GetManagedNetworksService(),
-            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
-            createKeySetService: CreateKeySetService = CreateKeySetService(),
-            recoveryKeySetService: RecoverKeySetService = RecoverKeySetService(),
+            networkService: GetManagedNetworksServicing = GetManagedNetworksService(),
+            createKeyService: CreateDerivedKeyServicing = CreateDerivedKeyService(),
+            createKeySetService: CreateKeySetServicing = CreateKeySetService(),
+            recoveryKeySetService: RecoverKeySetServicing = RecoverKeySetService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
