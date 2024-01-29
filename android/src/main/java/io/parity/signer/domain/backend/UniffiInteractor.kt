@@ -1,6 +1,7 @@
 package io.parity.signer.domain.backend
 
 import android.content.Context
+import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.KeySetDetailsModel
 import io.parity.signer.domain.KeySetsListModel
 import io.parity.signer.domain.NetworkModel
@@ -352,6 +353,13 @@ sealed class UniffiResult<T> {
 sealed class OperationResult<out T, out E> {
 	data class Ok<out T>(val result: T) : OperationResult<T, Nothing>()
 	data class Err<out E>(val error: E) : OperationResult<Nothing, E>()
+}
+
+sealed interface AuthOperationResult{
+	data object Success: AuthOperationResult
+	data class Error(val exception: Exception): AuthOperationResult
+	data class AuthFailed(val result: AuthResult) : AuthOperationResult
+
 }
 
 sealed class CompletableResult<out T, out E> {

@@ -8,15 +8,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import io.parity.signer.domain.NavigationError
-import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiResult
 import io.parity.signer.domain.backend.toOperationResult
-import io.parity.signer.domain.getDebugDetailedDescriptionString
 import io.parity.signer.screens.error.wrongversion.errorWrongVersionSubgraph
 import io.parity.signer.screens.initial.eachstartchecks.airgap.AirgapScreen
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
-import io.parity.signer.uniffi.ErrorDisplayed
 
 
 fun NavGraphBuilder.errorStateDestination(
@@ -67,63 +63,3 @@ inline fun <reified T> UniffiResult<T>.handleErrorAppState(coreNavController: Na
 	return this.toOperationResult().handleErrorAppState(coreNavController)
 }
 
-data class ErrorStateDestinationState(
-	val argHeader: String,
-	val argDescription: String,
-	val argVerbose: String,
-)
-
-inline fun <reified T, E> OperationResult<T, E>.handleErrorAppState(
-	coreNavController: NavController
-): T? {
-	return when (this) {
-		is OperationResult.Err -> {
-			coreNavController.navigate(
-				when (error) {
-					is ErrorStateDestinationState -> {
-						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
-							argHeader = error.argHeader,
-							argDescription = error.argDescription,
-							argVerbose = error.argVerbose,
-						)
-					}
-					is NavigationError -> {
-						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
-							argHeader = "Operation navigation error trying to get ${T::class.java}",
-							argDescription = error.message,
-							argVerbose = "",
-						)
-					}
-
-					is ErrorDisplayed ->
-						when (error) {
-							is ErrorDisplayed.DbSchemaMismatch -> {
-								CoreUnlockedNavSubgraph.errorWrongDbVersionUpdate
-							}
-
-							else -> {
-								CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
-									argHeader = "Operation error to get ${T::class.java}",
-									argDescription = error.toString(),
-									argVerbose = error.getDebugDetailedDescriptionString(),
-								)
-							}
-						}
-
-					else -> {
-						CoreUnlockedNavSubgraph.ErrorScreenGeneral.destination(
-							argHeader = "Operation unknown error trying to get ${T::class.java}",
-							argDescription = "",
-							argVerbose = error.toString(),
-						)
-					}
-				}
-			)
-			null
-		}
-
-		is OperationResult.Ok -> {
-			result
-		}
-	}
-}

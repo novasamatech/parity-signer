@@ -41,6 +41,7 @@ import io.parity.signer.components.base.SignerDivider
 import io.parity.signer.components.items.NetworkItemMultiselect
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.NetworkModel
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.ui.BottomSheetWrapperContent
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
@@ -54,6 +55,7 @@ fun NewKeySetSelectNetworkScreen(
 	seedName: String,
 	seedPhrase: String,
 	onBack: Callback,
+	showError: (AuthOperationResult) -> Unit,
 	onSuccess: Callback,
 ) {
 	val networksViewModel: NewKeySetNetworksViewModel = viewModel()
@@ -82,14 +84,24 @@ fun NewKeySetSelectNetworkScreen(
 			seedName = seedName, seedPhrase = seedPhrase,
 			networkForKeys = selected.value.mapNotNull { selected -> networks.find { it.key == selected } }
 				.toSet(),
-			onAfterCreate = { isSuccess ->
-				if (isSuccess) {
-					Toast.makeText(
-						context,
-						context.getString(R.string.key_set_has_been_created_toast, seedName),
-						Toast.LENGTH_LONG
-					).show()
-					onSuccess()
+			onAfterCreate = { success ->
+				when (success) {
+					is AuthOperationResult.AuthFailed,
+					is AuthOperationResult.Error -> {
+						showError(success)
+					}
+
+					AuthOperationResult.Success -> {
+						Toast.makeText(
+							context,
+							context.getString(
+								R.string.key_set_has_been_created_toast,
+								seedName
+							),
+							Toast.LENGTH_LONG
+						).show()
+						onSuccess()
+					}
 				}
 			}
 		)

@@ -74,11 +74,6 @@ internal fun ErrorStateScreen(
 				)
 			}
 		}
-//		PrimaryButtonWide(
-//			label = stringResource(R.string.button_next),
-//			modifier = Modifier.padding(24.dp),
-//			onClicked = {},
-//		)
 	}
 }
 

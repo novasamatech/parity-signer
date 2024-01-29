@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -20,8 +21,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import io.parity.signer.domain.backend.AuthOperationResult
 import io.parity.signer.domain.popUpToTop
 import io.parity.signer.domain.submitErrorState
+import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.keysets.restore.keysetname.KeysetRecoverNameScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.KeysetRecoverPhraseScreen
 import io.parity.signer.screens.keysets.restore.restorephrase.RecoverKeysetSelectNetworkRestoreFlowFullScreen
@@ -95,11 +98,15 @@ fun KeysetRecoverSubgraph(
 		) {
 			val seedPhrase =
 				it.arguments?.getString(KeysetRecoverSubgraph.NetworksSelection.seedPhrase)!!
+			val context = LocalContext.current
 
 			RecoverKeysetSelectNetworkRestoreFlowFullScreen(
 				seedName = keysetName,
 				seedPhrase = seedPhrase,
 				onBack = localNavController::popBackStack,
+				showError = { error: AuthOperationResult ->
+					error.handleErrorAppState(coreNavController, context)
+				},
 				navigateOnSuccess = {
 					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.KeySet.destination(
