@@ -108,13 +108,13 @@ extension CreateKeySetSeedPhraseView {
         @Published var isPresentingDetails: Bool = false
         @Published var isPresentingInfo: Bool = false
         @Published var presentableInfo: ErrorBottomModalViewModel = .bananaSplitExplanation()
-        private let service: CreateKeySetService
+        private let service: CreateKeySetServicing
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         init(
             dataModel: MNewSeedBackup,
             isPresented: Binding<Bool>,
-            service: CreateKeySetService = CreateKeySetService(),
+            service: CreateKeySetServicing = CreateKeySetService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {

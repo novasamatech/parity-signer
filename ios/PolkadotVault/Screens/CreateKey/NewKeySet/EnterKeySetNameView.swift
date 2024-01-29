@@ -108,11 +108,11 @@ extension EnterKeySetNameView {
         let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
 
         private let seedsMediator: SeedsMediating
-        private let service: CreateKeySetService
+        private let service: CreateKeySetServicing
 
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: CreateKeySetService = CreateKeySetService(),
+            service: CreateKeySetServicing = CreateKeySetService(),
             isPresented: Binding<Bool>,
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
