@@ -42,7 +42,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 			mutableStateOf(
 				if (viewModel.isDeviceRooted()) {
 					EachStartSubgraphScreenSteps.ROOT_EXPOSED
-				} else if (!viewModel.checkIsAuthPossible(context)) {
+				} else if (!viewModel.isAuthPossible(context)) {
 					EachStartSubgraphScreenSteps.SET_SCREEN_LOCK_BLOCKER
 				} else if (viewModel.networkState.value == NetworkState.Active || !context.isDbCreatedAndOnboardingPassed()){
 					EachStartSubgraphScreenSteps.AIR_GAP
@@ -67,7 +67,7 @@ fun NavGraphBuilder.enableEachStartAppFlow(globalNavController: NavHostControlle
 					DisposableEffect(this) {
 						val observer = LifecycleEventObserver { _, event ->
 							if (event.targetState == Lifecycle.State.RESUMED) {
-								if (viewModel.checkIsAuthPossible(context)) {
+								if (viewModel.isAuthPossible(context)) {
 									state.value = EachStartSubgraphScreenSteps.AIR_GAP
 								}
 							}
