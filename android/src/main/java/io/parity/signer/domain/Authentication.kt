@@ -1,5 +1,6 @@
 package io.parity.signer.domain
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.biometric.BiometricManager
@@ -16,26 +17,28 @@ class Authentication {
 
 	companion object {
 		fun canAuthenticate(context: Context): Boolean {
-			val biometricManager = BiometricManager.from(context)
+			val keygoard =
+				context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+			return keygoard.isDeviceSecure
+		}
+	}
 
-			return when (biometricManager.canAuthenticate(
+	/**
+	 * Due to BiometricPrompt.java:553 [setAllowedAuthenticators()] description we can't always require only
+	 * Device credentials as have to allow biometric on older android versions
+	 *
+	 * BiometricManager.Authenticators.DEVICE_CREDENTIAL should be used above 31
+	 */
+	private fun getRequiredAuthMethods(): Int {
+		return when (android.os.Build.VERSION.SDK_INT) {
+			in 30..Int.MAX_VALUE -> {
 				BiometricManager.Authenticators.DEVICE_CREDENTIAL
-			)) {
-				BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
-				BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED,
-				BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
-				BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED,
-				BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED,
-				BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
-					false
-				}
-				BiometricManager.BIOMETRIC_SUCCESS -> {
-					true
-				}
-				else -> {
-					submitErrorState("unexpected biometric response value, this should be impossible")
-					true
-				}
+			}
+			28, 29 -> {
+				BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK
+			}
+			else -> {
+				BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_STRONG
 			}
 		}
 	}
@@ -53,21 +56,71 @@ class Authentication {
 		}
 
 		val context = activity.baseContext
-		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
 			BiometricPrompt.PromptInfo.Builder()
 				.setTitle(context.getString(R.string.unlock_device_title))
 				.setSubtitle(context.getString(R.string.unlock_device_subtitle))
-				.setAllowedAuthenticators(
-					BiometricManager.Authenticators.DEVICE_CREDENTIAL
-				)
+				.setAllowedAuthenticators(getRequiredAuthMethods())
 				.build()
 
-		when (biometricManager.canAuthenticate(
-			BiometricManager.Authenticators.DEVICE_CREDENTIAL
-		)) {
-			BiometricManager.BIOMETRIC_SUCCESS -> {
+		if (canAuthenticate(context)) {
+
+			val executor = ContextCompat.getMainExecutor(context)
+
+			biometricPrompt = BiometricPrompt(
+				activity, executor,
+				object : BiometricPrompt.AuthenticationCallback() {
+					override fun onAuthenticationError(
+						errorCode: Int,
+						errString: CharSequence
+					) {
+						super.onAuthenticationError(errorCode, errString)
+						Toast.makeText(
+							context,
+							context.getString(R.string.auth_error_message, errString),
+							Toast.LENGTH_SHORT
+						).show()
+						_auth.value = false
+					}
+
+					override fun onAuthenticationSucceeded(
+						result: BiometricPrompt.AuthenticationResult
+					) {
+						super.onAuthenticationSucceeded(result)
+						_auth.value = true
+						onSuccess()
+					}
+
+					override fun onAuthenticationFailed() {
+						super.onAuthenticationFailed()
+						Toast.makeText(
+							context, context.getString(R.string.auth_failed_message),
+							Toast.LENGTH_SHORT
+						).show()
+					}
+				})
+			biometricPrompt.authenticate(promptInfo)
+		} else {
+			Toast.makeText(
+				context, context.getString(R.string.auth_error_status_unknown),
+				Toast.LENGTH_LONG
+			).show()
+		}
+	}
+
+	suspend fun authenticate(activity: FragmentActivity): AuthResult =
+		suspendCoroutine { continuation ->
+			val context = activity.baseContext
+
+			val promptInfo =
+				BiometricPrompt.PromptInfo.Builder()
+					.setTitle(context.getString(R.string.unlock_device_title))
+					.setSubtitle(context.getString(R.string.unlock_device_subtitle))
+					.setAllowedAuthenticators(getRequiredAuthMethods())
+					.build()
+
+			if (canAuthenticate(context)) {
 
 				val executor = ContextCompat.getMainExecutor(context)
 
@@ -85,6 +138,7 @@ class Authentication {
 								Toast.LENGTH_SHORT
 							).show()
 							_auth.value = false
+							continuation.resumeWith(Result.success(AuthResult.AuthError))
 						}
 
 						override fun onAuthenticationSucceeded(
@@ -92,7 +146,7 @@ class Authentication {
 						) {
 							super.onAuthenticationSucceeded(result)
 							_auth.value = true
-							onSuccess()
+							continuation.resumeWith(Result.success(AuthResult.AuthSuccess))
 						}
 
 						override fun onAuthenticationFailed() {
@@ -102,166 +156,24 @@ class Authentication {
 								Toast.LENGTH_SHORT
 							).show()
 						}
-					})
-
+					}
+				)
 				biometricPrompt.authenticate(promptInfo)
-			}
-			BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-				Toast.makeText(
-					context, context.getString(R.string.auth_error_no_hardware),
-					Toast.LENGTH_LONG
-				).show()
-				return
-			}
-			BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-				Toast.makeText(
-					context,
-					context.getString(R.string.auth_error_hardware_unavailable),
-					Toast.LENGTH_LONG
-				).show()
-				return
-			}
-			BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-				Toast.makeText(
-					context, context.getString(R.string.auth_error_none_enrolled),
-					Toast.LENGTH_LONG
-				).show()
-				return
-			}
-			BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
-				Toast.makeText(
-					context,
-					context.getString(R.string.auth_error_security_update_required),
-					Toast.LENGTH_LONG
-				).show()
-				return
-			}
-			BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-				Toast.makeText(
-					context, context.getString(R.string.auth_error_unsupported),
-					Toast.LENGTH_LONG
-				).show()
-				return
-			}
-			BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
+			} else {
 				Toast.makeText(
 					context, context.getString(R.string.auth_error_status_unknown),
 					Toast.LENGTH_LONG
 				).show()
-				return
 			}
 		}
+}
+
+
+	sealed class AuthResult {
+		data object AuthSuccess : AuthResult()
+		data object AuthError : AuthResult()
+		data object AuthFailed : AuthResult()
+		data object AuthUnavailable : AuthResult()
 	}
-
-	suspend fun authenticate(activity: FragmentActivity): AuthResult =
-		suspendCoroutine { continuation ->
-			val context = activity.baseContext
-			val biometricManager = BiometricManager.from(context)
-
-			val promptInfo =
-				BiometricPrompt.PromptInfo.Builder()
-					.setTitle(context.getString(R.string.unlock_device_title))
-					.setSubtitle(context.getString(R.string.unlock_device_subtitle))
-					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-					.build()
-
-			when (biometricManager.canAuthenticate(
-				BiometricManager.Authenticators.DEVICE_CREDENTIAL
-			)) {
-				BiometricManager.BIOMETRIC_SUCCESS -> {
-
-					val executor = ContextCompat.getMainExecutor(context)
-
-					biometricPrompt = BiometricPrompt(
-						activity, executor,
-						object : BiometricPrompt.AuthenticationCallback() {
-							override fun onAuthenticationError(
-								errorCode: Int,
-								errString: CharSequence
-							) {
-								super.onAuthenticationError(errorCode, errString)
-								Toast.makeText(
-									context,
-									context.getString(R.string.auth_error_message, errString),
-									Toast.LENGTH_SHORT
-								).show()
-								_auth.value = false
-								continuation.resumeWith(Result.success(AuthResult.AuthError))
-							}
-
-							override fun onAuthenticationSucceeded(
-								result: BiometricPrompt.AuthenticationResult
-							) {
-								super.onAuthenticationSucceeded(result)
-								_auth.value = true
-								continuation.resumeWith(Result.success(AuthResult.AuthSuccess))
-							}
-
-							override fun onAuthenticationFailed() {
-								super.onAuthenticationFailed()
-								Toast.makeText(
-									context, context.getString(R.string.auth_failed_message),
-									Toast.LENGTH_SHORT
-								).show()
-							}
-						}
-					)
-					biometricPrompt.authenticate(promptInfo)
-				}
-				BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-					Toast.makeText(
-						context, context.getString(R.string.auth_error_no_hardware),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-				BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-					Toast.makeText(
-						context,
-						context.getString(R.string.auth_error_hardware_unavailable),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-				BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-					Toast.makeText(
-						context, context.getString(R.string.auth_error_none_enrolled),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-				BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
-					Toast.makeText(
-						context,
-						context.getString(R.string.auth_error_security_update_required),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-				BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-					Toast.makeText(
-						context, context.getString(R.string.auth_error_unsupported),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-				BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
-					Toast.makeText(
-						context, context.getString(R.string.auth_error_status_unknown),
-						Toast.LENGTH_LONG
-					).show()
-					continuation.resumeWith(Result.success(AuthResult.AuthUnavailable))
-				}
-			}
-		}
-
-}
-
-sealed class AuthResult {
-	object AuthSuccess : AuthResult()
-	object AuthError : AuthResult()
-	object AuthFailed : AuthResult()
-	object AuthUnavailable : AuthResult()
-}
 
 
