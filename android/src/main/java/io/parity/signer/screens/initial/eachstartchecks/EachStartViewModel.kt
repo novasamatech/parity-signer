@@ -14,7 +14,7 @@ class EachStartViewModel : ViewModel() {
 	private val networkExposedStateKeeper =
 		ServiceLocator.networkExposedStateKeeper
 
-	fun checkIsAuthPossible(context: Context): Boolean = Authentication.canAuthenticate(context)
+	fun isAuthPossible(context: Context): Boolean = Authentication.canAuthenticate(context)
 
 	fun isDeviceRooted(): Boolean {
 		return RootUtils.isDeviceRooted()
