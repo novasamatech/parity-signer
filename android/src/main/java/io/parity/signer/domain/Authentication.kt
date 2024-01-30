@@ -100,7 +100,6 @@ class Authentication {
 						).show()
 					}
 				})
-
 			biometricPrompt.authenticate(promptInfo)
 		} else {
 			Toast.makeText(
