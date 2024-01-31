@@ -217,16 +217,16 @@ extension RecoverKeySetSeedPhraseView {
 
 extension RecoverKeySetSeedPhraseView {
     final class ViewModel: ObservableObject {
-        private enum Constants {
+        enum Constants {
             static let invisibleNonEmptyCharacter = "\u{200B}"
         }
 
         private let seedsMediator: SeedsMediating
         private let textInput = TextInput()
         private var shouldSkipUpdate = false
-        private let service: RecoverKeySetService
+        private let service: RecoverKeySetServicing
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
-        private let seedName: String
+        let seedName: String
         @Binding var isPresented: Bool
         @Published var isPresentingDetails: Bool = false
         @Published var isValidSeedPhrase: Bool = false
@@ -235,7 +235,7 @@ extension RecoverKeySetSeedPhraseView {
         @Published var guesses: [String] = []
         @Published var keyboardHeight: CGFloat = 0.0
 
-        private var seedPhraseDraft: [String] = [] {
+        var seedPhraseDraft: [String] = [] {
             didSet {
                 regenerateGrid()
                 validateSeedPhrase()
@@ -244,7 +244,7 @@ extension RecoverKeySetSeedPhraseView {
             }
         }
 
-        private var seedPhrase: String {
+        var seedPhrase: String {
             seedPhraseDraft.joined(separator: " ")
         }
 
@@ -255,7 +255,7 @@ extension RecoverKeySetSeedPhraseView {
             seedName: String,
             isPresented: Binding<Bool>,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            service: RecoverKeySetService = RecoverKeySetService(),
+            service: RecoverKeySetServicing = RecoverKeySetService(),
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.seedName = seedName
@@ -274,28 +274,18 @@ extension RecoverKeySetSeedPhraseView {
             seedPhraseDraft.append(guess)
         }
 
-        private func updateGuesses(_ userInput: String) {
-            service.updateGuessWords(userInput: userInput) { result in
-                switch result {
-                case let .success(guesses):
-                    self.guesses = guesses
-                case let .failure(error):
-                    self.presentableError = .alertError(message: error.localizedDescription)
-                    self.isPresentingError = true
-                }
-            }
-        }
-
         func onUserInput(_ word: String) {
             guard !shouldSkipUpdate else { return }
+            defer { shouldSkipUpdate = false }
             shouldSkipUpdate = true
             // User input is empty and invisible character was deleted
             // This means that backspace was tapped, we should delete last saved word
             if word.isEmpty {
                 seedPhraseDraft = Array(seedPhraseDraft.dropLast(1))
-                userInput = Constants.invisibleNonEmptyCharacter
-                // User added " " while typing, we should check guess words or delete whitespace
-            } else if word.hasSuffix(" ") {
+                return
+            }
+            // User added " " while typing, we should check guess words or delete whitespace
+            if word.hasSuffix(" ") {
                 let exactWord = String(word.dropFirst().dropLast(1))
                 // If there is a match, add this word and clear user input
                 if guesses.contains(exactWord) {
@@ -304,11 +294,10 @@ extension RecoverKeySetSeedPhraseView {
                 } else {
                     userInput = exactWord
                 }
-                // User just added new character, generate new guesses
-            } else {
-                updateGuesses(String(word.dropFirst()))
+                return
             }
-            shouldSkipUpdate = false
+            // User just added new character, generate new guesses
+            updateGuesses(String(word.dropFirst()))
         }
 
         func onDoneTap() {
@@ -324,32 +313,39 @@ extension RecoverKeySetSeedPhraseView {
                 onCompletion: onCompletion
             )
         }
-
-        private func validateSeedPhrase() {
-            service.validate(seedPhrase: seedPhrase) { result in
-                switch result {
-                case let .success(isValid):
-                    self.isValidSeedPhrase = isValid
-                case let .failure(error):
-                    self.presentableError = .alertError(message: error.localizedDescription)
-                    self.isPresentingError = true
-                }
-            }
-        }
     }
 }
 
 private extension RecoverKeySetSeedPhraseView.ViewModel {
+    func updateGuesses(_ userInput: String) {
+        service.updateGuessWords(userInput: userInput) { result in
+            switch result {
+            case let .success(guesses):
+                self.guesses = guesses
+            case let .failure(error):
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
+        }
+    }
+
     func regenerateGrid() {
         var updatedGrid: [RecoverKeySetSeedPhraseView.GridElement] = seedPhraseDraft.enumerated()
             .map { .seedPhraseElement(.init(position: String($0.offset + 1), word: $0.element)) }
         updatedGrid.append(.input(textInput))
         seedPhraseGrid = updatedGrid
     }
-}
 
-private extension MRecoverSeedPhrase {
-    func draftPhrase() -> String {
-        draft.joined(separator: " ")
+    func validateSeedPhrase() {
+        service.validate(seedPhrase: seedPhrase) { result in
+            switch result {
+            case let .success(isValid):
+                self.isValidSeedPhrase = isValid
+            case let .failure(error):
+                self.isValidSeedPhrase = false
+                self.presentableError = .alertError(message: error.localizedDescription)
+                self.isPresentingError = true
+            }
+        }
     }
 }
