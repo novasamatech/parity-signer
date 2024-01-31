@@ -139,6 +139,8 @@ jobs:
           alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+        env:
+           BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
       - name: Upload Gplay release APKs
         uses: actions/upload-artifact@v3
