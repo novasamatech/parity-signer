@@ -129,6 +129,13 @@ jobs:
         run:            |
           ./gradlew clean assembleRelease --stacktrace
 
+      - name: Setup build tool version variable
+        shell: bash
+        run: |
+          BUILD_TOOL_VERSION=$(ls /usr/local/lib/android/sdk/build-tools/ | tail -n 1)
+          echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
+          echo Last build tool version is: $BUILD_TOOL_VERSION
+
       - name: Sign app APK
         uses: r0adkll/sign-android-release@v1
         # ID used to access action output
@@ -139,6 +146,8 @@ jobs:
           alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_PLAY_STORE_KEYSTORE_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
       - name: Upload Gplay release APKs
         uses: actions/upload-artifact@v3
@@ -154,6 +163,5 @@ jobs:
           releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
           packageName: io.parity.signer
           track: internal
-
 
 
