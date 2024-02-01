@@ -48,15 +48,6 @@ struct AddDerivedKeysView: View {
             }
             .background(.backgroundPrimary)
         }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingError
-        ) {
-            ErrorBottomModal(
-                viewModel: viewModel.presentableError,
-                isShowingBottomAlert: $viewModel.isPresentingError
-            )
-            .clearModalBackground()
-        }
     }
 
     @ViewBuilder
@@ -200,11 +191,10 @@ extension AddDerivedKeysView {
 
     final class ViewModel: ObservableObject {
         private let onCompletion: (OnCompletionAction) -> Void
-        let dynamicDerivationsPreview: DdPreview
         private let seedsMediator: SeedsMediating
+        let dynamicDerivationsPreview: DdPreview
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
-        @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
 
         init(

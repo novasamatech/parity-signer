@@ -612,11 +612,6 @@
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Content" = "Derived key %@ could not be created: %@";
 "AddDerivedKeys.Error.DerivedKeyForNetwork.Title" = "There was an issue importing keys.";
 
-"AddDerivedKeys.Modal.Label.Title" = "Discard adding keys?";
-"AddDerivedKeys.Modal.Label.Content" = "Keys won't be added if you close the screen. If you still want to add keys, press the 'Confirm and Add Keys' button at the bottom of the screen.";
-"AddDerivedKeys.Modal.Action.Main" = "Discard";
-"AddDerivedKeys.Modal.Action.Cancel" = "Cancel";
-
 "ManageKeySets.Label.Header" = "Key Sets";
 "ManageKeySets.Label.DerivedKeys.single" = "%@ Key";
 "ManageKeySets.Label.DerivedKeys.plural" = "%@ Keys";
