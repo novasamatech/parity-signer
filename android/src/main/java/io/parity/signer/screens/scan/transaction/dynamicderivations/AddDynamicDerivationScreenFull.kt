@@ -14,24 +14,12 @@ import io.parity.signer.uniffi.DdPreview
 fun AddDynamicDerivationScreenFull(
 	model: DdPreview,
 	onClose: Callback,
-	onDone: Callback,
 ) {
-
-	val confirmCloseState = rememberSaveable { mutableStateOf(false) }
 
 	AddDerivedKeysScreen(
 		model = model,
 		modifier = Modifier.statusBarsPadding(),
-		onCack = { confirmCloseState.value = true },
-		onDone = onDone,
+		onBack = onClose,
+		onDone = onClose,
 	)
-
-	if (confirmCloseState.value) {
-		BottomSheetWrapperRoot(onClosedAction = { confirmCloseState.value = false }) {
-			AddDDConfirmCloseBottomSheet(
-				onConfirm = onClose,
-				onCancel = { confirmCloseState.value = false },
-			)
-		}
-	}
 }
