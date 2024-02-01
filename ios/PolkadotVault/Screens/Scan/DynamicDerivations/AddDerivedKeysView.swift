@@ -48,25 +48,6 @@ struct AddDerivedKeysView: View {
             }
             .background(.backgroundPrimary)
         }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingError
-        ) {
-            ErrorBottomModal(
-                viewModel: viewModel.presentableError,
-                isShowingBottomAlert: $viewModel.isPresentingError
-            )
-            .clearModalBackground()
-        }
-        .fullScreenModal(
-            isPresented: $viewModel.isPresentingAddKeysCancelation
-        ) {
-            HorizontalActionsBottomModal(
-                viewModel: .cancelAddingDerivedKeys,
-                mainAction: viewModel.onAddCancelationTap(),
-                isShowingBottomAlert: $viewModel.isPresentingAddKeysCancelation
-            )
-            .clearModalBackground()
-        }
     }
 
     @ViewBuilder
@@ -210,38 +191,27 @@ extension AddDerivedKeysView {
 
     final class ViewModel: ObservableObject {
         private let onCompletion: (OnCompletionAction) -> Void
-        let dynamicDerivationsPreview: DdPreview
-        private let derivedKeysService: CreateDerivedKeyService
         private let seedsMediator: SeedsMediating
+        let dynamicDerivationsPreview: DdPreview
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
-        @Published var isPresentingAddKeysCancelation: Bool = false
-        @Published var isPresentingDerivationPath: Bool = false
-        @Published var isPresentingError: Bool = false
-        @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
 
         init(
             dataModel: AddDerivedKeysData,
             dynamicDerivationsPreview: DdPreview,
-            derivedKeysService: CreateDerivedKeyService = CreateDerivedKeyService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             isPresented: Binding<Bool>,
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.dataModel = dataModel
             self.dynamicDerivationsPreview = dynamicDerivationsPreview
-            self.derivedKeysService = derivedKeysService
             self.seedsMediator = seedsMediator
             _isPresented = isPresented
             self.onCompletion = onCompletion
         }
 
         func onMainActionTap() {
-            if dynamicDerivationsPreview.keySet.derivations.isEmpty {
-                onSuccess()
-            } else {
-                continueCreation()
-            }
+            onSuccess()
         }
 
         func onAddCancelationTap() {
@@ -249,11 +219,7 @@ extension AddDerivedKeysView {
         }
 
         func onBackTap() {
-            if dynamicDerivationsPreview.keySet.derivations.isEmpty {
-                onCancel()
-            } else {
-                isPresentingAddKeysCancelation = true
-            }
+            onCancel()
         }
 
         private func onSuccess() {
@@ -264,22 +230,6 @@ extension AddDerivedKeysView {
         private func onCancel() {
             isPresented = false
             onCompletion(.onCancel)
-        }
-
-        private func continueCreation() {
-            derivedKeysService.createDerivedKeys(
-                dynamicDerivationsPreview.keySet.seedName,
-                seedsMediator.getSeed(seedName: dynamicDerivationsPreview.keySet.seedName),
-                keysToImport: dynamicDerivationsPreview.keySet.derivations
-            ) { [weak self] result in
-                switch result {
-                case .success:
-                    self?.onSuccess()
-                case let .failure(error):
-                    self?.presentableError = .importDynamicDerivedKeys(content: error.localizedDescription)
-                    self?.isPresentingError = true
-                }
-            }
         }
     }
 }

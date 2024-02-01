@@ -77,18 +77,6 @@ struct ErrorBottomModalViewModel: Equatable {
         )
     }
 
-    static func importDynamicDerivedKeys(content: String, _ action: @escaping @autoclosure () -> Void = {}())
-        -> ErrorBottomModalViewModel {
-        ErrorBottomModalViewModel(
-            title: Localizable.AddDerivedKeys.Error.DerivedKeyForNetwork.title.string,
-            content: content,
-            secondaryAction: .init(
-                label: Localizable.ImportKeys.ErrorModal.MissingKeySets.Action.ok.key,
-                action: action
-            )
-        )
-    }
-
     static func importDerivedKeysBadFormat(_ action: @escaping @autoclosure () -> Void = {}())
         -> ErrorBottomModalViewModel {
         ErrorBottomModalViewModel(
