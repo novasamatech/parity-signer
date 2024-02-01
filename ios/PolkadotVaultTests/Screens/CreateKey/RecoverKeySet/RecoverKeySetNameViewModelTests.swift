@@ -17,7 +17,7 @@ final class RecoverKeySetNameViewModelTests: XCTestCase {
     private var onCompletionExecuted: Bool = false
 
     override func setUp() {
-        super.setUp()   
+        super.setUp()
         seedsMediatorMock = SeedsMediatingMock()
         isPresented = false
         onCompletionExecuted = false
