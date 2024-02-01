@@ -195,7 +195,6 @@ extension AddDerivedKeysView {
         let dynamicDerivationsPreview: DdPreview
         let dataModel: AddDerivedKeysData
         @Binding var isPresented: Bool
-        @Published var presentableError: ErrorBottomModalViewModel = .importDynamicDerivedKeys(content: "")
 
         init(
             dataModel: AddDerivedKeysData,
