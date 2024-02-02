@@ -604,8 +604,6 @@
 "AddDerivedKeys.Label.Title" = "Add Derived Keys";
 "AddDerivedKeys.Label.Header" = "Сheck the keys, scan QR code into the app and confirm adding keys by pressing the button below";
 "AddDerivedKeys.Label.QRCodeHeader" = "Scan the QR code into the app";
-"AddDerivedKeys.Label.InfoBoxHeader" = "Confirm by entering the PIN code";
-"AddDerivedKeys.Label.Infobox" = "To finalize the addition of keys to the key set, please confirm that you have scanned the QR code back into the app by entering the PIN code.";
 "AddDerivedKeys.Action.Main" = "Confirm and Add Keys";
 "AddDerivedKeys.Error.NetworkMissing" = "Some keys can not be imported until their networks are added. Please add missing networks and their metadata. ";
 "AddDerivedKeys.Error.AlreadyImported" = "Some are hidden from the list because they have already been imported.";
