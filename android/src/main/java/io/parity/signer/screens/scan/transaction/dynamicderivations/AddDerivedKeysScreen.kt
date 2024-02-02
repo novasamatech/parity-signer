@@ -118,19 +118,6 @@ internal fun AddDerivedKeysScreen(
 			)
 		}
 
-		Text(
-			text = stringResource(R.string.add_derived_keys_screen_alert_title),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 16.dp, bottom = 8.dp),
-		)
-		NotificationFrameTextAlert(
-			message = stringResource(R.string.add_derived_keys_screen_alert_content),
-			modifier = Modifier.padding(horizontal = 16.dp),
-		)
-
 		PrimaryButtonWide(
 			label = stringResource(R.string.generic_done),
 			isEnabled = model.keySet.derivations.isNotEmpty(),
