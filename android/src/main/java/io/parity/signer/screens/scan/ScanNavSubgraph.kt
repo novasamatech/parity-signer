@@ -104,12 +104,6 @@ fun ScanNavSubgraph(
 		AddDynamicDerivationScreenFull(
 			model = dynamicDerivationsData,
 			onClose = scanViewModel::clearState,
-			onDone = {
-				scanViewModel.createDynamicDerivations(
-					dynamicDerivationsData.keySet,
-					context
-				)
-			},
 		)
 	} else if (transactionsValue == null || showingModals) {
 
