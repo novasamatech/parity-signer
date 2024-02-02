@@ -32,10 +32,7 @@ struct AddDerivedKeysView: View {
                         ActionButton(
                             action: viewModel.onMainActionTap,
                             text: Localizable.AddDerivedKeys.Action.main.key,
-                            style: .primary(isDisabled: .constant(
-                                viewModel.dynamicDerivationsPreview.keySet.derivations
-                                    .isEmpty
-                            ))
+                            style: .secondary()
                         )
                         .padding(Spacing.large)
                     }
