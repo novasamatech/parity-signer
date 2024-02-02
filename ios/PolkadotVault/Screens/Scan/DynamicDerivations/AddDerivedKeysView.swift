@@ -28,15 +28,11 @@ struct AddDerivedKeysView: View {
                         errorsSection()
                         keySets()
                         qrCodeSection()
-                        infoBoxSection()
                         Spacer()
                         ActionButton(
                             action: viewModel.onMainActionTap,
                             text: Localizable.AddDerivedKeys.Action.main.key,
-                            style: .primary(isDisabled: .constant(
-                                viewModel.dynamicDerivationsPreview.keySet.derivations
-                                    .isEmpty
-                            ))
+                            style: .secondary()
                         )
                         .padding(Spacing.large)
                     }
@@ -163,20 +159,6 @@ struct AddDerivedKeysView: View {
                 )
             }
             .containerBackground()
-        }
-        .padding(.horizontal, Spacing.large)
-        .padding(.top, Spacing.large)
-    }
-
-    @ViewBuilder
-    func infoBoxSection() -> some View {
-        VStack(alignment: .leading, spacing: Spacing.medium) {
-            // Header
-            Localizable.AddDerivedKeys.Label.infoBoxHeader.text
-                .font(PrimaryFont.bodyL.font)
-                .foregroundColor(.textAndIconsPrimary)
-            // Info Box
-            ActionableInfoBoxView(renderable: .init(text: Localizable.AddDerivedKeys.Label.infobox.string), action: nil)
         }
         .padding(.horizontal, Spacing.large)
         .padding(.top, Spacing.large)
