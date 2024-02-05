@@ -114,6 +114,7 @@ fun DeriveKeyNetworkSelectScreen(
 			SecondaryButtonWide(
 				label = stringResource(R.string.derivation_create_advanced_cta),
 				modifier = Modifier.padding(24.dp),
+				isEnabled = network != null,
 				onClicked = {
 					if (network != null) {
 						onAdvancePath(network)
