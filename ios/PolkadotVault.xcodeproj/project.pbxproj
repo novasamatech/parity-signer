@@ -208,6 +208,12 @@
 		6D971AC5294229AE00121A36 /* UIFont+Roboto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D971AC4294229AE00121A36 /* UIFont+Roboto.swift */; };
 		6D971AC72942465C00121A36 /* QrData+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D971AC62942465C00121A36 /* QrData+Helpers.swift */; };
 		6D971ACA2942E79100121A36 /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 6D971AC92942E79100121A36 /* QRCode */; };
+		6D9856472B6A622F002358D3 /* DevicePincodeRequiredViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9856462B6A622F002358D3 /* DevicePincodeRequiredViewModelTests.swift */; };
+		6D9856492B6A623F002358D3 /* UnlockDeviceViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9856482B6A623F002358D3 /* UnlockDeviceViewModelTests.swift */; };
+		6D98564B2B6A6249002358D3 /* ApplicationUpdateRequiredViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D98564A2B6A6249002358D3 /* ApplicationUpdateRequiredViewModelTests.swift */; };
+		6D9856502B6A6A6E002358D3 /* SetUpNetworksIntroViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D98564F2B6A6A6E002358D3 /* SetUpNetworksIntroViewModelTests.swift */; };
+		6D9856542B6A6B03002358D3 /* AirgapComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9856532B6A6B03002358D3 /* AirgapComponentTests.swift */; };
+		6D9856562B6A6C94002358D3 /* NoAirgapViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9856552B6A6C94002358D3 /* NoAirgapViewModelTests.swift */; };
 		6D9921B5297EC1E9004891B6 /* OnboardingAgreementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */; };
 		6D9921B7297FB471004891B6 /* PasswordProtectionStatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9921B6297FB471004891B6 /* PasswordProtectionStatePublisher.swift */; };
 		6DA08B8629AC88D50027CFCB /* WrappingHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */; };
@@ -617,6 +623,12 @@
 		6D971AC22941CDF600121A36 /* IdenticonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdenticonView.swift; sourceTree = "<group>"; };
 		6D971AC4294229AE00121A36 /* UIFont+Roboto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Roboto.swift"; sourceTree = "<group>"; };
 		6D971AC62942465C00121A36 /* QrData+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QrData+Helpers.swift"; sourceTree = "<group>"; };
+		6D9856462B6A622F002358D3 /* DevicePincodeRequiredViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePincodeRequiredViewModelTests.swift; sourceTree = "<group>"; };
+		6D9856482B6A623F002358D3 /* UnlockDeviceViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockDeviceViewModelTests.swift; sourceTree = "<group>"; };
+		6D98564A2B6A6249002358D3 /* ApplicationUpdateRequiredViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationUpdateRequiredViewModelTests.swift; sourceTree = "<group>"; };
+		6D98564F2B6A6A6E002358D3 /* SetUpNetworksIntroViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUpNetworksIntroViewModelTests.swift; sourceTree = "<group>"; };
+		6D9856532B6A6B03002358D3 /* AirgapComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirgapComponentTests.swift; sourceTree = "<group>"; };
+		6D9856552B6A6C94002358D3 /* NoAirgapViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAirgapViewModelTests.swift; sourceTree = "<group>"; };
 		6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAgreementsView.swift; sourceTree = "<group>"; };
 		6D9921B6297FB471004891B6 /* PasswordProtectionStatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectionStatePublisher.swift; sourceTree = "<group>"; };
 		6DA08B8529AC88D50027CFCB /* WrappingHStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappingHStack.swift; sourceTree = "<group>"; };
@@ -1717,6 +1729,42 @@
 			path = Image;
 			sourceTree = "<group>";
 		};
+		6D9856452B6A6227002358D3 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				6D9856462B6A622F002358D3 /* DevicePincodeRequiredViewModelTests.swift */,
+				6D9856482B6A623F002358D3 /* UnlockDeviceViewModelTests.swift */,
+				6D98564A2B6A6249002358D3 /* ApplicationUpdateRequiredViewModelTests.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		6D98564E2B6A6A61002358D3 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				6D9856522B6A6AF9002358D3 /* Airgap */,
+				6D9856512B6A6AF1002358D3 /* SetUpNetworks */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		6D9856512B6A6AF1002358D3 /* SetUpNetworks */ = {
+			isa = PBXGroup;
+			children = (
+				6D98564F2B6A6A6E002358D3 /* SetUpNetworksIntroViewModelTests.swift */,
+			);
+			path = SetUpNetworks;
+			sourceTree = "<group>";
+		};
+		6D9856522B6A6AF9002358D3 /* Airgap */ = {
+			isa = PBXGroup;
+			children = (
+				6D9856532B6A6B03002358D3 /* AirgapComponentTests.swift */,
+				6D9856552B6A6C94002358D3 /* NoAirgapViewModelTests.swift */,
+			);
+			path = Airgap;
+			sourceTree = "<group>";
+		};
 		6D9921B3297EC1DA004891B6 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -1994,6 +2042,8 @@
 		6DDD38B42B1346BB000D2B62 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				6D98564E2B6A6A61002358D3 /* Onboarding */,
+				6D9856452B6A6227002358D3 /* Errors */,
 				6D7786392B626FB4009C8E73 /* CreateKey */,
 				6DAB52F02B5E831B005FDBA8 /* NoKeySets */,
 				6DAB52E72B5E7182005FDBA8 /* Logs */,
@@ -2792,6 +2842,7 @@
 				6DB2E7CA2B4BBF6E002387DE /* MmNetwork+Generate.swift in Sources */,
 				6D686B9C2B45B36A007B7642 /* DevicePasscodeAuthenticatorTests.swift in Sources */,
 				6D80EB4B2B4E7034009C544B /* NetworkSettingDetailsActionModalViewModelTests.swift in Sources */,
+				6D9856502B6A6A6E002358D3 /* SetUpNetworksIntroViewModelTests.swift in Sources */,
 				6DAB52F22B5E832F005FDBA8 /* NoKeySetsViewModelTests.swift in Sources */,
 				6D7786462B631262009C8E73 /* CreateKeySetSeedPhraseViewModelTests.swift in Sources */,
 				6D57DC54289D6CE900005C63 /* NavigationTests.swift in Sources */,
@@ -2807,15 +2858,18 @@
 				6DE48E902B1F0B96003094D5 /* AutoMockable+A.generated.swift in Sources */,
 				6D8AF88A28BCC60600CF0AB2 /* KeychainQueryProviderTests.swift in Sources */,
 				6DB2E7C12B4BBAF7002387DE /* SettingsViewModelTests.swift in Sources */,
+				6D9856542B6A6B03002358D3 /* AirgapComponentTests.swift in Sources */,
 				6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */,
 				6DB2E7C52B4BBC24002387DE /* BackupSelectKeyViewModelTests.swift in Sources */,
 				6D7786412B630116009C8E73 /* MNewSeedBackup+Generate.swift in Sources */,
+				6D98564B2B6A6249002358D3 /* ApplicationUpdateRequiredViewModelTests.swift in Sources */,
 				6D7786482B631739009C8E73 /* RecoverKeySetSeedPhraseViewModelTests.swift in Sources */,
 				6DE48E812B1F0B96003094D5 /* AutoMockable+G.generated.swift in Sources */,
 				6D57DC52289D68B800005C63 /* ActionResult+Generate.swift in Sources */,
 				6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */,
 				6DB2E7C82B4BBEB0002387DE /* NetworkSelectionSettingsViewModelTests.swift in Sources */,
 				6D77863F2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift in Sources */,
+				6D9856492B6A623F002358D3 /* UnlockDeviceViewModelTests.swift in Sources */,
 				6DAB52ED2B5E75E7005FDBA8 /* MTransactionCardSet+Generate.swift in Sources */,
 				6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */,
 				6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */,
@@ -2842,6 +2896,8 @@
 				6DE48E862B1F0B96003094D5 /* AutoMockable+F.generated.swift in Sources */,
 				6DE48E942B1F0B96003094D5 /* AutoMockable+O.generated.swift in Sources */,
 				6D77863C2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift in Sources */,
+				6D9856472B6A622F002358D3 /* DevicePincodeRequiredViewModelTests.swift in Sources */,
+				6D9856562B6A6C94002358D3 /* NoAirgapViewModelTests.swift in Sources */,
 				6D57DC50289D667800005C63 /* NavigationCoordinatorTests.swift in Sources */,
 				6DC2EDFC2B1196DF00298F00 /* BackendServiceTests.swift in Sources */,
 				6DBD21FD289A83D0005D539B /* DatabaseMediatorTests.swift in Sources */,

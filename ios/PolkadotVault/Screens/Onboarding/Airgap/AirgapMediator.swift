@@ -14,6 +14,7 @@ enum AirgapComponent: Equatable, Hashable {
     case wifi
 }
 
+// sourcery: AutoMockable
 protocol AirgapMediating: AnyObject {
     func startMonitoringAirgap(_ update: @escaping (Bool, Bool) -> Void)
 }

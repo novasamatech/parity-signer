@@ -178,7 +178,6 @@ final class RecoverKeySetSeedPhraseViewModelTests: XCTestCase {
     func testOnUserInput_whenValidation_whenSuccess_isValidIsUpdated() {
         // Given
         let userInput = "\(RecoverKeySetSeedPhraseView.ViewModel.Constants.invisibleNonEmptyCharacter)abc "
-        let expectedSeedPhrase = "bcd abc"
         viewModel.isValidSeedPhrase = false
         viewModel.guesses = ["abc"]
         viewModel.seedPhraseDraft = ["bcd"]

@@ -11,6 +11,16 @@ import UIKit
 // sourcery: AutoMockable
 protocol URLOpening: AnyObject {
     func canOpenURL(_ url: URL) -> Bool
+    func open(_ url: URL)
+    func open(
+        _ url: URL,
+        options: [UIApplication.OpenExternalURLOptionsKey: Any],
+        completionHandler completion: ((Bool) -> Void)?
+    )
 }
 
-extension UIApplication: URLOpening {}
+extension UIApplication: URLOpening {
+    func open(_ url: URL) {
+        open(url, options: [:], completionHandler: nil)
+    }
+}
