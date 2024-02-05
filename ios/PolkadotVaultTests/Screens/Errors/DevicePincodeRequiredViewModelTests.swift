@@ -49,7 +49,7 @@ final class DevicePincodeRequiredViewModelTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockURLOpener.canOpenURLCallsCount, 1)
-        XCTAssertEqual(mockURLOpener.canOpenURLReceivedUrl, [UIApplication.openSettingsURLString])
+        XCTAssertEqual(mockURLOpener.canOpenURLReceivedUrl.map(\.absoluteString), [UIApplication.openSettingsURLString])
         XCTAssertEqual(mockURLOpener.openCallsCount, 0)
     }
 }
