@@ -8,17 +8,12 @@ import kotlinx.coroutines.runBlocking
 
 
 class AllNetworksUseCase(val uniffiInteractor: UniffiInteractor) {
-	private var allNetworks: List<NetworkModel> = runBlocking { getNetworks() }
 
-	fun updateCache(): Unit {
-		allNetworks = runBlocking { getNetworks() }
-	}
-
-	fun getAllNetworks(): List<NetworkModel> = allNetworks
+	fun getAllNetworks(): List<NetworkModel> = runBlocking { getNetworks() }
 
 	private val preselectedkeys = listOf<String>("Polkadot", "Kusama", "Westend")
 
-	fun getDefaultPreselectedNetworks(): List<NetworkModel> = allNetworks
+	fun getDefaultPreselectedNetworks(): List<NetworkModel> = getAllNetworks()
 		.filter { preselectedkeys.contains(it.title) }
 
 	private suspend fun getNetworks(): List<NetworkModel> {
