@@ -54,7 +54,6 @@ class DerivationCreateViewModel : ViewModel() {
 	 * should be called each time we open this flow again
 	 */
 	fun refreshCachedDependencies() {
-		allNetworksUseCase.updateCache()
 		seedRepository = ServiceLocator.activityScope!!.seedRepository
 	}
 
