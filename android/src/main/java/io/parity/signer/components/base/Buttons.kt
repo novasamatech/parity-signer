@@ -127,6 +127,7 @@ fun PrimaryButtonGreyDisabled(
 fun SecondaryButtonWide(
 	label: String,
 	modifier: Modifier = Modifier,
+	isEnabled: Boolean = true,
 	withBackground: Boolean = false,
 	textColor: Color = MaterialTheme.colors.textSecondary,
 	onClicked: Callback,
@@ -134,6 +135,7 @@ fun SecondaryButtonWide(
 	SecondaryButton(
 		label = label,
 		modifier = modifier.fillMaxWidth(),
+		isEnabled  = isEnabled,
 		withBackground = withBackground,
 		textColor = textColor,
 		onClicked = onClicked,
@@ -144,6 +146,7 @@ fun SecondaryButtonWide(
 private fun SecondaryButton(
 	label: String,
 	modifier: Modifier = Modifier,
+	isEnabled: Boolean = true,
 	withBackground: Boolean = false,
 	textColor: Color = MaterialTheme.colors.textSecondary,
 	onClicked: Callback,
@@ -151,7 +154,13 @@ private fun SecondaryButton(
 	Column(
 		modifier = modifier
 			.clip(RoundedCornerShape(dimensionResource(id = R.dimen.buttonCornerRadius)))
-			.clickable(onClick = onClicked)
+			.run {
+				if (isEnabled) {
+					clickable(onClick = onClicked)
+				} else {
+					this
+				}
+			}
 			.run {
 				if (withBackground) {
 					background(
