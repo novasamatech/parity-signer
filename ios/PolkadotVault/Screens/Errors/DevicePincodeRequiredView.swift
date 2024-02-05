@@ -65,9 +65,9 @@ struct DevicePincodeRequired: View {
 
 extension DevicePincodeRequired {
     final class ViewModel: ObservableObject {
-        private let urlOpener: UIApplication
+        private let urlOpener: URLOpening
 
-        init(urlOpener: UIApplication = UIApplication.shared) {
+        init(urlOpener: URLOpening = UIApplication.shared) {
             self.urlOpener = urlOpener
         }
 

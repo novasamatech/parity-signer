@@ -89,12 +89,6 @@ protocol CreateDerivedKeyServicing: AnyObject {
         _ networkName: String,
         _ completion: @escaping (Result<Void, CreateDerivedKeyForKeySetsError>) -> Void
     )
-    func createDerivedKeys(
-        _ seedName: String,
-        _ seedPhrase: String,
-        keysToImport: [DdDetail],
-        completion: @escaping (Result<Void, ImportDerivedKeyError>) -> Void
-    )
     func checkForCollision(
         _ seedName: String,
         _ path: String,
@@ -222,40 +216,6 @@ final class CreateDerivedKeyService {
                             .success(())
                         } else {
                             .failure(.keysNotCreated(occuredErrors))
-                        }
-                    completion(result)
-                }
-            })
-        }
-    }
-
-    func createDerivedKeys(
-        _ seedName: String,
-        _ seedPhrase: String,
-        keysToImport: [DdDetail],
-        completion: @escaping (Result<Void, ImportDerivedKeyError>) -> Void
-    ) {
-        var occuredErrors: [(key: String, error: String)] = []
-        keysToImport.forEach { keyToImport in
-            backendService.performCall({
-                try tryCreateAddress(
-                    seedName: seedName,
-                    seedPhrase: seedPhrase,
-                    path: keyToImport.path,
-                    network: keyToImport.networkSpecsKey
-                )
-            }, completion: { (result: Result<Void, ErrorDisplayed>) in
-                if case let .failure(displayedError) = result {
-                    occuredErrors.append((key: keyToImport.path, error: displayedError.backendDisplayError))
-                }
-                if keysToImport.last == keyToImport {
-                    let result: Result<Void, ImportDerivedKeyError> =
-                        if occuredErrors.isEmpty {
-                            .success(())
-                        } else if occuredErrors.count == keysToImport.count {
-                            .failure(.noKeysImported(errors: occuredErrors.map(\.error)))
-                        } else {
-                            .failure(.keyNotImported(occuredErrors))
                         }
                     completion(result)
                 }

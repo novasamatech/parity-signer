@@ -314,63 +314,6 @@ class ScanViewModel : ViewModel() {
 		}
 	}
 
-	fun createDynamicDerivations(
-		toImport: DdKeySet, context: Context
-	) {
-		viewModelScope.launch {
-			if (toImport.derivations.isNotEmpty()) {
-				val result = importKeysRepository.createDynamicDerivationKeys(
-					seedName = toImport.seedName, keysToImport = toImport.derivations
-				)
-
-				clearState()
-				when (result) {
-					is OperationResult.Err -> {
-						val errorMessage = when (result.error) {
-							is ImportDerivedKeyError.KeyNotImported -> result.error.keyToError.joinToString(
-								separator = "\n"
-							) {
-								context.getString(
-									R.string.dymanic_derivation_error_custom_message,
-									it.path,
-									it.errorLocalized
-								)
-							}
-
-							is ImportDerivedKeyError.NoKeysImported -> result.error.errors.joinToString(
-								separator = "\n"
-							)
-
-							ImportDerivedKeyError.AuthFailed -> {
-								context.getString(R.string.auth_failed_message)
-							}
-						}
-						transactionError.value = LocalErrorSheetModel(
-							title = context.getString(R.string.dymanic_derivation_error_custom_title),
-							subtitle = errorMessage,
-						)
-					}
-
-					is OperationResult.Ok -> {
-						Toast.makeText(
-							context,
-							context.getString(R.string.create_derivations_success),
-							Toast.LENGTH_SHORT
-						).show()
-					}
-				}
-			} else {
-				//list of derivations is empty
-				clearState()
-				Toast.makeText(
-					context,
-					context.getString(R.string.create_derivations_empty),
-					Toast.LENGTH_SHORT
-				).show()
-			}
-		}
-	}
-
 	private fun areSeedKeysTheSameButUpdated(
 		originalKey: SeedKeysPreview, resultKey: SeedKeysPreview
 	): Boolean =

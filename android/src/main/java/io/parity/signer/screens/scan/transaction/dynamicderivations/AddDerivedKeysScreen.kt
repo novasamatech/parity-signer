@@ -46,15 +46,15 @@ import io.parity.signer.uniffi.QrData
 internal fun AddDerivedKeysScreen(
 	model: DdPreview,
 	modifier: Modifier = Modifier,
-	onCack: Callback,
+	onBack: Callback,
 	onDone: Callback,
 ) {
-	BackHandler(onBack = onCack)
+	BackHandler(onBack = onBack)
 	Column(
 		modifier = modifier.verticalScroll(rememberScrollState()),
 	) {
 		ScreenHeaderClose(
-			onClose = onCack,
+			onClose = onBack,
 			title = null,
 			modifier = Modifier.padding(horizontal = 8.dp)
 		)
@@ -118,21 +118,8 @@ internal fun AddDerivedKeysScreen(
 			)
 		}
 
-		Text(
-			text = stringResource(R.string.add_derived_keys_screen_alert_title),
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(top = 16.dp, bottom = 8.dp),
-		)
-		NotificationFrameTextAlert(
-			message = stringResource(R.string.add_derived_keys_screen_alert_content),
-			modifier = Modifier.padding(horizontal = 16.dp),
-		)
-
 		PrimaryButtonWide(
-			label = stringResource(R.string.add_derived_keys_screen_cta),
+			label = stringResource(R.string.generic_done),
 			isEnabled = model.keySet.derivations.isNotEmpty(),
 			modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
 			onClicked = onDone,
@@ -219,7 +206,7 @@ private fun PreviewAddDerivedKeysScreen() {
 	SignerNewTheme {
 		AddDerivedKeysScreen(
 			model = ddPreviewcreateStub(),
-			onCack = {},
+			onBack = {},
 			onDone = {},
 		)
 	}
