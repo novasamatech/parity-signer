@@ -45,7 +45,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "u16" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -54,7 +55,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "u32" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -63,7 +65,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "u64" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -72,7 +75,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "u128" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -81,16 +85,11 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
-        "Percent" => {
-            decode_perthing::<Percent>(data, false, found_ty, indent).ok()
-        }
-        "Perbill" => {
-            decode_perthing::<Perbill>(data, false, found_ty, indent).ok()
-        }
-        "PerU16" => {
-            decode_perthing::<PerU16>(data, false, found_ty, indent).ok()
-        }
+        )
+        .ok(),
+        "Percent" => decode_perthing::<Percent>(data, false, found_ty, indent).ok(),
+        "Perbill" => decode_perthing::<Perbill>(data, false, found_ty, indent).ok(),
+        "PerU16" => decode_perthing::<PerU16>(data, false, found_ty, indent).ok(),
         "Compact<u8>" => decode_primitive_with_flags::<u8>(
             data,
             &mut None,
@@ -99,7 +98,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "Compact<u16>" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -108,7 +108,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "Compact<u32>" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -117,7 +118,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "Compact<u64>" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -126,7 +128,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
+        )
+        .ok(),
         "Compact<u128>" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -135,16 +138,11 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ).ok(),
-        "Compact<Percent>" => {
-            decode_perthing::<Percent>(data, true, found_ty, indent).ok()
-        }
-        "Compact<Perbill>" => {
-            decode_perthing::<Perbill>(data, true, found_ty, indent).ok()
-        }
-        "Compact<PerU16>" => {
-            decode_perthing::<PerU16>(data, true, found_ty, indent).ok()
-        }
+        )
+        .ok(),
+        "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent).ok(),
+        "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent).ok(),
+        "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent).ok(),
         _ => None,
     }
 }
