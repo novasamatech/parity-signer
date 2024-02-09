@@ -36,7 +36,7 @@ fn decode_primitive(
     short_specs: &ShortSpecs,
 ) -> Option<DecodedOut> {
     match found_ty {
-        "bool" => decode_known_length::<bool>(data, found_ty, indent).map_or_else(|_| None, Some),
+        "bool" => decode_known_length::<bool>(data, found_ty, indent).ok(),
         "u8" => decode_primitive_with_flags::<u8>(
             data,
             &mut None,
@@ -46,7 +46,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "u16" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -56,7 +56,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "u32" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -66,7 +66,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "u64" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -76,7 +76,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "u128" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -86,16 +86,10 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
-        "Percent" => {
-            decode_perthing::<Percent>(data, false, found_ty, indent).map_or_else(|_| None, Some)
-        }
-        "Perbill" => {
-            decode_perthing::<Perbill>(data, false, found_ty, indent).map_or_else(|_| None, Some)
-        }
-        "PerU16" => {
-            decode_perthing::<PerU16>(data, false, found_ty, indent).map_or_else(|_| None, Some)
-        }
+        .ok(),
+        "Percent" => decode_perthing::<Percent>(data, false, found_ty, indent).ok(),
+        "Perbill" => decode_perthing::<Perbill>(data, false, found_ty, indent).ok(),
+        "PerU16" => decode_perthing::<PerU16>(data, false, found_ty, indent).ok(),
         "Compact<u8>" => decode_primitive_with_flags::<u8>(
             data,
             &mut None,
@@ -105,7 +99,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "Compact<u16>" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -115,7 +109,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "Compact<u32>" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -125,7 +119,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "Compact<u64>" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -135,7 +129,7 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
+        .ok(),
         "Compact<u128>" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -145,16 +139,10 @@ fn decode_primitive(
             indent,
             short_specs,
         )
-        .map_or_else(|_| None, Some),
-        "Compact<Percent>" => {
-            decode_perthing::<Percent>(data, true, found_ty, indent).map_or_else(|_| None, Some)
-        }
-        "Compact<Perbill>" => {
-            decode_perthing::<Perbill>(data, true, found_ty, indent).map_or_else(|_| None, Some)
-        }
-        "Compact<PerU16>" => {
-            decode_perthing::<PerU16>(data, true, found_ty, indent).map_or_else(|_| None, Some)
-        }
+        .ok(),
+        "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent).ok(),
+        "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent).ok(),
+        "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent).ok(),
         _ => None,
     }
 }
