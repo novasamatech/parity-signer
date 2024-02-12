@@ -7,7 +7,12 @@
 
 import Foundation
 
-final class CreateDerivedKeyNameService {
+// sourcery: AutoMockable
+protocol CreateDerivedKeyNameServicing: AnyObject {
+    func defaultDerivedKeyName(_ keySet: MKeysNew, network: MmNetwork) -> String
+}
+
+final class CreateDerivedKeyNameService: CreateDerivedKeyNameServicing {
     func defaultDerivedKeyName(_ keySet: MKeysNew, network: MmNetwork) -> String {
         let currentPaths = keySet.set.map(\.key.address.path)
         let isPrimaryPathPresent = currentPaths.contains { $0 == network.pathId }
