@@ -18,7 +18,7 @@ regex = "1.10.3"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
-thiserror = "1.0.56"
+thiserror = "1.0.57"
 time = {version = "0.3.34", features = ["formatting", "macros"]}
 tiny-bip39 = {version = "1.0.0", default-features = false, optional = true}
 zeroize = { version = "1.7.0", optional = true, features = ["std"] }
