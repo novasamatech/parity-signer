@@ -143,9 +143,9 @@ extension CreateKeyNetworkSelectionView {
 
     final class ViewModel: ObservableObject {
         private let cancelBag = CancelBag()
-        private let networkService: GetManagedNetworksService
+        private let networkService: GetManagedNetworksServicing
         private let keyName: String
-        private let createKeyService: CreateDerivedKeyService
+        private let createKeyService: CreateDerivedKeyServicing
         private let keySet: MKeysNew
         let seedName: String
         @Published var isPresentingDerivationPath: Bool = false
@@ -170,8 +170,8 @@ extension CreateKeyNetworkSelectionView {
             seedName: String,
             keyName: String,
             keySet: MKeysNew,
-            networkService: GetManagedNetworksService = GetManagedNetworksService(),
-            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
+            networkService: GetManagedNetworksServicing = GetManagedNetworksService(),
+            createKeyService: CreateDerivedKeyServicing = CreateDerivedKeyService(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             self.seedName = seedName
@@ -236,11 +236,13 @@ private extension CreateKeyNetworkSelectionView.ViewModel {
     }
 
     func listenToChanges() {
-        $isNetworkTutorialPresented.sink { [weak self] isPresented in
-            guard let self, !isPresented else { return }
-            updateNetworks()
-        }
-        .store(in: cancelBag)
+        $isNetworkTutorialPresented
+            .dropFirst()
+            .sink { [weak self] isPresented in
+                guard let self, !isPresented else { return }
+                updateNetworks()
+            }
+            .store(in: cancelBag)
     }
 }
 

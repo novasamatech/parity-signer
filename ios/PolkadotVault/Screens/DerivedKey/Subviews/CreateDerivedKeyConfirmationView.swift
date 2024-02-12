@@ -101,7 +101,6 @@ extension CreateDerivedKeyConfirmationView {
         }
 
         func confirmAction() {
-
             onCompletion()
         }
 

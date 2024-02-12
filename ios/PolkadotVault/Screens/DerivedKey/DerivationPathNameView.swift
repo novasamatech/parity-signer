@@ -195,8 +195,8 @@ extension View {
 
 extension DerivationPathNameView {
     final class ViewModel: ObservableObject {
-        private let createKeyService: CreateDerivedKeyService
-        private let createKeyNameService: CreateDerivedKeyNameService
+        private let createKeyService: CreateDerivedKeyServicing
+        private let createKeyNameService: CreateDerivedKeyNameServicing
         private let seedName: String
         private let keySet: MKeysNew
         private let networkSelection: MmNetwork
@@ -227,8 +227,8 @@ extension DerivationPathNameView {
             seedName: String,
             keySet: MKeysNew,
             networkSelection: MmNetwork,
-            createKeyService: CreateDerivedKeyService = CreateDerivedKeyService(),
-            createKeyNameService: CreateDerivedKeyNameService = CreateDerivedKeyNameService(),
+            createKeyService: CreateDerivedKeyServicing = CreateDerivedKeyService(),
+            createKeyNameService: CreateDerivedKeyNameServicing = CreateDerivedKeyNameService(),
             onComplete: @escaping () -> Void
         ) {
             self.seedName = seedName
@@ -359,7 +359,7 @@ private extension DerivationPathNameView.ViewModel {
                 derivationPathError = nil
             }
         case let .failure(error):
-            presentableError = .alertError(message: error.backendDisplayError)
+            presentableError = .alertError(message: error.localizedDescription)
             isPresentingError = true
         }
     }
