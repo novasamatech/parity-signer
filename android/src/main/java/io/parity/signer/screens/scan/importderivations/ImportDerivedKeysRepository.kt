@@ -35,6 +35,7 @@ class ImportDerivedKeysRepository(
 			seedRepository.getAllSeeds().mapError() ?: return RepoResult.Failure()
 		return try {
 			val filledSeedKeys = populateDerivationsHasPwd(seeds, seedPreviews)
+			System.gc()
 			RepoResult.Success(filledSeedKeys)
 		} catch (e: java.lang.Exception) {
 			RepoResult.Failure(e)

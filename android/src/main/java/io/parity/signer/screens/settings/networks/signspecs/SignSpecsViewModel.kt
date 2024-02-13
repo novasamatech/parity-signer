@@ -95,6 +95,7 @@ class SignSpecsViewModel : ViewModel() {
 							}
 						}
 					}
+					System.gc()
 				}
 			}
 		}
