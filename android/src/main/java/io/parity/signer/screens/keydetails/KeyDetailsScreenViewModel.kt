@@ -49,6 +49,7 @@ class KeyDetailsScreenViewModel : ViewModel() {
 					seedPhrase = seedResult.result,
 					keyPassword = password,
 				)
+				System.gc()
 				when (secretKeyDetailsQR) {
 					is UniffiResult.Error -> OperationResult.Err(secretKeyDetailsQR.error)
 					is UniffiResult.Success -> {
@@ -96,6 +97,8 @@ class KeyDetailsScreenViewModel : ViewModel() {
 					seedPhrase = seedResult.result,
 					keyPassword = password,
 				)
+				System.gc()
+
 				when (secretKeyDetailsQR) {
 					is UniffiResult.Error -> {
 						if (passwordModel.attempt > 3) {

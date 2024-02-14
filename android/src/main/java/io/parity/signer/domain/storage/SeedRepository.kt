@@ -134,17 +134,20 @@ class SeedRepository(
 			return when (val authResult = authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> {
 					addSeedDangerous(seedName, seedPhrase, networksKeys)
+					System.gc()
 					AuthOperationResult.Success
 				}
 
 				AuthResult.AuthError,
 				AuthResult.AuthFailed,
 				AuthResult.AuthUnavailable -> {
+					System.gc()
 					Timber.w(TAG, "auth error - $authResult")
 					AuthOperationResult.AuthFailed(authResult)
 				}
 			}
 		} catch (e: java.lang.Exception) {
+			System.gc()
 			Timber.e(TAG, e.toString())
 			return AuthOperationResult.Error(e)
 		}
@@ -161,6 +164,7 @@ class SeedRepository(
 		} catch (e: ErrorDisplayed) {
 			submitErrorState("error in add seed $e")
 		}
+		System.gc()
 	}
 
 	/**
@@ -199,6 +203,9 @@ class SeedRepository(
 			.map { storage.getSeed(it) }
 			.filter { it.isNotEmpty() }
 			.joinToString(separator = "\n")
+
+		//Just collect some old seeds
+		System.gc()
 
 		return if (seedPhrases.isNotBlank()) {
 			RepoResult.Success(seedPhrases)

@@ -233,6 +233,7 @@ class ScanViewModel : ViewModel() {
 			is RepoResult.Success -> {
 				val previewDynDerivations =
 					uniffiInteractor.previewDynamicDerivations(phrases.result, payload)
+				System.gc()
 
 				when (previewDynDerivations) {
 					is UniffiResult.Error -> {
@@ -266,6 +267,7 @@ class ScanViewModel : ViewModel() {
 					uniffiInteractor.signDynamicDerivationsTransactions(
 						phrases.result, payload
 					)
+				System.gc()
 
 				when (dynDerivations) {
 					is UniffiResult.Error -> {
@@ -383,10 +385,12 @@ class ScanViewModel : ViewModel() {
 			}
 
 			is RepoResult.Success -> {
-				scanFlowInteractor.continueSigningTransaction(
+				val result = scanFlowInteractor.continueSigningTransaction(
 					comment,
 					phrases.result,
 				)
+				System.gc()
+				result
 			}
 		}
 	}

@@ -13,7 +13,6 @@ import io.parity.signer.domain.FeatureFlags
 import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.screens.error.ErrorStateDestinationState
-import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.historySeedWasShown
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -145,8 +144,11 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
-	fun checkIfSeedNameAlreadyExists(seedPhrase: String) =
-		sharedPreferences.all.values.contains(seedPhrase)
+	fun checkIfSeedNameAlreadyExists(seedPhrase: String) : Boolean {
+		val result = sharedPreferences.all.values.contains(seedPhrase)
+		Runtime.getRuntime().gc()
+		return result
+	}
 
 	/**
 	 * @throws UserNotAuthenticatedException

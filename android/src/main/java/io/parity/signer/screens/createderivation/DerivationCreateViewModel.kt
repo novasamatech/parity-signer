@@ -134,6 +134,7 @@ class DerivationCreateViewModel : ViewModel() {
 					path = path.value,
 					networkKey = selectedNetwork.key
 				)
+				System.gc()
 				when (result) {
 					is OperationResult.Ok -> {
 						Toast.makeText(
