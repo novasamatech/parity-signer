@@ -25,6 +25,9 @@ import androidx.compose.ui.zIndex
 import io.parity.signer.R
 import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
+import io.parity.signer.ui.theme.fill18
+import io.parity.signer.ui.theme.fill6
+import io.parity.signer.ui.theme.forcedFill30
 import io.parity.signer.ui.theme.pink500
 
 
@@ -36,24 +39,17 @@ fun ScanIconPlain(
 ) {
 	Box(
 		modifier = modifier
-			.size(72.dp)
+			.size(32.dp)
 			.clip(CircleShape)
 			.clickable(onClick = onClick)
-			.border(6.dp, MaterialTheme.colors.primary, CircleShape)
-			//todo dmitry make backgroudn as in design
-			.background(MaterialTheme.colors.background),
+			.background(MaterialTheme.colors.fill6),
 		contentAlignment = Alignment.Center,
 	) {
-		Box(
-			modifier = Modifier
-				.background(MaterialTheme.colors.pink500, CircleShape)
-				.size(56.dp)
-		)
 		Image(
 			painter = painterResource(R.drawable.ic_qr_code_2),
 			contentDescription = stringResource(R.string.description_scan_icon),
-			colorFilter = ColorFilter.tint(Color.White),
-			modifier = Modifier.size(32.dp)
+			colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+			modifier = Modifier.size(20.dp)
 		)
 	}
 }

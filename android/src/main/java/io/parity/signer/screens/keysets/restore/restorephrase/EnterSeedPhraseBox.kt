@@ -2,10 +2,13 @@ package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -32,6 +36,7 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
+import io.parity.signer.components.base.ScanIconPlain
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.domain.KeepScreenOn
@@ -51,7 +56,7 @@ fun EnterSeedPhraseBox(
 	rawUserInput: String,
 	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
-	onScanIcon: Callback,
+	onScanOpen: Callback,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape = RoundedCornerShape(innerRound)
@@ -108,6 +113,13 @@ fun EnterSeedPhraseBox(
 				}
 			}
 		)
+		Box(
+			//todo dmitry make sure it's at bottom right
+			modifier = Modifier.fillMaxWidth(1f),
+			contentAlignment = Alignment.BottomEnd
+		) {
+			ScanIconPlain(onClick = onScanOpen)
+		}
 	}
 
 	DisableScreenshots()
@@ -141,6 +153,7 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 	}
 }
 
+
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -153,7 +166,7 @@ private fun EnterSeedPhraseWord(index: Int, word: String) {
 @Composable
 private fun PreviewSeedPhraseRestoreComponentEmptry() {
 	SignerNewTheme {
-		EnterSeedPhraseBox(emptyList(), "", Modifier, {})
+		EnterSeedPhraseBox(emptyList(), "", Modifier, {}, {})
 	}
 }
 
@@ -173,7 +186,7 @@ private fun PreviewSeedPhraseRestoreComponentFinished() {
 		"long", "text", "here", "how", "printed1234"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "", Modifier, {})
+		EnterSeedPhraseBox(entered, "", Modifier, {}, {})
 	}
 }
 
@@ -193,7 +206,7 @@ private fun PreviewSeedPhraseRestoreComponentInProgress() {
 		"long", "text", "here", "how"
 	)
 	SignerNewTheme {
-		EnterSeedPhraseBox(entered, "printed", Modifier, {})
+		EnterSeedPhraseBox(entered, "printed", Modifier, {}, {})
 	}
 }
 

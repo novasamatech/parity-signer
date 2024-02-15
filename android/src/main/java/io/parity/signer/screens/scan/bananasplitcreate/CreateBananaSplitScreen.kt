@@ -9,8 +9,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 
 
-class  {
-}
 @Composable
 fun CreateBananaSplitScreen(
 	onClose: Callback,

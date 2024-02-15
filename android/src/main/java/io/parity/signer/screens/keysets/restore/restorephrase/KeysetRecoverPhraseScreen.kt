@@ -29,6 +29,7 @@ fun KeysetRecoverPhraseScreen(
 	onNewInput: (input: String) -> Unit,
 	onAddSuggestedWord: (input: String) -> Unit,
 	onDone: Callback,
+	onScanOpen: Callback,
 	modifier: Modifier = Modifier,
 ) {
 	Column(
@@ -67,6 +68,7 @@ fun KeysetRecoverPhraseScreen(
 				.padding(horizontal = 16.dp)
 				.padding(top = 8.dp, bottom = 12.dp),
 			onEnteredChange = onNewInput,
+			onScanOpen = onScanOpen,
 		)
 		RestoreSeedPhraseSuggest(
 			guessWord = model.suggestedWords,
@@ -94,6 +96,7 @@ private fun PreviewKeysetRecoverPhraseScreenView() {
 			onNewInput = { _ -> },
 			onAddSuggestedWord = { _ -> },
 			onDone = {},
+			onScanOpen = {},
 		)
 	}
 }
