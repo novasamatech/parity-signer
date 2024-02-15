@@ -32,6 +32,7 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
+import io.parity.signer.domain.Callback
 import io.parity.signer.domain.DisableScreenshots
 import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.domain.conditional
@@ -50,6 +51,7 @@ fun EnterSeedPhraseBox(
 	rawUserInput: String,
 	modifier: Modifier = Modifier,
 	onEnteredChange: (progressWord: String) -> Unit,
+	onScanIcon: Callback,
 ) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape = RoundedCornerShape(innerRound)

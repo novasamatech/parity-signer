@@ -17,7 +17,7 @@ fun CreateBananaSplitScreen(
 	onCreate: Callback,
 	modifier: Modifier = Modifier,
 ) {
-
+//todo dmitry implement https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?type=design&node-id=15728-46347&mode=design
 }
 
 
