@@ -2,13 +2,19 @@ package io.parity.signer.screens.keysets.restore.restorephrase
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,9 +38,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
 import io.parity.signer.components.base.ScanIconPlain
 import io.parity.signer.domain.Callback
@@ -50,6 +53,7 @@ import io.parity.signer.ui.theme.textDisabled
 import io.parity.signer.ui.theme.textTertiary
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EnterSeedPhraseBox(
 	enteredWords: List<String>,
@@ -72,50 +76,55 @@ fun EnterSeedPhraseBox(
 		selection = TextRange(rawUserInput.length)
 	)
 
-	FlowRow(
-		mainAxisSize = SizeMode.Expand,
-		mainAxisSpacing = 4.dp,
-		mainAxisAlignment = FlowMainAxisAlignment.Start,
-		crossAxisSpacing = 4.dp,
-		modifier = modifier
+	Column(
+		modifier
 			.background(MaterialTheme.colors.fill6, innerShape)
-			.defaultMinSize(minHeight = 156.dp)
-			.padding(8.dp),
+			.padding(8.dp)
+			//todo dmitry show keyboard
+			.clickable { focusRequester.requestFocus() }
 	) {
-		enteredWords.onEachIndexed { index, word ->
-			EnterSeedPhraseWord(index = index + 1, word = word)
-		}
-		val shouldShowPlaceholder = enteredWords.isEmpty() && rawUserInput.isEmpty()
-		BasicTextField(
-			textStyle = TextStyle(color = MaterialTheme.colors.primary),
-			value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
-			onValueChange = {
-				if (it.text != seedWord.value.text) {
-					onEnteredChange(it.text)
-				}
-				seedWord.value = it
-			},
-			cursorBrush = SolidColor(MaterialTheme.colors.primary),
-			modifier = Modifier
-				.focusRequester(focusRequester)
-				.padding(vertical = 8.dp, horizontal = 12.dp)
-				.conditional(!shouldShowPlaceholder) {
-					width(IntrinsicSize.Min)
-				},
-			decorationBox = @Composable { innerTextField ->
-				innerTextField()
-				if (shouldShowPlaceholder) {
-					Text(
-						text = stringResource(R.string.enter_seed_phease_box_placeholder),
-						color = MaterialTheme.colors.textTertiary,
-						style = SignerTypeface.BodyL,
-					)
-				}
+
+		FlowRow(
+			horizontalArrangement = Arrangement.spacedBy(4.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp),
+			modifier = Modifier.heightIn(min = 100.dp)
+		) {
+			enteredWords.onEachIndexed { index, word ->
+				EnterSeedPhraseWord(index = index + 1, word = word)
 			}
-		)
+			val shouldShowPlaceholder =
+				enteredWords.isEmpty() && rawUserInput.isEmpty()
+			BasicTextField(
+				textStyle = TextStyle(color = MaterialTheme.colors.primary),
+				value = seedWord.value, //as was before redesign, should been moved to rust but need to align with iOS
+				onValueChange = {
+					if (it.text != seedWord.value.text) {
+						onEnteredChange(it.text)
+					}
+					seedWord.value = it
+				},
+				cursorBrush = SolidColor(MaterialTheme.colors.primary),
+				modifier = Modifier
+					.focusRequester(focusRequester)
+					.padding(vertical = 8.dp, horizontal = 12.dp)
+					.conditional(!shouldShowPlaceholder) {
+						width(IntrinsicSize.Min)
+					},
+				decorationBox = @Composable { innerTextField ->
+					innerTextField()
+					if (shouldShowPlaceholder) {
+						Text(
+							text = stringResource(R.string.enter_seed_phease_box_placeholder),
+							color = MaterialTheme.colors.textTertiary,
+							style = SignerTypeface.BodyL,
+						)
+					}
+				}
+			)
+		}
 		Box(
-			//todo dmitry make sure it's at bottom right
-			modifier = Modifier.fillMaxWidth(1f),
+			modifier = Modifier
+				.fillMaxWidth(1f),
 			contentAlignment = Alignment.BottomEnd
 		) {
 			ScanIconPlain(onClick = onScanOpen)
