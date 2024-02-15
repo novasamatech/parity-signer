@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit
+package io.parity.signer.screens.scan.bananasplitrestore
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.scan.bananasplit.networks.RecoverKeysetSelectNetworkBananaFlowScreen
+import io.parity.signer.screens.scan.bananasplitrestore.networks.RecoverKeysetSelectNetworkBananaFlowScreen
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 

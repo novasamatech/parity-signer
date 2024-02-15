@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit.networks
+package io.parity.signer.screens.scan.bananasplitrestore.networks
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
