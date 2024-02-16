@@ -81,7 +81,7 @@ fun EnterSeedPhraseBox(
 			.background(MaterialTheme.colors.fill6, innerShape)
 			.padding(8.dp)
 			//todo dmitry show keyboard
-			.clickable { focusRequester.requestFocus() }
+//			.clickable { focusRequester.requestFocus() }
 	) {
 
 		FlowRow(
