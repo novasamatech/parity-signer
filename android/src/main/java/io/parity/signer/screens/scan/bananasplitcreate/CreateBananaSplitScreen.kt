@@ -12,21 +12,15 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.parity.signer.R
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.createderivation.DerivationCreateViewModel
-import io.parity.signer.screens.createderivation.DerivationPathVisualTransformation
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.textTertiary
@@ -44,7 +38,7 @@ fun CreateBananaSplitScreen(
 
 	var shards: String = rememberSaveable { "4" }
 
-	val canProceed: Boolean = Integer.getInteger(shards)?.let { it > 2 } ?: false
+	val canProceed: Boolean = shards.toIntOrNull()?.let { it > 2 } ?: false
 
 
 	Column(modifier = modifier) {
@@ -73,17 +67,17 @@ fun CreateBananaSplitScreen(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			modifier = Modifier
-				.padding(horizontal = 24.dp)
+				.padding(horizontal = 24.dp, vertical = 6.dp)
 		)
-		//todo dmiutry keyboard type only numbers
 		OutlinedTextField(
-			value = shards, //hide password, add hint
-			onValueChange = { newStr -> shards = newStr },
-			keyboardOptions = KeyboardOptions(
-//				fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices
+			value = shards,
+			onValueChange = { newStr: String -> shards = newStr },
+			visualTransformation = VisualTransformation.None,
+			keyboardOptions = KeyboardOptions.Default.copy(
+				keyboardType = KeyboardType.Number,
+				//	fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices so keeping it always Done
 				imeAction = ImeAction.Done
 			),
-			visualTransformation = VisualTransformation.None,
 			keyboardActions = KeyboardActions(onDone = {
 				if (canProceed) {
 					onCreate()
@@ -100,7 +94,6 @@ fun CreateBananaSplitScreen(
 				.fillMaxWidth(1f)
 				.padding(horizontal = 24.dp)
 		)
-
 
 		if (canProceed) {
 			//todo how many shards
