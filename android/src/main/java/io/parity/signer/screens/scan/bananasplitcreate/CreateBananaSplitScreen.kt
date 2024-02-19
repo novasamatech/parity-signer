@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -63,14 +65,14 @@ fun CreateBananaSplitScreen(
 		Text(
 			text = "Banana Split Backup",
 			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
+			style = SignerTypeface.TitleL,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
 		)
 		Text(
 			text = "Backup your key set by turning the secret phrase into sharded QR codes with passphrase protection",
 			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.CaptionM,
+			style = SignerTypeface.LabelS,
 			modifier = Modifier
 				.padding(horizontal = 24.dp)
 				.padding(vertical = 8.dp)
@@ -105,7 +107,7 @@ fun CreateBananaSplitScreen(
 			),
 			modifier = Modifier
 				.fillMaxWidth(1f)
-				.padding(horizontal = 24.dp)
+				.padding(horizontal = 16.dp)
 		)
 
 		if (canProceed) {
@@ -147,7 +149,7 @@ fun CreateBananaSplitScreen(
 		)
 		NotificationFrameTextImportant(
 			message = "Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.",
-			modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
+			modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
 			withBorder = false
 		)
 	}
@@ -163,7 +165,7 @@ private fun PassPhraseBox(
 		RoundedCornerShape(dimensionResource(id = R.dimen.innerFramesCornerRadius))
 	Row(
 		modifier = modifier
-			.padding(vertical = 8.dp)
+			.padding(vertical = 8.dp, horizontal = 16.dp)
 			.border(
 				BorderStroke(1.dp, MaterialTheme.colors.appliedStroke),
 				innerShape
@@ -171,7 +173,12 @@ private fun PassPhraseBox(
 
 	) {
 
-		Column(Modifier.weight(1f)) {
+		Column(
+			Modifier
+				.weight(1f)
+				.padding(vertical = 16.dp)
+				.padding(start = 16.dp)
+		) {
 			Text(
 				text = "Passphrase for the Recovery",
 				color = MaterialTheme.colors.textTertiary,
@@ -192,7 +199,9 @@ private fun PassPhraseBox(
 			tint = MaterialTheme.colors.textSecondary,
 			modifier = Modifier
 				.align(Alignment.CenterVertically)
-				.padding(start = 18.dp, end = 18.dp)
+				.padding(start = 4.dp, end = 16.dp)
+				.size(32.dp)
+				.clickable(onClick = onUpdate)
 		)
 	}
 }
