@@ -183,12 +183,12 @@ private fun PassPhraseBox(
 				text = "Passphrase for the Recovery",
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyM,
-				modifier = Modifier
+				modifier = Modifier.padding(bottom = 4.dp)
 			)
 			Text(
 				text = passPhrase,
 				color = MaterialTheme.colors.primary,
-				style = SignerTypeface.BodyM,
+				style = SignerTypeface.BodyL,
 				modifier = Modifier
 			)
 		}
