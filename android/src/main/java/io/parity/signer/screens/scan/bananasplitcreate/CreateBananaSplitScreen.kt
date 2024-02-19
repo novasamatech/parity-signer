@@ -37,7 +37,6 @@ import io.parity.signer.domain.Callback
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.appliedStroke
-import io.parity.signer.ui.theme.pink300
 import io.parity.signer.ui.theme.textSecondary
 import io.parity.signer.ui.theme.textTertiary
 
