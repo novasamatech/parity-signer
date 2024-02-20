@@ -28,8 +28,8 @@ fun BananaSplitExportRemoveConfirmBottomSheet(
 	onRemoveKeySet: Callback,
 ) {
 	BottomSheetConfirmDialog(
-		title = "Remove Banana Split", //todo dmitry export
-		message = "You can still use this backup if you have QR code shards printed and have passphrase written down on paper.",
+		title = stringResource(R.string.banana_split_menu_remove_confirm_title),
+		message = stringResource(R.string.banana_split_menu_remove_confirm_description),
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
 		isCtaDangerous = true,
 		onCancel = onCancel,
@@ -52,13 +52,13 @@ fun BananaSplitExportBottomSheet(
 
 		MenuItemForBottomSheet(
 			Icons.Outlined.Password,
-			label = "Show Passphrase", //todo dmitry export
+			label = stringResource(R.string.banana_split_menu_option_show_password),
 			onclick = onShowPassphrase
 		)
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_backspace_28,
-			label = "Remove Backup",
+			label = stringResource(R.string.banana_split_menu_option_remove_backup),
 			tint = MaterialTheme.colors.red400,
 			onclick = onRemoveBackup
 		)

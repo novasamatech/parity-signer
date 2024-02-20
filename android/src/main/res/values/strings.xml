@@ -464,6 +464,11 @@
 	<string name="create_bs_password_header">Passphrase for the Recovery</string>
 	<string name="create_bs_refresh_password_icon_description">Refresh Password</string>
 	<string name="create_bs_export_notification_text">Scan this animated QR code into the bs.parity.io app to print QR code shards.</string>
+	<string name="banana_split_menu_remove_confirm_title">Remove Banana Split</string>
+	<string name="banana_split_menu_remove_confirm_description">You can still use this backup if you have QR code shards printed and have passphrase written down on paper.</string>
+	<string name="banana_split_menu_option_show_password">Show Passphrase</string>
+	<string name="banana_split_menu_option_remove_backup">Remove Backup</string>
+	<string name="banana_split_menu_password_title">Passphrase</string>
 
 </resources>
 
