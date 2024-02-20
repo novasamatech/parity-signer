@@ -7,12 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,7 +17,6 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
-import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.red400
@@ -36,6 +31,7 @@ fun BananaSplitExportRemoveConfirmBottomSheet(
 		title = "Remove Banana Split", //todo dmitry export
 		message = "You can still use this backup if you have QR code shards printed and have passphrase written down on paper.",
 		ctaLabel = stringResource(R.string.remove_key_set_confirm_cta),
+		isCtaDangerous = true,
 		onCancel = onCancel,
 		onCta = onRemoveKeySet,
 	)
