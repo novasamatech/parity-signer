@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -25,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -46,111 +49,121 @@ fun CreateBananaSplitScreen(
 	onClose: Callback,
 	onCreate: Callback,
 	updatePassowrd: (shards: Int) -> Unit,
+	//todo dmitry remember password
 	password: String,
 	modifier: Modifier = Modifier,
 ) {
 //todo dmitry implement https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?type=design&node-id=15728-46347&mode=design
 
-	var shards: String = rememberSaveable { "4" }
+	var shardsField: String = rememberSaveable { "4" }
 
-	val canProceed: Boolean = shards.toIntOrNull()?.let { it > 2 } ?: false
+	val shardsValue: Int? = shardsField.toIntOrNull()
+	val canProceed: Boolean = shardsValue?.let { it > 2 } ?: false
 
 	Column(modifier = modifier) {
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
-			btnText = "Create",//todo dmitry export strings
+			btnText = stringResource(R.string.create_action_cta),
 			onClose = onClose, onDone = onCreate
 		)
-		Text(
-			text = "Banana Split Backup",
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.TitleL,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-		)
-		Text(
-			text = "Backup your key set by turning the secret phrase into sharded QR codes with passphrase protection",
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.LabelS,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(vertical = 8.dp)
-		)
-		Text(
-			text = "Number of QR Code Shards",
-			color = MaterialTheme.colors.primary,
-			style = SignerTypeface.BodyL,
-			modifier = Modifier
-				.padding(horizontal = 24.dp, vertical = 6.dp)
-		)
-		OutlinedTextField(
-			value = shards,
-			onValueChange = { newStr: String -> shards = newStr },
-			visualTransformation = VisualTransformation.None,
-			keyboardOptions = KeyboardOptions.Default.copy(
-				keyboardType = KeyboardType.Number,
-				//	fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices so keeping it always Done
-				imeAction = ImeAction.Done
-			),
-			keyboardActions = KeyboardActions(onDone = {
-				if (canProceed) {
-					onCreate()
-				}
-			}),
-			isError = Integer.getInteger(shards) == null,
-			singleLine = true,
-			textStyle = SignerTypeface.LabelM,
-			colors = TextFieldDefaults.textFieldColors(
-				textColor = MaterialTheme.colors.primary,
-				errorCursorColor = MaterialTheme.colors.primary,
-			),
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 16.dp)
-		)
-
-		if (canProceed) {
-			//todo how many shards
+		Column(Modifier.verticalScroll(rememberScrollState())) {
 			Text(
-				text = "3 shards out of 5 to reconstruct",//todo dmitry implement
+				text = stringResource(R.string.create_bs_title),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.TitleL,
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+			)
+			Text(
+				text = stringResource(R.string.create_bs_subtitle),
+				color = MaterialTheme.colors.textTertiary,
+				style = SignerTypeface.LabelS,
+				modifier = Modifier
+					.padding(horizontal = 24.dp)
+					.padding(vertical = 8.dp)
+			)
+			Text(
+				text = stringResource(R.string.create_bs_shards_header),
+				color = MaterialTheme.colors.primary,
+				style = SignerTypeface.BodyL,
+				modifier = Modifier
+					.padding(horizontal = 24.dp, vertical = 6.dp)
+			)
+			OutlinedTextField(
+				value = shardsField,
+				onValueChange = { newStr: String -> shardsField = newStr },
+				visualTransformation = VisualTransformation.None,
+				keyboardOptions = KeyboardOptions.Default.copy(
+					keyboardType = KeyboardType.Number,
+					//	fixme #1749 recreation of options leading to first letter dissapearing on some samsung devices so keeping it always Done
+					imeAction = ImeAction.Done
+				),
+				keyboardActions = KeyboardActions(onDone = {
+					if (canProceed) {
+						onCreate()
+					}
+				}),
+				isError = Integer.getInteger(shardsField) == null,
+				singleLine = true,
+				textStyle = SignerTypeface.LabelM,
+				colors = TextFieldDefaults.textFieldColors(
+					textColor = MaterialTheme.colors.primary,
+					errorCursorColor = MaterialTheme.colors.primary,
+				),
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.padding(horizontal = 16.dp)
+			)
+
+			if (canProceed && shardsValue != null) {
+				val requiresShards = BananaSplit.getMinShards(shardsValue)
+				Text(
+					text = stringResource(
+						R.string.create_bs_shards_description_required,
+						requiresShards,
+						shardsValue
+					),
+					color = MaterialTheme.colors.textTertiary,
+					style = SignerTypeface.CaptionM,
+					modifier = Modifier
+						.padding(horizontal = 24.dp)
+						.padding(vertical = 8.dp)
+				)
+			} else {
+				//error description
+				Text(
+					text = stringResource(R.string.create_bs_shards_description_error),
+					color = MaterialTheme.colors.error,
+					style = SignerTypeface.CaptionM,
+					modifier = Modifier
+						.padding(horizontal = 24.dp)
+						.padding(vertical = 8.dp)
+				)
+			}
+			//passcode section
+			PassPhraseBox(
+				passPhrase = password,
+				onUpdate = {
+					if (canProceed && shardsValue != null) {
+						updatePassowrd(shardsValue)
+					}
+				},
+			)
+
+			Text(
+				text = stringResource(R.string.create_bs_buttom_description),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.CaptionM,
 				modifier = Modifier
 					.padding(horizontal = 24.dp)
 					.padding(vertical = 8.dp)
 			)
-		} else {
-			//error description
-			Text(
-				text = "The number of shares must be no less than 2 ",
-				color = MaterialTheme.colors.error,
-				style = SignerTypeface.CaptionM,
-				modifier = Modifier
-					.padding(horizontal = 24.dp)
-					.padding(vertical = 8.dp)
+			NotificationFrameTextImportant(
+				message = stringResource(R.string.create_bs_notification_frame_text),
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
+				withBorder = false
 			)
 		}
-		//passcode section
-		PassPhraseBox(
-			passPhrase = password,
-			onUpdate = {
-				updatePassowrd(4) //todo dmitry shards
-			},
-		)
-
-		Text(
-			text = "Write down your passphrase. You'll need it to recover from Banana Split.",
-			color = MaterialTheme.colors.textTertiary,
-			style = SignerTypeface.CaptionM,
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.padding(vertical = 8.dp)
-		)
-		NotificationFrameTextImportant(
-			message = "Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.",
-			modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
-			withBorder = false
-		)
 	}
 }
 
@@ -179,7 +192,7 @@ private fun PassPhraseBox(
 				.padding(start = 16.dp)
 		) {
 			Text(
-				text = "Passphrase for the Recovery",
+				text = stringResource(R.string.create_bs_password_header),
 				color = MaterialTheme.colors.textTertiary,
 				style = SignerTypeface.BodyM,
 				modifier = Modifier.padding(bottom = 4.dp)
@@ -194,7 +207,7 @@ private fun PassPhraseBox(
 
 		Icon(
 			imageVector = Icons.Outlined.Refresh,
-			contentDescription = null,
+			contentDescription = stringResource(R.string.create_bs_refresh_password_icon_description),
 			tint = MaterialTheme.colors.textSecondary,
 			modifier = Modifier
 				.align(Alignment.CenterVertically)

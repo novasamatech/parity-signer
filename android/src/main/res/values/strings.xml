@@ -453,6 +453,16 @@
 	<string name="airgap_onboarding_adb_disable">Disable ADB on the device</string>
     <string name="error_secure_storage_title">Couldn\'t open secure storage</string>
 	<string name="error_secure_storage_description">There was an error during opening secure storage. Possible reasons - device unlock method was changed. Error below</string>
+	<string name="create_action_cta">Create</string>
+	<string name="create_bs_title">Banana Split Backup</string>
+	<string name="create_bs_subtitle">Backup your key set by turning the secret phrase into sharded QR codes with passphrase protection</string>
+	<string name="create_bs_shards_header">Number of QR Code Shards</string>
+	<string name="create_bs_shards_description_required">%1$i shards out of %2$i to reconstruct</string>
+	<string name="create_bs_shards_description_error">"The number of shares must be no less than 2 "</string>
+	<string name="create_bs_buttom_description">Write down your passphrase. You\'ll need it to recover from Banana Split.</string>
+	<string name="create_bs_notification_frame_text">Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.</string>
+	<string name="create_bs_password_header">Passphrase for the Recovery</string>
+	<string name="create_bs_refresh_password_icon_description">Refresh Password</string>
 
 </resources>
 
