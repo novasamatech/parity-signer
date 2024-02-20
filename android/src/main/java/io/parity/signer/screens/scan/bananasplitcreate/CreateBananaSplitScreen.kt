@@ -149,7 +149,6 @@ fun CreateBananaSplitScreen(
 					}
 				},
 			)
-
 			Text(
 				text = stringResource(R.string.create_bs_buttom_description),
 				color = MaterialTheme.colors.textTertiary,
@@ -166,6 +165,7 @@ fun CreateBananaSplitScreen(
 		}
 	}
 }
+
 
 @Composable
 private fun PassPhraseBox(

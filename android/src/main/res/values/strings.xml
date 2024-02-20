@@ -463,6 +463,7 @@
 	<string name="create_bs_notification_frame_text">Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.</string>
 	<string name="create_bs_password_header">Passphrase for the Recovery</string>
 	<string name="create_bs_refresh_password_icon_description">Refresh Password</string>
+	<string name="create_bs_export_notification_text">Scan this animated QR code into the bs.parity.io app to print QR code shards.</string>
 
 </resources>
 
