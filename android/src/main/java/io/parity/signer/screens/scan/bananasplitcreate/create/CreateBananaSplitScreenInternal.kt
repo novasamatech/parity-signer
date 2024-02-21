@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplitcreate
+package io.parity.signer.screens.scan.bananasplitcreate.create
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -37,6 +37,7 @@ import io.parity.signer.R
 import io.parity.signer.components.base.NotificationFrameTextImportant
 import io.parity.signer.components.base.ScreenHeaderWithButton
 import io.parity.signer.domain.Callback
+import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
 import io.parity.signer.ui.theme.SignerNewTheme
 import io.parity.signer.ui.theme.SignerTypeface
 import io.parity.signer.ui.theme.appliedStroke
@@ -45,9 +46,9 @@ import io.parity.signer.ui.theme.textTertiary
 
 
 @Composable
-fun CreateBananaSplitScreen(
+internal fun CreateBananaSplitScreenInternal(
 	onClose: Callback,
-	onCreate: Callback,
+	onCreate:  (shards: Int) -> Unit,
 	updatePassowrd: (shards: Int) -> Unit,
 	//todo dmitry remember password
 	password: String,

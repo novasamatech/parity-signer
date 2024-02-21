@@ -17,6 +17,7 @@ import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
+import io.parity.signer.screens.scan.bananasplitcreate.bananaSplitCreateDestination
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
 import io.parity.signer.screens.settings.settingsFullSubgraph
 
@@ -56,6 +57,7 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 				coreNavController = navController
 			)
 		}
+		bananaSplitCreateDestination(navController)
 		composable(
 			route = CoreUnlockedNavSubgraph.KeyDetails.route,
 			arguments = listOf(
@@ -137,6 +139,7 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 object CoreUnlockedNavSubgraph {
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
+	const val createBananaSplit = "banana_split_create"
 	const val camera = "unlocked_camera"
 
 	object KeySet {

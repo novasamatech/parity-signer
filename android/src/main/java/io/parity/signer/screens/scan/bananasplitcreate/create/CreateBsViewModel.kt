@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplitcreate
+package io.parity.signer.screens.scan.bananasplitcreate.create
 
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
