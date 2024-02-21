@@ -1,6 +1,5 @@
 package io.parity.signer.screens.scan.bananasplitcreate.create
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -48,7 +47,7 @@ import io.parity.signer.ui.theme.textTertiary
 @Composable
 internal fun CreateBananaSplitScreenInternal(
 	onClose: Callback,
-	onCreate:  (shards: Int) -> Unit,
+	onCreate: (shards: Int) -> Unit,
 	updatePassowrd: (shards: Int) -> Unit,
 	//todo dmitry remember password
 	password: String,
@@ -56,7 +55,9 @@ internal fun CreateBananaSplitScreenInternal(
 ) {
 //todo dmitry implement https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?type=design&node-id=15728-46347&mode=design
 
-	var shardsField: String = rememberSaveable { "4" }
+	var shardsField: String = rememberSaveable {
+		BananaSplit.defaultShards.toString()
+	}
 
 	val shardsValue: Int? = shardsField.toIntOrNull()
 	val canProceed: Boolean = shardsValue?.let { it > 2 } ?: false
@@ -65,7 +66,11 @@ internal fun CreateBananaSplitScreenInternal(
 		ScreenHeaderWithButton(
 			canProceed = canProceed,
 			btnText = stringResource(R.string.create_action_cta),
-			onClose = onClose, onDone = onCreate
+			onClose = onClose, onDone = {
+				if (canProceed && shardsValue != null) {
+					onCreate(shardsValue)
+				}
+			}
 		)
 		Column(Modifier.verticalScroll(rememberScrollState())) {
 			Text(
@@ -100,8 +105,8 @@ internal fun CreateBananaSplitScreenInternal(
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(onDone = {
-					if (canProceed) {
-						onCreate()
+					if (canProceed && shardsValue != null) {
+						onCreate(shardsValue)
 					}
 				}),
 				isError = Integer.getInteger(shardsField) == null,
@@ -122,7 +127,7 @@ internal fun CreateBananaSplitScreenInternal(
 					text = stringResource(
 						R.string.create_bs_shards_description_required,
 						requiresShards,
-						shardsValue
+						shardsValue,
 					),
 					color = MaterialTheme.colors.textTertiary,
 					style = SignerTypeface.CaptionM,
@@ -219,7 +224,6 @@ private fun PassPhraseBox(
 	}
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -232,11 +236,11 @@ private fun PassPhraseBox(
 @Composable
 private fun PreviewCreateBananaSplitScreen() {
 	SignerNewTheme {
-		CreateBananaSplitScreen(
+		CreateBananaSplitScreenInternal(
 			onClose = {},
 			onCreate = {},
 			updatePassowrd = {},
-			password = "delirium-claim-clad-down"
+			password = "delirium-claim-clad-down",
 		)
 	}
 }
