@@ -36,8 +36,9 @@ fun BananaSplitExportScreen(
 	qrCodes: List<QrData>,
 	onMenu: Callback,
 	onClose: Callback,
+	modifier: Modifier = Modifier,
 ) {
-	Column(Modifier.fillMaxHeight(1f)) {
+	Column(modifier.fillMaxHeight(1f)) {
 		//todo dmitry make spacings
 		ScreenHeaderClose(title = "", onClose = onClose, onMenu = onMenu)
 		Column(

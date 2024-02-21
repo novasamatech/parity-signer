@@ -38,7 +38,7 @@ fun BananaSplitExportRemoveConfirmBottomSheet(
 }
 
 @Composable
-fun BananaSplitExportBottomSheet(
+fun BananaSplitExportMenuBottomSheet(
 	onShowPassphrase: Callback,
 	onRemoveBackup: Callback,
 	onCancel: Callback,
@@ -85,7 +85,7 @@ fun BananaSplitExportBottomSheet(
 @Composable
 private fun PreviewBananaSplitExportBottomSheet() {
 	SignerNewTheme {
-		BananaSplitExportBottomSheet(
+		BananaSplitExportMenuBottomSheet(
 		{}, {}, {},
 		)
 	}
