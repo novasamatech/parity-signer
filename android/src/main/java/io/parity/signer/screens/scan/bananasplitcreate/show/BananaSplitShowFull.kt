@@ -112,11 +112,9 @@ fun BananaSplitShowFull(
 
 }
 
-internal object BananaSplitCreateSubgraph {
-	//todo dmitry values write
-	const val CreateBsCreateScreen = "new_keyset_name_select"
-	const val ShowBS = "new_keyset_backup_main"
-	const val ShowBSConfirmRemove = "new_keyset_backup_confirmation"
-	const val ShowBsMenu = "new_keyset_select_networkis"
-	const val ShowBsSeePassword = "new_keyset_select_networkis"
+internal object BananaSplitShowSubgraph {
+	const val ShowBS = "show_bs"
+	const val ShowBSConfirmRemove = "show_bs_confirm_remove"
+	const val ShowBsMenu = "show_bs_menu"
+	const val ShowBsSeePassword = "show_bs_password_show"
 }
