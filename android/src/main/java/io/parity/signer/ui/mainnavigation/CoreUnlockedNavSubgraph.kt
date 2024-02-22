@@ -139,8 +139,14 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 object CoreUnlockedNavSubgraph {
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
-	const val createBananaSplit = "banana_split_create"
 	const val camera = "unlocked_camera"
+
+	object CreateBananaSplit {
+		internal const val seedNameArg = "seed_name_arg"
+		private const val baseRoute = "banana_split_create"
+		const val route = "${baseRoute}/{${seedNameArg}}"
+		fun destination(seedName: String) = "${baseRoute}/${seedName}"
+	}
 
 	object KeySet {
 		internal const val seedName = "seed_name_arg"

@@ -11,7 +11,9 @@ import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
 
 
 @Composable
-fun CreateBananaSplitScreen(coreNavController: NavController) {
+fun CreateBananaSplitScreen(
+	coreNavController: NavController, seedName: String,
+) {
 	val vm: CreateBsViewModel = viewModel()
 
 	var passPhrase = rememberSaveable() {

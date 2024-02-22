@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,11 +17,12 @@ import io.parity.signer.ui.BottomSheetWrapperRoot
 @Composable
 fun BananaSplitShowFull(
 	coreNavController: NavController,
+	seedName: String,
 ) {
 
 	val menuNavController = rememberNavController()
 
-//	val vm: NewKeysetNameViewModel = viewModel()
+	val vm: ShowBananaSplitViewModel = viewModel()
 //	var seedName by rememberSaveable() {
 //		mutableStateOf("")
 //	}
@@ -30,7 +32,7 @@ fun BananaSplitShowFull(
 
 	BananaSplitExportScreen(
 		qrCodes = emptyList(),// todo dmitry
-		onMenu = { /*TODO*/ },
+		onMenu = { menuNavController.navigate(BananaSplitShowMenu.ShowBsMenu) },
 		onClose = { coreNavController.popBackStack() },
 		modifier = Modifier.statusBarsPadding(),
 	)
@@ -51,8 +53,16 @@ fun BananaSplitShowFull(
 			BottomSheetWrapperRoot(onClosedAction = closeAction) {
 				BananaSplitExportMenuBottomSheet(
 					onCancel = closeAction,
-					onShowPassphrase = {}, //todo dmitry
-					onRemoveBackup = {}, //todo dmitry
+					onShowPassphrase = {
+						menuNavController.navigate(BananaSplitShowMenu.ShowBsSeePassword) {
+							popUpTo(0)
+						}
+					},
+					onRemoveBackup = {
+						menuNavController.navigate(BananaSplitShowMenu.ShowBSConfirmRemove) {
+							popUpTo(0)
+						}
+					},
 				)
 			}
 		}

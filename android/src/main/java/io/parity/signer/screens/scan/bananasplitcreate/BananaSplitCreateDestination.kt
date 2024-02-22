@@ -1,32 +1,47 @@
 package io.parity.signer.screens.scan.bananasplitcreate
 
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import io.parity.signer.screens.scan.bananasplitcreate.create.CreateBananaSplitScreen
 import io.parity.signer.screens.scan.bananasplitcreate.show.BananaSplitShowFull
-import io.parity.signer.screens.settings.SettingsNavSubgraph
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 fun NavGraphBuilder.bananaSplitCreateDestination(
 	navController: NavController,
 ) {
 	navigation(
-		route = CoreUnlockedNavSubgraph.createBananaSplit,
+		route = CoreUnlockedNavSubgraph.CreateBananaSplit.route,
 		startDestination = BananaSplitCreateDestination.ShowBS,
+		arguments = listOf(navArgument(CoreUnlockedNavSubgraph.CreateBananaSplit.seedNameArg) {
+			type = NavType.StringType
+		}),
 	) {
 		composable(
 			route = BananaSplitCreateDestination.ShowBS,
-		) {
-			BananaSplitShowFull(navController)
+		) { entry ->
+			val parentEntry = remember(entry) {
+				navController.getBackStackEntry(CoreUnlockedNavSubgraph.CreateBananaSplit.route)
+			}
+			val seedName =
+				parentEntry.arguments?.getString(CoreUnlockedNavSubgraph.CreateBananaSplit.seedNameArg)!!
+
+			BananaSplitShowFull(navController, seedName)
 		}
 		composable(
 			route = BananaSplitCreateDestination.CreateBsCreateScreen,
-		) {
-			CreateBananaSplitScreen(navController)
+		) { entry ->
+			val parentEntry = remember(entry) {
+				navController.getBackStackEntry(CoreUnlockedNavSubgraph.CreateBananaSplit.route)
+			}
+			val seedName =
+				parentEntry.arguments?.getString(CoreUnlockedNavSubgraph.CreateBananaSplit.seedNameArg)!!
+
+			CreateBananaSplitScreen(navController, seedName)
 		}
 	}
 }
