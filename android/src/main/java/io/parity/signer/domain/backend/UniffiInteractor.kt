@@ -357,7 +357,7 @@ class UniffiInteractor(val appContext: Context) {
 			}
 		}
 
-	suspend fun createBananaSplit(
+	suspend fun generateBananaSplit(
 		secret: String, title: String, passphrase: String, totalShards: UInt, requiredShards: UInt
 	): UniffiResult<List<QrData>> =
 		withContext(Dispatchers.IO) {

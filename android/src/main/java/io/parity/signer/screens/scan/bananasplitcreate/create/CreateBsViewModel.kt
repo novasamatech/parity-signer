@@ -5,6 +5,7 @@ import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.toOperationResult
+import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
 import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.runBlocking
 
@@ -20,9 +21,13 @@ class CreateBsViewModel: ViewModel() {
 		}.toOperationResult()
 	}
 
-	fun createBS(shards: Int, passPhrase: String) {
+	suspend fun createBS(seedName: String, shards: Int, passPhrase: String,) {
+
 //		todo dmitry
-//		return uniffiInteractor.createBananaSplit(shards)
+		uniffiInteractor.generateBananaSplit(secret = "",// todo dmitry after auth
+			title = seedName, passphrase = passPhrase, totalShards = shards.toUInt(), requiredShards = BananaSplit.getMinShards(shards).toUInt()
+		)
+		return //todo dmitry
 	}
 
 }

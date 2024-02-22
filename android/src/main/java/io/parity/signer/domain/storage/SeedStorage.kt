@@ -144,7 +144,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
-	fun checkIfSeedNameAlreadyExists(seedPhrase: String) : Boolean {
+	fun checkIfSeedNameAlreadyExists(seedPhrase: String): Boolean {
 		val result = sharedPreferences.all.values.contains(seedPhrase)
 		Runtime.getRuntime().gc()
 		return result
@@ -169,13 +169,51 @@ class SeedStorage {
 	}
 
 	/**
+	 * @throws UserNotAuthenticatedException
+	 */
+	fun getBsPassword(
+		seedName: String,
+	): String {
+		val seedPhrase =
+			sharedPreferences.getString("$seedName$BS_POSTFIX", "") ?: ""
+		return seedPhrase.ifBlank {
+			""
+		}
+	}
+
+	/**
+	 * @throws UserNotAuthenticatedException
+	 */
+	fun getBsShards(
+		seedName: String,
+	): Int {
+		return sharedPreferences.getInt("$seedName$BS_SHARDS", -1)
+	}
+
+	/**
+	 * @throws UserNotAuthenticatedException
+	 * @throws IllegalArgumentException when name collision happening
+	 */
+	fun saveBsData(
+		seedName: String,
+		passPhrase: String,
+		totalShards: Int,
+	) {
+
+	}
+
+	/**
 	 * Don't forget to call tell rust seed names -so getSeedNames()
 	 * called and last known elements updated
 	 *
 	 * @throws [UserNotAuthenticatedException]
 	 */
 	fun removeSeed(seedName: String) {
-		sharedPreferences.edit().remove(seedName).apply()
+		sharedPreferences.edit()
+			.remove(seedName)
+			.remove("$seedName$BS_POSTFIX")
+			.remove("$seedName$BS_SHARDS")
+			.apply()
 		_lastKnownSeedNames.update { lastState ->
 			lastState.filter { it != seedName }.toTypedArray()
 		}
@@ -189,7 +227,10 @@ class SeedStorage {
 	}
 }
 
-private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateDestinationState {
+private fun consumeStorageAuthError(
+	e: Exception,
+	context: Context
+): ErrorStateDestinationState {
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 		when (e) {
 			is AEADBadTagException,
@@ -201,6 +242,7 @@ private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateD
 					argVerbose = e.stackTraceToString()
 				)
 			}
+
 			else -> throw e
 		}
 	} else {
@@ -213,12 +255,14 @@ private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateD
 					argVerbose = e.stackTraceToString()
 				)
 			}
+
 			else -> throw e
 		}
 	}
 }
 
-
+private const val BS_POSTFIX = "\$\$bs_passphrase"
+private const val BS_SHARDS = "\$\$bs_shards"
 
 
 

@@ -12,7 +12,8 @@ import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
 
 @Composable
 fun CreateBananaSplitScreen(
-	coreNavController: NavController, seedName: String,
+	coreNavController: NavController,
+	seedName: String,
 ) {
 	val vm: CreateBsViewModel = viewModel()
 
@@ -24,7 +25,7 @@ fun CreateBananaSplitScreen(
 	CreateBananaSplitScreenInternal(
 		onClose = { coreNavController.popBackStack() },
 		onCreate = { shards ->
-			vm.createBS(shards, passPhrase)
+//			vm.createBS(shards, passPhrase)
 			//todo dmitry navigate to next screen
 		},
 		updatePassowrd = {
