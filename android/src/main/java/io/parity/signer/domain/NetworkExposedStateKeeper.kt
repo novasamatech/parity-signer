@@ -138,20 +138,18 @@ class NetworkExposedStateKeeper(
 			return
 		}
 
-		when {
-			((usbIntent.extras?.getBoolean("connected") == true)
-				|| (usbIntent.extras?.getBoolean("host_connected")) == true) -> {
-				_usbDisconnected.value = false
-				updateGeneralAirgapState()
-			}
-			((usbIntent.extras?.getBoolean("connected") != true)
-				&& (usbIntent.extras?.getBoolean("host_connected") != true)) -> {
-				_usbDisconnected.value = true
-				updateGeneralAirgapState()
-			}
+		if ((usbIntent.extras?.getBoolean("connected") == true)
+			|| (usbIntent.extras?.getBoolean("host_connected") == true)
+		) {
+			_usbDisconnected.value = false
+			updateGeneralAirgapState()
+		} else {
+			_usbDisconnected.value = true
+			updateGeneralAirgapState()
 		}
 		if ((usbIntent.extras?.getBoolean("connected") == null)
-			|| (usbIntent.extras?.getBoolean("host_connected")) == null) {
+			|| (usbIntent.extras?.getBoolean("host_connected")) == null
+		) {
 			Timber.d("USB", "usb action intent doesn't have connection state")
 		}
 	}
