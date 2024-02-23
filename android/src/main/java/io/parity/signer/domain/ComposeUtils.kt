@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import java.util.concurrent.atomic.AtomicInteger
 
 
 @Composable
@@ -37,11 +38,11 @@ private fun Activity.enableScreenshots() {
 fun DisableScreenshots() {
 	val context: Context = LocalContext.current
 	DisposableEffect(Unit) {
-		DisableScreenshotCounter.counter ++
-		reactOnCounter(DisableScreenshotCounter.counter, context)
+		val count = DisableScreenshotCounter.forbiddenViews.incrementAndGet()
+		reactOnCounter(count, context)
 		onDispose {
-			DisableScreenshotCounter.counter --
-			reactOnCounter(DisableScreenshotCounter.counter, context)
+			val counted = DisableScreenshotCounter.forbiddenViews.decrementAndGet()
+			reactOnCounter(counted, context)
 		}
 	}
 }
@@ -55,5 +56,5 @@ private fun reactOnCounter(counter: Int, context: Context) {
 }
 
 private object DisableScreenshotCounter {
-	var counter: Int = 0 //not synced as always interacted from main thread
+	var forbiddenViews = AtomicInteger(0)
 }
