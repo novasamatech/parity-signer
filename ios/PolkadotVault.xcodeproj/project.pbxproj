@@ -2475,7 +2475,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    if which swiftgen >/dev/null; then\n        swiftgen \n    else\n        echo \"warning: swiftgen not installed, download from https://github.com/SwiftGen/SwiftGen\"\n    fi\nfi\n";
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    \"${PROJECT_DIR}/swiftgen/bin/swiftgen\" \nfi\n";
 		};
 		6DBD21F0289983DB005D539B /* Run Code Formatter */ = {
 			isa = PBXShellScriptBuildPhase;
