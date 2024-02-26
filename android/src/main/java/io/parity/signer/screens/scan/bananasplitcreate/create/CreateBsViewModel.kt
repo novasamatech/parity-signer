@@ -24,9 +24,10 @@ class CreateBsViewModel: ViewModel() {
 	suspend fun createBS(seedName: String, shards: Int, passPhrase: String,) {
 
 //		todo dmitry
-		uniffiInteractor.generateBananaSplit(secret = "",// todo dmitry after auth
+		val sampleResults = uniffiInteractor.generateBananaSplit(secret = "",// todo dmitry after auth
 			title = seedName, passphrase = passPhrase, totalShards = shards.toUInt(), requiredShards = BananaSplit.getMinShards(shards).toUInt()
 		)
+
 		return //todo dmitry
 	}
 

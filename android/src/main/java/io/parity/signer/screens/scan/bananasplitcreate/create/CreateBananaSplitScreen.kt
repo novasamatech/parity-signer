@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -24,9 +26,11 @@ fun CreateBananaSplitScreen(
 
 	CreateBananaSplitScreenInternal(
 		onClose = { coreNavController.popBackStack() },
-		onCreate = { shards ->
-//			vm.createBS(shards, passPhrase)
-			//todo dmitry navigate to next screen
+		onCreate = { maxShards ->
+			vm.viewModelScope.launch {
+				vm.createBS(seedName, maxShards, passPhrase)
+				//todo dmitry navigate to next screen
+			}
 		},
 		updatePassowrd = {
 			passPhrase = vm.generatePassPhrase(BananaSplit.defaultShards)
