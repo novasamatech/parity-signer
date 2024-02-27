@@ -31,7 +31,7 @@ fun BananaSplitShowFull(
 //	}
 
 	BananaSplitExportScreen(
-		qrCodes = emptyList(),// todo dmitry
+		qrCodes = emptyList(),// todo dmitry restore
 		onMenu = { menuNavController.navigate(BananaSplitShowMenu.ShowBsMenu) },
 		onClose = { coreNavController.popBackStack() },
 		modifier = Modifier.statusBarsPadding(),

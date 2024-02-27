@@ -9,7 +9,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.runBlocking
 
 
-class ShowBananaSplitViewModel: ViewModel() {
+class ShowBananaSplitViewModel : ViewModel() {
 	private val uniffiInteractor: UniffiInteractor =
 		ServiceLocator.uniffiInteractor
 
@@ -17,12 +17,13 @@ class ShowBananaSplitViewModel: ViewModel() {
 
 	}
 
-	fun removeBS() {
-
+	fun removeBS(seedName: String) {
+		//todo dmtiry remove bs and remove qr codes
 	}
 
-	fun getPassword() {
-
+	fun getPassword(seedName: String) {
+//require auth
+		//todo dmitry
 	}
 
 }

@@ -49,7 +49,6 @@ internal fun CreateBananaSplitScreenInternal(
 	onClose: Callback,
 	onCreate: (shards: Int) -> Unit,
 	updatePassowrd: (shards: Int) -> Unit,
-	//todo dmitry remember password
 	password: String,
 	modifier: Modifier = Modifier,
 ) {
