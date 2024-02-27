@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import java.util.concurrent.atomic.AtomicInteger
 
 
 @Composable
@@ -28,14 +29,32 @@ private fun Activity.enableScreenshots() {
 	window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
 }
 
+/**
+ * We need counter here since during navigation new view disposable effect start
+ * before old one onDispose(). And we want screenshots still be forbidden if both
+ * screens forbids it
+ */
 @Composable
 fun DisableScreenshots() {
 	val context: Context = LocalContext.current
 	DisposableEffect(Unit) {
-		context.findActivity()?.disableScreenshots()
+		val count = DisableScreenshotCounter.forbiddenViews.incrementAndGet()
+		reactOnCounter(count, context)
 		onDispose {
-			context.findActivity()?.enableScreenshots()
+			val counted = DisableScreenshotCounter.forbiddenViews.decrementAndGet()
+			reactOnCounter(counted, context)
 		}
 	}
 }
 
+private fun reactOnCounter(counter: Int, context: Context) {
+ if (counter > 0) {
+	 context.findActivity()?.disableScreenshots()
+ } else {
+	 context.findActivity()?.enableScreenshots()
+ }
+}
+
+private object DisableScreenshotCounter {
+	var forbiddenViews = AtomicInteger(0)
+}
