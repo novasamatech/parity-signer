@@ -138,18 +138,19 @@ class NetworkExposedStateKeeper(
 			return
 		}
 
-		when (usbIntent.extras?.getBoolean("connected")) {
-			true -> {
-				_usbDisconnected.value = false
-				updateGeneralAirgapState()
-			}
-			false -> {
-				_usbDisconnected.value = true
-				updateGeneralAirgapState()
-			}
-			null -> {
-				Timber.d("USB", "usb action intent doesn't have connection state")
-			}
+		if ((usbIntent.extras?.getBoolean("connected") == true)
+			|| (usbIntent.extras?.getBoolean("host_connected") == true)
+		) {
+			_usbDisconnected.value = false
+			updateGeneralAirgapState()
+		} else {
+			_usbDisconnected.value = true
+			updateGeneralAirgapState()
+		}
+		if ((usbIntent.extras?.getBoolean("connected") == null)
+			|| (usbIntent.extras?.getBoolean("host_connected")) == null
+		) {
+			Timber.d("USB", "usb action intent doesn't have connection state")
 		}
 	}
 
