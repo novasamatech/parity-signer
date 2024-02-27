@@ -39,13 +39,12 @@ fun BananaSplitExportScreen(
 	modifier: Modifier = Modifier,
 ) {
 	Column(modifier.fillMaxHeight(1f)) {
-		//todo dmitry make spacings
 		ScreenHeaderClose(title = "", onClose = onClose, onMenu = onMenu)
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
 				.weight(weight = 1f, fill = false)
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				.padding(start = 16.dp, end = 16.dp, bottom = 48.dp, top = 48.dp)
 		) {
 			if (LocalInspectionMode.current) {
 				AnimatedQrKeysInfo(

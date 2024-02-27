@@ -227,7 +227,7 @@ class SeedStorage {
 	}
 }
 
-private fun consumeStorageAuthError(
+internal fun consumeStorageAuthError(
 	e: Exception,
 	context: Context
 ): ErrorStateDestinationState {
