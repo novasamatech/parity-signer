@@ -27,7 +27,8 @@ class ClearCryptedStorageTest {
 	fun savingQrCodes() {
 		val seedName = "testname"
 		val qrCodes = listOf(QrData.Regular(PreviewData.exampleQRData),
-			QrData.Regular(PreviewData.exampleQRData))
+			QrData.Regular(PreviewData.exampleQRData.asReversed()))
+
 		storage.saveBsQRCodes(seedName, qrCodes)
 		val recovered = storage.getBsQrCodes(seedName)
 
