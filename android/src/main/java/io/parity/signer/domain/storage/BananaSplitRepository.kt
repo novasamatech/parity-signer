@@ -17,7 +17,8 @@ class BananaSplitRepository(
 ) {
 
 	fun creaseBs(seedName: String, shards: Int, passPhrase: String): OperationResult<Unit, ErrorDisplayed> {
-
+		//todo dmitry
+		return OperationResult.Ok(Unit)
 	}
 	//todo dmitry implement storage.getBsPassword() etc
 }
