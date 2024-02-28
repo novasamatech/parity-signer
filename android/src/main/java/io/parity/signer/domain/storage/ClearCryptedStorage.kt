@@ -8,6 +8,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.screens.error.ErrorStateDestinationState
+import io.parity.signer.uniffi.QrData
 import timber.log.Timber
 
 
@@ -55,6 +56,42 @@ class ClearCryptedStorage {
 			return OperationResult.Err(consumeStorageAuthError(e, appContext))
 		}
 		return OperationResult.Ok(Unit)
+	}
+
+	private fun String.toPreservedByteArray(): ByteArray {
+		return this.toByteArray(Charsets.ISO_8859_1)
+	}
+
+	private fun ByteArray.toPreservedString(): String {
+		return String(this, Charsets.ISO_8859_1)
+	}
+
+	@OptIn(ExperimentalUnsignedTypes::class)
+	fun saveBsQRCodes(seedName: String, qrs: List<QrData>) {
+		val strings = qrs.map {
+			when (it) {
+				is QrData.Regular -> it.data
+				is QrData.Sensitive -> it.data
+			}.toUByteArray()
+				.toByteArray()
+				.toPreservedString()
+		}.toSet()
+		with(sharedPreferences.edit()) {
+			putStringSet(seedName, strings)
+			apply()
+		}
+	}
+
+	/**
+	 * always returns insensitive qr data independent of original one
+	 */
+	fun getBsQrCodes(seedName: String): List<QrData>? {
+		return sharedPreferences.getStringSet(seedName, null)
+			?.map { str ->
+				str.toPreservedByteArray()
+					.map { byte -> byte.toUByte() }
+			}
+			?.map { QrData.Regular(data = it) }
 	}
 }
 
