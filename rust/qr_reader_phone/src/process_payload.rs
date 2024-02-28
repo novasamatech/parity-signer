@@ -1,5 +1,6 @@
 use crate::{Error, LegacyFrame, RaptorqFrame, Result};
 use banana_recovery::{NextAction, Share, ShareSet};
+use db_handling::helpers::validate_mnemonic;
 use raptorq::{self, EncodingPacket};
 use std::{collections::HashSet, convert::TryFrom};
 
@@ -74,7 +75,13 @@ pub fn process_decoded_payload(
                         if let Some(password) = password {
                             let result = match recovery.share_set.recover_with_passphrase(password)
                             {
-                                Ok(seed) => seed,
+                                Ok(seed) => {
+                                    if validate_mnemonic(&seed) {
+                                        seed
+                                    } else {
+                                        return Err(Error::InvalidMnemonic);
+                                    }
+                                }
                                 Err(banana_recovery::Error::DecodingFailed) => {
                                     return Err(Error::BananaSplitWrongPassword);
                                 }
