@@ -2851,6 +2851,7 @@ version = "0.1.0"
 dependencies = [
  "banana_recovery",
  "constants",
+ "db_handling",
  "definitions",
  "hex",
  "nom",
