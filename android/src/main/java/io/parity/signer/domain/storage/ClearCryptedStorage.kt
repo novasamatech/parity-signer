@@ -9,6 +9,7 @@ import androidx.security.crypto.MasterKey
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.screens.error.ErrorStateDestinationState
 import io.parity.signer.uniffi.QrData
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 
@@ -92,6 +93,13 @@ class ClearCryptedStorage {
 					.map { byte -> byte.toUByte() }
 			}
 			?.map { QrData.Regular(data = it) }
+	}
+
+	fun removeQrCode(seedName: String) {
+		with(sharedPreferences.edit()) {
+			remove(seedName)
+			apply()
+		}
 	}
 }
 

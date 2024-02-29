@@ -17,6 +17,7 @@ import io.parity.signer.uniffi.createKeySet
 
 class SeedRepository(
 	private val storage: SeedStorage,
+	private val clearCryptedStorage: ClearCryptedStorage,
 	private val authentication: Authentication,
 	private val activity: FragmentActivity,
 	private val uniffiInteractor: UniffiInteractor,
@@ -179,6 +180,7 @@ class SeedRepository(
 			AuthResult.AuthSuccess -> {
 				try {
 					storage.removeSeed(seedName)
+					clearCryptedStorage.removeQrCode(seedName)
 					when (val remove = uniffiInteractor.removeKeySet(seedName)) {
 						is UniffiResult.Error -> OperationResult.Err(remove.error)
 						is UniffiResult.Success -> OperationResult.Ok(Unit)
