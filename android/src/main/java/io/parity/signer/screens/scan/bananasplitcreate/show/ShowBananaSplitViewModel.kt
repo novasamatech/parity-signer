@@ -4,31 +4,29 @@ import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiInteractor
-import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.QrData
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class ShowBananaSplitViewModel : ViewModel() {
-	private val uniffiInteractor: UniffiInteractor =
-		ServiceLocator.uniffiInteractor
-//	private val usecase = BananaSplitU
-//	todo dmitry
+	private val bsRepository = ServiceLocator.activityScope!!.bsRepository
 
 
-	fun getBananaSplit(seedName: String): OperationResult<List<QrData>, ErrorDisplayed> {
-		//todo dmitry implement
-		return OperationResult.Ok(emptyList())
+	fun getBananaSplitQrs(seedName: String): List<QrData>? {
+		return bsRepository.getBsQrs(seedName)
 	}
 
-	fun removeBS(seedName: String) {
-		//todo dmtiry remove bs and remove qr codes
+	suspend fun removeBS(seedName: String): OperationResult<Unit, ErrorDisplayed> {
+		return withContext(Dispatchers.IO) {
+			bsRepository.removeBS(seedName)
+		}
 	}
 
-	fun getPassword(seedName: String): String {
-//require auth
-		//todo dmitry
-		return ""
+	suspend fun getPassword(seedName: String): OperationResult<String, ErrorDisplayed> {
+		return withContext(Dispatchers.IO) {
+			bsRepository.getBsPassword(seedName)
+		}
 	}
 }

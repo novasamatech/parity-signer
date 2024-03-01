@@ -54,7 +54,41 @@ class BananaSplitRepository(
 			}
 		}
 	}
-	//todo dmitry implement storage.getBsPassword() etc
+
+	fun getBsQrs(seedName: String): List<QrData>? {
+		return clearCryptedStorage.getBsQrCodes(seedName)
+	}
+
+	suspend fun removeBS(seedName: String): OperationResult<Unit, ErrorDisplayed> {
+		return when (val authResult = authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				//removing bs data data
+				seedStorage.removeBSData(seedName)
+				clearCryptedStorage.removeQrCode(seedName)
+				OperationResult.Ok(Unit)
+			}
+
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				OperationResult.Err(ErrorDisplayed.Str("auth error - $authResult"))
+			}
+		}
+	}
+
+	suspend fun getBsPassword(seedName: String): OperationResult<String, ErrorDisplayed> {
+		return when (val authResult = authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				OperationResult.Ok(seedStorage.getBsPassword(seedName))
+			}
+
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				OperationResult.Err(ErrorDisplayed.Str("auth error - $authResult"))
+			}
+		}
+	}
 }
 
 data class BsPassData(

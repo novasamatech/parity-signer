@@ -47,6 +47,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun init(appContext: Context): OperationResult<Unit, ErrorStateDestinationState> {
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			appContext
@@ -107,6 +108,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun getSeedNames(): Array<String> =
 		sharedPreferences.all.keys.sorted().toTypedArray().also {
 			_lastKnownSeedNames.value = it
@@ -120,6 +122,7 @@ class SeedStorage {
 	 *
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun addSeed(
 		seedName: String,
 		seedPhrase: String,
@@ -144,6 +147,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun checkIfSeedNameAlreadyExists(seedPhrase: String): Boolean {
 		val result = sharedPreferences.all.values.contains(seedPhrase)
 		Runtime.getRuntime().gc()
@@ -153,6 +157,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun getSeed(
 		seedName: String,
 		showInLogs: Boolean = false
@@ -171,35 +176,36 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun getBsPassword(
 		seedName: String,
 	): String {
-		val seedPhrase =
-			sharedPreferences.getString("$seedName$BS_POSTFIX", "") ?: ""
-		return seedPhrase.ifBlank {
-			""
-		}
-	}
-
-	/**
-	 * @throws UserNotAuthenticatedException
-	 */
-	fun getBsShards(
-		seedName: String,
-	): Int {
-		return sharedPreferences.getInt("$seedName$BS_SHARDS", -1)
+		return sharedPreferences.getString("$seedName$BS_POSTFIX", "") ?: ""
 	}
 
 	/**
 	 * @throws UserNotAuthenticatedException
 	 * @throws IllegalArgumentException when name collision happening
 	 */
+	@Throws(IllegalArgumentException::class, UserNotAuthenticatedException::class)
 	fun saveBsData(
 		seedName: String,
 		passPhrase: String,
-		totalShards: Int,
+//		totalShards: Int, todo dmitry remove than everywhere
 	) {
+		if (sharedPreferences.contains("$seedName$BS_POSTFIX")) {
+			throw IllegalArgumentException("element with this name already exists in the storage")
+		}
+		sharedPreferences.edit()
+			.putString("$seedName$BS_POSTFIX", passPhrase)
+			.apply()
+	}
 
+	@Throws(UserNotAuthenticatedException::class)
+	fun removeBSData(seedName: String) {
+		sharedPreferences.edit()
+			.remove("$seedName$BS_SHARDS")
+			.apply()
 	}
 
 	/**
@@ -208,6 +214,7 @@ class SeedStorage {
 	 *
 	 * @throws [UserNotAuthenticatedException]
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun removeSeed(seedName: String) {
 		sharedPreferences.edit()
 			.remove(seedName)
@@ -222,6 +229,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}

@@ -13,7 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.domain.Callback
 import io.parity.signer.screens.error.handleErrorAppState
+import io.parity.signer.screens.scan.bananasplitcreate.BananaSplitCreateDestination
 import io.parity.signer.ui.BottomSheetWrapperRoot
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 
 @Composable
@@ -25,8 +27,15 @@ fun BananaSplitShowFull(
 
 	val vm: ShowBananaSplitViewModel = viewModel()
 	val qrCodes = remember {
-		vm.getBananaSplit(seedName).handleErrorAppState(coreNavController)
-			?: emptyList()
+		val qrCodes = vm.getBananaSplitQrs(seedName)
+		if (qrCodes == null) {
+			//no BS for this seed - open create screen
+			coreNavController.navigate(BananaSplitCreateDestination.CreateBsCreateScreen) {
+				//todo dmitry test this
+				popUpTo(CoreUnlockedNavSubgraph.CreateBananaSplit.route)
+			}
+		}
+		qrCodes ?: emptyList()
 	}
 
 	BananaSplitExportScreen(
@@ -70,7 +79,10 @@ fun BananaSplitShowFull(
 				BananaSplitExportRemoveConfirmBottomSheet(
 					onCancel = closeAction,
 					onRemoveKeySet = {
-						vm.removeBS(seedName)
+						val result = vm.removeBS(seedName)
+						when (result) {
+
+						}
 						//todo dmitry handle result
 						coreNavController.popBackStack()
 					},
