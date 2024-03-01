@@ -53,4 +53,7 @@ pub enum Error {
 
     #[error("Was reading dynamic qr, and got interrupted by a static one.")]
     DynamicInterruptedByStatic,
+
+    #[error("Parsed mnemonic is invalid")]
+    InvalidMnemonic,
 }
