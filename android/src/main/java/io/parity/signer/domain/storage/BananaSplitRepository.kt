@@ -1,6 +1,7 @@
 package io.parity.signer.domain.storage
 
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.domain.AuthResult
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.backend.OperationResult
 import io.parity.signer.domain.backend.UniffiInteractor
@@ -18,26 +19,51 @@ class BananaSplitRepository(
 	private val uniffiInteractor: UniffiInteractor,
 ) {
 
-	suspend fun creaseBs(seedName: String, maxShards: Int, passPhrase: String): OperationResult<Unit, ErrorDisplayed> {
-//todo dmitry auth
+	suspend fun creaseBs(
+		seedName: String,
+		maxShards: Int,
+		passPhrase: String
+	): OperationResult<Unit, ErrorDisplayed> {
 
-		val qrResults: OperationResult<List<QrData>, ErrorDisplayed> =
-			uniffiInteractor.generateBananaSplit(
-				secret = "",// todo dmitry after auth
-				title = seedName,
-				passphrase = passPhrase,
-				totalShards = maxShards.toUInt(),
-				requiredShards = BananaSplit.getMinShards(maxShards).toUInt()
-			).toOperationResult()
+		return when (val authResult = authentication.authenticate(activity)) {
+			AuthResult.AuthSuccess -> {
+				val phrase = seedStorage.getSeed(seedName, false)
+				val qrResults: OperationResult<List<QrData>, ErrorDisplayed> =
+					uniffiInteractor.generateBananaSplit(
+						secret = phrase,
+						title = seedName,
+						passphrase = passPhrase,
+						totalShards = maxShards.toUInt(),
+						requiredShards = BananaSplit.getMinShards(maxShards).toUInt()
+					).toOperationResult()
+				when (qrResults) {
+					is OperationResult.Err -> qrResults
+					is OperationResult.Ok -> {
+						//saving data
+						seedStorage.saveBsData(seedName, passPhrase, maxShards)
+						clearCryptedStorage.saveBsQRCodes(seedName, qrResults.result)
+						OperationResult.Ok(Unit)
+					}
+				}
+			}
 
-
-
-		//todo dmitry
-		return OperationResult.Ok(Unit)
+			AuthResult.AuthError,
+			AuthResult.AuthFailed,
+			AuthResult.AuthUnavailable -> {
+				OperationResult.Err(ErrorDisplayed.Str("auth error - $authResult"))
+			}
+		}
 	}
 	//todo dmitry implement storage.getBsPassword() etc
 }
 
-data class BsPassData(val totalShards: Int, val passPhrase: String) //todo dmitry remove?
+data class BsPassData(
+	val totalShards: Int,
+	val passPhrase: String
+) //todo dmitry remove?
 
-data class BsData(val qrData: List<QrData>, val totalShards: Int, val passPhrase: String)
+data class BsData(
+	val qrData: List<QrData>,
+	val totalShards: Int,
+	val passPhrase: String
+)
