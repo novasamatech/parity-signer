@@ -11,6 +11,7 @@ import Foundation
 enum KeychainError: Error, Equatable {
     case fetchError
     case checkError
+    case dataDecodingError
     case saveError(message: String)
     case deleteError(message: String)
     case accessControlNotAvailable
@@ -62,8 +63,8 @@ protocol SeedsMediating: AnyObject {
 /// As this class contains logic related to UI state and data handling,
 /// it should not interact with Keychain directly, but through injected dependencies
 final class SeedsMediator: SeedsMediating {
-    private let queryProvider: KeychainQueryProviding
-    private let keychainAccessAdapter: KeychainAccessAdapting
+    private let queryProvider: KeychainSeedsQueryProviding
+    private let keychainAccessAdapter: KeychainSeedsAccessAdapting
     private let databaseMediator: DatabaseMediating
     private let authenticationStateMediator: AuthenticatedStateMediator
     var seedNamesSubject = CurrentValueSubject<[String], Never>([])
@@ -76,8 +77,8 @@ final class SeedsMediator: SeedsMediating {
     }
 
     init(
-        queryProvider: KeychainQueryProviding = KeychainQueryProvider(),
-        keychainAccessAdapter: KeychainAccessAdapting = KeychainAccessAdapter(),
+        queryProvider: KeychainSeedsQueryProviding = KeychainSeedsQueryProvider(),
+        keychainAccessAdapter: KeychainSeedsAccessAdapting = KeychainSeedsAccessAdapter(),
         databaseMediator: DatabaseMediating = DatabaseMediator(),
         authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator
     ) {

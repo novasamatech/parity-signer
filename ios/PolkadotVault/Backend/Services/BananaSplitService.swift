@@ -7,6 +7,10 @@
 
 import Foundation
 
+struct BananaSplitBackup: Equatable, Codable {
+    let qrCodes: [[UInt8]]
+}
+
 // sourcery: AutoMockable
 protocol BananaSplitServicing: AnyObject {
     func encrypt(
@@ -15,7 +19,7 @@ protocol BananaSplitServicing: AnyObject {
         passphrase: String,
         totalShards: UInt32,
         requiredShards: UInt32,
-        _ completion: @escaping (Result<[QrData], ServiceError>) -> Void
+        _ completion: @escaping (Result<BananaSplitBackup, ServiceError>) -> Void
     )
     func generatePassphrase(
         with words: UInt32,
@@ -40,16 +44,17 @@ final class BananaSplitService {
         passphrase: String,
         totalShards: UInt32,
         requiredShards: UInt32,
-        _ completion: @escaping (Result<[QrData], ServiceError>) -> Void
+        _ completion: @escaping (Result<BananaSplitBackup, ServiceError>) -> Void
     ) {
         backendService.performCall({
-            try bsEncrypt(
+            let qrCodes = try bsEncrypt(
                 secret: secret,
                 title: title,
                 passphrase: passphrase,
                 totalShards: totalShards,
                 requiredShards: requiredShards
             )
+            return BananaSplitBackup(qrCodes: qrCodes.map(\.payload))
         }, completion: completion)
     }
 
