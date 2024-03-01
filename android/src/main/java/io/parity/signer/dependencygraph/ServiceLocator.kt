@@ -45,7 +45,8 @@ object ServiceLocator {
 	val databaseAssetsInteractor by lazy {
 		DatabaseAssetsInteractor(
 			appContext,
-			seedStorage
+			seedStorage,
+			clearCryptedStorage,
 		)
 	}
 	val networkExposedStateKeeper by lazy {

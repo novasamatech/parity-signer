@@ -101,6 +101,10 @@ class ClearCryptedStorage {
 			apply()
 		}
 	}
+
+	fun wipe() {
+		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
+	}
 }
 
 private const val TAG = "ClearCryptedStorage"
