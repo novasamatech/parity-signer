@@ -69,10 +69,13 @@ struct KeyDetailsView: View {
             }
         ) {
             KeyDetailsActionsModal(
-                isShowingActionSheet: $viewModel.isShowingActionSheet,
-                shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal,
-                shouldPresentBackupModal: $viewModel.shouldPresentBackupModal,
-                shouldPresentExportKeysSelection: $viewModel.shouldPresentExportKeysSelection
+                viewModel: .init(
+                    isPresented: $viewModel.isShowingActionSheet,
+                    shouldPresentRemoveConfirmationModal: $viewModel.shouldPresentRemoveConfirmationModal,
+                    shouldPresentBananaSplitModal: $viewModel.shouldPresentBananaSplitBackupModal,
+                    shouldPresentManualBackupModal: $viewModel.shouldPresentManualBackupModal,
+                    shouldPresentExportKeysSelection: $viewModel.shouldPresentExportKeysSelection
+                )
             )
             .clearModalBackground()
         }
@@ -109,6 +112,16 @@ struct KeyDetailsView: View {
                 isShowingBottomAlert: $viewModel.isShowingRemoveConfirmation
             )
             .clearModalBackground()
+        }
+        .fullScreenModal(isPresented: $viewModel.isPresentingBananaSplitBackupModal) {
+            switch viewModel.bananaSplitPresentationState {
+            case let .createBackup(viewModel):
+                BananaSplitModalView(viewModel: viewModel)
+            case let .qrCode(viewModel):
+                BananaSplitQRCodeModalView(viewModel: viewModel)
+            case .empty:
+                EmptyView()
+            }
         }
         .fullScreenModal(
             isPresented: $viewModel.isShowingBackupModal,
