@@ -23,7 +23,7 @@ struct CloseModalButton: View {
                 ZStack {
                     Circle()
                         .frame(width: Sizes.xmarkButtonDiameter, height: Sizes.xmarkButtonDiameter, alignment: .center)
-                        .foregroundColor(.fill6)
+                        .foregroundColor(.fill18)
                     Image(.xmarkButton)
                         .foregroundColor(.textAndIconsPrimary)
                 }

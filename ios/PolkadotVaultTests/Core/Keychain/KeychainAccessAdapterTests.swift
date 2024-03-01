@@ -13,14 +13,14 @@ final class KeychainAccessAdapterTests: XCTestCase {
     private var keychainQueryProviderMock: KeychainQueryProvidingMock!
     private var accessControlProviderMock: AccessControlProvidingMock!
     private var keychainService: KeychainServiceMock!
-    private var keychainAccessAdapter: KeychainAccessAdapter!
+    private var keychainAccessAdapter: KeychainSeedsAccessAdapter!
 
     override func setUp() {
         super.setUp()
         keychainQueryProviderMock = KeychainQueryProvidingMock()
         accessControlProviderMock = AccessControlProvidingMock()
         keychainService = KeychainServiceMock()
-        keychainAccessAdapter = KeychainAccessAdapter(
+        keychainAccessAdapter = KeychainSeedsAccessAdapter(
             keychainService: keychainService,
             acccessControlProvider: accessControlProviderMock,
             queryProvider: keychainQueryProviderMock

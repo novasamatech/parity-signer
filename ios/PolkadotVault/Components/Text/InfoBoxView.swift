@@ -13,7 +13,8 @@ struct InfoBoxView: View {
     var body: some View {
         HStack {
             Text(text)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(nil)
+                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.textAndIconsTertiary)
             Spacer().frame(maxWidth: Spacing.medium)
@@ -21,6 +22,7 @@ struct InfoBoxView: View {
                 .foregroundColor(.accentPink300)
         }
         .padding()
+        .frame(maxWidth: .infinity)
         .font(PrimaryFont.bodyM.font)
         .strokeContainerBackground(CornerRadius.small)
     }

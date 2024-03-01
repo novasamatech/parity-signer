@@ -10,16 +10,16 @@ import XCTest
 
 // swiftlint:disable force_cast
 final class KeychainQueryProviderTests: XCTestCase {
-    private var subject: KeychainQueryProvider!
+    private var subject: KeychainSeedsQueryProvider!
 
     override func setUp() {
         super.setUp()
-        subject = KeychainQueryProvider()
+        subject = KeychainSeedsQueryProvider()
     }
 
     func test_query_fetch_returnsExpectedValues() {
         // Given
-        let queryType: KeychainQuery = .fetch
+        let queryType: KeychainSeedsQuery = .fetch
         let expectedSecClass = kSecClassGenericPassword
         let expectedMatchLimit = kSecMatchLimitAll
         let expectedReturnAttributes = true
@@ -37,7 +37,7 @@ final class KeychainQueryProviderTests: XCTestCase {
 
     func test_query_deleteAll_returnsExpectedValues() {
         // Given
-        let queryType: KeychainQuery = .deleteAll
+        let queryType: KeychainSeedsQuery = .deleteAll
         let expectedSecClass = kSecClassGenericPassword
 
         // When
@@ -49,7 +49,7 @@ final class KeychainQueryProviderTests: XCTestCase {
 
     func test_query_check_returnsExpectedValues() {
         // Given
-        let queryType: KeychainQuery = .check
+        let queryType: KeychainSeedsQuery = .check
         let expectedSecClass = kSecClassGenericPassword
         let expectedMatchLimit = kSecMatchLimitAll
         let expectedReturnData = true
@@ -66,7 +66,7 @@ final class KeychainQueryProviderTests: XCTestCase {
     func test_query_search_returnsExpectedValues() {
         // Given
         let seedName = "account"
-        let queryType: KeychainQuery = .search(seedName: seedName)
+        let queryType: KeychainSeedsQuery = .search(seedName: seedName)
         let expectedSecClass = kSecClassGenericPassword
         let expectedMatchLimit = kSecMatchLimitOne
         let expectedReturnData = true
@@ -85,7 +85,7 @@ final class KeychainQueryProviderTests: XCTestCase {
         // Given
         let seedName = "account"
         let expectedSecClass = kSecClassGenericPassword
-        let queryType: KeychainQuery = .delete(seedName: seedName)
+        let queryType: KeychainSeedsQuery = .delete(seedName: seedName)
 
         // When
         let result = subject.query(for: queryType) as! [CFString: Any]
@@ -103,7 +103,7 @@ final class KeychainQueryProviderTests: XCTestCase {
         let expectedAccessControl: SecAccessControl! = try? SimulatorAccessControlProvider()
             .accessControl() // it's fine to use it instead of mock, as! it's just dedicated to be used on simulator
         let expectedReturnData = true
-        let queryType: KeychainQuery = .restoreQuery(
+        let queryType: KeychainSeedsQuery = .restoreQuery(
             seedName: seedName,
             finalSeedPhrase: finalSeedPhrase,
             accessControl: expectedAccessControl

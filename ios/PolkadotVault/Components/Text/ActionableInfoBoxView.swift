@@ -24,10 +24,11 @@ struct ActionableInfoBoxView: View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
             HStack {
                 Text(renderable.text)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                     .foregroundColor(.textAndIconsPrimary)
                     .font(PrimaryFont.bodyM.font)
-                    .fixedSize(horizontal: false, vertical: true)
                 Spacer().frame(maxWidth: Spacing.medium)
                 Image(.infoIconBold)
                     .foregroundColor(.accentPink300)
@@ -44,8 +45,8 @@ struct ActionableInfoBoxView: View {
                     .onTapGesture { action.action() }
             }
         }
-
         .padding(Spacing.medium)
+        .frame(maxWidth: .infinity)
         .containerBackground(CornerRadius.small, state: .actionableInfo)
     }
 }
