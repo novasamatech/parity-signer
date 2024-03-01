@@ -3,7 +3,6 @@ package io.parity.signer.screens.scan.bananasplitcreate.create
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator
 import io.parity.signer.domain.backend.OperationResult
-import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.domain.backend.map
 import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
@@ -13,9 +12,8 @@ import kotlinx.coroutines.runBlocking
 
 
 class CreateBsViewModel : ViewModel() {
-	private val uniffiInteractor: UniffiInteractor =
-		ServiceLocator.uniffiInteractor
-
+	private val uniffiInteractor = ServiceLocator.uniffiInteractor
+	private val bsRepository = ServiceLocator.activityScope!!.bsRepository
 
 	fun generatePassPhrase(totalShards: Int): OperationResult<String, ErrorDisplayed> {
 		return runBlocking {
@@ -23,19 +21,12 @@ class CreateBsViewModel : ViewModel() {
 		}.toOperationResult()
 	}
 
-	suspend fun createBS(seedName: String, shards: Int, passPhrase: String) {
-
-//		todo dmitry
-		val qrResults: OperationResult<List<QrData>, ErrorDisplayed> =
-			uniffiInteractor.generateBananaSplit(
-				secret = "",// todo dmitry after auth
-				title = seedName,
-				passphrase = passPhrase,
-				totalShards = shards.toUInt(),
-				requiredShards = BananaSplit.getMinShards(shards).toUInt()
-			).toOperationResult()
-
-		return //todo dmitry
+	suspend fun createBS(
+		seedName: String,
+		maxShards: Int,
+		passPhrase: String
+	): OperationResult<Unit, ErrorDisplayed> {
+		return bsRepository.creaseBs(seedName, maxShards, passPhrase)
 	}
 
 }

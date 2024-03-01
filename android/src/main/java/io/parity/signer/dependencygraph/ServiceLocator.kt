@@ -6,6 +6,7 @@ import io.parity.signer.domain.backend.UniffiInteractor
 import io.parity.signer.components.networkicon.UnknownNetworkColorsGenerator
 import io.parity.signer.domain.Authentication
 import io.parity.signer.domain.NetworkExposedStateKeeper
+import io.parity.signer.domain.storage.BananaSplitRepository
 import io.parity.signer.domain.storage.ClearCryptedStorage
 import io.parity.signer.domain.storage.DatabaseAssetsInteractor
 import io.parity.signer.domain.storage.PreferencesRepository
@@ -59,7 +60,15 @@ object ServiceLocator {
 
 	class ActivityScope(val activity: FragmentActivity) {
 		val seedRepository: SeedRepository = SeedRepository(
-			storage = seedStorage,
+			seedStorage = seedStorage,
+			clearCryptedStorage = clearCryptedStorage,
+			authentication = authentication,
+			activity = activity,
+			uniffiInteractor = uniffiInteractor,
+		)
+
+		val bsRepository: BananaSplitRepository = BananaSplitRepository(
+			seedStorage = seedStorage,
 			clearCryptedStorage = clearCryptedStorage,
 			authentication = authentication,
 			activity = activity,

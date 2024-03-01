@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.parity.signer.screens.error.handleErrorAppState
 import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
+import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 import kotlinx.coroutines.launch
 
 
@@ -28,8 +29,15 @@ fun CreateBananaSplitScreen(
 		onClose = { coreNavController.popBackStack() },
 		onCreate = { maxShards ->
 			vm.viewModelScope.launch {
-				vm.createBS(seedName, maxShards, passPhrase)
-				//todo dmitry navigate to next screen
+				val result = vm.createBS(seedName, maxShards, passPhrase)
+				result.handleErrorAppState(coreNavController)?.let {
+					coreNavController.popBackStack()
+					coreNavController.navigate(
+						CoreUnlockedNavSubgraph.CreateBananaSplit.destination(
+							seedName
+						)
+					)
+				}
 			}
 		},
 		updatePassowrd = {
