@@ -1,5 +1,5 @@
 //
-//  KeychainBananaSplitAccessAdapter.swift
+//  KeychainBananaSplitMediator.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 27/02/2024.
@@ -7,7 +7,8 @@
 
 import Foundation
 
-protocol KeychainBananaSplitAccessAdapting: AnyObject {
+// sourcery: AutoMockable
+protocol KeychainBananaSplitAccessMediating: AnyObject {
     func saveBananaSplit(
         with seedName: String,
         bananaSplitBackup: BananaSplitBackup,
@@ -19,7 +20,7 @@ protocol KeychainBananaSplitAccessAdapting: AnyObject {
     func checkIfBananaSplitAlreadyExists(seedName: String) -> Result<Bool, KeychainError>
 }
 
-final class KeychainBananaSplitAccessAdapter: KeychainBananaSplitAccessAdapting {
+final class KeychainBananaSplitMediator: KeychainBananaSplitAccessMediating {
     private let keychainService: KeychainServicing
     private let queryProvider: KeychainBananaSplitQueryProviding
     private let acccessControlProvider: AccessControlProviding
@@ -53,7 +54,7 @@ final class KeychainBananaSplitAccessAdapter: KeychainBananaSplitAccessAdapting 
                 return .failure(.saveError(message: message))
             }
 
-            query = queryProvider.query(
+            query = queryProvider.passhpraseQuery(
                 for: KeychainBananaSplitPassphraseQuery.save(
                     seedName: seedName,
                     passphrase: passphrase,
@@ -88,7 +89,7 @@ final class KeychainBananaSplitAccessAdapter: KeychainBananaSplitAccessAdapting 
 
     func retrieveBananaSplitPassphrase(with seedName: String) -> Result<BananaSplitPassphrase, KeychainError> {
         var item: CFTypeRef?
-        let query = queryProvider.query(for: KeychainBananaSplitPassphraseQuery.fetch(seedName: seedName))
+        let query = queryProvider.passhpraseQuery(for: KeychainBananaSplitPassphraseQuery.fetch(seedName: seedName))
         let osStatus = keychainService.copyMatching(query, &item)
         if osStatus == errSecSuccess, let itemAsData = item as? Data {
             do {
@@ -108,7 +109,8 @@ final class KeychainBananaSplitAccessAdapter: KeychainBananaSplitAccessAdapting 
             let errorMessage = SecCopyErrorMessageString(osStatus, nil) as? String ?? ""
             return .failure(.deleteError(message: errorMessage))
         }
-        let passphraseQuery = queryProvider.query(for: KeychainBananaSplitPassphraseQuery.delete(seedName: seedName))
+        let passphraseQuery = queryProvider
+            .passhpraseQuery(for: KeychainBananaSplitPassphraseQuery.delete(seedName: seedName))
         osStatus = keychainService.delete(passphraseQuery)
         if osStatus != errSecSuccess {
             let errorMessage = SecCopyErrorMessageString(osStatus, nil) as? String ?? ""

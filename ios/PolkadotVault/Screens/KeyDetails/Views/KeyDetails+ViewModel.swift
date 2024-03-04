@@ -33,7 +33,7 @@ extension KeyDetailsView {
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
         private let seedsMediator: SeedsMediating
-        private let bananaSplitMediator: KeychainBananaSplitAccessAdapting
+        private let bananaSplitMediator: KeychainBananaSplitAccessMediating
 
         @Published var keyName: String
         @Published var keysData: MKeysNew?
@@ -87,7 +87,7 @@ extension KeyDetailsView {
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
-            bananaSplitMediator: KeychainBananaSplitAccessAdapting = KeychainBananaSplitAccessAdapter()
+            bananaSplitMediator: KeychainBananaSplitAccessMediating = KeychainBananaSplitMediator()
         ) {
             self.onDeleteCompletion = onDeleteCompletion
             self.exportPrivateKeyService = exportPrivateKeyService

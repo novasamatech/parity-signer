@@ -106,13 +106,13 @@ extension BananaSplitQRCodeModalView {
         @Published var shouldPresentPassphraseModal = false
         @Published var isPresentingError: Bool = false
         @Published var presentableError: ErrorBottomModalViewModel = .alertError(message: "")
-        private let bananaSplitMediator: KeychainBananaSplitAccessAdapting
+        private let bananaSplitMediator: KeychainBananaSplitAccessMediating
         private let onCompletion: (OnCompletionAction) -> Void
 
         init(
             seedName: String,
             bananaSplitBackup: BananaSplitBackup,
-            bananaSplitMediator: KeychainBananaSplitAccessAdapting = KeychainBananaSplitAccessAdapter(),
+            bananaSplitMediator: KeychainBananaSplitAccessMediating = KeychainBananaSplitMediator(),
             onCompletion: @escaping (OnCompletionAction) -> Void
         ) {
             _bananaSplitBackup = .init(initialValue: bananaSplitBackup)

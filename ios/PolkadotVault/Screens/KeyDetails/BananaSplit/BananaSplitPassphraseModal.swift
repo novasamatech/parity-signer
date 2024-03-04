@@ -42,12 +42,12 @@ extension BananaSplitPassphraseModal {
         @Published var passphrase: String = ""
         @Binding var isPresented: Bool
         private let seedName: String
-        private let bananaSplitMediator: KeychainBananaSplitAccessAdapting
+        private let bananaSplitMediator: KeychainBananaSplitAccessMediating
 
         init(
             seedName: String,
             isPresented: Binding<Bool>,
-            bananaSplitMediator: KeychainBananaSplitAccessAdapting = KeychainBananaSplitAccessAdapter()
+            bananaSplitMediator: KeychainBananaSplitAccessMediating = KeychainBananaSplitMediator()
         ) {
             _isPresented = isPresented
             self.seedName = seedName

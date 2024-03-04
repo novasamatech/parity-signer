@@ -11,7 +11,6 @@ struct BananaSplitPassphrase: Codable, Equatable {
     let passphrase: String
 }
 
-/// Available queries for accessing Keychain
 enum KeychainBananaSplitQuery {
     case fetch(seedName: String)
     case check(seedName: String)
@@ -28,7 +27,7 @@ enum KeychainBananaSplitPassphraseQuery {
 // sourcery: AutoMockable
 protocol KeychainBananaSplitQueryProviding: AnyObject {
     func query(for queryType: KeychainBananaSplitQuery) -> CFDictionary
-    func query(for queryType: KeychainBananaSplitPassphraseQuery) -> CFDictionary
+    func passhpraseQuery(for queryType: KeychainBananaSplitPassphraseQuery) -> CFDictionary
 }
 
 final class KeychainBananaSplitQueryProvider: KeychainBananaSplitQueryProviding {
@@ -69,7 +68,7 @@ final class KeychainBananaSplitQueryProvider: KeychainBananaSplitQueryProviding 
         return dictionary as CFDictionary
     }
 
-    func query(for queryType: KeychainBananaSplitPassphraseQuery) -> CFDictionary {
+    func passhpraseQuery(for queryType: KeychainBananaSplitPassphraseQuery) -> CFDictionary {
         var dictionary: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword
         ]

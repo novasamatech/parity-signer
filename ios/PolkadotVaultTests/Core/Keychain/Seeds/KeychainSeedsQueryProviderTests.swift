@@ -1,5 +1,5 @@
 //
-//  KeychainQueryProviderTests.swift
+//  KeychainSeedsQueryProviderTests.swift
 //  PolkadotVaultTests
 //
 //  Created by Krzysztof Rodak on 29/08/2022.
@@ -9,7 +9,7 @@
 import XCTest
 
 // swiftlint:disable force_cast
-final class KeychainQueryProviderTests: XCTestCase {
+final class KeychainSeedsQueryProviderTests: XCTestCase {
     private var subject: KeychainSeedsQueryProvider!
 
     override func setUp() {

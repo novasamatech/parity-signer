@@ -201,7 +201,7 @@ extension BananaSplitModalView {
         let onCompletion: (BananaSplitModalView.OnCompletionAction) -> Void
 
         let seedName: String
-        private let bananaSplitMediator: KeychainBananaSplitAccessAdapting
+        private let bananaSplitMediator: KeychainBananaSplitAccessMediating
         private let seedsMediator: SeedsMediating
         private let service: BananaSplitServicing
         private var totalShardsCount: UInt32 {
@@ -210,7 +210,7 @@ extension BananaSplitModalView {
 
         init(
             seedName: String,
-            bananaSplitMediator: KeychainBananaSplitAccessAdapting = KeychainBananaSplitAccessAdapter(),
+            bananaSplitMediator: KeychainBananaSplitAccessMediating = KeychainBananaSplitMediator(),
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             service: BananaSplitServicing = BananaSplitService(),
             isPresented: Binding<Bool>,
