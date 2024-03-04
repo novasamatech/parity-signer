@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FileUpload
+import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +21,8 @@ import io.parity.signer.R
 import io.parity.signer.components.base.BottomSheetConfirmDialog
 import io.parity.signer.components.base.SecondaryButtonWide
 import io.parity.signer.domain.Callback
+import io.parity.signer.domain.FeatureFlags
+import io.parity.signer.domain.FeatureOption
 import io.parity.signer.domain.NetworkState
 import io.parity.signer.screens.keydetails.MenuItemForBottomSheet
 import io.parity.signer.ui.theme.SignerNewTheme
@@ -44,7 +47,8 @@ fun KeySetDeleteConfirmBottomSheet(
 fun KeyDetailsMenuGeneral(
 	networkState: State<NetworkState?>,
 	onSelectKeysClicked: Callback,
-	onBackupClicked: Callback,
+	onBackupBsClicked: Callback,
+	onBackupManualClicked: Callback,
 	onDeleteClicked: Callback,
 	exposeConfirmAction: Callback,//also called shield
 	onCancel: Callback,
@@ -62,12 +66,25 @@ fun KeyDetailsMenuGeneral(
 			onclick = onSelectKeysClicked
 		)
 
+		if (FeatureFlags.isEnabled(FeatureOption.CREATE_BANANA_SPLIT_ENABLED)) {
+			MenuItemForBottomSheet(
+				vector = Icons.Outlined.QrCode,
+				label = stringResource(R.string.key_set_menu_option_backup_bs),
+				onclick = {
+					if (networkState.value == NetworkState.None)
+						onBackupBsClicked()
+					else
+						exposeConfirmAction()
+				}
+			)
+		}
+
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_settings_backup_restore_28,
-			label = stringResource(R.string.menu_option_backup_key_set),
+			label = stringResource(R.string.key_set_menu_option_backup_manual),
 			onclick = {
 				if (networkState.value == NetworkState.None)
-					onBackupClicked()
+					onBackupManualClicked()
 				else
 					exposeConfirmAction()
 			}
@@ -104,7 +121,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.None) }
 		KeyDetailsMenuGeneral(
-		state, {}, {}, {}, {}, {},
+		state, {}, {}, {}, {}, {}, {},
 		)
 	}
 }

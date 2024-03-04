@@ -45,7 +45,8 @@
 	<string name="key_lock_item">Locked key</string>
 	<string name="key_sets_details_screem_filter_icon_description">Network filter button</string>
 	<string name="menu_option_export_keys">Export Keys</string>
-	<string name="menu_option_backup_key_set">Backup Key Set</string>
+	<string name="key_set_menu_option_backup_bs">Banana Split Backup</string>
+	<string name="key_set_menu_option_backup_manual">Manual Backup</string>
 	<string name="log_title_database_initiated">Database initiated</string>
 	<string name="log_title_device_was_online">Device was connected to network</string>
 	<string name="log_title_general_virifier_set">General verifier set</string>

@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun KeySetDetailsScreenSubgraph(
 	originalSeedName: String?,
-	navController: NavController,
+	coreNavController: NavController,
 ) {
 	val menuNavController = rememberNavController()
 	val coroutineScope = rememberCoroutineScope()
@@ -57,7 +57,8 @@ fun KeySetDetailsScreenSubgraph(
 	}
 	LaunchedEffect(key1 = Unit) {
 		//this is first screen - check db version here
-		keySetViewModel.validateDbSchemaCorrect().handleErrorAppState(navController)
+		keySetViewModel.validateDbSchemaCorrect()
+			.handleErrorAppState(coreNavController)
 	}
 
 	val filteredScreenModel =
@@ -65,7 +66,7 @@ fun KeySetDetailsScreenSubgraph(
 	val networkState = keySetViewModel.networkState.collectAsStateWithLifecycle()
 
 	when (val state =
-		filteredScreenModel.value.handleErrorAppState(navController)) {
+		filteredScreenModel.value.handleErrorAppState(coreNavController)) {
 
 		KeySetDetailsScreenState.NoKeySets -> {
 			NoKeySetEmptyWelcomeScreen(
@@ -75,12 +76,12 @@ fun KeySetDetailsScreenSubgraph(
 					}
 				},
 				onNewKeySet = {
-					navController.navigate(
+					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.newKeySet
 					)
 				},
 				onRecoverKeySet = {
-					navController.navigate(
+					coreNavController.navigate(
 						CoreUnlockedNavSubgraph.recoverKeySet
 					)
 				},
@@ -94,7 +95,7 @@ fun KeySetDetailsScreenSubgraph(
 			Box(Modifier.statusBarsPadding()) {
 				KeySetDetailsScreenView(
 					model = state.filteredModel,
-					navController = navController,
+					navController = coreNavController,
 					networkState = networkState,
 					fullModelWasEmpty = state.wasEmptyKeyset,
 					onExposedClicked = {
@@ -106,7 +107,7 @@ fun KeySetDetailsScreenSubgraph(
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.keys_menu)
 					},
 					onAddNewDerivation = {
-						navController.navigate(
+						coreNavController.navigate(
 							CoreUnlockedNavSubgraph.NewDerivedKey.destination(
 								seedName = state.filteredModel.root.seedName
 							)
@@ -122,7 +123,7 @@ fun KeySetDetailsScreenSubgraph(
 						menuNavController.navigate(KeySetDetailsMenuSubgraph.show_root)
 					},
 					onOpenKey = { keyAddr: String, keySpecs: String ->
-						navController.navigate(
+						coreNavController.navigate(
 							CoreUnlockedNavSubgraph.KeyDetails.destination(
 								keyAddr = keyAddr,
 								keySpec = keySpecs
@@ -152,9 +153,19 @@ fun KeySetDetailsScreenSubgraph(
 								menuNavController.popBackStack()
 								menuNavController.navigate(KeySetDetailsMenuSubgraph.export)
 							},
-							onBackupClicked = {
+							onBackupManualClicked = {
 								menuNavController.navigate(KeySetDetailsMenuSubgraph.backup) {
 									popUpTo(KeySetDetailsMenuSubgraph.empty)
+								}
+							},
+							onBackupBsClicked = {
+								menuNavController.popBackStack()
+								seedName?.let { seedName ->
+									coreNavController.navigate(
+										CoreUnlockedNavSubgraph.CreateBananaSplit.destination(
+											seedName
+										)
+									)
 								}
 							},
 							onCancel = {
@@ -175,7 +186,7 @@ fun KeySetDetailsScreenSubgraph(
 				}
 				composable(KeySetDetailsMenuSubgraph.select_keyset) {
 					SeedSelectMenuFull(
-						coreNavController = navController,
+						coreNavController = coreNavController,
 						selectedSeed = state.filteredModel.root.seedName,
 						onSelectSeed = { newSeed ->
 							seedName = newSeed
@@ -192,7 +203,7 @@ fun KeySetDetailsScreenSubgraph(
 								val root = state.filteredModel.root
 								coroutineScope.launch {
 									keySetViewModel.removeSeed(root)
-										.handleErrorAppState(navController)
+										.handleErrorAppState(coreNavController)
 									closeAction()
 								}
 							},
