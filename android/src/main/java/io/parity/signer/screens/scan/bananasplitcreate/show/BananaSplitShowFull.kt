@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -97,19 +97,36 @@ fun BananaSplitShowFull(
 									context.getString(R.string.banana_split_backup_removed_ok),
 									Toast.LENGTH_SHORT
 								).show()
-								coreNavController.popBackStack() }
+								coreNavController.popBackStack()
+							}
 						}
 					},
 				)
 			}
 		}
 		composable(BananaSplitShowMenu.ShowBsSeePassword) {
+			var password: String? = remember { null }
+			LaunchedEffect(key1 = seedName) {
+				val result =
+					vm.getPassword(seedName)
+				when (result) {
+					is OperationResult.Err -> {
+						menuNavController.popBackStack()
+						(result as OperationResult).handleErrorAppState(coreNavController)
+					}
 
-			BottomSheetWrapperRoot(onClosedAction = closeAction) {
-				BananaSplitShowPassphraseMenu(
-					onClose = closeAction,
-					password = vm.getPassword(seedName),
-				)
+					is OperationResult.Ok -> {
+						password = result.result
+					}
+				}
+			}
+			password?.let { password ->
+				BottomSheetWrapperRoot(onClosedAction = closeAction) {
+					BananaSplitShowPassphraseMenu(
+						onClose = closeAction,
+						password = password,
+					)
+				}
 			}
 		}
 	}

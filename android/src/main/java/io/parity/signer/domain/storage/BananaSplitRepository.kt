@@ -40,7 +40,7 @@ class BananaSplitRepository(
 					is OperationResult.Err -> qrResults
 					is OperationResult.Ok -> {
 						//saving data
-						seedStorage.saveBsData(seedName, passPhrase, maxShards)
+						seedStorage.saveBsData(seedName, passPhrase)
 						clearCryptedStorage.saveBsQRCodes(seedName, qrResults.result)
 						OperationResult.Ok(Unit)
 					}
@@ -91,13 +91,4 @@ class BananaSplitRepository(
 	}
 }
 
-data class BsPassData(
-	val totalShards: Int,
-	val passPhrase: String
-) //todo dmitry remove?
 
-data class BsData(
-	val qrData: List<QrData>,
-	val totalShards: Int,
-	val passPhrase: String
-)
