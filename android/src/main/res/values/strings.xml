@@ -469,6 +469,7 @@
 	<string name="banana_split_menu_option_show_password">Show Passphrase</string>
 	<string name="banana_split_menu_option_remove_backup">Remove Backup</string>
 	<string name="banana_split_menu_password_title">Passphrase</string>
+	<string name="banana_split_backup_removed_ok">Banana Split Backup removed</string>
 
 </resources>
 
