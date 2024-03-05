@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -46,14 +47,11 @@ fun KeySetDetailsScreenSubgraph(
 	val menuNavController = rememberNavController()
 	val coroutineScope = rememberCoroutineScope()
 
-	var seedName by rememberSaveable() {
-		mutableStateOf(originalSeedName)
-	}
-
 	val keySetViewModel: KeySetDetailsViewModel = viewModel()
+	val seedName = keySetViewModel.shownSeedName.collectAsStateWithLifecycle()
 
-	LaunchedEffect(key1 = seedName) {
-		keySetViewModel.feedModelForSeed(seedName)
+	LaunchedEffect(key1 = originalSeedName) {
+		keySetViewModel.feedModelForSeed(originalSeedName)
 	}
 	LaunchedEffect(key1 = Unit) {
 		//this is first screen - check db version here
@@ -160,7 +158,7 @@ fun KeySetDetailsScreenSubgraph(
 							},
 							onBackupBsClicked = {
 								menuNavController.popBackStack()
-								seedName?.let { seedName ->
+								seedName.value?.let { seedName ->
 									coreNavController.navigate(
 										CoreUnlockedNavSubgraph.CreateBananaSplit.destination(
 											seedName
@@ -189,8 +187,10 @@ fun KeySetDetailsScreenSubgraph(
 						coreNavController = coreNavController,
 						selectedSeed = state.filteredModel.root.seedName,
 						onSelectSeed = { newSeed ->
-							seedName = newSeed
-							closeAction()
+							keySetViewModel.viewModelScope.launch {
+								keySetViewModel.feedModelForSeed(newSeed)
+								closeAction()
+							}
 						},
 						onClose = closeAction,
 					)
