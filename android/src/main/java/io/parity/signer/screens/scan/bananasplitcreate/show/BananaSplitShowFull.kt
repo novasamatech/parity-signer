@@ -120,6 +120,7 @@ fun BananaSplitShowFull(
 					}
 				}
 			}
+			//todo dmitry test why not shown
 			password?.let { password ->
 				BottomSheetWrapperRoot(onClosedAction = closeAction) {
 					BananaSplitShowPassphraseMenu(

@@ -9,6 +9,8 @@ import io.parity.signer.domain.backend.toOperationResult
 import io.parity.signer.screens.scan.bananasplitcreate.BananaSplit
 import io.parity.signer.uniffi.ErrorDisplayed
 import io.parity.signer.uniffi.QrData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class BananaSplitRepository(
@@ -79,7 +81,10 @@ class BananaSplitRepository(
 	suspend fun getBsPassword(seedName: String): OperationResult<String, ErrorDisplayed> {
 		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
-				OperationResult.Ok(seedStorage.getBsPassword(seedName))
+				val bsPassword = withContext(Dispatchers.IO) {
+					seedStorage.getBsPassword(seedName)
+				}
+				OperationResult.Ok(bsPassword)
 			}
 
 			AuthResult.AuthError,

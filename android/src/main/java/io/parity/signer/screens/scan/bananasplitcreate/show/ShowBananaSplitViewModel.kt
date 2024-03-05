@@ -25,8 +25,6 @@ class ShowBananaSplitViewModel : ViewModel() {
 	}
 
 	suspend fun getPassword(seedName: String): OperationResult<String, ErrorDisplayed> {
-		return withContext(Dispatchers.IO) {
-			bsRepository.getBsPassword(seedName)
-		}
+		return bsRepository.getBsPassword(seedName)
 	}
 }
