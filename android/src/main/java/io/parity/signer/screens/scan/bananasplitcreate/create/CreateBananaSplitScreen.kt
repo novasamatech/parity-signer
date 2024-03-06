@@ -2,6 +2,8 @@ package io.parity.signer.screens.scan.bananasplitcreate.create
 
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
@@ -20,16 +22,18 @@ fun CreateBananaSplitScreen(
 ) {
 	val vm: CreateBsViewModel = viewModel()
 
-	var passPhrase = rememberSaveable() {
-		vm.generatePassPhrase(BananaSplit.defaultShards)
-			.handleErrorAppState(coreNavController) ?: ""
+	val passPhrase: MutableState<String> = rememberSaveable() {
+		mutableStateOf(
+			vm.generatePassPhrase(BananaSplit.defaultShards)
+				.handleErrorAppState(coreNavController) ?: ""
+		)
 	}
 
 	CreateBananaSplitScreenInternal(
 		onClose = { coreNavController.popBackStack() },
 		onCreate = { maxShards ->
 			vm.viewModelScope.launch {
-				val result = vm.createBS(seedName, maxShards, passPhrase)
+				val result = vm.createBS(seedName, maxShards, passPhrase.value)
 				result.handleErrorAppState(coreNavController)?.let {
 					coreNavController.popBackStack()
 					coreNavController.navigate(
@@ -41,10 +45,10 @@ fun CreateBananaSplitScreen(
 			}
 		},
 		updatePassowrd = {
-			passPhrase = vm.generatePassPhrase(BananaSplit.defaultShards)
+			passPhrase.value = vm.generatePassPhrase(BananaSplit.defaultShards)
 				.handleErrorAppState(coreNavController) ?: ""
 		},
-		password = passPhrase,
+		password = passPhrase.value,
 		modifier = Modifier.statusBarsPadding(),
 	)
 }
