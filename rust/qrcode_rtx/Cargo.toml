@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 bitvec = "1.0.1"
 hex = "0.4.3"
-raptorq = "1.8.0"
+raptorq = "1.8.1"
 qrcodegen = "1.8.0"
 png = "0.17.13"
 
