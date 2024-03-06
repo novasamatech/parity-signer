@@ -19,9 +19,8 @@ class ShowBananaSplitViewModel : ViewModel() {
 	}
 
 	suspend fun removeBS(seedName: String): OperationResult<Unit, ErrorDisplayed> {
-		return withContext(Dispatchers.IO) {
-			bsRepository.removeBS(seedName)
-		}
+		return bsRepository.removeBS(seedName)
+
 	}
 
 	suspend fun getPassword(seedName: String): OperationResult<String, ErrorDisplayed> {
