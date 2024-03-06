@@ -32,7 +32,9 @@ fun BananaSplitShowPassphraseMenu(
 			color = MaterialTheme.colors.primary,
 			style = SignerTypeface.BodyL,
 			maxLines = 1,
-			modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+			modifier = Modifier
+				.padding(horizontal = 24.dp, vertical = 16.dp)
+				.padding(bottom = 8.dp)
 		)
 	}
 }
