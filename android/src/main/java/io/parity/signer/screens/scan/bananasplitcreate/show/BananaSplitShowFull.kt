@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -105,7 +107,7 @@ fun BananaSplitShowFull(
 			}
 		}
 		composable(BananaSplitShowMenu.ShowBsSeePassword) {
-			var password: String? = remember { null }
+			val password: MutableState<String?> = remember { mutableStateOf(null) }
 			LaunchedEffect(key1 = seedName) {
 				val result =
 					vm.getPassword(seedName)
@@ -116,12 +118,11 @@ fun BananaSplitShowFull(
 					}
 
 					is OperationResult.Ok -> {
-						password = result.result
+						password.value = result.result
 					}
 				}
 			}
-			//todo dmitry test why not shown
-			password?.let { password ->
+			password.value?.let { password ->
 				BottomSheetWrapperRoot(onClosedAction = closeAction) {
 					BananaSplitShowPassphraseMenu(
 						onClose = closeAction,
