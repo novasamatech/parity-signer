@@ -65,8 +65,10 @@ class BananaSplitRepository(
 		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
 				//removing bs data data
-				seedStorage.removeBSData(seedName)
-				clearCryptedStorage.removeQrCode(seedName)
+				withContext(Dispatchers.IO) {
+					seedStorage.removeBSData(seedName)
+					clearCryptedStorage.removeQrCode(seedName)
+				}
 				OperationResult.Ok(Unit)
 			}
 

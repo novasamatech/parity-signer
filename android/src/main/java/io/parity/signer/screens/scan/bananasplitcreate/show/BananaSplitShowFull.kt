@@ -54,6 +54,7 @@ fun BananaSplitShowFull(
 		modifier = Modifier.statusBarsPadding(),
 	)
 
+	//todo dmitry menu icons like remove and passphrase are not working
 	NavHost(
 		navController = menuNavController,
 		startDestination = BananaSplitShowMenu.Empty,
@@ -92,6 +93,7 @@ fun BananaSplitShowFull(
 						vm.viewModelScope.launch {
 							val result =
 								vm.removeBS(seedName).handleErrorAppState(coreNavController)
+
 							result?.let {
 								//Show toast
 								Toast.makeText(
@@ -122,6 +124,7 @@ fun BananaSplitShowFull(
 					}
 				}
 			}
+			//todo dmitry close action not working?
 			password.value?.let { password ->
 				BottomSheetWrapperRoot(onClosedAction = closeAction) {
 					BananaSplitShowPassphraseMenu(
