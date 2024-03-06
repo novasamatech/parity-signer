@@ -22,6 +22,8 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,11 +56,13 @@ internal fun CreateBananaSplitScreenInternal(
 ) {
 //todo dmitry implement https://www.figma.com/file/k0F8XYk9XVYdKLtkj0Vzp5/Signer-(Vault)-%C2%B7-Redesign?type=design&node-id=15728-46347&mode=design
 
-	var shardsField: String = rememberSaveable {
-		BananaSplit.defaultShards.toString()
+	val shardsField: MutableState<String> = rememberSaveable {
+		mutableStateOf(
+			BananaSplit.defaultShards.toString()
+		)
 	}
 
-	val shardsValue: Int? = shardsField.toIntOrNull()
+	val shardsValue: Int? = shardsField.value.toIntOrNull()
 	val canProceed: Boolean = shardsValue?.let { it > 2 } ?: false
 
 	Column(modifier = modifier) {
@@ -95,8 +99,8 @@ internal fun CreateBananaSplitScreenInternal(
 					.padding(horizontal = 24.dp, vertical = 6.dp)
 			)
 			OutlinedTextField(
-				value = shardsField,
-				onValueChange = { newStr: String -> shardsField = newStr },
+				value = shardsField.value,
+				onValueChange = { newStr: String -> shardsField.value = newStr },
 				visualTransformation = VisualTransformation.None,
 				keyboardOptions = KeyboardOptions.Default.copy(
 					keyboardType = KeyboardType.Number,
@@ -108,7 +112,7 @@ internal fun CreateBananaSplitScreenInternal(
 						onCreate(shardsValue)
 					}
 				}),
-				isError = Integer.getInteger(shardsField) == null,
+				isError = Integer.getInteger(shardsField.value) == null,
 				singleLine = true,
 				textStyle = SignerTypeface.LabelM,
 				colors = TextFieldDefaults.textFieldColors(
