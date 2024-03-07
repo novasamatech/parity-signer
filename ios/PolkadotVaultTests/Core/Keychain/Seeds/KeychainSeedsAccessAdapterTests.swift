@@ -1,5 +1,5 @@
 //
-//  KeychainAccessAdapterTests.swift
+//  KeychainSeedsAccessAdapterTests.swift
 //  PolkadotVaultTests
 //
 //  Created by Krzysztof Rodak on 22/11/2023.
@@ -9,18 +9,18 @@ import Foundation
 @testable import PolkadotVault
 import XCTest
 
-final class KeychainAccessAdapterTests: XCTestCase {
-    private var keychainQueryProviderMock: KeychainQueryProvidingMock!
+final class KeychainSeedsAccessAdapterTests: XCTestCase {
+    private var keychainQueryProviderMock: KeychainSeedsQueryProvidingMock!
     private var accessControlProviderMock: AccessControlProvidingMock!
     private var keychainService: KeychainServiceMock!
-    private var keychainAccessAdapter: KeychainAccessAdapter!
+    private var keychainAccessAdapter: KeychainSeedsAccessAdapter!
 
     override func setUp() {
         super.setUp()
-        keychainQueryProviderMock = KeychainQueryProvidingMock()
+        keychainQueryProviderMock = KeychainSeedsQueryProvidingMock()
         accessControlProviderMock = AccessControlProvidingMock()
         keychainService = KeychainServiceMock()
-        keychainAccessAdapter = KeychainAccessAdapter(
+        keychainAccessAdapter = KeychainSeedsAccessAdapter(
             keychainService: keychainService,
             acccessControlProvider: accessControlProviderMock,
             queryProvider: keychainQueryProviderMock

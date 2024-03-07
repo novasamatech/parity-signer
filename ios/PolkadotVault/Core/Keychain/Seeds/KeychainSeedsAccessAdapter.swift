@@ -1,5 +1,5 @@
 //
-//  KeychainAccessAdapter.swift
+//  KeychainSeedsAccessAdapter.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 26/08/2022.
@@ -12,7 +12,7 @@ struct FetchSeedsPayload {
 }
 
 /// Protocol that provides access to Keychain's C-like API using modern approach
-protocol KeychainAccessAdapting: AnyObject {
+protocol KeychainSeedsAccessAdapting: AnyObject {
     /// Attempts to fetch list of seeds name from Keychain
     /// - Returns: closure with `.success` and requested `FetchSeedsPayload`
     ///            otherwise `.failure` with `KeychainError`
@@ -45,15 +45,15 @@ protocol KeychainAccessAdapting: AnyObject {
     func removeAllSeeds() -> Bool
 }
 
-final class KeychainAccessAdapter: KeychainAccessAdapting {
+final class KeychainSeedsAccessAdapter: KeychainSeedsAccessAdapting {
     private let keychainService: KeychainServicing
-    private let queryProvider: KeychainQueryProviding
+    private let queryProvider: KeychainSeedsQueryProviding
     private let acccessControlProvider: AccessControlProviding
 
     init(
         keychainService: KeychainServicing = KeychainService(),
         acccessControlProvider: AccessControlProviding = AccessControlProvidingAssembler().assemble(),
-        queryProvider: KeychainQueryProviding = KeychainQueryProvider()
+        queryProvider: KeychainSeedsQueryProviding = KeychainSeedsQueryProvider()
     ) {
         self.keychainService = keychainService
         self.acccessControlProvider = acccessControlProvider
@@ -69,6 +69,10 @@ final class KeychainAccessAdapter: KeychainAccessAdapting {
             let seedNames = resultAsItems
                 .compactMap { seed in seed[kSecAttrAccount as String] as? String }
                 .sorted()
+                .filter {
+                    !$0.hasSuffix(KeychainBananaSplitQueryProvider.Constants.bananaSplitSuffix)
+                        && !$0.hasSuffix(KeychainBananaSplitQueryProvider.Constants.passphraseSuffix)
+                }
             return .success(FetchSeedsPayload(seeds: seedNames))
         }
         // Keychain returned success but no data

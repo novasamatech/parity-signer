@@ -1,5 +1,5 @@
 //
-//  KeychainQueryProvider.swift
+//  KeychainSeedsQueryProvider.swift
 //  Polkadot Vault
 //
 //  Created by Krzysztof Rodak on 26/08/2022.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// Available queries for accessing Keychain
-enum KeychainQuery {
+enum KeychainSeedsQuery {
     case fetch
     case fetchWithData
     case check
@@ -20,15 +20,15 @@ enum KeychainQuery {
 
 // sourcery: AutoMockable
 /// Protocol that provides access to query payload
-protocol KeychainQueryProviding: AnyObject {
+protocol KeychainSeedsQueryProviding: AnyObject {
     /// Generates payload query for given query type with given input
     /// - Parameter queryType: query type and payload if needed
     /// - Returns: query payload as dictionary that can be used in Keychain querying
-    func query(for queryType: KeychainQuery) -> CFDictionary
+    func query(for queryType: KeychainSeedsQuery) -> CFDictionary
 }
 
-final class KeychainQueryProvider: KeychainQueryProviding {
-    func query(for queryType: KeychainQuery) -> CFDictionary {
+final class KeychainSeedsQueryProvider: KeychainSeedsQueryProviding {
+    func query(for queryType: KeychainSeedsQuery) -> CFDictionary {
         var dictionary: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword
         ]

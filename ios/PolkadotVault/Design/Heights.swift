@@ -21,6 +21,8 @@ enum Heights {
     static let navigationBarHeight: CGFloat = 54
     /// All variants of `NavbarButton`, 40 pt
     static let navigationButton: CGFloat = 40
+    /// All variants of `IconButton`, 36 pt
+    static let iconButton: CGFloat = 36
     /// All variants of `MenuButton`, 48 pt
     static let menuButton: CGFloat = 48
     /// All variants of `ActionSheetButton`, 44 pt
