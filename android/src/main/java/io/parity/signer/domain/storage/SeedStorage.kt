@@ -191,7 +191,6 @@ class SeedStorage {
 	fun saveBsData(
 		seedName: String,
 		passPhrase: String,
-//		totalShards: Int, todo dmitry remove than everywhere
 	) {
 		if (sharedPreferences.contains("$seedName$BS_POSTFIX")) {
 			throw IllegalArgumentException("element with this name already exists in the storage")
@@ -204,7 +203,7 @@ class SeedStorage {
 	@Throws(UserNotAuthenticatedException::class)
 	fun removeBSData(seedName: String) {
 		sharedPreferences.edit()
-			.remove("$seedName$BS_SHARDS")
+			.remove("$seedName$BS_POSTFIX")
 			.apply()
 	}
 
@@ -219,7 +218,6 @@ class SeedStorage {
 		sharedPreferences.edit()
 			.remove(seedName)
 			.remove("$seedName$BS_POSTFIX")
-			.remove("$seedName$BS_SHARDS")
 			.apply()
 		_lastKnownSeedNames.update { lastState ->
 			lastState.filter { it != seedName }.toTypedArray()
@@ -270,7 +268,6 @@ internal fun consumeStorageAuthError(
 }
 
 private const val BS_POSTFIX = "\$\$bs_passphrase"
-private const val BS_SHARDS = "\$\$bs_shards"
 
 
 
