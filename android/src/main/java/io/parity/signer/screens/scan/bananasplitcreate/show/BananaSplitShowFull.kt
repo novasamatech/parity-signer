@@ -40,7 +40,6 @@ fun BananaSplitShowFull(
 		if (qrCodes == null) {
 			//no BS for this seed - open create screen
 			coreNavController.navigate(BananaSplitCreateDestination.CreateBsCreateScreen) {
-				//todo dmitry test this
 				popUpTo(CoreUnlockedNavSubgraph.CreateBananaSplit.route)
 			}
 		}
@@ -54,7 +53,6 @@ fun BananaSplitShowFull(
 		modifier = Modifier.statusBarsPadding(),
 	)
 
-	//todo dmitry menu icons like remove and passphrase are not working
 	NavHost(
 		navController = menuNavController,
 		startDestination = BananaSplitShowMenu.Empty,
