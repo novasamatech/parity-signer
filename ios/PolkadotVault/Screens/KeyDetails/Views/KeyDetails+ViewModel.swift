@@ -9,6 +9,12 @@ import Combine
 import Foundation
 import SwiftUI
 
+enum BananaSplitPresentationState {
+    case createBackup(BananaSplitModalView.ViewModel)
+    case qrCode(BananaSplitQRCodeModalView.ViewModel)
+    case empty
+}
+
 extension KeyDetailsView {
     enum OnCompletionAction: Equatable {
         case keySetDeleted
@@ -27,14 +33,18 @@ extension KeyDetailsView {
         private let exportPrivateKeyService: PrivateKeyQRCodeService
         private let keyDetailsActionsService: KeyDetailsActionService
         private let seedsMediator: SeedsMediating
+        private let bananaSplitMediator: KeychainBananaSplitAccessMediating
 
         @Published var keyName: String
         @Published var keysData: MKeysNew?
+        @Published var bananaSplitPresentationState: BananaSplitPresentationState = .empty
         @Published var shouldPresentRemoveConfirmationModal = false
-        @Published var shouldPresentBackupModal = false
+        @Published var shouldPresentBananaSplitBackupModal = false
+        @Published var shouldPresentManualBackupModal = false
         @Published var shouldPresentExportKeysSelection = false
         @Published var isShowingActionSheet = false
         @Published var isShowingRemoveConfirmation = false
+        @Published var isPresentingBananaSplitBackupModal = false
         @Published var isShowingBackupModal = false
         @Published var isPresentingExportKeySelection = false
         @Published var isPresentingRootDetails = false
@@ -76,7 +86,8 @@ extension KeyDetailsView {
             keyDetailsService: KeyDetailsService = KeyDetailsService(),
             networksService: GetManagedNetworksService = GetManagedNetworksService(),
             keyDetailsActionsService: KeyDetailsActionService = KeyDetailsActionService(),
-            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
+            seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            bananaSplitMediator: KeychainBananaSplitAccessMediating = KeychainBananaSplitMediator()
         ) {
             self.onDeleteCompletion = onDeleteCompletion
             self.exportPrivateKeyService = exportPrivateKeyService
@@ -84,6 +95,7 @@ extension KeyDetailsView {
             self.networksService = networksService
             self.keyDetailsActionsService = keyDetailsActionsService
             self.seedsMediator = seedsMediator
+            self.bananaSplitMediator = bananaSplitMediator
             _keyName = .init(initialValue: initialKeyName)
             subscribeToNetworkChanges()
         }
@@ -117,6 +129,7 @@ extension KeyDetailsView {
                     self.isPresentingError = true
                 }
             }
+            updateBananaSplitPresentationState()
         }
 
         func refreshNetworks() {
@@ -252,6 +265,16 @@ extension KeyDetailsView {
             )
             isSnackbarPresented = true
         }
+
+        func onBananaSplitModalCompletion(_: BananaSplitModalView.OnCompletionAction) {
+            updateBananaSplitPresentationState()
+            isPresentingBananaSplitBackupModal = false
+        }
+
+        func onBananaSplitBackupModalCompletion(_: BananaSplitQRCodeModalView.OnCompletionAction) {
+            updateBananaSplitPresentationState()
+            isPresentingBananaSplitBackupModal = false
+        }
     }
 }
 
@@ -328,8 +351,8 @@ extension KeyDetailsView.ViewModel {
             shouldPresentRemoveConfirmationModal.toggle()
             isShowingRemoveConfirmation.toggle()
         }
-        if shouldPresentBackupModal {
-            shouldPresentBackupModal.toggle()
+        if shouldPresentManualBackupModal {
+            shouldPresentManualBackupModal.toggle()
             keyDetailsActionsService.performBackupSeed(seedName: keyName) { result in
                 switch result {
                 case .success:
@@ -339,6 +362,10 @@ extension KeyDetailsView.ViewModel {
                     self.isPresentingError = true
                 }
             }
+        }
+        if shouldPresentBananaSplitBackupModal {
+            shouldPresentBananaSplitBackupModal.toggle()
+            isPresentingBananaSplitBackupModal = true
         }
         if shouldPresentExportKeysSelection {
             shouldPresentExportKeysSelection = false
@@ -356,6 +383,50 @@ extension KeyDetailsView.ViewModel {
             identicon: keysData?.root?.address.identicon,
             base58: keysData?.root?.base58 ?? ""
         )
+    }
+
+    func updateBananaSplitPresentationState() {
+        switch bananaSplitMediator.checkIfBananaSplitAlreadyExists(seedName: keyName) {
+        case let .success(exists):
+            if exists {
+                switch bananaSplitMediator.retrieveBananaSplit(with: keyName) {
+                case let .success(bananaSplitBackup):
+                    bananaSplitPresentationState = .qrCode(
+                        .init(
+                            seedName: keyName,
+                            bananaSplitBackup: bananaSplitBackup,
+                            onCompletion: onBananaSplitBackupModalCompletion(_:)
+                        )
+                    )
+                case .failure:
+                    bananaSplitPresentationState = .createBackup(
+                        .init(
+                            seedName: keyName,
+                            isPresented: Binding(
+                                get: { self.isPresentingBananaSplitBackupModal },
+                                set: { self.isPresentingBananaSplitBackupModal = $0 }
+                            ),
+                            onCompletion: onBananaSplitModalCompletion(_:)
+                        )
+                    )
+                }
+            } else {
+                bananaSplitPresentationState = .createBackup(
+                    .init(
+                        seedName: keyName,
+                        isPresented: Binding(
+                            get: { self.isPresentingBananaSplitBackupModal },
+                            set: { self.isPresentingBananaSplitBackupModal = $0 }
+                        ),
+                        onCompletion: onBananaSplitModalCompletion(_:)
+                    )
+                )
+            }
+        case let .failure(failure):
+            presentableError = .alertError(message: failure.localizedDescription)
+            isPresentingError = true
+            bananaSplitPresentationState = .empty
+        }
     }
 }
 

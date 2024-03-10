@@ -17,7 +17,9 @@ struct PolkadotVaultApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if jailbreakDetectionPublisher.isJailbroken {
+            if RuntimePropertiesProvider().isRunningTests {
+                EmptyView()
+            } else if jailbreakDetectionPublisher.isJailbroken {
                 JailbreakDetectedView()
             } else {
                 MainScreenContainer(

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PrimaryTextFieldStyle: ViewModifier {
     let placeholder: String
+    let keyboardType: UIKeyboardType
     @Binding var text: String
     @Binding var isValid: Bool
 
@@ -19,7 +20,7 @@ struct PrimaryTextFieldStyle: ViewModifier {
             .font(PrimaryFont.bodyL.font)
             .autocapitalization(.none)
             .disableAutocorrection(true)
-            .keyboardType(.asciiCapable)
+            .keyboardType(keyboardType)
             .submitLabel(.return)
             .frame(height: Heights.textFieldHeight)
             .padding(.horizontal, Spacing.medium)
@@ -35,9 +36,15 @@ struct PrimaryTextFieldStyle: ViewModifier {
 extension View {
     func primaryTextFieldStyle(
         _ placeholder: String,
+        keyboardType: UIKeyboardType = .asciiCapable,
         text: Binding<String>,
         isValid: Binding<Bool> = Binding<Bool>.constant(true)
     ) -> some View {
-        modifier(PrimaryTextFieldStyle(placeholder: placeholder, text: text, isValid: isValid))
+        modifier(PrimaryTextFieldStyle(
+            placeholder: placeholder,
+            keyboardType: keyboardType,
+            text: text,
+            isValid: isValid
+        ))
     }
 }

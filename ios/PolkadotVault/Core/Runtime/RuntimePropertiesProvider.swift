@@ -22,6 +22,12 @@ protocol RuntimePropertiesProviding: AnyObject {
 
 /// Wrapper for accessing `RuntimeProperties` and other application runtime values
 final class RuntimePropertiesProvider: RuntimePropertiesProviding {
+    enum Properties: String, CustomStringConvertible {
+        case testConfiguration = "XCTestConfigurationFilePath"
+
+        var description: String { rawValue }
+    }
+
     private enum PropertiesValues: String, CustomStringConvertible {
         case `true`
         case `false`
@@ -30,11 +36,14 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
     }
 
     private let appInformationContainer: ApplicationInformationContaining.Type
+    private let processInfo: ProcessInfoProtocol
 
     init(
-        appInformationContainer: ApplicationInformationContaining.Type = ApplicationInformation.self
+        appInformationContainer: ApplicationInformationContaining.Type = ApplicationInformation.self,
+        processInfo: ProcessInfoProtocol = ProcessInfo.processInfo
     ) {
         self.appInformationContainer = appInformationContainer
+        self.processInfo = processInfo
     }
 
     var runtimeMode: ApplicationRuntimeMode {
@@ -43,6 +52,10 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
 
     var dynamicDerivationsEnabled: Bool {
         appInformationContainer.dynamicDerivationsEnabled == PropertiesValues.true.rawValue
+    }
+
+    var isRunningTests: Bool {
+        processInfo.environment[Properties.testConfiguration.description] != nil
     }
 }
 

@@ -407,7 +407,7 @@ final class DatabaseMediatorMock: DatabaseMediating {
     }
 }
 
-final class KeychainAccessAdapterMock: KeychainAccessAdapting {
+final class KeychainAccessAdapterMock: KeychainSeedsAccessAdapting {
     // Properties to track method calls and arguments
     var fetchSeedNamesCallsCount = 0
     var saveSeedCallsCount = 0

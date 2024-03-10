@@ -270,4 +270,21 @@ extension Localizable {
         }
         return attributedString
     }
+
+    static func bananaSplitBackupQRCodeInfo() -> AttributedString {
+        let mainText = Localizable.BananaSplitBackupQRCode.Label.info.string
+        let highlightedText = Localizable.BananaSplitBackupQRCode.Label.Info.highlight.string
+
+        let attributedString = NSMutableAttributedString(string: mainText)
+        attributedString.addAttribute(
+            .foregroundColor,
+            value: Color(.textAndIconsTertiary),
+            range: NSRange(location: 0, length: mainText.count)
+        )
+
+        let range = (mainText as NSString).range(of: highlightedText)
+        attributedString.setAttributes([.foregroundColor: UIColor(.accentPink300)], range: range)
+
+        return AttributedString(attributedString)
+    }
 }
