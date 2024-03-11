@@ -71,13 +71,13 @@ fun BananaSplitShowFull(
 					onCancel = closeAction,
 					onShowPassphrase = {
 						menuNavController.navigate(BananaSplitShowMenu.ShowBsSeePassword) {
-							//todo dmitry keep original one, otherwise close doesn't work
-							popUpTo(0)
+							popUpTo(BananaSplitShowMenu.Empty)
 						}
 					},
 					onRemoveBackup = {
 						menuNavController.navigate(BananaSplitShowMenu.ShowBSConfirmRemove) {
-							popUpTo(0)
+							popUpTo(BananaSplitShowMenu.Empty)
+//							todo dmitry find out popupto(0) and if navigation is broken there, test this - if close is working
 						}
 					},
 				)
