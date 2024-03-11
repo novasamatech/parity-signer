@@ -71,6 +71,7 @@ fun BananaSplitShowFull(
 					onCancel = closeAction,
 					onShowPassphrase = {
 						menuNavController.navigate(BananaSplitShowMenu.ShowBsSeePassword) {
+							//todo dmitry keep original one, otherwise close doesn't work
 							popUpTo(0)
 						}
 					},
