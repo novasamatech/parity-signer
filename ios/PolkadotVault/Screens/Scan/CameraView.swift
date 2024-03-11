@@ -128,6 +128,7 @@ struct CameraView: View {
         ) {
             EnterBananaSplitPasswordView(
                 viewModel: .init(
+                    seedName: viewModel.bananaSplitQRCodeRecovery?.seedName ?? "",
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
                     qrCodeData: model.bucket,
                     onCompletion: viewModel.onKeySetAddCompletion(_:)
@@ -262,19 +263,19 @@ extension CameraView {
         private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
         private let runtimePropertiesProvider: RuntimePropertiesProviding
-        private let onRecoveryComplete: ((CreateKeysForNetworksView.OnCompletionAction) -> Void)?
+        let bananaSplitQRCodeRecovery: BananaSplitQRCodeRecovery?
         private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
-            onRecoveryComplete: ((CreateKeysForNetworksView.OnCompletionAction) -> Void)? = nil,
+            bananaSplitQRCodeRecovery: BananaSplitQRCodeRecovery? = nil,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService(),
             dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService(),
             runtimePropertiesProvider: RuntimePropertiesProviding = RuntimePropertiesProvider()
         ) {
             _isPresented = isPresented
-            self.onRecoveryComplete = onRecoveryComplete
+            self.bananaSplitQRCodeRecovery = bananaSplitQRCodeRecovery
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
@@ -375,7 +376,7 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
-            if let onRecoveryComplete {
+            if let onRecoveryComplete = bananaSplitQRCodeRecovery?.onRecoveryComplete {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     onRecoveryComplete(completionAction)
                     self.dismissView()

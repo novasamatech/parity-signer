@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+struct BananaSplitQRCodeRecovery {
+    let seedName: String
+    let onRecoveryComplete: (CreateKeysForNetworksView.OnCompletionAction) -> Void
+}
+
 struct RecoverKeySetSeedPhraseView: View {
     private enum Constants {
         static let capsuleContainerID = "capsuleContainerID"
@@ -133,7 +138,10 @@ struct RecoverKeySetSeedPhraseView: View {
                     CameraView(
                         viewModel: .init(
                             isPresented: $viewModel.isShowingQRScanner,
-                            onRecoveryComplete: viewModel.onCameraComplete
+                            bananaSplitQRCodeRecovery: .init(
+                                seedName: viewModel.seedName,
+                                onRecoveryComplete: viewModel.onCameraComplete(_:)
+                            )
                         )
                     )
                 }
