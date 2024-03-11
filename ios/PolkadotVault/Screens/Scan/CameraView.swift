@@ -377,7 +377,7 @@ extension CameraView {
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
             if let onRecoveryComplete {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.onRecoveryComplete?(completionAction)
+                    onRecoveryComplete(completionAction)
                     self.dismissView()
                 }
                 return

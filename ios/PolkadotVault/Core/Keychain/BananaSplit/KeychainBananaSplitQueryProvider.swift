@@ -50,7 +50,6 @@ final class KeychainBananaSplitQueryProvider: KeychainBananaSplitQueryProviding 
         case let .fetch(seedName):
             dictionary[kSecMatchLimit] = kSecMatchLimitOne
             dictionary[kSecAttrAccount] = backupName(seedName)
-            dictionary[kSecReturnAttributes] = false
             dictionary[kSecReturnData] = true
         case let .check(seedName):
             dictionary[kSecMatchLimit] = kSecMatchLimitOne
@@ -76,7 +75,6 @@ final class KeychainBananaSplitQueryProvider: KeychainBananaSplitQueryProviding 
         case let .fetch(seedName):
             dictionary[kSecMatchLimit] = kSecMatchLimitOne
             dictionary[kSecAttrAccount] = passphraseName(seedName)
-            dictionary[kSecReturnAttributes] = false
             dictionary[kSecReturnData] = true
         case let .delete(seedName):
             dictionary[kSecAttrAccount] = passphraseName(seedName)
