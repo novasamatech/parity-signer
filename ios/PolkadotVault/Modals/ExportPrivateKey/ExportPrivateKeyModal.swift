@@ -34,7 +34,7 @@ struct ExportPrivateKeyModal: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: animateDismissal)
+                        CircleButton(action: animateDismissal)
                     }
                     .padding([.leading], Spacing.large)
                     .padding([.trailing], Spacing.medium)

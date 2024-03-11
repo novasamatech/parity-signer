@@ -28,7 +28,7 @@ struct ManageKeySetsView: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.onClose)
+                        CircleButton(action: viewModel.onClose)
                     }
                     .padding(.bottom, Spacing.small)
                     // Spacer

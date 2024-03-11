@@ -262,16 +262,19 @@ extension CameraView {
         private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
         private let runtimePropertiesProvider: RuntimePropertiesProviding
+        private let onRecoveryComplete: ((CreateKeysForNetworksView.OnCompletionAction) -> Void)?
         private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
+            onRecoveryComplete: ((CreateKeysForNetworksView.OnCompletionAction) -> Void)? = nil,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService(),
             dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService(),
             runtimePropertiesProvider: RuntimePropertiesProviding = RuntimePropertiesProvider()
         ) {
             _isPresented = isPresented
+            self.onRecoveryComplete = onRecoveryComplete
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
@@ -372,6 +375,13 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            if let onRecoveryComplete {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.onRecoveryComplete?(completionAction)
+                    self.dismissView()
+                }
+                return
+            }
             let message: String =
                 switch completionAction {
                 case let .createKeySet(seedName):
@@ -384,6 +394,7 @@ extension CameraView {
                 style: .info
             )
             isSnackbarPresented = true
+            resumeCamera()
         }
 
         func onEnterPasswordDismissal() {

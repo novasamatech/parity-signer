@@ -29,7 +29,7 @@ struct ExportKeysSelectionModal: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.cancelAction)
+                        CircleButton(action: viewModel.cancelAction)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)
