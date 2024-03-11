@@ -95,7 +95,7 @@ private extension ExportMultipleKeysModal {
                 .foregroundColor(.textAndIconsPrimary)
                 .font(PrimaryFont.titleS.font)
             Spacer()
-            CloseModalButton(action: animateDismissal)
+            CircleButton(action: animateDismissal)
         }
     }
 }

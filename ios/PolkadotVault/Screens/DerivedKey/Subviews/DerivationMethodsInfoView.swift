@@ -23,7 +23,7 @@ struct DerivationMethodsInfoView: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.animateDismissal)
+                        CircleButton(action: viewModel.animateDismissal)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)

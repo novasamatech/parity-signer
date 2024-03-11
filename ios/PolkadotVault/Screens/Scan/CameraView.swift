@@ -128,6 +128,7 @@ struct CameraView: View {
         ) {
             EnterBananaSplitPasswordView(
                 viewModel: .init(
+                    seedName: viewModel.bananaSplitQRCodeRecovery?.seedName ?? "",
                     isPresented: $viewModel.isPresentingEnterBananaSplitPassword,
                     qrCodeData: model.bucket,
                     onCompletion: viewModel.onKeySetAddCompletion(_:)
@@ -262,16 +263,19 @@ extension CameraView {
         private let dynamicDerivationsService: DynamicDerivationsService
         private let seedsMediator: SeedsMediating
         private let runtimePropertiesProvider: RuntimePropertiesProviding
+        let bananaSplitQRCodeRecovery: BananaSplitQRCodeRecovery?
         private weak var cameraModel: CameraService?
 
         init(
             isPresented: Binding<Bool>,
+            bananaSplitQRCodeRecovery: BananaSplitQRCodeRecovery? = nil,
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
             scanService: ScanTabService = ScanTabService(),
             dynamicDerivationsService: DynamicDerivationsService = DynamicDerivationsService(),
             runtimePropertiesProvider: RuntimePropertiesProviding = RuntimePropertiesProvider()
         ) {
             _isPresented = isPresented
+            self.bananaSplitQRCodeRecovery = bananaSplitQRCodeRecovery
             self.seedsMediator = seedsMediator
             self.scanService = scanService
             self.dynamicDerivationsService = dynamicDerivationsService
@@ -372,6 +376,13 @@ extension CameraView {
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
+            if let onRecoveryComplete = bananaSplitQRCodeRecovery?.onRecoveryComplete {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    onRecoveryComplete(completionAction)
+                    self.dismissView()
+                }
+                return
+            }
             let message: String =
                 switch completionAction {
                 case let .createKeySet(seedName):
@@ -384,6 +395,7 @@ extension CameraView {
                 style: .info
             )
             isSnackbarPresented = true
+            resumeCamera()
         }
 
         func onEnterPasswordDismissal() {
