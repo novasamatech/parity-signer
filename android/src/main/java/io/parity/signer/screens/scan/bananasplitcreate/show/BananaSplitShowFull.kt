@@ -122,7 +122,6 @@ fun BananaSplitShowFull(
 					}
 				}
 			}
-			//todo dmitry close action not working?
 			password.value?.let { password ->
 				BottomSheetWrapperRoot(onClosedAction = closeAction) {
 					BananaSplitShowPassphraseMenu(

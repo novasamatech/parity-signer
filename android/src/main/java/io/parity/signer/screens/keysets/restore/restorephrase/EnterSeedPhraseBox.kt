@@ -80,7 +80,6 @@ fun EnterSeedPhraseBox(
 		modifier
 			.background(MaterialTheme.colors.fill6, innerShape)
 			.padding(8.dp)
-			//todo dmitry show keyboard
 //			.clickable { focusRequester.requestFocus() }
 	) {
 
