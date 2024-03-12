@@ -77,7 +77,6 @@ fun BananaSplitShowFull(
 					onRemoveBackup = {
 						menuNavController.navigate(BananaSplitShowMenu.ShowBSConfirmRemove) {
 							popUpTo(BananaSplitShowMenu.Empty)
-//							todo dmitry find out popupto(0) and if navigation is broken there, test this - if close is working
 						}
 					},
 				)
