@@ -503,7 +503,6 @@
 "Error.ApplicationUpdateRequired.Label.Info.Highlight" = "paritytech.github.io/parity-signer/tutorials/Upgrading.html";
 "Error.ApplicationUpdateRequired.Action.Backup" = "Backup Secret Phrase";
 
-
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
@@ -518,6 +517,8 @@
 "Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
 "Airgap.Label.Airplane" = "Enable Airplane Mode";
 "Airgap.Label.Wifi" = "Turn off WiFi Connection";
+"Airgap.Label.Location" = "Turn off Location Services";
+
 "Airgap.Label.Cables" = "Disconnect all cables";
 "Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
 "Airgap.Action.Next" = "Next";

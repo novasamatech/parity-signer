@@ -36,13 +36,13 @@ final class JailbreakDetectionPublisher: ObservableObject {
         self.fileManager = fileManager
         self.urlOpener = urlOpener
         self.processInfo = processInfo
-        guard runtimePropertiesProvider.runtimeMode == .production else { return }
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .map { _ in self.detectJailbreak() }
-            .switchToLatest()
-            .sink { self.isJailbroken = $0 }
-            .store(in: cancelBag)
+//        guard runtimePropertiesProvider.runtimeMode == .production else { return }
+//        NotificationCenter.default
+//            .publisher(for: UIApplication.didBecomeActiveNotification)
+//            .map { _ in self.detectJailbreak() }
+//            .switchToLatest()
+//            .sink { self.isJailbroken = $0 }
+//            .store(in: cancelBag)
     }
 }
 

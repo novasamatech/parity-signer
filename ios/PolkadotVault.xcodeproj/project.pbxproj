@@ -104,6 +104,9 @@
 		6D476A1B29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D476A1A29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift */; };
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
+		6D4CFFBB2BA1686A0061CC1B /* Blockies in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBA2BA1686A0061CC1B /* Blockies */; };
+		6D4CFFBD2BA1686E0061CC1B /* Jdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBC2BA1686E0061CC1B /* Jdenticon */; };
+		6D4CFFBF2BA168710061CC1B /* PolkadotIdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */; };
 		6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift */; };
 		6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */; };
 		6D4F779929CAECA500374C83 /* SignSpecsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779829CAECA500374C83 /* SignSpecsListView.swift */; };
@@ -133,11 +136,7 @@
 		6D57DC6C289E524800005C63 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6D57DC61289E524800005C63 /* Inter-Medium.otf */; };
 		6D57DC6E289E524800005C63 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6D57DC63289E524800005C63 /* Inter-SemiBold.otf */; };
 		6D5801D12899130E006C41D8 /* PathMonitorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */; };
-		6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */; };
 		6D5801D728991F11006C41D8 /* RuntimePropertiesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */; };
-		6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */; };
-		6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */; };
-		6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */; };
 		6D5DB5E82B3C61A200EF82AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5DB5E72B3C61A200EF82AB /* AppDelegate.swift */; };
 		6D5DB5EB2B3D1A9500EF82AB /* DevicePasscodeAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5DB5EA2B3D1A9500EF82AB /* DevicePasscodeAuthenticator.swift */; };
 		6D5DCA032A7CFA2E0050B101 /* ExportKeysSelectionModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */; };
@@ -160,11 +159,8 @@
 		6D71290E294C2A380048558C /* VerticalActionsBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D71290D294C2A380048558C /* VerticalActionsBottomModal.swift */; };
 		6D7129222952B7800048558C /* NetworkSettingsDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129212952B7800048558C /* NetworkSettingsDetails.swift */; };
 		6D7129252952C3D50048558C /* VerticalRoundedBackgroundContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7129242952C3D50048558C /* VerticalRoundedBackgroundContainer.swift */; };
-		6D749C5C2A6871BA0064D7E5 /* Blockies in Frameworks */ = {isa = PBXBuildFile; productRef = 6D749C5B2A6871BA0064D7E5 /* Blockies */; };
 		6D749C602A69C6020064D7E5 /* PolkadotIdenticonViewPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D749C5F2A69C6020064D7E5 /* PolkadotIdenticonViewPreviews.swift */; };
-		6D749C622A69CE2C0064D7E5 /* PolkadotIdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */; };
 		6D755C092A6FECCD00A73E20 /* JdenticonViewPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D755C082A6FECCD00A73E20 /* JdenticonViewPreviews.swift */; };
-		6D755C0B2A6FECE000A73E20 /* Jdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D755C0A2A6FECE000A73E20 /* Jdenticon */; };
 		6D77863C2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77863B2B626FD2009C8E73 /* CreateKeysForNetworksViewModelTests.swift */; };
 		6D77863F2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D77863E2B62FF6F009C8E73 /* EnterKeySetNameViewModelTests.swift */; };
 		6D7786412B630116009C8E73 /* MNewSeedBackup+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7786402B630116009C8E73 /* MNewSeedBackup+Generate.swift */; };
@@ -259,7 +255,6 @@
 		6DAFCAF82B0A360600DDD165 /* CameraPermissionHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAF72B0A360600DDD165 /* CameraPermissionHandlerTests.swift */; };
 		6DAFCAFA2B0AE5C000DDD165 /* KeychainSeedsAccessAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAF92B0AE5C000DDD165 /* KeychainSeedsAccessAdapterTests.swift */; };
 		6DAFCAFD2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAFC2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift */; };
-		6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */; };
 		6DAFCB022B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */; };
 		6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */; };
 		6DB2E7C12B4BBAF7002387DE /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB2E7C02B4BBAF7002387DE /* SettingsViewModelTests.swift */; };
@@ -285,7 +280,6 @@
 		6DBD2202289A8E1F005D539B /* ErrorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBD2201289A8E1F005D539B /* ErrorMock.swift */; };
 		6DBF6E2728E44DD700CC959F /* ErrorBottomModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */; };
 		6DBF6E2928E47EE000CC959F /* ErrorBottomModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */; };
-		6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */; };
 		6DBF6E4B28EC51D600CC959F /* GenericError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBF6E4A28EC51D600CC959F /* GenericError.swift */; };
 		6DC0FC98296695D000A45883 /* SeedKeysPreview+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */; };
 		6DC2EDF92B11961800298F00 /* DateFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC2EDF82B11961800298F00 /* DateFormatterTests.swift */; };
@@ -316,6 +310,7 @@
 		6DDD01D72B958372000F53B3 /* BananaSplitPassphraseModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD01D62B958372000F53B3 /* BananaSplitPassphraseModalViewModelTests.swift */; };
 		6DDD01D92B958845000F53B3 /* BananaSplitActionModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD01D82B958845000F53B3 /* BananaSplitActionModalViewModelTests.swift */; };
 		6DDD01DB2B9589B5000F53B3 /* BananaSplitQRCodeModalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD01DA2B9589B5000F53B3 /* BananaSplitQRCodeModalViewModelTests.swift */; };
+		6DDD01DE2B959BF3000F53B3 /* AirgapMediatorAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD01DD2B959BF3000F53B3 /* AirgapMediatorAssemblerTests.swift */; };
 		6DDD38B22B11C3C2000D2B62 /* SeedsMediatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B12B11C3C2000D2B62 /* SeedsMediatorTests.swift */; };
 		6DDD38B72B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B62B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift */; };
 		6DDD38B92B134ADF000D2B62 /* MKeyDetails+Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */; };
@@ -569,12 +564,8 @@
 		6D57DC61289E524800005C63 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
 		6D57DC63289E524800005C63 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
 		6D5801D02899130E006C41D8 /* PathMonitorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMonitorProtocol.swift; sourceTree = "<group>"; };
-		6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapter.swift; sourceTree = "<group>"; };
 		6D5801D628991F11006C41D8 /* RuntimePropertiesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProvider.swift; sourceTree = "<group>"; };
 		6D5801DC28992375006C41D8 /* PolkadotVaultTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PolkadotVaultTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAdapterTests.swift; sourceTree = "<group>"; };
-		6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssemblerTests.swift; sourceTree = "<group>"; };
-		6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMonitoringAssembler.swift; sourceTree = "<group>"; };
 		6D5DB5E72B3C61A200EF82AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D5DB5EA2B3D1A9500EF82AB /* DevicePasscodeAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePasscodeAuthenticator.swift; sourceTree = "<group>"; };
 		6D5DCA022A7CFA2E0050B101 /* ExportKeysSelectionModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportKeysSelectionModal.swift; sourceTree = "<group>"; };
@@ -693,7 +684,6 @@
 		6DAFCAF72B0A360600DDD165 /* CameraPermissionHandlerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPermissionHandlerTests.swift; sourceTree = "<group>"; };
 		6DAFCAF92B0AE5C000DDD165 /* KeychainSeedsAccessAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainSeedsAccessAdapterTests.swift; sourceTree = "<group>"; };
 		6DAFCAFC2B0AE87300DDD165 /* RuntimePropertiesProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimePropertiesProviderTests.swift; sourceTree = "<group>"; };
-		6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediatorTests.swift; sourceTree = "<group>"; };
 		6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatePublisherTests.swift; sourceTree = "<group>"; };
 		6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProtectionStatePublisherTests.swift; sourceTree = "<group>"; };
 		6DB2E7C02B4BBAF7002387DE /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
@@ -719,7 +709,6 @@
 		6DBD2201289A8E1F005D539B /* ErrorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMock.swift; sourceTree = "<group>"; };
 		6DBF6E2628E44DD700CC959F /* ErrorBottomModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModal.swift; sourceTree = "<group>"; };
 		6DBF6E2828E47EE000CC959F /* ErrorBottomModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBottomModalViewModel.swift; sourceTree = "<group>"; };
-		6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityMediator.swift; sourceTree = "<group>"; };
 		6DBF6E4A28EC51D600CC959F /* GenericError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericError.swift; sourceTree = "<group>"; };
 		6DC0FC97296695D000A45883 /* SeedKeysPreview+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SeedKeysPreview+Helpers.swift"; sourceTree = "<group>"; };
 		6DC2EDF82B11961800298F00 /* DateFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterTests.swift; sourceTree = "<group>"; };
@@ -751,6 +740,7 @@
 		6DDD01D62B958372000F53B3 /* BananaSplitPassphraseModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitPassphraseModalViewModelTests.swift; sourceTree = "<group>"; };
 		6DDD01D82B958845000F53B3 /* BananaSplitActionModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitActionModalViewModelTests.swift; sourceTree = "<group>"; };
 		6DDD01DA2B9589B5000F53B3 /* BananaSplitQRCodeModalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BananaSplitQRCodeModalViewModelTests.swift; sourceTree = "<group>"; };
+		6DDD01DD2B959BF3000F53B3 /* AirgapMediatorAssemblerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirgapMediatorAssemblerTests.swift; sourceTree = "<group>"; };
 		6DDD38B12B11C3C2000D2B62 /* SeedsMediatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedsMediatorTests.swift; sourceTree = "<group>"; };
 		6DDD38B62B1346C8000D2B62 /* KeyDetailsPublicKeyViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsPublicKeyViewModelTests.swift; sourceTree = "<group>"; };
 		6DDD38B82B134ADF000D2B62 /* MKeyDetails+Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKeyDetails+Generate.swift"; sourceTree = "<group>"; };
@@ -846,11 +836,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D755C0B2A6FECE000A73E20 /* Jdenticon in Frameworks */,
-				6D749C5C2A6871BA0064D7E5 /* Blockies in Frameworks */,
 				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
 				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
-				6D749C622A69CE2C0064D7E5 /* PolkadotIdenticon in Frameworks */,
+				6D4CFFBB2BA1686A0061CC1B /* Blockies in Frameworks */,
+				6D4CFFBD2BA1686E0061CC1B /* Jdenticon in Frameworks */,
+				6D4CFFBF2BA168710061CC1B /* PolkadotIdenticon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1416,7 +1406,7 @@
 				6DC5643128B68FB2003D540B /* Keychain */,
 				6DBD21F8289A7A14005D539B /* Database */,
 				6D5801D528991DA4006C41D8 /* Runtime */,
-				6D5801D22899132C006C41D8 /* Connectivity */,
+				6DD860E6299CAD030000D81E /* Airgap */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1432,16 +1422,6 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
-		6D5801D22899132C006C41D8 /* Connectivity */ = {
-			isa = PBXGroup;
-			children = (
-				6D5801D32899133A006C41D8 /* ConnectivityMonitoringAdapter.swift */,
-				6D5801E6289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift */,
-				6DBF6E4228EACB7B00CC959F /* ConnectivityMediator.swift */,
-			);
-			path = Connectivity;
-			sourceTree = "<group>";
-		};
 		6D5801D528991DA4006C41D8 /* Runtime */ = {
 			isa = PBXGroup;
 			children = (
@@ -1453,27 +1433,17 @@
 		6D5801DA2899235C006C41D8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6DDD01DC2B959BE7000F53B3 /* Airgap */,
 				6D686B9A2B45B35B007B7642 /* Authentication */,
 				6DAFCAFB2B0AE86C00DDD165 /* Runtime */,
 				6DAFCAF62B0A360600DDD165 /* Camera */,
 				6D8AF88028BCC4BF00CF0AB2 /* Keychain */,
 				6D57DC4E289D667000005C63 /* Navigation */,
-				6D5801DF289924A3006C41D8 /* Connectivity */,
 				6DAFCB012B0AEE4900DDD165 /* ApplicationStatePublisherTests.swift */,
 				6DAFCB032B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift */,
 				6DE1B8372B56C79300D299C1 /* JailbreakDetectionPublisherTests.swift */,
 			);
 			path = Core;
-			sourceTree = "<group>";
-		};
-		6D5801DF289924A3006C41D8 /* Connectivity */ = {
-			isa = PBXGroup;
-			children = (
-				6D5801E0289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift */,
-				6D5801E4289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift */,
-				6DAFCAFF2B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift */,
-			);
-			path = Connectivity;
 			sourceTree = "<group>";
 		};
 		6D5DB5E92B3D1A8700EF82AB /* Authentication */ = {
@@ -1834,8 +1804,9 @@
 		6D9921B3297EC1DA004891B6 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				6DD860E4299CAAA70000D81E /* NoAirgapView.swift */,
 				6DF07ADC29C1060D00C01DE8 /* SetUpNetworks */,
-				6DD860E6299CAD030000D81E /* Airgap */,
+				6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */,
 				6D9921B4297EC1E9004891B6 /* OnboardingAgreementsView.swift */,
 				6D7DF6532987ADEF00A8438E /* OnboardingState.swift */,
 				6D3A538D299B162F0004DDDD /* OnboardingScreenshotsView.swift */,
@@ -2088,8 +2059,6 @@
 		6DD860E6299CAD030000D81E /* Airgap */ = {
 			isa = PBXGroup;
 			children = (
-				6DD860E7299CAD140000D81E /* OnboadingAirgapView+Components.swift */,
-				6DD860E4299CAAA70000D81E /* NoAirgapView.swift */,
 				6DD860E9299CED3F0000D81E /* AirgapMediator.swift */,
 				6DA317C2299F6FF1005DD060 /* AirgapMediatorAssembler.swift */,
 			);
@@ -2139,6 +2108,14 @@
 				6DDD01DA2B9589B5000F53B3 /* BananaSplitQRCodeModalViewModelTests.swift */,
 			);
 			path = BananaSplit;
+			sourceTree = "<group>";
+		};
+		6DDD01DC2B959BE7000F53B3 /* Airgap */ = {
+			isa = PBXGroup;
+			children = (
+				6DDD01DD2B959BF3000F53B3 /* AirgapMediatorAssemblerTests.swift */,
+			);
+			path = Airgap;
 			sourceTree = "<group>";
 		};
 		6DDD38B42B1346BB000D2B62 /* Screens */ = {
@@ -2429,9 +2406,9 @@
 			name = PolkadotVault;
 			packageProductDependencies = (
 				6D971AC92942E79100121A36 /* QRCode */,
-				6D749C5B2A6871BA0064D7E5 /* Blockies */,
-				6D755C0A2A6FECE000A73E20 /* Jdenticon */,
-				6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */,
+				6D4CFFBA2BA1686A0061CC1B /* Blockies */,
+				6D4CFFBC2BA1686E0061CC1B /* Jdenticon */,
+				6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */,
 			);
 			productName = PolkadotVault;
 			productReference = 2DE72BBE26A588C7002BB752 /* Vault Dev.app */;
@@ -2811,7 +2788,6 @@
 				6DDD737C2940629D00F04CE7 /* LogsMoreActionsModal.swift in Sources */,
 				6DA08B8E29B615390027CFCB /* RecoverKeySetNameView.swift in Sources */,
 				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
-				6D5801E7289937C0006C41D8 /* ConnectivityMonitoringAssembler.swift in Sources */,
 				6DA08B9229B694A30027CFCB /* BackendConstants.swift in Sources */,
 				6D8045D728D06E6B00237F8C /* ViewModels+Stubs.swift in Sources */,
 				6DA317C3299F6FF1005DD060 /* AirgapMediatorAssembler.swift in Sources */,
@@ -2871,7 +2847,6 @@
 				6DB99039295E95E9001101DC /* NetworkCapsuleView.swift in Sources */,
 				6DFE588B297A5F09002BFDBF /* ApplicationStatePublisher.swift in Sources */,
 				6DA2ACA72939DBCE00AAEADC /* DateFormatter+Utils.swift in Sources */,
-				6D5801D42899133A006C41D8 /* ConnectivityMonitoringAdapter.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				6D476A1929FC05ED00326F74 /* AddKeySetUpNetworksStepOneView.swift in Sources */,
 				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
@@ -2924,7 +2899,6 @@
 				6DB9903D2962A619001101DC /* MTransaction+ImportDerivedKeys.swift in Sources */,
 				6DEB18EA2A0B8EEC0013995E /* Stubs+Signer.swift in Sources */,
 				6D17EF8328EDC951008626E9 /* Encryption+RawRepresentable.swift in Sources */,
-				6DBF6E4328EACB7B00CC959F /* ConnectivityMediator.swift in Sources */,
 				6D36CBBA2A55834B0001BB31 /* CreateDerivedKeyNameService.swift in Sources */,
 				6D7B44FE2979298700111D0E /* PrivacyPolicyView.swift in Sources */,
 				6DC5643928B7DED8003D540B /* KeychainSeedsQueryProvider.swift in Sources */,
@@ -2956,10 +2930,8 @@
 				6DE48E822B1F0B96003094D5 /* AutoMockable+J.generated.swift in Sources */,
 				6DE48E7E2B1F0B95003094D5 /* AutoMockable+X.generated.swift in Sources */,
 				6D9856752B717F3D002358D3 /* DerivationCheck+Generate.swift in Sources */,
-				6D5801E1289924AD006C41D8 /* ConnectivityMonitoringAdapterTests.swift in Sources */,
 				6D98566F2B716312002358D3 /* AddKeySetUpNetworksStepTwoViewModelTests.swift in Sources */,
 				6DE48E912B1F0B96003094D5 /* AutoMockable+H.generated.swift in Sources */,
-				6DAFCB002B0AEB7E00DDD165 /* ConnectivityMediatorTests.swift in Sources */,
 				6D9856712B7164CE002358D3 /* DerivationMethodsInfoViewModelTests.swift in Sources */,
 				6DE48E8E2B1F0B96003094D5 /* AutoMockable+B.generated.swift in Sources */,
 				6D2C78AC2B56D98F006431E3 /* SignSpecDetailsViewModelTests.swift in Sources */,
@@ -3029,8 +3001,8 @@
 				6D2C78B02B56EF55006431E3 /* SettingsBackupModalViewModelTests.swift in Sources */,
 				6D80EB522B4EB0B8009C544B /* MSufficientCryptoReady+Generate.swift in Sources */,
 				6DE48E8C2B1F0B96003094D5 /* AutoMockable+R.generated.swift in Sources */,
+				6DDD01DE2B959BF3000F53B3 /* AirgapMediatorAssemblerTests.swift in Sources */,
 				6DAB52EF2B5E81BB005FDBA8 /* LogNoteModalViewModelTests.swift in Sources */,
-				6D5801E5289937BA006C41D8 /* ConnectivityMonitoringAssemblerTests.swift in Sources */,
 				6DE07B102B450EB7001AF54C /* OnboardingMediatorTests.swift in Sources */,
 				6DE48E882B1F0B96003094D5 /* AutoMockable+N.generated.swift in Sources */,
 				6DAFCB042B0AEF6800DDD165 /* PasswordProtectionStatePublisherTests.swift in Sources */,
@@ -3141,6 +3113,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -3199,6 +3172,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -3234,7 +3208,6 @@
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";
 			};
@@ -3250,7 +3223,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PolkadotVault/Preview Content\"";
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				DEVELOPMENT_TEAM = HN8MSF5ULF;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
@@ -3266,11 +3239,10 @@
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
 				MARKETING_VERSION = 6.3.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.parity.-";
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";
 			};
@@ -3379,6 +3351,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = QA;
@@ -3413,7 +3386,6 @@
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";
 			};
@@ -3497,22 +3469,22 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6D4CFFBA2BA1686A0061CC1B /* Blockies */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Blockies;
+		};
+		6D4CFFBC2BA1686E0061CC1B /* Jdenticon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Jdenticon;
+		};
+		6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PolkadotIdenticon;
+		};
 		6D5DB5EF2B43F8A700EF82AB /* SwiftLintPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6DC1EF8B2AD55E4F009A2777 /* XCRemoteSwiftPackageReference "SwiftLint" */;
 			productName = "plugin:SwiftLintPlugin";
-		};
-		6D749C5B2A6871BA0064D7E5 /* Blockies */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Blockies;
-		};
-		6D749C612A69CE2C0064D7E5 /* PolkadotIdenticon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PolkadotIdenticon;
-		};
-		6D755C0A2A6FECE000A73E20 /* Jdenticon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Jdenticon;
 		};
 		6D971AC92942E79100121A36 /* QRCode */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -35,6 +35,10 @@ struct NoAirgapView: View {
                             Divider()
                             cell(.wifi, isChecked: viewModel.isWifiChecked)
                                 .padding(.top, Spacing.small)
+                                .padding(.bottom, Spacing.small)
+                            Divider()
+                            cell(.location, isChecked: viewModel.isLocationChecked)
+                                .padding(.top, Spacing.small)
                         }
                         .padding(Spacing.medium)
                     }
@@ -128,6 +132,8 @@ extension NoAirgapView {
         @Published var isActionDisabled: Bool = true
         @Published var isAirplaneModeChecked: Bool = false
         @Published var isWifiChecked: Bool = false
+        @Published var isLocationChecked: Bool = false
+        private let cancelBag = CancelBag()
         private let mode: Mode
         private let airgapMediator: AirgapMediating
         private let onActionTap: () -> Void
@@ -151,12 +157,17 @@ extension NoAirgapView {
             subscribeToUpdates()
         }
 
-        func subscribeToUpdates() {
-            airgapMediator.startMonitoringAirgap { [weak self] isAirplaneModeOn, isWifiOn in
-                self?.isAirplaneModeChecked = isAirplaneModeOn
-                self?.isWifiChecked = !isWifiOn
-                self?.updateActionState()
-            }
+        private func subscribeToUpdates() {
+            airgapMediator.airgapPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] airgapState in
+                    self?.isAirplaneModeChecked = airgapState.isAirplaneModeOn
+                    self?.isWifiChecked = !airgapState.isWifiOn
+                    self?.isLocationChecked = !airgapState.isLocationServiceEnabled
+                    self?.updateActionState()
+                }
+                .store(in: cancelBag)
+            airgapMediator.startMonitoringAirgap()
         }
 
         func onDoneTap() {
@@ -169,7 +180,10 @@ extension NoAirgapView {
         }
 
         private func updateActionState() {
-            isActionDisabled = !isCableCheckBoxSelected || !isWifiChecked || !isAirplaneModeChecked
+            isActionDisabled = !isCableCheckBoxSelected
+                || !isWifiChecked
+                || !isAirplaneModeChecked
+                || !isLocationChecked
         }
     }
 }

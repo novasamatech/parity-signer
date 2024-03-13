@@ -47,7 +47,7 @@ final class RuntimePropertiesProvider: RuntimePropertiesProviding {
     }
 
     var runtimeMode: ApplicationRuntimeMode {
-        ApplicationRuntimeMode(rawValue: appInformationContainer.appRuntimeMode) ?? .production
+        .production
     }
 
     var dynamicDerivationsEnabled: Bool {
