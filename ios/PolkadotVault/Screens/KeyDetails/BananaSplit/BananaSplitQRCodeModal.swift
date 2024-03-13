@@ -167,7 +167,6 @@ extension BananaSplitQRCodeModalView {
             }
             .previewLayout(.sizeThatFits)
             .preferredColorScheme(.dark)
-            .environmentObject(ConnectivityMediator())
         }
     }
 #endif

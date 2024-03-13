@@ -1,21 +1,21 @@
 //
-//  ConnectivityMonitoringAssemblerTests.swift
+//  AirgapMediatorAssemblerTests.swift
 //  PolkadotVaultTests
 //
-//  Created by Krzysztof Rodak on 02/08/2022.
+//  Created by Krzysztof Rodak on 04/03/2024.
 //
 
 @testable import PolkadotVault
 import XCTest
 
-final class ConnectivityMonitoringAssemblerTests: XCTestCase {
+final class AirgapMediatorAssemblerTests: XCTestCase {
     private var runtimePropertiesProvider: RuntimePropertiesProvidingMock!
-    private var subject: ConnectivityMonitoringAssembler!
+    private var subject: AirgapMediatorAssembler!
 
     override func setUp() {
         super.setUp()
         runtimePropertiesProvider = RuntimePropertiesProvidingMock()
-        subject = ConnectivityMonitoringAssembler(
+        subject = AirgapMediatorAssembler(
             runtimePropertiesProvider: runtimePropertiesProvider
         )
     }
@@ -28,7 +28,7 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         let result = subject.assemble()
 
         // Then
-        XCTAssertTrue(result is ConnectivityMonitoringStub)
+        XCTAssertTrue(result is AirgapMediatingStub)
     }
 
     func test_assemble_whenProduction_returnsSystemAdapter() {
@@ -39,7 +39,7 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         let result = subject.assemble()
 
         // Then
-        XCTAssertTrue(result is ConnectivityMonitoringAdapter)
+        XCTAssertTrue(result is AirgapMediator)
     }
 
     func test_assemble_whenQA_returnsSystemAdapter() {
@@ -50,6 +50,6 @@ final class ConnectivityMonitoringAssemblerTests: XCTestCase {
         let result = subject.assemble()
 
         // Then
-        XCTAssertTrue(result is ConnectivityMonitoringAdapter)
+        XCTAssertTrue(result is AirgapMediator)
     }
 }
