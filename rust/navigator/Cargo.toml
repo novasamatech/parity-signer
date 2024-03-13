@@ -12,7 +12,7 @@ hex = "0.4.3"
 lazy_static = "1.4.0"
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
-thiserror = "1.0.57"
+thiserror = "1.0.58"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = { version = "1.7.0", features = ["std"] }
