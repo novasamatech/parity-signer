@@ -104,9 +104,9 @@
 		6D476A1B29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D476A1A29FC05F500326F74 /* AddKeySetUpNetworksStepTwoView.swift */; };
 		6D4C0753289AC36100B2EE48 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0751289AC36100B2EE48 /* Fonts.swift */; };
 		6D4C0758289BD95500B2EE48 /* SFSymbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4C0757289BD95500B2EE48 /* SFSymbols.swift */; };
-		6D4CFFBB2BA1686A0061CC1B /* Blockies in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBA2BA1686A0061CC1B /* Blockies */; };
 		6D4CFFBD2BA1686E0061CC1B /* Jdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBC2BA1686E0061CC1B /* Jdenticon */; };
 		6D4CFFBF2BA168710061CC1B /* PolkadotIdenticon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */; };
+		6D4CFFC12BA16A450061CC1B /* Blockies in Frameworks */ = {isa = PBXBuildFile; productRef = 6D4CFFC02BA16A450061CC1B /* Blockies */; };
 		6D4F711929F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711829F913FC00729610 /* KeyDetailsPublicKeyViewRenderable.swift */; };
 		6D4F711B29F9142D00729610 /* PublicKeyDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F711A29F9142D00729610 /* PublicKeyDetailsService.swift */; };
 		6D4F779929CAECA500374C83 /* SignSpecsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4F779829CAECA500374C83 /* SignSpecsListView.swift */; };
@@ -836,9 +836,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D4CFFC12BA16A450061CC1B /* Blockies in Frameworks */,
 				6DEEA87E28AFBF5D00371ECA /* libsigner.a in Frameworks */,
 				6D971ACA2942E79100121A36 /* QRCode in Frameworks */,
-				6D4CFFBB2BA1686A0061CC1B /* Blockies in Frameworks */,
 				6D4CFFBD2BA1686E0061CC1B /* Jdenticon in Frameworks */,
 				6D4CFFBF2BA168710061CC1B /* PolkadotIdenticon in Frameworks */,
 			);
@@ -2406,9 +2406,9 @@
 			name = PolkadotVault;
 			packageProductDependencies = (
 				6D971AC92942E79100121A36 /* QRCode */,
-				6D4CFFBA2BA1686A0061CC1B /* Blockies */,
 				6D4CFFBC2BA1686E0061CC1B /* Jdenticon */,
 				6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */,
+				6D4CFFC02BA16A450061CC1B /* Blockies */,
 			);
 			productName = PolkadotVault;
 			productReference = 2DE72BBE26A588C7002BB752 /* Vault Dev.app */;
@@ -2441,7 +2441,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1530;
 				TargetAttributes = {
 					2DE72BBD26A588C7002BB752 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -3220,10 +3220,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = accent_pink300;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PolkadotVault/Preview Content\"";
-				DEVELOPMENT_TEAM = HN8MSF5ULF;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
@@ -3239,7 +3239,7 @@
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
 				MARKETING_VERSION = 6.3.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.parity.-";
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/PolkadotVault-Bridging-Header.h";
@@ -3469,10 +3469,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6D4CFFBA2BA1686A0061CC1B /* Blockies */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Blockies;
-		};
 		6D4CFFBC2BA1686E0061CC1B /* Jdenticon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Jdenticon;
@@ -3480,6 +3476,10 @@
 		6D4CFFBE2BA168710061CC1B /* PolkadotIdenticon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PolkadotIdenticon;
+		};
+		6D4CFFC02BA16A450061CC1B /* Blockies */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Blockies;
 		};
 		6D5DB5EF2B43F8A700EF82AB /* SwiftLintPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
