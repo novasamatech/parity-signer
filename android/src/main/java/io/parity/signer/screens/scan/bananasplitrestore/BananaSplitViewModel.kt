@@ -49,8 +49,9 @@ class BananaSplitViewModel() : ViewModel() {
 	private lateinit var qrCodeData: List<String>
 	private var invalidPasswordAttempts = 0
 
-	fun initState(qrCodeData: List<String>) {
+	fun initState(qrCodeData: List<String>, suggestedSeedName: String?) {
 		cleanState()
+		this._seedName.value = suggestedSeedName ?: ""
 		this.qrCodeData = qrCodeData
 		this.invalidPasswordAttempts = 0
 		_isWrongPasswordTerminal.value = false

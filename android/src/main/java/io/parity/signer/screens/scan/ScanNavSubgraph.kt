@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScanNavSubgraph(
 	onCloseCamera: Callback,
+	seedNameSuggestion: String?,
 	openKeySet:(seedName: String) -> Unit,
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
@@ -95,6 +96,7 @@ fun ScanNavSubgraph(
 					LocalErrorSheetModel(context = context, details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
+			suggestedSeedName = seedNameSuggestion,
 			onErrorWrongPassword = {
 				scanViewModel.errorWrongPassword.value = true
 				scanViewModel.bananaSplitPassword.value = null

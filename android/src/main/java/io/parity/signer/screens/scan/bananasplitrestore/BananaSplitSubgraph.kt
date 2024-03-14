@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 fun BananaSplitSubgraph(
 	qrData: List<String>,
 	onClose: Callback,
+	suggestedSeedName: String?,
 	onSuccess: (newSeed: String) -> Unit,
 	onErrorWrongPassword: Callback,
 	onCustomError: (errorText: String) -> Unit,
@@ -32,7 +33,7 @@ fun BananaSplitSubgraph(
 	val bananaViewModel: BananaSplitViewModel = viewModel()
 
 	DisposableEffect(qrData) {
-		bananaViewModel.initState(qrData)
+		bananaViewModel.initState(qrData, suggestedSeedName)
 		onDispose {
 			bananaViewModel.cleanState()
 		}
