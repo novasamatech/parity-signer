@@ -31,7 +31,7 @@ struct SettingsBackupModal: View {
                                 .font(PrimaryFont.titleS.font)
                         }
                         Spacer()
-                        CloseModalButton(action: viewModel.dismissModal)
+                        CircleButton(action: viewModel.dismissModal)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)

@@ -115,7 +115,7 @@ struct EnterBananaSplitPasswordView: View {
 extension EnterBananaSplitPasswordView {
     final class ViewModel: ObservableObject {
         @Binding var isPresented: Bool
-        @Published var seedName: String = ""
+        @Published var seedName: String
         @Published var password: String = ""
         @Published var isNameValid: Bool = true
         @Published var isPasswordValid: Bool = true
@@ -133,11 +133,13 @@ extension EnterBananaSplitPasswordView {
 
         init(
             seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
+            seedName: String = "",
             isPresented: Binding<Bool>,
             qrCodeData: [String],
             onCompletion: @escaping (CreateKeysForNetworksView.OnCompletionAction) -> Void
         ) {
             self.seedsMediator = seedsMediator
+            _seedName = .init(initialValue: seedName)
             self.onCompletion = onCompletion
             self.qrCodeData = qrCodeData
             _isPresented = isPresented

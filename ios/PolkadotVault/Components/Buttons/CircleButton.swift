@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-struct CloseModalButton: View {
+struct CircleButton: View {
+    private let image: ImageResource
     private let action: () -> Void
 
     init(
+        image: ImageResource = .xmarkButton,
         action: @escaping () -> Void
     ) {
+        self.image = image
         self.action = action
     }
 
@@ -24,7 +27,7 @@ struct CloseModalButton: View {
                     Circle()
                         .frame(width: Sizes.xmarkButtonDiameter, height: Sizes.xmarkButtonDiameter, alignment: .center)
                         .foregroundColor(.fill18)
-                    Image(.xmarkButton)
+                    Image(image)
                         .foregroundColor(.textAndIconsPrimary)
                 }
             }

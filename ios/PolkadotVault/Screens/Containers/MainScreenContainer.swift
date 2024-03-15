@@ -59,7 +59,7 @@ extension MainScreenContainer {
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let databaseVersionMediator: DatabaseVersionMediator
         private let appLaunchMediator: AppLaunchMediating
-        private let connectivityMediator: ConnectivityMediator
+        private let airgapMediator: AirgapMediating
 
         private let cancelBag = CancelBag()
         @Published var viewState: ViewState = .deviceLocked
@@ -73,14 +73,14 @@ extension MainScreenContainer {
             passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
             databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator(),
             appLaunchMediator: AppLaunchMediating = AppLaunchMediator(),
-            connectivityMediator: ConnectivityMediator = ServiceLocator.connectivityMediator
+            airgapMediator: AirgapMediating = ServiceLocator.airgapMediator
         ) {
             self.authenticationStateMediator = authenticationStateMediator
             self.onboardingMediator = onboardingMediator
             self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
             self.databaseVersionMediator = databaseVersionMediator
             self.appLaunchMediator = appLaunchMediator
-            self.connectivityMediator = connectivityMediator
+            self.airgapMediator = airgapMediator
             initialiseAppRun()
         }
 
@@ -94,15 +94,20 @@ extension MainScreenContainer {
 
 private extension MainScreenContainer.ViewModel {
     func initialiseAppRun() {
-        appLaunchMediator.finaliseInitialisation(connectivityMediator.isConnectivityOn) { result in
-            switch result {
-            case .success:
-                self.checkInitialState()
-            case let .failure(error):
-                self.presentableError = .alertError(message: error.localizedDescription)
-                self.isPresentingError = true
+        airgapMediator.isConnectedPublisher
+            .first()
+            .sink { [weak self] isConnected in
+                self?.appLaunchMediator.finaliseInitialisation(isConnected) { result in
+                    switch result {
+                    case .success:
+                        self?.checkInitialState()
+                    case let .failure(error):
+                        self?.presentableError = .alertError(message: error.localizedDescription)
+                        self?.isPresentingError = true
+                    }
+                }
             }
-        }
+            .store(in: cancelBag)
     }
 
     func checkInitialState() {
@@ -144,11 +149,11 @@ private extension MainScreenContainer.ViewModel {
         }
         .assign(to: \.viewState, on: self)
         .store(in: cancelBag)
-        connectivityMediator.$isConnectivityOn
-            .sink(receiveValue: { newValue in
-                guard !self.isPresentingNoAirgap, newValue else { return }
-                self.isPresentingNoAirgap = newValue
-            })
+        airgapMediator.isConnectedPublisher
+            .sink { [weak self] isConnected in
+                guard let self, !self.isPresentingNoAirgap else { return }
+                isPresentingNoAirgap = isConnected
+            }
             .store(in: cancelBag)
     }
 }

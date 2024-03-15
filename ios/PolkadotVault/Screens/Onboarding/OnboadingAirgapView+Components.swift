@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+enum AirgapComponent: Equatable, Hashable {
+    case aiplaneMode
+    case wifi
+    case location
+}
+
 extension AirgapComponent {
     var uncheckedForegroundColor: Color {
         .accentRed300
@@ -22,6 +28,8 @@ extension AirgapComponent {
             Localizable.Airgap.Label.airplane.string
         case .wifi:
             Localizable.Airgap.Label.wifi.string
+        case .location:
+            Localizable.Airgap.Label.location.string
         }
     }
 
@@ -31,6 +39,8 @@ extension AirgapComponent {
             Image(.airgapAirplaneError)
         case .wifi:
             Image(.airgapWifiError)
+        case .location:
+            Image(.airgapLocationError)
         }
     }
 
@@ -40,6 +50,8 @@ extension AirgapComponent {
             Image(.airgapAirplane)
         case .wifi:
             Image(.airgapWifi)
+        case .location:
+            Image(.airgapLocation)
         }
     }
 }

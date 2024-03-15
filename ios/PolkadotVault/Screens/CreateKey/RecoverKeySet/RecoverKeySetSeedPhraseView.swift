@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+struct BananaSplitQRCodeRecovery {
+    let seedName: String
+    let onRecoveryComplete: (CreateKeysForNetworksView.OnCompletionAction) -> Void
+}
+
 struct RecoverKeySetSeedPhraseView: View {
     private enum Constants {
         static let capsuleContainerID = "capsuleContainerID"
@@ -72,6 +77,11 @@ struct RecoverKeySetSeedPhraseView: View {
                         .padding(.top, Spacing.extraSmall)
                         .padding(.bottom, Spacing.extraExtraSmall)
                         Spacer()
+                        HStack(alignment: .center, spacing: 0) {
+                            Spacer()
+                            CircleButton(image: .qrCode, action: viewModel.didTapQRCode)
+                                .padding(Spacing.extraSmall)
+                        }
                     }
                     .frame(minHeight: 156)
                     .containerBackground(CornerRadius.small)
@@ -117,6 +127,23 @@ struct RecoverKeySetSeedPhraseView: View {
                         isShowingBottomAlert: $viewModel.isPresentingError
                     )
                     .clearModalBackground()
+                }
+                .fullScreenModal(
+                    isPresented: $viewModel.isShowingQRScanner,
+                    onDismiss: {
+                        focus = false
+                        viewModel.onCameraDismiss()
+                    }
+                ) {
+                    CameraView(
+                        viewModel: .init(
+                            isPresented: $viewModel.isShowingQRScanner,
+                            bananaSplitQRCodeRecovery: .init(
+                                seedName: viewModel.seedName,
+                                onRecoveryComplete: viewModel.onCameraComplete(_:)
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -226,9 +253,11 @@ extension RecoverKeySetSeedPhraseView {
         private var shouldSkipUpdate = false
         private let service: RecoverKeySetServicing
         private let onCompletion: (CreateKeysForNetworksView.OnCompletionAction) -> Void
+        private var flowCompleted: (CreateKeysForNetworksView.OnCompletionAction)?
         let seedName: String
         @Binding var isPresented: Bool
         @Published var isPresentingDetails: Bool = false
+        @Published var isShowingQRScanner: Bool = false
         @Published var isValidSeedPhrase: Bool = false
         @Published var seedPhraseGrid: [GridElement] = []
         @Published var userInput: String = Constants.invisibleNonEmptyCharacter
@@ -272,6 +301,25 @@ extension RecoverKeySetSeedPhraseView {
 
         func onGuessTap(_ guess: String) {
             seedPhraseDraft.append(guess)
+        }
+
+        func didTapQRCode() {
+            isShowingQRScanner = true
+        }
+
+        func onCameraComplete(_ onComplete: CreateKeysForNetworksView.OnCompletionAction) {
+            isShowingQRScanner = false
+            flowCompleted = onComplete
+        }
+
+        func onCameraDismiss() {
+            guard let flowCompleted else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                self.isPresented = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.onCompletion(flowCompleted)
+                }
+            }
         }
 
         func onUserInput(_ word: String) {

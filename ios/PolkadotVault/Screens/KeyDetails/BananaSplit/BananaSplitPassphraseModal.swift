@@ -21,7 +21,7 @@ struct BananaSplitPassphraseModal: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.dismissActionSheet)
+                        CircleButton(action: viewModel.dismissActionSheet)
                     }
                     Text(viewModel.passphrase)
                         .multilineTextAlignment(.leading)
