@@ -35,7 +35,7 @@ jobs:
           workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+        uses:                 baptiste0928/cargo-install@9f6037ed331dcf7da101461a20656273fa72abf0 # v3.1.0
         with:
           crate:              cargo-spellcheck
 
@@ -66,12 +66,12 @@ jobs:
           mdbook-version:     latest
 
       - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+        uses:                 baptiste0928/cargo-install@9f6037ed331dcf7da101461a20656273fa72abf0 # v3.1.0
         with:
           crate:              mdbook-linkcheck
 
       - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+        uses:                 baptiste0928/cargo-install@9f6037ed331dcf7da101461a20656273fa72abf0 # v3.1.0
         with:
           crate:              mdbook-mermaid
 
