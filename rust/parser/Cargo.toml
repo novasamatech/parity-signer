@@ -25,7 +25,7 @@ thiserror = "1.0.57"
 [dev-dependencies]
 pretty_assertions = "1"
 defaults = { path = "../defaults", default-features = false }
-subxt = { version = "0.27", default-features = false }
+subxt = { version = "0.31", default-features = false }
 
 [lib]
 name = "parser"

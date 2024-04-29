@@ -373,6 +373,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "blake2b_simd"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c2f0dc9a68c6317d884f97cc36cf5a3d20ba14ce404227df55e1af708ab04bc"
+dependencies = [
+ "arrayref",
+ "arrayvec 0.7.2",
+ "constant_time_eq",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -618,6 +629,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "constant_time_eq"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21a53c0a4d288377e7415b53dcfc3c04da5cdc2cc95c8d5ac178b58f0b861ad6"
+
+[[package]]
 name = "constants"
 version = "0.1.0"
 dependencies = [
@@ -787,8 +804,18 @@ version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b750cb3417fd1b327431a470f388520309479ab0bf5e323505daf0290cd3850"
 dependencies = [
- "darling_core",
- "darling_macro",
+ "darling_core 0.14.4",
+ "darling_macro 0.14.4",
+]
+
+[[package]]
+name = "darling"
+version = "0.20.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0209d94da627ab5605dcccf08bb18afa5009cfbef48d8a8b7d7bdbc79be25c5e"
+dependencies = [
+ "darling_core 0.20.3",
+ "darling_macro 0.20.3",
 ]
 
 [[package]]
@@ -806,14 +833,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "darling_core"
+version = "0.20.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "177e3443818124b357d8e76f53be906d60937f0d3a90773a664fa63fa253e621"
+dependencies = [
+ "fnv",
+ "ident_case",
+ "proc-macro2",
+ "quote",
+ "strsim",
+ "syn 2.0.29",
+]
+
+[[package]]
 name = "darling_macro"
 version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4aab4dbc9f7611d8b55048a3a16d2d010c2c8334e46304b40ac1cc14bf3b48e"
 dependencies = [
- "darling_core",
+ "darling_core 0.14.4",
  "quote",
  "syn 1.0.102",
+]
+
+[[package]]
+name = "darling_macro"
+version = "0.20.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "836a9bbc7ad63342d6d6e7b815ccab164bc77a2d95d84bc3117a8c0d5c98e2d5"
+dependencies = [
+ "darling_core 0.20.3",
+ "quote",
+ "syn 2.0.29",
 ]
 
 [[package]]
@@ -1173,7 +1225,6 @@ dependencies = [
  "cfg-if",
  "parity-scale-codec",
  "scale-info",
- "serde",
 ]
 
 [[package]]
@@ -3287,9 +3338,9 @@ dependencies = [
 
 [[package]]
 name = "scale-bits"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8dd7aca73785181cc41f0bbe017263e682b585ca660540ba569133901d013ecf"
+checksum = "036575c29af9b6e4866ffb7fa055dbf623fe7a9cc159b33786de6013a6969d89"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
@@ -3298,14 +3349,58 @@ dependencies = [
 
 [[package]]
 name = "scale-decode"
-version = "0.4.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d823d4be477fc33321f93d08fb6c2698273d044f01362dc27573a750deb7c233"
+checksum = "7789f5728e4e954aaa20cadcc370b99096fb8645fca3c9333ace44bb18f30095"
 dependencies = [
+ "derive_more",
  "parity-scale-codec",
+ "primitive-types",
  "scale-bits",
+ "scale-decode-derive",
  "scale-info",
- "thiserror",
+ "smallvec",
+]
+
+[[package]]
+name = "scale-decode-derive"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "27873eb6005868f8cc72dcfe109fae664cf51223d35387bc2f28be4c28d94c47"
+dependencies = [
+ "darling 0.14.4",
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.102",
+]
+
+[[package]]
+name = "scale-encode"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d70cb4b29360105483fac1ed567ff95d65224a14dd275b6303ed0a654c78de5"
+dependencies = [
+ "derive_more",
+ "parity-scale-codec",
+ "primitive-types",
+ "scale-bits",
+ "scale-encode-derive",
+ "scale-info",
+ "smallvec",
+]
+
+[[package]]
+name = "scale-encode-derive"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "995491f110efdc6bea96d6a746140e32bfceb4ea47510750a5467295a4707a25"
+dependencies = [
+ "darling 0.14.4",
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.102",
 ]
 
 [[package]]
@@ -3336,18 +3431,21 @@ dependencies = [
 
 [[package]]
 name = "scale-value"
-version = "0.6.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16a5e7810815bd295da73e4216d1dfbced3c7c7c7054d70fa5f6e4c58123fff4"
+checksum = "6538d1cc1af9c0baf401c57da8a6d4730ef582db0d330d2efa56ec946b5b0283"
 dependencies = [
+ "base58",
+ "blake2",
+ "derive_more",
  "either",
  "frame-metadata 15.1.0",
  "parity-scale-codec",
  "scale-bits",
  "scale-decode",
+ "scale-encode",
  "scale-info",
  "serde",
- "thiserror",
  "yap",
 ]
 
@@ -3793,16 +3891,16 @@ dependencies = [
 
 [[package]]
 name = "sp-core-hashing"
-version = "6.0.0"
+version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbc2d1947252b7a4e403b0a260f596920443742791765ec111daa2bbf98eff25"
+checksum = "2ee599a8399448e65197f9a6cee338ad192e9023e35e31f22382964c3c174c68"
 dependencies = [
- "blake2",
+ "blake2b_simd",
  "byteorder",
  "digest 0.10.7",
  "sha2 0.10.2",
  "sha3",
- "sp-std 6.0.0",
+ "sp-std 8.0.0",
  "twox-hash",
 ]
 
@@ -4006,9 +4104,9 @@ source = "git+https://github.com/paritytech/substrate#49734dd1d72a00b9d3b87ba397
 
 [[package]]
 name = "sp-std"
-version = "6.0.0"
+version = "8.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af0ee286f98455272f64ac5bb1384ff21ac029fbb669afbaf48477faff12760e"
+checksum = "53458e3c57df53698b3401ec0934bea8e8cfce034816873c0b0abbd83d7bac0d"
 
 [[package]]
 name = "sp-storage"
@@ -4205,28 +4303,28 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "subxt"
-version = "0.27.1"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54639dba6a113584083968b6a8f457dedae612abe1bd214762101ca29f12e332"
+checksum = "b9d140449e7d967b21b0ae386cdc6bd5933ade38613866bb40bb2c6df79638a4"
 dependencies = [
  "base58",
  "blake2",
  "derivative",
- "frame-metadata 15.1.0",
+ "either",
+ "frame-metadata 16.0.0",
  "futures",
- "getrandom 0.2.6",
  "hex",
  "impl-serde",
  "parity-scale-codec",
- "parking_lot 0.12.1",
  "primitive-types",
  "scale-bits",
  "scale-decode",
+ "scale-encode",
  "scale-info",
  "scale-value",
  "serde",
  "serde_json",
- "sp-core-hashing 6.0.0",
+ "sp-core-hashing 9.0.0",
  "subxt-macro",
  "subxt-metadata",
  "thiserror",
@@ -4235,47 +4333,47 @@ dependencies = [
 
 [[package]]
 name = "subxt-codegen"
-version = "0.27.1"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e86cb719003f1cedf2710a6e55ca4c37aba4c989bbd3b81dd1c52af9e4827e"
+checksum = "9af52575d54de7b9528601788f2876b41965e3e473d137c9c61c1ac35aeeaa3b"
 dependencies = [
- "darling",
- "frame-metadata 15.1.0",
+ "frame-metadata 16.0.0",
  "heck",
  "hex",
  "jsonrpsee 0.16.3",
  "parity-scale-codec",
- "proc-macro-error",
  "proc-macro2",
  "quote",
  "scale-info",
  "subxt-metadata",
- "syn 1.0.102",
+ "syn 2.0.29",
+ "thiserror",
  "tokio",
 ]
 
 [[package]]
 name = "subxt-macro"
-version = "0.27.1"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74c08de402a78c4c06c3ee3702c80e519efdcb65911348e018b6998d04404916"
+checksum = "afe9f7e2994a20ab9748a9a040a3fe96054faa219a60ed21af51b9ab9e5f7da6"
 dependencies = [
- "darling",
+ "darling 0.20.3",
  "proc-macro-error",
  "subxt-codegen",
- "syn 1.0.102",
+ "syn 2.0.29",
 ]
 
 [[package]]
 name = "subxt-metadata"
-version = "0.27.1"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2593ab5f53435e6352675af4f9851342607f37785d84c7a3fb3139550d3c35f0"
+checksum = "880017c466f66af10e1c9b28cfa4cb2e4f59ab1bfe0b0f7250f7aca6e9d593b0"
 dependencies = [
- "frame-metadata 15.1.0",
+ "frame-metadata 16.0.0",
  "parity-scale-codec",
  "scale-info",
- "sp-core-hashing 6.0.0",
+ "sp-core-hashing 9.0.0",
+ "thiserror",
 ]
 
 [[package]]
@@ -5434,9 +5532,9 @@ checksum = "09041cd90cf85f7f8b2df60c646f853b7f535ce68f85244eb6731cf89fa498ec"
 
 [[package]]
 name = "yap"
-version = "0.7.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fc77f52dc9e9b10d55d3f4462c3b7fc393c4f17975d641542833ab2d3bc26ef"
+checksum = "ff4524214bc4629eba08d78ceb1d6507070cc0bcbbed23af74e19e6e924a24cf"
 
 [[package]]
 name = "zeroize"
