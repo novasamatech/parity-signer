@@ -29,7 +29,7 @@ struct NetworkSelectionModal: View {
                             .foregroundColor(.textAndIconsPrimary)
                             .font(PrimaryFont.titleS.font)
                         Spacer()
-                        CloseModalButton(action: viewModel.resetAction)
+                        CircleButton(action: viewModel.resetAction)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)

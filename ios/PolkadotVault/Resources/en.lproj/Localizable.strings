@@ -105,8 +105,8 @@
 "KeySets.Label.Empty.Subtitle" = "Add a new Key Set to Store Keys and Sign Transactions";
 
 "KeySetsModal.Action.Export" = "Export Keys";
-"KeySetsModal.Action.Derive" = "Derive from Key";
-"KeySetsModal.Action.Backup" = "Backup Key Set";
+"KeySetsModal.Action.BananaSplit" = "Banana Split Backup";
+"KeySetsModal.Action.Backup" = "Manual Backup";
 "KeySetsModal.Action.Delete" = "Delete";
 
 "KeySetsModal.Confirmation.Label.Title" = "Forget this Key Set?";
@@ -503,7 +503,6 @@
 "Error.ApplicationUpdateRequired.Label.Info.Highlight" = "paritytech.github.io/parity-signer/tutorials/Upgrading.html";
 "Error.ApplicationUpdateRequired.Action.Backup" = "Backup Secret Phrase";
 
-
 "Error.LockedDevice.Label.Title" = "Please Unlock the App";
 "Error.LockedDevice.Label.Subtitle" = "The device has been locked owing to an authentication failure. Please unlock it to keep using the Polkadot Vault.";
 "Error.LockedDevice.Action.Unlock" = "Unlock the App";
@@ -518,6 +517,8 @@
 "Airgap.Label.Content" = "Please follow these steps to enable Air Gap mode and keep it permanently enabled.";
 "Airgap.Label.Airplane" = "Enable Airplane Mode";
 "Airgap.Label.Wifi" = "Turn off WiFi Connection";
+"Airgap.Label.Location" = "Turn off Location Services";
+
 "Airgap.Label.Cables" = "Disconnect all cables";
 "Airgap.Label.Cables.Confirmation" = "I confirm that all Cables are Disconnected";
 "Airgap.Action.Next" = "Next";
@@ -620,3 +621,27 @@
 "NoKeySets.Label.Subheader" = "Add a new key set or recover an existing one by entering the secret recovery phrase to get started";
 "NoKeySets.Action.Add" = "Add new Key Set";
 "NoKeySets.Action.Recover" = "Recover Key Set";
+
+"BananaSplitBackup.Label.Title" = "Banana Split Backup";
+"BananaSplitBackup.Label.Header" = "Backup your key set by turning the secret phrase into sharded QR codes with passphrase protection";
+"BananaSplitBackup.Label.Shards.Header" = "Number of QR Code Shards";
+"BananaSplitBackup.Label.Shards.Footer" = "%@ shards out of %@ to reconstruct";
+"BananaSplitBackup.Label.Passphrase.Header" = "Passphrase for the Recovery";
+"BananaSplitBackup.Label.Passphrase.Footer" = "Write down your passphrase. You'll need it to recover from Banana Split.";
+"BananaSplitBackup.Label.Passphrase.Info" = "Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.";
+"BananaSplitBackup.Action.Create" = "Create";
+"BananaSplitBackup.Error.CouldNotLoad" = "Banana Split Backup could not be loaded";
+
+"BananaSplitBackupQRCode.Label.Info" = "Scan this animated QR code into the bs.parity.io app to print QR code shards.";
+"BananaSplitBackupQRCode.Label.Info.Highlight" = "bs.parity.io";
+
+"BananaSplitActionModal.Action.Passphrase" = "Show Passphrase";
+"BananaSplitActionModal.Action.Remove" = "Remove Backup";
+"BananaSplitActionModal.Action.Cancel" = "Cancel";
+
+"BananaSplitPassphraseModal.Label.Header" = "Passphrase";
+"BananaSplitDeleteBackup.Label.Title" = "Remove Banana Split";
+"BananaSplitDeleteBackup.Label.Content" = "You can still use this backup if you have QR code shards printed and have passphrase written down on paper.";
+"BananaSplitDeleteBackup.Action.Cancel" = "Cancel";
+"BananaSplitDeleteBackup.Action.Remove" = "Remove";
+

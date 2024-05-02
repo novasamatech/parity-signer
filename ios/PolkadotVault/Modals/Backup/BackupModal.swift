@@ -53,7 +53,7 @@ struct BackupModal: View {
                                 .font(PrimaryFont.bodyM.font)
                         }
                         Spacer()
-                        CloseModalButton(action: animateDismissal)
+                        CircleButton(action: animateDismissal)
                     }
                     .padding(.leading, Spacing.large)
                     .padding(.trailing, Spacing.medium)

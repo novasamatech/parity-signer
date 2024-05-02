@@ -15,6 +15,13 @@ struct HorizontalActionsBottomModalViewModel {
     var mainActionStyle: ActionButtonStyle = .primaryDestructive()
     var alignment: HorizontalAlignment = .center
 
+    static let bananaSplitDeleteBackup = HorizontalActionsBottomModalViewModel(
+        title: Localizable.BananaSplitDeleteBackup.Label.title.string,
+        content: Localizable.BananaSplitDeleteBackup.Label.content.string,
+        dismissActionLabel: Localizable.BananaSplitDeleteBackup.Action.cancel.key,
+        mainActionLabel: Localizable.BananaSplitDeleteBackup.Action.remove.key
+    )
+
     static let forgetKeySet = HorizontalActionsBottomModalViewModel(
         title: Localizable.KeySetsModal.Confirmation.Label.title.string,
         content: Localizable.KeySetsModal.Confirmation.Label.content.string,
