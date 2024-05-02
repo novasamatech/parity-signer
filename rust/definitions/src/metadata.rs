@@ -460,7 +460,7 @@ pub struct AddressBookEntry {
 
 #[cfg(feature = "active")]
 impl AddressBookEntry {
-    /// Gets [`AddressBookEntry`] from from hot database tree `ADDRESS_BOOK`
+    /// Gets [`AddressBookEntry`] from hot database tree `ADDRESS_BOOK`
     /// (key, value) entry.  
     pub fn from_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
@@ -470,7 +470,7 @@ impl AddressBookEntry {
     }
 
     /// Gets network address book title and [`AddressBookEntry`] as a tuple from
-    /// from hot database tree `ADDRESS_BOOK` (key, value) entry.  
+    /// hot database tree `ADDRESS_BOOK` (key, value) entry.
     ///
     /// Network address book title **differs** from `title` in network specs.
     /// This is just a key in hot database `ADDRESS_BOOK`, and is not displayed
