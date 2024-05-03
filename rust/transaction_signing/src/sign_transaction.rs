@@ -35,6 +35,8 @@ impl SignatureAndChecksum {
     }
 }
 
+/// TODO avoid using ToString for business logic for hash/signature implementation.
+#[allow(clippy::to_string_trait_impl)]
 impl ToString for SignatureAndChecksum {
     fn to_string(&self) -> String {
         match self.signature_type {
