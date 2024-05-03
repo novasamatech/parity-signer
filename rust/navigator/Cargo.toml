@@ -24,7 +24,7 @@ log = "0.4"
 [dev-dependencies]
 pretty_assertions = "1"
 tempfile = "3.10"
-regex = { version = "1.10.3" }
+regex = { version = "1.10.4" }
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
 
 constants = { path = "../constants" }
