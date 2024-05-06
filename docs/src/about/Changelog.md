@@ -39,7 +39,7 @@ Transactions content is shown before signing; no hash signing is allowed, but si
 
 #### History feature
 
-The Vault now logs all operations it performs. It it important to remember that this is not log of account operations, but log of device history. This history could be cleared if needed, but not modified by other means. Detected presence of network connection is also logged.
+The Vault now logs all operations it performs. It is important to remember that this is not log of account operations, but log of device history. This history could be cleared if needed, but not modified by other means. Detected presence of network connection is also logged.
 
 #### N+1 derivation
 

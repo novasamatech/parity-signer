@@ -698,7 +698,7 @@
 //!
 //! Keys to be used in command line:
 //!
-//! - Key `--goal` followed by the type to to generate
+//! - Key `--goal` followed by the type to generate
 //!    - `qr` will generate only a png QR code
 //!    - `text` will generate only text file with hex-encoded update.
 //!    - default, i.e. if goal is not provided, both QR code and text file are generated.
@@ -742,7 +742,7 @@
 //!
 //! Keys to be used in command line:
 //!
-//! - Key `--goal` followed by the type to to generate
+//! - Key `--goal` followed by the type to generate
 //!    - `qr` will generate only a png QR code
 //!    - `text` will generate only text file with hex-encoded update.
 //!    - default, i.e. if goal is not provided, both QR code and text file are generated.
