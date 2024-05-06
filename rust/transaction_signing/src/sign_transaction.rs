@@ -35,6 +35,7 @@ impl SignatureAndChecksum {
     }
 }
 
+#[allow(clippy::to_string_trait_impl)]
 impl ToString for SignatureAndChecksum {
     fn to_string(&self) -> String {
         match self.signature_type {
