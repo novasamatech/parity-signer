@@ -779,7 +779,7 @@ pub fn update_modify_encryption_specs(
     specs.title =
         optional_signer_title_override.unwrap_or(format!("{}-{}", specs.name, encryption.show()));
 
-    specs.encryption = encryption.to_owned();
+    encryption.clone_into(&mut specs.encryption);
 
     Ok(())
 }
