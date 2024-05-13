@@ -321,9 +321,9 @@
 	<string name="transaction_error_network_already_added_title">%1$s Network has already been added</string>
 	<string name="transaction_error_network_already_added_subtitle"><![CDATA[Go to Settings > Networks to check all the added networks.]]></string>
 	<string name="transaction_error_no_metadata_for_network_title">Please download the %1$s Network Metadata</string>
-	<string name="transaction_error_no_metadata_for_network_subtitle">There’s no metadata downloaded for the Unique network on what you’re trying to sign the transaction</string>
-	<string name="transaction_error_outdated_metadata_title">Please update Your %1$s Network Metadata</string>
-	<string name="transaction_error_outdated_metadata_subtitle">Unique network\'s 3220 metadata is different to the 3219 data you\'re using in the app. Please update it to sign the transaction.</string>
+	<string name="transaction_error_no_metadata_for_network_subtitle">There is no metadata available for the network of the transaction you are trying to sign</string>
+	<string name="transaction_error_outdated_metadata_title">Please update the %1$s Network Metadata</string>
+	<string name="transaction_error_outdated_metadata_subtitle">The metadata of the transaction is of a newer version. Please update the metadata to be able to sign the transaction.</string>
 	<string name="transaction_error_unknown_network_title">Please add the Network you want to Transact in</string>
 	<string name="transaction_error_unknown_network_subtitle">You\'re trying to sign a transaction in a network which has not been added</string>
 	<string name="networks_screen_title">Networks</string>
