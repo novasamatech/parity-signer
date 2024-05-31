@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit
+package io.parity.signer.screens.scan.bananasplitrestore
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.parity.signer.domain.Callback
-import io.parity.signer.screens.scan.bananasplit.networks.RecoverKeysetSelectNetworkBananaFlowScreen
+import io.parity.signer.screens.scan.bananasplitrestore.networks.RecoverKeysetSelectNetworkBananaFlowScreen
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 fun BananaSplitSubgraph(
 	qrData: List<String>,
 	onClose: Callback,
+	suggestedSeedName: String?,
 	onSuccess: (newSeed: String) -> Unit,
 	onErrorWrongPassword: Callback,
 	onCustomError: (errorText: String) -> Unit,
@@ -32,7 +33,7 @@ fun BananaSplitSubgraph(
 	val bananaViewModel: BananaSplitViewModel = viewModel()
 
 	DisposableEffect(qrData) {
-		bananaViewModel.initState(qrData)
+		bananaViewModel.initState(qrData, suggestedSeedName)
 		onDispose {
 			bananaViewModel.cleanState()
 		}

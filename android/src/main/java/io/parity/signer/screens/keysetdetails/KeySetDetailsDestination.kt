@@ -8,7 +8,7 @@ import androidx.navigation.navArgument
 import io.parity.signer.ui.mainnavigation.CoreUnlockedNavSubgraph
 
 fun NavGraphBuilder.keySetDetailsDestination(
-	navController: NavController,
+	coreNavController: NavController,
 ) {
 	composable(
 		route = CoreUnlockedNavSubgraph.KeySet.route,
@@ -24,7 +24,7 @@ fun NavGraphBuilder.keySetDetailsDestination(
 
 		KeySetDetailsScreenSubgraph(
 			originalSeedName = seedName,
-			navController = navController,
+			coreNavController = coreNavController,
 		)
 	}
 }

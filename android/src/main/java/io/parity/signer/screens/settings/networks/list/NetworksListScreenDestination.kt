@@ -37,7 +37,7 @@ fun NavGraphBuilder.networkListDestination(
 					)
 				},
 				onNetworkHelp = { navController.navigate(CoreUnlockedNavSubgraph.networkHelpers) },
-				onAddNetwork = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+				onAddNetwork = { navController.navigate(CoreUnlockedNavSubgraph.Camera.destination(null)) },
 			)
 		}
 	}

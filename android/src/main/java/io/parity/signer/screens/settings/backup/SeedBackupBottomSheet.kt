@@ -64,7 +64,7 @@ private fun SeedBackupBottomSheet(
 		//header
 		BottomSheetHeader(
 			title = seedName,
-			onCloseClicked = onClose,
+			onClose = onClose,
 		)
 		SignerDivider(sidePadding = 24.dp)
 		Column(
