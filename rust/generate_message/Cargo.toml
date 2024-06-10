@@ -16,7 +16,7 @@ jsonrpsee = {version = "0.20.3", features = ["ws-client"]}
 lazy_static = "1.4.0"
 parity-scale-codec = "3.6.9"
 qrcode_rtx = {path = "../qrcode_rtx"}
-regex = "1.10.3"
+regex = "1.10.5"
 serde_json = "1.0.114"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
