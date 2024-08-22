@@ -23,7 +23,7 @@ You can create accounts in Substrate-based networks, sign messages/transactions,
 
 You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.
 
-☝️ **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](https://paritytech.github.io/parity-signer/about/Security-And-Privacy.html) for more details.**
+☝️ **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](https://novasamatech.github.io/parity-signer/about/Security-And-Privacy.html) for more details.**
 
 Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
@@ -34,7 +34,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 # Links
 
 - [Official Website](https://signer.parity.io/)
-- [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
+- [Docs](https://novasamatech.github.io/parity-signer/index.html) — auto-generated documentation for end users
 - [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
 - [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
 - [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
@@ -177,7 +177,7 @@ We don't have test for UIs for now (other than navigation which is handled on ru
 
 # Bugs and Feedback
 
-If you found a bug or want to propose an improvement, please open [an issue](https://github.com/paritytech/parity-signer/issues).
+If you found a bug or want to propose an improvement, please open [an issue](https://github.com/novasamatech/parity-signer/issues).
 
 Try to create bug reports that are:
 
