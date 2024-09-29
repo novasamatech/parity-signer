@@ -51,7 +51,7 @@ internal fun SignSpecsResultBottomSheet(
 	) {
 		BottomSheetHeader(
 			title = stringResource(R.string.sign_specs_result_title),
-			onCloseClicked = onBack
+			onClose = onBack
 		)
 		Box(
 			modifier = Modifier

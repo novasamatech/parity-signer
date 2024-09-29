@@ -68,7 +68,7 @@ private fun KeySetBackupBottomSheet(
 		BottomSheetHeader(
 			title = model.seedName,
 			subtitile = model.seedBase58.abbreviateString(BASE58_STYLE_ABBREVIATE),
-			onCloseClicked = onClose,
+			onClose = onClose,
 		)
 		SignerDivider(sidePadding = 24.dp)
 		Column(

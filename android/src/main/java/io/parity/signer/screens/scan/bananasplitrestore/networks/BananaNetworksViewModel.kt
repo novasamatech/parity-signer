@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit.networks
+package io.parity.signer.screens.scan.bananasplitrestore.networks
 
 import androidx.lifecycle.ViewModel
 import io.parity.signer.dependencygraph.ServiceLocator

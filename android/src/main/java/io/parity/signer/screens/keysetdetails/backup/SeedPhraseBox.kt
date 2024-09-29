@@ -2,6 +2,8 @@ package io.parity.signer.screens.keysetdetails.backup
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -20,9 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.SizeMode
 import io.parity.signer.R
 import io.parity.signer.domain.KeepScreenOn
 import io.parity.signer.domain.DisableScreenshots
@@ -46,14 +45,13 @@ internal val PhraseWordStyle: TextStyle = TextStyle(
 	fontSize = 13.sp
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SeedPhraseBox(seedPhrase: String) {
 	val innerRound = dimensionResource(id = R.dimen.innerFramesCornerRadius)
 	val innerShape =
 		RoundedCornerShape(innerRound, innerRound, innerRound, innerRound)
 	FlowRow(
-		mainAxisSize = SizeMode.Expand,
-		mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
 		modifier = Modifier
 			.padding(horizontal = 16.dp)
 			.padding(top = 8.dp, bottom = 16.dp)

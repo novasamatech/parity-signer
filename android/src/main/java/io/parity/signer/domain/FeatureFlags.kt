@@ -13,7 +13,7 @@ object FeatureFlags {
 			FeatureOption.EXPORT_SECRET_KEY -> false //unused
 			FeatureOption.FAIL_DB_VERSION_CHECK -> false
 			FeatureOption.SKIP_USB_CHECK -> true
-
+			FeatureOption.CREATE_BANANA_SPLIT_ENABLED -> true
 		}
 	}
 
@@ -23,6 +23,7 @@ object FeatureFlags {
 
 enum class FeatureOption {
 	FAIL_DB_VERSION_CHECK,
+	CREATE_BANANA_SPLIT_ENABLED,
 	SKIP_UNLOCK_FOR_DEVELOPMENT,
 	SKIP_ROOTED_CHECK_EMULATOR,
 	SKIP_USB_CHECK,

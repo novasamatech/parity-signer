@@ -19,6 +19,7 @@ import io.parity.signer.uniffi.ErrorDisplayed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -42,6 +43,9 @@ class KeySetDetailsViewModel : ViewModel() {
 		)
 	val networkState: StateFlow<NetworkState> =
 		networkExposedStateKeeper.airGapModeState
+
+	private val _shownSeedName: MutableStateFlow<String?> = MutableStateFlow(null)
+	val shownSeedName: StateFlow<String?> = _shownSeedName.asStateFlow()
 
 	private val fullScreenState =
 		MutableStateFlow<OperationResult<KeySetDetailsScreenState, ErrorDisplayed>>(
@@ -83,16 +87,15 @@ class KeySetDetailsViewModel : ViewModel() {
 			initialValue = fullScreenState.value,
 		)
 
-
 	private suspend fun getKeySetDetails(requestedSeedName: String?): OperationResult<KeySetDetailsScreenState, ErrorDisplayed> {
 		if (requestedSeedName != null) {
 			preferencesRepository.setLastSelectedSeed(requestedSeedName)
 		}
 
-		val seedName =
+		_shownSeedName.value =
 			requestedSeedName ?: preferencesRepository.getLastSelectedSeed()
 
-		val result = seedName?.let { seedName ->
+		val result = shownSeedName.value?.let { seedName ->
 			uniffiInteractor.keySetBySeedName(seedName)
 				.mapInner {
 					KeySetDetailsScreenState.Data(
