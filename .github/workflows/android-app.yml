@@ -133,7 +133,7 @@ jobs:
           ./gradlew clean assembleDebug --stacktrace
 
       - name:           Upload Gplay unsigned APKs
-        uses:           actions/upload-artifact@v3
+        uses:           actions/upload-artifact@v4
         with:
           name:         signer-debug-unsigned
           path:         |
