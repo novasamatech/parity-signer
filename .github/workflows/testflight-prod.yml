@@ -5,7 +5,7 @@ on:
 
 jobs:
   distribute_testflight:
-    if: contains('["krodak","ERussel"]', github.actor)
+    if: contains('["krodak","ERussel","stepanLav"]', github.actor)
     runs-on:                  macos-13
     name:                     Distribute TestFlight Production Build
 
