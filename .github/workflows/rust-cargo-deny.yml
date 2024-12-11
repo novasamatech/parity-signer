@@ -1,5 +1,9 @@
 name:                     Check cargo deny
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
   push:
