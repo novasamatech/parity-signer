@@ -27,6 +27,7 @@ fn assist(a: String, decimals: u8, order: u8) -> (String, Option<String>, i8) {
 
 /// Input `balance` has to be a printed number. Likely `u128` or `u64`.
 /// Validity of input is checked elsewhere.
+
 pub fn convert_balance_pretty(balance: &str, decimals: u8, units: &str) -> PrettyOutput {
     let order = (balance.len() as u8) - 1;
 
