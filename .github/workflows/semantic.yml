@@ -1,11 +1,18 @@
 name:                         Semantic PR
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request_target:
     types:
       - opened
       - edited
       - synchronize
+
+permissions:
+  pull-requests: write
 
 jobs:
   main:
