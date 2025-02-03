@@ -16,7 +16,6 @@ struct TransactionCardSelector: View {
             TCAuthorPlain(value: value)
         case let .authorPublicKeyCard(value): // Not present on new designs
             TCAuthorPublicKey(value: value)
-
         // Foldable Markdown values on tap
         case let .callCard(value): // This is used to present `Method` and provides details on tap
             TCCall(value: value)
@@ -26,7 +25,6 @@ struct TransactionCardSelector: View {
             TCFieldName(value: value)
         case let .fieldNumberCard(value):
             TCFieldNumber(value: value)
-
         // Sections
         case let .newSpecsCard(value): // User when adding new network, redesigned
             TCAddNewNetwork(value: value)
@@ -39,13 +37,11 @@ struct TransactionCardSelector: View {
         case let .txSpecPlainCard(value): // Unknown network information for given transaction, not present on new
             // designs
             TCTXSpecPlain(content: value)
-
         // Error handling
         case let .errorCard(text):
             TCError(text: text)
         case let .warningCard(text):
             TCWarning(text: text)
-
         // Simple values with identicons / icons / markdown
         case let .networkInfoCard(value): // Not present in new designs
             TCNetworkInfo(content: value)
@@ -53,7 +49,6 @@ struct TransactionCardSelector: View {
             TCTypesInfo(content: value)
         case let .textCard(text): // Markdown text field, not present on new designs
             TCText(text: text)
-
         // Simple values - redesigned
         case let .authorCard(author):
             TCNamedValueCard(name: Localizable.TCName.from.string, value: author.base58, valueInSameLine: false)
