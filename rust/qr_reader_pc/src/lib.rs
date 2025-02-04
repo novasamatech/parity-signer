@@ -15,6 +15,7 @@ use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Read
 use opencv::{
     highgui,
     imgproc::{cvt_color, COLOR_BGR2GRAY},
+    core::{AlgorithmHint},
     prelude::*,
     videoio,
     videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
@@ -123,7 +124,7 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Gr
     let mut image: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     let mut ocv_gray_image = Mat::default();
 
-    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
+    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0, AlgorithmHint::ALGO_HINT_DEFAULT)?;
 
     for y in 0..ocv_gray_image.rows() {
         for x in 0..ocv_gray_image.cols() {
