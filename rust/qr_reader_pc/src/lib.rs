@@ -15,7 +15,7 @@ use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Read
 use opencv::{
     highgui,
     imgproc::{cvt_color, COLOR_BGR2GRAY},
-    core::{AlgorithmHint},
+    core::AlgorithmHint,
     prelude::*,
     videoio,
     videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH},
