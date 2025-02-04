@@ -22,7 +22,7 @@ struct SecurePrimaryTextField: View {
     var onCommit: (() -> Void) = {}
 
     var body: some View {
-        ZStack(alignment: .trailing) {
+			HStack(alignment: .center, spacing: Spacing.minimal) {
             ZStack {
                 SecureField("", text: $text, onCommit: {
                     onCommit()
@@ -39,7 +39,7 @@ struct SecurePrimaryTextField: View {
                 .focused($focusedField, equals: .plain)
                 .opacity(isSecured ? 0 : 1)
             }
-            .primaryTextFieldStyle(placeholder, text: $text, isValid: $isValid)
+						.plainTextFieldStyle(placeholder, text: $text, isValid: $isValid)
             .onChange(of: text) { _ in
                 isValid = true
             }
@@ -50,9 +50,10 @@ struct SecurePrimaryTextField: View {
                 }
             ) {
                 Image(isSecured ? .showPassword : .hidePassword)
-                    .padding(.trailing, Spacing.medium)
                     .foregroundColor(.textAndIconsTertiary)
             }
         }
+        .padding(.horizontal, Spacing.medium)
+        .containerBackground(CornerRadius.small, state: isValid ? .standard : .error)
     }
 }
