@@ -1,5 +1,5 @@
 //
-//  SecuredTextField.swift
+//  PlainTextField.swift
 //  Polkadot Vault
 //
 //  Created by Ruslan Rezin on 03/02/2025.
