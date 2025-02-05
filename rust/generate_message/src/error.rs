@@ -530,6 +530,7 @@ impl std::fmt::Display for Changed {
 ///
 /// Expected to receive data in hexadecimal format, got something different.
 /// [`NotHexActive`] specifies what was expected.
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum NotHexActive {
     /// Network genesis hash, fetched through RPC call.
