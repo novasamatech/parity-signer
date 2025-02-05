@@ -1,0 +1,21 @@
+[package]
+name = "extrinsic_proof"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+array-bytes = { version = "6.2.2", default-features = false }
+hex = "0.4.3"
+blake3 = { version = "1.5.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.6.9", features = [ "derive" ], default-features = false }
+frame-metadata = { version = "16.0.0", features = [ "current" ], default-features = false }
+scale-decode = { version = "0.13.0", default-features = false }
+scale-info = { version = "2.10.0", default-features = false }
+
+[dev-dependencies]
+pretty_assertions = "1"
+
+[lib]
+name = "extrinsic_proof"
+crate-type = ["lib"]
