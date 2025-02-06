@@ -11,28 +11,49 @@ extension KeyDetailsView {
     @ViewBuilder
     func derivedKeysList() -> some View {
         ScrollView(showsIndicators: false) {
+            VStack(spacing: 0) {
+                // Main key cell
+                rootKeyHeader()
+                // Derived Keys header
+                derivedKeysHeader()
+                // List
+                derivedKeys()
+            }
+        }
+    }
+
+    @ViewBuilder
+    func emptyKeysList() -> some View {
+        VStack(spacing: 0) {
             // Main key cell
             rootKeyHeader()
             // Derived Keys header
-            HStack {
-                Localizable.KeyDetails.Label.derived.text
-                    .font(PrimaryFont.bodyM.font)
-                Spacer().frame(maxWidth: .infinity)
-                Image(.switches)
-                    .foregroundColor(
-                        viewModel.isFilteringActive ? .accentPink300 : .textAndIconsTertiary
-                    )
-                    .frame(width: Heights.actionSheetButton)
-                    .onTapGesture {
-                        viewModel.onNetworkSelectionTap()
-                    }
-            }
-            .foregroundColor(.textAndIconsTertiary)
-            .padding(.horizontal, Spacing.large)
-            .padding(.top, Spacing.medium)
-            // List
-            derivedKeys()
+            derivedKeysHeader()
+            Spacer()
+            // Empty state
+            emptyState()
+            Spacer()
         }
+    }
+
+    @ViewBuilder
+    func derivedKeysHeader() -> some View {
+        HStack {
+            Localizable.KeyDetails.Label.derived.text
+                .font(PrimaryFont.bodyM.font)
+            Spacer().frame(maxWidth: .infinity)
+            Image(.switches)
+                .foregroundColor(
+                    viewModel.isFilteringActive ? .accentPink300 : .textAndIconsTertiary
+                )
+                .frame(width: Heights.actionSheetButton)
+                .onTapGesture {
+                    viewModel.onNetworkSelectionTap()
+                }
+        }
+        .foregroundColor(.textAndIconsTertiary)
+        .padding(.horizontal, Spacing.large)
+        .padding(.top, Spacing.medium)
     }
 
     @ViewBuilder
