@@ -9,7 +9,21 @@ import SwiftUI
 
 extension KeyDetailsView {
     @ViewBuilder
-    func emptyState() -> some View {
+    func emptyKeysList() -> some View {
+        VStack(spacing: 0) {
+            // Main key cell
+            rootKeyHeader()
+            // Derived Keys header
+            listHeader()
+            Spacer()
+            // Empty state
+            emptyState()
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func emptyState() -> some View {
         VStack(spacing: 0) {
             Localizable.KeyDetails.Label.EmptyState.header.text
                 .font(PrimaryFont.titleM.font)
