@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 definitions = {path = "../definitions", default-features = false, optional = true}
 lazy_static = {version = "1.4.0", optional = true}
-regex = {version = "1.10.3", optional = true}
+regex = {version = "1.10.5", optional = true}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 thiserror = "1.0.57"
