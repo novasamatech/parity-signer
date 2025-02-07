@@ -1130,6 +1130,7 @@ dependencies = [
  "frame-metadata 16.0.0",
  "hex",
  "parity-scale-codec",
+ "parser",
  "pretty_assertions",
  "scale-decode 0.13.1",
  "scale-info",

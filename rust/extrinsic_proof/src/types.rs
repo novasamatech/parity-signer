@@ -1,4 +1,44 @@
 use codec::{Compact, Encode, Decode};
+use core::cmp::Ordering;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TypeId {
+	Enumeration { type_id: u32, variant: u32 },
+	Other(u32),
+}
+
+impl TypeId {
+	/// Returns the actual `type_id`.
+	pub fn type_id(&self) -> u32 {
+		match self {
+			Self::Enumeration { type_id, .. } => *type_id,
+			Self::Other(id) => *id,
+		}
+	}
+}
+
+impl PartialOrd for TypeId {
+	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+		Some(self.cmp(other))
+	}
+}
+
+impl Ord for TypeId {
+	fn cmp(&self, other: &Self) -> Ordering {
+		match (self, other) {
+			(
+				Self::Enumeration { type_id, variant },
+				Self::Enumeration { type_id: type_id_o, variant: variant_o },
+			) =>
+				if type_id == type_id_o {
+					variant.cmp(variant_o)
+				} else {
+					type_id.cmp(type_id_o)
+				},
+			(s, o) => s.type_id().cmp(&o.type_id()),
+		}
+	}
+}
 
 /// A reference to a type in the registry.
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Debug, Encode, Decode, Default, Copy)]
@@ -202,7 +242,7 @@ pub struct ExtraInfo {
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub struct MetadataProof {
-    proof: Proof,
-    extrinsic: ExtrinsicMetadata,
-    extra_info: ExtraInfo,
+    pub proof: Proof,
+    pub extrinsic: ExtrinsicMetadata,
+    pub extra_info: ExtraInfo,
 }
