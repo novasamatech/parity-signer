@@ -9,3 +9,4 @@ mod tests;
 
 mod visitor;
 mod extrinsic_decoder;
+mod state_machine;

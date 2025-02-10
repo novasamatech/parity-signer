@@ -1126,14 +1126,17 @@ name = "extrinsic_proof"
 version = "0.1.0"
 dependencies = [
  "array-bytes 6.2.3",
+ "bitvec",
  "blake3",
  "frame-metadata 16.0.0",
  "hex",
+ "num-bigint",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
  "scale-decode 0.13.1",
  "scale-info",
+ "transaction_parsing",
 ]
 
 [[package]]

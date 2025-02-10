@@ -1,6 +1,7 @@
 // The code is adopted from https://github.com/Zondax/merkleized-metadata/blob/main/src/extrinsic_decoder.rs
 
 use core::sync::atomic::AtomicUsize;
+use std::path;
 
 use alloc::{
 	collections::{BTreeMap, BTreeSet},
@@ -8,7 +9,14 @@ use alloc::{
 	string::String,
 	vec::Vec,
 };
+
+use bitvec::{
+	prelude::BitVec,
+};
+
 use codec::{Compact, Decode, Input};
+use parser::{cards, decoding_commons::OutputCard};
+use parser::cards::ParserCard;
 use scale_decode::{
 	ext::scale_type_resolver::{
 		BitsOrderFormat, BitsStoreFormat, Primitive as RPrimitive, ResolvedTypeVisitor, Variant,
@@ -17,11 +25,11 @@ use scale_decode::{
 	Field, Visitor,
 };
 
+use num_bigint::{BigInt, BigUint};
+
 use crate::{
   types::{Type, TypeDef, TypeRef, TypeId}
 };
-
-use parser::decoding_commons::OutputCard;
 
 
 /// Decoding happens recursively and we need some upper bound to stop somewhere
@@ -152,136 +160,186 @@ impl scale_decode::TypeResolver for TypeResolver {
 	}
 }
 
-#[derive(Clone, Default)]
-pub struct CollectOutputCards {
-	pub cards: Vec<OutputCard>,
+fn path_to_string<'a>(path_iterator: impl Iterator<Item = &'a str>) -> String {
+	path_iterator.collect::<Vec<_>>().join(" >> ")
 }
 
-impl Visitor for CollectOutputCards {
+#[derive(Clone, Default)]
+pub struct CallCardsParser {
+	pub cards: Vec<OutputCard>,
+	pub indent: u32
+}
+
+impl CallCardsParser {
+	fn append_default_card( &mut self, value: String) {
+		let output = OutputCard {
+			card: ParserCard::Default(value),
+			indent: self.indent
+		};
+	
+		self.cards.push(output);
+	}
+
+	fn inc_indent(&mut self) {
+		self.indent += 1;
+	}
+
+	fn dec_indent(&mut self) {
+		self.indent -= 1;
+	}
+}
+
+impl Visitor for CallCardsParser {
 	type TypeResolver = TypeResolver;
 	type Value<'scale, 'resolver> = Self;
 	type Error = DecodeError;
 
 	fn visit_bool<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: bool,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_char<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: char,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u8<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: u8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u16<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: u16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u32<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: u32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u64<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: u64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u128<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: u128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_u256<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		let target_value = BigUint::from_bytes_le(_value);
+		self.append_default_card(target_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i8<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: i8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i16<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: i16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i32<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: i32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i64<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: i64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i128<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: i128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		self.append_default_card(_value.to_string());
+
 		Ok(self)
 	}
 
 	fn visit_i256<'scale, 'resolver>(
-		self,
+		mut self,
 		_value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		let target_value = BigInt::from_signed_bytes_le(_value);
+		self.append_default_card(target_value.to_string());
+
 		Ok(self)
 	}
 
-	fn visit_sequence<'scale, 'resolver>(
+	fn start_sequence<'scale, 'resolver>(
 		mut self,
-		value: &mut scale_decode::visitor::types::Sequence<'scale, 'resolver, Self::TypeResolver>,
-		type_id: TypeRef,
+		
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.accessed_types
-			.insert(TypeId::Other(type_id.id().expect("Sequence is always referenced by id; qed")));
-
 		let mut visitor = self;
 		while let Some(field) = value.next() {
 			visitor = field?.decode_with_visitor(visitor)?;
@@ -300,28 +358,81 @@ impl Visitor for CollectOutputCards {
 			return Ok(self);
 		}
 
-		self.accessed_types.insert(TypeId::Other(
-			type_id.id().expect("Composite is always referenced by id; qed"),
-		));
-
 		let mut visitor = self;
-		while let Some(field) = value.next() {
-			visitor = field?.decode_with_visitor(visitor)?;
+
+		let fields_count = value.fields().len();
+
+		while let Some((index, field_result)) = value.enumerate().next() {
+			let field = field_result?;
+
+			let mut should_indent =  true;
+
+			match field.name() {
+					Some(field_name) => {
+						let card = OutputCard {
+							card: ParserCard::FieldName {
+									name: field_name.to_string(),
+									docs_field_name: "".to_string(),
+									path_type: "".to_string(),
+									docs_type: "".to_string(),
+							},
+							indent: visitor.indent,
+						};
+
+						visitor.cards.push(card);
+					}
+					None => {
+						if fields_count > 1 {
+							let card = OutputCard {
+								card: ParserCard::FieldNumber { 
+									number: index, 
+									docs_field_number: "".to_string(),
+									path_type: "".to_string(),
+									docs_type: "".to_string()
+								},
+								indent: visitor.indent
+							};
+							visitor.cards.push(card);
+						} else {
+							should_indent = false
+						}
+					}
+			}
+
+			if should_indent {
+				visitor.inc_indent();
+
+				visitor = field.decode_with_visitor(visitor)?;
+
+				visitor.dec_indent();
+			} else {
+				visitor = field.decode_with_visitor(visitor)?;
+			}
 		}
 
 		Ok(visitor)
 	}
 
 	fn visit_tuple<'scale, 'resolver>(
-		mut self,
+		self,
 		value: &mut scale_decode::visitor::types::Tuple<'scale, 'resolver, Self::TypeResolver>,
-		type_id: TypeRef,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.accessed_types
-			.insert(TypeId::Other(type_id.id().expect("Tuple is always referenced by id; qed")));
 
 		let mut visitor = self;
-		while let Some(field) = value.next() {
+		while let Some((index, field)) = value.enumerate().next() {
+			let card = OutputCard {
+				card: ParserCard::FieldNumber { 
+					number: index + 1, 
+					docs_field_number: "".to_string(),
+					path_type: "".to_string(),
+					docs_type: "".to_string()
+				},
+				indent: visitor.indent
+			};
+			
+			visitor.cards.push(card);
+
 			visitor = field?.decode_with_visitor(visitor)?;
 		}
 
@@ -329,24 +440,33 @@ impl Visitor for CollectOutputCards {
 	}
 
 	fn visit_str<'scale, 'resolver>(
-		self,
-		_value: &mut scale_decode::visitor::types::Str<'scale>,
+		mut self,
+		value: &mut scale_decode::visitor::types::Str<'scale>,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		let target_value = value.as_str()?.to_string();
+		self.append_default_card(target_value);
+
 		Ok(self)
 	}
 
 	fn visit_variant<'scale, 'resolver>(
-		mut self,
+		self,
 		value: &mut scale_decode::visitor::types::Variant<'scale, 'resolver, Self::TypeResolver>,
-		type_id: TypeRef,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.accessed_types.insert(TypeId::Enumeration {
-			type_id: type_id.id().expect("Enumeration is always referenced by id; qed"),
-			variant: value.index() as u32,
-		});
-
 		let mut visitor = self;
+
+		let card = OutputCard {
+			card: ParserCard::EnumVariantName { 
+				name: value.name().to_string(), 
+				docs_enum_variant: "".to_string() 
+			},
+			indent: visitor.indent
+		};
+		
+		visitor.cards.push(card);
+
 		while let Some(field) = value.fields().next() {
 			visitor = field?.decode_with_visitor(visitor)?;
 		}
@@ -355,13 +475,10 @@ impl Visitor for CollectOutputCards {
 	}
 
 	fn visit_array<'scale, 'resolver>(
-		mut self,
+		self,
 		value: &mut scale_decode::visitor::types::Array<'scale, 'resolver, Self::TypeResolver>,
-		type_id: TypeRef,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.accessed_types.insert(TypeId::Other(
-			type_id.id().expect("BitSequence is always referenced by id; qed"),
-		));
 
 		let mut visitor = self;
 		while let Some(field) = value.next() {
@@ -373,12 +490,20 @@ impl Visitor for CollectOutputCards {
 
 	fn visit_bitsequence<'scale, 'resolver>(
 		mut self,
-		_value: &mut scale_decode::visitor::types::BitSequence<'scale>,
-		type_id: TypeRef,
+		value: &mut scale_decode::visitor::types::BitSequence<'scale>,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.accessed_types.insert(TypeId::Other(
-			type_id.id().expect("BitSequence is always referenced by id; qed"),
-		));
+    let result: Result<Vec<bool>, _> = value.decode()?.collect();
+
+		let string_repr = result?.into_iter().map(|b| if b  { '1' }  else { '0' }).collect();
+
+		let card = OutputCard {
+			card: ParserCard::BitVec(string_repr),
+			indent: self.indent
+		};
+
+		self.cards.push(card);
+
 		Ok(self)
 	}
 }

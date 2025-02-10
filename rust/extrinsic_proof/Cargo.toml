@@ -6,11 +6,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+bitvec = "1.0.1"
 array-bytes = { version = "6.2.2", default-features = false }
 hex = "0.4.3"
 parser = {path = "../parser", default-features = false}
+transaction_parsing = {path = "../transaction_parsing", default-features = false}
 blake3 = { version = "1.5.0", default-features = false }
-codec = { package = "parity-scale-codec", version = "3.6.9", features = [ "derive" ], default-features = false }
+num-bigint = "0.4.4"
+codec = { package = "parity-scale-codec", version = "3.6.9", features = [ "derive", "bit-vec"] }
 frame-metadata = { version = "16.0.0", features = [ "current" ], default-features = false }
 scale-decode = { version = "0.13.0", default-features = false }
 scale-info = { version = "2.10.0", default-features = false }
