@@ -7,6 +7,10 @@ on:
       - edited
       - synchronize
 
+permissions:
+  pull-requests: write
+  statuses: write
+
 jobs:
   main:
     # By default, these PR titles are allowed:
