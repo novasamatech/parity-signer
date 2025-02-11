@@ -28,4 +28,5 @@ jobs:
       - name:               Run cargo-deny
         uses:               EmbarkStudios/cargo-deny-action@v2.0.4 # v0.16.3
         with:
-          command:          --manifest-path=./rust/Cargo.toml check ${{ matrix.checks }}
+          manifest-path:    ./rust/Cargo.toml
+          command:          check ${{ matrix.checks }}
