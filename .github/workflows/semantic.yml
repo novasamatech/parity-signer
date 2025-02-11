@@ -13,7 +13,6 @@ on:
 
 permissions:
   pull-requests: write
-  statuses: write
 
 jobs:
   main:
@@ -22,16 +21,11 @@ jobs:
     name:                     Validate PR title
     runs-on:                  ubuntu-latest
     steps:
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.NOVASAMA_APP_ID }}
-          private_key: ${{ secrets.NOVASAMA_APP_PRIVATE_KEY }}
 
       # Documentation: https://github.com/amannn/action-semantic-pull-request
-      - uses:                 amannn/action-semantic-pull-request@v5.5.3
+      - uses:                 amannn/action-semantic-pull-request@e9fabac35e210fea40ca5b14c0da95a099eff26f # v5.4.0
         env:
-          GITHUB_TOKEN:       ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
             major

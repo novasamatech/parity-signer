@@ -33,10 +33,10 @@ jobs:
           sudo apt update
           sudo apt install -y clang libclang-dev libopencv-dev
 
-      - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-        with:
-          workspaces:         rust -> rust/target
+      # - name:                 Rust Cache
+      #   uses:                 Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      #   with:
+      #     workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
         uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0

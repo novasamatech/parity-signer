@@ -9,16 +9,16 @@ edition = "2021"
 frame-metadata = {version = "16.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 libsecp256k1 = "0.7.1"
-parity-scale-codec = {version = "3.6.9", features = ["derive"]}
-sc-executor-common = {version = "0.36.0"}
-sc-executor-wasmi = {version = "0.22.0", optional = true}
+parity-scale-codec = {version = "3.6.6", features = ["derive"]}
+sc-executor-common = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05"}
+sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", optional = true}
 sled = "0.34.6"
-sp-core = {version = "35.0.0", default-features = false, features = ["full_crypto"]}
-sp-io = {version = "39.0.0", optional = true}
-sp-runtime = {version = "40.1.0", default-features = false}
-sp-version = {version = "38.0.0"}
-sp-wasm-interface = {version = "21.0.1", optional = true}
-thiserror = "1.0.57"
+sp-core = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"]}
+sp-io = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", optional = true}
+sp-runtime = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false}
+sp-version = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05"}
+sp-wasm-interface = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", optional = true}
+thiserror = "1.0.56"
 constants = {path = "../constants"}
 
 [features]

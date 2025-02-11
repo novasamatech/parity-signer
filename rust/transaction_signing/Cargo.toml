@@ -12,10 +12,10 @@ zeroize = { version = "1.7.0", features = ["std"] }
 
 definitions = { path = "../definitions", default-features = false }
 db_handling = { path = "../db_handling", default-features = false }
-sp-core = { version = "35.0.0", default-features = false, features = ["full_crypto"] }
-sp-runtime = { version = "40.1.0", default-features = false }
-thiserror = "1.0.57"
-anyhow = "1.0.82"
+sp-core = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"] }
+sp-runtime = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false }
+thiserror = "1.0.56"
+anyhow = "1.0.79"
 sled = "0.34"
 
 
@@ -25,7 +25,7 @@ sled = "0.34.6"
 constants = { path = "../constants" }
 db_handling = {path = "../db_handling"}
 transaction_parsing = { path = "../transaction_parsing", default-features = false }
-tempfile = "3.10"
+tempfile = "3.9"
 
 [lib]
 name = "transaction_signing"

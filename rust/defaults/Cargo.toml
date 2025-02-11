@@ -9,9 +9,9 @@ edition = "2021"
 definitions = {path = "../definitions", default-features = false, optional = true}
 lazy_static = {version = "1.4.0", optional = true}
 regex = {version = "1.10.3", optional = true}
-sp-core = {version = "35.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "40.1.0", default-features = false}
-thiserror = "1.0.57"
+sp-core = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false}
+thiserror = "1.0.56"
 
 [features]
 default = []

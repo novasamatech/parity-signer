@@ -173,7 +173,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
     let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::WasmError)?;
     let wasmi_runtime = create_runtime(
         runtime_blob,
-        64,
+        sc_executor_common::wasm_runtime::HeapAllocStrategy::Static { extra_pages: 64 },
         SubstrateHostFunctions::host_functions(),
         false,
     )

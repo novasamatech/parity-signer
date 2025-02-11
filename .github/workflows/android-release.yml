@@ -50,10 +50,10 @@ jobs:
       - name:           Install NDK
         run:            echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
-      - name:           Rust Cache
-        uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-        with:
-          workspaces:   rust -> rust/target
+      # - name:           Rust Cache
+      #   uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      #   with:
+      #     workspaces:   rust -> rust/target
 
       - name:           Gradle Cache
         uses:           actions/cache@v3
@@ -112,10 +112,10 @@ jobs:
       - name:           Install NDK
         run:            echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
-      - name:           Rust Cache
-        uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-        with:
-          workspaces:   rust -> rust/target
+      # - name:           Rust Cache
+      #   uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      #   with:
+      #     workspaces:   rust -> rust/target
 
       - name:           Gradle Cache
         uses:           actions/cache@v3

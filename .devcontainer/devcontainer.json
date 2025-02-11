@@ -1,0 +1,17 @@
+{
+    "name": "Ubuntu Development",
+    "image": "ubuntu:22.04",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.rust-analyzer"
+            ]
+        }
+    },
+
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    }
+}

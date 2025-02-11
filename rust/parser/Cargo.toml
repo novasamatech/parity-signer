@@ -17,10 +17,10 @@ parity-scale-codec = {version = "3.6.9", features = ["derive", "bit-vec"]}
 printing_balance = {path = "../printing_balance"}
 regex = "1.10.3"
 scale-info = "2.10.0"
-sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
-sp-core = {version = "35.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "40.1.0", default-features = false}
-thiserror = "1.0.57"
+sp-arithmetic = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05"}
+sp-core = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false}
+thiserror = "1.0.56"
 
 [dev-dependencies]
 pretty_assertions = "1"
