@@ -18,8 +18,8 @@ printing_balance = {path = "../printing_balance"}
 regex = "1.10.3"
 scale-info = "2.10.0"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+sp-core = {version = "35.0.0", default-features = false, features = ["full_crypto"]}
+sp-runtime = {version = "40.1.0", default-features = false}
 thiserror = "1.0.57"
 
 [dev-dependencies]

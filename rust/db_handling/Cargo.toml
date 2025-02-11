@@ -16,8 +16,8 @@ lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.6.9", features = ["derive"]}
 regex = "1.10.3"
 sled = "0.34.6"
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
+sp-core = {version = "35.0.0", default-features = false, features = ["full_crypto"], optional = true}
+sp-runtime = {version = "40.1.0", default-features = false, optional = true}
 thiserror = "1.0.57"
 time = {version = "0.3.36", features = ["formatting", "macros"]}
 tiny-bip39 = {version = "1.0.0", default-features = false, optional = true}

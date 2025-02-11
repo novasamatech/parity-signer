@@ -10,7 +10,7 @@ db_handling = {path = "../db_handling", default-features = false }
 definitions = {path = "../definitions", default-features = false }
 hex = "0.4.3"
 lazy_static = "1.4.0"
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+sp-runtime = {version = "40.1.0", default-features = false}
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
 thiserror = "1.0.57"
 transaction_parsing = {path = "../transaction_parsing"}
@@ -25,7 +25,7 @@ log = "0.4"
 pretty_assertions = "1"
 tempfile = "3.10"
 regex = { version = "1.10.3" }
-sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"] }
+sp-core = { version = "35.0.0", default-features = false, features = ["full_crypto"] }
 
 constants = { path = "../constants" }
 parser = { path = "../parser", default-features = false }
