@@ -1,5 +1,3 @@
-targets = []
-
 [advisories]
 version = 2
 db-path = "~/.cargo/advisory-db"
@@ -15,10 +13,7 @@ ignore = [
     "RUSTSEC-2022-0081",
     "RUSTSEC-2024-0384",
     "RUSTSEC-2024-0388",
-    "RUSTSEC-2024-0404",
     "RUSTSEC-2022-0093",
-    "RUSTSEC-2024-0421",
-    "RUSTSEC-2023-0031",
 ]
 
 [licenses]
