@@ -12,8 +12,8 @@ raptorq = "1.8.1"
 nom = "7.1.3"
 thiserror = "1.0.57"
 constants = {path = "../constants"}
-db_handling = { path = "../db_handling" }
 banana_recovery = { git = "https://github.com/paritytech/banana-recovery-rust" }
+db_handling = { path = "../db_handling" }
 transaction_parsing = { path = "../transaction_parsing" }
 definitions = {path = "../definitions", default-features = false}
 

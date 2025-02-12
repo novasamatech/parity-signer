@@ -10,7 +10,7 @@ edition = "2018"
 hex = "0.4.3"
 qr_reader_phone = {path = "../qr_reader_phone"}
 anyhow = "1.0.82"
-image = "0.24.8"
+image = "0.24.9"
 quircs = "0.10.2"
 indicatif = "0.17.8"
 
