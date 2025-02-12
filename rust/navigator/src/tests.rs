@@ -6205,7 +6205,7 @@ fn test_sign_dd_transaction() {
         "530102".to_string() + &alice_westend_public + tx + WESTEND_GENESIS;
     assert!(signature_is_good(
         &non_dynamic_transaction,
-        core::str::from_utf8(transaction.signature.signatures[0].data()).unwrap()
+        &String::from_utf8(transaction.signature.signatures[0].data().to_vec()).unwrap()
     ));
 }
 

@@ -201,7 +201,10 @@ pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
     let mut settings = CameraSettings { index: None };
 
     while let Some(arg) = args.next() {
-        let par = args.next().unwrap_or_default();
+        let par = match args.next() {
+            Some(x) => x,
+            None => String::from(""),
+        };
 
         match &arg[..] {
             "d" | "-d" | "--device" => match par.trim().parse() {
