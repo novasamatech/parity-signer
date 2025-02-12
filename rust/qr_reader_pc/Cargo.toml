@@ -18,3 +18,8 @@ indicatif = "0.17.7"
 version = "0.93"
 default-features = false
 features = ["videoio", "imgproc", "highgui"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(ocvrs_opencv_branch_32)',
+] }

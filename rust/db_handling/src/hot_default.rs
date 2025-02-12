@@ -6,15 +6,15 @@
 //! Hot database contains following trees:
 //!
 //! - [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) with information needed to
-//! perform RPC calls on networks
+//!   perform RPC calls on networks
 //! - [`METATREE`](constants::METATREE) with network metadata fetched through
-//! RPC calls, maximum two entries are allowed for each network, empty by
-//! default
+//!   RPC calls, maximum two entries are allowed for each network, empty by
+//!   default
 //! - [`META_HISTORY`](constants::META_HISTORY) with block hashes for metadata
-//! fetched through RPC calls, empty by default
+//!   fetched through RPC calls, empty by default
 //! - [`SETTREE`](constants::SETTREE) with types information
 //! - [`SPECSTREEPREP`](constants::SPECSTREEPREP) with network specs entries
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+//!   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 use parity_scale_codec::Encode;
 use sled::Batch;
 

@@ -498,8 +498,8 @@ impl TrDbColdStub {
     /// cold database:
     ///
     /// - Add a (key, value) pair to the metadata additions queue in
-    /// `metadata_stub`. Key is [`MetaKey`] in key form, value is metadata in
-    /// `Vec<u8>` format.
+    ///   `metadata_stub`. Key is [`MetaKey`] in key form, value is metadata in
+    ///   `Vec<u8>` format.
     /// - Add corresponding `Event::MetadataAdded(_)` into `history_stub`.
     pub fn add_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
@@ -515,7 +515,7 @@ impl TrDbColdStub {
     /// Prepare removing the metadata from the cold database:
     ///
     /// - Add [`MetaKey`] in key form to the metadata removals queue in
-    /// `metadata_stub`.
+    ///   `metadata_stub`.
     /// - Add corresponding `Event::MetadataRemoved(_)` into `history_stub`.
     ///
     /// Function is used for `Hold` and `GeneralHold` processing when,
@@ -532,26 +532,26 @@ impl TrDbColdStub {
     /// Prepare adding [`OrderedNetworkSpecs`] into the cold database:
     ///
     /// - Transform received in `add_specs` payload [`NetworkSpecs`]
-    /// into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
-    /// in the end of the network list, with order set to the total number of
-    /// network specs entries currently in Vault. When a network is removed,
-    /// the order of the remaining networks gets rearranged, see details in
-    /// function [`remove_network`](crate::helpers::remove_network).
+    ///   into [`OrderedNetworkSpecs`] by adding `order` field. Networks are always added
+    ///   in the end of the network list, with order set to the total number of
+    ///   network specs entries currently in Vault. When a network is removed,
+    ///   the order of the remaining networks gets rearranged, see details in
+    ///   function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
-    /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
-    /// SCALE-encoded [`OrderedNetworkSpecs`].
+    ///   `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
+    ///   SCALE-encoded [`OrderedNetworkSpecs`].
     /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
     /// - Add root address for the network if the
-    /// [`AddressDetails`](definitions::users::AddressDetails) entry with
-    /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
-    /// i.e. add (key, value) pair to the address additions queue in
-    /// `addresses_stub`. Key is
-    /// [`AddressKey`](definitions::keyring::AddressKey)
-    /// in key form, value is
-    /// SCALE-encoded updated
-    /// [`AddressDetails`](definitions::users::AddressDetails).
+    ///   [`AddressDetails`](definitions::users::AddressDetails) entry with
+    ///   matching [`Encryption`](definitions::crypto::Encryption) already exists,
+    ///   i.e. add (key, value) pair to the address additions queue in
+    ///   `addresses_stub`. Key is
+    ///   [`AddressKey`](definitions::keyring::AddressKey)
+    ///   in key form, value is
+    ///   SCALE-encoded updated
+    ///   [`AddressDetails`](definitions::users::AddressDetails).
     /// - If address was added, add corresponding `Event::IdentityAdded(_)`
-    /// into `history_stub`.
+    ///   into `history_stub`.
     ///
     /// Note that `add_network_specs` does not deal with network verifiers:
     /// verifier data is not necessarily updated each time the network
@@ -589,7 +589,7 @@ impl TrDbColdStub {
     /// Prepare removing [`OrderedNetworkSpecs`] from the cold database:
     ///
     /// - Add [`NetworkSpecsKey`] in key form to the network specs removal queue
-    /// in `network_specs_stub`.
+    ///   in `network_specs_stub`.
     /// - Add corresponding `Event::NetworkSpecsRemoved(_)` into `history_stub`.
     ///
     /// Function is used for `Hold` and `GeneralHold` processing when,
@@ -627,8 +627,8 @@ impl TrDbColdStub {
     /// database:
     ///
     /// - Add a (key, value) pair to the settings additions queue in
-    /// `settings_stub`. Key is [`GENERALVERIFIER`] and the value is
-    /// SCALE-encoded [`Verifier`] that is set to be the new general verifier.
+    ///   `settings_stub`. Key is [`GENERALVERIFIER`] and the value is
+    ///   SCALE-encoded [`Verifier`] that is set to be the new general verifier.
     /// - Add corresponding `Event::GeneralVerifierSet(_)` into `history_stub`.
     pub fn new_general_verifier(mut self, general_verifier: &Verifier) -> Self {
         self.settings_stub = self
@@ -644,8 +644,8 @@ impl TrDbColdStub {
     /// `load_types` update into the cold database:
     ///
     /// - Add a (key, value) pair to the settings additions queue in
-    /// `settings_stub`. Key is [`TYPES`] and the value is [`ContentLoadTypes`]
-    /// types information in `store` format (SCALE-encoded).
+    ///   `settings_stub`. Key is [`TYPES`] and the value is [`ContentLoadTypes`]
+    ///   types information in `store` format (SCALE-encoded).
     /// - Add corresponding `Event::TypesAdded(_)` into `history_stub`.
     pub fn add_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self
@@ -676,9 +676,9 @@ impl TrDbColdStub {
     /// cold database:
     ///
     /// - Add a (key, value) pair to the verifiers additions queue in
-    /// `verifiers_stub`. Key is [`VerifierKey`] and the value is SCALE-encoded
-    /// [`ValidCurrentVerifier`] that is set to be the new verifier for the
-    /// network.
+    ///   `verifiers_stub`. Key is [`VerifierKey`] and the value is SCALE-encoded
+    ///   [`ValidCurrentVerifier`] that is set to be the new verifier for the
+    ///   network.
     /// - Add corresponding `Event::NetworkVerifierSet(_)` into `history_stub`.
     pub fn new_network_verifier(
         mut self,
@@ -748,9 +748,9 @@ impl Default for TrDbColdStub {
 /// - [`SignContent`] with data to sign
 /// - name of the network in which the transaction is made
 /// - derivation path of the address used, whether the address has password,
-/// corresponding [`MultiSigner`] value
+///   corresponding [`MultiSigner`] value
 /// - relevant history [`Event`] set: warnings that were shown during the
-/// parsing
+///   parsing
 #[derive(Debug, Decode, Default, Encode)]
 pub struct TrDbColdSign {
     /// Bulk of transactions to sign.
@@ -803,17 +803,17 @@ impl TrDbColdSign {
     /// Possible history log entries are:
     ///
     /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
-    /// cases when the signature was generated and displayed through the user
-    /// interface
+    ///   cases when the signature was generated and displayed through the user
+    ///   interface
     /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
-    /// the cases when the user has entered the wrong password and no signature
-    /// was generated. Vault current policy is to log all wrong password entry
-    /// attempts.
+    ///   the cases when the user has entered the wrong password and no signature
+    ///   was generated. Vault current policy is to log all wrong password entry
+    ///   attempts.
     ///
     /// Required input:
     ///
     /// - `wrong_password` flag; for entries with `true` value the signature
-    /// was not generated, because user has entered the wrong password;
+    ///   was not generated, because user has entered the wrong password;
     /// - user-added text comment for the transaction
     /// - index of the transaction in the bulk
     /// - database name, into which the data is added
@@ -939,7 +939,7 @@ impl TrDbColdSignOne {
     /// - [`SignContent`] with data to sign
     /// - name of the network in which the transaction is made
     /// - derivation path of the address used, whether the address has password,
-    /// corresponding [`MultiSigner`] value
+    ///   corresponding [`MultiSigner`] value
     /// - relevant history [`Event`] set
     pub fn generate(
         content: SignContent,

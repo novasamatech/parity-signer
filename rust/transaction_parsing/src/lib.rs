@@ -37,10 +37,9 @@ pub use crate::error::{Error, Result};
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
-/// see the standard for details,
+///   see the standard for details,
 /// - actual content (differs between transaction types, could be even empty)
-/// actual content is handled individually depending on prelude
-
+///   actual content is handled individually depending on prelude
 fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<TransactionAction> {
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
