@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.4", features = ["derive"] }
+clap = { version = "4.5", features = ["derive"] }
 constants = {path = "../constants"}
 db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
 definitions = {path = "../definitions", default-features = false, features = ["active"]}
@@ -17,15 +17,15 @@ lazy_static = "1.4.0"
 parity-scale-codec = "3.6.9"
 qrcode_rtx = {path = "../qrcode_rtx"}
 regex = "1.10.3"
-serde_json = "1.0.113"
+serde_json = "1.0.114"
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"]}
 sp-runtime = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false }
 sp-keyring = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false }
-thiserror = "1.0.56"
+thiserror = "1.0.57"
 tokio = { version = "1", features = ["full"] }
 
 [dev-dependencies]
 assert_cmd = "2.0"
 defaults = {path = "../defaults", features = ["active"]}
-tempfile = "3.9"
+tempfile = "3.10"
