@@ -11,7 +11,7 @@ lane :build_release do |options|
   configuration = options[:configuration]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
-  profile_name = "NativeSigner Distribution Provisioning Profile"
+  profile_name = "Polkadot Vault Distribution"
   output_name = scheme # just in case we need to customise it for other GAs
   export_method = "app-store"
   compile_bitcode = false
@@ -50,7 +50,7 @@ desc "Prepares certificate and provisioning profile"
 lane :prepare_code_signing do |options|
   api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-  profile_name = "NativeSigner Distribution Provisioning Profile"
+  profile_name = "Polkadot Vault Distribution"
 
   cert(
     api_key: api_key,
