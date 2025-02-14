@@ -28,9 +28,26 @@ use scale_decode::{
 use num_bigint::{BigInt, BigUint};
 
 use crate::{
-  types::{Type, TypeDef, TypeRef, TypeId}
+  state_machine::{DefaultState, PushStateMachine, State, StateInputCompositeValue, StateInputFieldValue},
+	types::{Type, TypeDef, TypeRef}
 };
 
+pub struct TypeRegistry(BTreeMap<u32, Vec<Type>>);
+
+impl TypeRegistry {
+		pub fn new<'a>(types: impl Iterator<Item = &'a Type>) -> Self {
+		Self {
+				0: types.fold(Default::default(), |mut map, ty| {
+					map.entry(ty.type_id.0).or_default().push(ty.clone());
+					map
+				})
+			}
+		}
+
+		pub fn get_first_matching(&self, id: &u32) -> Option<&Type> {
+			self.0.get(id)?.first()
+		}
+}
 
 /// Decoding happens recursively and we need some upper bound to stop somewhere
 /// to prevent a stack overflow.
@@ -164,181 +181,211 @@ fn path_to_string<'a>(path_iterator: impl Iterator<Item = &'a str>) -> String {
 	path_iterator.collect::<Vec<_>>().join(" >> ")
 }
 
-#[derive(Clone, Default)]
-pub struct CallCardsParser {
+pub struct CallCardsParser<'registry> {
+	pub type_registry: &'registry TypeRegistry,
 	pub cards: Vec<OutputCard>,
-	pub indent: u32
+	pub state: Box<dyn State>,
+	pub stack: Vec<Box<dyn State>>
 }
 
-impl CallCardsParser {
-	fn append_default_card( &mut self, value: String) {
-		let output = OutputCard {
-			card: ParserCard::Default(value),
-			indent: self.indent
-		};
-	
-		self.cards.push(output);
-	}
-
-	fn inc_indent(&mut self) {
-		self.indent += 1;
-	}
-
-	fn dec_indent(&mut self) {
-		self.indent -= 1;
+impl CallCardsParser<'_> {
+	pub fn new<'registry>(type_registry: &'registry TypeRegistry) -> CallCardsParser<'registry> {
+		CallCardsParser {
+			type_registry,
+			cards: vec![],
+			state: Box::new(DefaultState { indent: 0 }),
+			stack: vec![]
+		}
 	}
 }
 
-impl Visitor for CallCardsParser {
+impl CallCardsParser<'_> {
+	fn cloned_state(&self) -> Box<dyn State> {
+		self.state.clone()
+	}
+}
+
+impl PushStateMachine for CallCardsParser<'_> {
+	fn push_state(&mut self) {
+		self.stack.push(self.state.clone());
+	}
+
+	fn set_state(&mut self, state: Box<dyn State>) {
+		self.state = state;
+	}
+
+	fn pop_state(&mut self) {
+		self.state = self.stack.pop().unwrap();
+	}
+
+	fn can_pop_state(&self) -> bool {
+		!self.stack.is_empty()
+	}
+}
+
+impl Visitor for CallCardsParser<'_> {
 	type TypeResolver = TypeResolver;
 	type Value<'scale, 'resolver> = Self;
 	type Error = DecodeError;
 
 	fn visit_bool<'scale, 'resolver>(
 		mut self,
-		_value: bool,
+		value: bool,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let mut output = self.cloned_state().process_bool(&mut self, value)?;
+		self.cards.append(&mut output.cards);
 
 		Ok(self)
 	}
 
 	fn visit_char<'scale, 'resolver>(
 		mut self,
-		_value: char,
+		value: char,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_char(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u8<'scale, 'resolver>(
 		mut self,
-		_value: u8,
+		value: u8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_u8(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u16<'scale, 'resolver>(
 		mut self,
-		_value: u16,
+		value: u16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_u16(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u32<'scale, 'resolver>(
 		mut self,
-		_value: u32,
+		value: u32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_u32(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u64<'scale, 'resolver>(
 		mut self,
-		_value: u64,
+		value: u64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_u64(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u128<'scale, 'resolver>(
 		mut self,
-		_value: u128,
+		value: u128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_u128(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_u256<'scale, 'resolver>(
 		mut self,
-		_value: &'scale [u8; 32],
+		value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let target_value = BigUint::from_bytes_le(_value);
-		self.append_default_card(target_value.to_string());
+		let output = self.state.process_u256(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i8<'scale, 'resolver>(
 		mut self,
-		_value: i8,
+		value: i8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_i8(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i16<'scale, 'resolver>(
 		mut self,
-		_value: i16,
+		value: i16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_i16(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i32<'scale, 'resolver>(
 		mut self,
-		_value: i32,
+		value: i32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_i32(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i64<'scale, 'resolver>(
 		mut self,
-		_value: i64,
+		value: i64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_i64(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i128<'scale, 'resolver>(
 		mut self,
-		_value: i128,
+		value: i128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		self.append_default_card(_value.to_string());
+		let output = self.state.process_i128(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
 	fn visit_i256<'scale, 'resolver>(
 		mut self,
-		_value: &'scale [u8; 32],
+		value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let target_value = BigInt::from_signed_bytes_le(_value);
-		self.append_default_card(target_value.to_string());
+		let output = self.state.process_i256(value)?;
+		self.apply_exec(output);
 
 		Ok(self)
 	}
 
-	fn start_sequence<'scale, 'resolver>(
-		mut self,
-		
+	fn visit_sequence<'scale, 'resolver>(
+		self,
+		value: &mut scale_decode::visitor::types::Sequence<'scale, 'resolver, Self::TypeResolver>,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let mut visitor = self;
 		while let Some(field) = value.next() {
@@ -349,65 +396,43 @@ impl Visitor for CallCardsParser {
 	}
 
 	fn visit_composite<'scale, 'resolver>(
-		mut self,
+		self,
 		value: &mut scale_decode::visitor::types::Composite<'scale, 'resolver, Self::TypeResolver>,
-		type_id: TypeRef,
+		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		// We forward `Void` as composite with no fields.
+		// TODO: call state also
 		if value.remaining() == 0 {
 			return Ok(self);
 		}
 
 		let mut visitor = self;
 
+		let path = value.path().map(|item| item.to_string()).collect();
 		let fields_count = value.fields().len();
+
+		let input = StateInputCompositeValue {
+			name: value.name().map(|name| name.to_string()),
+			path: Some(path),
+			field_count: fields_count
+		};
+
+		let mut output = visitor.cloned_state().start_composite(&mut visitor, input)?;
+		visitor.cards.append(&mut output.cards);
 
 		while let Some((index, field_result)) = value.enumerate().next() {
 			let field = field_result?;
+			let field_name = field.name().map(|name| name.to_string());
 
-			let mut should_indent =  true;
+			let input = StateInputFieldValue {
+				index,
+				name: field_name
+			};
 
-			match field.name() {
-					Some(field_name) => {
-						let card = OutputCard {
-							card: ParserCard::FieldName {
-									name: field_name.to_string(),
-									docs_field_name: "".to_string(),
-									path_type: "".to_string(),
-									docs_type: "".to_string(),
-							},
-							indent: visitor.indent,
-						};
+			let mut output = visitor.cloned_state().process_field(&mut visitor, input)?;
+			visitor.cards.append(&mut output.cards);
 
-						visitor.cards.push(card);
-					}
-					None => {
-						if fields_count > 1 {
-							let card = OutputCard {
-								card: ParserCard::FieldNumber { 
-									number: index, 
-									docs_field_number: "".to_string(),
-									path_type: "".to_string(),
-									docs_type: "".to_string()
-								},
-								indent: visitor.indent
-							};
-							visitor.cards.push(card);
-						} else {
-							should_indent = false
-						}
-					}
-			}
-
-			if should_indent {
-				visitor.inc_indent();
-
-				visitor = field.decode_with_visitor(visitor)?;
-
-				visitor.dec_indent();
-			} else {
-				visitor = field.decode_with_visitor(visitor)?;
-			}
+			visitor = field.decode_with_visitor(visitor)?;
 		}
 
 		Ok(visitor)
@@ -453,19 +478,18 @@ impl Visitor for CallCardsParser {
 	fn visit_variant<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Variant<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		let enum_id = type_id.id().ok_or(DecodeError::TypeResolvingError("Expected by id".to_string()))?;
+		let enum_type = self.type_registry.get_first_matching(&enum_id).ok_or(
+			DecodeError::TypeResolvingError(format!("No type for {:?}", &enum_id).to_string())
+		)?;
+
 		let mut visitor = self;
 
-		let card = OutputCard {
-			card: ParserCard::EnumVariantName { 
-				name: value.name().to_string(), 
-				docs_enum_variant: "".to_string() 
-			},
-			indent: visitor.indent
-		};
-		
-		visitor.cards.push(card);
+		match visitor.type_registry.get_first_matching(type_id.id()) {
+				
+		}
 
 		while let Some(field) = value.fields().next() {
 			visitor = field?.decode_with_visitor(visitor)?;
