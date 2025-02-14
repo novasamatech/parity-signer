@@ -487,10 +487,6 @@ impl Visitor for CallCardsParser<'_> {
 
 		let mut visitor = self;
 
-		match visitor.type_registry.get_first_matching(type_id.id()) {
-				
-		}
-
 		while let Some(field) = value.fields().next() {
 			visitor = field?.decode_with_visitor(visitor)?;
 		}
