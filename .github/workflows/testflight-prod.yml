@@ -10,7 +10,7 @@ on:
 jobs:
   distribute_testflight:
     if: contains('["krodak","ERussel","stepanLav"]', github.actor)
-    runs-on:                  macos-13
+    runs-on:                  macos-15
     name:                     Distribute TestFlight Production Build
 
     steps:
@@ -25,7 +25,9 @@ jobs:
           bundler-cache:      true
 
       - name:                 Setup - Xcode
-        run:                  sudo xcode-select -switch '/Applications/Xcode_15.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
+        uses:                 maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version:      16.0
 
       - name:                 Install dependencies
         run:                  |
