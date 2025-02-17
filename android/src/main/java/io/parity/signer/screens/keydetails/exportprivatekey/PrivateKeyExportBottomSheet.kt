@@ -47,7 +47,7 @@ fun PrivateKeyExportBottomSheet(
 	) {
 		BottomSheetHeader(
 			title = stringResource(R.string.export_private_key_title),
-			onCloseClicked = onClose,
+			onClose = onClose,
 		)
 		//scrollable part if doesn't fit into screen
 		Column(

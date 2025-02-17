@@ -1,4 +1,4 @@
-package io.parity.signer.screens.scan.bananasplit
+package io.parity.signer.screens.scan.bananasplitrestore
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration

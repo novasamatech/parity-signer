@@ -23,7 +23,7 @@ fun BottomSheetHeader(
 	title: String,
 	modifier: Modifier = Modifier,
 	subtitile: String? = null,
-	onCloseClicked: Callback?
+	onClose: Callback?
 ) {
 	Row(
 		modifier = modifier
@@ -46,9 +46,9 @@ fun BottomSheetHeader(
 				)
 			}
 		}
-		if (onCloseClicked != null) {
+		if (onClose != null) {
 			CloseIcon(
-				onCloseClicked = onCloseClicked,
+				onCloseClicked = onClose,
 				modifier = Modifier.padding(start = 16.dp)
 			)
 		}
@@ -86,11 +86,11 @@ fun BottomSheetSubtitle(
 private fun PreviewHeaderWithClose() {
 	SignerNewTheme {
 		Column() {
-			BottomSheetHeader(title = "Title", onCloseClicked = {})
+			BottomSheetHeader(title = "Title", onClose = {})
 			Divider()
 			BottomSheetHeader(title = "Very very very very long title Very very very very long title") {}
 			Divider()
-			BottomSheetHeader(title = "Title", subtitile = "With subtitle", onCloseClicked = {})
+			BottomSheetHeader(title = "Title", subtitile = "With subtitle", onClose = {})
 			Divider()
 			BottomSheetSubtitle(R.string.subtitle_secret_recovery_phrase)
 		}

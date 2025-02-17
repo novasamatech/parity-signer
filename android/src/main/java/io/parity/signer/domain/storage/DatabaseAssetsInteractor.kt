@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.security.keystore.UserNotAuthenticatedException
 import io.parity.signer.domain.getDbNameFromContext
+import okhttp3.internal.wait
 import java.io.File
 import java.io.FileOutputStream
 
@@ -13,7 +14,8 @@ import java.io.FileOutputStream
  */
 class DatabaseAssetsInteractor(
 	private val context: Context,
-	private val seedStorage: SeedStorage
+	private val seedStorage: SeedStorage,
+	private val cryptedStorage: ClearCryptedStorage,
 ) {
 	private val dbName: String = context.getDbNameFromContext()
 
@@ -25,6 +27,7 @@ class DatabaseAssetsInteractor(
 	fun wipe() {
 		deleteDir(File(dbName))
 		seedStorage.wipe()
+		cryptedStorage.wipe()
 	}
 
 	/**
