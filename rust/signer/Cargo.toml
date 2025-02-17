@@ -12,8 +12,8 @@ uniffi = { version = "0.22.0" }
 lazy_static = "1.4.0"
 sled = "0.34"
 
-sp-runtime = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false }
-sp-core = { git = "https://github.com/paritytech/substrate", tag = "monthly-2023-05", default-features = false, features = ["full_crypto"] }
+sp-runtime = { git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"] }
 
 db_handling = { path = "../db_handling", default-features = false }
 definitions = { path = "../definitions", default-features = false }
