@@ -124,6 +124,11 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-gradle-
 
+      - name: Make directory writable
+        run: |
+          mkdir -p /home/runner/.config/.android
+          chmod -R 755 /home/runner/.config/.android
+
       - name:           Assemble unsigned debug apk
         run:            |
           ./gradlew clean assembleDebug --stacktrace
