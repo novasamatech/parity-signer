@@ -4,7 +4,7 @@ source $HOME/.cargo/env
 
 IOS_ARCHS=(aarch64-apple-ios x86_64-apple-ios)
 LIB_NAME=signer
-IOS_VERSION=18.2
+IOS_VERSION=15.8.1
 
 printf "Building iOS targets...";
 
@@ -17,9 +17,8 @@ for i in "${IOS_ARCHS[@]}";
 do
   rustup target add "$i";
   env -i PATH="${PATH}" IPHONEOS_DEPLOYMENT_TARGET="${IOS_VERSION}" \
-  "${HOME}"/.cargo/bin/cargo build --locked --target "$i" --release --no-default-features \
-  -Z build-std \
-  -- -C link-arg=-mios-version-min="${IOS_VERSION}"
+  RUSTFLAGS="-C link-arg=-mios-version-min=${IOS_VERSION}" \
+  "${HOME}"/.cargo/bin/cargo build --locked --target "$i" --release --no-default-features
 done
 
 lipo -create -output "../../ios/PolkadotVault/lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
