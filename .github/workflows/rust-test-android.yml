@@ -13,7 +13,9 @@ on:
 jobs:
   check:
     name:                     Cargo test on Ubuntu
-    runs-on:                  ubuntu-24.04
+    runs-on:                  ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     steps:
 
       - name:                 Checkout sources
@@ -21,11 +23,6 @@ jobs:
         with:
           fetch-depth:        50
           submodules:         'recursive'
-
-      - name:                 Install system dependancies
-        run:                  |
-          sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
 
       - name:                 Install Rust stable toolchain
         uses:                 dtolnay/rust-toolchain@stable
