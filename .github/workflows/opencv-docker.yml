@@ -7,7 +7,6 @@ on:
       - 'docker/opencv.Dockerfile'
     branches:
       - master
-  pull_request:
 
 jobs:
   build-and-push:
