@@ -1,5 +1,6 @@
 FROM ghcr.io/actions/actions-runner:latest
 
+USER root
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install OpenCV dependencies
