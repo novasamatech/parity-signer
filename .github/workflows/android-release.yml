@@ -10,7 +10,7 @@ jobs:
   #it's tests but build job is required in our branch policies
   build:
     name: Build android unit test
-    runs-on:            ubuntu-24.04
+    runs-on:            ubuntu-22.04
     steps:
 
       - name:           Checkout Sources
@@ -67,7 +67,7 @@ jobs:
 
   make:
     name: Build signed APKs
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     # if: github.ref == ' refs/head/main'
     steps:
 
