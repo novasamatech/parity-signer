@@ -13,6 +13,7 @@ use indicatif::ProgressBar;
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
 
 use opencv::{
+    core::AlgorithmHint,
     highgui,
     imgproc::{cvt_color, COLOR_BGR2GRAY},
     prelude::*,
@@ -21,8 +22,6 @@ use opencv::{
     Result,
 };
 
-#[cfg(target_os = "macos")]
-use opencv::core::AlgorithmHint;
 
 // Default camera settings
 const DEFAULT_WIDTH: u32 = 640;
@@ -126,7 +125,6 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Gr
     let mut image: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     let mut ocv_gray_image = Mat::default();
 
-    #[cfg(target_os = "macos")]
     cvt_color(
         &frame,
         &mut ocv_gray_image,
@@ -134,9 +132,6 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Gr
         0,
         AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
-
-    #[cfg(not(target_os = "macos"))]
-    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
 
     for y in 0..ocv_gray_image.rows() {
         for x in 0..ocv_gray_image.cols() {
