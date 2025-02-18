@@ -3,7 +3,10 @@ FROM ghcr.io/actions/actions-runner:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install OpenCV dependencies
-RUN apt-get update && apt-get install -y \
+RUN cat /etc/os-release && \
+    apt-get update -y && \
+    apt-cache policy libjpeg-dev libgtk-3-dev && \
+    apt-get install -y \
     libjpeg-dev \
     libtiff-dev \
     libpng-dev \
@@ -15,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     libx264-dev \
     libgtk-3-dev \
     libatlas-base-dev \
-    gfortran
+    gfortran \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
 
