@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     wget \
     cmake \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
