@@ -32,6 +32,7 @@ jobs:
       - name:                 Install dependencies
         run:                  |
           brew install sourcery
+          bundle install
 
       # - name: Get cached Swift Packages managed by Xcode
       #   uses: actions/cache@v3

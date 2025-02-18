@@ -23,5 +23,9 @@ transform_regex = [
     # 22_100
     "^(?:[0-9]+_)+[0-9]+$"
 ]
+
+[files]
+ignore = ["ios/fastlane/README.md"]
+
 allow_concatenation = true
 allow_dashes = true
