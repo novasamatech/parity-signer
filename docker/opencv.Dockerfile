@@ -1,4 +1,4 @@
-FROM ghcr.io/catthehacker/ubuntu:full-22.04
+FROM ghcr.io/catthehacker/ubuntu:rust-22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
