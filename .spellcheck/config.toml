@@ -4,6 +4,7 @@ search_dirs = ["."]
 extra_dictionaries = ["signer.dic"]
 skip_os_lookups = true
 use_builtin = true
+skip_readme = true
 
 [hunspell.quirks]
 # He tagged it as 'TheGreatestOfAllTimes'
@@ -23,9 +24,6 @@ transform_regex = [
     # 22_100
     "^(?:[0-9]+_)+[0-9]+$"
 ]
-
-[files]
-ignore = ["ios/fastlane/README.md"]
 
 allow_concatenation = true
 allow_dashes = true
