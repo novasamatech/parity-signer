@@ -22,7 +22,6 @@ use opencv::{
     Result,
 };
 
-
 // Default camera settings
 const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 480;
