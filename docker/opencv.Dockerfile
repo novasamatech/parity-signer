@@ -15,8 +15,7 @@ RUN apt-get update && apt-get install -y \
     libx264-dev \
     libgtk-3-dev \
     libatlas-base-dev \
-    gfortran \
-    && rm -rf /var/lib/apt/lists/*
+    gfortran
 
 WORKDIR /tmp
 
