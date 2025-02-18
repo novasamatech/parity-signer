@@ -1,11 +1,9 @@
-FROM ubuntu:22.04
+FROM ghcr.io/actions/actions-runner:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install OpenCV dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    pkg-config \
     libjpeg-dev \
     libtiff-dev \
     libpng-dev \
@@ -18,13 +16,11 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-dev \
     libatlas-base-dev \
     gfortran \
-    python3-dev \
-    unzip \
-    wget \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
 
+# Download and build OpenCV
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.11.0.zip && \
     wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.11.0.zip && \
     unzip opencv.zip && \

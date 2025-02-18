@@ -3,10 +3,10 @@ name: Build OpenCV Docker Image
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'docker/opencv.Dockerfile'
-    branches:
-      - master
+    # paths:
+    #   - 'docker/opencv.Dockerfile'
+    # branches:
+    #   - master
 
 jobs:
   build-and-push:
