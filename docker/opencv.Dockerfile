@@ -1,6 +1,5 @@
-FROM ghcr.io/actions/actions-runner:latest
+FROM ghcr.io/catthehacker/ubuntu:full-22.04
 
-USER root
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -20,8 +19,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     wget \
     cmake \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+    g++
 
 WORKDIR /tmp
 
