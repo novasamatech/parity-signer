@@ -68,7 +68,7 @@ jobs:
 
   makeapk:
     name: Build unsigned APKs
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     # if: github.ref == ' refs/head/main'
