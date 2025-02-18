@@ -1,4 +1,4 @@
-FROM ghcr.io/actions/runner-images/ubuntu22:latest
+FROM ghcr.io/actions/actions-runner:latest
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
