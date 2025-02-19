@@ -27,10 +27,10 @@ jobs:
           fetch-depth:        1
           submodules:         recursive
 
-      - name:                 Install dependencies
-        run:                  |
+      - name:           Install System Dependencies (Linux)
+        run:            |
           sudo apt-get update
-          sudo apt-get install -y libclang-dev
+          sudo apt-get install -y clang libclang-dev
 
       # - name:                 Rust Cache
       #   uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7

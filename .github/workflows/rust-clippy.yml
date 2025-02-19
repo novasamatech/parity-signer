@@ -24,10 +24,10 @@ jobs:
           fetch-depth:        50
           submodules:         'recursive'
 
-      - name:                 Install dependencies
-        run:                  |
+      - name:           Install System Dependencies (Linux)
+        run:            |
           sudo apt-get update
-          sudo apt-get install -y llvm-dev libclang-dev clang
+          sudo apt-get install -y clang libclang-dev
 
       - name:                 Install Rust stable toolchain
         uses:                 dtolnay/rust-toolchain@stable
