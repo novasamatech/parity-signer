@@ -44,6 +44,18 @@ jobs:
           distribution: 'adopt'
           java-version: 17
 
+      - name: Debug Android SDK setup
+        run: |
+          echo "Current working directory: $(pwd)"
+          echo "ANDROID_SDK_ROOT: ${ANDROID_SDK_ROOT:-not set}"
+          echo "Listing root directory structure:"
+          ls -la /
+          echo "Checking for Android SDK directories:"
+          ls -la /usr/local/lib/android || echo "No /usr/local/lib/android"
+          ls -la /opt/android-sdk || echo "No /opt/android-sdk"
+          echo "Environment variables:"
+          env | grep -i android
+
       - name:           Install NDK
         run:            echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
@@ -98,6 +110,19 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: 17
+
+
+      - name: Debug Android SDK setup
+        run: |
+          echo "Current working directory: $(pwd)"
+          echo "ANDROID_SDK_ROOT: ${ANDROID_SDK_ROOT:-not set}"
+          echo "Listing root directory structure:"
+          ls -la /
+          echo "Checking for Android SDK directories:"
+          ls -la /usr/local/lib/android || echo "No /usr/local/lib/android"
+          ls -la /opt/android-sdk || echo "No /opt/android-sdk"
+          echo "Environment variables:"
+          env | grep -i android
 
       - name:           Install NDK
         run:            echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
