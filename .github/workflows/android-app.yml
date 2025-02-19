@@ -44,17 +44,17 @@ jobs:
           distribution: 'adopt'
           java-version: 17
 
-      - name: Debug Android SDK setup
+      - name: Setup Android SDK
         run: |
-          echo "Current working directory: $(pwd)"
-          echo "ANDROID_SDK_ROOT: ${ANDROID_SDK_ROOT:-not set}"
-          echo "Listing root directory structure:"
-          ls -la /
-          echo "Checking for Android SDK directories:"
-          ls -la /usr/local/lib/android || echo "No /usr/local/lib/android"
-          ls -la /opt/android-sdk || echo "No /opt/android-sdk"
-          echo "Environment variables:"
-          env | grep -i android
+          mkdir -p /opt/android-sdk
+          export ANDROID_SDK_ROOT=/opt/android-sdk
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d $ANDROID_SDK_ROOT
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
+          mv $ANDROID_SDK_ROOT/cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/ || true
+          rm -rf $ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name:           Install NDK
         run:            echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
@@ -112,17 +112,17 @@ jobs:
           java-version: 17
 
 
-      - name: Debug Android SDK setup
+      - name: Setup Android SDK
         run: |
-          echo "Current working directory: $(pwd)"
-          echo "ANDROID_SDK_ROOT: ${ANDROID_SDK_ROOT:-not set}"
-          echo "Listing root directory structure:"
-          ls -la /
-          echo "Checking for Android SDK directories:"
-          ls -la /usr/local/lib/android || echo "No /usr/local/lib/android"
-          ls -la /opt/android-sdk || echo "No /opt/android-sdk"
-          echo "Environment variables:"
-          env | grep -i android
+          mkdir -p /opt/android-sdk
+          export ANDROID_SDK_ROOT=/opt/android-sdk
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d $ANDROID_SDK_ROOT
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
+          mv $ANDROID_SDK_ROOT/cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/ || true
+          rm -rf $ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name:           Install NDK
         run:            echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
