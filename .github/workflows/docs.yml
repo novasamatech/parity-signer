@@ -30,6 +30,9 @@ jobs:
           sudo apt update
           sudo apt install -y clang libclang-dev
 
+      - name:                 Install Rust stable toolchain
+        uses:                 dtolnay/rust-toolchain@stable
+
       # - name:                 Rust Cache
       #   uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
       #   with:
