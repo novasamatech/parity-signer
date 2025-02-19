@@ -13,7 +13,9 @@ on:
 jobs:
   rustdocs_user_docs:
     name:                     Build rustdocs, user-docs and check links
-    runs-on:                  ubuntu-latest
+    runs-on:                  ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     steps:
 
       - name:                 Checkout sources
@@ -26,7 +28,10 @@ jobs:
       - name:                 Install rustdocs dependencies
         run:                  |
           sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
+          sudo apt install -y clang libclang-dev
+
+      - name:                 Install Rust stable toolchain
+        uses:                 dtolnay/rust-toolchain@stable
 
       # - name:                 Rust Cache
       #   uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
