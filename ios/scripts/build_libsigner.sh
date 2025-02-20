@@ -27,11 +27,10 @@ cd "$(dirname "${0}")/../../rust/signer"
 for i in "${IOS_ARCHS[@]}";
 do
   rustup target add "$i";
+  env -i PATH="${PATH}" IPHONEOS_DEPLOYMENT_TARGET="${IOS_VERSION}" \
+  RUSTFLAGS="-C link-arg=-mios-version-min=${IOS_VERSION}"
+  "${HOME}"/.cargo/bin/cargo build --locked --target "$i" --release --no-default-features
 done
 
-env -i PATH="${PATH}" IPHONEOS_DEPLOYMENT_TARGET="${IOS_VERSION}" \
-RUSTFLAGS="-C link-arg=-mios-version-min=${IOS_VERSION}" \
-
-"${HOME}"/.cargo/bin/cargo lipo --locked --targets x86_64-apple-ios,${ARM_ARCH} --release --no-default-features
-
-mv "../target/universal/release/libsigner.a" "../../ios/PolkadotVault/lib${LIB_NAME}.a"
+lipo -create -output "../../ios/PolkadotVault/lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/${ARM_ARCH}/release/libsigner.a
+lipo -create -output "lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/${ARM_ARCH}/release/libsigner.a
