@@ -8,7 +8,7 @@
 //! - `HISTORY` with Vault history log
 //! - `METATREE` with network metadata
 //! - `SETTREE` with settings: types information, Vault dangerous exposures
-//! record and Vault database general verifier
+//!   record and Vault database general verifier
 //! - `SPECSTREE` with network specs
 //! - `TRANSACTION` for temporary storage of the transaction data
 //! - `VERIFIERS` with network verifiers data
@@ -19,10 +19,10 @@
 //! Before the database could be used, it must be initiated:
 //!
 //! - History log old entries (if any are present) are removed and a new entry
-//! `Event::DatabaseInitiated` is added
+//!   `Event::DatabaseInitiated` is added
 //! - General verifier is set and this event is recorded in the history log. By
-//! default, Vault sets up Parity-associated key as a general verifier. This
-//! could be later on changed by the user.
+//!   default, Vault sets up Parity-associated key as a general verifier. This
+//!   could be later on changed by the user.
 //!
 //! Vault then reads and updates the database as it operates.
 //!
@@ -31,13 +31,13 @@
 //! state. The difference would be only in the general verifier setting:
 //!
 //! - `Wipe all data` would set the general verifier to default `Some(_)`,
-//! with Parity-associated key inside
+//!   with Parity-associated key inside
 //! - `Remove general certificate` would set the general verifier to `None`.
-//! User would then be able to set up own general verifier, preferably
-//! immediately afterwards, by loading to Vault any verified data.
-//! Setting up a new general verifier would remove all data associated with the
-//! general verifier from the Vault database to avoid confusion as to who
-//! verified what information.
+//!   User would then be able to set up own general verifier, preferably
+//!   immediately afterwards, by loading to Vault any verified data.
+//!   Setting up a new general verifier would remove all data associated with the
+//!   general verifier from the Vault database to avoid confusion as to who
+//!   verified what information.
 #[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 #[cfg(feature = "active")]

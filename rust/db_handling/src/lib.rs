@@ -6,11 +6,11 @@
 //!
 //! - contains helpers to operate the databases, used throughout Vault system
 //! - generates cold (used in air-gapped Vault) and hot (used in
-//! `generate_message` client) databases with default settings
+//!   `generate_message` client) databases with default settings
 //! - deals with taking data out of the database and putting the data in the
-//! database
+//!   database
 //! - contains Vault interface interactions, allowing exports of data to the
-//! interface
+//!   interface
 //! - deals with address generation for Vault
 //!
 //! # Features
@@ -67,7 +67,7 @@ use hot_default::reset_hot_database;
 ///
 /// - network specs for default networks (Polkadot, Kusama, Westend)
 /// - verifier information for default networks, with verifiers set to the
-/// general one
+///   general one
 /// - two latest metadata versions for default networks
 /// - default types information and clean danger status
 ///
