@@ -200,7 +200,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 /// - must have 'System' pallet  
 /// - must have `Version` constant in `System` pallet, SCALE-decodeable  
 /// - can have `SS58Prefix` constant in `System` pallet, and if it does, the
-/// constant must be SCALE-decodeable  
+///   constant must be SCALE-decodeable  
 ///
 /// Additionally, for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 /// the extensions set must be decoding-compatible for any signable transaction.  

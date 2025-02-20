@@ -15,8 +15,8 @@ hex = "0.4.3"
 parity-scale-codec = "3.6.9"
 parser = {path = "../parser", default-features = false}
 sled = "0.34.6"
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+sp-core = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false}
 thiserror = "1.0.57"
 nom = "7.1.3"
 log = "0.4"

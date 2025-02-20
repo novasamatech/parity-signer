@@ -221,7 +221,7 @@ pub enum Error {
     ///
     /// Associated error content is:
     /// - [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
-    /// of the already existing address
+    ///   of the already existing address
     /// - [`AddressDetails`] for already existing address
     /// - [`NetworkSpecsKey`] of the associated network
     #[error(

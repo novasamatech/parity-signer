@@ -13,13 +13,10 @@ on:
 jobs:
   rustdocs_user_docs:
     name:                     Build rustdocs, user-docs and check links
-    runs-on:                  ubuntu-latest
+    runs-on:                  ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     steps:
-
-      - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@85880fa0301c86cca9da44039ee3bb12d3bedbfa # 0.12.1
-        with:
-          access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
         uses:                 actions/checkout@v4.1.1
@@ -31,12 +28,15 @@ jobs:
       - name:                 Install rustdocs dependencies
         run:                  |
           sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
+          sudo apt install -y clang libclang-dev
 
-      - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-        with:
-          workspaces:         rust -> rust/target
+      - name:                 Install Rust stable toolchain
+        uses:                 dtolnay/rust-toolchain@stable
+
+      # - name:                 Rust Cache
+      #   uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
+      #   with:
+      #     workspaces:         rust -> rust/target
 
       - name:                 Install cargo-spellcheck
         uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
@@ -48,7 +48,7 @@ jobs:
         with:
           crate:              uniffi_bindgen
           version:            0.22.0 # Must be in sync with version in Cargo.toml
-          use-tool-cache:     true
+          use-tool-cache:     false
 
       - name:                 Run spellcheck
         run:                  |

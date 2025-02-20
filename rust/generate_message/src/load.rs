@@ -3,16 +3,16 @@
 //! This module deals with processing commands:
 //!
 //! - `$ cargo run load-metadata <key(s)> <(argument)>` to produce
-//! `load_metadata` update payloads from the database entries and through RPC
-//! calls and update the hot database
+//!   `load_metadata` update payloads from the database entries and through RPC
+//!   calls and update the hot database
 //!
 //! - `$ cargo run unwasm -payload <wasm_file_path> <optional -d key>` to
-//! produce `load_metadata` update payloads from `.wasm` files and update the
-//! hot database
+//!   produce `load_metadata` update payloads from `.wasm` files and update the
+//!   hot database
 //!
 //! - `$ cargo run meta_default_file -name <network_name> -version
 //! <network_version>` to generates metadata files for `defaults` crate from
-//! hot database entries
+//!   hot database entries
 use sp_core::H256;
 use std::path::Path;
 
@@ -245,7 +245,7 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<()> {
 /// `load-metadata-f -a` for individual [`AddressSpecs`] value.
 ///
 /// - Get metadata entries from database [`METATREE`] by [`MetaKeyPrefix`]
-/// generated with network name. At most two entries are expected.
+///   generated with network name. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
 fn meta_f_a_element<P>(database: &sled::Db, set_element: &AddressSpecs, files_dir: P) -> Result<()>
@@ -279,9 +279,9 @@ where
 /// `load-metadata-f -n <network_name>`
 ///
 /// - Get all available [`AddressSpecs`] from the database and search for the
-/// one with user-entered network name
+///   one with user-entered network name
 /// - Get metadata entries from database [`METATREE`] by [`MetaKeyPrefix`]
-/// generated with `name`. At most two entries are expected.
+///   generated with `name`. At most two entries are expected.
 /// - Check the metadata integrity
 /// - Output raw bytes payload file
 fn meta_f_n<P>(database: &sled::Db, name: &str, files_dir: P) -> Result<()>
@@ -294,7 +294,7 @@ where
 /// `load-metadata-d -a` for individual [`AddressSpecs`] value.
 ///
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
-/// and interpret it
+///   and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
 fn meta_d_a_element<P>(set_element: &AddressSpecs, files_dir: P) -> Result<()>
@@ -308,9 +308,9 @@ where
 /// `load-metadata-d -n <network_name>`
 ///
 /// - Get all available [`AddressSpecs`] from the database and search for the
-/// one with user-entered network name
+///   one with user-entered network name
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
-/// and interpret it
+///   and interpret it
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
 fn meta_d_n<P>(database: &sled::Db, name: &str, files_dir: P) -> Result<()>
@@ -323,7 +323,7 @@ where
 /// `load-metadata-d -u <url_address>`
 ///
 /// - Fetch network information using RPC calls at user-entered `address` and
-/// interpret it
+///   interpret it
 /// - Output raw bytes payload file
 ///
 /// The command is intended to be used with unknown networks that do not have
@@ -353,11 +353,11 @@ where
 ///
 /// - Get all available [`AddressSpecs`] from the database
 /// - Get and sort existing metadata entries from [`METATREE`], with block
-/// data from [`META_HISTORY`](constants::META_HISTORY) if available
+///   data from [`META_HISTORY`](constants::META_HISTORY) if available
 /// - Process each [`AddressSpecs`] and update sorted metadata entries in the
-/// process. Input [`Write`] indicates if the payload file should be created.
+///   process. Input [`Write`] indicates if the payload file should be created.
 /// - Rewrite the database [`METATREE`] with updated metadata set and update
-/// [`META_HISTORY`](constants::META_HISTORY)
+///   [`META_HISTORY`](constants::META_HISTORY)
 fn meta_kpt_a<P>(database: &sled::Db, write: &Write, pass_errors: bool, files_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
@@ -376,9 +376,9 @@ where
 /// `load-metadata<-k/-p/-t> -a` for individual [`AddressSpecs`] value.
 ///
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
-/// and interpret it
+///   and interpret it
 /// - Check the metadata integrity with the data on record in the database,
-/// insert it into received [`SortedMetaValues`]
+///   insert it into received [`SortedMetaValues`]
 /// - Output raw bytes payload file, if requested by input [`Write`]
 ///
 /// Inputs [`AddressSpecs`] for the network currently processed, [`Write`]
@@ -423,16 +423,16 @@ where
 /// `load-metadata<-k/-p/-t> -n <network_name>`
 ///
 /// - Get and sort existing metadata entries from [`METATREE`], with block
-/// data from [`META_HISTORY`](constants::META_HISTORY) if available
+///   data from [`META_HISTORY`](constants::META_HISTORY) if available
 /// - Get all available [`AddressSpecs`] from the database and search for the
-/// one with user-entered network name
+///   one with user-entered network name
 /// - Fetch network information using RPC calls at `address` in [`AddressSpecs`]
-/// and interpret it
+///   and interpret it
 /// - Check the metadata integrity with the data on record in the database,
-/// insert it into [`SortedMetaValues`]
+///   insert it into [`SortedMetaValues`]
 /// - Output raw bytes payload file, if requested by input [`Write`]
 /// - Rewrite the database [`METATREE`] with updated metadata set and update
-/// [`META_HISTORY`](constants::META_HISTORY)
+///   [`META_HISTORY`](constants::META_HISTORY)
 ///
 /// Inputs user-entered network name and [`Write`] indicating if the
 /// `load_metadata` payload should be created.

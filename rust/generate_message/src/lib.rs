@@ -7,11 +7,11 @@
 //! - fetch network data through RPC calls
 //! - prepare Vault update and derivation import payloads
 //! - generate Vault update QR codes, either signed or unsigned, and
-//! derivations import QR codes, to be scanned into Vault
+//!   derivations import QR codes, to be scanned into Vault
 //! - maintain the `hot` database on the network-connected device, to store and
-//! manage the data that went into update QR codes
+//!   manage the data that went into update QR codes
 //! - maintain Vault default network metadata set in `defaults` crate and
-//! prepare the `cold` database for the Vault release
+//!   prepare the `cold` database for the Vault release
 //!
 //! # Supported Vault updates
 //!
@@ -20,11 +20,11 @@
 //!
 //! - `add-specs`, to add a new network (i.e. the network specs) into the Vault
 //! - `load-metadata`, to load into the Vault the network metadata, for
-//! networks that already have corresponding network specs entry in the Vault
-//! database
+//!   networks that already have corresponding network specs entry in the Vault
+//!   database
 //! - `load-types`, to load types information (it is used to support the
-//! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
-//! version below `V14`)
+//!   transactions parsing in networks with legacy metadata, `RuntimeMetadata`
+//!   version below `V14`)
 //!
 //! Updates are assembled as `Vec<u8>` and could be transformed into:
 //!
@@ -110,7 +110,7 @@
 //! 1. make update payload
 //! 2. (optional) make signature for update payload
 //! 3. make update QR code (optionally signed), that could be scanned into
-//! Vault
+//!    Vault
 //!
 //! Steps (1) and (3) are done in `generate_message`, the signature is produced
 //! in other tools, except the test "signed" updates with Alice as a verifier,
@@ -151,13 +151,13 @@
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
 //!
 //! - address book title for the network `<network_name>-<network_encryption>`,
-//! used only to distinguish between address book entries
+//!   used only to distinguish between address book entries
 //! - URL address at which RPC calls are made for the network
 //! - network encryption
 //! - additional marker that the network is a default one, i.e. entry has not
-//! changed since the database generation
+//!   changed since the database generation
 //! - network title as it will be displayed in Vault, from
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+//!   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 //!
 //! ## Show network specs for a network, as recorded in the hot database
 //!
@@ -179,9 +179,9 @@
 //! Asserts that:
 //!
 //! - the file contains valid metadata, with retrievable network name and
-//! version
+//!   version
 //! - if the metadata for same network name and version is in the hot
-//! database, it completely matches the one from the file
+//!   database, it completely matches the one from the file
 //!
 //! ### Example
 //!
@@ -214,13 +214,13 @@
 //! Setting keys that could be used in command line (maximum one):
 //!
 //! - `-d`: do **not** update the database, make RPC calls, and produce
-//! output files
+//!   output files
 //! - `-f`: do **not** run RPC calls, produce output files using data already in
-//! the database
+//!   the database
 //! - `-p`: update or check database through RPC calls, do **not** produce any
-//! output files
+//!   output files
 //! - `-t` (no setting key defaults here): update or check database through RPC
-//! calls, produce output files
+//!   calls, produce output files
 //!
 //! <table>
 //!     <tr>
@@ -258,11 +258,11 @@
 //! Reference keys (exactly only one has to be used):
 //!
 //! - `--all`: all networks with entries in the
-//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+//!   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `--name` followed by single network address book title: for a network with
-//! existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//!   existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //! - `--url` followed by single URL address: reserved for networks with no
-//! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//!   record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `--all` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
@@ -423,15 +423,15 @@
 //! Setting keys that could be used in command line (maximum one):
 //!
 //! - `-d`: do **not** update the database, make RPC calls, and produce
-//! output files
+//!   output files
 //! - `-f`: do **not** run RPC calls, produce output files from database as
-//! it is
+//!   it is
 //! - `-k`: update database through RPC calls, produce output files only for
-//! **new** database entries
+//!   **new** database entries
 //! - `-p`: update database through RPC calls, do **not** produce any output
-//! files
+//!   files
 //! - `-t` (no setting key defaults here): update database through RPC
-//! calls, produce output files
+//!   calls, produce output files
 //!
 //! <table>
 //!     <tr>
@@ -479,11 +479,11 @@
 //! Reference keys (exactly only one has to be used):
 //!
 //! - `-a,--all`: all networks with entries in the
-//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+//!   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
 //! - `-n,--name` followed by single network name: for a network with existing
-//! record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//!   record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //! - `-u,--url` followed by single URL address: reserved for networks with no
-//! record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+//!   record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
 //!
 //! `-a` key could be used with `--pass-errors` key, to stop processing after first
 //! error.
@@ -643,10 +643,10 @@
 //! Command `make` is used to generate:
 //!
 //! - signed updates with a valid signature, associated public key and
-//! encryption algorithm
+//!   encryption algorithm
 //! - test signed updates, i.e. updates signed by a key with
-//! [Alice seed phrase](constants::ALICE_SEED_PHRASE) and derivation `//Alice`,
-//! with encryption algorithm chosen by user, for tests
+//!   [Alice seed phrase](constants::ALICE_SEED_PHRASE) and derivation `//Alice`,
+//!   with encryption algorithm chosen by user, for tests
 //! - unsigned updates
 //!
 //! Signature for `make` command is generated for contents of raw `[u8]` update
@@ -715,26 +715,26 @@
 //!    - `add-specs`
 //!
 //! - Key `--verifier` (can be entered only if the `--crypto` argument was
-//! `ed25519`, `sr25519`, or `ecdsa`), followed by:
+//!   `ed25519`, `sr25519`, or `ecdsa`), followed by:
 //!    - `Alice` to generate messages "verified" by
-//! [Alice seed phrase](constants::ALICE_SEED_PHRASE) with derivation `//Alice`
+//!       [Alice seed phrase](constants::ALICE_SEED_PHRASE) with derivation `//Alice`
 //!    - `-hex` followed by hex public key
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
-//! for file with public key as raw bytes
+//!       for file with public key as raw bytes
 //!
 //! - Key `--payload` followed by file path in dedicated
-//! [`FOLDER`](constants::FOLDER) containing already generated payload as
-//! raw bytes
+//!   [`FOLDER`](constants::FOLDER) containing already generated payload as
+//!   raw bytes
 //!
 //! - Key `--signature` (can be entered only if the `--crypto` argument was
-//! `ed25519`, `sr25519`, or `ecdsa` **and** `--verifier` is not `Alice`),
-//! followed by:
+//!   `ed25519`, `sr25519`, or `ecdsa` **and** `--verifier` is not `Alice`),
+//!   followed by:
 //!    - `-hex` followed by hex signature
 //!    - `-file` followed by the path in dedicated [`FOLDER`](constants::FOLDER)
-//! for file with signature as raw bytes
+//!       for file with signature as raw bytes
 //!
 //! - Optional key `-name` followed by path override for export file in
-//! dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
+//!   dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
 //!
 //! ### `sign` command
 //!
@@ -749,10 +749,10 @@
 //!
 //! - Key `-sufficient` followed by:
 //!    - `-hex` followed by hexadecimal string with contents of Vault-produced
-//! `SufficientCrypto` QR code
+//!       `SufficientCrypto` QR code
 //!    - `-file` followed by file path in dedicated
-//! [`FOLDER`](constants::FOLDER) for raw bytes file with contents of
-//! Vault-produced `SufficientCrypto` QR code
+//!       [`FOLDER`](constants::FOLDER) for raw bytes file with contents of
+//!       Vault-produced `SufficientCrypto` QR code
 //!
 //! - Key `-msg` followed by message type:
 //!    - `load-types`
@@ -760,11 +760,11 @@
 //!    - `add-specs`
 //!
 //! - Key `--payload` followed by file path in dedicated
-//! [`FOLDER`](constants::FOLDER) containing already generated payload as
-//! raw bytes
+//!   [`FOLDER`](constants::FOLDER) containing already generated payload as
+//!   raw bytes
 //!
 //! - Optional key `-name` followed by path override for export file in
-//! dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
+//!   dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
 //!
 //! Generating `SufficientCrypto` in Vault is suggested mainly for update
 //! distribution purposes. A dedicated (i.e. used only for updates signing),
@@ -866,17 +866,17 @@
 //!
 //! This will remove:
 //! - address book entry
-//! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
-//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+//!   [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+//!   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
 //! - network specs
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
-//! from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+//!   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+//!   from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 //! - all associated metadata entries from [`METATREE`](constants::METATREE)
-//! if there are no other address book entries this metadata is associated
-//! with
+//!   if there are no other address book entries this metadata is associated
+//!   with
 //! - all associated meta block history entries from
-//! [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
-//! entries this block history entries are associated with
+//!   [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
+//!   entries this block history entries are associated with
 //!
 //! ## Restore hot database to default state
 //!
@@ -892,7 +892,7 @@
 //! - types information in [`SETTREE`](constants::SETTREE)
 //! - **no** metadata entries in [`METATREE`](constants::METATREE)
 //! - **no** meta block history entries in
-//! [`META_HISTORY`](constants::META_HISTORY)
+//!   [`META_HISTORY`](constants::META_HISTORY)
 //!
 //! Default networks are Polkadot, Kusama, and Westend.
 //!
@@ -908,11 +908,11 @@
 //!
 //! - [`SPECSTREE`](constants::SPECSTREE) entries for default networks
 //! - [`VERIFIERS`](constants::VERIFIERS) entries for default networks, with
-//! verifiers set to the general one
+//!   verifiers set to the general one
 //! - two latest metadata versions for default networks in
-//! [`METATREE`](constants::METATREE)
+//!   [`METATREE`](constants::METATREE)
 //! - default types information and clean danger status in
-//! [`SETTREE`](constants::SETTREE)
+//!   [`SETTREE`](constants::SETTREE)
 //!
 //! Note that the general verifier is not specified and history is not
 //! started. This will be done only in Vault itself. Before initialization,
@@ -938,19 +938,19 @@
 //! Keys to be used in command line:
 //!
 //! - `<GOAL>`: `qr` will generate only apng QR code, `text`
-//! will generate only text file with hex-encoded update. By default, i.e. if
-//! content key is not provided, both QR code and text file are generated.
-//! `<optional_target_key>` is expected immediately after `derivations` command,
-//! if at all; keys to follow could go in any order, but with argument
-//! immediately following the key.
+//!   will generate only text file with hex-encoded update. By default, i.e. if
+//!   content key is not provided, both QR code and text file are generated.
+//!   `<optional_target_key>` is expected immediately after `derivations` command,
+//!   if at all; keys to follow could go in any order, but with argument
+//!   immediately following the key.
 //!
 //! - Key `--derivations` followed by file path in `/generate_message/` folder.
-//! File with derivations contains valid derivations, each on its own line. Only
-//! suitable derivations will be processed. Processed derivations are also
-//! printed for user to check.
+//!   File with derivations contains valid derivations, each on its own line. Only
+//!   suitable derivations will be processed. Processed derivations are also
+//!   printed for user to check.
 //!
 //! - Key `--title` followed by network address book title, to indicate to
-//! which network the derivations belong.
+//!   which network the derivations belong.
 //!
 //! Output file is in `/generate_message/` folder, file name would be
 //! `derivations-<address_book_title>`.

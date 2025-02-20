@@ -148,24 +148,24 @@
 //! by accepting updating payloads:  
 //!
 //! - `ValidCurrentVerifier::General` with general verifier `None` could be
-//! upgraded to `ValidCurrentVerifier::General` with general verifier
-//! `(Some(VerifierValue))`. Happens when Vault with no value set up for
-//! the general verifier receives and accepts a verified update with any
-//! network specs or types.  
+//!   upgraded to `ValidCurrentVerifier::General` with general verifier
+//!   `(Some(VerifierValue))`. Happens when Vault with no value set up for
+//!   the general verifier receives and accepts a verified update with any
+//!   network specs or types.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(Some(VerifierValue))` could be
-//! upgraded to `ValidCurrentVerifier::General` with general verifier set to
-//! `(Some(VerifierValue))`.
-//! Happens when Vault receives and accepts network specs update verified
-//! by general verifier for this network. Note: metadata update with
-//! verifier upgrade would be rejected.  
+//!   upgraded to `ValidCurrentVerifier::General` with general verifier set to
+//!   `(Some(VerifierValue))`.
+//!   Happens when Vault receives and accepts network specs update verified
+//!   by general verifier for this network. Note: metadata update with
+//!   verifier upgrade would be rejected.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(None)` could be upgraded to
-//! `ValidCurrentVerifier::General` with general verifier set to
-//! `(Some(VerifierValue))`.
-//! Happens when Vault receives and accepts network specs update verified
-//! by general verifier for this network. Note: metadata update with
-//! verifier upgrade would be rejected.  
+//!   `ValidCurrentVerifier::General` with general verifier set to
+//!   `(Some(VerifierValue))`.
+//!   Happens when Vault receives and accepts network specs update verified
+//!   by general verifier for this network. Note: metadata update with
+//!   verifier upgrade would be rejected.  
 //!
 //! If [`CurrentVerifier`] upgrade occurs, all pre-upgrade network information
 //! is wiped (Vault warns about that).

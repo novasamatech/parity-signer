@@ -35,17 +35,17 @@ pub enum Command {
     ///
     /// This will remove:
     /// - address book entry
-    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
-    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    ///   [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    ///   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
-    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    ///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+    ///   from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
-    /// if there are no other address book entries this metadata is associated
-    /// with
+    ///   if there are no other address book entries this metadata is associated
+    ///   with
     /// - all associated meta block history entries from
-    /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
-    /// entries this block history entries are associated with
+    ///   [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
+    ///   entries this block history entries are associated with
     #[command(name = "add-specs")]
     Specs {
         #[clap(flatten)]
@@ -78,17 +78,17 @@ pub enum Command {
     ///
     /// This will remove:
     /// - address book entry
-    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
-    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    ///   [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    ///   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
     /// - network specs
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
-    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    ///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+    ///   from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
     /// - all associated metadata entries from [`METATREE`](constants::METATREE)
-    /// if there are no other address book entries this metadata is associated
-    /// with
+    ///   if there are no other address book entries this metadata is associated
+    ///   with
     /// - all associated meta block history entries from
-    /// [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
-    /// entries this block history entries are associated with
+    ///   [`META_HISTORY`](constants::META_HISTORY) if there are no other address book
+    ///   entries this block history entries are associated with
     Remove {
         #[clap(subcommand)]
         r: Remove,
@@ -110,7 +110,7 @@ pub enum Command {
     /// - types information in [`SETTREE`](constants::SETTREE)
     /// - **no** metadata entries in [`METATREE`](constants::METATREE)
     /// - **no** meta block history entries in
-    /// [`META_HISTORY`](constants::META_HISTORY)
+    ///   [`META_HISTORY`](constants::META_HISTORY)
     ///
     /// Default networks are Polkadot, Kusama, and Westend.
     RestoreDefaults {
@@ -129,11 +129,11 @@ pub enum Command {
     ///
     /// - [`SPECSTREE`](constants::SPECSTREE) entries for default networks
     /// - [`VERIFIERS`](constants::VERIFIERS) entries for default networks, with
-    /// verifiers set to the general one
+    ///   verifiers set to the general one
     /// - two latest metadata versions for default networks in
-    /// [`METATREE`](constants::METATREE)
+    ///   [`METATREE`](constants::METATREE)
     /// - default types information and clean danger status in
-    /// [`SETTREE`](constants::SETTREE)
+    ///   [`SETTREE`](constants::SETTREE)
     ///
     /// Note that the general verifier is not specified and history is not
     /// started. This will be done only in Vault itself. Before initialization,
@@ -782,7 +782,7 @@ pub struct Override {
     ///
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
-    /// arrays of equal size.
+    ///   arrays of equal size.
     #[arg(long)]
     pub token_decimals: Option<u8>,
 
@@ -793,7 +793,7 @@ pub struct Override {
     ///
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
-    /// arrays of equal size.
+    ///   arrays of equal size.
     #[arg(long)]
     pub token_unit: Option<String>,
 }
