@@ -27,7 +27,7 @@ jobs:
         uses:                 ruby/setup-ruby@v1
         with:
           ruby-version:       '2.7'
-          bundler-cache:      false
+          bundler-cache:      true
 
       - name:                 Setup - Xcode
         uses:                 maxim-lobanov/setup-xcode@v1
@@ -39,13 +39,13 @@ jobs:
           brew install sourcery
           bundle install
 
-      # - name: Get cached Swift Packages managed by Xcode
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/
-      #     key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-spm-
+      - name: Get cached Swift Packages managed by Xcode
+        uses: actions/cache@v3
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name:                 Install Rust targets
         uses:                 dtolnay/rust-toolchain@stable
@@ -58,12 +58,12 @@ jobs:
         with:
           crate:              uniffi_bindgen
           version:            0.22.0 # Must be in sync with version in Cargo.toml
-          use-tool-cache:     false
+          use-tool-cache:     true
 
-      # - name:                 Rust Cache
-      #   uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
-      #   with:
-      #     workspaces:         rust -> rust/target
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
+        with:
+          workspaces:         rust -> rust/target
 
       - name:                 Build iOS and run tests
         shell:                bash
