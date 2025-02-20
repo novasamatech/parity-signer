@@ -466,13 +466,13 @@ pub enum Changed {
     /// Network name is stored in multiple places in the hot database:
     ///
     /// - in `name` field of network specs
-    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) stored
-    /// in `SPECSTREEPREP` tree
+    ///   [`NetworkSpecs`](crate::network_specs::NetworkSpecs) stored
+    ///   in `SPECSTREEPREP` tree
     /// - in `name` field of address book entry
-    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) stored in
-    /// `ADDRESS_BOOK` tree
+    ///   [`AddressBookEntry`](crate::metadata::AddressBookEntry) stored in
+    ///   `ADDRESS_BOOK` tree
     /// - encoded as a part of [`MetaKey`] and inside the network metadata
-    /// stored in `METATREE` tree
+    ///   stored in `METATREE` tree
     ///
     /// All those entries eventually are produced from network name that is
     /// part of `Version` constant in `System` pallet of the network metadata.

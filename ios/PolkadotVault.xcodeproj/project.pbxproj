@@ -2573,7 +2573,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    bash $PROJECT_DIR/scripts/build_libsigner.sh\nfi\n";
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    if [ \"$PLATFORM_NAME\" = \"iphoneos\" ]; then\n        bash \"$PROJECT_DIR/scripts/build_libsigner.sh\" device\n    else\n        bash \"$PROJECT_DIR/scripts/build_libsigner.sh\" simulator\n    fi\nfi\n";
 		};
 		6DDEF13A28AE744F004CA2FD /* Generate Database */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2640,7 +2640,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    sourcery --config \"${SRCROOT}/sourcery.yml\" && bash \"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh\"\nfi\n";
+			shellScript = "if [ $ACTION != \"indexbuild\" ]; then\n    export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\n    sourcery --config \"${SRCROOT}/sourcery.yml\" && bash \"${SRCROOT}/PolkadotVaultTests/Generated/AutoMockable/Scripts/initial_setup.sh\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3190,7 +3190,6 @@
 				DEVELOPMENT_TEAM = QXCVVJ6654;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = PolkadotVault/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -3256,7 +3255,6 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QXCVVJ6654;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = PolkadotVaultTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

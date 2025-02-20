@@ -145,7 +145,7 @@ pub fn history_entry_system(database: &sled::Db, event: Event) -> Result<()> {
 ///
 /// - Add history log entry with `Event::DeviceWasOnline`.
 /// - Update [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) with
-/// `device_was_online = true` flag.
+///   `device_was_online = true` flag.
 ///
 /// Unacknowledged non-safe [`DangerRecord`] block the use of Vault in the
 /// frontend.
@@ -164,7 +164,7 @@ pub fn device_was_online(database: &sled::Db) -> Result<()> {
 ///
 /// - Add history log entry with `Event::ResetDangerRecord`.
 /// - Reset [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) to
-/// `safe`, i.e. with `device_was_online = false` flag.
+///   `safe`, i.e. with `device_was_online = false` flag.
 ///
 /// Acknowledged and reset [`DangerRecord`] allow to resume the use of Vault in
 /// the frontend. Use it wisely.
