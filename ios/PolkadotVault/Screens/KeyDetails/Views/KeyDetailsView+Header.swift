@@ -53,4 +53,24 @@ extension KeyDetailsView {
             EmptyView()
         }
     }
+
+    @ViewBuilder
+    func listHeader() -> some View {
+        HStack {
+            Localizable.KeyDetails.Label.derived.text
+                .font(PrimaryFont.bodyM.font)
+            Spacer().frame(maxWidth: .infinity)
+            Image(.switches)
+                .foregroundColor(
+                    viewModel.isFilteringActive ? .accentPink300 : .textAndIconsTertiary
+                )
+                .frame(width: Heights.actionSheetButton)
+                .onTapGesture {
+                    viewModel.onNetworkSelectionTap()
+                }
+        }
+        .foregroundColor(.textAndIconsTertiary)
+        .padding(.horizontal, Spacing.large)
+        .padding(.top, Spacing.medium)
+    }
 }

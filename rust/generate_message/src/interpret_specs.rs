@@ -8,9 +8,9 @@
 //!
 //! - base58 prefix for the network (to be fit into `u16`)
 //! - decimals to display balance-related values with correct order of magnitude
-//! (to be fit into `u8`)
+//!   (to be fit into `u8`)
 //! - unit to display balance-related values with correct units (to be fit into
-//! `String`)
+//!   `String`)
 //!
 //! There could be base58 prefix information in network metadata. If base58
 //! prefix is fetched via `system_properties` RPC call and the metadata contains

@@ -159,11 +159,11 @@ fn decode_primitive(
 /// - `data` (remaining `Vec<u8>` of data),
 /// - `meta` (metadata for the network used),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
@@ -226,11 +226,11 @@ fn decode_complex(
 /// - `data` (call itself),
 /// - `meta` (metadata for the network used),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
@@ -314,11 +314,11 @@ lazy_static! {
 /// - `inner_ty` (type inside Option, found using regular expressions)
 /// - `data` (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 ///
@@ -410,11 +410,11 @@ fn deal_with_option(
 /// - `inner_ty` (type inside `Vec`, found using regular expressions)
 /// - `data` (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_vector(
@@ -468,11 +468,11 @@ fn deal_with_vector(
 /// - `number_of_elements` (number of array elements, found using regular expressions)
 /// - `data` (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - `indent` used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_array(
@@ -508,8 +508,8 @@ fn deal_with_array(
 /// The function takes as arguments
 /// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards.
 ///
 /// The function outputs the `DecodedOut` value in case of success.
@@ -700,11 +700,11 @@ fn special_case_balance(
 /// - vector of `StructField` of currently processed type, as found in `type_database`
 /// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_struct(
@@ -758,11 +758,11 @@ fn deal_with_struct(
 /// - vector of `EnumVariant` of currently processed type, as found in `type_database`
 /// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn deal_with_enum(
@@ -869,11 +869,11 @@ fn deal_with_enum(
 /// - found_ty (type of the argument found in the previous iteration, to be interpreted on run)
 /// - data (remaining `Vec<u8>` of data),
 /// - `type_database` (it describes all fundamental types that could be encountered in known networks
-/// and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
-/// currently is retrieved and decoded from the database on device used),
+///   and are not primitive types (i.e. types decoded by `decode_primitive` function), this database
+///   currently is retrieved and decoded from the database on device used),
 /// - indent used for creating properly formatted js cards,
 /// - `short_specs` (network parameters, such as base58 prefix, currency units and decimals),
-/// all those are used in some cases for proper output formatting).
+///   all those are used in some cases for proper output formatting).
 ///
 /// The function outputs the `DecodedOut` value in case of success.
 fn decode_simple(

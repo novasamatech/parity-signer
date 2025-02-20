@@ -26,11 +26,10 @@ use crate::TransactionAction;
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
-/// see the standard for details,
+///   see the standard for details,
 /// - author public key (length depends on cryptography used),
 /// - method, extensions, network genesis hash
-
-/// Enum to move around cards in preparatory stage (author details or author card, and warning card)
+///   Enum to move around cards in preparatory stage (author details or author card, and warning card)
 enum CardsPrep<'a> {
     SignProceed(AddressDetails, Option<Warning<'a>>),
     ShowOnly(TransactionCard, Box<TransactionCard>),
@@ -44,7 +43,6 @@ enum CardsPrep<'a> {
 /// Transaction format corresponds to what we get from qr code:
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
-
 pub(crate) fn parse_transaction(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
     let (author_multi_signer, call_data, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(database, data_hex)?;
