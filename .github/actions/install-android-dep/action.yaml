@@ -1,0 +1,20 @@
+name: 'Install Android Dependencies'
+description: 'Sets up JDK and Android SDK/NDK'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK environment
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+
+    - name: Install NDK
+      shell: bash
+      run: echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/16.0/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}

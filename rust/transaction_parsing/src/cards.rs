@@ -77,7 +77,7 @@ pub(crate) enum Warning<'a> {
     MetadataExtensionsIncomplete,
 }
 
-impl<'a> Warning<'a> {
+impl Warning<'_> {
     pub(crate) fn show(&self) -> String {
         match &self {
             Warning::AuthorNotFound => String::from("Transaction author public key not found."),
@@ -97,7 +97,7 @@ impl<'a> Warning<'a> {
     }
 }
 
-impl<'a> Card<'a> {
+impl Card<'_> {
     pub(crate) fn card(&self, index: &mut u32, indent: u32) -> TransactionCard {
         let card = match &self {
             Card::ParserCard(m) => match m {

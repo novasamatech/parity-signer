@@ -3,32 +3,32 @@
 //! Cold database has following trees:  
 //!
 //! - `SPECSTREE`, for network specs `OrderedNetworkSpecs` entries, with keys
-//! [`NetworkSpecsKey`]  
+//!   [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
-//! entries, with keys [`VerifierKey`]  
+//!   entries, with keys [`VerifierKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
-//! prefix search with [`MetaKeyPrefix`]  
+//!   prefix search with [`MetaKeyPrefix`]  
 //! - `ADDRTREE`, for [`AddressDetails`](crate::users::AddressDetails) entries
-//! with public information associated with user addresses, with keys
-//! [`AddressKey`]  
+//!   with public information associated with user addresses, with keys
+//!   [`AddressKey`]  
 //! - `SETTREE`, for types information, Vault danger status, and general
-//! verifier  
+//!   verifier  
 //! - `TRANSACTION`, to temporarily store transaction information while waiting
-//! for user approval  
+//!   for user approval  
 //! - `HISTORY`, for [`Entry`](crate::history::Entry) log of all events
-//! happening in Vault, with keys [`Order`]
+//!   happening in Vault, with keys [`Order`]
 //!
 //! Hot database has following trees:  
 //!
 //! - `SPECSTREEPREP`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
-//! entries, with keys [`NetworkSpecsKey`]  
+//!   entries, with keys [`NetworkSpecsKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
-//! prefix search with [`MetaKeyPrefix`]  
+//!   prefix search with [`MetaKeyPrefix`]  
 //! - `META_HISTORY`, for [`H256`] block hash entries, with keys [`MetaKey`] and
-//! prefix search with [`MetaKeyPrefix`]
+//!   prefix search with [`MetaKeyPrefix`]
 //! - `SETTREE`, for types information  
 //! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
-//! and send RPC calls to fetch network information, with keys `AddressBookKey`
+//!   and send RPC calls to fetch network information, with keys `AddressBookKey`
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
@@ -164,7 +164,7 @@ impl VerifierKey {
 /// - derivation: soft (`/`) and hard (`//`) junctions and password (`///`)  
 /// - encryption algorithm  
 /// - network for address to be used with (network must support the encryption
-/// algorithm)  
+///   algorithm)  
 ///
 /// The seed phrase and password are **not** stored in rust-managed database.
 /// For storing seed phrases, Vault device's own key management system is used.
@@ -263,13 +263,13 @@ impl AddressKey {
 /// entry has unique [`MetaKey`]. This is so because:
 ///
 /// - Metadata that could be used in Vault must contain `Version` constant in
-/// pallet `System`, and only such metadata can be added in the databases.  
+///   pallet `System`, and only such metadata can be added in the databases.  
 ///
 /// - Two raw metadata entries corresponding to same network name and network
-/// version must be identical. If the metadata changes without bumping the
-/// network version, both Vault and hot database client would produce an error.
-/// It is not possible to switch the metadata in cold or hot database to the
-/// changed one without removing the old entry first.  
+///   version must be identical. If the metadata changes without bumping the
+///   network version, both Vault and hot database client would produce an error.
+///   It is not possible to switch the metadata in cold or hot database to the
+///   changed one without removing the old entry first.  
 #[derive(Debug, Clone)]
 pub struct MetaKey(Vec<u8>);
 

@@ -12,10 +12,10 @@
 //! Default build of the cold database for Vault includes:
 //!
 //! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
-//! public key as a verifier value
+//!   public key as a verifier value
 //! - network specs `OrderedNetworkSpecs` for default networks
 //! - verifiers for default networks, set to
-//! `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
+//!   `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
 //! - two latest metadata versions for each of the default networks
 //! - default types information
 //!

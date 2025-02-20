@@ -61,7 +61,7 @@ extension MTransaction {
     var hasImportableKeys: Bool {
         switch ttype {
         case .importDerivations:
-            var hasImportableKeys: Bool = false
+            var hasImportableKeys = false
             sortedValueCards().forEach {
                 if case let .derivationsCard(keys) = $0.card {
                     hasImportableKeys = keys

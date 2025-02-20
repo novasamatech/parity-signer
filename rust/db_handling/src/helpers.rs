@@ -266,9 +266,9 @@ pub fn try_get_types(database: &sled::Db) -> Result<Option<Vec<TypeEntry>>> {
 /// Types data is expected to be found, for example, in:
 ///
 /// - hot database, from which the types data could not be removed using
-/// standard operations
+///   standard operations
 /// - cold database, when transactions made using `RuntimeMetadata` `V12` or `V13` are
-/// being decoded
+///   being decoded
 ///
 /// Not finding types data results in an error.
 pub fn get_types(database: &sled::Db) -> Result<Vec<TypeEntry>> {
@@ -455,9 +455,9 @@ pub fn transfer_metadata_to_cold(database_hot: &sled::Db, database_cold: &sled::
 /// Removing a network means:
 ///
 /// - Remove from [`SPECSTREE`] all [`OrderedNetworkSpecs`] that have genesis hash
-/// associated with given `NetworkSpecsKey`
+///   associated with given `NetworkSpecsKey`
 /// - Remove from [`METATREE`] all metadata entries corresponding to the network
-/// name, as found in `OrderedNetworkSpecs`
+///   name, as found in `OrderedNetworkSpecs`
 /// - Remove from [`ADDRTREE`] all addresses in the networks being removed
 /// - Modify `Verifier` data if necessary.
 ///

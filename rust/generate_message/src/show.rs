@@ -21,7 +21,7 @@ use crate::helpers::{
 /// - network version
 /// - hexadecimal metadata hash
 /// - block hash at which the metadata was fetched if on record, from
-/// [`META_HISTORY`](constants::META_HISTORY) tree
+///   [`META_HISTORY`](constants::META_HISTORY) tree
 ///
 /// It could be called by:
 ///
@@ -70,8 +70,8 @@ pub fn show_metadata(database: &sled::Db) -> Result<()> {
 /// - network encryption
 /// - additional marker that the network is a default one
 /// - network title as it will be displayed in Vault, from
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in
-/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in
+///   [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 ///
 /// It could be called by:
 ///
@@ -133,9 +133,9 @@ pub fn show_networks(database: &sled::Db) -> Result<()> {
 /// Function asserts that:
 ///
 /// - the file contains valid metadata, with retrievable network name and
-/// version
+///   version
 /// - if the metadata for same network name and version is in the hot database,
-/// it completely matches the one from the file
+///   it completely matches the one from the file
 ///
 /// Function could be used to check release metadata files in `defaults` crate.
 pub fn check_file(database: &sled::Db, path: String) -> Result<()> {

@@ -66,7 +66,7 @@ pub enum ParserError {
 /// `53xx00` and `53xx02` transcations consist of:
 ///
 /// - prelude, `53xx00` or `53xx02`, where `xx` stands for the encryption
-/// algorithm associated with address and network used
+///   algorithm associated with address and network used
 /// - public key corresponding to the address that can sign the transaction
 /// - encoded call data, the body of the transaction
 /// - extensions, as set in the network metadata
@@ -126,7 +126,7 @@ pub enum ParserError {
 /// `53xx03` transaction consists of:
 ///
 /// - prelude `53xx03`, where `xx` stands for the encryption algorithm
-/// associated with address and network used
+///   associated with address and network used
 /// - public key corresponding to the address that can sign the transaction
 /// - SCALE-encoded `String` contents of the message
 /// - genesis hash of the network in which the transaction was generated

@@ -22,7 +22,7 @@ pub fn base_cmd() -> Command {
 
 pub fn assert_cmd_stdout(command: &str, output: &'static str) {
     base_cmd()
-        .args(&command.split(' ').collect::<Vec<&str>>())
+        .args(command.split(' ').collect::<Vec<&str>>())
         .assert()
         .success()
         .code(0)

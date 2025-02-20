@@ -13,13 +13,13 @@
 //!
 //! - [`SPECSTREE`], with network specs in cold database format
 //! - [`VERIFIERS`], with network verifiers, i.e. data on who user trusts to
-//! sign updates for a given network
+//!   sign updates for a given network
 //! - [`METATREE`], with network metadata
 //! - [`ADDRTREE`], with user addresses public information
 //! - [`SETTREE`], containing general verifier, types information, and Vault
-//! danger status
+//!   danger status
 //! - [`TRANSACTION`], used to store temporarily transaction data while the
-//! user accepts or declines it
+//!   user accepts or declines it
 //! - [`HISTORY`], with history log
 //!
 //! Hot database contains following trees:
@@ -34,7 +34,7 @@
 //!
 //! - tree names in cold database alone or shared between cold and hot databases
 //! - key names in [`SPECSTREE`] tree of cold database alone or shared between
-//! cold and hot databases
+//!   cold and hot databases
 //! - recurring throughout the Vault seed phrase for Alice
 //! - QR graphic settings, used for both static and animated PNG QR codes
 //!
@@ -43,7 +43,7 @@
 //! air-gapped device. It includes:
 //!
 //! - keys for [`TRANSACTION`] tree, used for temporary storage for various
-//! kinds of transactions while they are shown to user for approval
+//!   kinds of transactions while they are shown to user for approval
 //! - display settings for history log and word guesser
 //!
 //! Feature `"active"` corresponds to all Vault-related things happening
@@ -54,7 +54,7 @@
 //! - default color settings for network specs
 //! - default files and folders name fragments, for use with `generate_message`
 //! - fountain qr generation parameters (large apng fountain qr codes are
-//! generated only on the hot side)
+//!   generated only on the hot side)
 //!
 //! Feature `"test"` includes all `"signer"` and `"active"` contents, and some
 //! recurring data for integration testing, such as known identicons and known

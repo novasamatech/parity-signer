@@ -7,9 +7,9 @@
 //! Required data to generate address:
 //!
 //! - seed phrase (secret words set, must be always zeroized after use and is
-//! never stored in Rust database)
+//!   never stored in Rust database)
 //! - derivation path (`/soft//hard///password`); password part, i.e. whatever
-//! follows `///` is not stored in Rust database and must be zeroized after use
+//!   follows `///` is not stored in Rust database and must be zeroized after use
 //! - [`NetworkSpecsKey`](definitions::keyring::NetworkSpecsKey)
 //!
 //! The combination of seed phrase and derivation path allows to generate key
@@ -767,10 +767,10 @@ pub(crate) struct PrepData {
 /// The output [`PrepData`] contains:
 ///
 /// - `address_prep` set of `(AddressKey, AddressDetails)` values that
-/// eventually will be transformed into [`Batch`](sled::Batch) to update the
-/// `ADDRTREE` of the cold database
+///   eventually will be transformed into [`Batch`](sled::Batch) to update the
+///   `ADDRTREE` of the cold database
 /// - output `Event` set that will be eventually added into `HISTORY` as a part
-/// of single `Entry`(definitions::history::Entry)
+///   of single `Entry`(definitions::history::Entry)
 ///
 /// Function creates only **one** address, and output `PrepData` **updates**
 /// address preparation set received as input.
@@ -1003,10 +1003,10 @@ fn do_create_address(
 /// The output [`PrepData`] contains:
 ///
 /// - `address_prep` set of `(AddressKey, AddressDetails)` values that
-/// eventually will be transformed into [`Batch`](sled::Batch) to update the
-/// `ADDRTREE` of the cold database
+///   eventually will be transformed into [`Batch`](sled::Batch) to update the
+///   `ADDRTREE` of the cold database
 /// - output `Event` set that will be eventually added into `HISTORY` as a part
-/// of single `Entry`(definitions::history::Entry)
+///   of single `Entry`(definitions::history::Entry)
 ///
 /// All output `PrepData` elements are generated within this function.
 /// It does not input addresses previously processed for the same transaction
@@ -1464,7 +1464,7 @@ pub fn try_create_address(
 /// Function wipes [`ADDRTREE`] and adds:
 ///
 /// - seed key, i.e. seed addresses for all 3 default networks (Polkadot,
-/// Kusama, Westend)
+///   Kusama, Westend)
 /// - addresses with default derivation path in each default network
 /// - address with `//Alice` derivation path in Westend network
 #[cfg(feature = "active")]
