@@ -1,6 +1,7 @@
 use crate::{
   types::MetadataProof, 
   visitor::{CallCardsParser, TypeRegistry, TypeResolver},
+  state_machine::DefaultState
 };
 use parser::decoding_commons::OutputCard;
 use scale_decode::visitor::decode_with_visitor;
@@ -10,9 +11,8 @@ pub fn decode_call(
   proof_metadata: &MetadataProof,
 ) -> Result<Vec<OutputCard>, String> {
   let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
-  let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
 
-	let visitor = CallCardsParser::new(&type_registry);
+	let visitor = CallCardsParser::new(DefaultState { indent: 0 });
 
   let result = decode_with_visitor(
 		call,
