@@ -9,13 +9,13 @@ use alloc::{
 	vec::Vec,
 };
 
-use parser::{decoding_commons::OutputCard};
+use parser::decoding_commons::OutputCard;
 use scale_decode::{
 	ext::scale_type_resolver::{
-		BitsOrderFormat, BitsStoreFormat, Primitive as RPrimitive, ResolvedTypeVisitor, Variant,
+		BitsOrderFormat, BitsStoreFormat, Primitive as RPrimitive, ResolvedTypeVisitor, Variant
 	},
-	visitor::{DecodeError},
-	Field, Visitor,
+	visitor::DecodeError,
+	Field, Visitor
 };
 
 use crate::{
@@ -403,23 +403,24 @@ impl Visitor for CallCardsParser {
 
 		let path = None;
 
-		let items_count = value.count();
+		let seq_items: Vec<_> = value.collect();
+		let items_count = seq_items.len();
 
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
-			items_count: items_count
+			items_count
 		};
 
 		let output = visitor.cloned_state().start_sequence(&mut visitor, &input)?;
 		visitor.consume(output);
 
-		while let Some((index, field_result)) = value.enumerate().next() {
+		for (index, field_result) in seq_items.into_iter().enumerate() {
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
   			parent_path: &path,
-  			items_count: items_count
+  			items_count
 			};
 
 			let output = visitor.cloned_state().start_sequence_item(&mut visitor, &input)?;
@@ -497,6 +498,7 @@ impl Visitor for CallCardsParser {
 		let mut visitor = self;
 
 		let path = None;
+		let items: Vec<_> = value.collect();
 		let items_count = value.count();
 
 		let input = StateInputCompound {
@@ -508,7 +510,7 @@ impl Visitor for CallCardsParser {
 		let output = visitor.cloned_state().start_tuple(&mut visitor, &input)?;
 		visitor.consume(output);
 
-		while let Some((index, field)) = value.enumerate().next() {
+		for (index, field) in items.into_iter().enumerate() {
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
@@ -539,7 +541,8 @@ impl Visitor for CallCardsParser {
 		let mut visitor = self;
 
 		let path = None;
-		let fields_count = value.fields().count();
+		let fields: Vec<_> = value.fields().collect();
+		let fields_count = fields.len();
 
 		let input = StateInputCompound {
 			name: Some(value.name().to_string()),
@@ -550,7 +553,7 @@ impl Visitor for CallCardsParser {
 		let output = visitor.cloned_state().start_variant(&mut visitor, &input)?;
 		visitor.consume(output);
 
-		while let Some((index, field_result)) = value.fields().enumerate().next() {
+		for (index, field_result) in fields.into_iter().enumerate() {
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
 
@@ -564,10 +567,10 @@ impl Visitor for CallCardsParser {
 			let output = visitor.cloned_state().start_field(&mut visitor, &input)?;
 			visitor.consume(output);
 
+			visitor = field.decode_with_visitor(visitor)?;
+
 			let output = visitor.cloned_state().complete_field(&mut visitor, &input)?;
 			visitor.consume(output);
-
-			visitor = field.decode_with_visitor(visitor)?;
 		}
 
 		let output = visitor.cloned_state().complete_variant(&mut visitor, &input)?;
@@ -585,23 +588,24 @@ impl Visitor for CallCardsParser {
 		let mut visitor = self;
 
 		let path = None;
-		let items_count = value.count();
+		let items: Vec<_> = value.collect();
+		let items_count = items.len();
 
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
-			items_count: items_count
+			items_count
 		};
 
 		let output = visitor.cloned_state().start_array(&mut visitor, &input)?;
 		visitor.consume(output);
 
-		while let Some((index, field)) = value.enumerate().next() {
+		for (index, field) in items.into_iter().enumerate() {
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
   			parent_path: &path,
-  			items_count: items_count
+  			items_count
 			};
 
 			let output = visitor.cloned_state().start_array_item(&mut visitor, &input)?;

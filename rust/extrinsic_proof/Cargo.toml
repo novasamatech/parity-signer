@@ -10,7 +10,6 @@ bitvec = "1.0.1"
 array-bytes = { version = "6.2.2", default-features = false }
 hex = "0.4.3"
 parser = {path = "../parser", default-features = false}
-transaction_parsing = {path = "../transaction_parsing", default-features = false}
 blake3 = { version = "1.5.0", default-features = false }
 num-bigint = "0.4.4"
 codec = { package = "parity-scale-codec", version = "3.6.9", features = [ "derive", "bit-vec"] }

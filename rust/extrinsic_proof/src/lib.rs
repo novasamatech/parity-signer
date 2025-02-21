@@ -1,12 +1,12 @@
 extern crate alloc;
 
 mod types;
-
-pub use types::MetadataProof;
-
-#[cfg(test)]
-mod tests;
-
 mod visitor;
 mod extrinsic_decoder;
 mod state_machine;
+
+pub use types::MetadataProof;
+pub use extrinsic_decoder::decode_call;
+
+#[cfg(test)]
+mod tests;

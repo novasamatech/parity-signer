@@ -1163,7 +1163,6 @@ dependencies = [
  "pretty_assertions",
  "scale-decode 0.13.1",
  "scale-info",
- "transaction_parsing",
 ]
 
 [[package]]

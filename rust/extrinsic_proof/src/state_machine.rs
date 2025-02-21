@@ -415,9 +415,11 @@ pub trait State: Send + Sync {
 
   fn start_variant(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
+    state_machine:&mut dyn PushStateMachine,
 		input: &StateInputCompound
 	) -> Result<StateOutput, DecodeError> {
+    state_machine.push_state();
+
     let card = OutputCard {
 			card: ParserCard::EnumVariantName { 
 				name: input.name.clone().unwrap_or_default(), 
@@ -426,14 +428,20 @@ pub trait State: Send + Sync {
 			indent: self.get_indent()
 		};
 
+    let next_state = DefaultState { indent: self.get_indent() + 1 };
+
+    state_machine.set_state(Box::new(next_state));
+
     Ok(StateOutput { cards: vec![card] })
 	}
 
   fn complete_variant(
     &self,
-    _state_machine:&mut dyn PushStateMachine,
+    state_machine:&mut dyn PushStateMachine,
     _input: &StateInputCompound
   ) -> Result<StateOutput, DecodeError> {
+    state_machine.pop_state();
+
     Ok(StateOutput::empty())
   }
 
@@ -483,6 +491,12 @@ impl Clone for Box<dyn State> {
 #[derive(Debug, Clone)]
 pub struct DefaultState {
   pub indent: u32
+}
+
+impl Default for DefaultState {
+  fn default() -> Self {
+    DefaultState { indent: 0 }
+  }
 }
 
 impl State for DefaultState {

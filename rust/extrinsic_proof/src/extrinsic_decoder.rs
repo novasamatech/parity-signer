@@ -1,6 +1,6 @@
 use crate::{
   types::MetadataProof, 
-  visitor::{CallCardsParser, TypeRegistry, TypeResolver},
+  visitor::{CallCardsParser, TypeResolver},
   state_machine::DefaultState
 };
 use parser::decoding_commons::OutputCard;
@@ -12,7 +12,7 @@ pub fn decode_call(
 ) -> Result<Vec<OutputCard>, String> {
   let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
 
-	let visitor = CallCardsParser::new(DefaultState { indent: 0 });
+	let visitor = CallCardsParser::new(DefaultState::default());
 
   let result = decode_with_visitor(
 		call,
@@ -30,30 +30,15 @@ pub fn decode_extensions(
   proof_metadata: &MetadataProof,
 ) -> Result<Vec<OutputCard>, String> {
   let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
-  let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
 
   let mut cards: Vec<OutputCard> = Vec::new();
 
   for signed_ext in proof_metadata.extrinsic.signed_extensions.iter() {
-    let visitor = CallCardsParser::new(&type_registry);
+    let visitor = CallCardsParser::new(DefaultState::default());
 
     let mut result = decode_with_visitor(
       data,
       signed_ext.included_in_extrinsic,
-      &type_resolver,
-      visitor,
-    )
-    .map_err(|e| format!("Failed to decode call: {e}"))?;
-
-    cards.append(&mut result.cards);
-  }
-
-  for signed_ext in proof_metadata.extrinsic.signed_extensions.iter() {
-    let visitor = CallCardsParser::new(&type_registry);
-
-    let mut result = decode_with_visitor(
-      data,
-      signed_ext.included_in_signed_data,
       &type_resolver,
       visitor,
     )
