@@ -2,7 +2,7 @@ use parser::decoding_commons::OutputCard;
 use parser::cards::ParserCard;
 use num_bigint::{BigInt, BigUint};
 use scale_decode::visitor::DecodeError;
-use std::clone::Clone;
+use std::{clone::Clone, os::macos::raw::stat};
 
 pub struct StateInputCompound<'a> {
   pub name: Option<String>,
@@ -507,4 +507,123 @@ impl State for DefaultState {
     fn get_indent(&self) -> u32 {
         self.indent
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct CallPalletState {
+  pub indent: u32
+}
+
+impl Default for CallPalletState {
+  fn default() -> Self {
+    CallPalletState { indent: 0 }
+  }
+}
+
+impl State for CallPalletState {
+  fn clone_box(&self) -> Box<dyn State> {
+      Box::new(self.clone())
+  }
+
+  fn get_indent(&self) -> u32 {
+      self.indent
+  }
+
+  fn start_variant(
+		&self,
+    state_machine:&mut dyn PushStateMachine,
+		input: &StateInputCompound
+	) -> Result<StateOutput, DecodeError> {
+    state_machine.push_state();
+
+    let card = OutputCard {
+			card: ParserCard::Pallet( 
+        input.name.clone().unwrap_or_default()
+      ),
+			indent: self.get_indent()
+		};
+
+    Ok(StateOutput { cards: vec![card] })
+	}
+
+  fn start_field(
+    &self,
+    state_machine:&mut dyn PushStateMachine,
+    _input: &StateInputCompoundItem
+  ) -> Result<StateOutput, DecodeError> {
+    // expecting single field as method variant inside pallet field
+
+    state_machine.push_state();
+
+    let next_state = Box::new(CallMethodState { indent: self.get_indent() + 1 });
+    state_machine.set_state(next_state);
+
+    Ok(StateOutput::empty())
+  }
+
+  fn complete_field(
+    &self,
+    state_machine:&mut dyn PushStateMachine,
+    _input: &StateInputCompoundItem
+  ) -> Result<StateOutput, DecodeError> {
+    state_machine.pop_state();
+
+    Ok(StateOutput::empty())
+  }
+
+  fn complete_variant(
+    &self,
+    state_machine:&mut dyn PushStateMachine,
+    _input: &StateInputCompound
+  ) -> Result<StateOutput, DecodeError> {
+    state_machine.pop_state();
+
+    Ok(StateOutput::empty())
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct CallMethodState {
+  pub indent: u32
+}
+
+impl State for CallMethodState {
+  fn clone_box(&self) -> Box<dyn State> {
+      Box::new(self.clone())
+  }
+
+  fn get_indent(&self) -> u32 {
+      self.indent
+  }
+
+  fn start_variant(
+		&self,
+    state_machine:&mut dyn PushStateMachine,
+		input: &StateInputCompound
+	) -> Result<StateOutput, DecodeError> {
+    state_machine.push_state();
+
+    let card = OutputCard {
+			card: ParserCard::Method {
+        method_name: input.name.clone().unwrap_or_default(),
+        docs: "".to_string()
+      },
+			indent: self.get_indent()
+		};
+
+    let next_state = Box::new(DefaultState { indent: self.get_indent() + 1});
+    state_machine.set_state(next_state);
+
+    Ok(StateOutput { cards: vec![card] })
+	}
+
+  fn complete_variant(
+    &self,
+    state_machine:&mut dyn PushStateMachine,
+    _input: &StateInputCompound
+  ) -> Result<StateOutput, DecodeError> {
+    state_machine.pop_state();
+
+    Ok(StateOutput::empty())
+  }
 }

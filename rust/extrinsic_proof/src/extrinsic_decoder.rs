@@ -1,7 +1,5 @@
 use crate::{
-  types::MetadataProof, 
-  visitor::{CallCardsParser, TypeResolver},
-  state_machine::DefaultState
+  state_machine::{CallPalletState, DefaultState}, types::MetadataProof, visitor::{CallCardsParser, TypeResolver}
 };
 use parser::decoding_commons::OutputCard;
 use scale_decode::visitor::decode_with_visitor;
@@ -12,7 +10,7 @@ pub fn decode_call(
 ) -> Result<Vec<OutputCard>, String> {
   let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
 
-	let visitor = CallCardsParser::new(DefaultState::default());
+	let visitor = CallCardsParser::new(CallPalletState::default());
 
   let result = decode_with_visitor(
 		call,
