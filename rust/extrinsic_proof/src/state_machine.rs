@@ -2,7 +2,6 @@ use parser::decoding_commons::OutputCard;
 use parser::cards::ParserCard;
 use num_bigint::{BigInt, BigUint};
 use scale_decode::visitor::DecodeError;
-use std::{clone::Clone, os::macos::raw::stat};
 
 pub struct StateInputCompound<'a> {
   pub name: Option<String>,
@@ -18,13 +17,17 @@ pub struct StateInputCompoundItem<'a> {
 }
 
 pub struct StateOutput {
-  pub cards: Vec<OutputCard>
+  pub next_state: Box<dyn State>,
+  pub cards: Vec<OutputCard>,
+  pub indent: u32
 }
 
 impl StateOutput {
-    fn empty() -> Self {
+    fn with(state: Box<dyn State>, indent: u32) -> Self {
       StateOutput {
-        cards: vec![]
+        next_state: state,
+        cards: vec![],
+        indent
       }
     }
 }
@@ -51,261 +54,228 @@ fn path_from_parent<'a>(parent_path: &Option<Vec<String>>, maybe_type_name: &Opt
   }
 }
 
-pub trait PushStateMachine {
-    fn push_state(&mut self);
-    fn set_state(&mut self, state: Box<dyn State>);
-    fn pop_state(&mut self);
-    fn can_pop_state(&self) -> bool;
-
-    fn pop_if_possible(&mut self) {
-      if self.can_pop_state() {
-        self.pop_state();
-      }
-  }
-}
-
 pub trait State: Send + Sync {
   fn clone_box(&self) -> Box<dyn State>;
 
   fn get_default_output(
     &self,
-		input: String
+		input: String,
+    indent: u32
   ) -> StateOutput {
     let card = OutputCard {
 			card: ParserCard::Default(input),
-			indent: self.get_indent()
+			indent
 		};
 
     StateOutput {
-      cards: vec![card]
+      next_state: Box::new(DefaultState),
+      cards: vec![card],
+      indent
     }
   }
 
-  fn get_indent(&self) -> u32;
-
   fn process_bool(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: bool
+		input: bool,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    let output = self.get_default_output(input.to_string());
+    let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
   }
 
 	fn process_char(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: char
+		input: char,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    let output = self.get_default_output(input.to_string());
+    let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
   }
 
 	fn process_u8(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: u8
+		input: u8,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    let output = self.get_default_output(input.to_string());
+    let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
   }
 
 	fn process_u16(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: u16
+		input: u16,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_u32(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: u32
+		input: u32,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_u64(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: u64
+		input: u64,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_u128(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: u128
+		input: u128,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_u256<'a>(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: &'a [u8; 32]
+		input: &'a [u8; 32],
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
 		let target_value = BigUint::from_bytes_le(input);
-		let output = self.get_default_output(target_value.to_string());
+		let output = self.get_default_output(target_value.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i8(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: i8
+		input: i8,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i16<'scale, 'resolver>(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: i16
+		input: i16,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i32(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: i32
+		input: i32,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i64(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: i64
+		input: i64,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i128(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: i128
+		input: i128,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input.to_string());
+		let output = self.get_default_output(input.to_string(), indent);
 
     return Ok(output);
 	}
 
 	fn process_i256<'a>(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: &'a [u8; 32]
+		input: &'a [u8; 32],
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
 		let target_value = BigInt::from_signed_bytes_le(input);
-		let output = self.get_default_output(target_value.to_string());
+		let output = self.get_default_output(target_value.to_string(), indent);
 
     return Ok(output);
 	}
 
   fn process_str(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: String
+		input: String,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		let output = self.get_default_output(input);
+		let output = self.get_default_output(input, indent);
 
     return Ok(output);
 	}
 
   fn process_bitsequence(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		input: Vec<bool>
+		input: Vec<bool>,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
 		let string_repr = input.into_iter().map(|b| if b  { '1' }  else { '0' }).collect();
 
 		let card = OutputCard {
 			card: ParserCard::BitVec(string_repr),
-			indent: self.get_indent()
+			indent
 		};
 
     let output = StateOutput {
-      cards: vec![card]
+      next_state: Box::new(DefaultState),
+      cards: vec![card],
+      indent
     };
 
 		Ok(output)
 	}
 
-	fn start_sequence(
+	fn process_sequence(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
+    _input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		Ok(StateOutput::empty())
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn start_sequence_item(
+  fn process_sequence_item(
     &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
+    _input: &StateInputCompoundItem,
+    indent: u32
   ) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
-    Ok(StateOutput::empty())
+    Ok(StateOutput::with(Box::new(DefaultState), indent))
   }
 
-  fn complete_sequence_item(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_sequence(
-    &self,
-    _state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-		Ok(StateOutput::empty())
-  }
-
-	fn start_composite(
+	fn process_composite(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		_input: &StateInputCompound
+		_input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		Ok(StateOutput::empty())
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn start_field(
+  fn process_field(
     &self,
-    state_machine:&mut dyn PushStateMachine,
-    input: &StateInputCompoundItem
+    input: &StateInputCompoundItem,
+    indent: u32
   ) -> Result<StateOutput, DecodeError> {
-		state_machine.push_state();
-
-    let current_indent = self.get_indent();
     let maybe_field_type = &input.name;
 
     let full_path = path_from_parent(&input.parent_path, maybe_field_type);
@@ -319,10 +289,10 @@ pub trait State: Send + Sync {
               path_type: full_path,
               docs_type: "".to_string(),
           },
-          indent: current_indent,
+          indent,
         };
 
-        (vec![card], current_indent + 1)
+        (vec![card], indent + 1)
       }
       None => {
         if input.items_count > 1 {
@@ -333,55 +303,32 @@ pub trait State: Send + Sync {
               path_type: full_path,
               docs_type: "".to_string()
             },
-            indent: current_indent
+            indent
           };
           
-          (vec![card], current_indent + 1)
+          (vec![card], indent + 1)
         } else {
-          (vec![], current_indent)
+          (vec![], indent)
         }
       }
     };
 
-    let next_state = Box::new(DefaultState { indent: next_indent });
-    state_machine.set_state(next_state);
-
-		Ok(StateOutput { cards })
+		Ok(StateOutput { next_state: Box::new(DefaultState), cards, indent: next_indent })
   }
 
-  fn complete_field(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_composite(
+	fn process_tuple(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		_input: &StateInputCompound
+		_input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-		Ok(StateOutput::empty())
+    Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-	fn start_tuple(
-		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		_input: &StateInputCompound
-	) -> Result<StateOutput, DecodeError> {
-    Ok(StateOutput::empty())
-	}
-
-  fn start_tuple_item(
+  fn process_tuple_item(
     &self,
-    state_machine:&mut dyn PushStateMachine,
-    input: &StateInputCompoundItem
+    input: &StateInputCompoundItem,
+    indent: u32
   ) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
     let card = OutputCard {
       card: ParserCard::FieldNumber { 
         number: input.index + 1, 
@@ -389,96 +336,42 @@ pub trait State: Send + Sync {
         path_type: "".to_string(),
         docs_type: "".to_string()
       },
-      indent: self.get_indent()
+      indent
     };
 
-		Ok(StateOutput { cards: vec![card] })
+		Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
   }
 
-  fn complete_tuple_item(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_tuple(
-    &self,
-    _state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-    Ok(StateOutput::empty())
-  }
-
-  fn start_variant(
+  fn process_variant(
 		&self,
-    state_machine:&mut dyn PushStateMachine,
-		input: &StateInputCompound
+		input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
     let card = OutputCard {
 			card: ParserCard::EnumVariantName { 
 				name: input.name.clone().unwrap_or_default(), 
 				docs_enum_variant: "".to_string() 
 			},
-			indent: self.get_indent()
+			indent
 		};
 
-    let next_state = DefaultState { indent: self.get_indent() + 1 };
-
-    state_machine.set_state(Box::new(next_state));
-
-    Ok(StateOutput { cards: vec![card] })
+    Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
 	}
 
-  fn complete_variant(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-	fn start_array(
+	fn process_array(
 		&self,
-    _state_machine:&mut dyn PushStateMachine,
-		_input: &StateInputCompound
+		_input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    Ok(StateOutput::empty())
+    Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn start_array_item(
+  fn process_array_item(
     &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
+    _input: &StateInputCompoundItem,
+    indent: u32
   ) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
-		Ok(StateOutput::empty())
-  }
-
-  fn complete_array_item(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_array(
-    &self,
-    _state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-    Ok(StateOutput::empty())
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
   }
 }
 
@@ -488,142 +381,70 @@ impl Clone for Box<dyn State> {
   }
 }
 
-#[derive(Debug, Clone)]
-pub struct DefaultState {
-  pub indent: u32
-}
-
-impl Default for DefaultState {
-  fn default() -> Self {
-    DefaultState { indent: 0 }
-  }
-}
+#[derive(Debug, Clone, Default)]
+pub struct DefaultState;
 
 impl State for DefaultState {
     fn clone_box(&self) -> Box<dyn State> {
         Box::new(self.clone())
     }
-
-    fn get_indent(&self) -> u32 {
-        self.indent
-    }
 }
 
-#[derive(Debug, Clone)]
-pub struct CallPalletState {
-  pub indent: u32
-}
-
-impl Default for CallPalletState {
-  fn default() -> Self {
-    CallPalletState { indent: 0 }
-  }
-}
+#[derive(Debug, Clone, Default)]
+pub struct CallPalletState;
 
 impl State for CallPalletState {
   fn clone_box(&self) -> Box<dyn State> {
       Box::new(self.clone())
   }
 
-  fn get_indent(&self) -> u32 {
-      self.indent
-  }
-
-  fn start_variant(
+  fn process_variant(
 		&self,
-    state_machine:&mut dyn PushStateMachine,
-		input: &StateInputCompound
+		input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
     let card = OutputCard {
 			card: ParserCard::Pallet( 
         input.name.clone().unwrap_or_default()
       ),
-			indent: self.get_indent()
+			indent
 		};
 
-    Ok(StateOutput { cards: vec![card] })
+    Ok(StateOutput { next_state: Box::new(Self), cards: vec![card], indent })
 	}
 
-  fn start_field(
+  fn process_field(
     &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
+    _input: &StateInputCompoundItem,
+    indent: u32
   ) -> Result<StateOutput, DecodeError> {
     // expecting single field as method variant inside pallet field
 
-    state_machine.push_state();
-
-    let next_state = Box::new(CallMethodState { indent: self.get_indent() + 1 });
-    state_machine.set_state(next_state);
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_field(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompoundItem
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
-
-  fn complete_variant(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
+    Ok(StateOutput::with(Box::new(CallMethodState), indent + 1))
   }
 }
 
-#[derive(Debug, Clone)]
-pub struct CallMethodState {
-  pub indent: u32
-}
+#[derive(Debug, Clone, Default)]
+pub struct CallMethodState;
 
 impl State for CallMethodState {
   fn clone_box(&self) -> Box<dyn State> {
       Box::new(self.clone())
   }
 
-  fn get_indent(&self) -> u32 {
-      self.indent
-  }
-
-  fn start_variant(
+  fn process_variant(
 		&self,
-    state_machine:&mut dyn PushStateMachine,
-		input: &StateInputCompound
+		input: &StateInputCompound,
+    indent: u32
 	) -> Result<StateOutput, DecodeError> {
-    state_machine.push_state();
-
     let card = OutputCard {
 			card: ParserCard::Method {
         method_name: input.name.clone().unwrap_or_default(),
         docs: "".to_string()
       },
-			indent: self.get_indent()
+			indent
 		};
 
-    let next_state = Box::new(DefaultState { indent: self.get_indent() + 1});
-    state_machine.set_state(next_state);
-
-    Ok(StateOutput { cards: vec![card] })
+    Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent: indent + 1 })
 	}
-
-  fn complete_variant(
-    &self,
-    state_machine:&mut dyn PushStateMachine,
-    _input: &StateInputCompound
-  ) -> Result<StateOutput, DecodeError> {
-    state_machine.pop_state();
-
-    Ok(StateOutput::empty())
-  }
 }

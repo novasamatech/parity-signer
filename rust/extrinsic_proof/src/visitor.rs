@@ -19,7 +19,7 @@ use scale_decode::{
 };
 
 use crate::{
-  state_machine::{PushStateMachine, State, StateInputCompound, StateInputCompoundItem, StateOutput},
+  state_machine::{State, StateInputCompound, StateInputCompoundItem, StateOutput},
 	types::{Type, TypeDef, TypeRef}
 };
 
@@ -171,7 +171,8 @@ impl scale_decode::TypeResolver for TypeResolver {
 pub struct CallCardsParser {
 	pub cards: Vec<OutputCard>,
 	pub state: Box<dyn State>,
-	pub stack: Vec<Box<dyn State>>
+	pub stack: Vec<u32>,
+	pub indent: u32
 }
 
 impl CallCardsParser {
@@ -179,7 +180,8 @@ impl CallCardsParser {
 		Self { 
 			cards: vec![],
 			state: Box::new(state),
-			stack: vec![]
+			stack: vec![],
+			indent: 0
 		 }
 	}
 
@@ -187,26 +189,18 @@ impl CallCardsParser {
 		self.state.clone()
 	}
 
-	fn consume(&mut self, mut output: StateOutput) {
+	fn apply(&mut self, mut output: StateOutput) {
+		self.state = output.next_state;
 		self.cards.append(&mut output.cards);
-	}
-}
-
-impl PushStateMachine for CallCardsParser {
-	fn push_state(&mut self) {
-		self.stack.push(self.state.clone());
+		self.indent = output.indent;
 	}
 
-	fn set_state(&mut self, state: Box<dyn State>) {
-		self.state = state;
+	fn push_indent(&mut self) {
+		self.stack.push(self.indent);
 	}
 
-	fn pop_state(&mut self) {
-		self.state = self.stack.pop().unwrap();
-	}
-
-	fn can_pop_state(&self) -> bool {
-		!self.stack.is_empty()
+	fn pop_indent(&mut self) {
+		self.indent =	self.stack.pop().unwrap();
 	}
 }
 
@@ -220,8 +214,8 @@ impl Visitor for CallCardsParser {
 		value: bool,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_bool(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_bool(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -231,8 +225,8 @@ impl Visitor for CallCardsParser {
 		value: char,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_char(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_char(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -242,8 +236,8 @@ impl Visitor for CallCardsParser {
 		value: u8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u8(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u8(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -253,8 +247,8 @@ impl Visitor for CallCardsParser {
 		value: u16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u16(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u16(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -264,8 +258,8 @@ impl Visitor for CallCardsParser {
 		value: u32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u32(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u32( value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -275,8 +269,8 @@ impl Visitor for CallCardsParser {
 		value: u64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u64(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u64(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -286,8 +280,8 @@ impl Visitor for CallCardsParser {
 		value: u128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u128(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u128(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -297,8 +291,8 @@ impl Visitor for CallCardsParser {
 		value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_u256(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_u256(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -308,8 +302,8 @@ impl Visitor for CallCardsParser {
 		value: i8,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i8(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i8(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -319,8 +313,8 @@ impl Visitor for CallCardsParser {
 		value: i16,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i16(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i16(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -330,8 +324,8 @@ impl Visitor for CallCardsParser {
 		value: i32,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i32(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i32(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -341,8 +335,8 @@ impl Visitor for CallCardsParser {
 		value: i64,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i64(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i64(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -352,8 +346,8 @@ impl Visitor for CallCardsParser {
 		value: i128,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i128(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i128(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -363,8 +357,8 @@ impl Visitor for CallCardsParser {
 		value: &'scale [u8; 32],
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-		let output = self.cloned_state().process_i256(&mut self, value)?;
-		self.consume(output);
+		let output = self.state.process_i256(value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -375,8 +369,8 @@ impl Visitor for CallCardsParser {
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let target_value = value.as_str()?.to_string();
-		let output = self.cloned_state().process_str(&mut self, target_value)?;
-		self.consume(output);
+		let output = self.state.process_str(target_value, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -388,8 +382,8 @@ impl Visitor for CallCardsParser {
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
     let bits = value.decode()?.collect::<Result<Vec<bool>, _>>()?;
 
-		let output = self.cloned_state().process_bitsequence(&mut self, bits)?;
-		self.consume(output);
+		let output = self.state.process_bitsequence(bits, self.indent)?;
+		self.apply(output);
 
 		Ok(self)
 	}
@@ -412,10 +406,14 @@ impl Visitor for CallCardsParser {
 			items_count
 		};
 
-		let output = visitor.cloned_state().start_sequence(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.push_indent();
+
+		let output = visitor.state.process_sequence(&input, visitor.indent)?;
+		visitor.apply(output);
 
 		for (index, field_result) in seq_items.into_iter().enumerate() {
+			visitor.push_indent();
+
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
@@ -423,17 +421,15 @@ impl Visitor for CallCardsParser {
   			items_count
 			};
 
-			let output = visitor.cloned_state().start_sequence_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			let output = visitor.state.process_sequence_item(&input, visitor.indent)?;
+			visitor.apply(output);
 
 			visitor = field_result?.decode_with_visitor(visitor)?;
 
-			let output = visitor.cloned_state().complete_sequence_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			visitor.pop_indent();
 		}
 
-		let output = visitor.cloned_state().complete_sequence(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.pop_indent();
 
 		Ok(visitor)
 	}
@@ -443,13 +439,13 @@ impl Visitor for CallCardsParser {
 		value: &mut scale_decode::visitor::types::Composite<'scale, 'resolver, Self::TypeResolver>,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+		let mut visitor = self;
+
 		// We forward `Void` as composite with no fields.
 		// TODO: call state also
 		if value.remaining() == 0 {
-			return Ok(self);
+			return Ok(visitor);
 		}
-
-		let mut visitor = self;
 
 		let path = Some(value.path().map(|item| item.to_string()).collect());
 		let fields_count = value.fields().len();
@@ -460,10 +456,14 @@ impl Visitor for CallCardsParser {
 			items_count: fields_count
 		};
 
-		let output = visitor.cloned_state().start_composite(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.push_indent();
+
+		let output = visitor.state.process_composite(&input, visitor.indent)?;
+		visitor.apply(output);
 
 		while let Some((index, field_result)) = value.enumerate().next() {
+			visitor.push_indent();
+
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
 
@@ -474,17 +474,15 @@ impl Visitor for CallCardsParser {
   			items_count: fields_count
 			};
 
-			let output = visitor.cloned_state().start_field(&mut visitor, &input)?;
-			visitor.consume(output);
+			let output = visitor.state.process_field(&input, visitor.indent)?;
+			visitor.apply(output);
 
 			visitor = field.decode_with_visitor(visitor)?;
 
-			let output = visitor.cloned_state().complete_field(&mut visitor, &input)?;
-			visitor.consume(output);
+			visitor.pop_indent();
 		}
 
-		let output = visitor.cloned_state().complete_composite(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.pop_indent();
 
 		Ok(visitor)
 	}
@@ -504,31 +502,33 @@ impl Visitor for CallCardsParser {
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
-			items_count: items_count
+			items_count
 		};
 
-		let output = visitor.cloned_state().start_tuple(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.push_indent();
+
+		let output = visitor.cloned_state().process_tuple(&input, visitor.indent)?;
+		visitor.apply(output);
 
 		for (index, field) in items.into_iter().enumerate() {
+			visitor.push_indent();
+
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
   			parent_path: &path,
-  			items_count: items_count
+  			items_count
 			};
 
-			let output = visitor.cloned_state().start_tuple_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			let output = visitor.cloned_state().process_tuple_item(&input, visitor.indent)?;
+			visitor.apply(output);
 
 			visitor = field?.decode_with_visitor(visitor)?;
 
-			let output = visitor.cloned_state().complete_tuple_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			visitor.pop_indent();
 		}
 
-		let output = visitor.cloned_state().complete_tuple(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.pop_indent();
 
 		Ok(visitor)
 	}
@@ -550,10 +550,14 @@ impl Visitor for CallCardsParser {
 			items_count: fields_count
 		};
 
-		let output = visitor.cloned_state().start_variant(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.push_indent();
+
+		let output = visitor.cloned_state().process_variant(&input, visitor.indent)?;
+		visitor.apply(output);
 
 		for (index, field_result) in fields.into_iter().enumerate() {
+			visitor.push_indent();
+
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
 
@@ -564,17 +568,15 @@ impl Visitor for CallCardsParser {
   			items_count: fields_count
 			};
 
-			let output = visitor.cloned_state().start_field(&mut visitor, &input)?;
-			visitor.consume(output);
+			let output = visitor.cloned_state().process_field(&input,visitor.indent)?;
+			visitor.apply(output);
 
 			visitor = field.decode_with_visitor(visitor)?;
 
-			let output = visitor.cloned_state().complete_field(&mut visitor, &input)?;
-			visitor.consume(output);
+			visitor.pop_indent();
 		}
 
-		let output = visitor.cloned_state().complete_variant(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.pop_indent();
 
 		Ok(visitor)
 	}
@@ -597,10 +599,14 @@ impl Visitor for CallCardsParser {
 			items_count
 		};
 
-		let output = visitor.cloned_state().start_array(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.push_indent();
+
+		let output = visitor.cloned_state().process_array(&input, visitor.indent)?;
+		visitor.apply(output);
 
 		for (index, field) in items.into_iter().enumerate() {
+			visitor.push_indent();
+
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
@@ -608,17 +614,15 @@ impl Visitor for CallCardsParser {
   			items_count
 			};
 
-			let output = visitor.cloned_state().start_array_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			let output = visitor.cloned_state().process_array_item(&input, visitor.indent)?;
+			visitor.apply(output);
 
 			visitor = field?.decode_with_visitor(visitor)?;
 
-			let output = visitor.cloned_state().complete_array_item(&mut visitor, &input)?;
-			visitor.consume(output);
+			visitor.pop_indent();
 		}
 
-		let output = visitor.cloned_state().complete_array(&mut visitor, &input)?;
-		visitor.consume(output);
+		visitor.pop_indent();
 
 		Ok(visitor)
 	}
