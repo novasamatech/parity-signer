@@ -11,7 +11,7 @@ pub fn decode_call(
   let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
   let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
 
-	let visitor = CallCardsParser::new(&type_registry, CallPalletState::default());
+	let visitor = CallCardsParser::new(&type_registry, proof_metadata.extra_info.clone(), CallPalletState::default());
 
   let result = decode_with_visitor(
 		call,
@@ -34,7 +34,7 @@ pub fn decode_extensions(
   let mut cards: Vec<OutputCard> = Vec::new();
 
   for signed_ext in proof_metadata.extrinsic.signed_extensions.iter() {
-    let visitor = CallCardsParser::new(&type_registry, DefaultState::default());
+    let visitor = CallCardsParser::new(&type_registry, proof_metadata.extra_info.clone(), DefaultState::default());
 
     let mut result = decode_with_visitor(
       data,

@@ -20,7 +20,7 @@ use scale_decode::{
 
 use crate::{
   state_machine::{State, StateInputCompound, StateInputCompoundItem, StateOutput},
-	types::{Type, TypeDef, TypeRef}
+	types::{ExtraInfo, Type, TypeDef, TypeRef}
 };
 
 pub struct TypeRegistry(BTreeMap<u32, Vec<Type>>);
@@ -170,6 +170,7 @@ impl scale_decode::TypeResolver for TypeResolver {
 
 pub struct CallCardsParser<'registry> {
 	pub type_registry: &'registry TypeRegistry,
+	pub extra_info: ExtraInfo,
 	pub cards: Vec<OutputCard>,
 	pub state: Box<dyn State>,
 	pub stack: Vec<u32>,
@@ -177,9 +178,10 @@ pub struct CallCardsParser<'registry> {
 }
 
 impl CallCardsParser<'_> {
-	pub fn new<'registry>(type_registry: &'registry TypeRegistry, state: impl State + 'static) -> CallCardsParser<'registry> {
+	pub fn new<'registry>(type_registry: &'registry TypeRegistry, extra_info: ExtraInfo, state: impl State + 'static) -> CallCardsParser<'registry> {
 		CallCardsParser {
-			type_registry, 
+			type_registry,
+			extra_info: extra_info, 
 			cards: vec![],
 			state: Box::new(state),
 			stack: vec![],
@@ -432,6 +434,7 @@ impl Visitor for CallCardsParser<'_> {
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
 
@@ -447,6 +450,7 @@ impl Visitor for CallCardsParser<'_> {
 				index,
   			name: None,
   			parent_path: &path,
+				extra_info: visitor.extra_info.clone(),
 				type_name: None,
   			items_count
 			};
@@ -483,6 +487,7 @@ impl Visitor for CallCardsParser<'_> {
 		let input = StateInputCompound {
 			name: value.name().map(|name| name.to_string()),
 			path: &path,
+			extra_info: visitor.extra_info.clone(),
 			items_count: fields_count
 		};
 
@@ -502,7 +507,8 @@ impl Visitor for CallCardsParser<'_> {
 				index,
   			name: field_name,
   			parent_path: &path,
-				type_name,
+				extra_info: visitor.extra_info.clone(),
+				type_name: type_name,
   			items_count: fields_count
 			};
 
@@ -534,6 +540,7 @@ impl Visitor for CallCardsParser<'_> {
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
 
@@ -549,6 +556,7 @@ impl Visitor for CallCardsParser<'_> {
 				index,
   			name: None,
   			parent_path: &path,
+				extra_info: visitor.extra_info.clone(),
 				type_name: None,
   			items_count
 			};
@@ -580,6 +588,7 @@ impl Visitor for CallCardsParser<'_> {
 		let input = StateInputCompound {
 			name: Some(value.name().to_string()),
 			path: &path,
+			extra_info: visitor.extra_info.clone(),
 			items_count: fields_count
 		};
 
@@ -599,6 +608,7 @@ impl Visitor for CallCardsParser<'_> {
 				index,
   			name: field_name,
   			parent_path: &path,
+				extra_info: visitor.extra_info.clone(),
 				type_name: type_name,
   			items_count: fields_count
 			};
@@ -631,6 +641,7 @@ impl Visitor for CallCardsParser<'_> {
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
 
@@ -646,6 +657,7 @@ impl Visitor for CallCardsParser<'_> {
 				index,
   			name: None,
   			parent_path: &path,
+				extra_info: visitor.extra_info.clone(),
 				type_name: None,
   			items_count
 			};

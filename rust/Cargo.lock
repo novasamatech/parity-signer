@@ -1161,8 +1161,10 @@ dependencies = [
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
+ "printing_balance",
  "scale-decode 0.13.1",
  "scale-info",
+ "sp-core",
 ]
 
 [[package]]
