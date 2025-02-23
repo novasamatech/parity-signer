@@ -81,6 +81,10 @@ fn field_type_name_is_account(type_name: &str) -> bool {
       || (type_name == "AccountId20")
 }
 
+fn field_type_name_is_call(type_name: &str) -> bool {
+  type_name == "Call"
+}
+
 pub trait State: Send + Sync {
   fn clone_box(&self) -> Box<dyn State>;
 
@@ -573,6 +577,9 @@ impl State for DefaultState {
       };
   
       let next_state: Box<dyn State> = match maybe_field_type {
+          Some(field_type) if field_type_name_is_call(&field_type) => {
+            Box::new(CallPalletState)
+          },
           Some(field_type) if field_type_name_is_account(&field_type) => {
             Box::new(AccountState::new(input.extra_info.clone()))
           },
