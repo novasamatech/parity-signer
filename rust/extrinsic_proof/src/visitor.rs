@@ -35,8 +35,8 @@ impl TypeRegistry {
 			}
 		}
 
-		pub fn get_first_matching(&self, id: &u32) -> Option<&Type> {
-			self.0.get(id)?.first()
+		pub fn get_types_by(&self, id: u32) -> Option<&Vec<Type>> {
+			self.0.get(&id)
 		}
 }
 
@@ -168,16 +168,18 @@ impl scale_decode::TypeResolver for TypeResolver {
 	}
 }
 
-pub struct CallCardsParser {
+pub struct CallCardsParser<'registry> {
+	pub type_registry: &'registry TypeRegistry,
 	pub cards: Vec<OutputCard>,
 	pub state: Box<dyn State>,
 	pub stack: Vec<u32>,
 	pub indent: u32
 }
 
-impl CallCardsParser {
-	pub fn new(state: impl State + 'static) -> Self {
-		Self { 
+impl CallCardsParser<'_> {
+	pub fn new<'registry>(type_registry: &'registry TypeRegistry, state: impl State + 'static) -> CallCardsParser<'registry> {
+		CallCardsParser {
+			type_registry, 
 			cards: vec![],
 			state: Box::new(state),
 			stack: vec![],
@@ -202,9 +204,36 @@ impl CallCardsParser {
 	fn pop_indent(&mut self) {
 		self.indent =	self.stack.pop().unwrap();
 	}
+
+	fn get_composite_field_type_name(&self, type_ref: &TypeRef, field_index: usize) -> Option<String> {
+		let type_id = type_ref.id()?;
+
+		let result_type = self.type_registry.get_types_by(type_id)?.first()?;
+		
+		match &result_type.type_def {
+				TypeDef::Composite(fields) => fields[field_index].type_name.clone(),
+				_ => None
+		}
+	}
+
+	fn get_enum_field_type_name(&self, type_ref: &TypeRef, variant_index: u32, field_index: usize) -> Option<String> {
+		let type_id = type_ref.id()?;
+
+		let result_type = self.type_registry.get_types_by(type_id)?
+    													.into_iter()
+    													.find(|t| match t.type_def.as_enumeration() {
+        												Some(e) => e.index.0 == variant_index,
+        												None => false,
+    													})?;
+		
+		match &result_type.type_def {
+				TypeDef::Enumeration(variant) => variant.fields[field_index].type_name.clone(),
+				_ => None
+		}
+	}
 }
 
-impl Visitor for CallCardsParser {
+impl Visitor for CallCardsParser<'_> {
 	type TypeResolver = TypeResolver;
 	type Value<'scale, 'resolver> = Self;
 	type Error = DecodeError;
@@ -418,6 +447,7 @@ impl Visitor for CallCardsParser {
 				index,
   			name: None,
   			parent_path: &path,
+				type_name: None,
   			items_count
 			};
 
@@ -437,7 +467,7 @@ impl Visitor for CallCardsParser {
 	fn visit_composite<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Composite<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let mut visitor = self;
 
@@ -466,11 +496,13 @@ impl Visitor for CallCardsParser {
 
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
+			let type_name = visitor.get_composite_field_type_name(&type_id, index);
 
 			let input = StateInputCompoundItem {
 				index,
   			name: field_name,
   			parent_path: &path,
+				type_name,
   			items_count: fields_count
 			};
 
@@ -517,6 +549,7 @@ impl Visitor for CallCardsParser {
 				index,
   			name: None,
   			parent_path: &path,
+				type_name: None,
   			items_count
 			};
 
@@ -536,7 +569,7 @@ impl Visitor for CallCardsParser {
 	fn visit_variant<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Variant<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let mut visitor = self;
 
@@ -560,11 +593,13 @@ impl Visitor for CallCardsParser {
 
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
+			let type_name = visitor.get_enum_field_type_name(&type_id, value.index() as u32, index);
 
 			let input = StateInputCompoundItem {
 				index,
   			name: field_name,
   			parent_path: &path,
+				type_name: type_name,
   			items_count: fields_count
 			};
 
@@ -611,6 +646,7 @@ impl Visitor for CallCardsParser {
 				index,
   			name: None,
   			parent_path: &path,
+				type_name: None,
   			items_count
 			};
 

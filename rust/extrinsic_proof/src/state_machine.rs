@@ -13,6 +13,7 @@ pub struct StateInputCompoundItem<'a> {
   pub index: usize,
   pub name: Option<String>,
   pub parent_path: &'a Option<Vec<String>>,
+  pub type_name: Option<String>,
   pub items_count: usize
 }
 
@@ -276,11 +277,11 @@ pub trait State: Send + Sync {
     input: &StateInputCompoundItem,
     indent: u32
   ) -> Result<StateOutput, DecodeError> {
-    let maybe_field_type = &input.name;
+    let maybe_field_type = &input.type_name;
 
     let full_path = path_from_parent(&input.parent_path, maybe_field_type);
 
-    let (cards, next_indent) = match maybe_field_type {
+    let (cards, next_indent) = match &input.name {
       Some(field_name) => {
         let card = OutputCard {
           card: ParserCard::FieldName {
