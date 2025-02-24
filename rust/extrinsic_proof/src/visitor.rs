@@ -476,8 +476,10 @@ impl Visitor for CallCardsParser<'_> {
 		let mut visitor = self;
 
 		// We forward `Void` as composite with no fields.
-		// TODO: call state also
 		if value.remaining() == 0 {
+			let output = visitor.state.process_void(visitor.indent)?;
+			visitor.apply(output);
+
 			return Ok(visitor);
 		}
 

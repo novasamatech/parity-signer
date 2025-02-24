@@ -82,7 +82,7 @@ fn field_type_name_is_account(type_name: &str) -> bool {
 }
 
 fn field_type_name_is_call(type_name: &str) -> bool {
-  type_name == "Call"
+  (type_name == "Call") || (type_name == "RuntimeCall")
 }
 
 pub trait State: Send + Sync {
@@ -212,6 +212,13 @@ pub trait State: Send + Sync {
 	fn process_i256<'a>(
 		&self,
 		_input: &'a [u8; 32],
+    _indent: u32
+	) -> Result<StateOutput, DecodeError> {
+		Err(DecodeError::Unexpected(scale_decode::visitor::Unexpected::I256))
+	}
+
+  fn process_void(
+		&self,
     _indent: u32
 	) -> Result<StateOutput, DecodeError> {
 		Err(DecodeError::Unexpected(scale_decode::visitor::Unexpected::I256))
@@ -508,6 +515,13 @@ impl State for DefaultState {
       };
   
       Ok(output)
+    }
+
+    fn process_void(
+      &self,
+      indent: u32
+    ) -> Result<StateOutput, DecodeError> {
+      Ok(StateOutput::with(Box::new(DefaultState), indent))
     }
   
     fn process_sequence(

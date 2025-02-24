@@ -24,7 +24,7 @@ pub fn decode_call(
   Ok(result.cards)
 }
 
-pub fn decode_extensions(
+pub fn decode_included_in_extrinsic(
   data: &mut &[u8],
   proof_metadata: &MetadataProof,
 ) -> Result<Vec<OutputCard>, String> {
@@ -39,6 +39,32 @@ pub fn decode_extensions(
     let mut result = decode_with_visitor(
       data,
       signed_ext.included_in_extrinsic,
+      &type_resolver,
+      visitor,
+    )
+    .map_err(|e| format!("Failed to decode call: {e}"))?;
+
+    cards.append(&mut result.cards);
+  }
+
+  Ok(cards)
+}
+
+pub fn decode_included_in_signature(
+  data: &mut &[u8],
+  proof_metadata: &MetadataProof,
+) -> Result<Vec<OutputCard>, String> {
+  let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
+  let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
+
+  let mut cards: Vec<OutputCard> = Vec::new();
+
+  for signed_ext in proof_metadata.extrinsic.signed_extensions.iter() {
+    let visitor = CallCardsParser::new(&type_registry, proof_metadata.extra_info.clone(), DefaultState::default());
+
+    let mut result = decode_with_visitor(
+      data,
+      signed_ext.included_in_signed_data,
       &type_resolver,
       visitor,
     )
