@@ -66,18 +66,16 @@ fun KeyDetailsMenuGeneral(
 			onclick = onSelectKeysClicked
 		)
 
-		if (FeatureFlags.isEnabled(FeatureOption.CREATE_BANANA_SPLIT_ENABLED)) {
-			MenuItemForBottomSheet(
-				vector = Icons.Outlined.QrCode,
-				label = stringResource(R.string.key_set_menu_option_backup_bs),
-				onclick = {
-					if (networkState.value == NetworkState.None)
-						onBackupBsClicked()
-					else
-						exposeConfirmAction()
-				}
-			)
-		}
+		MenuItemForBottomSheet(
+			vector = Icons.Outlined.QrCode,
+			label = stringResource(R.string.key_set_menu_option_backup_bs),
+			onclick = {
+				if (networkState.value == NetworkState.None)
+					onBackupBsClicked()
+				else
+					exposeConfirmAction()
+			}
+		)
 
 		MenuItemForBottomSheet(
 			iconId = R.drawable.ic_settings_backup_restore_28,
@@ -106,7 +104,6 @@ fun KeyDetailsMenuGeneral(
 }
 
 
-
 @Preview(
 	name = "light", group = "general", uiMode = Configuration.UI_MODE_NIGHT_NO,
 	showBackground = true, backgroundColor = 0xFFFFFFFF,
@@ -121,7 +118,7 @@ private fun PreviewKeyDetailsMenu() {
 	SignerNewTheme {
 		val state = remember { mutableStateOf(NetworkState.None) }
 		KeyDetailsMenuGeneral(
-		state, {}, {}, {}, {}, {}, {},
+			state, {}, {}, {}, {}, {}, {},
 		)
 	}
 }
