@@ -306,7 +306,6 @@ pub enum Error {
     ///
     /// Custom verifier could be upgraded only to general one, see
     /// [here](definitions::network_specs).
-
     #[error(
         "Network {name} current verifier is {}. Received add_specs message \
         is verified by {}, which is neither current network verifier not the \

@@ -762,9 +762,9 @@ pub fn update_known_specs(
 ///
 /// - `&str` address to make RPC calls
 /// - `NetworkSpecs` as they were found in the database, to be modified
-/// here
+///   here
 /// - new `Encryption` to apply to `encryption` and `title` (if no title
-/// override was entered) fields of the `NetworkSpecs`
+///   override was entered) fields of the `NetworkSpecs`
 /// - optional title override
 /// - optional token override
 pub fn update_modify_encryption_specs(
@@ -779,7 +779,7 @@ pub fn update_modify_encryption_specs(
     specs.title =
         optional_signer_title_override.unwrap_or(format!("{}-{}", specs.name, encryption.show()));
 
-    specs.encryption = encryption.to_owned();
+    encryption.clone_into(&mut specs.encryption);
 
     Ok(())
 }

@@ -11,27 +11,14 @@ extension KeyDetailsView {
     @ViewBuilder
     func derivedKeysList() -> some View {
         ScrollView(showsIndicators: false) {
-            // Main key cell
-            rootKeyHeader()
-            // Derived Keys header
-            HStack {
-                Localizable.KeyDetails.Label.derived.text
-                    .font(PrimaryFont.bodyM.font)
-                Spacer().frame(maxWidth: .infinity)
-                Image(.switches)
-                    .foregroundColor(
-                        viewModel.isFilteringActive ? .accentPink300 : .textAndIconsTertiary
-                    )
-                    .frame(width: Heights.actionSheetButton)
-                    .onTapGesture {
-                        viewModel.onNetworkSelectionTap()
-                    }
+            VStack(spacing: 0) {
+                // Main key cell
+                rootKeyHeader()
+                // Derived Keys header
+                listHeader()
+                // List
+                derivedKeys()
             }
-            .foregroundColor(.textAndIconsTertiary)
-            .padding(.horizontal, Spacing.large)
-            .padding(.top, Spacing.medium)
-            // List
-            derivedKeys()
         }
     }
 

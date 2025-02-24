@@ -255,8 +255,8 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<()> {
 /// `add-specs -f -a` for individual address book entry.
 ///
 /// - Get network specs
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
-/// the database using information in address book entry
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
+///   the database using information in address book entry
 /// - Output raw bytes payload file
 fn specs_f_a_element<P>(database: &sled::Db, entry: &AddressBookEntry, files_dir: P) -> Result<()>
 where
@@ -273,8 +273,8 @@ where
 ///
 /// - Get address book entry for the network using network address book `title`
 /// - Get network specs
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
-/// the database using information in address book entry
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
+///   the database using information in address book entry
 /// - Output raw bytes payload file
 fn specs_f_n<P>(
     database: &sled::Db,
@@ -315,8 +315,8 @@ where
 ///
 /// - Fetch network information using RPC calls and interpret it
 /// - Construct
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
-/// fetched values, user overrides and defaults
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
+///   fetched values, user overrides and defaults
 /// - Output raw bytes payload file
 fn specs_d_u<P>(
     address: &str,
@@ -346,16 +346,16 @@ where
 /// `printing` flag indicating if payload file should be made.
 ///
 /// - Search for an address book entry by address book title and get
-/// corresponding
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
+///   corresponding
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs)
 /// - Fetch network specs through RPC calls and check that the network specs
-/// from the database are still valid
+///   from the database are still valid
 /// - Modify network specs according to the overrides requested
 /// - Update database as needed: [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
-/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) are updated if the encryption
-/// was not previously in the database for this network,
-/// [`SPECSTREEPREP`](constants::SPECSTREEPREP) alone is updated if the
-/// overrides modified network specs entry
+///   [`SPECSTREEPREP`](constants::SPECSTREEPREP) are updated if the encryption
+///   was not previously in the database for this network,
+///   [`SPECSTREEPREP`](constants::SPECSTREEPREP) alone is updated if the
+///   overrides modified network specs entry
 /// - Print payload files if requested
 ///
 /// Network address book title for new address book entries is constructed as
@@ -470,10 +470,10 @@ where
 /// - Check that the URL address is unknown to the database
 /// - Fetch network information using RPC calls and interpret it
 /// - Check that there is no entries with same genesis hash as was just fetched
-/// in the database
+///   in the database
 /// - Construct
-/// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
-/// fetched values, user overrides and defaults
+///   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) with
+///   fetched values, user overrides and defaults
 /// - Construct `AddressBookEntry`
 /// - Update the database (network specs and address book)
 /// - Output raw bytes payload files if requested

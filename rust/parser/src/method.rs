@@ -34,7 +34,6 @@ pub enum OlderMeta<'a> {
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
-
 fn find_method_v12(
     pallet_index: u8,
     method_index: u8,
@@ -133,7 +132,6 @@ fn find_method_v12(
 /// in case of success outputs Method value.
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
-
 fn find_method_v13(
     pallet_index: u8,
     method_index: u8,
@@ -230,7 +228,6 @@ fn find_method_v13(
 
 /// Function to find method for current call for metadata in `V12` or `V13`
 /// Outputs `NextDecode` value.
-
 pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld> {
     if data.len() < 2 {
         return Err(Error::Decoding(ParserDecodingError::DataTooShort));

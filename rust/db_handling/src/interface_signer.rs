@@ -85,13 +85,13 @@ pub fn get_all_seed_names_with_identicons(
                 .entry(address_details.seed_name.to_string())
                 .and_modify(|e| *e += 1)
                 .or_insert(1);
-            if data_set.get(&address_details.seed_name).is_none() {
+            if !data_set.contains_key(&address_details.seed_name) {
                 data_set.insert(address_details.seed_name.to_string(), Identicon::default());
             }
         }
     }
     for x in names_phone_knows.iter() {
-        if data_set.get(x).is_none() {
+        if !data_set.contains_key(x) {
             data_set.insert(x.to_string(), Identicon::default());
         }
     }
