@@ -1155,7 +1155,6 @@ dependencies = [
  "array-bytes 6.2.3",
  "bitvec",
  "blake3",
- "frame-metadata 16.0.0",
  "hex",
  "num-bigint",
  "parity-scale-codec",

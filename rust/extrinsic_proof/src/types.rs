@@ -1,5 +1,6 @@
 use codec::{Compact, Encode, Decode};
 use core::cmp::Ordering;
+use parser::decoding_commons::OutputCard;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TypeId {
@@ -185,6 +186,12 @@ pub struct ExtrinsicMetadata {
 	pub signed_extensions: Vec<SignedExtensionMetadata>,
 }
 
+impl ExtrinsicMetadata {
+	pub fn hash(&self) -> Hash {
+		blake3::hash(&self.encode()).into()
+	}
+}
+
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Debug, Encode, Decode)]
 pub struct SignedExtensionMetadata {
 	pub identifier: String,
@@ -245,4 +252,22 @@ pub struct MetadataProof {
     pub proof: Proof,
     pub extrinsic: ExtrinsicMetadata,
     pub extra_info: ExtraInfo,
+}
+
+#[derive(Debug, Clone, Decode, Encode)]
+pub enum CheckMetadataHashMode {
+	Disabled,
+	Enabled,
+}
+
+#[derive(Default, Debug)]
+pub struct IncludedInExtrinsic {
+	pub checkMetadataHashMode: Option<CheckMetadataHashMode>,
+	pub cards: Vec<OutputCard>
+}
+
+#[derive(Default, Debug)]
+pub struct IncludedInSignature {
+	pub metadataHash: Option<Hash>,
+	pub cards: Vec<OutputCard>
 }
