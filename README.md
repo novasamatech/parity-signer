@@ -55,7 +55,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 Please read our documentation before using Vault for the first time or before upgrading. It covers the main use-cases such as installing on a new phone, creating keys, upgrading and adding new networks:
 
-👉 https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/polkadot-vault 
+👉 https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/polkadot-vault
 
 # Project Structure
 
@@ -153,6 +153,16 @@ Enable "Show package details" checkmark to select specific version.
 `rust.pythonCommand=python3`
 
 **10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
+
+### Troubleshooting
+
+#### "no such file or directory" error when invoking cargo/rustc/uniffi-bindgen
+1. Ensure rust and uniffi-bindgen are installed
+2. Sometimes launching Android Studio from the Finder might result in Android Studio not seeing all env needed variables
+Try launching Studio from the shell (command assumes you are in the "Applications" folder)
+```shell
+./Android\ Studio.app/Contents/MacOS/studio
+```
 
 # Release Android
 
