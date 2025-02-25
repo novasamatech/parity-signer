@@ -1164,6 +1164,7 @@ dependencies = [
  "scale-decode 0.13.1",
  "scale-info",
  "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]

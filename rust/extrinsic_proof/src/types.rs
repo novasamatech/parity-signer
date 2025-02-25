@@ -1,6 +1,7 @@
 use codec::{Compact, Encode, Decode};
 use core::cmp::Ordering;
 use parser::decoding_commons::OutputCard;
+use sp_runtime::generic::Era;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TypeId {
@@ -263,11 +264,14 @@ pub enum CheckMetadataHashMode {
 #[derive(Default, Debug)]
 pub struct IncludedInExtrinsic {
 	pub checkMetadataHashMode: Option<CheckMetadataHashMode>,
+	pub mortality: Option<Era>,
+	pub nonce: Option<u32>,
 	pub cards: Vec<OutputCard>
 }
 
 #[derive(Default, Debug)]
 pub struct IncludedInSignature {
 	pub metadataHash: Option<Hash>,
+	pub genesis_hash: Option<Hash>,
 	pub cards: Vec<OutputCard>
 }

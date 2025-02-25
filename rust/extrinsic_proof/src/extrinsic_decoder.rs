@@ -1,9 +1,12 @@
 use crate::{
-  state_machine::{CallPalletState, DefaultState}, types::{CheckMetadataHashMode, IncludedInExtrinsic, IncludedInSignature, MetadataProof}, visitor::{CallCardsParser, TypeRegistry, TypeResolver}
+  state_machine::{CallPalletState, DefaultState}, types::{CheckMetadataHashMode, IncludedInExtrinsic, IncludedInSignature, MetadataProof, Hash}, visitor::{CallCardsParser, TypeRegistry, TypeResolver}
 };
-use codec::Decode;
+use codec::{Compact, Decode};
 use parser::decoding_commons::OutputCard;
+use parser::cards::ParserCard;
 use scale_decode::{visitor::decode_with_visitor};
+use sp_core::H256;
+use sp_runtime::generic::Era;
 
 fn decode_special_included_in_extrinsic(identifier: &str, model: &mut IncludedInExtrinsic, data: &mut &[u8]) -> Result<bool, String> {
   match identifier {
@@ -11,6 +14,21 @@ fn decode_special_included_in_extrinsic(identifier: &str, model: &mut IncludedIn
         let decoded = CheckMetadataHashMode::decode(data)
           .map_err(|e| format!("Failed to decode extension: {e}"))?;
         model.checkMetadataHashMode = Some(decoded);
+        Ok(true)
+      },
+      "CheckMortality" => {
+        let era = Era::decode(data)
+          .map_err(|e| format!("Failed to decode check mortality: {e}"))?;
+        
+        model.mortality = Some(era);
+
+        let card = OutputCard {
+          card: ParserCard::Era(era),
+          indent: 0
+        };
+
+        model.cards.push(card);
+
         Ok(true)
       },
       _ => Ok(false)
@@ -23,6 +41,27 @@ fn decode_special_included_in_signature(identifier: &str, model: &mut IncludedIn
         let decoded = Option::decode(data)
           .map_err(|e| format!("Failed to decode extension: {e}"))?;
         model.metadataHash = decoded;
+        Ok(true)
+      },
+      "CheckMortality" => {
+        let block_hash = H256::decode(data)
+          .map_err(|e| format!("Failed to decode check mortality: {e}"))?;
+
+        let card = OutputCard {
+          card: ParserCard::BlockHash(block_hash),
+          indent: 0
+        };
+
+        model.cards.push(card);
+
+        Ok(true)
+      },
+      "CheckGenesis" => {
+        let genesis_hash = Hash::decode(data)
+          .map_err(|e| format!("Failed to decode check genesis: {e}"))?;
+
+        model.genesis_hash = Some(genesis_hash);
+
         Ok(true)
       },
       _ => Ok(false)
