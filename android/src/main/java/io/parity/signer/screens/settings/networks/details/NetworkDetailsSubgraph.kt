@@ -63,7 +63,7 @@ fun NetworkDetailsSubgraph(
 				)
 			},
 			onAddNetwork = {
-				navController.navigate(CoreUnlockedNavSubgraph.camera)
+				navController.navigate(CoreUnlockedNavSubgraph.Camera.destination(null))
 				menuController.popBackStack()
 			},
 		)
