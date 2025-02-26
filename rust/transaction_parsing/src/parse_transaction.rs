@@ -129,23 +129,30 @@ fn do_parse_transaction_with_proof(
     let mut history: Vec<Event> = Vec::new();
     let possible_warning = None;
 
-    let address_details = address_details.unwrap();
-
-    let mut card_prep = CardsPrep::SignProceed(address_details.clone(), None);
+    let address_details = address_details.ok_or_else(|| Error::AddrNotFound("".to_string()))?;
 
     let copied_vec: Vec<u8> = payload.to_vec();
     let mut remained_payload = &copied_vec[..];
 
-    let metadata_proof = decode_metadata_proof(&mut remained_payload).unwrap();
+    let metadata_proof = decode_metadata_proof(&mut remained_payload)
+        .map_err(|e| 
+            Error::AddrNotFound("Metadata proof".to_string())
+        )?;
 
     let signing_payload_len = remained_payload.len();
 
-    let method = decode_call(&mut remained_payload, &metadata_proof).unwrap();
+    let method = decode_call(&mut remained_payload, &metadata_proof)
+        .map_err(|e| 
+            Error::AddrNotFound(format!("Call decoding decoding: {}", e))
+        )?;
 
     let extensions_len = remained_payload.len();
     let method_len = signing_payload_len - extensions_len;
 
-    let extensions = decode_and_verify_extensions(&mut remained_payload, &metadata_proof).unwrap();
+    let extensions = decode_and_verify_extensions(&mut remained_payload, &metadata_proof)
+    .map_err(|e| 
+        Error::AddrNotFound(format!("Extensions decoding: {}", e))
+    )?;
 
     let (method_data, extensions_data) = payload[..payload.len() - signing_payload_len].split_at(method_len);
 

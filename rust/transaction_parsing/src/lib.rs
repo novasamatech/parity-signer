@@ -64,7 +64,7 @@ fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<Transactio
         "00" | "02" => parse_transaction(database, data_hex),
         "03" => process_message(database, data_hex),
         "04" => parse_transaction_bulk(database, data_hex),
-        "05" => parse_transaction_with_proof(database, data_hex),
+        "06" => parse_transaction_with_proof(database, data_hex),
         "80" => load_metadata(database, data_hex),
         "81" => load_types(database, data_hex),
         "c1" => add_specs(database, data_hex),

@@ -3,7 +3,7 @@ use crate::{
     CallPalletState, 
     DefaultState}, types::{CheckMetadataHashMode, Hash, IncludedInExtrinsic, IncludedInSignature, MetadataProof}, visitor::{CallCardsParser, TypeRegistry, TypeResolver}
 };
-use codec::{Decode};
+use codec::{Decode, Compact};
 use parser::decoding_commons::OutputCard;
 use parser::cards::ParserCard;
 use scale_decode::{visitor::decode_with_visitor};
@@ -83,8 +83,11 @@ pub fn decode_call(
   let type_resolver = TypeResolver::new(metadata_proof.proof.leaves.iter());
   let type_registry = TypeRegistry::new(metadata_proof.proof.leaves.iter());
 
-	let visitor = CallCardsParser::new(&type_registry, metadata_proof.extra_info.clone(), CallPalletState::default());
+  let _call_len = Compact::<u32>::decode(data)
+    .map_err(|e| format!("Failed to decode call len: {e}"))?;
 
+	let visitor = CallCardsParser::new(&type_registry, metadata_proof.extra_info.clone(), CallPalletState::default());
+  
   let result = decode_with_visitor(
 		data,
 		metadata_proof.extrinsic.call_ty,
