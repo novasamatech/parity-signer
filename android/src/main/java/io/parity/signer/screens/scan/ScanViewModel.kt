@@ -378,7 +378,7 @@ class ScanViewModel : ViewModel() {
 		comment: String,
 		seedNames: List<String>,
 	): ActionResult? {
-		return when (val phrases = seedRepository.getSeedPhrases(seedNames)) {
+		return when (val phrases = seedRepository.getSeedPhrasesForceAuth(seedNames)) {
 			is RepoResult.Failure -> {
 				Timber.w(TAG, "signature transactions failure ${phrases.error}")
 				null
