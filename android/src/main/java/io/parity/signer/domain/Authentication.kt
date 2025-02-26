@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import io.parity.signer.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -46,7 +47,7 @@ class Authentication {
 	private lateinit var biometricPrompt: BiometricPrompt
 
 	private val _auth = MutableStateFlow<Boolean>(false)
-	val auth: StateFlow<Boolean> = _auth
+	val auth: StateFlow<Boolean> = _auth.asStateFlow()
 
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
 		if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
