@@ -4,6 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
+use definitions::network_specs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
@@ -11,6 +12,7 @@ use definitions::{
     network_specs::VerifierValue,
     users::AddressDetails,
 };
+use extrinsic_proof::decode_and_verify_extensions;
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
@@ -23,6 +25,8 @@ use crate::helpers::{
     bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name,
 };
 use crate::TransactionAction;
+
+use crate::extrinsic_proof::{decode_call, decode_metadata_proof, };
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -59,6 +63,22 @@ pub(crate) fn parse_transaction(database: &sled::Db, data_hex: &str) -> Result<T
     )
 }
 
+pub(crate) fn parse_transaction_with_proof(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
+    let (author_multi_signer, payload, genesis_hash, encryption) =
+        multisigner_msg_genesis_encryption(database, data_hex)?;
+
+    let author_address_key = AddressKey::new(author_multi_signer.clone(), Some(genesis_hash));
+    let address_details = try_get_address_details(database, &author_address_key)?;
+    do_parse_transaction_with_proof(
+        database, 
+        author_multi_signer, 
+        &payload, 
+        genesis_hash, 
+        encryption, 
+        address_details
+    )
+}
+
 pub fn parse_dd_transaction(
     database: &sled::Db,
     data_hex: &str,
@@ -82,6 +102,98 @@ pub fn parse_dd_transaction(
         encryption,
         Some(address_details),
     )
+}
+
+fn do_parse_transaction_with_proof(
+    database: &sled::Db,
+    author_multi_signer: MultiSigner,
+    payload: &[u8],
+    genesis_hash: H256,
+    encryption: Encryption,
+    address_details: Option<AddressDetails>,
+) -> Result<TransactionAction> {
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
+
+    // initialize index and indent
+    let mut index: u32 = 0;
+    let indent: u32 = 0;
+
+    let network_specs = try_get_network_specs(database, &network_specs_key)?
+        .ok_or_else( || 
+            Error::UnknownNetwork {
+                genesis_hash,
+                encryption,
+            }
+    )?;
+
+    let mut history: Vec<Event> = Vec::new();
+    let possible_warning = None;
+
+    let address_details = address_details.unwrap();
+
+    let mut card_prep = CardsPrep::SignProceed(address_details.clone(), None);
+
+    let copied_vec: Vec<u8> = payload.to_vec();
+    let mut remained_payload = &copied_vec[..];
+
+    let metadata_proof = decode_metadata_proof(&mut remained_payload).unwrap();
+
+    let signing_payload_len = remained_payload.len();
+
+    let method = decode_call(&mut remained_payload, &metadata_proof).unwrap();
+
+    let extensions_len = remained_payload.len();
+    let method_len = signing_payload_len - extensions_len;
+
+    let extensions = decode_and_verify_extensions(&mut remained_payload, &metadata_proof).unwrap();
+
+    let (method_data, extensions_data) = payload[..payload.len() - signing_payload_len].split_at(method_len);
+
+    let sign_one = TrDbColdSignOne::generate(
+        SignContent::Transaction {
+            method: method_data.to_vec(),
+            extensions: extensions_data.to_vec(),
+        },
+        &network_specs.specs.name,
+        &address_details.path,
+        address_details.has_pwd,
+        &author_multi_signer,
+        history,
+    );
+            
+    let mut sign = TrDbColdSign::from_storage(database, None)?
+                .unwrap_or_default();
+    sign.signing_bulk.push(sign_one);
+    let checksum = sign.store_and_get_checksum(database)?;
+    let author_info = make_author_info(
+        &author_multi_signer,
+        network_specs.specs.base58prefix,
+        network_specs.specs.genesis_hash,
+        &address_details,
+    );
+            
+    let warning = possible_warning
+        .map(|w| Card::Warning(w).card(&mut index, indent))
+        .map(|w| vec![w]);
+            
+    let method_cards = into_cards(&method, &mut index);
+    let extensions_cards = into_cards(&extensions, &mut index);
+    let content = TransactionCardSet {
+        warning,
+        method: Some(method_cards),
+        extensions: Some(extensions_cards),
+        ..Default::default()
+    };
+            
+    Ok(TransactionAction::Sign {
+        actions: vec![TransactionSignAction {
+            content,
+            has_pwd: address_details.has_pwd,
+            author_info,
+            network_info: network_specs.clone(),
+        }],
+        checksum,
+    })
 }
 
 fn do_parse_transaction(

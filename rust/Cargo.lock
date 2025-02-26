@@ -4847,6 +4847,7 @@ dependencies = [
  "constants",
  "db_handling",
  "definitions",
+ "extrinsic_proof",
  "frame-metadata 16.0.0",
  "hex",
  "log",

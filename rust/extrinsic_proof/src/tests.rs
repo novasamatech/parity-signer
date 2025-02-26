@@ -46,7 +46,7 @@ fn parse_include_in_signature() {
     println!("Included in signature {:?}", included_in_signature);
 
     verify_metadata_proof(
-        metadata, 
-        included_in_signature.metadataHash.unwrap()
+        &metadata, 
+        included_in_signature.metadata_hash.unwrap()
     ).unwrap()
 }

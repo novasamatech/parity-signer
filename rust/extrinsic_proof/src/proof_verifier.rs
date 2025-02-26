@@ -119,7 +119,7 @@ fn get_hash(
   blake3::hash(&(left, right).encode()).into()
 }
 
-pub fn verify_metadata_proof(metadata_proof: MetadataProof, expected_hash: Hash) -> Result<(), String> {
+pub fn verify_metadata_proof(metadata_proof: &MetadataProof, expected_hash: Hash) -> Result<(), String> {
   let proof_hash = get_hash(
     &mut &metadata_proof.proof.leaf_indices[..], 
     &mut &metadata_proof.proof.leaves[..], 
@@ -133,10 +133,10 @@ pub fn verify_metadata_proof(metadata_proof: MetadataProof, expected_hash: Hash)
     types_tree_root: proof_hash, 
     extrinsic_metadata_hash: extrinsic_metadata_hash,
     spec_version: metadata_proof.extra_info.spec_version,
-    spec_name: metadata_proof.extra_info.spec_name,
+    spec_name: metadata_proof.extra_info.spec_name.clone(),
     base58_prefix: metadata_proof.extra_info.base58_prefix,
     decimals: metadata_proof.extra_info.decimals,
-    token_symbol: metadata_proof.extra_info.token_symbol 
+    token_symbol: metadata_proof.extra_info.token_symbol.clone() 
   }.hash();
 
   println!("Calculated hash: {:?}", metadata_hash.hex(""));

@@ -14,6 +14,7 @@ frame-metadata = {version = "16.0.0", default-features = false}
 hex = "0.4.3"
 parity-scale-codec = "3.6.9"
 parser = {path = "../parser", default-features = false}
+extrinsic_proof = {path = "../extrinsic_proof"}
 sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false}

@@ -263,7 +263,7 @@ pub enum CheckMetadataHashMode {
 
 #[derive(Default, Debug)]
 pub struct IncludedInExtrinsic {
-	pub checkMetadataHashMode: Option<CheckMetadataHashMode>,
+	pub check_metadata_hash_mode: Option<CheckMetadataHashMode>,
 	pub mortality: Option<Era>,
 	pub nonce: Option<u32>,
 	pub cards: Vec<OutputCard>
@@ -271,7 +271,7 @@ pub struct IncludedInExtrinsic {
 
 #[derive(Default, Debug)]
 pub struct IncludedInSignature {
-	pub metadataHash: Option<Hash>,
+	pub metadata_hash: Option<Hash>,
 	pub genesis_hash: Option<Hash>,
 	pub cards: Vec<OutputCard>
 }

@@ -1,7 +1,9 @@
 use crate::{
-  state_machine::{CallPalletState, DefaultState}, types::{CheckMetadataHashMode, IncludedInExtrinsic, IncludedInSignature, MetadataProof, Hash}, visitor::{CallCardsParser, TypeRegistry, TypeResolver}
+  proof_verifier::verify_metadata_proof, state_machine::{
+    CallPalletState, 
+    DefaultState}, types::{CheckMetadataHashMode, Hash, IncludedInExtrinsic, IncludedInSignature, MetadataProof}, visitor::{CallCardsParser, TypeRegistry, TypeResolver}
 };
-use codec::{Compact, Decode};
+use codec::{Decode};
 use parser::decoding_commons::OutputCard;
 use parser::cards::ParserCard;
 use scale_decode::{visitor::decode_with_visitor};
@@ -13,7 +15,7 @@ fn decode_special_included_in_extrinsic(identifier: &str, model: &mut IncludedIn
       "CheckMetadataHash" => {
         let decoded = CheckMetadataHashMode::decode(data)
           .map_err(|e| format!("Failed to decode extension: {e}"))?;
-        model.checkMetadataHashMode = Some(decoded);
+        model.check_metadata_hash_mode = Some(decoded);
         Ok(true)
       },
       "CheckMortality" => {
@@ -40,7 +42,7 @@ fn decode_special_included_in_signature(identifier: &str, model: &mut IncludedIn
       "CheckMetadataHash" => {
         let decoded = Option::decode(data)
           .map_err(|e| format!("Failed to decode extension: {e}"))?;
-        model.metadataHash = decoded;
+        model.metadata_hash = decoded;
         Ok(true)
       },
       "CheckMortality" => {
@@ -68,18 +70,24 @@ fn decode_special_included_in_signature(identifier: &str, model: &mut IncludedIn
   }
 }
 
-pub fn decode_call(
-  call: &mut &[u8],
-  proof_metadata: &MetadataProof,
-) -> Result<Vec<OutputCard>, String> {
-  let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
-  let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
+pub fn decode_metadata_proof(
+  data: &mut &[u8]
+) -> Result<MetadataProof, String> {
+  MetadataProof::decode(data).map_err(|e| format!("Failed to decode metadata: {e}"))
+}
 
-	let visitor = CallCardsParser::new(&type_registry, proof_metadata.extra_info.clone(), CallPalletState::default());
+pub fn decode_call(
+  data: &mut &[u8],
+  metadata_proof: &MetadataProof,
+) -> Result<Vec<OutputCard>, String> {
+  let type_resolver = TypeResolver::new(metadata_proof.proof.leaves.iter());
+  let type_registry = TypeRegistry::new(metadata_proof.proof.leaves.iter());
+
+	let visitor = CallCardsParser::new(&type_registry, metadata_proof.extra_info.clone(), CallPalletState::default());
 
   let result = decode_with_visitor(
-		call,
-		proof_metadata.extrinsic.call_ty,
+		data,
+		metadata_proof.extrinsic.call_ty,
 		&type_resolver,
 		visitor,
 	)
@@ -88,20 +96,44 @@ pub fn decode_call(
   Ok(result.cards)
 }
 
+pub fn decode_and_verify_extensions(
+  data: &mut &[u8],
+  metadata_proof: &MetadataProof,
+) -> Result<Vec<OutputCard>, String> {
+  let mut included_in_extrinsic = decode_included_in_extrinsic(data, metadata_proof)?;
+  let mut included_in_signature = decode_included_in_signature(data, metadata_proof)?;
+
+  match included_in_extrinsic.check_metadata_hash_mode {
+    Some(CheckMetadataHashMode::Enabled) => {
+      let expected_hash = included_in_signature.metadata_hash.ok_or_else(|| "Missing metadata hash")?;
+
+      verify_metadata_proof(metadata_proof, expected_hash)?;
+
+      let mut cards = vec![];
+
+      cards.append(&mut included_in_extrinsic.cards);
+      cards.append(&mut included_in_signature.cards);
+
+      Ok(cards)
+    },
+    _ => Err("Only enabled mode supported".to_string())
+  }
+}
+
 pub fn decode_included_in_extrinsic(
   data: &mut &[u8],
-  proof_metadata: &MetadataProof,
+  metadata_proof: &MetadataProof,
 ) -> Result<IncludedInExtrinsic, String> {
-  let type_resolver = TypeResolver::new(proof_metadata.proof.leaves.iter());
-  let type_registry = TypeRegistry::new(proof_metadata.proof.leaves.iter());
+  let type_resolver = TypeResolver::new(metadata_proof.proof.leaves.iter());
+  let type_registry = TypeRegistry::new(metadata_proof.proof.leaves.iter());
 
   let mut included_in_extrinsic = IncludedInExtrinsic::default();
 
-  for signed_ext in proof_metadata.extrinsic.signed_extensions.iter() {
+  for signed_ext in metadata_proof.extrinsic.signed_extensions.iter() {
     let is_decoded = decode_special_included_in_extrinsic(&signed_ext.identifier, &mut  included_in_extrinsic, data)?;
 
     if !is_decoded {
-      let visitor = CallCardsParser::new(&type_registry, proof_metadata.extra_info.clone(), DefaultState::default());
+      let visitor = CallCardsParser::new(&type_registry, metadata_proof.extra_info.clone(), DefaultState::default());
 
       let mut result = decode_with_visitor(
         data,
