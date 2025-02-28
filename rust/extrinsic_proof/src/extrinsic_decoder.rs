@@ -76,15 +76,20 @@ pub fn decode_metadata_proof(
   MetadataProof::decode(data).map_err(|e| format!("Failed to decode metadata: {e}"))
 }
 
+pub fn decode_call_len(
+  data: &mut &[u8]
+) -> Result<u32, String> {
+  Compact::<u32>::decode(data)
+    .map(|c| c.0)
+    .map_err(|e| format!("Failed to decode len: {e}"))
+}
+
 pub fn decode_call(
   data: &mut &[u8],
   metadata_proof: &MetadataProof,
 ) -> Result<Vec<OutputCard>, String> {
   let type_resolver = TypeResolver::new(metadata_proof.proof.leaves.iter());
   let type_registry = TypeRegistry::new(metadata_proof.proof.leaves.iter());
-
-  let _call_len = Compact::<u32>::decode(data)
-    .map_err(|e| format!("Failed to decode call len: {e}"))?;
 
 	let visitor = CallCardsParser::new(&type_registry, metadata_proof.extra_info.clone(), CallPalletState::default());
   

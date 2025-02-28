@@ -12,7 +12,6 @@ use definitions::{
     network_specs::VerifierValue,
     users::AddressDetails,
 };
-use extrinsic_proof::decode_and_verify_extensions;
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
@@ -26,7 +25,7 @@ use crate::helpers::{
 };
 use crate::TransactionAction;
 
-use crate::extrinsic_proof::{decode_call, decode_metadata_proof, };
+use crate::extrinsic_proof::{decode_call, decode_metadata_proof, decode_and_verify_extensions, decode_call_len};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -139,27 +138,25 @@ fn do_parse_transaction_with_proof(
             Error::AddrNotFound("Metadata proof".to_string())
         )?;
 
-    let signing_payload_len = remained_payload.len();
+    let (method_data, extension_data) = cut_method_extensions(remained_payload)
+        .map_err(|e| 
+            Error::AddrNotFound("Cutting method and extensions failed".to_string())
+        )?;
 
-    let method = decode_call(&mut remained_payload, &metadata_proof)
+    let method = decode_call(&mut method_data.as_slice(), &metadata_proof)
         .map_err(|e| 
             Error::AddrNotFound(format!("Call decoding decoding: {}", e))
         )?;
 
-    let extensions_len = remained_payload.len();
-    let method_len = signing_payload_len - extensions_len;
-
-    let extensions = decode_and_verify_extensions(&mut remained_payload, &metadata_proof)
+    let extensions = decode_and_verify_extensions(&mut extension_data.as_slice(), &metadata_proof)
     .map_err(|e| 
         Error::AddrNotFound(format!("Extensions decoding: {}", e))
     )?;
 
-    let (method_data, extensions_data) = payload[..payload.len() - signing_payload_len].split_at(method_len);
-
     let sign_one = TrDbColdSignOne::generate(
         SignContent::Transaction {
-            method: method_data.to_vec(),
-            extensions: extensions_data.to_vec(),
+            method: method_data,
+            extensions: extension_data,
         },
         &network_specs.specs.name,
         &address_details.path,
