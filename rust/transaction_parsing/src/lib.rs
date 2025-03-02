@@ -30,8 +30,6 @@ use parse_transaction::{parse_transaction, parse_transaction_with_proof};
 pub mod dynamic_derivations;
 mod error;
 
-use extrinsic_proof;
-
 #[cfg(test)]
 mod tests;
 use crate::dynamic_derivations::decode_dynamic_derivations;

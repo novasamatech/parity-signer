@@ -4,7 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
-use definitions::network_specs;
+use definitions::network_specs::OrderedNetworkSpecs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
@@ -12,7 +12,15 @@ use definitions::{
     network_specs::VerifierValue,
     users::AddressDetails,
 };
-use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
+use parser::{
+    cut_method_extensions, 
+    decoding_commons::OutputCard, 
+    parse_extensions, 
+    parse_method, 
+    decode_call, 
+    decode_metadata_proof,
+    decode_extensions
+};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
@@ -24,8 +32,6 @@ use crate::helpers::{
     bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name,
 };
 use crate::TransactionAction;
-
-use crate::extrinsic_proof::{decode_call, decode_metadata_proof, decode_and_verify_extensions, decode_call_len};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -125,44 +131,117 @@ fn do_parse_transaction_with_proof(
             }
     )?;
 
-    let mut history: Vec<Event> = Vec::new();
-    let possible_warning = None;
-
-    let address_details = address_details.ok_or_else(|| Error::AddrNotFound("".to_string()))?;
+    let cards_prep = match address_details {
+        Some(address_details) => {
+            if address_details.network_id.as_ref() == Some(&network_specs_key) {
+                CardsPrep::SignProceed(address_details, None)
+            } else {
+                let author_card = (Card::Author {
+                    author: &author_multi_signer,
+                    base58prefix: network_specs.specs.base58prefix,
+                    genesis_hash: network_specs.specs.genesis_hash,
+                    address_details: &address_details,
+                })
+                .card(&mut index, indent);
+                CardsPrep::ShowOnly(
+                    author_card,
+                    Box::new(Card::Warning(Warning::NoNetworkID).card(&mut index, indent)),
+                )
+            }
+        }
+        None => CardsPrep::ShowOnly(
+            (Card::AuthorPlain {
+                author: &author_multi_signer,
+                base58prefix: network_specs.specs.base58prefix,
+            })
+            .card(&mut index, indent),
+            Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
+        ),
+    };
 
     let copied_vec: Vec<u8> = payload.to_vec();
     let mut remained_payload = &copied_vec[..];
 
-    let metadata_proof = decode_metadata_proof(&mut remained_payload)
-        .map_err(|e| 
-            Error::AddrNotFound("Metadata proof".to_string())
-        )?;
+    let metadata_proof = match decode_metadata_proof(&mut remained_payload) {
+        Ok(v) => v,
+        Err(e) =>  return prepare_read_transaction_action(
+            Some(e), 
+            cards_prep, 
+            network_specs, 
+            author_multi_signer, 
+            None, 
+            None, 
+            index, 
+            indent
+        )
+    };
 
-    let (method_data, extension_data) = cut_method_extensions(remained_payload)
-        .map_err(|e| 
-            Error::AddrNotFound("Cutting method and extensions failed".to_string())
-        )?;
+    let (call_data, extensions_data) = match cut_method_extensions(remained_payload) {
+        Ok(v) => v,
+        Err(e) => return prepare_read_transaction_action(
+            Some(e), 
+            cards_prep, 
+            network_specs, 
+            author_multi_signer, 
+            None, 
+            None, 
+            index, 
+            indent
+        )
+    };
 
-    let method = decode_call(&mut method_data.as_slice(), &metadata_proof)
-        .map_err(|e| 
-            Error::AddrNotFound(format!("Call decoding decoding: {}", e))
-        )?;
+    let extensions_cards = match decode_extensions(&mut extensions_data.as_slice(), &metadata_proof) {
+        Ok(v) => v,
+        Err(e) => return prepare_read_transaction_action(
+            Some(e), 
+            cards_prep, 
+            network_specs, 
+            author_multi_signer, 
+            None, 
+            None, 
+            index, 
+            indent
+        )
+    };
 
-    let extensions = decode_and_verify_extensions(&mut extension_data.as_slice(), &metadata_proof)
-    .map_err(|e| 
-        Error::AddrNotFound(format!("Extensions decoding: {}", e))
-    )?;
+    let call_cards = match decode_call(&mut call_data.as_slice(), &metadata_proof) {
+        Ok(v) => v,
+        Err(e) => return prepare_read_transaction_action(
+            Some(e), 
+            cards_prep, 
+            network_specs, 
+            author_multi_signer, 
+            None, 
+            Some(extensions_cards), 
+            index, 
+            indent
+        )
+    };
+
+    let (address_details, possible_warning) = match cards_prep {
+        CardsPrep::SignProceed(a, w ) => (a, w),
+        _ => return prepare_read_transaction_action(
+            None, 
+            cards_prep, 
+            network_specs, 
+            author_multi_signer, 
+            Some(call_cards), 
+            Some(extensions_cards),
+            index, 
+            indent
+        )
+    };
 
     let sign_one = TrDbColdSignOne::generate(
         SignContent::Transaction {
-            method: method_data,
-            extensions: extension_data,
+            method: call_data,
+            extensions: extensions_data,
         },
         &network_specs.specs.name,
         &address_details.path,
         address_details.has_pwd,
         &author_multi_signer,
-        history,
+        vec![],
     );
             
     let mut sign = TrDbColdSign::from_storage(database, None)?
@@ -180,8 +259,8 @@ fn do_parse_transaction_with_proof(
         .map(|w| Card::Warning(w).card(&mut index, indent))
         .map(|w| vec![w]);
             
-    let method_cards = into_cards(&method, &mut index);
-    let extensions_cards = into_cards(&extensions, &mut index);
+    let method_cards = into_cards(&call_cards, &mut index);
+    let extensions_cards = into_cards(&extensions_cards, &mut index);
     let content = TransactionCardSet {
         warning,
         method: Some(method_cards),
@@ -198,6 +277,64 @@ fn do_parse_transaction_with_proof(
         }],
         checksum,
     })
+}
+
+fn prepare_read_transaction_action(
+    maybe_error: Option<parser::Error>,
+    cards_prep: CardsPrep,
+    network_specs: OrderedNetworkSpecs,
+    author_multi_signer: MultiSigner, 
+    maybe_method_cards: Option<Vec<OutputCard>>,
+    maybe_extension_cards: Option<Vec<OutputCard>>,
+    index: u32,
+    indent: u32
+) -> Result<TransactionAction> {
+    match cards_prep {
+        CardsPrep::SignProceed(address_details, possible_warning) => {
+            let mut index = index;
+
+            let warning = possible_warning
+                .map(|w| Card::Warning(w).card(&mut index, indent))
+                .map(|w| vec![w]);
+            let author = Card::Author {
+                author: &author_multi_signer,
+                base58prefix: network_specs.specs.base58prefix,
+                genesis_hash: network_specs.specs.genesis_hash,
+                address_details: &address_details,
+            }
+            .card(&mut index, indent);
+            let error_cards = maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
+            let method = maybe_method_cards.map(|c| into_cards(&c, &mut index));
+            let extensions = maybe_extension_cards.map(|c| into_cards(&c, &mut index));
+            let r = Box::new(TransactionCardSet {
+                author: Some(vec![author]),
+                error: error_cards,
+                warning,
+                method,
+                extensions,
+                ..Default::default()
+            });
+            Ok(TransactionAction::Read { r })
+        }
+        CardsPrep::ShowOnly(author_card, warning_card) => {
+            let mut index = index;
+
+            let author = Some(vec![author_card]);
+            let warning = Some(vec![*warning_card]);
+            let error_cards = maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
+            let method = maybe_method_cards.map(|c| into_cards(&c, &mut index));
+            let extensions = maybe_extension_cards.map(|c| into_cards(&c, &mut index));
+            let r = Box::new(TransactionCardSet {
+                author,
+                warning,
+                error: error_cards,
+                method,
+                extensions,
+                ..Default::default()
+            });
+            Ok(TransactionAction::Read { r })
+        }
+    }
 }
 
 fn do_parse_transaction(

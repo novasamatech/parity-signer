@@ -9,18 +9,17 @@ use alloc::{
 	vec::Vec,
 };
 
-use parser::decoding_commons::OutputCard;
 use scale_decode::{
 	ext::scale_type_resolver::{
 		BitsOrderFormat, BitsStoreFormat, Primitive as RPrimitive, ResolvedTypeVisitor, Variant
 	},
-	visitor::DecodeError,
 	Field, Visitor
 };
 
 use crate::{
-  state_machine::{State, StateInputCompound, StateInputCompoundItem, StateOutput},
-	types::{ExtraInfo, Type, TypeDef, TypeRef}
+  state::{State, StateError, StateInputCompound, StateInputCompoundItem, StateOutput},
+	types::{ExtraInfo, Type, TypeDef, TypeRef},
+	decoding_commons::OutputCard,
 };
 
 pub struct TypeRegistry(BTreeMap<u32, Vec<Type>>);
@@ -168,7 +167,7 @@ impl scale_decode::TypeResolver for TypeResolver {
 	}
 }
 
-pub struct CallCardsParser<'registry> {
+pub struct StateMachineParser<'registry> {
 	pub type_registry: &'registry TypeRegistry,
 	pub extra_info: ExtraInfo,
 	pub cards: Vec<OutputCard>,
@@ -177,9 +176,9 @@ pub struct CallCardsParser<'registry> {
 	pub indent: u32
 }
 
-impl CallCardsParser<'_> {
-	pub fn new<'registry>(type_registry: &'registry TypeRegistry, extra_info: ExtraInfo, state: impl State + 'static) -> CallCardsParser<'registry> {
-		CallCardsParser {
+impl StateMachineParser<'_> {
+	pub fn new<'registry>(type_registry: &'registry TypeRegistry, extra_info: ExtraInfo, state: impl State + 'static) -> StateMachineParser<'registry> {
+		StateMachineParser {
 			type_registry,
 			extra_info: extra_info, 
 			cards: vec![],
@@ -235,10 +234,10 @@ impl CallCardsParser<'_> {
 	}
 }
 
-impl Visitor for CallCardsParser<'_> {
+impl Visitor for StateMachineParser<'_> {
 	type TypeResolver = TypeResolver;
 	type Value<'scale, 'resolver> = Self;
-	type Error = DecodeError;
+	type Error = StateError;
 
 	fn visit_bool<'scale, 'resolver>(
 		mut self,
@@ -411,7 +410,8 @@ impl Visitor for CallCardsParser<'_> {
 		value: &mut scale_decode::visitor::types::BitSequence<'scale>,
 		_type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
-    let bits = value.decode()?.collect::<Result<Vec<bool>, _>>()?;
+    let bits = value.decode()?.collect::<Result<Vec<bool>, _>>()
+			.map_err(|_| StateError::BadInput("bitsequence".to_string()))?;
 
 		let output = self.state.process_bitsequence(bits, self.indent)?;
 		self.apply(output);

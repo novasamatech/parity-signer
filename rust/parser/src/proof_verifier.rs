@@ -1,6 +1,6 @@
 use crate::types::{MetadataProof, Hash, Type};
-use array_bytes::Hex;
-use codec::Encode;
+
+use parity_scale_codec::Encode;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Debug, Encode)]
 enum MetadataDigest {
@@ -119,7 +119,7 @@ fn get_hash(
   blake3::hash(&(left, right).encode()).into()
 }
 
-pub fn verify_metadata_proof(metadata_proof: &MetadataProof, expected_hash: Hash) -> Result<(), String> {
+pub fn verify_metadata_proof(metadata_proof: &MetadataProof, expected_hash: Hash) -> bool {
   let proof_hash = get_hash(
     &mut &metadata_proof.proof.leaf_indices[..], 
     &mut &metadata_proof.proof.leaves[..], 
@@ -139,12 +139,5 @@ pub fn verify_metadata_proof(metadata_proof: &MetadataProof, expected_hash: Hash
     token_symbol: metadata_proof.extra_info.token_symbol.clone() 
   }.hash();
 
-  println!("Calculated hash: {:?}", metadata_hash.hex(""));
-  println!("Expected hash: {:?}", expected_hash.hex(""));
-
-  if metadata_hash == expected_hash {
-    Ok(())
-  } else {
-    Err("Different metadata hashes".to_string())
-  }
+  metadata_hash == expected_hash
 }

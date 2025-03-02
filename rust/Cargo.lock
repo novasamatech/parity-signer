@@ -162,12 +162,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f52f63c5c1316a16a4b35eaac8b76a98248961a533f061684cb2a7cb0eafb6c6"
 
 [[package]]
-name = "array-bytes"
-version = "6.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d5dde061bd34119e902bbb2d9b90c5692635cf59fb91d582c2b68043f1b8293"
-
-[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1146,25 +1140,6 @@ dependencies = [
  "rayon-core",
  "smallvec",
  "zune-inflate",
-]
-
-[[package]]
-name = "extrinsic_proof"
-version = "0.1.0"
-dependencies = [
- "array-bytes 6.2.3",
- "bitvec",
- "blake3",
- "hex",
- "num-bigint",
- "parity-scale-codec",
- "parser",
- "pretty_assertions",
- "printing_balance",
- "scale-decode 0.13.1",
- "scale-info",
- "sp-core",
- "sp-runtime",
 ]
 
 [[package]]
@@ -2734,6 +2709,7 @@ name = "parser"
 version = "0.1.0"
 dependencies = [
  "bitvec",
+ "blake3",
  "defaults",
  "definitions",
  "frame-metadata 16.0.0",
@@ -2744,6 +2720,7 @@ dependencies = [
  "pretty_assertions",
  "printing_balance",
  "regex",
+ "scale-decode 0.13.1",
  "scale-info",
  "sp-arithmetic",
  "sp-core",
@@ -3915,7 +3892,7 @@ name = "sp-core"
 version = "6.0.0"
 source = "git+https://github.com/paritytech/substrate?rev=49734dd1d72a00b9d3b87ba397661a63e0e17af3#49734dd1d72a00b9d3b87ba397661a63e0e17af3"
 dependencies = [
- "array-bytes 4.2.0",
+ "array-bytes",
  "base58",
  "bitflags 1.3.2",
  "blake2",
@@ -4847,7 +4824,6 @@ dependencies = [
  "constants",
  "db_handling",
  "definitions",
- "extrinsic_proof",
  "frame-metadata 16.0.0",
  "hex",
  "log",

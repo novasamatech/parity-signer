@@ -1,4 +1,7 @@
+#![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
+
+extern crate alloc;
 
 use error::{ParserDecodingError, ParserMetadataError};
 use frame_metadata::v14::RuntimeMetadataV14;
@@ -19,6 +22,18 @@ mod decoding_sci;
 use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
 use decoding_sci_ext::{decode_ext_attempt, Ext};
+mod state_machine;
+mod state;
+mod default_state;
+mod call_state;
+mod account_state;
+mod balance_state;
+mod types;
+pub use types::MetadataProof;
+mod proof_verifier;
+mod utils;
+mod decoding_with_proof;
+pub use decoding_with_proof::{decode_call, decode_extensions, decode_metadata_proof};
 mod error;
 pub mod method;
 use method::OlderMeta;

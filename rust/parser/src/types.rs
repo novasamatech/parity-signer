@@ -1,6 +1,6 @@
-use codec::{Compact, Encode, Decode};
+use parity_scale_codec::{Compact, Encode, Decode};
 use core::cmp::Ordering;
-use parser::decoding_commons::OutputCard;
+use crate::decoding_commons::OutputCard;
 use sp_runtime::generic::Era;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
