@@ -11,7 +11,7 @@ lane :build_release do |options|
   configuration = options[:configuration]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
-  profile_name = "Polkadot Vault Distribution"
+  profile_name = "match AppStore io.parity.NativeSigner"
   output_name = scheme # just in case we need to customise it for other GAs
   export_method = "app-store"
   compile_bitcode = false
