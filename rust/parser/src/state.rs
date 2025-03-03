@@ -1,10 +1,11 @@
 use scale_decode::visitor::DecodeError;
 use crate::{
-  types::ExtraInfo,
   decoding_commons::OutputCard,
   cards::ParserCard,
   default_state::DefaultState
 };
+
+use merkleized_metadata::ExtraInfo;
 
 #[derive(Debug)]
 pub enum StateError {

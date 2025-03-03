@@ -2,9 +2,10 @@ use crate::{
   state::{State, StateOutput, StateError},
   cards::ParserCard,
   decoding_commons::OutputCard,
-  default_state::DefaultState,
-  types::ExtraInfo
+  default_state::DefaultState
 };
+
+use merkleized_metadata::ExtraInfo;
 
 use printing_balance::convert_balance_pretty;
 use num_bigint::{BigInt, BigUint};

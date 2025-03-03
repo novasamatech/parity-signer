@@ -1,12 +1,17 @@
 use crate::{
   default_state::DefaultState,
   call_state::CallPalletState,
-  state_machine::{StateMachineParser, TypeRegistry, TypeResolver},
+  state_machine::{StateMachineParser, TypeRegistry},
   decoding_commons::OutputCard,
   cards::ParserCard,
-  proof_verifier::verify_metadata_proof,
-  types::{IncludedInExtrinsic, IncludedInSignature, CheckMetadataHashMode, MetadataProof, Hash},
+  types::{IncludedInExtrinsic, IncludedInSignature, CheckMetadataHashMode, MetadataProof},
   error::{Error, ParserDecodingError}
+};
+
+use merkleized_metadata::{
+  verify_metadata_digest,
+  TypeResolver,
+  types::Hash
 };
 
 use parity_scale_codec::Decode;
@@ -145,7 +150,16 @@ fn verify_decoded_metadata_hash(
         let expected_hash = included_in_signature.metadata_hash
           .ok_or_else(|| Error::MetadataHashMissing)?;
 
-        if verify_metadata_proof(metadata_proof, expected_hash) {
+        let extrinsic_metadata_hash = metadata_proof.extrinsic.hash();
+
+        let is_valid = verify_metadata_digest(
+          metadata_proof.proof.clone(), 
+          extrinsic_metadata_hash, 
+          metadata_proof.extra_info.clone(),
+           expected_hash
+        );
+
+        if is_valid {
           Ok(())
         } else {
           Err(Error::MetadataHashMismatch)

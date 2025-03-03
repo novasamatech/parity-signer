@@ -30,7 +30,6 @@ mod account_state;
 mod balance_state;
 mod types;
 pub use types::MetadataProof;
-mod proof_verifier;
 mod utils;
 mod decoding_with_proof;
 pub use decoding_with_proof::{decode_call, decode_extensions, decode_metadata_proof};

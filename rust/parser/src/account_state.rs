@@ -3,8 +3,9 @@ use crate::{
   cards::ParserCard,
   decoding_commons::OutputCard,
   default_state::DefaultState,
-  types::ExtraInfo
 };
+
+use merkleized_metadata::ExtraInfo;
 
 use sp_core::crypto::AccountId32;
 
