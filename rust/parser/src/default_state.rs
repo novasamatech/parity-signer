@@ -287,8 +287,6 @@ impl State for DefaultState {
           }
         }
       };
-
-      // TODO: Refactor to a special function
   
       let next_state: Box<dyn State> = match maybe_field_type {
           Some(field_type) if field_type_name_is_call(&field_type) => {
