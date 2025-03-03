@@ -63,7 +63,7 @@ lane :prepare_code_signing do |options|
   end
 
   match(
-    type: "adhoc",
+    type: "appstore",
     app_identifier: app_identifier,
     readonly: false,
     keychain_name: "github_actions_keychain",
