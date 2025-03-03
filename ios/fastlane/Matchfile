@@ -1,0 +1,4 @@
+git_url("https://github.com/novasamatech/match_security_management_gmbh")
+storage_mode("git")
+type("adhoc")
+app_identifier("io.parity.NativeSigner")
