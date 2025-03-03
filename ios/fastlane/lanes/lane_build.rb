@@ -65,7 +65,7 @@ lane :prepare_code_signing do |options|
   match(
     type: "appstore",
     app_identifier: app_identifier,
-    readonly: false,
+    readonly: is_ci?,
     keychain_name: "github_actions_keychain",
     keychain_password: ENV["KEYCHAIN_PASSWORD"]
   )
