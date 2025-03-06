@@ -5,6 +5,8 @@ use crate::{
   default_state::DefaultState
 };
 
+use alloc::fmt;
+
 use merkleized_metadata::ExtraInfo;
 
 #[derive(Debug)]
@@ -13,6 +15,17 @@ pub enum StateError {
   UnexpectedInput(String),
   UnexpectedAccountFormat(String),
   BadInput(String)
+}
+
+impl fmt::Display for StateError {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+			match self {
+					StateError::Decoding(decoding_error) => write!(f, "decoding failed {}", decoding_error),
+					StateError::UnexpectedInput(input) => write!(f, "unexpected input {}", input),
+					StateError::UnexpectedAccountFormat(account_format) => write!(f, "unexpected account format {}", account_format),
+					StateError::BadInput(input) => write!(f, "bad input {}.", input),
+			}
+	}
 }
 
 impl From<DecodeError> for StateError {

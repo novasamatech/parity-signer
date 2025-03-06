@@ -1,11 +1,5 @@
 use crate::{
-  state::{State, StateInputCompound, StateInputCompoundItem, StateOutput, StateError},
-  cards::ParserCard,
-  decoding_commons::OutputCard,
-  call_state::CallPalletState,
-  balance_state::BalanceState,
-  account_state::AccountState,
-  utils::{
+  account_state::AccountState, call_state::CallPalletState, cards::ParserCard, decoding_commons::OutputCard, number_state::{BalanceCardProducer, NumberState}, state::{State, StateError, StateInputCompound, StateInputCompoundItem, StateOutput}, utils::{
     field_type_name_is_account,
     field_type_name_is_balance,
     field_type_name_is_call,
@@ -296,7 +290,7 @@ impl State for DefaultState {
             Box::new(AccountState::new(input.extra_info.clone()))
           },
           Some(field_type) if field_type_name_is_balance(&field_type) => {
-            Box::new(BalanceState { extra_info: input.extra_info.clone() })
+            Box::new(NumberState::<BalanceCardProducer>::balance_state(input.extra_info.clone()))
           },
           _ => Box::new(DefaultState)
       };
@@ -343,7 +337,7 @@ impl State for DefaultState {
         indent
       };
   
-      Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
+      Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent: indent + 1 })
     }
   
     fn process_array(

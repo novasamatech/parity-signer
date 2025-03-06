@@ -3779,3 +3779,190 @@ Identities:"#;
 
     fs::remove_dir_all(dbname).unwrap();
 }
+
+#[test]
+fn can_parse_westend_with_proof() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    
+    let line = "530106d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d60000340000000035d01082873705f72756e74696d65384d756c74695369676e6174757265011c456432353531390400165d010148656432353531393a3a5369676e6174757265006d02082873705f72756e74696d65384d756c74695369676e6174757265011c537232353531390400165d010148737232353531393a3a5369676e6174757265046d02082873705f72756e74696d65384d756c74695369676e6174757265011445636473610400167102014065636473613a3a5369676e6174757265086d0200034100000003710210306672616d655f73797374656d28657874656e73696f6e733c636865636b5f6d6f7274616c69747938436865636b4d6f7274616c697479000400161907010c4572611507102873705f72756e74696d651c67656e657269630c6572610c45726101244d6f7274616c323133040003005503190710306672616d655f73797374656d28657874656e73696f6e732c636865636b5f6e6f6e636528436865636b4e6f6e6365000400110120543a3a4e6f6e63651d07086870616c6c65745f7472616e73616374696f6e5f7061796d656e74604368617267655472616e73616374696f6e5061796d656e7400040013013042616c616e63654f663c543e210708746672616d655f6d657461646174615f686173685f657874656e73696f6e44436865636b4d6574616461746148617368000401106d6f646516290701104d6f6465250708746672616d655f6d657461646174615f686173685f657874656e73696f6e104d6f6465011c456e61626c6564000429070c1c73705f636f72651863727970746f2c4163636f756e7449643332000400160401205b75383b2033325d000003200000000304083c7072696d69746976655f74797065731048323536000400160401205b75383b2033325d0c0002031004184f7074696f6e0110536f6d650400160400044c083c77657374656e645f72756e74696d652c52756e74696d6543616c6c012042616c616e636573040016d001b50173656c663a3a73705f6170695f68696464656e5f696e636c756465735f636f6e7374727563745f72756e74696d653a3a68696464656e5f696e636c7564653a3a64697370617463680a3a3a43616c6c61626c6543616c6c466f723c42616c616e6365732c2052756e74696d653e10880c2873705f72756e74696d65306d756c746961646472657373304d756c746941646472657373010849640400160001244163636f756e74496400c80c2873705f72756e74696d65306d756c746961646472657373304d756c7469416464726573730114496e64657804001501304163636f756e74496e64657804c80c2873705f72756e74696d65306d756c746961646472657373304d756c746941646472657373010c52617704001610011c5665633c75383e08c80c2873705f72756e74696d65306d756c746961646472657373304d756c74694164647265737301244164647265737333320400160401205b75383b2033325d0cc80c2873705f72756e74696d65306d756c746961646472657373304d756c7469416464726573730124416464726573733230040016cc01205b75383b2032305d10c800031400000003cc0c3c70616c6c65745f62616c616e6365731870616c6c65741043616c6c014c7472616e736665725f6b6565705f616c6976650801106465737416c801504163636f756e7449644c6f6f6b75704f663c543e011476616c7565130128543a3a42616c616e63650cd06002080000d7080000d8080000d9080000da080000090d0000df0d00000a0e00000b0e00000c0e00000e0e000007070000080700000a0700000b070000240700004d0700009c0700009d0700009e0700009f070000a0070000a1070000a4070000e8f9084b7498d3c36abc24bf31cd7e5f830b9377079f8a36a5427c1346b958f6bf2eae60c993c36c9aca8d47f1a5cebf038a80c3f8ac3f4270a040eaa75c40923d609156d3b9beb9cbb53333df540776dcc89f48e9f7f3e4e4f638e3da9488c8c02e14d14a3a26de78d60a40478fb6c3d730ff1239b30f0c925a354034a3839dec321da9f9c9b939af014b8b3849da2b63744127710b06ab7fc1354f99bf0b4a843f33df358141ac8a52455298bdaf3ebe524cdf1a5f8c82cd2f969c1d97d14a3cb83022017338065223d6674aec30034f7dae2a9246a2d850cf7977cc2f38be226b1536563222b63b3aeab80c1066d49c8ff81a91dcdcfe4e3c05aa7aee753fffe93b82c886a27b331d9d0f96234a9cfc1b1c6a42690b0ed5ef8f553f24a074c7991ed482bf1cbb8904e642d76a8cfc5f87d1a139f62d688d71aa832ebe15290d8c57279a4cea70247e8ff0265a8468d2a06770c5e5429d18e00110f8b67c36d6dde480de386a13403ed4e11b5eb8b1540b5f1d1a95920296fc4d5249884ad721a784758d2a7cade7f7fa436de2e859b6f0401c68b48687509cab7e60adb8484cd1faf63be16401a855932fd024f66cd44089dbf395c54ac0d6bbda9abd4555c998c458328899538036d53b3b2c332ee899e54c03187f965805eda1249e5a537e37e9953fe34c6e1bd1ac662946f00ec83f2579b45a3a7062bfa626d5298f806861d99cde4c00647c398abdb89d95249f3933c48ef7ae60b2122ee7296e5651d17e1d697062b463173f53e169ac3117edcf99d5ea99f4d5d3b57e7aec166efab1c526271c4664fa797e07a01b0c334e10d3e4130040792285567648ef4be6239ef36118dfafa0bf98dda299d978cfaf1ddec80bd9d331f2c6715cc7b3f3dbf2af51a07be4bd1be4be5cc86fd94c1af168f1ed7f7cd2684b1468d02a54beab1f7153ac4e0b52a3d514603847d0a0bb777b543bd9706efd77ddf6c30b12f37cc67f0ed5283b2aa32a605e730e6c1f852fccdc5f45502a306d9606540ace0acdf192245a537b748c796da0a5316a191652658cbf674b2b3b9751cb45c2f65a1c94aa4cc011c98513978543ee499946060b07e27a331fc8e000c7de2e5806353259a13994364c7eb1c6039406bee6036b10ca9e0714741c9961d197c1d4357131d14ba260743c3407313dd258e4ca74613b56aa405d071be1958b093ec25c72ee781ffdf588e326ee8982c2ff2c875f79b117b5282736e53437e04a984cf8893ed80cf158fc1a8f743f5ec054114bc30ead678f34e9e40d5271e89c27cbcdcb6ccfe2227f31e10d2b1e02fb31731912236e30db7d101d65b2fcfae4203d2c66a8a5654e9e879f1adf4f926d3a7042c3d91acf0a817daada406780637249998df335bc3c7a0f54b1b17bb59bab77cf61a6fe74dcc975d268fcbbf384c85c9d0a8cd952a0aceada12907ac0d91d4b71bb22b8b54a90bdaed9ece81350b166991e4813acd3814e151905ab6499c76ccb290d3cc9fa2f41bd00139140b7206e31ff9d98e4beef1d1a2e20bbc4a225773b9327590503729e589420b1a75d86eaabff22d7ceea7a024d18bea5369999f4b625993a2f3310854ab751a0f7864f01728e9c5df5fd124c3a8bf9d13d828e4ffa8b46ccf0d835e63355465a7d7478d357b4ab6a7511a33d5928ef7159aaddd94d9e1a8804115b034573ca06b8f699f888b195f7579301a1b8cb0b20d0606f2f3c866d972d5b5eb4cc67280aa90151131114112392b9d32e36f43a821401af9ed1e10ad67a3eb9420636c61bca136044d435abf123d3dd87a531e3ef4cd8817e951fb99de35c0b223e44673a4fd7144b299444aa735be0c8d24292128ee4802341f54cb6cbc7e1de5d4fc92f56a39530203200f124e1bca045650e62e2244ec6ab5a578998b965bd916872d8b2bc161a73b3ad6fa08b1ef75fa80c25026c29418e0e12f6df25cd157dd88bc30e9f1fec7dcea37c43a70c7ac83bf01e660a7174e5654e7a748b909c48f5734b83537cc92508488d0926ca82896b39c33b33dbbdcdc977c7ddf87ed9a384ad3fed24d644033deb06b8cd50f559b4cb33a7df0c6038510b0241e4781136e34e94a5c613f6abfaf0384e4a7a58640961d6a11b918514006dc1e6d9f14e1e2ac2738803d9668f5d5eb41b13ad9070280cd3c11622d80e530812ddb9f642d9836d3ddc9aa789dc656b1549385fc54c9ae74ec08e84d0b85d055f6b0a9cb2bc91a4ff30598115a992caf3255d40a39d7e51581c27961ef8c4b826ad91e147e0a42c54c646a2ee75b7257d4b5307d88c7aa75966cf492bd311df0507642dae620e9de700ebc59c39b60a28a8fd1c7e9d324a6ab66b19ea580f4e6a474757edc5519d30854494a3c0fb809cd7ba5ab19225b5069c63b379a76918db5a1e1dbfb5b0b18a3fed3326b75b2221d67d6d632594cc76cb6736ed8d1d3e08c9a31995e4ec984c56ddfcbf6b5203d3889ad6c38f63505c0f57f4760d0b3de2838e386ae8da96a904f98c69193c89087fc4d5b29ca96dd5b241324dab87d2b220b809ba38ad67741736fa1fcd293a5d6ab32484b6af71b70bd0d300f0cc7ff282e60cc7c86d9f6cdf71c2f857a590b1f90416c81688166d022848436865636b4e6f6e5a65726f53656e646572151540436865636b5370656356657273696f6e150538436865636b547856657273696f6e150530436865636b47656e6573697315160c38436865636b4d6f7274616c697479161507160c28436865636b4e6f6e6365161d07152c436865636b5765696768741515604368617267655472616e73616374696f6e5061796d656e741621071544436865636b4d6574616461746148617368162507164c345765696768745265636c61696d151590880f001c77657374656e642a000c0c574e44a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817d5031504025a62020190880f001b000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84011ad078baf468ff964c6b1bd4734d6cb24ec66a06a5986f6352067ef2487f2f20e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+
+    let output = produce_output(&db, line).unwrap();
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Balances".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "transfer_keep_alive".to_string(),
+                        docs: "".into(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "dest".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: "sp_runtime >> multiaddress >> MultiAddress".to_string(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: Identicon::Dots { identity: bob() },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "value".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 3,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "100.000000".to_string(),
+                        units: "mWND".to_string(),
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 7,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "61".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "261".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "10.000000".to_string(),
+                        units: "uWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "1018000".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 0,
+                card: Card::TxSpecCard { f: "7".to_string() },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+    // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
+
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        // TODO: assert_eq!(network_info, network_info_known);
+        assert!(!has_pwd, "Expected no password");
+        sign_action_test(
+            &db,
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            network_info.specs.encryption,
+        )
+        .unwrap();
+    } else {
+        panic!("Wrong action: {output:?}")
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
+}

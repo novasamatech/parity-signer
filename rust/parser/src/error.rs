@@ -88,7 +88,7 @@ pub enum Error {
     #[error(
         "Metadata hash provided in the CheckMetadataHash extension is not matching the proof"
     )]
-    MetadataHashMismatch
+    MetadataHashMismatch,
 }
 
 /// Parse result.
@@ -405,6 +405,6 @@ pub enum ParserDecodingError {
     MetadataProofExpected,
 
     // Decoding with state machine is failed
-    #[error("State machine failed while decoding.")]
+    #[error("State machine failed while decoding: {0}.")]
     StateMachine(StateError)
 }
