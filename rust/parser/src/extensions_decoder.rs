@@ -223,7 +223,7 @@ impl ExtensionHandling for CheckGenesisInSignatureHandler {
     let genesis_hash = Hash::decode(data)
       .map_err(|_| ParserDecodingError::GenesisHashExpected)?;
 
-    output.metadata_hash = Some(genesis_hash);
+    output.genesis_hash = Some(genesis_hash);
 
     Ok(true)
   }

@@ -22,8 +22,7 @@ use crate::{
 };
 
 use merkleized_metadata::{
-  verify_metadata_digest,
-  TypeResolver
+  types::Hash, verify_metadata_digest, TypeResolver
 };
 
 use parity_scale_codec::Decode;
@@ -62,6 +61,22 @@ fn verify_decoded_metadata_hash(
   }
 }
 
+fn verify_genesis_hash(
+  output: &ExtensionsOutput,
+  expected_genesis_hash: &Hash
+) -> Result<(), Error> {
+  match output.genesis_hash {
+    Some(genesis_hash) => {
+      if *expected_genesis_hash != genesis_hash {
+        return  Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch))
+      }
+    },
+    _ => ()
+  }
+
+  Ok(())
+}
+
 pub fn decode_metadata_proof(
   data: &mut &[u8]
 ) -> Result<MetadataProof, Error> {
@@ -89,7 +104,8 @@ pub fn decode_call(
 
 pub fn decode_extensions(
   data: &mut &[u8],
-  metadata_proof: &MetadataProof
+  metadata_proof: &MetadataProof,
+  expected_genesis_hash: &Hash
 ) -> Result<Vec<OutputCard>, Error> {
   let type_resolver = TypeResolver::new(metadata_proof.proof.leaves.iter());
   let type_registry = TypeRegistry::new(metadata_proof.proof.leaves.iter());
@@ -144,6 +160,7 @@ pub fn decode_extensions(
   }
 
   verify_decoded_metadata_hash(&output, metadata_proof)?;
+  verify_genesis_hash(&output, expected_genesis_hash)?;
 
   Ok(output.cards)
 }

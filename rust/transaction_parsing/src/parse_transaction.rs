@@ -190,7 +190,11 @@ fn do_parse_transaction_with_proof(
         )
     };
 
-    let extensions_cards = match decode_extensions(&mut extensions_data.as_slice(), &metadata_proof) {
+    let extensions_cards = match decode_extensions(
+        &mut extensions_data.as_slice(), 
+        &metadata_proof, 
+        &genesis_hash.0
+    ) {
         Ok(v) => v,
         Err(e) => return prepare_read_transaction_action(
             Some(e), 
