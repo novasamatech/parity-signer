@@ -1,5 +1,5 @@
 use crate::{
-  cards::ParserCard, decoding_commons::OutputCard, default_state::DefaultState, state::{State, StateError, StateOutput}
+  cards::ParserCard, decoding_commons::OutputCard, state::DefaultState, state::{State, StateError, StateOutput}
 };
 
 use merkleized_metadata::ExtraInfo;

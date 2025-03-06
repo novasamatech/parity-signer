@@ -24,7 +24,6 @@ mod decoding_sci_ext;
 use decoding_sci_ext::{decode_ext_attempt, Ext};
 mod state_machine;
 mod state;
-mod default_state;
 mod call_state;
 mod account_state;
 mod number_state;

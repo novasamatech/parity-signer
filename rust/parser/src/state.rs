@@ -1,13 +1,25 @@
 use scale_decode::visitor::DecodeError;
 use crate::{
-  decoding_commons::OutputCard,
-  cards::ParserCard,
-  default_state::DefaultState
+  account_state::AccountState, 
+	call_state::CallPalletState, 
+	cards::ParserCard, 
+	decoding_commons::OutputCard, 
+	number_state::{BalanceCardProducer, NumberState}, 
+	utils::{
+    field_type_name_is_account,
+    field_type_name_is_balance,
+    field_type_name_is_call,
+    path_from_parent
+  }
 };
 
 use alloc::fmt;
 
 use merkleized_metadata::ExtraInfo;
+
+use num_bigint::{BigInt, BigUint};
+
+
 
 #[derive(Debug)]
 pub enum StateError {
@@ -86,216 +98,340 @@ pub trait State: Send + Sync {
     }
   }
 
-  fn process_bool(
+	fn process_bool(
 		&self,
-		_input: bool,
-    _indent: u32
+		input: bool,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("bool")))
-  }
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
+	}
 
 	fn process_char(
 		&self,
-		_input: char,
-    _indent: u32
+		input: char,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("char")))
-  }
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
+	}
 
 	fn process_u8(
 		&self,
-		_input: u8,
-    _indent: u32
+		input: u8,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("u8")))
-  }
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
+	}
 
 	fn process_u16(
 		&self,
-		_input: u16,
-    _indent: u32
+		input: u16,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("u16")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_u32(
 		&self,
-		_input: u32,
-    _indent: u32
+		input: u32,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("u32")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_u64(
 		&self,
-		_input: u64,
-    _indent: u32
+		input: u64,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("u64")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_u128(
 		&self,
-		_input: u128,
-    _indent: u32
+		input: u128,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("u128")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_u256<'a>(
 		&self,
-		_input: &'a [u8; 32],
-    _indent: u32
+		input: &'a [u8; 32],
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("u256")))
+		let target_value = BigUint::from_bytes_le(input);
+		let output = self.get_default_output(target_value.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i8(
 		&self,
-		_input: i8,
-    _indent: u32
+		input: i8,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i8")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i16<'scale, 'resolver>(
 		&self,
-		_input: i16,
-    _indent: u32
+		input: i16,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i16")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i32(
 		&self,
-		_input: i32,
-    _indent: u32
+		input: i32,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i32")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i64(
 		&self,
-		_input: i64,
-    _indent: u32
+		input: i64,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i64")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i128(
 		&self,
-		_input: i128,
-    _indent: u32
+		input: i128,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i128")))
+		let output = self.get_default_output(input.to_string(), indent);
+
+		return Ok(output);
 	}
 
 	fn process_i256<'a>(
 		&self,
-		_input: &'a [u8; 32],
-    _indent: u32
+		input: &'a [u8; 32],
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("i256")))
+		let target_value = BigInt::from_signed_bytes_le(input);
+		let output = self.get_default_output(target_value.to_string(), indent);
+
+		return Ok(output);
 	}
 
-  fn process_void(
+	fn process_str(
 		&self,
-    _indent: u32
+		input: String,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("Void")))
+		let output = self.get_default_output(input, indent);
+
+		return Ok(output);
 	}
 
-  fn process_str(
+	fn process_bitsequence(
 		&self,
-		_input: String,
-    _indent: u32
+		input: Vec<bool>,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("str")))
+		let string_repr = input.into_iter().map(|b| if b  { '1' }  else { '0' }).collect();
+
+		let card = OutputCard {
+			card: ParserCard::BitVec(string_repr),
+			indent
+		};
+
+		let output = StateOutput {
+			next_state: Box::new(DefaultState),
+			cards: vec![card],
+			indent
+		};
+
+		Ok(output)
 	}
 
-  fn process_bitsequence(
+	fn process_void(
 		&self,
-		_input: Vec<bool>,
-    _indent: u32
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("bitsequence")))
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
 	fn process_sequence(
 		&self,
-    _input: &StateInputCompound,
-    _indent: u32
+		_input: &StateInputCompound,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("sequence")))
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn process_sequence_item(
-    &self,
-    _input: &StateInputCompoundItem,
-    _indent: u32
-  ) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("sequenceItem")))
-  }
+	fn process_sequence_item(
+		&self,
+		_input: &StateInputCompoundItem,
+		indent: u32
+	) -> Result<StateOutput, StateError> {
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
+	}
 
 	fn process_composite(
 		&self,
 		_input: &StateInputCompound,
-    _indent: u32
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("composite")))
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn process_field(
-    &self,
-    _input: &StateInputCompoundItem,
-    _indent: u32
-  ) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("field")))
-  }
+	fn process_field(
+		&self,
+		input: &StateInputCompoundItem,
+		indent: u32
+	) -> Result<StateOutput, StateError> {
+		let maybe_field_type = &input.type_name;
+
+		// TODO: duplicates logic of process_fields function in the parser crate
+
+		let full_path = path_from_parent(&input.parent_path, maybe_field_type);
+
+		let (cards, next_indent) = match &input.name {
+			Some(field_name) => {
+				let card = OutputCard {
+					card: ParserCard::FieldName {
+							name: field_name.to_string(),
+							docs_field_name: "".to_string(),
+							path_type: full_path,
+							docs_type: "".to_string(),
+					},
+					indent,
+				};
+
+				(vec![card], indent + 1)
+			}
+			None => {
+				if input.items_count > 1 {
+					let card = OutputCard {
+						card: ParserCard::FieldNumber { 
+							number: input.index, 
+							docs_field_number: "".to_string(),
+							path_type: full_path,
+							docs_type: "".to_string()
+						},
+						indent
+					};
+					
+					(vec![card], indent + 1)
+				} else {
+					(vec![], indent)
+				}
+			}
+		};
+
+		let next_state: Box<dyn State> = match maybe_field_type {
+				Some(field_type) if field_type_name_is_call(&field_type) => {
+					Box::new(CallPalletState)
+				},
+				Some(field_type) if field_type_name_is_account(&field_type) => {
+					Box::new(AccountState::new(input.extra_info.clone()))
+				},
+				Some(field_type) if field_type_name_is_balance(&field_type) => {
+					Box::new(NumberState::<BalanceCardProducer>::balance_state(input.extra_info.clone()))
+				},
+				_ => Box::new(DefaultState)
+		};
+
+		Ok(StateOutput { next_state, cards, indent: next_indent })
+	}
 
 	fn process_tuple(
 		&self,
 		_input: &StateInputCompound,
-    _indent: u32
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("tuple")))
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn process_tuple_item(
-    &self,
-    _input: &StateInputCompoundItem,
-    _indent: u32
-  ) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("tupleItem")))
-  }
-
-  fn process_variant(
+	fn process_tuple_item(
 		&self,
-		_input: &StateInputCompound,
-    _indent: u32
+		input: &StateInputCompoundItem,
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("variant")))
+		let card = OutputCard {
+			card: ParserCard::FieldNumber { 
+				number: input.index + 1, 
+				docs_field_number: "".to_string(),
+				path_type: "".to_string(),
+				docs_type: "".to_string()
+			},
+			indent
+		};
+
+		Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
+	}
+
+	fn process_variant(
+		&self,
+		input: &StateInputCompound,
+		indent: u32
+	) -> Result<StateOutput, StateError> {
+		let card = OutputCard {
+			card: ParserCard::EnumVariantName { 
+				name: input.name.clone().unwrap_or_default(), 
+				docs_enum_variant: "".to_string() 
+			},
+			indent
+		};
+
+		Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent: indent + 1 })
 	}
 
 	fn process_array(
 		&self,
 		_input: &StateInputCompound,
-    _indent: u32
+		indent: u32
 	) -> Result<StateOutput, StateError> {
-    Err(StateError::UnexpectedInput(String::from("array")))
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
 	}
 
-  fn process_array_item(
-    &self,
-    _input: &StateInputCompoundItem,
-    _indent: u32
-  ) -> Result<StateOutput, StateError> {
-		Err(StateError::UnexpectedInput(String::from("arrayItem")))
-  }
+	fn process_array_item(
+		&self,
+		_input: &StateInputCompoundItem,
+		indent: u32
+	) -> Result<StateOutput, StateError> {
+		Ok(StateOutput::with(Box::new(DefaultState), indent))
+	}
 }
 
 impl Clone for Box<dyn State> {
   fn clone(&self) -> Self {
     self.clone_box()
   }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DefaultState;
+
+impl State for DefaultState {
+    fn clone_box(&self) -> Box<dyn State> {
+        Box::new(self.clone())
+    }
 }

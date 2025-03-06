@@ -2,7 +2,7 @@ use crate::{
   state::{State, StateInputCompound, StateInputCompoundItem, StateOutput, StateError},
   cards::ParserCard,
   decoding_commons::OutputCard,
-  default_state::DefaultState,
+  state::DefaultState,
 };
 
 use merkleized_metadata::ExtraInfo;

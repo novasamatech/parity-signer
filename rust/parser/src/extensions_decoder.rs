@@ -1,5 +1,8 @@
 use crate::{
-  cards::ParserCard, decoding_commons::OutputCard, default_state::DefaultState, error::ParserDecodingError, 
+  cards::ParserCard, 
+  decoding_commons::OutputCard, 
+  state::DefaultState, 
+  error::ParserDecodingError, 
   extension_state::{NonceState, ChargeTransactionPaymentState}, 
   number_state::{NumberState, SpecVersionCardProducer, TxVersionCardProducer}, 
   state_machine::{StateMachineParser, TypeRegistry}, types::CheckMetadataHashMode
