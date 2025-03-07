@@ -1,10 +1,6 @@
-use parity_scale_codec::{Encode, Decode};
+use parity_scale_codec::{Decode, Encode};
 
-use merkleized_metadata::{
-	Proof, 
-	ExtraInfo, 
-	types::ExtrinsicMetadata
-};
+use merkleized_metadata::{types::ExtrinsicMetadata, ExtraInfo, Proof};
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub struct MetadataProof {
@@ -15,6 +11,6 @@ pub struct MetadataProof {
 
 #[derive(Debug, Clone, Decode, Encode)]
 pub enum CheckMetadataHashMode {
-	Disabled,
-	Enabled,
+    Disabled,
+    Enabled,
 }

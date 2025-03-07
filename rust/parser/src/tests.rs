@@ -1,14 +1,14 @@
 use std::convert::TryInto;
-use std::str::FromStr;
 use std::fs;
+use std::str::FromStr;
 
 use crate::method::OlderMeta;
 use crate::Error;
 use crate::{
-    parse_set, 
-    MetadataBundle,
-    types:: MetadataProof,
     decoding_with_proof::{decode_call, decode_extensions},
+    parse_set,
+    types::MetadataProof,
+    MetadataBundle,
 };
 use defaults::default_types_vec;
 use definitions::metadata::info_from_metadata;
@@ -581,7 +581,10 @@ fn parse_raw_extrinsic_with_proof() {
     let data = hex::decode(proof_line).unwrap();
     let metadata = MetadataProof::decode(&mut &data[..]).ok().unwrap();
 
-    let call_data = hex::decode("040000e2e058da1316f8425be6c6f7104bb44c96fa29ea8b890b4c2866ba8bb6bc67b807007c118d35").unwrap();
+    let call_data = hex::decode(
+        "040000e2e058da1316f8425be6c6f7104bb44c96fa29ea8b890b4c2866ba8bb6bc67b807007c118d35",
+    )
+    .unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
@@ -592,10 +595,11 @@ fn parse_raw_extrinsic_with_proof() {
 
     extension_data.append(&mut included_in_signature_data);
 
-    let genesis_hash: Hash = hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe")
-        .unwrap()
-        .try_into()
-        .expect("Slice must be exactly 32 bytes");
+    let genesis_hash: Hash =
+        hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe")
+            .unwrap()
+            .try_into()
+            .expect("Slice must be exactly 32 bytes");
 
     let extension_result = decode_extensions(&mut &extension_data[..], &metadata, &genesis_hash);
 

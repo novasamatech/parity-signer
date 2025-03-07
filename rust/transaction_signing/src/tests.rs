@@ -3786,7 +3786,7 @@ fn can_parse_westend_trasfer_with_proof() {
     let db = sled::open(dbname).unwrap();
 
     populate_cold(&db, Verifier { v: None }).unwrap();
-    
+
     let line = fs::read_to_string("for_tests/valid_westend_transfer_with_proof.txt").unwrap();
 
     let output = produce_output(&db, &line).unwrap();
@@ -3906,7 +3906,9 @@ fn can_parse_westend_trasfer_with_proof() {
             TransactionCard {
                 index: 11,
                 indent: 0,
-                card: Card::TxSpecCard { f: "27".to_string() },
+                card: Card::TxSpecCard {
+                    f: "27".to_string(),
+                },
             },
             TransactionCard {
                 index: 12,
@@ -3971,8 +3973,11 @@ fn cannot_sign_if_check_genesis_modified() {
     let db = sled::open(dbname).unwrap();
 
     populate_cold(&db, Verifier { v: None }).unwrap();
-    
-    let line = fs::read_to_string("for_tests/invalid_westend_transfer_with_modified_check_genesis_extension.txt").unwrap();
+
+    let line = fs::read_to_string(
+        "for_tests/invalid_westend_transfer_with_modified_check_genesis_extension.txt",
+    )
+    .unwrap();
 
     let output = produce_output(&db, &line).unwrap();
 
@@ -4028,8 +4033,10 @@ fn cannot_sign_if_proof_verification_fails_when_check_metadata_hash_modified() {
     let db = sled::open(dbname).unwrap();
 
     populate_cold(&db, Verifier { v: None }).unwrap();
-    
-    let line = fs::read_to_string("for_tests/invalid_westend_transfer_with_modified_metadata_hash.txt").unwrap();
+
+    let line =
+        fs::read_to_string("for_tests/invalid_westend_transfer_with_modified_metadata_hash.txt")
+            .unwrap();
 
     let output = produce_output(&db, &line).unwrap();
 
@@ -4310,7 +4317,9 @@ fn can_parse_westend_staking_with_proof() {
             TransactionCard {
                 index: 22,
                 indent: 0,
-                card: Card::TxSpecCard { f: "27".to_string() },
+                card: Card::TxSpecCard {
+                    f: "27".to_string(),
+                },
             },
             TransactionCard {
                 index: 23,
@@ -4353,7 +4362,7 @@ fn can_parse_westend_staking_with_proof() {
         assert_eq!(actions.len(), 1);
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
-        
+
         assert!(!has_pwd, "Expected no password");
         sign_action_test(
             &db,

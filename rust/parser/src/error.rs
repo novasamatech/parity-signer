@@ -1,5 +1,5 @@
-use definitions::error::MetadataError;
 use crate::state::StateError;
+use definitions::error::MetadataError;
 
 /// Parse error.
 #[derive(Debug, thiserror::Error)]
@@ -75,19 +75,13 @@ pub enum Error {
     )]
     DefaultTypes,
 
-    #[error(
-        "Can't verify extrinsic as metadata hash extension is disabled"
-    )]
+    #[error("Can't verify extrinsic as metadata hash extension is disabled")]
     MetadataHashDisabled,
 
-    #[error(
-        "Metadata hash must be provided in the CheckMetadataHash extension"
-    )]
+    #[error("Metadata hash must be provided in the CheckMetadataHash extension")]
     MetadataHashMissing,
 
-    #[error(
-        "Metadata hash provided in the CheckMetadataHash extension is not matching the proof"
-    )]
+    #[error("Metadata hash provided in the CheckMetadataHash extension is not matching the proof")]
     MetadataHashMismatch,
 }
 
@@ -395,16 +389,16 @@ pub enum ParserDecodingError {
     // Decoding of the block hash for the CheckMortality extension is failed
     #[error("Couldn't decode block hash for CheckMortality extension.")]
     BlockHashExpected,
-    
+
     // Decoding of the genesis hash for the CheckGenesis extension is failed
     #[error("Couldn't decode genesis hash for CheckGenesis extension.")]
     GenesisHashExpected,
-    
+
     // Decoding of the metadata proof is failed
     #[error("Couldn't decode metadata proof.")]
     MetadataProofExpected,
 
     // Decoding with state machine is failed
     #[error("State machine failed while decoding: {0}.")]
-    StateMachine(StateError)
+    StateMachine(StateError),
 }
