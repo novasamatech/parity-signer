@@ -4005,7 +4005,7 @@ fn cannot_sign_if_check_genesis_modified() {
         error: Some(vec![TransactionCard {
             index: 1,
             indent: 0,
-            card: Card::ErrorCard { 
+            card: Card::ErrorCard {
                 f: "Bad input data. Error parsing incoming transaction content. Genesis hash values from decoded extensions and from used network specs do not match.".into()
              }
         }]),
@@ -4062,7 +4062,7 @@ fn cannot_sign_if_proof_verification_fails_when_check_metadata_hash_modified() {
         error: Some(vec![TransactionCard {
             index: 1,
             indent: 0,
-            card: Card::ErrorCard { 
+            card: Card::ErrorCard {
                 f: "Bad input data. Metadata hash provided in the CheckMetadataHash extension is not matching the proof".into()
              }
         }]),
