@@ -3848,7 +3848,7 @@ fn can_parse_westend_trasfer_with_proof() {
                     f: MSCFieldName {
                         name: "value".to_string(),
                         docs_field_name: String::new(),
-                        path_type: "T::Balance".into(),
+                        path_type: String::new(),
                         docs_type: String::new(),
                     },
                 },
@@ -4165,7 +4165,7 @@ fn can_parse_westend_staking_with_proof() {
                     f: MSCFieldName {
                         name: "payee".to_string(),
                         docs_field_name: String::new(),
-                        path_type: "pallet_staking >> RewardDestination".to_string(),
+                        path_type: "pallet_staking >> RewardDestination".into(),
                         docs_type: String::new(),
                     },
                 },

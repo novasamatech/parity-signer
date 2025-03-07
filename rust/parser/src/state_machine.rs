@@ -32,6 +32,41 @@ impl TypeRegistry {
 		pub fn get_types_by(&self, id: u32) -> Option<&Vec<Type>> {
 			self.0.get(&id)
 		}
+
+		pub fn get_first_type(&self, type_ref: &TypeRef) -> Option<Type> {
+			let type_id = type_ref.id()?;
+	
+			self.get_types_by(type_id)?.first().cloned()
+		}
+	
+		pub fn get_composite_field_type_name(&self, type_ref: &TypeRef, field_index: usize) -> Option<String> {
+			let result_type = self.get_first_type(type_ref)?;
+			
+			match &result_type.type_def {
+					TypeDef::Composite(fields) => fields[field_index].type_name.clone(),
+					_ => None
+			}
+		}
+	
+		pub fn get_enum_variant_type(&self, type_ref: &TypeRef, variant_index: u32) -> Option<Type> {
+			let type_id = type_ref.id()?;
+	
+			self.get_types_by(type_id)?
+				.into_iter()
+				.find(|t| match t.type_def.as_enumeration() {
+					Some(e) => e.index.0 == variant_index,
+					None => false,
+				}).cloned()
+		}
+	
+		pub fn get_enum_field_type_name(&self, type_ref: &TypeRef, variant_index: u32, field_index: usize) -> Option<String> {
+			let result_type = self.get_enum_variant_type(type_ref, variant_index)?;
+			
+			match &result_type.type_def {
+					TypeDef::Enumeration(variant) => variant.fields[field_index].type_name.clone(),
+					_ => None
+			}
+		}
 }
 
 pub struct StateMachineParser<'registry> {
@@ -71,33 +106,6 @@ impl StateMachineParser<'_> {
 
 	fn pop_indent(&mut self) {
 		self.indent =	self.stack.pop().unwrap();
-	}
-
-	fn get_composite_field_type_name(&self, type_ref: &TypeRef, field_index: usize) -> Option<String> {
-		let type_id = type_ref.id()?;
-
-		let result_type = self.type_registry.get_types_by(type_id)?.first()?;
-		
-		match &result_type.type_def {
-				TypeDef::Composite(fields) => fields[field_index].type_name.clone(),
-				_ => None
-		}
-	}
-
-	fn get_enum_field_type_name(&self, type_ref: &TypeRef, variant_index: u32, field_index: usize) -> Option<String> {
-		let type_id = type_ref.id()?;
-
-		let result_type = self.type_registry.get_types_by(type_id)?
-    													.into_iter()
-    													.find(|t| match t.type_def.as_enumeration() {
-        												Some(e) => e.index.0 == variant_index,
-        												None => false,
-    													})?;
-		
-		match &result_type.type_def {
-				TypeDef::Enumeration(variant) => variant.fields[field_index].type_name.clone(),
-				_ => None
-		}
 	}
 }
 
@@ -289,11 +297,11 @@ impl Visitor for StateMachineParser<'_> {
 	fn visit_sequence<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Sequence<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let mut visitor = self;
 
-		let path = None;
+		let path = visitor.type_registry.get_first_type(&type_id).map(|v| v.path );
 
 		let seq_items: Vec<_> = value.collect();
 		let items_count = seq_items.len();
@@ -301,6 +309,7 @@ impl Visitor for StateMachineParser<'_> {
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			type_name: path.as_ref().and_then(|p| p.last() ).cloned(),
 			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
@@ -313,12 +322,15 @@ impl Visitor for StateMachineParser<'_> {
 		for (index, field_result) in seq_items.into_iter().enumerate() {
 			visitor.push_indent();
 
+			let field = field_result.clone()?;
+			let item_path = visitor.type_registry.get_first_type(&field.type_id()).map(|v| v.path );
+
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
-  			parent_path: &path,
+  			path: &item_path,
 				extra_info: visitor.extra_info.clone(),
-				type_name: None,
+				type_name: item_path.as_ref().and_then(|p| p.last() ).cloned(),
   			items_count
 			};
 
@@ -356,6 +368,7 @@ impl Visitor for StateMachineParser<'_> {
 		let input = StateInputCompound {
 			name: value.name().map(|name| name.to_string()),
 			path: &path,
+			type_name: path.as_ref().and_then(|p| p.last() ).cloned(),
 			extra_info: visitor.extra_info.clone(),
 			items_count: fields_count
 		};
@@ -370,12 +383,13 @@ impl Visitor for StateMachineParser<'_> {
 
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
-			let type_name = visitor.get_composite_field_type_name(&type_id, index);
+			let type_name = visitor.type_registry.get_composite_field_type_name(&type_id, index);
+			let field_path = visitor.type_registry.get_first_type(&field.type_id()).map(|v| v.path);
 
 			let input = StateInputCompoundItem {
 				index,
   			name: field_name,
-  			parent_path: &path,
+  			path: &field_path,
 				extra_info: visitor.extra_info.clone(),
 				type_name: type_name,
   			items_count: fields_count
@@ -397,18 +411,19 @@ impl Visitor for StateMachineParser<'_> {
 	fn visit_tuple<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Tuple<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 
 		let mut visitor = self;
 
-		let path = None;
+		let path = visitor.type_registry.get_first_type(&type_id).map(|v| v.path );
 		let items: Vec<_> = value.collect();
 		let items_count = value.count();
 
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			type_name: path.as_ref().and_then(|p| p.last() ).cloned(),
 			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
@@ -418,13 +433,16 @@ impl Visitor for StateMachineParser<'_> {
 		let output = visitor.cloned_state().process_tuple(&input, visitor.indent)?;
 		visitor.apply(output);
 
-		for (index, field) in items.into_iter().enumerate() {
+		for (index, field_result) in items.into_iter().enumerate() {
 			visitor.push_indent();
+
+			let field = field_result?;
+			let item_path = visitor.type_registry.get_first_type(&field.type_id()).map(|v| v.path);
 
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
-  			parent_path: &path,
+  			path: &item_path,
 				extra_info: visitor.extra_info.clone(),
 				type_name: None,
   			items_count
@@ -433,7 +451,7 @@ impl Visitor for StateMachineParser<'_> {
 			let output = visitor.cloned_state().process_tuple_item(&input, visitor.indent)?;
 			visitor.apply(output);
 
-			visitor = field?.decode_with_visitor(visitor)?;
+			visitor = field.decode_with_visitor(visitor)?;
 
 			visitor.pop_indent();
 		}
@@ -450,13 +468,18 @@ impl Visitor for StateMachineParser<'_> {
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 		let mut visitor = self;
 
-		let path = None;
+		let path = visitor.type_registry.get_enum_variant_type(
+			&type_id, 
+			value.index() as u32
+		).map(|v| v.path);
+
 		let fields: Vec<_> = value.fields().collect();
 		let fields_count = fields.len();
 
 		let input = StateInputCompound {
 			name: Some(value.name().to_string()),
 			path: &path,
+			type_name: path.as_ref().and_then(|p| p.last() ).cloned(),
 			extra_info: visitor.extra_info.clone(),
 			items_count: fields_count
 		};
@@ -471,12 +494,14 @@ impl Visitor for StateMachineParser<'_> {
 
 			let field = field_result?;
 			let field_name = field.name().map(|name| name.to_string());
-			let type_name = visitor.get_enum_field_type_name(&type_id, value.index() as u32, index);
+			let type_name = visitor.type_registry.get_enum_field_type_name(&type_id, value.index() as u32, index);
+
+			let field_path = visitor.type_registry.get_first_type(&field.type_id()).map(|v| v.path);
 
 			let input = StateInputCompoundItem {
 				index,
   			name: field_name,
-  			parent_path: &path,
+  			path: &field_path,
 				extra_info: visitor.extra_info.clone(),
 				type_name: type_name,
   			items_count: fields_count
@@ -498,18 +523,19 @@ impl Visitor for StateMachineParser<'_> {
 	fn visit_array<'scale, 'resolver>(
 		self,
 		value: &mut scale_decode::visitor::types::Array<'scale, 'resolver, Self::TypeResolver>,
-		_type_id: TypeRef,
+		type_id: TypeRef,
 	) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
 
 		let mut visitor = self;
 
-		let path = None;
+		let path = visitor.type_registry.get_first_type(&type_id).map(|v| v.path );
 		let items: Vec<_> = value.collect();
 		let items_count = items.len();
 
 		let input = StateInputCompound {
 			name: None,
 			path: &path,
+			type_name: path.as_ref().and_then(|p| p.last()).cloned(),
 			extra_info: visitor.extra_info.clone(),
 			items_count
 		};
@@ -522,12 +548,15 @@ impl Visitor for StateMachineParser<'_> {
 		for (index, field) in items.into_iter().enumerate() {
 			visitor.push_indent();
 
+			let field_result = field.clone()?;
+			let item_path = visitor.type_registry.get_first_type(&field_result.type_id()).map(|v| v.path );
+
 			let input = StateInputCompoundItem {
 				index,
   			name: None,
-  			parent_path: &path,
+  			path: &item_path,
 				extra_info: visitor.extra_info.clone(),
-				type_name: None,
+				type_name: item_path.as_ref().and_then(|p| p.last() ).cloned(),
   			items_count
 			};
 

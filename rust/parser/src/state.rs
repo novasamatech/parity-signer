@@ -9,7 +9,7 @@ use crate::{
     field_type_name_is_account,
     field_type_name_is_balance,
     field_type_name_is_call,
-    path_from_parent
+    path_to_string
   }
 };
 
@@ -24,8 +24,6 @@ use num_bigint::{BigInt, BigUint};
 #[derive(Debug)]
 pub enum StateError {
   Decoding(DecodeError),
-  UnexpectedInput(String),
-  UnexpectedAccountFormat(String),
   BadInput(String)
 }
 
@@ -33,8 +31,6 @@ impl fmt::Display for StateError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 			match self {
 					StateError::Decoding(decoding_error) => write!(f, "decoding failed {}", decoding_error),
-					StateError::UnexpectedInput(input) => write!(f, "unexpected input {}", input),
-					StateError::UnexpectedAccountFormat(account_format) => write!(f, "unexpected account format {}", account_format),
 					StateError::BadInput(input) => write!(f, "bad input {}.", input),
 			}
 	}
@@ -49,6 +45,7 @@ impl From<DecodeError> for StateError {
 pub struct StateInputCompound<'a> {
   pub name: Option<String>,
   pub path: &'a Option<Vec<String>>,
+	pub type_name: Option<String>,
   pub extra_info: ExtraInfo,
   pub items_count: usize
 }
@@ -56,7 +53,7 @@ pub struct StateInputCompound<'a> {
 pub struct StateInputCompoundItem<'a> {
   pub index: usize,
   pub name: Option<String>,
-  pub parent_path: &'a Option<Vec<String>>,
+  pub path: &'a Option<Vec<String>>,
   pub type_name: Option<String>,
   pub extra_info: ExtraInfo,
   pub items_count: usize
@@ -97,6 +94,21 @@ pub trait State: Send + Sync {
       indent
     }
   }
+
+	fn get_special_state_or_default(&self, maybe_type_name: &Option<String>, extra_info: &ExtraInfo) -> Box<dyn State> {
+		match maybe_type_name {
+			Some(field_type) if field_type_name_is_call(&field_type) => {
+				Box::new(CallPalletState)
+			},
+			Some(field_type) if field_type_name_is_account(&field_type) => {
+				Box::new(AccountState::new(extra_info.clone()))
+			},
+			Some(field_type) if field_type_name_is_balance(&field_type) => {
+				Box::new(NumberState::<BalanceCardProducer>::balance_state(extra_info.clone()))
+			},
+			_ => Box::new(DefaultState)
+		}
+	}
 
 	fn process_bool(
 		&self,
@@ -280,26 +292,32 @@ pub trait State: Send + Sync {
 
 	fn process_sequence(
 		&self,
-		_input: &StateInputCompound,
+		input: &StateInputCompound,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 
 	fn process_sequence_item(
 		&self,
-		_input: &StateInputCompoundItem,
+		input: &StateInputCompoundItem,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 
 	fn process_composite(
 		&self,
-		_input: &StateInputCompound,
+		input: &StateInputCompound,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 
 	fn process_field(
@@ -307,11 +325,9 @@ pub trait State: Send + Sync {
 		input: &StateInputCompoundItem,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		let maybe_field_type = &input.type_name;
+		let full_path = input.path.clone().map(|p| path_to_string(p));
 
 		// TODO: duplicates logic of process_fields function in the parser crate
-
-		let full_path = path_from_parent(&input.parent_path, maybe_field_type);
 
 		let (cards, next_indent) = match &input.name {
 			Some(field_name) => {
@@ -319,7 +335,7 @@ pub trait State: Send + Sync {
 					card: ParserCard::FieldName {
 							name: field_name.to_string(),
 							docs_field_name: "".to_string(),
-							path_type: full_path,
+							path_type: full_path.unwrap_or_default(),
 							docs_type: "".to_string(),
 					},
 					indent,
@@ -333,7 +349,7 @@ pub trait State: Send + Sync {
 						card: ParserCard::FieldNumber { 
 							number: input.index, 
 							docs_field_number: "".to_string(),
-							path_type: full_path,
+							path_type: full_path.unwrap_or_default(),
 							docs_type: "".to_string()
 						},
 						indent
@@ -346,28 +362,19 @@ pub trait State: Send + Sync {
 			}
 		};
 
-		let next_state: Box<dyn State> = match maybe_field_type {
-				Some(field_type) if field_type_name_is_call(&field_type) => {
-					Box::new(CallPalletState)
-				},
-				Some(field_type) if field_type_name_is_account(&field_type) => {
-					Box::new(AccountState::new(input.extra_info.clone()))
-				},
-				Some(field_type) if field_type_name_is_balance(&field_type) => {
-					Box::new(NumberState::<BalanceCardProducer>::balance_state(input.extra_info.clone()))
-				},
-				_ => Box::new(DefaultState)
-		};
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
 
 		Ok(StateOutput { next_state, cards, indent: next_indent })
 	}
 
 	fn process_tuple(
 		&self,
-		_input: &StateInputCompound,
+		input: &StateInputCompound,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 
 	fn process_tuple_item(
@@ -375,17 +382,21 @@ pub trait State: Send + Sync {
 		input: &StateInputCompoundItem,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
+		let full_path = input.path.clone().map(|p| path_to_string(p));
+
 		let card = OutputCard {
 			card: ParserCard::FieldNumber { 
 				number: input.index + 1, 
 				docs_field_number: "".to_string(),
-				path_type: "".to_string(),
+				path_type: full_path.unwrap_or_default(),
 				docs_type: "".to_string()
 			},
 			indent
 		};
 
-		Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput { next_state: next_state, cards: vec![card], indent })
 	}
 
 	fn process_variant(
@@ -406,18 +417,22 @@ pub trait State: Send + Sync {
 
 	fn process_array(
 		&self,
-		_input: &StateInputCompound,
+		input: &StateInputCompound,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 
 	fn process_array_item(
 		&self,
-		_input: &StateInputCompoundItem,
+		input: &StateInputCompoundItem,
 		indent: u32
 	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(DefaultState), indent))
+		let next_state: Box<dyn State> = self.get_special_state_or_default(&input.type_name, &input.extra_info);
+
+		Ok(StateOutput::with(next_state, indent))
 	}
 }
 

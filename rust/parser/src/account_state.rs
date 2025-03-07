@@ -11,6 +11,8 @@ use sp_core::crypto::AccountId32;
 
 use std::convert::TryInto;
 
+use hex::encode;
+
 // Account is expected as [u8, 32] or [u8; 20] sequence
 #[derive(Debug, Clone)]
 pub struct AccountState {
@@ -27,6 +29,17 @@ impl AccountState {
         extra_info: extra_info
       }
     }
+}
+
+impl AccountState {
+  fn get_default_output(&self, indent: u32) -> OutputCard {
+    let hex_string = encode(&self.partial);
+
+    OutputCard {
+      card: ParserCard::Default(hex_string),
+      indent
+    }
+  }
 }
 
 impl State for AccountState {
@@ -87,7 +100,13 @@ impl State for AccountState {
 		input: u8,
     indent: u32
 	) -> Result<StateOutput, StateError> {
-    let current_len = self.len.ok_or(StateError::UnexpectedAccountFormat("length missing".to_string()))?;
+    let current_len = match self.len {
+        Some(l) => l,
+        _ => {
+          let card = self.get_default_output(indent);
+          return Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent })
+        }
+    };
 
     let mut new_partial = self.partial.clone();
     new_partial.push(input);
@@ -101,7 +120,7 @@ impl State for AccountState {
     let card = match  current_len {
       32 => {
         let account_id: [u8; 32] = new_partial.try_into()
-          .map_err(|_err| StateError::UnexpectedAccountFormat("32 bytes expected".to_string()))?;
+          .map_err(|_err| StateError::BadInput("32 bytes expected".to_string()))?;
         
         OutputCard {
           card: ParserCard::Id { id: AccountId32::new(account_id), base58prefix: self.extra_info.base58_prefix }, 
@@ -110,14 +129,14 @@ impl State for AccountState {
       },
       20 => {
         let account_id: [u8; 20] = new_partial.try_into()
-          .map_err(|_err| StateError::UnexpectedAccountFormat("20 bytes expected".to_string()))?;
+          .map_err(|_err| StateError::BadInput("20 bytes expected".to_string()))?;
         
         OutputCard {
           card: ParserCard::Id20 { id: account_id, base58prefix: self.extra_info.base58_prefix }, 
           indent
         }
       },
-      _ => return Err(StateError::UnexpectedAccountFormat(format!("invalid length {}", current_len)))
+      _ => self.get_default_output(indent)
     };
 
     Ok(StateOutput { next_state: Box::new(DefaultState), cards: vec![card], indent: indent })
