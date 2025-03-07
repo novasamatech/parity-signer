@@ -4341,7 +4341,6 @@ fn can_parse_westend_staking_with_proof() {
             secret_exposed: false,
         },
     };
-    // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
     if let TransactionAction::Sign { actions, checksum } = output {
         let TransactionSignAction {
@@ -4354,7 +4353,7 @@ fn can_parse_westend_staking_with_proof() {
         assert_eq!(actions.len(), 1);
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
-        // TODO assert_eq!(network_info, network_info_known);
+        
         assert!(!has_pwd, "Expected no password");
         sign_action_test(
             &db,

@@ -13,9 +13,7 @@ pub fn field_type_name_is_balance(type_name: &str) -> bool {
 }
 
 pub fn field_type_name_is_account(type_name: &str) -> bool {
-  (type_name == "AccountId")
-      || (type_name == "AccountId32")
-      || (type_name == "AccountId20")
+  (type_name == "AccountId32") || (type_name == "AccountId20")
 }
 
 pub fn field_type_name_is_call(type_name: &str) -> bool {

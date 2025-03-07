@@ -362,7 +362,8 @@ impl Visitor for StateMachineParser<'_> {
 			return Ok(visitor);
 		}
 
-		let path = Some(value.path().map(|item| item.to_string()).collect());
+		let path = visitor.type_registry.get_first_type(&type_id).map(|v| v.path );
+
 		let fields_count = value.fields().len();
 
 		let input = StateInputCompound {

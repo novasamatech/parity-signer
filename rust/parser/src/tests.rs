@@ -577,7 +577,7 @@ block_hash: 2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5"#;
 
 #[test]
 fn parse_raw_extrinsic_with_proof() {
-    let proof_line = fs::read_to_string("for_tests/kusama_valid_metadata_proof.txt").unwrap();
+    let proof_line = fs::read_to_string("for_tests/kusama_transfer_metadata_proof.txt").unwrap();
     let data = hex::decode(proof_line).unwrap();
     let metadata = MetadataProof::decode(&mut &data[..]).ok().unwrap();
 

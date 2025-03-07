@@ -47,22 +47,6 @@ impl State for AccountState {
       Box::new(self.clone())
   }
 
-  fn process_composite(
-		&self,
-		_input: &StateInputCompound,
-    indent: u32
-	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(AccountState::new(self.extra_info.clone())), indent))
-	}
-
-  fn process_variant(
-		&self,
-		_input: &StateInputCompound,
-    indent: u32
-	) -> Result<StateOutput, StateError> {
-		Ok(StateOutput::with(Box::new(AccountState::new(self.extra_info.clone())), indent))
-	}
-
   fn process_field(
     &self,
     _input: &StateInputCompoundItem,
