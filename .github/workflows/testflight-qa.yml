@@ -60,38 +60,15 @@ jobs:
         with:
           workspaces:         rust -> rust/target
 
-      - name:                 Install the Apple certificate and provisioning profile
-        env:
-          IOS_CERT_BASE64:    ${{ secrets.IOS_CERT_BASE64 }}
-          IOS_CERT_PASSWORD:  ${{ secrets.IOS_CERT_PASSWORD }}
-          KEYCHAIN_PASSWORD:  ${{ secrets.KEYCHAIN_PASSWORD }}
-        run:                  |
-          # create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-          # import certificate and provisioning profile from secrets
-          echo -n "$IOS_CERT_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-
-          # create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-          # import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$IOS_CERT_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
-
-          echo "KEYCHAIN_PATH_ENV=$(echo $KEYCHAIN_PATH)" >> $GITHUB_ENV
-
       - name:                 Distribute TestFlight build
         env:
           ASC_KEY_ID:         ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID:      ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_BASE64:     ${{ secrets.ASC_KEY_BASE64 }}
           BUILD_NUMBER:       $GITHUB_RUN_ID
-          KEYCHAIN_PATH:      ${{ env.KEYCHAIN_PATH_ENV }}
           KEYCHAIN_PASSWORD:  ${{ secrets.KEYCHAIN_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD:      ${{ secrets.MATCH_PASSWORD }}
         run:                  |
           cd ios
           bundle exec fastlane distribute_qa_testflight
