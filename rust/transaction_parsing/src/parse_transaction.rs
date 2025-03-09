@@ -28,6 +28,17 @@ use crate::helpers::{
 };
 use crate::TransactionAction;
 
+struct ReadTransactionPrepareParams<'a> {
+    maybe_error: Option<parser::Error>,
+    cards_prep: CardsPrep<'a>,
+    network_specs: OrderedNetworkSpecs,
+    author_multi_signer: MultiSigner,
+    maybe_method_cards: Option<Vec<OutputCard>>,
+    maybe_extension_cards: Option<Vec<OutputCard>>,
+    index: u32,
+    indent: u32,
+}
+
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
 ///   see the standard for details,
@@ -163,14 +174,16 @@ fn do_parse_transaction_with_proof(
         Ok(v) => v,
         Err(e) => {
             return prepare_read_transaction_action(
-                Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                None,
-                None,
-                index,
-                indent,
+                ReadTransactionPrepareParams {
+                    maybe_error: Some(e),
+                    cards_prep,
+                    network_specs,
+                    author_multi_signer,
+                    maybe_method_cards: None,
+                    maybe_extension_cards: None,
+                    index,
+                    indent,
+                }
             )
         }
     };
@@ -179,14 +192,16 @@ fn do_parse_transaction_with_proof(
         Ok(v) => v,
         Err(e) => {
             return prepare_read_transaction_action(
-                Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                None,
-                None,
-                index,
-                indent,
+                ReadTransactionPrepareParams {
+                    maybe_error: Some(e),
+                    cards_prep,
+                    network_specs,
+                    author_multi_signer,
+                    maybe_method_cards: None,
+                    maybe_extension_cards: None,
+                    index,
+                    indent,
+                }
             )
         }
     };
@@ -199,14 +214,16 @@ fn do_parse_transaction_with_proof(
         Ok(v) => v,
         Err(e) => {
             return prepare_read_transaction_action(
-                Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                None,
-                None,
-                index,
-                indent,
+                ReadTransactionPrepareParams {
+                    maybe_error: Some(e),
+                    cards_prep,
+                    network_specs,
+                    author_multi_signer,
+                    maybe_method_cards: None,
+                    maybe_extension_cards: None,
+                    index,
+                    indent,
+                }
             )
         }
     };
@@ -215,14 +232,16 @@ fn do_parse_transaction_with_proof(
         Ok(v) => v,
         Err(e) => {
             return prepare_read_transaction_action(
-                Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                None,
-                Some(extensions_cards),
-                index,
-                indent,
+                ReadTransactionPrepareParams {
+                    maybe_error: Some(e),
+                    cards_prep,
+                    network_specs,
+                    author_multi_signer,
+                    maybe_method_cards: None,
+                    maybe_extension_cards: Some(extensions_cards),
+                    index,
+                    indent,
+                }
             )
         }
     };
@@ -231,14 +250,16 @@ fn do_parse_transaction_with_proof(
         CardsPrep::SignProceed(a, w) => (a, w),
         _ => {
             return prepare_read_transaction_action(
-                None,
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                Some(call_cards),
-                Some(extensions_cards),
-                index,
-                indent,
+                ReadTransactionPrepareParams {
+                    maybe_error: None,
+                    cards_prep,
+                    network_specs,
+                    author_multi_signer,
+                    maybe_method_cards: Some(call_cards),
+                    maybe_extension_cards: Some(extensions_cards),
+                    index,
+                    indent,
+                }
             )
         }
     };
@@ -289,34 +310,26 @@ fn do_parse_transaction_with_proof(
     })
 }
 
-fn prepare_read_transaction_action(
-    maybe_error: Option<parser::Error>,
-    cards_prep: CardsPrep,
-    network_specs: OrderedNetworkSpecs,
-    author_multi_signer: MultiSigner,
-    maybe_method_cards: Option<Vec<OutputCard>>,
-    maybe_extension_cards: Option<Vec<OutputCard>>,
-    index: u32,
-    indent: u32,
-) -> Result<TransactionAction> {
-    match cards_prep {
+fn prepare_read_transaction_action(params: ReadTransactionPrepareParams) -> Result<TransactionAction> {
+    match params.cards_prep {
         CardsPrep::SignProceed(address_details, possible_warning) => {
-            let mut index = index;
+            let mut index = params.index;
+            let indent = params.indent;
 
             let warning = possible_warning
                 .map(|w| Card::Warning(w).card(&mut index, indent))
                 .map(|w| vec![w]);
             let author = Card::Author {
-                author: &author_multi_signer,
-                base58prefix: network_specs.specs.base58prefix,
-                genesis_hash: network_specs.specs.genesis_hash,
+                author: &params.author_multi_signer,
+                base58prefix: params.network_specs.specs.base58prefix,
+                genesis_hash: params.network_specs.specs.genesis_hash,
                 address_details: &address_details,
             }
-            .card(&mut index, indent);
+            .card(&mut index, params.indent);
             let error_cards =
-                maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
-            let method = maybe_method_cards.map(|c| into_cards(&c, &mut index));
-            let extensions = maybe_extension_cards.map(|c| into_cards(&c, &mut index));
+                params.maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
+            let method = params.maybe_method_cards.map(|c| into_cards(&c, &mut index));
+            let extensions = params.maybe_extension_cards.map(|c| into_cards(&c, &mut index));
             let r = Box::new(TransactionCardSet {
                 author: Some(vec![author]),
                 error: error_cards,
@@ -328,14 +341,15 @@ fn prepare_read_transaction_action(
             Ok(TransactionAction::Read { r })
         }
         CardsPrep::ShowOnly(author_card, warning_card) => {
-            let mut index = index;
+            let mut index = params.index;
+            let indent = params.indent;
 
             let author = Some(vec![author_card]);
             let warning = Some(vec![*warning_card]);
             let error_cards =
-                maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
-            let method = maybe_method_cards.map(|c| into_cards(&c, &mut index));
-            let extensions = maybe_extension_cards.map(|c| into_cards(&c, &mut index));
+                params.maybe_error.map(|e| vec![Card::Error(e.into()).card(&mut index, indent)]);
+            let method = params.maybe_method_cards.map(|c| into_cards(&c, &mut index));
+            let extensions = params.maybe_extension_cards.map(|c| into_cards(&c, &mut index));
             let r = Box::new(TransactionCardSet {
                 author,
                 warning,
