@@ -4,7 +4,7 @@ use sp_core::{
 };
 use sp_runtime::generic::Era;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ParserCard {
     Pallet(String), // pallet name
     Method {

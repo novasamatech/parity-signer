@@ -1,13 +1,20 @@
 use std::convert::TryInto;
+use std::fs;
 use std::str::FromStr;
 
 use crate::method::OlderMeta;
 use crate::Error;
-use crate::{parse_set, MetadataBundle};
+use crate::{
+    decoding_with_proof::{decode_call, decode_extensions},
+    parse_set,
+    types::MetadataProof,
+    MetadataBundle,
+};
 use defaults::default_types_vec;
 use definitions::metadata::info_from_metadata;
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
+use merkleized_metadata::types::Hash;
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
 use pretty_assertions::assert_eq;
@@ -566,4 +573,35 @@ tx_version: 2,
 block_hash: 2470dff6295dd9bb3e5a89c9eb7647d7c5ae525618d77757171718dc034be8f5"#;
 
     assert_eq!(reply, reply_known)
+}
+
+#[test]
+fn parse_raw_extrinsic_with_proof() {
+    let proof_line = fs::read_to_string("for_tests/kusama_transfer_metadata_proof.txt").unwrap();
+    let data = hex::decode(proof_line).unwrap();
+    let metadata = MetadataProof::decode(&mut &data[..]).ok().unwrap();
+
+    let call_data = hex::decode(
+        "040000e2e058da1316f8425be6c6f7104bb44c96fa29ea8b890b4c2866ba8bb6bc67b807007c118d35",
+    )
+    .unwrap();
+
+    let call_result = decode_call(&mut &call_data[..], &metadata);
+
+    assert!(call_result.is_ok());
+
+    let mut extension_data = hex::decode("00000001").unwrap();
+    let mut included_in_signature_data = hex::decode("e0510f001a000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0170d7bc8f2b306a20914d9dac518ccfd7b08e1e0404e0379534327560d5391c38").unwrap();
+
+    extension_data.append(&mut included_in_signature_data);
+
+    let genesis_hash: Hash =
+        hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe")
+            .unwrap()
+            .try_into()
+            .expect("Slice must be exactly 32 bytes");
+
+    let extension_result = decode_extensions(&mut &extension_data[..], &metadata, &genesis_hash);
+
+    assert!(extension_result.is_ok());
 }
