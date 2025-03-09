@@ -1,4 +1,4 @@
-pub fn path_to_string<'a>(path: Vec<String>) -> String {
+pub fn path_to_string(path: Vec<String>) -> String {
     path.join(" >> ")
 }
 

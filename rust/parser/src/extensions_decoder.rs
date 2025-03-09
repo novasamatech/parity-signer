@@ -83,11 +83,11 @@ impl ExtensionHandling for DefaultExtensionHandler {
         let visitor = StateMachineParser::new(
             params.type_registry,
             params.extra_info.clone(),
-            DefaultState::default(),
+            DefaultState,
         );
 
         let mut result = decode_with_visitor(data, type_ref, params.type_resolver, visitor)
-            .map_err(|e| ParserDecodingError::StateMachine(e))?;
+            .map_err(ParserDecodingError::StateMachine)?;
 
         output.cards.append(&mut result.cards);
 
@@ -246,7 +246,7 @@ impl ExtensionHandling for CheckNonceInExtrinsicHandler {
             StateMachineParser::new(params.type_registry, params.extra_info.clone(), NonceState);
 
         let mut result = decode_with_visitor(data, type_ref, params.type_resolver, visitor)
-            .map_err(|e| ParserDecodingError::StateMachine(e))?;
+            .map_err(ParserDecodingError::StateMachine)?;
 
         output.cards.append(&mut result.cards);
 
@@ -278,7 +278,7 @@ impl ExtensionHandling for CheckTxVersionInSignatureHandler {
         );
 
         let mut result = decode_with_visitor(data, type_ref, params.type_resolver, visitor)
-            .map_err(|e| ParserDecodingError::StateMachine(e))?;
+            .map_err(ParserDecodingError::StateMachine)?;
 
         output.cards.append(&mut result.cards);
 
@@ -310,7 +310,7 @@ impl ExtensionHandling for CheckSpecVersionInSignatureHandler {
         );
 
         let mut result = decode_with_visitor(data, type_ref, params.type_resolver, visitor)
-            .map_err(|e| ParserDecodingError::StateMachine(e))?;
+            .map_err(ParserDecodingError::StateMachine)?;
 
         output.cards.append(&mut result.cards);
 
@@ -342,7 +342,7 @@ impl ExtensionHandling for ChargeTransactionPaymentInExtrinsicHandler {
         );
 
         let mut result = decode_with_visitor(data, type_ref, params.type_resolver, visitor)
-            .map_err(|e| ParserDecodingError::StateMachine(e))?;
+            .map_err(ParserDecodingError::StateMachine)?;
 
         output.cards.append(&mut result.cards);
 

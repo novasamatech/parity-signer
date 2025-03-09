@@ -93,11 +93,11 @@ pub trait State: Send + Sync {
         extra_info: &ExtraInfo,
     ) -> Box<dyn State> {
         match maybe_type_name {
-            Some(field_type) if field_type_name_is_call(&field_type) => Box::new(CallPalletState),
-            Some(field_type) if field_type_name_is_account(&field_type) => {
+            Some(field_type) if field_type_name_is_call(field_type) => Box::new(CallPalletState),
+            Some(field_type) if field_type_name_is_account(field_type) => {
                 Box::new(AccountState::new(extra_info.clone()))
             }
-            Some(field_type) if field_type_name_is_balance(&field_type) => {
+            Some(field_type) if field_type_name_is_balance(field_type) => {
                 Box::new(NumberState::<BalanceCardProducer>::balance_state(
                     extra_info.clone(),
                 ))
@@ -109,105 +109,105 @@ pub trait State: Send + Sync {
     fn process_bool(&self, input: bool, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_char(&self, input: char, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u8(&self, input: u8, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u16(&self, input: u16, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u32(&self, input: u32, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u64(&self, input: u64, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u128(&self, input: u128, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
-    fn process_u256<'a>(
+    fn process_u256(
         &self,
-        input: &'a [u8; 32],
+        input: &[u8; 32],
         indent: u32,
     ) -> Result<StateOutput, StateError> {
         let target_value = BigUint::from_bytes_le(input);
         let output = self.get_default_output(target_value.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i8(&self, input: i8, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
-    fn process_i16<'scale, 'resolver>(
+    fn process_i16(
         &self,
         input: i16,
         indent: u32,
     ) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i32(&self, input: i32, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i64(&self, input: i64, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i128(&self, input: i128, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
-    fn process_i256<'a>(
+    fn process_i256(
         &self,
-        input: &'a [u8; 32],
+        input: &[u8; 32],
         indent: u32,
     ) -> Result<StateOutput, StateError> {
         let target_value = BigInt::from_signed_bytes_le(input);
         let output = self.get_default_output(target_value.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_str(&self, input: String, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input, indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_bitsequence(
@@ -276,9 +276,9 @@ pub trait State: Send + Sync {
         input: &StateInputCompoundItem,
         indent: u32,
     ) -> Result<StateOutput, StateError> {
-        let full_path = input.path.clone().map(|p| path_to_string(p));
+        let full_path = input.path.clone().map(path_to_string);
 
-        // TODO: duplicates logic of process_fields function in the parser crate
+        // duplicates logic of process_fields function in the parser crate
 
         let (cards, next_indent) = match &input.name {
             Some(field_name) => {
@@ -339,7 +339,7 @@ pub trait State: Send + Sync {
         input: &StateInputCompoundItem,
         indent: u32,
     ) -> Result<StateOutput, StateError> {
-        let full_path = input.path.clone().map(|p| path_to_string(p));
+        let full_path = input.path.clone().map(path_to_string);
 
         let card = OutputCard {
             card: ParserCard::FieldNumber {
@@ -355,7 +355,7 @@ pub trait State: Send + Sync {
             self.get_special_state_or_default(&input.type_name, &input.extra_info);
 
         Ok(StateOutput {
-            next_state: next_state,
+            next_state,
             cards: vec![card],
             indent,
         })

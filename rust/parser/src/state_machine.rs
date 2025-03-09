@@ -16,12 +16,12 @@ pub struct TypeRegistry(BTreeMap<u32, Vec<Type>>);
 
 impl TypeRegistry {
     pub fn new<'a>(types: impl Iterator<Item = &'a Type>) -> Self {
-        Self {
-            0: types.fold(Default::default(), |mut map, ty| {
-                map.entry(ty.type_id.0).or_default().push(ty.clone());
-                map
-            }),
-        }
+        let tree: BTreeMap<u32, Vec<Type>> = types.fold(Default::default(), |mut map, ty| {
+            map.entry(ty.type_id.0).or_default().push(ty.clone());
+            map
+        });
+
+        Self(tree)
     }
 
     pub fn get_types_by(&self, id: u32) -> Option<&Vec<Type>> {
@@ -51,7 +51,7 @@ impl TypeRegistry {
         let type_id = type_ref.id()?;
 
         self.get_types_by(type_id)?
-            .into_iter()
+            .iter()
             .find(|t| match t.type_def.as_enumeration() {
                 Some(e) => e.index.0 == variant_index,
                 None => false,
@@ -84,14 +84,14 @@ pub struct StateMachineParser<'registry> {
 }
 
 impl StateMachineParser<'_> {
-    pub fn new<'registry>(
-        type_registry: &'registry TypeRegistry,
+    pub fn new(
+        type_registry: &TypeRegistry,
         extra_info: ExtraInfo,
         state: impl State + 'static,
-    ) -> StateMachineParser<'registry> {
+    ) -> StateMachineParser<'_> {
         StateMachineParser {
             type_registry,
-            extra_info: extra_info,
+            extra_info,
             cards: vec![],
             state: Box::new(state),
             stack: vec![],
@@ -200,11 +200,11 @@ impl Visitor for StateMachineParser<'_> {
         Ok(self)
     }
 
-    fn visit_u256<'scale, 'resolver>(
+    fn visit_u256<'resolver>(
         mut self,
-        value: &'scale [u8; 32],
+        value: &[u8; 32],
         _type_id: TypeRef,
-    ) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+    ) -> Result<Self::Value<'_, 'resolver>, Self::Error> {
         let output = self.state.process_u256(value, self.indent)?;
         self.apply(output);
 
@@ -266,11 +266,11 @@ impl Visitor for StateMachineParser<'_> {
         Ok(self)
     }
 
-    fn visit_i256<'scale, 'resolver>(
+    fn visit_i256<'resolver>(
         mut self,
-        value: &'scale [u8; 32],
+        value: &[u8; 32],
         _type_id: TypeRef,
-    ) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+    ) -> Result<Self::Value<'_, 'resolver>, Self::Error> {
         let output = self.state.process_i256(value, self.indent)?;
         self.apply(output);
 
@@ -339,7 +339,7 @@ impl Visitor for StateMachineParser<'_> {
             let field = field_result.clone()?;
             let item_path = visitor
                 .type_registry
-                .get_first_type(&field.type_id())
+                .get_first_type(field.type_id())
                 .map(|v| v.path);
 
             let input = StateInputCompoundItem {
@@ -411,7 +411,7 @@ impl Visitor for StateMachineParser<'_> {
                 .get_composite_field_type_name(&type_id, index);
             let field_path = visitor
                 .type_registry
-                .get_first_type(&field.type_id())
+                .get_first_type(field.type_id())
                 .map(|v| v.path);
 
             let input = StateInputCompoundItem {
@@ -419,7 +419,7 @@ impl Visitor for StateMachineParser<'_> {
                 name: field_name,
                 path: &field_path,
                 extra_info: visitor.extra_info.clone(),
-                type_name: type_name,
+                type_name,
                 items_count: fields_count,
             };
 
@@ -471,7 +471,7 @@ impl Visitor for StateMachineParser<'_> {
             let field = field_result?;
             let item_path = visitor
                 .type_registry
-                .get_first_type(&field.type_id())
+                .get_first_type(field.type_id())
                 .map(|v| v.path);
 
             let input = StateInputCompoundItem {
@@ -541,7 +541,7 @@ impl Visitor for StateMachineParser<'_> {
 
             let field_path = visitor
                 .type_registry
-                .get_first_type(&field.type_id())
+                .get_first_type(field.type_id())
                 .map(|v| v.path);
 
             let input = StateInputCompoundItem {
@@ -549,7 +549,7 @@ impl Visitor for StateMachineParser<'_> {
                 name: field_name,
                 path: &field_path,
                 extra_info: visitor.extra_info.clone(),
-                type_name: type_name,
+                type_name,
                 items_count: fields_count,
             };
 
@@ -603,7 +603,7 @@ impl Visitor for StateMachineParser<'_> {
             let field_result = field.clone()?;
             let item_path = visitor
                 .type_registry
-                .get_first_type(&field_result.type_id())
+                .get_first_type(field_result.type_id())
                 .map(|v| v.path);
 
             let input = StateInputCompoundItem {

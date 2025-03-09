@@ -57,13 +57,10 @@ fn verify_genesis_hash(
     output: &ExtensionsOutput,
     expected_genesis_hash: &Hash,
 ) -> Result<(), Error> {
-    match output.genesis_hash {
-        Some(genesis_hash) => {
-            if *expected_genesis_hash != genesis_hash {
-                return Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch));
-            }
+    if let Some(genesis_hash) = output.genesis_hash {
+        if *expected_genesis_hash != genesis_hash {
+            return Err(Error::Decoding(ParserDecodingError::GenesisHashMismatch));
         }
-        _ => (),
     }
 
     Ok(())
@@ -84,7 +81,7 @@ pub fn decode_call(
     let visitor = StateMachineParser::new(
         &type_registry,
         metadata_proof.extra_info.clone(),
-        CallPalletState::default(),
+        CallPalletState,
     );
 
     let result = decode_with_visitor(

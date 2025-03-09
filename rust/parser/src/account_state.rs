@@ -26,7 +26,7 @@ impl AccountState {
         Self {
             len: None,
             partial: vec![],
-            extra_info: extra_info,
+            extra_info,
         }
     }
 }
@@ -148,7 +148,7 @@ impl State for AccountState {
         Ok(StateOutput {
             next_state: Box::new(DefaultState),
             cards: vec![card],
-            indent: indent,
+            indent,
         })
     }
 }

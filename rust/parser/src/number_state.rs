@@ -26,7 +26,7 @@ impl<T: NumberCardProducing> NumberState<T> {
         StateOutput {
             next_state: Box::new(DefaultState),
             cards: vec![card],
-            indent: indent,
+            indent,
         }
     }
 }
@@ -39,48 +39,48 @@ impl<T: NumberCardProducing + 'static> State for NumberState<T> {
     fn process_u8(&self, input: u8, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u16(&self, input: u16, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u32(&self, input: u32, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u64(&self, input: u64, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_u128(&self, input: u128, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
-    fn process_u256<'a>(
+    fn process_u256(
         &self,
-        input: &'a [u8; 32],
+        input: &[u8; 32],
         indent: u32,
     ) -> Result<StateOutput, StateError> {
         let target_value = BigUint::from_bytes_le(input);
         let output = self.process_number(target_value.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i8(&self, input: i8, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i16<'scale, 'resolver>(
@@ -90,36 +90,36 @@ impl<T: NumberCardProducing + 'static> State for NumberState<T> {
     ) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i32(&self, input: i32, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i64(&self, input: i64, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
     fn process_i128(&self, input: i128, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 
-    fn process_i256<'a>(
+    fn process_i256(
         &self,
-        input: &'a [u8; 32],
+        input: &[u8; 32],
         indent: u32,
     ) -> Result<StateOutput, StateError> {
         let target_value = BigInt::from_signed_bytes_le(input);
         let output = self.process_number(target_value.to_string(), indent);
 
-        return Ok(output);
+        Ok(output)
     }
 }
 
