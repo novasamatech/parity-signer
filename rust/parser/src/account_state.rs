@@ -89,6 +89,9 @@ impl State for AccountState {
     }
 
     fn process_u8(&self, input: u8, indent: u32) -> Result<StateOutput, StateError> {
+        let mut new_partial = self.partial.clone();
+        new_partial.push(input);
+
         let current_len = match self.len {
             Some(l) => l,
             _ => {
@@ -100,9 +103,6 @@ impl State for AccountState {
                 });
             }
         };
-
-        let mut new_partial = self.partial.clone();
-        new_partial.push(input);
 
         if new_partial.len() < current_len {
             return Ok(StateOutput::with(
