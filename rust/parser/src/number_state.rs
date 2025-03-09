@@ -66,11 +66,7 @@ impl<T: NumberCardProducing + 'static> State for NumberState<T> {
         Ok(output)
     }
 
-    fn process_u256(
-        &self,
-        input: &[u8; 32],
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_u256(&self, input: &[u8; 32], indent: u32) -> Result<StateOutput, StateError> {
         let target_value = BigUint::from_bytes_le(input);
         let output = self.process_number(target_value.to_string(), indent);
 
@@ -111,11 +107,7 @@ impl<T: NumberCardProducing + 'static> State for NumberState<T> {
         Ok(output)
     }
 
-    fn process_i256(
-        &self,
-        input: &[u8; 32],
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_i256(&self, input: &[u8; 32], indent: u32) -> Result<StateOutput, StateError> {
         let target_value = BigInt::from_signed_bytes_le(input);
         let output = self.process_number(target_value.to_string(), indent);
 

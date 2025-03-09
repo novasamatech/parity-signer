@@ -148,11 +148,7 @@ pub trait State: Send + Sync {
         Ok(output)
     }
 
-    fn process_u256(
-        &self,
-        input: &[u8; 32],
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_u256(&self, input: &[u8; 32], indent: u32) -> Result<StateOutput, StateError> {
         let target_value = BigUint::from_bytes_le(input);
         let output = self.get_default_output(target_value.to_string(), indent);
 
@@ -165,11 +161,7 @@ pub trait State: Send + Sync {
         Ok(output)
     }
 
-    fn process_i16(
-        &self,
-        input: i16,
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_i16(&self, input: i16, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.get_default_output(input.to_string(), indent);
 
         Ok(output)
@@ -193,11 +185,7 @@ pub trait State: Send + Sync {
         Ok(output)
     }
 
-    fn process_i256(
-        &self,
-        input: &[u8; 32],
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_i256(&self, input: &[u8; 32], indent: u32) -> Result<StateOutput, StateError> {
         let target_value = BigInt::from_signed_bytes_le(input);
         let output = self.get_default_output(target_value.to_string(), indent);
 
