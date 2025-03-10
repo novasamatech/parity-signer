@@ -20,7 +20,7 @@ pub(crate) struct DecodedOut {
     pub(crate) fancy_out: Vec<OutputCard>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct OutputCard {
     pub card: ParserCard,
     pub indent: u32,

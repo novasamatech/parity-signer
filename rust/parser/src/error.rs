@@ -1,3 +1,4 @@
+use crate::state::StateError;
 use definitions::error::MetadataError;
 
 /// Parse error.
@@ -73,6 +74,15 @@ pub enum Error {
         pre-existing types info. Error generating default types info."
     )]
     DefaultTypes,
+
+    #[error("Can't verify extrinsic as metadata hash extension is disabled")]
+    MetadataHashDisabled,
+
+    #[error("Metadata hash must be provided in the CheckMetadataHash extension")]
+    MetadataHashMissing,
+
+    #[error("Metadata hash provided in the CheckMetadataHash extension is not matching the proof")]
+    MetadataHashMismatch,
 }
 
 /// Parse result.
@@ -367,4 +377,28 @@ pub enum ParserDecodingError {
     /// data from extensions is not used in the decoding.
     #[error("After decoding the extensions some data remained unused.")]
     SomeDataNotUsedExtensions,
+
+    // Decoding of the CheckMetadataHash mode is failed
+    #[error("Couldn't decode mode for CheckMetadataHash extension.")]
+    CheckMetadataHashModeExpected,
+
+    // Decoding of the metadata hash for the CheckMetadataHash extension is failed
+    #[error("Couldn't decode metadata hash for CheckMetadataHash extension.")]
+    MetadataHashExpected,
+
+    // Decoding of the block hash for the CheckMortality extension is failed
+    #[error("Couldn't decode block hash for CheckMortality extension.")]
+    BlockHashExpected,
+
+    // Decoding of the genesis hash for the CheckGenesis extension is failed
+    #[error("Couldn't decode genesis hash for CheckGenesis extension.")]
+    GenesisHashExpected,
+
+    // Decoding of the metadata proof is failed
+    #[error("Couldn't decode metadata proof.")]
+    MetadataProofExpected,
+
+    // Decoding with state machine is failed
+    #[error("State machine failed while decoding: {0}.")]
+    StateMachine(StateError),
 }
