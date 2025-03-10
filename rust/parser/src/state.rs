@@ -84,7 +84,7 @@ impl StateOutput {
 /// - Calls (`call_state.rs`)
 /// - Balances and numeric values (`number_state.rs`)
 ///
-/// Implementors of this trait define how values are rendered, when to nest,
+/// Implementation of this trait define how values are rendered, when to nest,
 /// and how to transition between different decoding contexts.
 pub trait State: Send + Sync {
     fn clone_box(&self) -> Box<dyn State>;
