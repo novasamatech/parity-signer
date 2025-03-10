@@ -17,7 +17,7 @@ import io.parity.signer.bottomsheets.password.EnterPassword
 import io.parity.signer.domain.Callback
 import io.parity.signer.domain.FakeNavigator
 import io.parity.signer.screens.scan.addnetwork.AddedNetworkSheetsSubgraph
-import io.parity.signer.screens.scan.bananasplit.BananaSplitSubgraph
+import io.parity.signer.screens.scan.bananasplitrestore.BananaSplitSubgraph
 import io.parity.signer.screens.scan.camera.ScanScreen
 import io.parity.signer.screens.scan.elements.WrongPasswordBottomSheet
 import io.parity.signer.screens.scan.errors.LocalErrorBottomSheet
@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScanNavSubgraph(
 	onCloseCamera: Callback,
+	seedNameSuggestion: String?,
 	openKeySet:(seedName: String) -> Unit,
 ) {
 	val scanViewModel: ScanViewModel = viewModel()
@@ -95,6 +96,7 @@ fun ScanNavSubgraph(
 					LocalErrorSheetModel(context = context, details = error)
 				scanViewModel.bananaSplitPassword.value = null
 			},
+			suggestedSeedName = seedNameSuggestion,
 			onErrorWrongPassword = {
 				scanViewModel.errorWrongPassword.value = true
 				scanViewModel.bananaSplitPassword.value = null

@@ -157,7 +157,7 @@ fun KeySetDetailsScreenView(
 			)
 			ScanIconComponent(
 				onClick = {
-					navController.navigate(CoreUnlockedNavSubgraph.camera)
+					navController.navigate(CoreUnlockedNavSubgraph.Camera.destination(null))
 				},
 				Modifier
 					.align(Alignment.BottomCenter)

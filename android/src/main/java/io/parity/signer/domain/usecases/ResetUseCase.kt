@@ -19,6 +19,7 @@ import io.parity.signer.uniffi.initNavigation
 class ResetUseCase {
 
 	private val seedStorage = ServiceLocator.seedStorage
+	private val clearCryptedStorage = ServiceLocator.clearCryptedStorage
 	private val databaseAssetsInteractor: DatabaseAssetsInteractor =
 		ServiceLocator.databaseAssetsInteractor
 	private val appContext = ServiceLocator.appContext
@@ -103,6 +104,10 @@ class ResetUseCase {
 			val result = seedStorage.init(appContext)
 			if (result is OperationResult.Err) {
 				return result
+			}
+			val result2 = clearCryptedStorage.init(appContext)
+			if (result2 is OperationResult.Err) {
+				return result2
 			}
 		}
 		if (!appContext.isDbCreatedAndOnboardingPassed()) {

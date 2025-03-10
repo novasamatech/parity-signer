@@ -59,7 +59,7 @@ fun KeySetDetailsMultiselectBottomSheet(
 				count = keysToExport,
 				keysToExport,
 			),
-			onCloseClicked = onClose,
+			onClose = onClose,
 		)
 		SignerDivider(sidePadding = 24.dp)
 		Column(

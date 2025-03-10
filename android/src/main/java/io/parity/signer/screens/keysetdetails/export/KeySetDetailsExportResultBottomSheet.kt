@@ -46,7 +46,7 @@ fun KeySetDetailsExportResultBottomSheet(
 				count = keysToExport,
 				keysToExport,
 			),
-			onCloseClicked = onClose
+			onClose = onClose
 		)
 		val plateShape =
 			RoundedCornerShape(dimensionResource(id = R.dimen.qrShapeCornerRadius))
