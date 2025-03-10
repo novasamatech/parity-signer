@@ -13,7 +13,14 @@ use std::convert::TryInto;
 
 use hex::encode;
 
-// Account is expected as [u8, 32] or [u8; 20] sequence
+/// A decoding state that detects account ID byte sequences and outputs a single
+/// card containing the corresponding human-readable address.
+///
+/// This state is designed to recognize account IDs typically represented as
+/// `[u8; 32]` (e.g. for Substrate-based addresses) or `[u8; 20]` (e.g. Ethereum-style addresses).
+///
+/// When such a sequence is detected, the state replaces the default byte output
+/// with a formatted address string to improve readability.
 #[derive(Debug, Clone)]
 pub struct AccountState {
     len: Option<usize>,

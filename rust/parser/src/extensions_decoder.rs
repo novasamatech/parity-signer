@@ -35,6 +35,15 @@ pub struct ExtensionHandlingParams<'resolver, 'registry> {
     pub extra_info: ExtraInfo,
 }
 
+/// A trait for decoding extension parameters into human-readable output cards.
+///
+/// This trait is intended to be implemented using a chain-of-responsibility pattern
+/// (see [`ExtensionCompoundHandler`]) to enable context-aware parsing of extrinsic extensions
+/// based on their identifiers and usage context.
+///
+/// The context determines whether an extension should be decoded as part of the
+/// `included_in_extrinsic` or `included_in_signature` data structures, allowing
+/// different representations depending on where the extension appears.
 pub trait ExtensionHandling {
     fn decode_extension(
         &self,

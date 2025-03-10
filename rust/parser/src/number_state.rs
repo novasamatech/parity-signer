@@ -15,6 +15,16 @@ pub trait NumberCardProducing: Sync + Send + Clone {
     fn produce_card(&self, number: String, indent: u32) -> OutputCard;
 }
 
+/// A decoding state that detects numeric values and outputs a single
+/// card, as defined by the provided `card_producer` implementation.
+///
+/// This approach allows for flexible customization of how numeric values
+/// are displayed based on their context. For example, a "tip" value shown
+/// in an extension may be rendered with a different style than a balance
+/// value inside a transfer call.
+///
+/// By abstracting card creation through `card_producer`, this state enables
+/// context-aware formatting and styling of numbers during decoding.
 #[derive(Debug, Clone)]
 pub struct NumberState<T: NumberCardProducing> {
     pub card_producer: T,

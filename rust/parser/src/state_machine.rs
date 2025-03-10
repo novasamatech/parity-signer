@@ -12,6 +12,16 @@ use crate::{
     state::{State, StateError, StateInputCompound, StateInputCompoundItem, StateOutput},
 };
 
+/// Implements the state machine responsible for decoding SCALE-encoded data
+/// into a human-readable format, represented as a list of output cards.
+///
+/// On one hand, this state machine follows the visitor protocol, handling
+/// decoding logic for each supported type. On the other hand, it delegates
+/// to the current state the decision-making regarding the generated output cards and 
+/// transitions to the next state.
+///
+/// For more information on how state transitions and output generation are handled,
+/// refer to the [`State`] trait documentation.
 pub struct TypeRegistry(BTreeMap<u32, Vec<Type>>);
 
 impl TypeRegistry {
@@ -74,6 +84,11 @@ impl TypeRegistry {
     }
 }
 
+// Implementation of the State Machine to decode scale encoded data into human readable format represented by the list of output cards.
+// 
+// From one hand the State Machine implements visitor protocol to handle decoding for each possible type. From the other hands
+// for given type and state the State Machine delegates decision about output cards and next state to the current state.
+// See State trait for further details.
 pub struct StateMachineParser<'registry> {
     pub type_registry: &'registry TypeRegistry,
     pub extra_info: ExtraInfo,

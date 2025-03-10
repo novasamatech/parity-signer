@@ -71,6 +71,21 @@ impl StateOutput {
     }
 }
 
+/// A trait that defines the behavior of a state within the state machine used
+/// for decoding SCALE-encoded values into a tree-like, human-readable representation.
+///
+/// By default, each decoded value is rendered as an output card containing
+/// its string representation. For wrapped types (such as composites or variants),
+/// the implementation increases the indentation level to reflect the nested structure.
+///
+/// This trait can also be extended to recognize and enrich known types,
+/// providing more meaningful or context-aware output. Examples include:
+/// - Account IDs (`account_state.rs`)
+/// - Calls (`call_state.rs`)
+/// - Balances and numeric values (`number_state.rs`)
+///
+/// Implementors of this trait define how values are rendered, when to nest,
+/// and how to transition between different decoding contexts.
 pub trait State: Send + Sync {
     fn clone_box(&self) -> Box<dyn State>;
 
