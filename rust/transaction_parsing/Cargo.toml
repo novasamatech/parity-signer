@@ -23,7 +23,6 @@ log = "0.4"
 
 [dev-dependencies]
 pretty_assertions = "1"
-db_handling = {path = "../db_handling"}
 tempfile = "3.10"
 
 [lib]
