@@ -89,11 +89,7 @@ impl<T: NumberCardProducing + 'static> State for NumberState<T> {
         Ok(output)
     }
 
-    fn process_i16<'scale, 'resolver>(
-        &self,
-        input: i16,
-        indent: u32,
-    ) -> Result<StateOutput, StateError> {
+    fn process_i16(&self, input: i16, indent: u32) -> Result<StateOutput, StateError> {
         let output = self.process_number(input.to_string(), indent);
 
         Ok(output)
