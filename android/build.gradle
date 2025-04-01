@@ -81,6 +81,11 @@ cargo {
 	extraCargoBuildArguments = ["--locked"]
 }
 
+tasks.matching { it.name.matches(/merge.*JniLibFolders/) }.configureEach {
+	it.inputs.dir(new File(buildDir, "rustJniLibs/android"))
+	it.dependsOn("cargoBuild")
+}
+
 task buildDB (type: Exec) {
 	commandLine './generate_database.sh'
 }
