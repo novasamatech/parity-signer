@@ -31,7 +31,7 @@ internal fun SeedSelectMenuView(
 	Column {
 		BottomSheetHeader(
 			title = stringResource(R.string.key_sets_screem_title),
-			onCloseClicked = onClose
+			onClose = onClose
 		)
 		SignerDivider()
 		keySetsListModel.keys.forEach { item ->

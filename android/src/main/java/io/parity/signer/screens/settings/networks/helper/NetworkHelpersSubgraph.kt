@@ -15,7 +15,7 @@ fun NavGraphBuilder.networkHelpersCoreSubgraph(
 ) {
 	networkHelpersSubgraph(
 		routePath = CoreUnlockedNavSubgraph.networkHelpers,
-		onScanClicked = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+		onScanClicked = { navController.navigate(CoreUnlockedNavSubgraph.Camera.destination(null)) },
 		navController = navController,
 	)
 }

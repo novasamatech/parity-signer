@@ -22,7 +22,7 @@ fun DerivationMethodsHelpBottomSheet(
 	Column(Modifier.background(MaterialTheme.colors.backgroundTertiary)) {
 		BottomSheetHeader(
 			title = stringResource(R.string.derivation_help_methods_title),
-			onCloseClicked = onClose,
+			onClose = onClose,
 		)
 		//scrollable part
 		Column(

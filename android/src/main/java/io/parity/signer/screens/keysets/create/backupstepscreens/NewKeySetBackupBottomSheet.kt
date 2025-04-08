@@ -62,7 +62,6 @@ internal fun NewKeySetBackupBottomSheet(
 			isCtaEnabled = confirmBackup && confirmNotLoose,
 		)
 	}
-
 }
 
 

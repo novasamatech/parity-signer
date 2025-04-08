@@ -70,7 +70,7 @@ private fun NetworkFilterMenu(
 	) {
 		BottomSheetHeader(
 			title = stringResource(R.string.network_filters_header),
-			onCloseClicked = onCancel
+			onClose = onCancel
 		)
 		SignerDivider(sidePadding = 24.dp)
 		networks.forEach { network ->
