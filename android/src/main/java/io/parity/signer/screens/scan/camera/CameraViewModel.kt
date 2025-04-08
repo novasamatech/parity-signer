@@ -8,7 +8,10 @@ import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.domain.encodeHex
 import io.parity.signer.domain.submitErrorState
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.BananaSplitRecoveryResult
+import io.parity.signer.uniffi.DecodeSequenceResult
+import io.parity.signer.uniffi.qrparserGetPacketsTotal
+import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,7 +73,9 @@ class CameraViewModel() : ViewModel() {
 				barcodes.forEach {
 					val payloadString = it?.rawBytes?.encodeHex()
 					if (!currentMultiQrTransaction.contains(payloadString) && !payloadString.isNullOrEmpty()) {
-						if (total.value == null) {
+						val knownTotal = total.value
+
+						if (knownTotal == null) {
 							try {
 								val proposeTotal =
 									qrparserGetPacketsTotal(payloadString, true).toInt()
@@ -82,23 +87,25 @@ class CameraViewModel() : ViewModel() {
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
-								Timber.e("scanVM", "QR sequence length estimation $e")
+								Timber.e("QR sequence length estimation $e")
 							}
 						} else {
 							currentMultiQrTransaction += payloadString
-							if ((currentMultiQrTransaction.size + 1) >= (total.value ?: 0)) {
+
+							if (currentMultiQrTransaction.size >= knownTotal) {
 								decode(currentMultiQrTransaction.toList())
 							} else {
 								_captured.value = currentMultiQrTransaction.size
 							}
-							Timber.d("scanVM", "captured " + captured.value.toString())
+
+							Timber.d("captured " + captured.value.toString())
 						}
 					}
 				}
 				Trace.endSection()
 			}
 			.addOnFailureListener {
-				Timber.e("scanVM", "Scan failed " + it.message.toString())
+				Timber.e(it, "Scan failed")
 			}
 			.addOnCompleteListener {
 				Trace.endSection()
@@ -146,7 +153,7 @@ class CameraViewModel() : ViewModel() {
 			}
 
 		} catch (e: Exception) {
-			Timber.e("scanVM", "Single frame decode failed $e")
+			Timber.e(e, "Single frame decode failed")
 		}
 	}
 

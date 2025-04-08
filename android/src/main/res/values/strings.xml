@@ -45,7 +45,8 @@
 	<string name="key_lock_item">Locked key</string>
 	<string name="key_sets_details_screem_filter_icon_description">Network filter button</string>
 	<string name="menu_option_export_keys">Export Keys</string>
-	<string name="menu_option_backup_key_set">Backup Key Set</string>
+	<string name="key_set_menu_option_backup_bs">Banana Split Backup</string>
+	<string name="key_set_menu_option_backup_manual">Manual Backup</string>
 	<string name="log_title_database_initiated">Database initiated</string>
 	<string name="log_title_device_was_online">Device was connected to network</string>
 	<string name="log_title_general_virifier_set">General verifier set</string>
@@ -453,6 +454,23 @@
 	<string name="airgap_onboarding_adb_disable">Disable ADB on the device</string>
     <string name="error_secure_storage_title">Couldn\'t open secure storage</string>
 	<string name="error_secure_storage_description">There was an error during opening secure storage. Possible reasons - device unlock method was changed. Error below</string>
+	<string name="create_action_cta">Create</string>
+	<string name="create_bs_title">Banana Split Backup</string>
+	<string name="create_bs_subtitle">Backup your key set by turning the secret phrase into sharded QR codes with passphrase protection</string>
+	<string name="create_bs_shards_header">Number of QR Code Shards</string>
+	<string name="create_bs_shards_description_required">%1$d shards out of %2$d to reconstruct</string>
+	<string name="create_bs_shards_description_error">"The number of shares must be no less than 2 "</string>
+	<string name="create_bs_buttom_description">Write down your passphrase. You\'ll need it to recover from Banana Split.</string>
+	<string name="create_bs_notification_frame_text">Banana Split backup will recover the key set without derived keys. To back up derived keys, use the manual backup option. Each key will have to be added individually by entering the derivation path name.</string>
+	<string name="create_bs_password_header">Passphrase for the Recovery</string>
+	<string name="create_bs_refresh_password_icon_description">Refresh Password</string>
+	<string name="create_bs_export_notification_text">Scan this animated QR code into the bs.parity.io app to print QR code shards.</string>
+	<string name="banana_split_menu_remove_confirm_title">Remove Banana Split</string>
+	<string name="banana_split_menu_remove_confirm_description">You can still use this backup if you have QR code shards printed and have passphrase written down on paper.</string>
+	<string name="banana_split_menu_option_show_password">Show Passphrase</string>
+	<string name="banana_split_menu_option_remove_backup">Remove Backup</string>
+	<string name="banana_split_menu_password_title">Passphrase</string>
+	<string name="banana_split_backup_removed_ok">Banana Split Backup removed</string>
 
 </resources>
 

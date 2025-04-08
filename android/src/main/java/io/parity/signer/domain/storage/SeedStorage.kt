@@ -47,6 +47,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun init(appContext: Context): OperationResult<Unit, ErrorStateDestinationState> {
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			appContext
@@ -107,6 +108,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun getSeedNames(): Array<String> =
 		sharedPreferences.all.keys.sorted().toTypedArray().also {
 			_lastKnownSeedNames.value = it
@@ -120,6 +122,7 @@ class SeedStorage {
 	 *
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun addSeed(
 		seedName: String,
 		seedPhrase: String,
@@ -144,7 +147,8 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
-	fun checkIfSeedNameAlreadyExists(seedPhrase: String) : Boolean {
+	@Throws(UserNotAuthenticatedException::class)
+	fun checkIfSeedNameAlreadyExists(seedPhrase: String): Boolean {
 		val result = sharedPreferences.all.values.contains(seedPhrase)
 		Runtime.getRuntime().gc()
 		return result
@@ -153,6 +157,7 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun getSeed(
 		seedName: String,
 		showInLogs: Boolean = false
@@ -169,13 +174,51 @@ class SeedStorage {
 	}
 
 	/**
+	 * @throws UserNotAuthenticatedException
+	 */
+	@Throws(UserNotAuthenticatedException::class)
+	fun getBsPassword(
+		seedName: String,
+	): String {
+		return sharedPreferences.getString("$seedName$BS_POSTFIX", "") ?: ""
+	}
+
+	/**
+	 * @throws UserNotAuthenticatedException
+	 * @throws IllegalArgumentException when name collision happening
+	 */
+	@Throws(IllegalArgumentException::class, UserNotAuthenticatedException::class)
+	fun saveBsData(
+		seedName: String,
+		passPhrase: String,
+	) {
+		if (sharedPreferences.contains("$seedName$BS_POSTFIX")) {
+			throw IllegalArgumentException("element with this name already exists in the storage")
+		}
+		sharedPreferences.edit()
+			.putString("$seedName$BS_POSTFIX", passPhrase)
+			.apply()
+	}
+
+	@Throws(UserNotAuthenticatedException::class)
+	fun removeBSData(seedName: String) {
+		sharedPreferences.edit()
+			.remove("$seedName$BS_POSTFIX")
+			.apply()
+	}
+
+	/**
 	 * Don't forget to call tell rust seed names -so getSeedNames()
 	 * called and last known elements updated
 	 *
 	 * @throws [UserNotAuthenticatedException]
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun removeSeed(seedName: String) {
-		sharedPreferences.edit().remove(seedName).apply()
+		sharedPreferences.edit()
+			.remove(seedName)
+			.remove("$seedName$BS_POSTFIX")
+			.apply()
 		_lastKnownSeedNames.update { lastState ->
 			lastState.filter { it != seedName }.toTypedArray()
 		}
@@ -184,12 +227,16 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@Throws(UserNotAuthenticatedException::class)
 	fun wipe() {
 		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
 }
 
-private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateDestinationState {
+internal fun consumeStorageAuthError(
+	e: Exception,
+	context: Context
+): ErrorStateDestinationState {
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 		when (e) {
 			is AEADBadTagException,
@@ -201,6 +248,7 @@ private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateD
 					argVerbose = e.stackTraceToString()
 				)
 			}
+
 			else -> throw e
 		}
 	} else {
@@ -213,12 +261,13 @@ private fun consumeStorageAuthError(e: Exception, context: Context): ErrorStateD
 					argVerbose = e.stackTraceToString()
 				)
 			}
+
 			else -> throw e
 		}
 	}
 }
 
-
+private const val BS_POSTFIX = "\$\$bs_passphrase"
 
 
 

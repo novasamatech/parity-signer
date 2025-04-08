@@ -16,25 +16,26 @@ import io.parity.signer.uniffi.createKeySet
 
 
 class SeedRepository(
-	private val storage: SeedStorage,
+	private val seedStorage: SeedStorage,
+	private val clearCryptedStorage: ClearCryptedStorage,
 	private val authentication: Authentication,
 	private val activity: FragmentActivity,
 	private val uniffiInteractor: UniffiInteractor,
 ) {
 
 	fun containSeedName(seedName: String): Boolean {
-		return storage.lastKnownSeedNames.value.contains(seedName)
+		return seedStorage.lastKnownSeedNames.value.contains(seedName)
 	}
 
 	fun getLastKnownSeedNames(): Array<String> {
-		return storage.lastKnownSeedNames.value
+		return seedStorage.lastKnownSeedNames.value
 	}
 
 	suspend fun getAllSeeds(): RepoResult<Map<String, String>> {
 		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
-				val result = storage.getSeedNames()
-					.associateWith { seedName -> storage.getSeed(seedName, false) }
+				val result = seedStorage.getSeedNames()
+					.associateWith { seedName -> seedStorage.getSeed(seedName, false) }
 				RepoResult.Success(result)
 			}
 
@@ -97,7 +98,7 @@ class SeedRepository(
 			when (val authResult =
 				authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> {
-					val result = seedNames.map { it to storage.getSeed(it) }
+					val result = seedNames.map { it to seedStorage.getSeed(it) }
 					return if (result.any { it.second.isEmpty() }) {
 						RepoResult.Failure(IllegalStateException("phrase some are empty - broken storage?"))
 					} else {
@@ -158,7 +159,7 @@ class SeedRepository(
 		seedPhrase: String,
 		networks: List<String>,
 	) {
-		storage.addSeed(seedName, seedPhrase)
+		seedStorage.addSeed(seedName, seedPhrase)
 		try {
 			createKeySet(seedName, seedPhrase, networks)
 		} catch (e: ErrorDisplayed) {
@@ -178,7 +179,8 @@ class SeedRepository(
 		return when (val authResult = authentication.authenticate(activity)) {
 			AuthResult.AuthSuccess -> {
 				try {
-					storage.removeSeed(seedName)
+					seedStorage.removeSeed(seedName)
+					clearCryptedStorage.removeQrCode(seedName)
 					when (val remove = uniffiInteractor.removeKeySet(seedName)) {
 						is UniffiResult.Error -> OperationResult.Err(remove.error)
 						is UniffiResult.Success -> OperationResult.Ok(Unit)
@@ -200,7 +202,7 @@ class SeedRepository(
 
 	private fun getSeedPhrasesDangerous(seedNames: List<String>): RepoResult<String> {
 		val seedPhrases = seedNames
-			.map { storage.getSeed(it) }
+			.map { seedStorage.getSeed(it) }
 			.filter { it.isNotEmpty() }
 			.joinToString(separator = "\n")
 
@@ -216,13 +218,13 @@ class SeedRepository(
 
 	suspend fun isSeedPhraseCollision(seedPhrase: String): Boolean {
 		return try {
-			val result = storage.checkIfSeedNameAlreadyExists(seedPhrase)
+			val result = seedStorage.checkIfSeedNameAlreadyExists(seedPhrase)
 			result
 		} catch (e: UserNotAuthenticatedException) {
 			when (val authResult =
 				authentication.authenticate(activity)) {
 				AuthResult.AuthSuccess -> {
-					val result = storage.checkIfSeedNameAlreadyExists(seedPhrase)
+					val result = seedStorage.checkIfSeedNameAlreadyExists(seedPhrase)
 					result
 				}
 

@@ -343,6 +343,32 @@ class UniffiInteractor(val appContext: Context) {
 				UniffiResult.Error(e)
 			}
 		}
+
+	suspend fun bsGeneratePassphrase(
+		shards: Int
+	): UniffiResult<String> =
+		withContext(Dispatchers.IO) {
+			try {
+				val result =
+					io.parity.signer.uniffi.bsGeneratePassphrase(shards.toUInt())
+				UniffiResult.Success(result)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
+
+	suspend fun generateBananaSplit(
+		secret: String, title: String, passphrase: String, totalShards: UInt, requiredShards: UInt
+	): UniffiResult<List<QrData>> =
+		withContext(Dispatchers.IO) {
+			try {
+				val transactionResult =
+					io.parity.signer.uniffi.bsEncrypt(secret, title, passphrase, totalShards, requiredShards)
+				UniffiResult.Success(transactionResult)
+			} catch (e: ErrorDisplayed) {
+				UniffiResult.Error(e)
+			}
+		}
 }
 
 sealed class UniffiResult<T> {

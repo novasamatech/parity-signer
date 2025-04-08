@@ -17,6 +17,7 @@ import io.parity.signer.screens.keysetdetails.keySetDetailsDestination
 import io.parity.signer.screens.keysets.create.NewKeysetSubgraph
 import io.parity.signer.screens.keysets.restore.KeysetRecoverSubgraph
 import io.parity.signer.screens.scan.ScanNavSubgraph
+import io.parity.signer.screens.scan.bananasplitcreate.bananaSplitCreateDestination
 import io.parity.signer.screens.settings.networks.helper.networkHelpersCoreSubgraph
 import io.parity.signer.screens.settings.settingsFullSubgraph
 
@@ -56,6 +57,7 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 				coreNavController = navController
 			)
 		}
+		bananaSplitCreateDestination(navController)
 		composable(
 			route = CoreUnlockedNavSubgraph.KeyDetails.route,
 			arguments = listOf(
@@ -90,12 +92,18 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 
 			DerivationCreateSubgraph(
 				onBack = { navController.popBackStack() },
-				onOpenCamera = { navController.navigate(CoreUnlockedNavSubgraph.camera) },
+				onOpenCamera = {
+					navController.navigate(
+						CoreUnlockedNavSubgraph.Camera.destination(
+							null
+						)
+					)
+				},
 				seedName = seedName,
 			)
 		}
 		composable(
-			CoreUnlockedNavSubgraph.camera,
+			CoreUnlockedNavSubgraph.Camera.route,
 			enterTransition = {
 				slideIntoContainer(
 					AnimatedContentTransitionScope.SlideDirection.Up,
@@ -108,11 +116,21 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 					animationSpec = tween()
 				)
 			},
+			arguments = listOf(
+				navArgument(CoreUnlockedNavSubgraph.Camera.bsKeysetArg) {
+					type = NavType.StringType
+					nullable = true
+				}
+			)
 		) {
+			val bsKeysetValue =
+				it.arguments?.getString(CoreUnlockedNavSubgraph.Camera.bsKeysetArg)
+
 			ScanNavSubgraph(
 				onCloseCamera = {
 					navController.popBackStack()
 				},
+				seedNameSuggestion = bsKeysetValue,
 				openKeySet = { seedName ->
 					navController.navigate(
 						CoreUnlockedNavSubgraph.KeySet.destination(
@@ -137,7 +155,24 @@ fun CoreUnlockedNavSubgraph(navController: NavHostController) {
 object CoreUnlockedNavSubgraph {
 	const val newKeySet = "core_new_keyset"
 	const val recoverKeySet = "keyset_recover_flow"
-	const val camera = "unlocked_camera"
+
+	object Camera {
+		internal const val bsKeysetArg = "seed_name_arg"
+		private const val baseRoute = "unlocked_camera"
+		const val route = "$baseRoute?$bsKeysetArg={$bsKeysetArg}" //optional
+		fun destination(bsKeysetValue: String?): String {
+			val result =
+				if (bsKeysetValue == null) baseRoute else "$baseRoute?$bsKeysetArg=${bsKeysetValue}"
+			return result
+		}
+	}
+
+	object CreateBananaSplit {
+		internal const val seedNameArg = "seed_name_arg"
+		private const val baseRoute = "banana_split_create"
+		const val route = "$baseRoute/{$seedNameArg}"
+		fun destination(seedName: String) = "$baseRoute/$seedName"
+	}
 
 	object KeySet {
 		internal const val seedName = "seed_name_arg"
@@ -179,6 +214,7 @@ object CoreUnlockedNavSubgraph {
 		) =
 			"$baseRoute/$argHeader/$argDescription/$argVerbose"
 	}
+
 	const val errorWrongDbVersionUpdate = "core_wrong_version_mismatch"
 
 	const val airgapBreached = "core_airgap_blocker"
