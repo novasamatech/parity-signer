@@ -46,229 +46,132 @@ fun PpText(modifier: Modifier = Modifier) {
 		"""
 # Privacy Policy
 
-Parity Technologies Limited (“**We**”; “**us**”; or “**our**”) are committed to protecting and respecting your privacy.
+**1. GENERAL INFORMATION**
 
-This policy (together with our terms of use on our websites [https://parity.io](https://parity.io), [https://paritytech.io](https://paritytech.io) and [https://polkadot.io](https://polkadot.io) (the “**Sites**“) and any other documents referred to on it) sets out the basis on which any personal data we collect from you, or that you provide to us, will be processed by us. Please read the following carefully to understand our views and practices regarding your personal data and how we will treat it.
+Novasama Technologies GmbH, Schönhauser Allee 163, 10435 Berlin, Germany (hereinafter "**Novasama**" or “**we**”) offers the mobile application Polkadot Vault (hereinafter: “**Vault**”), a non-custodial wallet software that allows the User to turn his/her mobile device, such as smartphone or tablet (hereinafter: “**Storage Device**”), into a cold storage hardware wallet by holding the User’s private cryptographic keys offline while keeping the Storage Device offline. The Vault can be downloaded from the Apple App Store and from the Google Play Store. The User can use the Vault to safekeep their Private Keys, manage their accounts and blockchain-based digital assets (hereinafter: “**Digital Assets**”), send and receive transactions of Digital Assets, and cryptographically sign blockchain transactions. The Vault contains certain features that, inter alia, allow the User to connect the Vault to third-party decentralized applications (hereinafter: “**DApp**”), protocols and services that Novasama does not operate itself (hereinafter: “**Third-Party Services**”). Novasama does not offer Third-Party Services in its own name. Further information about the functions offered in connection with the Vault can be found in Novasama’s General terms and conditions of business and use (hereafter “GTC”). We encourage you to read the GTC carefully as they affect your obligations and legal rights regarding the usage of the Vault.
 
-## What data do we collect from you?
+In connection with the usage of the Vault, no personal data will be processed by Novasama since the Vault will be installed on Users’ Storage Device without Novasama having access to any personal data of the User when using the Vault. However, Novasama may process personal data of persons who visit Novasama’s website https://novasama.io/ (hereinafter each a “**Website** and together “**Websites**”) and/or contact Novasama. Personal data is information that relates to an identified or identifiable natural person. An identifiable natural person is a person who can be identified directly or indirectly, e.g., by means of association with an online identifier (hereinafter: “**Data Subject**”).
 
-The Ethereum and Substrate based blockchain clients written in the programming language Rust known as Parity does not collect information from you, however any information you publish onto a blockchain like Ethereum is public by design.
+Novasama takes the protection of personal data very seriously. We treat personal data confidentially, in accordance with this Privacy Notice and applicable data protection law, including, but not limited to the General Data Protection Regulation (hereinafter: “**GDPR**”) and the German Federal Data Protection Act (hereinafter: “**FDPA**”).
+This Privacy Notice informs you about how we handle your personal data that is under our control.
+Unless otherwise provided in this Privacy Notice, capitalised terms used herein have the meaning determined in the GTC.
 
-If you go to our Sites or utilise other services, we may collect and process the following personal data about you:
+**2. CONTROLLER**
 
-- **Information you give us**. This is information about you that you give us by filling in forms on our Sites, filling in forms on the sites of third party vendors providing us with a service, or by corresponding with us by phone, e-mail or otherwise. It includes information you provide when you agree to our contributors license agreement (“**CLA**”), apply to attend one of the events that we host, attend one of the events that we host, apply for a job on our Sites, ask to receive our newsletter and when you report a problem with our Sites. The information you give us may include your name, address, e-mail address and phone number and job application information (e.g. your CV, education data, and picture).
+Novasama acts as responsible party and, hence, as controller within the meaning of the GDPR with regard to the personal data processed in connection with the Websites or any contacting of Novasama. A controller is a natural or legal person who alone or jointly with others decides on the purposes and means of the processing of personal data.
+If you have any questions regarding this Privacy Notice or the processing of your personal data, do not hesitate to contact us via the following contact details:
 
-- **Information we collect about you**. With regard to each of your visits to our Sites we may automatically collect the following information:
-  - technical information, including the Internet protocol (IP) address used to connect your computer to the Internet, browser type and version, and versions, operating system and platform; and
-  - information about your visit, including the full Uniform Resource Locators (URL), page response times and download errors.
+**Name:**
+**Novasama Technologies GmbH**
+**Address:**
+**Schönhauser Allee 163, 10435 Berlin, Germany**
+**Email:**
+**admin@novasama.io**
 
-- **Information we receive from other sources**. This is information we receive about you if you use any of the other websites we operate or the other services we provide or, to the extent permitted by law, publicly accessible information about you on e.g. business social media. We are working closely with third parties (including, for example, recruitment services providers, and event organisation service providers and event partners). We will notify you when we receive information about you from them and the purposes for which we intend to use that information.
+**3. PURPOSES AND LEGAL BASES OF DATA PROCESSING BY NOVASAMA**
 
-## Cookies
+**a) General**
 
-Our Sites uses cookies to distinguish you from other users of our Sites. This helps us to provide you with a good experience when you browse our Sites and also allows us to improve our Sites. For detailed information on the cookies we use and the purposes for which we use them see our “**Cookie Policy**” below.
-## For what purposes do we use your data and what is the legal basis for this use?
+The Vault was built with privacy in mind, and we expect you to use it in a privacy-friendly manner. We intend to provide you with all the necessary tools and opportunities to use the Vault while processing as little personal data as possible. In particular, no personal data will be processed by Novasama in connection with the usage of the Vault. Rather, all personal data provided by the User when using the Vault will be stored locally on the User’s Storage Device and kept offline therein. Should the Vault be used to sign a transaction or to interact with DApps no personal data will be processed or accessed by Novasama. Any data processing in connection with the use of the Vault will, therefore, either be a data processing by a third party through interaction with Third-Party Services according to Section 4.a) of this Privacy Notice or a blockchain data processing according to Section 4.b) of this Privacy Notice, which are both not controlled by Novasama. Other than described under Section 3. b) - d) below, we neither collect your personal data nor process or store it.
 
-We may use information held about you in the following ways and relying on the following legal bases:
+**b) Visiting our Websites**
 
-  As required by Parity to conduct our business and pursue our legitimate interests, in particular:
-  - to notify you about changes to our service;
-  - to ensure that content from our Sites are presented in the most effective manner for you and for your computer;
-  - to administer our Sites and for internal operations, including troubleshooting and statistical purposes;
-  - to improve our Sites to ensure that content is presented in the most effective manner for you and for your computer;
-  - to allow you to participate in interactive features of our service, when you choose to do so;
-  - as part of our efforts to keep our Sites safe and secure;
-  - to use information you provide to investigate any complaints received from you or from others, about our Sites or our products or services;
-  - to assess your eligibility for the particular role you applied for;
-  - to assess your eligibility for any role that we might have available;
-  - to schedule, arrange and administer events and meetups in which you have expressed an interest (including creating an attendance record for the event and sending anonymised data to the venue including attendees, dietary requirements and accessibility requirements);
-  - to document the copyright and other rights granted with contributions made under our CLA;
-  - to use data in connection with legal claims, compliance, regulatory and investigative purposes as necessary (including disclosure of such information in connection with legal process or litigation); and
-  - Information we receive from other sources: We will combine this information with information you give to us and information we collect about you. We will use this information and the combined information for the purposes set out above (depending on the types of information we receive).
+When visiting our Websites certain personal data is automatically collected every time you call up the Websites and is automatically stored in so-called server log files. The personal data processed in this regard are browser type and version, operating system used, website from which the access is made (referrer URL), host name of the accessing computer, date and time of access as well as IP address of the requesting computer (hereafter referred to as “**Access Personal Data**”).
+The processing of Access Personal Data is necessary for technical reasons to provide the Websites in a functional way and to ensure system security. This also applies to the storage of your IP address, which is necessary and, under further conditions, can at least theoretically enable an assignment to your person. In addition to the above-mentioned purposes, we use server log files exclusively for the needs-based design and optimisation of the Websites. We do not combine this data with other data sources, nor do we evaluate the data for marketing purposes.
+The Access Personal Data is only stored for the period of time for which it is required to achieve the above-mentioned purposes. Your IP address is stored for a maximum of 7 days for IT security purposes.
+The legal basis for the temporary storage and processing of Access Personal Data is Art. 6 (1) sentence 1 lit. b GDPR, which permits the processing of personal data for the fulfilment of a contract or for the implementation of pre-contractual measures. In addition, Art. 6 para. 1 sentence 1 lit. f GDPR serves as the legal basis for the temporary storage of technical Access Personal Data. Our legitimate interest here is to be able to provide you with the Websites in a technically functioning and user-friendly way and to ensure the security of our systems.
 
-  Where you give us consent:
-  - we or our carefully selected partners will send you direct marketing in relation to our relevant products and services, or other products and services provided by us, our affiliates and carefully selected partners. However, we will only provide you with marketing related information after you have, where legally required to do so, opted in to receive those communications and having provided the opportunity for you to opt out at any time.
-  - we place cookies and use similar technologies in accordance with our Cookies Policy and the information provided to you when those technologies are used
-  - on other occasions where we ask you for consent. We will use the data for the purpose which we explain at that time.
+**c) Contacting us**
 
-  For purposes which are required by law:
-  - In response to requests by government or law enforcement authorities conducting an investigation.
+If you contact us, we may collect and process certain information related to your request, such as your name, email addresses and any other data requested by us or data that you choose to provide us with (hereafter together referred to as “**ontact Data**”).
 
-## Relying on our legitimate interests
+Contact Data will be processed for the purpose of processing and answering your enquiry and in the event of follow-up questions.
 
-We have carried out balancing tests for all the data processing we carry out on the basis of our legitimate interests, which we have described above. You can obtain information on any of our balancing tests by contacting us using the details set out later in this notice.
+If you contact us, our processing activities in this regard are based on our legitimate interests in accordance with Art. 6 (1) sentence 1 lit. f GDPR to provide appropriate response to customer/contact enquiries. In addition, if you contact us within the framework of an existing contractual relationship or in advance for information about our services, the Contact Data you provide to us will be processed for the purpose of processing and answering your contact enquiry in accordance with Art. 6 (1) sentence 1 lit. b GDPR as a legal basis.
+The Contact Data will remain with us until the purpose for storing/processing no longer applies (i.e., after processing your enquiry has been completed). The Contact Data will, at the latest, be deleted after one (1) year from the last date when you contacted us regarding the same matter. Mandatory legal provisions – in particular retention periods – remain unaffected.
 
-## Withdrawing consent or otherwise objecting to direct marketing
+**d) Other processing purposes**
 
-Wherever we rely on your consent, you will always be able to withdraw that consent, although we may have other legal grounds for processing your data for other purposes, such as those set out above. In some cases, we are able to send you direct marketing without your consent, where we rely on our legitimate interests. Once we have received notification that you have withdrawn your consent, we will no longer process your information for the purpose(s) to which you originally consented unless there is no other legal ground for the processing.
+    **i) Compliance with legal requirements:** We also process your personal data to comply with other legal obligations that may apply to us in connection with our business activities, including, but not limited to compliance with mandatory retention periods under commercial, trade or tax law or regulations and laws against money laundering. We process your personal data in accordance with Art. 6 (1) sentence 1 lit. c GDPR as legal basis to fulfil a legal obligation to which we are subject.
 
-You have an absolute right to opt-out of direct marketing, or profiling we carry out for direct marketing, at any time. You can do this by following the instructions in the communication where this is an electronic message, or by contacting us using the details set out below.
+    **ii) Legal enforcement:** We also process your personal data in order to be able to assert our rights and enforce our legal claims, as well as to be able to defend ourselves against legal claims. Finally, we process your personal data to the extent necessary to prevent or prosecute criminal offences. In this context, we process your personal data to protect our legitimate interests pursuant to Art. 6 (1) sentence 1 lit. f GDPR as legal basis, insofar as we assert legal claims or defend ourselves in legal disputes or we prevent or investigate criminal offences.
 
-## Who will we share your data with, where and when?
+    **iii) Consent:** Please note that we currently do not collect your personal data based on your consent. However, in case you give us consent to process your personal data for certain purposes (e.g., sending information material and offers), the lawfulness of this processing is based on your consent. Consent given can be withdrawn at any time. Please note that the withdrawal is only effective for the future and processing up to that point is not affected.
 
-We will share your personal information with:
+**4. OTHER DATA PROCESSING NOT CONTROLLED BY NOVASAMA**
 
-- Any member of our group, which means our subsidiaries, our ultimate holding company and its subsidiaries for :
-  - website maintenance and security; and
-  - recruitment and hiring
-- Selected third parties including but not limited to:
-  - business partners and sub-contractors for the performance of any contract we enter into with them or you;
-  - our newsletter service provider for the purposes of providing you with our newsletter;
-  - event organisation service providers for the purposes of scheduling and arranging events and meetups in which you have expressed an interest;
-  - our applicant tracking system service provider for the purposes of assessing your application for a role at Parity; and
-  - third party developers for and / or providers of website hosting and maintenance.
+**a) Interaction with Third-Party Services**
 
-We will also disclose your personal information to third parties:
+Using the Vault to cryptographically sign a transaction may require the User to interact with certain Third-Party Services. Any interaction with or enabling such connections may allow such Third-Party Services providers to collect, process, or share certain personal data about you. Please note that Novasama does neither receive, process or store such personal data nor does it control, operate, or manage those Third-Party Services providers. Therefore, Novasama is not responsible for the Third-Party Services providers’ data processing or privacy documentation (policy, notice, statement) and any data protection rights in this regard would need to be exercised against the Third-Party Services provider. When you intend to interact with any such Third-Party Services providers or leave the Vault, we encourage you to read the privacy documentation of the respective Third-Party Service you use or visit.
 
-- In the event that we sell or buy any business or assets, in which case we will disclose your personal data to the prospective seller or buyer of such business or assets.
-- If Parity Technologies Limited or substantially all of its assets are acquired by a third party, in which case personal data held by it about its customers will be one of the transferred assets.
-- If we are under a duty to disclose or share your personal data in order to comply with any legal obligation, or in order to enforce or apply our terms of use and other agreements; or to protect the rights, property, or safety of Parity Technologies Limited, our customers, or others. This includes exchanging information with other companies and organisations for the purposes of fraud protection and credit risk reduction.
+**b) Blockchain data processing**
 
-The data that we collect from you may be transferred to, and stored at, a destination outside the European Economic Area ("EEA"). It may also be processed by staff operating outside the EEA (in our case the US) who works for us or for one of our suppliers.
+Please note that certain data, such as public addresses associated with your wallets and information about transactions associated therewith (hereafter “**Transactions**”), interact with public decentralised blockchain infrastructures and blockchain-based software, including smart-contracts, which work autonomously. “Decentralised” means that there is no single person, including Novasama, who controls the blockchain or stores data available thereon. “Public” means that the access is available for anyone and cannot be restricted. The data entered in a public decentralised blockchain is distributed via the nodes that simultaneously store all records entered into the blockchain. By design, blockchain records cannot be changed or deleted and are said to be “immutable”. Due to the blockchain’s nature, once you start entering information into a blockchain, particularly by carrying out any Transactions, such information, which may be considered personal data, will become publicly available on a blockchain. Please be aware that any Transaction within a blockchain is irreversible and any information, including personal data, entered into a blockchain cannot be deleted or changed. Novasama will never control such information entered in a blockchain nor manage access to it and is, therefore, not responsible for any data processing in this regard. The ultimate decision whether to transact on a blockchain or carry out any Transaction rests with you. Therefore, your ability to exercise certain data protection rights in this regard will be limited.
 
-Where information is transferred outside the EEA, and where this is to a stakeholder or vendor in a country that is not subject to an adequacy decision by the EU Commission, data is adequately protected by EU Commission approved standard contractual clauses, an appropriate Privacy Shield certification or a vendor's Processor Binding Corporate Rules. A copy of the relevant mechanism can be provided for your review on request to admin@parity.io.
+**c) App Store data processing**
 
-Our Sites may, from time to time, contain links to and from the websites of our partner networks, and affiliates. If you follow a link to any of these websites, please note that these websites have their own privacy policies and that we do not accept any responsibility or liability for these policies. Please check these policies before you submit any personal data to these websites.
 
-## Your rights
+The Vault can be downloaded from the Apple App Store and from the Google Play Store. Please note, that downloading the Vault from an App Store will allow the respective App Store provider to collect, process, or share certain personal data about you (e.g. account information and/or contact details). Please note that Novasama does neither receive, process or store such personal data nor does it control, operate, or manage those App Store providers. Therefore, Novasama is not responsible for the App Store providers’ data processing or privacy documentation (policy, notice, statement) and any data protection rights in this regard would need to be exercised against the App Store provider. When you intend to interact with any such App Store providers, e.g. to download the Vault, we encourage you to read the privacy documentation of the respective App Store provider you use or visit prior.
 
-You have the right to **ask us for a copy** of your personal data; to **correct**, **delete** or **restrict** (stop any active) processing of your personal data; and to **obtain the personal data you provide to us for a contract or with your consent in a structured, machine readable format**, and to ask us to **share (port) this data to another controller**.
+**5. DATA RECIPIENTS**
 
-In addition, you can **object to the processing** of your personal data in some circumstances (in particular, where we don’t have to process the data to meet a contractual or other legal requirement).
+Within Novasama those persons will get access to your personal data that need it to fulfil our contractual and legal obligations.
 
-These **rights may be limited**, for example if fulfilling your request would reveal personal data about another person, where they would infringe the rights of a third party (including our rights) or if you ask us to delete information which we are required by law to keep or have compelling legitimate interests in keeping. Relevant exemptions are included in the GDPR. We will inform you of relevant exemptions we rely upon when responding to any request you make.
+In individual cases we may transmit personal data to our advisors in legal or tax matters, whereby these recipients act independently in their own data protection responsibility and are also obliged to comply with the requirements of the GDPR and other applicable data protection regulations. Furthermore, they are obliged to maintain special confidentiality and secrecy due to their professional status. Other than that, we will not transfer any personal data controlled by us to any third-party recipients.
 
-To exercise any of these rights, or to obtain other information, such as a copy of a legitimate interests balancing test, you can get in touch with us using the details set out under the Section “**Contact**” below. If you have unresolved concerns, you have the **right to complain** to an EU data protection authority where you live, work or where you believe a breach may have occurred.
+**6. DATA TRANSFER TO THIRD COUNTRIES**
 
-You have the right to ask us not to process your personal data for marketing purposes. We will usually inform you (before collecting your data) if we intend to use your data for such purposes or if we intend to disclose your information to any third party for such purposes. You can exercise your right to prevent such processing by checking certain boxes on the forms we use to collect your data. You can also exercise the right at any time by contacting us at admin@parity.io.
+We will not transfer any personal data to recipients located in countries outside the EU (European Union) / EEA (European Economic Area).
 
-## Which entity is my data controller, and which affiliates might my data be shared with?
+**7. DURATION OF DATA STORAGE**
 
-The data controller for your information is Parity Technologies Limited of c/o IGNITION LAW Moray House, Floor 1, Moray House, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
+We initially process and store your personal data for the duration for which the respective purpose of use requires corresponding storage (see above under Section 3 on the individual processing purposes). This may also include the periods of initiating a contract (pre-contractual legal relationship) and processing a contract. On this basis, personal data is regularly deleted as part of the fulfilment of our contractual and/or legal obligations, unless its temporary further processing is necessary for the following purposes:
 
-Your data might be shared with our group company Parity Technologies Deutschland GmbH, Glogauer Str. 6, 10999, Berlin, Germany for recruiting purposes and for the management of group functions.
-How long will you retain my data?
+    · Fulfilment of legal storage obligations, which result, for example, from the German Commercial Code (§§ 238, 257 para. 4 HGB) and the German Fiscal Code (§ 147 para. 3, 4 AO). The periods specified there for storage or documentation are up to ten years.
 
-Where you are a contributor, customer or a registered user, we will keep your information for the duration of any contractual relationship you have with us, and, to the extent permitted, after the end of that relationship for as long as necessary to perform the purposes set out in this notice.
+    · Preservation of evidence taking into account the statute of limitations. According to §§ 194 ff. of the German Civil Code (BGB), these limitation periods can be up to 30 years, with the regular limitation period being three years.
 
-Where we process personal data with your consent, we process the data until you ask us to stop and for a short period after this (to allow us to implement your requests). We also keep a record of the fact that you have asked us not to process your data indefinitely so that we can respect your request in future.
+**8. DATA SUBJECT RIGHTS**
 
-For data about your visits to our Sites and where we process personal data for Sites security purposes, we will retain this data for 12 months following your last visit of our Sites.
+You are entitled to the following rights as a Data Subject under the legal requirements:
 
-Data you provided to us in the course of your job application will be kept for 6 months, if your application was not successful. If you enter in an employment relationship with us, the relevant information will be kept for the duration of the employment contract as part of your personnel file.
+**a) Right of withdrawal:** You may, in accordance with Art. 7 (3) GDPR, at any time withdraw any consent you provided to allow us to process your personal data. Please note that the withdrawal only takes effect for the future. Processing that took place before the withdrawal is not affected. However, please note that we currently do not collect your personal data based on your consent.
 
+**b) Right to information/access:** You are entitled at any time, within the framework of Art. 15 GDPR, to request confirmation from us as to whether we are processing personal data relating to you. If this is the case, you are also entitled, within the framework of Art. 15 GDPR, to receive information about this personal data as well as certain other information (including processing purposes, categories of personal data, categories of recipients, planned storage period, the origin of the data, the use of automated decision-making and, in the case of third country transfers, the appropriate safeguards) and a copy of your personal data. The restrictions of § 34 FDPA apply.
 
-Laws may require us to hold certain information for specific periods. In other cases, we may retain data for an appropriate period after any relationship with you ends to protect itself from legal claims, or to administer its business.
+**c) Right to rectification:** You are entitled to request us to rectify the personal data stored about you if it is inaccurate or incorrect, in accordance with Art. 16 GDPR.
 
-## How you protect my data
+**d) Right to erasure:** You are entitled, under the conditions of Art. 17 GDPR, to demand that we delete personal data relating to you without delay. The right to erasure does not apply if the processing of the personal data is necessary, for example, to comply with a legal obligation (e.g., statutory retention obligations) or to assert, exercise or defend legal claims. Furthermore, the restrictions of § 35 FDPA apply.
 
-We strive to maintain the highest standards of security and Parity has put in place robust technical and organizational measures for the protection of your data in accordance with the current, general state of the art technologies, especially to protect the data against loss, falsification or access by unauthorized third persons. However the transmission of information via the internet is not completely secure. So, whilst we will do our best to protect your personal data, we cannot guarantee the security of your data transmitted to our Sites. Any transmission is at your own risk. Once we have received your personal data we will use strict procedures and security features to prevent unauthorized access.
+**e) Right to restrict processing:** You are entitled to demand that we restrict the processing of your personal data under the conditions of Art. 18 GDPR.
 
-Where we have given you (or where you have chosen) a password which enables you to access certain parts of our Sites, you are responsible for keeping this password confidential. We ask you not to share a password with anyone.
+**f) Right to data portability:** You are entitled, under the conditions of Art. 20 GDPR to demand that we hand over to you the personal data concerning you that you have provided to us, in a structured, common and machine-readable format. Note that this right only applies to automated information which you initially provided consent for us to use or where we used the information to perform a contract with you. However, we are currently not processing your personal data based on your consent or based on performance of a contract with you.
 
-## Cookie-policy
+**g) Right of objection:** You are entitled to object to the processing of your personal data under the conditions of Art. 21 GDPR, so that we must stop processing your personal data. The right to object only exists within the limits provided for in Art. 21 GDPR. In addition, our interests may conflict with the termination of processing, so that we are entitled to process your personal data despite your objection.
 
-Cookies are small text files that are placed on your computer by the websites that you visit. They are widely used in order to make websites work, or work more efficiently, as well as to provide information to the owners of the site. The use of cookies is now standard for most websites. If you are uncomfortable with the use of cookies, you can manage and control them through your browser, including removing cookies by deleting them from your ‘browser history’ (cache) when you leave the site. See the subsection “How to manage cookies” for further information
+**h) Right of appeal to a supervisory authority:** Subject to the conditions of Art. 77 GDPR, you have the right to lodge a complaint with a competent supervisory authority. A list of data protection supervisory authorities in Germany and their contact details can be found here. As a rule, the Data Subject can turn to the supervisory authority at his/her habitual residence or place of work or Novasama’s registered office. The supervisory authority responsible for Novasama is the Berlin Commissioner for Data Protection and Freedom of Information (Der Berliner Beauftragte für Datenschutz und Informationsfreiheit)
 
-## Necessary cookies
+**Other concerns:** For further data protection questions and concerns, please contact us under the contact details provided in Section 2 above.
 
-The law states that we can store cookies on your device if they are strictly necessary for the operation of this site. To set all other types of cookies we need your permission. Necessary cookies help make a website usable by enabling basic functions like page navigation and access to secure areas of the website. The website cannot function properly without these cookies.
+**9. REQUIREMENT TO PROVIDE DATA**
 
-## Parity Technologies’ use of cookies
+Visiting our Websites requires you to provide certain personal data to us, as described in Section 3.b) above. Other than that, you are not required to provide any personal data to us. However, if you decide not to provide your personal data to us, you may not be able to contact us and/or we will not be able to contact you, e.g., to respond to your enquiries or questions.
 
-The only cookie set on Parity Technologies’ websites is the "cfduid" cookie. This cookie is set by a third party, CloudFlare (a content delivery network service), and is necessary for the website to function properly as it is used to identify trusted web traffic. It does not correspond to any user ID in the web application, nor does the cookie store any personally identifiable information. In addition, it’s a “first-party” cookie bound to Parity’s hostname and not accessible from anywhere else, which makes it unusable for tracking purposes. Where technically possible it is also marked as “Secure” which would only allow its transmission over encrypted channels. [https://support.cloudflare.com/hc/en-us/articles/200170156-What-does-the-CloudFlare-cfduid-cookie-do-](https://support.cloudflare.com/hc/en-us/articles/200170156-What-does-the-CloudFlare-cfduid-cookie-do-)
+**10. AUTOMATED DECISION MAKING / PROFILING**
 
-This cookie expires after 1 year.
+We do not use your personal data to make any automated decision making or profiling (meaning an automated analysis of your personal circumstances).
 
-## How to manage cookies
+**11. CHILDREN PERSONAL DATA**
 
-Current versions of web browsers offer enhanced user controls regarding the placement and duration of both first and third party cookies. Search for "cookies" under your web browser's “Help menu” for more information on cookie management features available to you. You can enable or disable cookies by modifying the settings in your browser. You can also find out how to do this, and find more information on cookies at www.allaboutcookies.org. However, if you choose to disable cookies in your browser, you may be unable to complete certain activities on our Sites or to correctly access certain parts of it. If you would like more information about interest-based advertising, including how to opt-out of these cookies, please visit [ http://youronlinechoices.eu/](http://youronlinechoices.eu/).
+The Vault is not intended for the use of children (under 18 years old). We do not knowingly market to, solicit, process, collect, or use personal data of children.
 
-## Changes to our privacy policy
+If we become aware that a child has provided us with personal data, we will use commercially reasonable efforts to delete such information from our database within a reasonable timeframe. If you are the parent or legal guardian of a child and believe that we have collected personal data from your child, please contact us.
 
-Any changes we make to our privacy policy in the future will be posted on this page and, where appropriate, notified to you by e-mail. Please check back frequently to see any updates or changes to our privacy policy.
+**12. CHANGES TO THIS PRIVACY NOTICE**
 
-## Contact
+We keep this Privacy Notice under regular review and may update it at any time. If we make any changes to this Privacy Notice, we will change the “Last Updated” date above. Please review this Privacy Notice regularly to check for any updates. The current version of the Privacy Notice can be accessed at any time on https://novasama.io/vault-privacy.
 
-Questions, comments and requests regarding this privacy policy are welcomed and should be addressed to admin@parity.io or by writing to Parity Technologies Limited of c/o IGNITION LAW Moray House, Floor 1, Moray House, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
-
-# Supplemental privacy notice for event participants
-
-"We", "our", "Parity" – refers to Parity Technologies Limited.
-
-This notice supplements our Privacy Notice and describes how we collect, use, share and retain additional personal data collected when you participate in a Parity event (whether as an attendee, guest, or speaker), and how to access and control this additional data. Please let us know if you have any questions about this supplemental notice.
-
-## What additional data do we collect from you:
-
-### Event registration
-
-When you register to participate in a Parity event we will collect some or all of the following information from you directly or we will receive it from Eventbrite or Meetup:
-
-- Name
-- Meetup or Eventbrite profile link
-- Organisation
-- Email address
-- Dietary requirements
-- Accessibility requirements
-
-When you book an event through Eventbrite or Meetup you will also have to agree to their terms and conditions of service. Please note that Eventbrite and Meetup are third-party services that are not owned or managed by Parity. This policy only refers to the way Parity will use your information.
-
-If you wish to attend one of our events but do not wish to use Eventbrite or Meetup to book a place, please contact the event organiser. Contact details for each event are provided on the event booking page.
-
-### Event photography and audio / video recordings
-
-We frequently take photos and record audio and/or video at our events. If so, we may make and store photographs containing your likeness and recordings of your voice and likeness. We may associate your image and the sound of your voice with your name if you are identified during the recording or identify yourself by name.
-
-If you do not want your photograph to be taken or to be featured in video or audio of an event please let a member of our team know.
-
-## What we do with this additional data and why:
-
-### Event registration data
-
-We may use this information for the purposes of scheduling, organising and administering the event, this includes but is not limited to:
-
-- registering you to attend the event;
-- sending you an email to you to confirm your registration and provide you with updates regarding the event;
-- tracking and administering dietary and accessibility requirements; and
-- organising and arranging an appropriate venue and refreshments.
-
-### Event photography and audio or video recordings
-
-We may use, edit, copy, exhibit, publish, or distribute photos and audio or video recording from our events for the purposes of promoting our events and Parity.
-When we share this additional data
-
-### Event registration data
-
-Unless otherwise stated we use Meetup or Eventbrite to manage online registration for our events. We may share your personal data with Meetup or Eventbrite (or an alternative service provider), event partners (including but not limited to: event space providers, caterers and security service providers) and partner organisations (for example partners with whom we are joint hosting or presenting) as needed to provide you with information and services associated with the event and so as to administer the event itself.
-
-### Event photography and audio or video recordings
-
-We may publish our or distribute photos and audio or video recording from our events via social media, including Twitter, Telegram, and LinkedIn. In doing so we will share those photos, audio or video with those services and their users.
-
-## How long do we retain your data?
-
-### Event Registration Data
-
-If you have informed us that you wish to be contacted about future events we will keep your data until you tell us that you no longer wish to be contacted. We will check from time to time that you still wish to hear from us. If you have informed us that you do not wish to be contacted about events we will delete your information within eight weeks of the event.
-
-Event photography and audio or video recordings
-
-Any photos and audio or video recording from our events that we choose not to use for the purposes of promoting our events and Parity will be deleted within eight weeks of the event.
-
-## Changes to this supplemental policy
-
-We keep this policy under regular review and we will post any updates on this webpage.
-
-## How to contact us
-
-Please contact us at admin@parity.io if you have any questions about this supplemental policy or the information we hold about you.
-Statutory information
-
-# Statutory information about Parity Technologies Limited:
-
-- Registered in England and Wales
-- Registered Number: 09760015
-- Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
+Last Updated: February 5, 2024
 						""".toRichTextStr()
 	)
 }
