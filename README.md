@@ -23,7 +23,7 @@ You can create accounts in Substrate-based networks, sign messages/transactions,
 
 You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.
 
-☝️ **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](https://paritytech.github.io/parity-signer/about/Security-And-Privacy.html) for more details.**
+☝️ **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended**
 
 Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Polkadot Vault mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
@@ -33,13 +33,13 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # Links
 
-- [Official Website](https://signer.parity.io/)
-- [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
-- [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
+- [Official Website](https://vault.novasama.io/)
+- [Docs](https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/polkadot-vault) — auto-generated documentation for end users
+- [App Store](https://apps.apple.com/gb/app/polkadot-vault-parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer&hl=en_GB&pli=1), [Github Releases](https://github.com/novasamatech/parity-signer/releases) — public builds
 - [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
-- [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
+- [Metadata Portal](https://metadata.novasama.io) — QR codes with the latest metadata
 - [BananaSplit](https://bs.parity.io) — split your seed phrase for maximum security
-- [Legacy: last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
+- [Legacy: last public release with React Native](https://github.com/novasamatech/parity-signer/tree/legacy-4.5.3)
 
 # Features
 
@@ -48,16 +48,14 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - Use derived keys to have multiple addresses with a single seed phrase
 - Backup and restore your accounts
 - View activity log to detect unauthorized access
-- Update [metadata](https://metadata.parity.io) without going online
+- Update [metadata](https://metadata.novasama.io/) without going online
 - Add new networks
 
 # How to use
 
 Please read our documentation before using Vault for the first time or before upgrading. It covers the main use-cases such as installing on a new phone, creating keys, upgrading and adding new networks:
 
-👉 https://paritytech.github.io/parity-signer/index.html
-
-To contribute into the documentation use [docs](docs) folder
+👉 https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/polkadot-vault
 
 # Project Structure
 
@@ -156,6 +154,16 @@ Enable "Show package details" checkmark to select specific version.
 
 **10.** Run the project (`Ctrl+R`). It should build the Rust core library automatically.
 
+### Troubleshooting
+
+#### "no such file or directory" error when invoking cargo/rustc/uniffi-bindgen
+1. Ensure rust and uniffi-bindgen are installed
+2. Sometimes launching Android Studio from the Finder might result in Android Studio not seeing all env needed variables
+Try launching Studio from the shell (command assumes you are in the "Applications" folder)
+```shell
+./Android\ Studio.app/Contents/MacOS/studio
+```
+
 # Release Android
 
 - Create PR with new app version updated
@@ -177,7 +185,7 @@ We don't have test for UIs for now (other than navigation which is handled on ru
 
 # Bugs and Feedback
 
-If you found a bug or want to propose an improvement, please open [an issue](https://github.com/paritytech/parity-signer/issues).
+If you found a bug or want to propose an improvement, please open [an issue](https://github.com/novasamatech/parity-signer/issues).
 
 Try to create bug reports that are:
 
@@ -186,7 +194,7 @@ Try to create bug reports that are:
 - _Unique._ Do not duplicate existing opened issues.
 - _Scoped to a Single Bug._ One bug per report.
 
-Official team email for direct inquiries: signer@parity.io
+Official team email for direct inquiries: support@novawallet.io
 
 # Contributing
 

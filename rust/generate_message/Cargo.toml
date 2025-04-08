@@ -19,9 +19,9 @@ qrcode_rtx = {path = "../qrcode_rtx"}
 regex = "1.10.3"
 serde_json = "1.0.114"
 sled = "0.34.6"
-sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false }
-sp-keyring = { git = "https://github.com/paritytech/substrate", default-features = false }
+sp-core = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"]}
+sp-runtime = { git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false }
+sp-keyring = { git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false }
 thiserror = "1.0.57"
 tokio = { version = "1", features = ["full"] }
 

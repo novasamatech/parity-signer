@@ -1,5 +1,9 @@
 name:                         E2E Test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
   push:
@@ -10,13 +14,8 @@ on:
 jobs:
   check:
     name:                     Check on MacOS
-    runs-on:                  macos-13
+    runs-on:                  macos-15
     steps:
-
-      - name:                 Cancel Previous Runs
-        uses:                 styfle/cancel-workflow-action@85880fa0301c86cca9da44039ee3bb12d3bedbfa # 0.12.1
-        with:
-          access_token:       ${{ github.token }}
 
       - name:                 Checkout sources
         uses:                 actions/checkout@v4.1.1
@@ -28,14 +27,17 @@ jobs:
         uses:                 ruby/setup-ruby@v1
         with:
           ruby-version:       '2.7'
-          bundler-cache:      true
+          bundler-cache:      false
 
       - name:                 Setup - Xcode
-        run:                  sudo xcode-select -switch '/Applications/Xcode_15.0.app/Contents/Developer' && /usr/bin/xcodebuild -version
+        uses:                 maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version:      16
 
       - name:                 Install dependencies
         run:                  |
           brew install sourcery
+          bundle install
 
       - name: Get cached Swift Packages managed by Xcode
         uses: actions/cache@v3
@@ -59,7 +61,7 @@ jobs:
           use-tool-cache:     true
 
       - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
         with:
           workspaces:         rust -> rust/target
 

@@ -30,10 +30,7 @@ struct KeyDetailsView: View {
                     case .list:
                         derivedKeysList()
                     case .emptyState:
-                        rootKeyHeader()
-                        Spacer()
-                        emptyState()
-                        Spacer()
+                        emptyKeysList()
                     }
                 }
                 .navigationBarHidden(true)

@@ -9,12 +9,17 @@ edition = "2018"
 [dependencies]
 hex = "0.4.3"
 qr_reader_phone = {path = "../qr_reader_phone"}
-anyhow = "1.0.81"
+anyhow = "1.0.82"
 image = "0.24.9"
 quircs = "0.10.2"
 indicatif = "0.17.8"
 
 [dependencies.opencv]
-version = "0.88"
+version = "0.94.2"
 default-features = false
 features = ["videoio", "imgproc", "highgui"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(ocvrs_opencv_branch_32)',
+] }

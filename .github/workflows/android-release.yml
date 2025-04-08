@@ -1,5 +1,9 @@
 name: Release android app
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
 jobs:
@@ -7,11 +11,9 @@ jobs:
   build:
     name: Build android unit test
     runs-on:            ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     steps:
-      - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@85880fa0301c86cca9da44039ee3bb12d3bedbfa # 0.12.1
-        with:
-          access_token: ${{ github.token }}
 
       - name:           Checkout Sources
         uses:           actions/checkout@v4.1.1
@@ -22,7 +24,7 @@ jobs:
       - name:           Install System Dependencies (Linux)
         run:            |
           sudo apt-get update
-          sudo apt-get install -y clang libclang-dev libopencv-dev
+          sudo apt-get install -y clang libclang-dev
 
       - name:           Install Rust stable toolchain
         uses:           dtolnay/rust-toolchain@stable
@@ -37,17 +39,11 @@ jobs:
       - name:           Install additional rust targets
         run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
-      - name:           Set up JDK environment
-        uses:           actions/setup-java@v4
-        with:
-          distribution: 'adopt'
-          java-version: 17
-
-      - name:           Install NDK
-        run:            echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
+      - name:           Install Android Dependencies
+        uses:           ./.github/actions/install-android-dep
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        uses:           Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
         with:
           workspaces:   rust -> rust/target
 
@@ -68,12 +64,10 @@ jobs:
   make:
     name: Build signed APKs
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     # if: github.ref == ' refs/head/main'
     steps:
-      - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@85880fa0301c86cca9da44039ee3bb12d3bedbfa # 0.12.1
-        with:
-          access_token: ${{ github.token }}
 
       - name:           Checkout Sources
         uses:           actions/checkout@v4.1.1
@@ -84,7 +78,7 @@ jobs:
       - name:           Install System Dependencies (Linux)
         run:            |
           sudo apt-get update
-          sudo apt-get install -y clang libclang-dev libopencv-dev
+          sudo apt-get install -y clang libclang-dev
 
       - name:           Install Rust stable toolchain
         uses:           dtolnay/rust-toolchain@stable
@@ -99,17 +93,11 @@ jobs:
       - name:           Install additional rust targets
         run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
-      - name:           Set up JDK environment
-        uses:           actions/setup-java@v4
-        with:
-          distribution: 'adopt'
-          java-version: 17
-
-      - name:           Install NDK
-        run:            echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
+      - name:           Install Android Dependencies
+        uses:           ./.github/actions/install-android-dep
 
       - name:           Rust Cache
-        uses:           Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        uses:           Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
         with:
           workspaces:   rust -> rust/target
 
@@ -150,7 +138,7 @@ jobs:
           BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
       - name: Upload Gplay release APKs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: signer-release-signed
           path: |

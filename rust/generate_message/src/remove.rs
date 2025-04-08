@@ -35,16 +35,16 @@
 //! Removed data associated with the address book title consists of:
 //!
 //! - address book entry
-//! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
-//! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+//!   [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+//!   [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
 //! - network specs
-//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
-//! [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+//!   [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from
+//!   [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
 //! - all associated metadata entries from [`METATREE`] if there are no other
-//! address book entries this metadata is associated with
+//!   address book entries this metadata is associated with
 //! - all associated meta block history entries from [`META_HISTORY`] if there
-//! are no other address book entries this block history entries are associated
-//! with
+//!   are no other address book entries this block history entries are associated
+//!   with
 //!
 //! Note that single address book entry corresponds to single network specs
 //! entry, and they are created and removed always simultaneously.

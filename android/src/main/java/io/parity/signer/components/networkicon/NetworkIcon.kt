@@ -105,6 +105,8 @@ private fun getResourceIdForNetwork(networkName: String) =
 		"alphanet" -> R.drawable.network_alphanet
 		"altair" -> R.drawable.network_altair
 		"amplitude" -> R.drawable.network_amplitude
+		"analog-testnet" -> R.drawable.network_analog
+		"analog-timechain" -> R.drawable.network_analog
 		"appchain" -> R.drawable.network_appchain
 		"apron" -> R.drawable.network_apron
 		"ares" -> R.drawable.network_ares

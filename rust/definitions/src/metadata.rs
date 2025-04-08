@@ -200,7 +200,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>> {
 /// - must have 'System' pallet  
 /// - must have `Version` constant in `System` pallet, SCALE-decodeable  
 /// - can have `SS58Prefix` constant in `System` pallet, and if it does, the
-/// constant must be SCALE-decodeable  
+///   constant must be SCALE-decodeable  
 ///
 /// Additionally, for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
 /// the extensions set must be decoding-compatible for any signable transaction.  
@@ -460,7 +460,7 @@ pub struct AddressBookEntry {
 
 #[cfg(feature = "active")]
 impl AddressBookEntry {
-    /// Gets [`AddressBookEntry`] from from hot database tree `ADDRESS_BOOK`
+    /// Gets [`AddressBookEntry`] from hot database tree `ADDRESS_BOOK`
     /// (key, value) entry.  
     pub fn from_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
@@ -470,7 +470,7 @@ impl AddressBookEntry {
     }
 
     /// Gets network address book title and [`AddressBookEntry`] as a tuple from
-    /// from hot database tree `ADDRESS_BOOK` (key, value) entry.  
+    /// hot database tree `ADDRESS_BOOK` (key, value) entry.
     ///
     /// Network address book title **differs** from `title` in network specs.
     /// This is just a key in hot database `ADDRESS_BOOK`, and is not displayed
