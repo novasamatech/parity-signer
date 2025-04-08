@@ -47,6 +47,15 @@ extension AuthenticatedScreenContainer {
         case loading
         case keyDetails(String)
         case noKeys
+
+        var isKeyDetails: Bool {
+            switch self {
+            case .keyDetails:
+                true
+            default:
+                false
+            }
+        }
     }
 
     final class ViewModel: ObservableObject {
@@ -59,11 +68,15 @@ extension AuthenticatedScreenContainer {
         init(seedsMediator: SeedsMediating = ServiceLocator.seedsMediator) {
             self.seedsMediator = seedsMediator
             updateViewState()
-            seedsMediator.seedNamesPublisher
-                .sink { [weak self] _ in
-                    self?.updateViewState()
-                }
-                .store(in: cancelBag)
+
+			/*
+			 * 	We monitor seed changes for keyDetails state only since
+			 *	for onboarding onKeySetAddCompletion used
+			 */
+			seedsMediator.seedNamesPublisher
+				.sink { [weak self] _ in
+					self?.updateKeyDetailsState()
+				}.store(in: cancelBag)
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
@@ -88,6 +101,12 @@ extension AuthenticatedScreenContainer {
             } else {
                 viewState = .noKeys
             }
+        }
+
+        func updateKeyDetailsState() {
+            guard viewState.isKeyDetails else { return }
+
+            updateViewState()
         }
     }
 }
