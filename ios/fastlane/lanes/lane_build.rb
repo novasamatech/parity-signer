@@ -11,7 +11,7 @@ lane :build_release do |options|
   configuration = options[:configuration]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
-  profile_name = "Polkadot Vault Distribution"
+  profile_name = "match AppStore io.parity.NativeSigner"
   output_name = scheme # just in case we need to customise it for other GAs
   export_method = "app-store"
   compile_bitcode = false
@@ -48,19 +48,26 @@ end
 
 desc "Prepares certificate and provisioning profile"
 lane :prepare_code_signing do |options|
-  api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
-  profile_name = "Polkadot Vault Distribution"
 
-  cert(
-    api_key: api_key,
-    keychain_path: ENV["KEYCHAIN_PATH"],
+  if is_ci?
+    create_keychain(
+      name: "github_actions_keychain",
+      password: ENV["KEYCHAIN_PASSWORD"],
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      add_to_search_list: true,
+      lock_when_sleeps: false
+    )
+  end
+
+  match(
+    type: "appstore",
+    app_identifier: app_identifier,
+    readonly: is_ci?,
+    keychain_name: "github_actions_keychain",
     keychain_password: ENV["KEYCHAIN_PASSWORD"]
   )
-  sigh(
-    api_key: api_key,
-    app_identifier: app_identifier,
-    provisioning_name: profile_name,
-    force: false
- )
+
 end
