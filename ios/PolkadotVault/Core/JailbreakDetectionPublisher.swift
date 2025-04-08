@@ -90,7 +90,13 @@ private extension JailbreakDetectionPublisher {
 }
 
 extension UIDevice: DeviceProtocol {
-    var isSimulator: Bool { TARGET_OS_SIMULATOR != 0 }
+    var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+            true
+        #else
+            false
+        #endif
+    }
 }
 
 private enum Constants {
