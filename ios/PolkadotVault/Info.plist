@@ -43,8 +43,6 @@
 		<string>Inter-Medium.otf</string>
 		<string>Inter-Regular.otf</string>
 		<string>Inter-SemiBold.otf</string>
-		<string>RobotoMono-Medium.otf</string>
-		<string>RobotoMono-Light.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
