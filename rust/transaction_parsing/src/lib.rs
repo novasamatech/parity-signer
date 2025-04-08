@@ -26,9 +26,10 @@ mod message;
 use message::process_message;
 pub mod parse_transaction;
 pub use parse_transaction::entry_to_transactions_with_decoding;
-use parse_transaction::parse_transaction;
+use parse_transaction::{parse_transaction, parse_transaction_with_proof};
 pub mod dynamic_derivations;
 mod error;
+
 #[cfg(test)]
 mod tests;
 use crate::dynamic_derivations::decode_dynamic_derivations;
@@ -61,6 +62,7 @@ fn handle_scanner_input(database: &sled::Db, payload: &str) -> Result<Transactio
         "00" | "02" => parse_transaction(database, data_hex),
         "03" => process_message(database, data_hex),
         "04" => parse_transaction_bulk(database, data_hex),
+        "06" => parse_transaction_with_proof(database, data_hex),
         "80" => load_metadata(database, data_hex),
         "81" => load_types(database, data_hex),
         "c1" => add_specs(database, data_hex),

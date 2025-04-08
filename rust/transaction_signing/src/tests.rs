@@ -3779,3 +3779,601 @@ Identities:"#;
 
     fs::remove_dir_all(dbname).unwrap();
 }
+
+#[test]
+fn can_parse_westend_trasfer_with_proof() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let line = fs::read_to_string("for_tests/valid_westend_transfer_with_proof.txt").unwrap();
+
+    let output = produce_output(&db, &line).unwrap();
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Balances".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "transfer_keep_alive".to_string(),
+                        docs: "".into(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "dest".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: "sp_runtime >> multiaddress >> MultiAddress".to_string(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
+                        identicon: Identicon::Dots { identity: bob() },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "value".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 3,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "100.000000".to_string(),
+                        units: "uWND".to_string(),
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 7,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "61".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 0,
+                card: Card::NonceCard {
+                    f: "261".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "10.000000".to_string(),
+                        units: "uWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "1018000".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 0,
+                card: Card::TxSpecCard {
+                    f: "27".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+        assert!(!has_pwd, "Expected no password");
+        sign_action_test(
+            &db,
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            network_info.specs.encryption,
+        )
+        .unwrap();
+    } else {
+        panic!("Wrong action: {output:?}")
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn cannot_sign_if_check_genesis_modified() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let line = fs::read_to_string(
+        "for_tests/invalid_westend_transfer_with_modified_check_genesis_extension.txt",
+    )
+    .unwrap();
+
+    let output = produce_output(&db, &line).unwrap();
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+
+    let content_known = TransactionCardSet {
+        author: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::AuthorCard {
+                f: author_info_known
+            },
+        }]),
+        error: Some(vec![TransactionCard {
+            index: 1,
+            indent: 0,
+            card: Card::ErrorCard {
+                f: "Bad input data. Error parsing incoming transaction content. Genesis hash values from decoded extensions and from used network specs do not match.".into()
+             }
+        }]),
+        ..Default::default()
+    };
+
+    if let TransactionAction::Read { r: content } = output {
+        assert_eq!(*content, content_known);
+    } else {
+        panic!("Wrong action: {output:?}")
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn cannot_sign_if_proof_verification_fails_when_check_metadata_hash_modified() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let line =
+        fs::read_to_string("for_tests/invalid_westend_transfer_with_modified_metadata_hash.txt")
+            .unwrap();
+
+    let output = produce_output(&db, &line).unwrap();
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+
+    let content_known = TransactionCardSet {
+        author: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::AuthorCard {
+                f: author_info_known
+            },
+        }]),
+        error: Some(vec![TransactionCard {
+            index: 1,
+            indent: 0,
+            card: Card::ErrorCard {
+                f: "Bad input data. Metadata hash provided in the CheckMetadataHash extension is not matching the proof".into()
+             }
+        }]),
+        ..Default::default()
+    };
+
+    if let TransactionAction::Read { r: content } = output {
+        assert_eq!(*content, content_known);
+    } else {
+        panic!("Wrong action: {output:?}")
+    }
+
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn can_parse_westend_staking_with_proof() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    let line = fs::read_to_string("for_tests/valid_westend_staking_with_proof.txt").unwrap();
+    let output = produce_output(&db, &line).unwrap();
+
+    let content_known = TransactionCardSet {
+        method: Some(vec![
+            TransactionCard {
+                index: 0,
+                indent: 0,
+                card: Card::PalletCard {
+                    f: "Utility".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 1,
+                indent: 1,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "batch_all".to_string(),
+                        docs: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 2,
+                indent: 2,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "calls".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 3,
+                indent: 3,
+                card: Card::PalletCard {
+                    f: "Staking".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 4,
+                indent: 4,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "bond".to_string(),
+                        docs: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 5,
+                indent: 5,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "value".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 6,
+                indent: 6,
+                card: Card::BalanceCard {
+                    f: MSCCurrency {
+                        amount: "1.061900000000".to_string(),
+                        units: "WND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 7,
+                indent: 5,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "payee".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: "pallet_staking >> RewardDestination".into(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 8,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Staked".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 9,
+                indent: 3,
+                card: Card::PalletCard {
+                    f: "Staking".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 10,
+                indent: 4,
+                card: Card::CallCard {
+                    f: MSCCall {
+                        method_name: "nominate".to_string(),
+                        docs: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 11,
+                indent: 5,
+                card: Card::FieldNameCard {
+                    f: MSCFieldName {
+                        name: "targets".to_string(),
+                        docs_field_name: String::new(),
+                        path_type: String::new(),
+                        docs_type: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 12,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 13,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh".to_string(),
+                        identicon: Identicon::Dots { identity: id_04() },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 14,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 15,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
+                        identicon: Identicon::Dots { identity: id_01() },
+                    },
+                },
+            },
+            TransactionCard {
+                index: 16,
+                indent: 6,
+                card: Card::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: "Id".to_string(),
+                        docs_enum_variant: String::new(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 17,
+                indent: 7,
+                card: Card::IdCard {
+                    f: MSCId {
+                        base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
+                        identicon: Identicon::Dots { identity: id_02() },
+                    },
+                },
+            },
+        ]),
+        extensions: Some(vec![
+            TransactionCard {
+                index: 18,
+                indent: 0,
+                card: Card::EraMortalCard {
+                    f: MSCEraMortal {
+                        era: "Mortal".to_string(),
+                        phase: "5".to_string(),
+                        period: "64".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 19,
+                indent: 0,
+                card: Card::NonceCard { f: "2".to_string() },
+            },
+            TransactionCard {
+                index: 20,
+                indent: 0,
+                card: Card::TipCard {
+                    f: MSCCurrency {
+                        amount: "0".to_string(),
+                        units: "pWND".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 21,
+                indent: 0,
+                card: Card::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: "westend".to_string(),
+                        version: "1018000".to_string(),
+                    },
+                },
+            },
+            TransactionCard {
+                index: 22,
+                indent: 0,
+                card: Card::TxSpecCard {
+                    f: "27".to_string(),
+                },
+            },
+            TransactionCard {
+                index: 23,
+                indent: 0,
+                card: Card::BlockHashCard {
+                    f: "5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff"
+                        .to_string(),
+                },
+            },
+        ]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+
+    if let TransactionAction::Sign { actions, checksum } = output {
+        let TransactionSignAction {
+            content,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+
+        assert_eq!(actions.len(), 1);
+        assert_eq!(content, &content_known);
+        assert_eq!(author_info, &author_info_known);
+
+        assert!(!has_pwd, "Expected no password");
+        sign_action_test(
+            &db,
+            checksum,
+            ALICE_SEED_PHRASE,
+            PWD,
+            USER_COMMENT,
+            network_info.specs.encryption,
+        )
+        .unwrap();
+    } else {
+        panic!("Wrong action: {output:?}")
+    }
+}

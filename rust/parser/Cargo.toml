@@ -14,17 +14,19 @@ hex = "0.4.3"
 lazy_static = "1.4.0"
 num-bigint = "0.4.4"
 parity-scale-codec = {version = "3.6.9", features = ["derive", "bit-vec"]}
+merkleized-metadata = {git = "https://github.com/novasamatech/merkleized-metadata.git", tag = "0.4.0"}
 printing_balance = {path = "../printing_balance"}
 regex = "1.10.3"
 scale-info = "2.10.0"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3"}
 sp-core = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"]}
 sp-runtime = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false}
+scale-decode = { version = "0.13.0", default-features = false }
 thiserror = "1.0.57"
 
 [dev-dependencies]
 pretty_assertions = "1"
-defaults = { path = "../defaults", default-features = false }
+defaults = { path = "../defaults", default-features = false, features = ["active"] }
 subxt = { version = "0.27", default-features = false }
 
 [lib]
