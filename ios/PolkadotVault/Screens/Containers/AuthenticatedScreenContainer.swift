@@ -69,14 +69,12 @@ extension AuthenticatedScreenContainer {
             self.seedsMediator = seedsMediator
             updateViewState()
 
-					/*
-					 * 	We monitor seed changes for keyDetails state only since
-					 *	for onboarding onKeySetAddCompletion used
-					 */
-					seedsMediator.seedNamesPublisher
-						.sink { [weak self] _ in
-							self?.updateKeyDetailsState()
-						}.store(in: cancelBag)
+            // 	We monitor seed changes for keyDetails state only since
+            // 	for onboarding onKeySetAddCompletion used
+            seedsMediator.seedNamesPublisher
+                .sink { [weak self] _ in
+                    self?.updateKeyDetailsState()
+                }.store(in: cancelBag)
         }
 
         func onKeySetAddCompletion(_ completionAction: CreateKeysForNetworksView.OnCompletionAction) {
