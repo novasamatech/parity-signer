@@ -27,7 +27,7 @@ protocol DatabaseMediating: AnyObject {
 /// Class that should act as main accessor for database
 final class DatabaseMediator: DatabaseMediating {
     private enum Constants {
-        static let resource = "Database"
+        static let resource = "DatabaseV7_0_0"
     }
 
     private let bundle: BundleProtocol
