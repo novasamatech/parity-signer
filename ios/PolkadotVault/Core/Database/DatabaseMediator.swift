@@ -27,7 +27,8 @@ protocol DatabaseMediating: AnyObject {
 /// Class that should act as main accessor for database
 final class DatabaseMediator: DatabaseMediating {
     private enum Constants {
-        static let resource = "DatabaseV7_0_0"
+        static let bundleResource = "Database"
+        static let destinationResource = "DatabaseV7_0_0"
     }
 
     private let bundle: BundleProtocol
@@ -42,7 +43,8 @@ final class DatabaseMediator: DatabaseMediating {
             appropriateFor: nil,
             create: false
         )
-        return documentsURL?.appendingPathComponent(Constants.resource).path ?? ""
+        return documentsURL?
+            .appendingPathComponent(Constants.destinationResource).path ?? ""
     }
 
     init(
@@ -59,7 +61,9 @@ final class DatabaseMediator: DatabaseMediating {
 
     @discardableResult
     func recreateDatabaseFile() -> Bool {
-        guard let source = bundle.url(forResource: Constants.resource, withExtension: "") else { return false }
+        guard let source = bundle.url(forResource: Constants.bundleResource, withExtension: "") else {
+            return false
+        }
         do {
             var destination = try fileManager.url(
                 for: .documentDirectory,
@@ -67,7 +71,7 @@ final class DatabaseMediator: DatabaseMediating {
                 appropriateFor: nil,
                 create: true
             )
-            destination.appendPathComponent(Constants.resource)
+            destination.appendPathComponent(Constants.destinationResource)
             if fileManager.fileExists(atPath: databasePath) {
                 do {
                     try fileManager.removeItem(at: destination)
