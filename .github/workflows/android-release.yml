@@ -6,6 +6,10 @@ concurrency:
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - add-firebase
+  
 jobs:
   run-tests:
     name: Run tests
@@ -32,7 +36,6 @@ jobs:
 
       - name: Sign app APK
         uses: r0adkll/sign-android-release@v1
-        # ID used to access action output
         id: sign_app
         with:
           releaseDirectory: app
@@ -43,12 +46,12 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
-      - name: Publish to Google Play Store
-        uses: r0adkll/upload-google-play@v1.1.2
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
-          releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
-          packageName: io.parity.signer
-          track: internal
+      # - name: Publish to Google Play Store
+      #   uses: r0adkll/upload-google-play@v1.1.2
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+      #     releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
+      #     packageName: io.parity.signer
+      #     track: internal
 
 

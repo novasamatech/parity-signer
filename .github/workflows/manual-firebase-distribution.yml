@@ -11,10 +11,6 @@ on:
   #       description: 'Firebase group'
   #       required: true
   #       default: dev-team
-  #     branch:
-  #       description: 'From which branch the application will be built'
-  #       required: true
-  #       default: develop
   push:
     branches:
       - add-firebase
