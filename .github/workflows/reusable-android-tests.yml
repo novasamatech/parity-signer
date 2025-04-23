@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  run_tests:
+  run-tests:
     name: Run android unit test
     runs-on: ubuntu-22.04
     container:

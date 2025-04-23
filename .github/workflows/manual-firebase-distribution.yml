@@ -20,19 +20,19 @@ on:
       - add-firebase
 
 jobs:
-  run_tests:
+  run-tests:
     name: Run tests
     uses: ./.github/workflows/reusable-android-tests.yml 
-  build_apk:
+  build-apk:
     name: Build APKs
     uses: ./.github/workflows/reusable-android-build.yml
     with:
       is-release: false
-  upload_apk:
+  upload-apk:
     runs-on: ubuntu-latest
-    needs: [run_tests, build_apk]
+    needs: [run-tests, build-apk]
     steps:
-      # - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Download built artifacts
         uses: actions/download-artifact@v4
         with:
