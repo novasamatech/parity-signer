@@ -6,9 +6,9 @@ concurrency:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - add-firebase
+  # push:
+  #   branches:
+  #     - add-firebase
   
 jobs:
   run-tests:

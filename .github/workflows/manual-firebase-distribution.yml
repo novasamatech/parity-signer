@@ -35,7 +35,7 @@ jobs:
           name: polkadot-vault-apk
           path: app
       - name: Upload debug apk to Firebase
-        uses: ./.github/workflows/upload-to-firebase
+        uses: ./.github/actions/upload-to-firebase
         with:
           appId: ${{ secrets.ANDROID_FIREBASE_APP_ID }}
           firebase-token: ${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}
