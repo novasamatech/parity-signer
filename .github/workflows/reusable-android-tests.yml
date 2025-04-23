@@ -1,4 +1,4 @@
-name: Reusable workflow for building Android app
+name: Reusable workflow for testing Android app
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
