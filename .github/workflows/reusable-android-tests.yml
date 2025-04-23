@@ -6,15 +6,10 @@ concurrency:
 
 on:
   workflow_call:
-    inputs:
-      is-release:
-        required: true
-        type: boolean
-        default: false
 
 jobs:
-  build_apk:
-    name: Build APKs
+  run_tests:
+    name: Run android unit test
     runs-on: ubuntu-22.04
     container:
       image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
@@ -61,12 +56,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble debug apk
-        if: ${{ inputs.is-release == false }}
+      - name: Build
         run: |
-          ./gradlew clean assembleDebug --stacktrace
-
-      - name: Assemble release apk
-        if: ${{ inputs.is-release == true }}
-        run: |
-          ./gradlew clean assembleRelease --stacktrace
+          ./gradlew :android:testDebugUnitTest
