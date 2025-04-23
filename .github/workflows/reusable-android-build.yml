@@ -9,7 +9,7 @@ on:
         default: false
     outputs:
       build-tool-version:
-        description: "Build tool version"
+        description: "build-tool version"
         value: ${{ jobs.build-apk.outputs.build-tool-version }}
 
 jobs:
@@ -35,14 +35,12 @@ jobs:
       - name: Install Android Dependencies
         uses: ./.github/actions/install-android-dep
 
-      - name: Read build tool version
+      - name: Read build-tool version
         id: read-build-tool-version
         shell: bash
         run: |
-          ls $ANDROID_SDK_ROOT/build-tools
           BUILD_TOOL_VERSION=$(ls $ANDROID_SDK_ROOT/build-tools | sort -V | tail -n1)
           echo "Build tool version is: ${BUILD_TOOL_VERSION}"
-          echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
           echo "build-tool-version=${BUILD_TOOL_VERSION}" >> "${GITHUB_OUTPUT}"
 
       - name: Install Rust stable toolchain

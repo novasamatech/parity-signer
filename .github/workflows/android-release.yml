@@ -6,9 +6,9 @@ concurrency:
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - add-firebase
+  push:
+    branches:
+      - add-firebase
   
 jobs:
   run-tests:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [run-tests, build-apk]
     steps:
-      - name: Setup build tool version variable
+      - name: Setup build-tool version variable
         shell: bash
         run: |
           echo "BUILD_TOOL_VERSION=${{ needs.build-apk.outputs.build-tool-version }}" >> $GITHUB_ENV

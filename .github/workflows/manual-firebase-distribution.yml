@@ -5,15 +5,15 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  # workflow_dispatch:
-  #    inputs:
-  #     firebase_group:
-  #       description: 'Firebase group'
-  #       required: true
-  #       default: dev-team
-  push:
-    branches:
-      - add-firebase
+  workflow_dispatch:
+     inputs:
+      firebase_group:
+        description: 'Firebase group'
+        required: true
+        default: dev-team
+  # push:
+  #   branches:
+  #     - add-firebase
 
 jobs:
   run-tests:
