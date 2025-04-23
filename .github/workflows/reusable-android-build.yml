@@ -32,6 +32,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang libclang-dev
 
+      - name: Install Android Dependencies
+        uses: ./.github/actions/install-android-dep
+
+      - name: Read build tool version
+        id: read-build-tool-version
+        shell: bash
+        run: |
+          ls $ANDROID_SDK_ROOT/build-tools
+          BUILD_TOOL_VERSION=$(ls $ANDROID_SDK_ROOT/build-tools | sort -V | tail -n1)
+          echo "Build tool version is: ${BUILD_TOOL_VERSION}"
+          echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
+          echo "build-tool-version=${BUILD_TOOL_VERSION}" >> "${GITHUB_OUTPUT}"
+
       - name: Install Rust stable toolchain
         uses: dtolnay/rust-toolchain@stable
 
@@ -44,19 +57,6 @@ jobs:
 
       - name: Install additional rust targets
         run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
-
-      - name: Install Android Dependencies
-        uses: ./.github/actions/install-android-dep
-
-      - name: Read build tool version
-        id: read-build-tool-version
-        shell: bash
-        run: |
-          ls ${ANDROID_SDK_ROOT}/build-tools/
-          BUILD_TOOL_VERSION=$(ls ${ANDROID_SDK_ROOT}/build-tools/ | tail -n 1)
-          echo "Build tool version is: ${BUILD_TOOL_VERSION}"
-          echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
-          echo "build-tool-version=${BUILD_TOOL_VERSION}" >> "${GITHUB_OUTPUT}"
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
