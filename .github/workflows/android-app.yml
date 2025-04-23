@@ -1,9 +1,5 @@
 name: Build android app
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   pull_request:
   push:
@@ -14,7 +10,11 @@ on:
 jobs:
   build_apk:
     name: Build APKs
-    uses: ./.github/workflows/android-build.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        workflow-names: [reusable-android-build]
+    uses: ./.github/workflows/${{ matrix.workflow-names }}.yml
     with:
       is-release: false
   upload_apk:
