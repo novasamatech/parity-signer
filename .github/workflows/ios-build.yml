@@ -1,0 +1,37 @@
+name: Build iOS app
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - add-firebase
+
+jobs:
+  build-ipa:
+    name: Build ipa
+    runs-on: macos-15
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install iOS Dependencies
+        uses: ./.github/actions/install-ios-dep
+
+      - name: Build ipa
+        shell: bash
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          BUILD_NUMBER: $GITHUB_RUN_ID
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          cd ios
+          bundle exec fastlane build_qa

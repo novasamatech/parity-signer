@@ -9,11 +9,13 @@ lane :build_release do |options|
   scheme = options[:scheme]
   target = options[:target]
   configuration = options[:configuration]
+  profile_name = options[:profile_name]
+  export_method = options[:export_method]
+  
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
-  profile_name = "match AppStore io.parity.NativeSigner"
   output_name = scheme # just in case we need to customise it for other GAs
-  export_method = "app-store"
+  
   compile_bitcode = false
   xcodeproj_path = "./#{target}.xcodeproj"
 
@@ -48,6 +50,7 @@ end
 
 desc "Prepares certificate and provisioning profile"
 lane :prepare_code_signing do |options|
+	type = options[:type]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
   if is_ci?
@@ -63,7 +66,7 @@ lane :prepare_code_signing do |options|
   end
 
   match(
-    type: "appstore",
+    type: type,
     app_identifier: app_identifier,
     readonly: is_ci?,
     keychain_name: "github_actions_keychain",

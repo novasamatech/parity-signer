@@ -18,3 +18,7 @@ runs:
     - name: Install NDK
       shell: bash
       run: echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/16.0/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
+
+    - name: Install build-tools
+      shell: bash
+      run: echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/16.0/bin/sdkmanager --install "build-tools;34.0.0" --sdk_root=${ANDROID_SDK_ROOT}
