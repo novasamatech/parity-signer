@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038344838311",
+    "project_id": "polkadot-vault",
+    "storage_bucket": "polkadot-vault.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038344838311:android:449f9f13559e02eb538f82",
+        "android_client_info": {
+          "package_name": "io.parity.signer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9o4tXThoYsrP33B0sB4m7Nl6BqekhXVo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

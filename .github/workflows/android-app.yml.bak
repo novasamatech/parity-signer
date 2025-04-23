@@ -10,7 +10,6 @@ on:
     branches:
       - master
       - stable
-      - add-firebase
 
 jobs:
   run_tests:

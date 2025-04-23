@@ -62,26 +62,31 @@ jobs:
         run: |
           ./gradlew clean assembleDebug --stacktrace
 
-      - name: Upload unsigned debug APKs
-        if: ${{ inputs.is-release == false }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: signer-unsigned-apk
-          path: android/build/outputs/apk/debug/*.apk
-
-      - name: Install additional rust targets
+      - name: List debug APKs
         if: ${{ inputs.is-release == false }}
         run: |
           ls android/build/outputs/apk/debug
+
+      - name: Upload debug APKs
+        if: ${{ inputs.is-release == false }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: polkadot-vault-apk
+          path: android/build/outputs/apk/debug/*.apk
 
       - name: Assemble release apk
         if: ${{ inputs.is-release == true }}
         run: |
           ./gradlew clean assembleRelease --stacktrace
 
-      - name: Upload unsigned release APKs
+      - name: List release APKs
+        if: ${{ inputs.is-release == true }}
+        run: |
+          ls android/build/outputs/apk/release
+
+      - name: Upload release APKs
         if: ${{ inputs.is-release == true }}
         uses: actions/upload-artifact@v4
         with:
-          name: signer-unsigned-apk
+          name: polkadot-vault-apk
           path: android/build/outputs/apk/release/*.apk
