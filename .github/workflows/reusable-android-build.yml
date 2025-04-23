@@ -62,7 +62,21 @@ jobs:
         run: |
           ./gradlew clean assembleDebug --stacktrace
 
+      - name: Upload unsigned debug APKs
+        if: ${{ inputs.is-release == false }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: signer-unsigned-apk
+          path: android/build/outputs/apk/debug/*.apk
+
       - name: Assemble release apk
         if: ${{ inputs.is-release == true }}
         run: |
           ./gradlew clean assembleRelease --stacktrace
+
+      - name: Upload unsigned release APKs
+        if: ${{ inputs.is-release == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: signer-unsigned-apk
+          path: android/build/outputs/apk/release/*.apk
