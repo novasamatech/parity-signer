@@ -37,13 +37,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: polkadot-vault-apk
-          path: ./apks
+          path: app
       - name: Upload debug apk to Firebase
-        uses: novasamatech/nova-wallet-android/.github/workflows/upload-to-firebase@develop
+        uses: ./.github/workflows/upload-to-firebase
         with:
           appId: ${{ secrets.ANDROID_FIREBASE_APP_ID }}
           firebase-token: ${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}
           releaseNotes: ${{ github.event.head_commit.message }}
           #test-groups: ${{ github.event.inputs.firebase_group }}
           test-groups: dev-team
-          upload-file: ./apks/android-debug.apk
+          upload-file: app/android-debug.apk

@@ -1,0 +1,42 @@
+name: Manual Firebase distribution
+
+on:
+  workflow_dispatch:
+     inputs:
+      firebase_group:
+        description: 'Firebase group'
+        required: true
+        default: dev-team
+      branch:
+        description: 'From which branch the application will be built'
+        required: true
+        default: develop
+
+jobs:
+  build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    with:
+      branch: ${{ github.event.inputs.branch }}
+      gradlew-command: assembleDevelop
+    secrets: inherit
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: app
+
+      - name: 🗳 Upload to Firebase
+        uses: ./.github/workflows/upload-to-firebase
+        with:
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
+          firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          releaseNotes: ${{ github.event.head_commit.message }}
+          test-groups: ${{ github.event.inputs.firebase_group }}
+          upload-file: app/develop/app-develop.apk
