@@ -69,6 +69,11 @@ jobs:
           name: signer-unsigned-apk
           path: android/build/outputs/apk/debug/*.apk
 
+      - name: Install additional rust targets
+        if: ${{ inputs.is-release == false }}
+        run: |
+        	ls android/build/outputs/apk/debug
+
       - name: Assemble release apk
         if: ${{ inputs.is-release == true }}
         run: |
