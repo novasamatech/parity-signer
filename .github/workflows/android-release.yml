@@ -46,12 +46,12 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
-      # - name: Publish to Google Play Store
-      #   uses: r0adkll/upload-google-play@v1.1.2
-      #   with:
-      #     serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
-      #     releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
-      #     packageName: io.parity.signer
-      #     track: internal
+      - name: Publish to Google Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_PLAY_STORE_API_JSON }}
+          releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          packageName: io.parity.signer
+          track: internal
 
 
