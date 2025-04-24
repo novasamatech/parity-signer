@@ -1,0 +1,7 @@
+source 'https://cdn.cocoapods.org/'
+platform :ios, '16.0'
+use_frameworks!
+
+target 'PolkadotVault' do
+  pod 'FirebaseCore', '~> 11.12.0'
+end
