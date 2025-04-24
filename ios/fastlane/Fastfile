@@ -9,6 +9,8 @@ platform :ios do
   import ("lanes/lane_tests.rb")
   import ("lanes/lane_build.rb")
   import ("lanes/lane_testflight.rb")
+  import ("lanes/lane_appstore.rb")
+  import ("lanes/lane_firebase.rb")
 
   # shared variables
   main_target = "PolkadotVault"
@@ -37,13 +39,11 @@ platform :ios do
     build_release(
       scheme:distribution_scheme,
       target:main_target,
-      configuration:distribution_configuration
+      configuration:distribution_configuration,
+      profile_name:"match AppStore io.parity.NativeSigner",
+      export_method: "app-store"
     )
-    upload_testflight(
-      scheme:distribution_scheme,
-      target:main_target,
-      configuration:distribution_configuration
-    )
+    upload_testflight
   end
 
   desc "Distribute new iOS QA build through TestFlight"
@@ -54,13 +54,11 @@ platform :ios do
     build_release(
       scheme:distribution_qa_scheme,
       target:main_target,
-      configuration:distribution_qa_configuration
+      configuration:distribution_qa_configuration,
+      profile_name:"match AppStore io.parity.NativeSigner",
+      export_method: "app-store"
     )
-    upload_testflight(
-      scheme:distribution_qa_scheme,
-      target:main_target,
-      configuration:distribution_qa_configuration
-    )
+    upload_testflight
   end
   
 
@@ -72,7 +70,9 @@ platform :ios do
     build_release(
       scheme:distribution_qa_scheme,
       target:main_target,
-      configuration:distribution_qa_configuration
+      configuration:distribution_qa_configuration,
+      profile_name:"match AdHoc io.parity.NativeSigner",
+      export_method: "ad-hoc"
     )
     upload_firebase
   end

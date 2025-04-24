@@ -16,7 +16,7 @@ on:
       - add-firebase
 
 jobs:
-  distribute_firebase:
+  distribute-firebase:
     #if: contains('["krodak","ERussel","stepanLav"]', github.actor)
     runs-on: macos-15
     name: Distribute Firabase QA Build
@@ -33,7 +33,7 @@ jobs:
           mkdir -p $HOME/.firebase
           echo "${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}" > $HOME/.firebase/firebase_key.json
 
-      - name: Distribute Firebase build
+      - name: Distribute Firebase QA build
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
