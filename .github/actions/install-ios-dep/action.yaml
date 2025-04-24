@@ -36,7 +36,6 @@ runs:
       run: |
         cd ios
         pod install --repo-update
-        cat Podfile.lock
 
     - name: Get cached Swift Packages managed by Xcode
       uses: actions/cache@v4

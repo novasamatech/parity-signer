@@ -1,7 +1,11 @@
+install! 'cocoapods',
+  disable_input_output_paths: true
+
 source 'https://cdn.cocoapods.org/'
 platform :ios, '16.0'
 use_frameworks!
 
 target 'PolkadotVault' do
+  # если вам нужен только FirebaseCore, то оставьте эту строку
   pod 'FirebaseCore', '~> 11.12.0'
 end
