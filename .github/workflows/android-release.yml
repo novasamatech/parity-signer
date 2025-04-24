@@ -6,9 +6,9 @@ concurrency:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - add-firebase
+  # push:
+  #   branches:
+  #     - add-firebase
   
 jobs:
   run-tests:
@@ -19,7 +19,7 @@ jobs:
     uses: ./.github/workflows/reusable-android-build.yml
     with:
       is-release: true
-  upload_apk:
+  upload-apk:
     runs-on: ubuntu-latest
     needs: [run-tests, build-apk]
     steps:
@@ -53,5 +53,3 @@ jobs:
           releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
           packageName: io.parity.signer
           track: internal
-
-
