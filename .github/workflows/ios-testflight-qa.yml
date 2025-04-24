@@ -6,13 +6,10 @@ concurrency:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - add-firebase
 
 jobs:
   distribute_testflight:
-    #if: contains('["krodak","ERussel","stepanLav"]', github.actor)
+    if: contains('["krodak","ERussel","stepanLav"]', github.actor)
     runs-on:                  macos-15
     name:                     Distribute TestFlight QA Build
 
@@ -35,17 +32,4 @@ jobs:
           MATCH_PASSWORD:      ${{ secrets.MATCH_PASSWORD }}
         run:                  |
           cd ios
-          bundle exec fastlane assemble_qa
-          ls 
-      # - name:                 Distribute TestFlight build
-      #   env:
-      #     ASC_KEY_ID:         ${{ secrets.ASC_KEY_ID }}
-      #     ASC_ISSUER_ID:      ${{ secrets.ASC_ISSUER_ID }}
-      #     ASC_KEY_BASE64:     ${{ secrets.ASC_KEY_BASE64 }}
-      #     BUILD_NUMBER:       $GITHUB_RUN_ID
-      #     KEYCHAIN_PASSWORD:  ${{ secrets.KEYCHAIN_PASSWORD }}
-      #     MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-      #     MATCH_PASSWORD:      ${{ secrets.MATCH_PASSWORD }}
-      #   run:                  |
-      #     cd ios
-      #     bundle exec fastlane distribute_qa_testflight
+          bundle exec fastlane distribute_qa_testflight
