@@ -7,14 +7,11 @@
 
 import UIKit
 
-import FirebaseCore
-
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
         _: UIApplication,
         shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
     ) -> Bool {
-        FirebaseApp.configure()
         switch extensionPointIdentifier {
         case .keyboard:
             false
