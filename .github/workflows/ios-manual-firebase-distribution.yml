@@ -28,6 +28,11 @@ jobs:
       - name: Install iOS Dependencies
         uses: ./.github/actions/install-ios-dep
 
+      - name: Write Firebase service account key
+        run: |
+          mkdir -p $HOME/.firebase
+          echo "${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}" > $HOME/.firebase/firebase_key.json
+
       - name: Distribute Firebase build
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
@@ -39,6 +44,7 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FIREBASE_GROUPS: ${{ github.event.inputs.firebase_group }}
           FIREBASE_RELEASE_NOTES: ${{ github.event.head_commit.message }}
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/.firebase/firebase_key.json
         run: |
           cd ios
           bundle exec fastlane distribute_qa_firebase
