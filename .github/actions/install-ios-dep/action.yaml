@@ -22,6 +22,22 @@ runs:
         brew install sourcery
         bundle install
 
+    - name: Cache Cocoapods
+      id: cache-cocoapods
+      uses: actions/cache@v4
+      with:
+        path: ios/Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+
+    - name: Install Cocoapods
+      shell: bash
+      run: |
+        cd ios
+        pod install --repo-update
+        cat Podfile.lock
+
     - name: Get cached Swift Packages managed by Xcode
       uses: actions/cache@v4
       with:
@@ -48,18 +64,3 @@ runs:
       with:
         workspaces:         rust -> rust/target
         
-    - name: Cache Cocoapods
-      id: cache-cocoapods
-      uses: actions/cache@v4
-      with:
-        path: ios/Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
-
-    - name: Install Cocoapods
-      shell: bash
-      run: |
-        cd ios
-        pod install --repo-update
-        cat Podfile.lock
