@@ -35,7 +35,9 @@ platform :ios do
   desc "Example usage: fastlane distribute_production_testflight"
   lane :distribute_production_testflight do
     load_asc_api_key
-    prepare_code_signing
+    prepare_code_signing(
+    	type: "appstore"
+    )
     build_release(
       scheme:distribution_scheme,
       target:main_target,
@@ -50,7 +52,9 @@ platform :ios do
   desc "Example usage: fastlane distribute_qa_testflight"
   lane :distribute_qa_testflight do
     load_asc_api_key
-    prepare_code_signing
+    prepare_code_signing(
+      type: "appstore"
+    )
     build_release(
       scheme:distribution_qa_scheme,
       target:main_target,
@@ -66,7 +70,9 @@ platform :ios do
   desc "Example usage: fastlane distribute_qa_firebase"
   lane :distribute_qa_firebase do
     load_asc_api_key
-    prepare_code_signing
+    prepare_code_signing(
+    	type: "adhoc"
+    )
     build_release(
       scheme:distribution_qa_scheme,
       target:main_target,

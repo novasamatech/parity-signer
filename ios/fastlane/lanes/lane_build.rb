@@ -50,6 +50,7 @@ end
 
 desc "Prepares certificate and provisioning profile"
 lane :prepare_code_signing do |options|
+	type = options[:type]
   app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
   if is_ci?
@@ -65,7 +66,7 @@ lane :prepare_code_signing do |options|
   end
 
   match(
-    type: "appstore",
+    type: type,
     app_identifier: app_identifier,
     readonly: is_ci?,
     keychain_name: "github_actions_keychain",
