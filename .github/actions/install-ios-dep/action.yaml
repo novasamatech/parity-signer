@@ -21,6 +21,7 @@ runs:
       run:                  |
         brew install sourcery
         bundle install
+        cat Gemfile.lock
 
     - name: Get cached Swift Packages managed by Xcode
       uses: actions/cache@v4

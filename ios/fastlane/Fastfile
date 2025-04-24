@@ -1,3 +1,4 @@
+plugin 'firebase_app_distribution'
 opt_out_usage
 default_platform(:ios)
 
