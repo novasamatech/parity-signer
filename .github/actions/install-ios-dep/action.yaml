@@ -23,7 +23,7 @@ runs:
         bundle install
 
     - name: Get cached Swift Packages managed by Xcode
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/
         key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
@@ -47,3 +47,19 @@ runs:
       uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
       with:
         workspaces:         rust -> rust/target
+        
+    - name: Cache Cocoapods
+      id: cache-cocoapods
+      uses: actions/cache@v4
+      with:
+        path: ios/Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+
+    - name: Install Cocoapods
+      shell: bash
+      run: |
+        cd ios
+        pod install --repo-update
+        cat Podfile.lock
