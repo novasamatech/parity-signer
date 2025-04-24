@@ -62,4 +62,17 @@ platform :ios do
       configuration:distribution_qa_configuration
     )
   end
+  
+  desc "Assemble iOS QA build"
+  desc "Example usage: fastlane assemble_qa"
+  lane :assemble_qa do
+    load_asc_api_key
+    prepare_code_signing
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration
+    )
+  end
+  
 end
