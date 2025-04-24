@@ -17,6 +17,7 @@ runs:
         xcode-version:      16
 
     - name:                 Install dependencies
+      shell: bash
       run:                  |
         brew install sourcery
         bundle install
