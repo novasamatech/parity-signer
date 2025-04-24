@@ -48,3 +48,4 @@ jobs:
         run: |
           cd ios
           bundle exec fastlane distribute_qa_firebase
+          rm ${GOOGLE_APPLICATION_CREDENTIALS}
