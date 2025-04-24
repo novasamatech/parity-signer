@@ -44,7 +44,7 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FIREBASE_GROUPS: ${{ github.event.inputs.firebase_group }}
           FIREBASE_RELEASE_NOTES: ${{ github.event.head_commit.message }}
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/.firebase/firebase_key.json
+          FIREBASE_SERVICE_CREDENTIALS_FILE: $HOME/.firebase/firebase_key.json
           FIREBASE_APP_ID: ${{ secrets.IOS_FIREBASE_APP_ID }}
         run: |
           cd ios
