@@ -29,9 +29,10 @@ jobs:
         uses: ./.github/actions/install-ios-dep
 
       - name: Write Firebase service account key
+        shell: bash
         run: |
           cd ios
-          echo "${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}" > firebase_key.json
+          printf '%s' '${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}' > firebase_key.json
 
       - name: Distribute Firebase QA build
         shell: bash
