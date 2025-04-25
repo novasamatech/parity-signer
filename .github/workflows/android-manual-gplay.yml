@@ -1,4 +1,4 @@
-name: Release android app
+name: Manual Android Google play distribution
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -6,9 +6,6 @@ concurrency:
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - add-firebase
   
 jobs:
   run-tests:

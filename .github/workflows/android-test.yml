@@ -1,4 +1,4 @@
-name: Build android app
+name: Test Android app
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -9,14 +9,8 @@ on:
   push:
     branches:
       - master
-      - stable
 
 jobs:
-  run_tests:
-    name: Run tests
+  run-tests:
+    name: Run unit tests
     uses: ./.github/workflows/reusable-android-tests.yml
-  build_apk:
-    name: Build APKs
-    uses: ./.github/workflows/reusable-android-build.yml
-    with:
-      is-release: false

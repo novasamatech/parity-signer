@@ -1,4 +1,4 @@
-name:                         Rustfmt
+name: Rustfmt
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -9,23 +9,22 @@ on:
   push:
     branches:
       - master
-      - stable
+
 jobs:
   rustfmt:
-    name:                     Cargo fmt
-    runs-on:                  ubuntu-latest
+    name: Cargo fmt
+    runs-on: ubuntu-latest
     steps:
-
-      - name:                 Checkout sources
-        uses:                 actions/checkout@v4.1.1
+      - name: Checkout sources
+        uses: actions/checkout@v4.1.1
         with:
-          fetch-depth:        50
-          submodules:         'recursive'
+          fetch-depth: 50
+          submodules: "recursive"
 
-      - name:                 Install Rust stable toolchain
-        uses:                 dtolnay/rust-toolchain@stable
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name:                 cargo fmt
-        run:                  |
+      - name: cargo fmt
+        run: |
           cd rust
           cargo fmt --all -- --check

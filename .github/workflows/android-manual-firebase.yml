@@ -11,9 +11,6 @@ on:
         description: 'Firebase group'
         required: true
         default: dev-team
-  # push:
-  #   branches:
-  #     - add-firebase
 
 jobs:
   run-tests:

@@ -1,4 +1,4 @@
-name: Manual IOS Firebase distribution
+name: Manual QA iOS Firebase distribution
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,9 +11,6 @@ on:
         description: "Firebase group"
         required: true
         default: dev-team
-  push:
-    branches:
-      - add-firebase
 
 jobs:
   distribute-firebase:

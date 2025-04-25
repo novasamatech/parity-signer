@@ -1,4 +1,4 @@
-name:                     Check cargo deny
+name: Check cargo deny
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -9,24 +9,24 @@ on:
   push:
     branches:
       - master
-      - stable
+
 jobs:
   cargo-deny:
-    name:                 Cargo deny
-    runs-on:              ubuntu-latest
+    name: Cargo deny
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         checks:
           - advisories
 
-    continue-on-error:    ${{ matrix.checks == 'advisories' }}
+    continue-on-error: ${{ matrix.checks == 'advisories' }}
 
     steps:
-      - name:               Checkout Sources
-        uses:               actions/checkout@v4.1.1
+      - name: Checkout Sources
+        uses: actions/checkout@v4.1.1
 
-      - name:               Run cargo-deny
-        uses:               EmbarkStudios/cargo-deny-action@v2.0.4
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2.0.4
         with:
-          manifest-path:    ./rust/Cargo.toml
-          command:          check ${{ matrix.checks }}
+          manifest-path: ./rust/Cargo.toml
+          command: check ${{ matrix.checks }}

@@ -31,6 +31,39 @@ platform :ios do
     )
   end
 
+  desc "Build iOS QA"
+  desc "Example usage: fastlane build_qa"
+  lane :build_qa do
+    load_asc_api_key
+    prepare_code_signing(
+    	type: "adhoc"
+    )
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration,
+      profile_name:"match AdHoc io.parity.NativeSigner",
+      export_method: "ad-hoc"
+    )
+  end
+  
+  desc "Distribute new iOS QA build through Firebase"
+  desc "Example usage: fastlane distribute_qa_firebase"
+  lane :distribute_qa_firebase do
+    load_asc_api_key
+    prepare_code_signing(
+    	type: "adhoc"
+    )
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration,
+      profile_name:"match AdHoc io.parity.NativeSigner",
+      export_method: "ad-hoc"
+    )
+    upload_firebase
+  end
+  
   desc "Distribute new iOS production build through TestFlight"
   desc "Example usage: fastlane distribute_production_testflight"
   lane :distribute_production_testflight do
@@ -63,24 +96,6 @@ platform :ios do
       export_method: "app-store"
     )
     upload_testflight
-  end
-  
-
-  desc "Distribute new iOS QA build through Firebase"
-  desc "Example usage: fastlane distribute_qa_firebase"
-  lane :distribute_qa_firebase do
-    load_asc_api_key
-    prepare_code_signing(
-    	type: "adhoc"
-    )
-    build_release(
-      scheme:distribution_qa_scheme,
-      target:main_target,
-      configuration:distribution_qa_configuration,
-      profile_name:"match AdHoc io.parity.NativeSigner",
-      export_method: "ad-hoc"
-    )
-    upload_firebase
   end
   
 end
