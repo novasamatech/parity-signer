@@ -5,4 +5,3 @@ lane :upload_testflight do
     apple_id: "1218174838"
   )
 end
-

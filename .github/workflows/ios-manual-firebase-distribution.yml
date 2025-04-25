@@ -30,10 +30,11 @@ jobs:
 
       - name: Write Firebase service account key
         run: |
-          mkdir -p $HOME/.firebase
-          echo "${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}" > $HOME/.firebase/firebase_key.json
+          cd ios
+          echo "${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}" > firebase_key.json
 
       - name: Distribute Firebase QA build
+        shell: bash
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -44,9 +45,11 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FIREBASE_GROUPS: ${{ github.event.inputs.firebase_group }}
           FIREBASE_RELEASE_NOTES: ${{ github.event.head_commit.message }}
-          FIREBASE_SERVICE_CREDENTIALS_FILE: $HOME/.firebase/firebase_key.json
           FIREBASE_APP_ID: ${{ secrets.IOS_FIREBASE_APP_ID }}
         run: |
+          cleanup() {
+            rm -f firebase_key.json
+          }
+          trap cleanup EXIT
           cd ios
           bundle exec fastlane distribute_qa_firebase
-          rm ${GOOGLE_APPLICATION_CREDENTIALS}
