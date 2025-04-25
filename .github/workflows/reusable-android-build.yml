@@ -101,5 +101,3 @@ jobs:
         with:
           name: polkadot-vault-apk
           path: android/build/outputs/apk/release/*.apk
-
-
