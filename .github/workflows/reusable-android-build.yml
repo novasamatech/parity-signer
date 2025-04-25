@@ -22,10 +22,7 @@ jobs:
       build-tool-version: ${{ steps.read-build-tool-version.outputs.build-tool-version }}
     steps:
       - name: Checkout Sources
-        uses: actions/checkout@v4.1.1
-        with:
-          fetch-depth: 50
-          submodules: "recursive"
+        uses: actions/checkout@v4
 
       - name: Install System Dependencies (Linux)
         run: |
