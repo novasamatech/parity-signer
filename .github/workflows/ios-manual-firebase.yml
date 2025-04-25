@@ -14,7 +14,6 @@ on:
 
 jobs:
   distribute-firebase:
-    #if: contains('["krodak","ERussel","stepanLav"]', github.actor)
     runs-on: macos-15
     name: Distribute Firabase QA Build
 
