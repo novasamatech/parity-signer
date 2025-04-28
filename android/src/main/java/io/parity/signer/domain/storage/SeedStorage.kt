@@ -1,5 +1,6 @@
 package io.parity.signer.domain.storage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -39,10 +40,19 @@ class SeedStorage {
 
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
-	private lateinit var sharedPreferences: SharedPreferences
-	private val KEYSTORE_NAME = "AndroidKeyStore"
 
-	fun isInitialized(): Boolean = this::sharedPreferences.isInitialized
+	private lateinit var seedSharedPreferences: SharedPreferences
+	private lateinit var associatedValuesSharedPreferences: SharedPreferences
+
+	// This is wrongly named from beginning, but we need a migration from one pref file to another to change that
+	private val MAIN_SEED_PREF_FILE = "AndroidKeyStore"
+	private val ASSOCIATED_VALUES_PREF_FILE = "SeedAssociatedValues"
+
+	// This is wrongly named from beginning, but we need a migration from one pref file to another to change that
+	private val DEV_MAIN_SEED_FILE_NAME = "FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT"
+	private val DEV_ASSOCIATED_VALUES_PREF_FILE = "DevSeedAssociatedValues"
+
+	fun isInitialized(): Boolean = this::seedSharedPreferences.isInitialized
 
 	/**
 	 * @throws UserNotAuthenticatedException
@@ -80,37 +90,51 @@ class SeedStorage {
 				.build()
 		}
 
-		Timber.e("ENCRY", "$appContext $KEYSTORE_NAME $masterKey")
 		//we need to be authenticated for this
 		try {
-			sharedPreferences =
-				if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
-					appContext.getSharedPreferences(
-						"FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT",
-						Context.MODE_PRIVATE
-					)
-				} else {
-					EncryptedSharedPreferences(
-						appContext,
-						KEYSTORE_NAME,
-						masterKey,
-						EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-						EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-					)
-				}
+			seedSharedPreferences = createEncryptedPrefsFile(
+				appContext = appContext,
+				filename = MAIN_SEED_PREF_FILE,
+				developmentFileName = DEV_MAIN_SEED_FILE_NAME
+			)
+			associatedValuesSharedPreferences = createEncryptedPrefsFile(
+				appContext = appContext,
+				filename = ASSOCIATED_VALUES_PREF_FILE,
+				developmentFileName = DEV_ASSOCIATED_VALUES_PREF_FILE
+			)
 		} catch (e: Exception) {
 			return OperationResult.Err(consumeStorageAuthError(e, appContext))
 		}
 		return OperationResult.Ok(Unit)
 	}
 
+	private fun createEncryptedPrefsFile(
+		appContext: Context,
+		filename: String,
+		developmentFileName: String
+	): SharedPreferences {
+		return if (FeatureFlags.isEnabled(FeatureOption.SKIP_UNLOCK_FOR_DEVELOPMENT)) {
+			appContext.getSharedPreferences(
+				developmentFileName,
+				Context.MODE_PRIVATE
+			)
+		} else {
+			EncryptedSharedPreferences(
+				appContext,
+				filename,
+				masterKey,
+				EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+				EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+			)
+		}
+	}
 
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
 	@Throws(UserNotAuthenticatedException::class)
 	fun getSeedNames(): Array<String> =
-		sharedPreferences.all.keys.sorted().toTypedArray().also {
+		seedSharedPreferences.all.keys.sorted().toTypedArray().also {
 			_lastKnownSeedNames.value = it
 		}
 
@@ -134,7 +158,7 @@ class SeedStorage {
 		}
 
 		// Encrypt and save seed
-		with(sharedPreferences.edit()) {
+		with(seedSharedPreferences.edit()) {
 			putString(seedName, seedPhrase)
 			apply()
 		}
@@ -149,7 +173,7 @@ class SeedStorage {
 	 */
 	@Throws(UserNotAuthenticatedException::class)
 	fun checkIfSeedNameAlreadyExists(seedPhrase: String): Boolean {
-		val result = sharedPreferences.all.values.contains(seedPhrase)
+		val result = seedSharedPreferences.all.values.contains(seedPhrase)
 		Runtime.getRuntime().gc()
 		return result
 	}
@@ -162,7 +186,7 @@ class SeedStorage {
 		seedName: String,
 		showInLogs: Boolean = false
 	): String {
-		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
+		val seedPhrase = seedSharedPreferences.getString(seedName, "") ?: ""
 		return if (seedPhrase.isBlank()) {
 			""
 		} else {
@@ -180,7 +204,8 @@ class SeedStorage {
 	fun getBsPassword(
 		seedName: String,
 	): String {
-		return sharedPreferences.getString("$seedName$BS_POSTFIX", "") ?: ""
+		val keyName = SeedAssociatedValue.BANANA_SPLIT_PASSWORD.keyName(seedName)
+		return associatedValuesSharedPreferences.getString(keyName, "") ?: ""
 	}
 
 	/**
@@ -192,18 +217,20 @@ class SeedStorage {
 		seedName: String,
 		passPhrase: String,
 	) {
-		if (sharedPreferences.contains("$seedName$BS_POSTFIX")) {
+		val keyName = SeedAssociatedValue.BANANA_SPLIT_PASSWORD.keyName(seedName)
+		if (associatedValuesSharedPreferences.contains(keyName)) {
 			throw IllegalArgumentException("element with this name already exists in the storage")
 		}
-		sharedPreferences.edit()
-			.putString("$seedName$BS_POSTFIX", passPhrase)
+		associatedValuesSharedPreferences.edit()
+			.putString(keyName, passPhrase)
 			.apply()
 	}
 
 	@Throws(UserNotAuthenticatedException::class)
 	fun removeBSData(seedName: String) {
-		sharedPreferences.edit()
-			.remove("$seedName$BS_POSTFIX")
+		val keyName = SeedAssociatedValue.BANANA_SPLIT_PASSWORD.keyName(seedName)
+		associatedValuesSharedPreferences.edit()
+			.remove(keyName)
 			.apply()
 	}
 
@@ -215,10 +242,17 @@ class SeedStorage {
 	 */
 	@Throws(UserNotAuthenticatedException::class)
 	fun removeSeed(seedName: String) {
-		sharedPreferences.edit()
+		seedSharedPreferences.edit()
 			.remove(seedName)
-			.remove("$seedName$BS_POSTFIX")
 			.apply()
+
+		associatedValuesSharedPreferences.edit()
+			.apply {
+				SeedAssociatedValue.entries.forEach { seedAssociatedValue ->
+					remove(seedAssociatedValue.keyName(seedName))
+				}
+			}.apply()
+
 		_lastKnownSeedNames.update { lastState ->
 			lastState.filter { it != seedName }.toTypedArray()
 		}
@@ -227,9 +261,19 @@ class SeedStorage {
 	/**
 	 * @throws UserNotAuthenticatedException
 	 */
+	@SuppressLint("ApplySharedPref")
 	@Throws(UserNotAuthenticatedException::class)
 	fun wipe() {
-		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
+		seedSharedPreferences.edit().clear().commit() // No, not apply(), do it now!
+		associatedValuesSharedPreferences.edit().clear().commit()
+	}
+
+	private enum class SeedAssociatedValue(private val keySuffix: String) {
+		BANANA_SPLIT_PASSWORD("bs_passphrase");
+
+		fun keyName(seedName: String): String {
+			return seedName + "\$\$" + keySuffix
+		}
 	}
 }
 
@@ -266,8 +310,5 @@ internal fun consumeStorageAuthError(
 		}
 	}
 }
-
-private const val BS_POSTFIX = "\$\$bs_passphrase"
-
 
 
