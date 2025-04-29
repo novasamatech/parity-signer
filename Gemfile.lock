@@ -162,7 +162,7 @@ GEM
       domain_name (~> 0.5)
     httpclient (2.8.3)
     jmespath (1.6.2)
-    json (2.10.1)
+    json (2.10.2)
     jwt (2.10.1)
       base64
     mini_magick (4.13.2)
@@ -218,10 +218,13 @@ GEM
       rouge (~> 3.28.0)
     xcpretty-travis-formatter (1.0.1)
       xcpretty (~> 0.2, >= 0.0.7)
+
 PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
   x86_64-darwin-20
+  x86_64-linux
+
 DEPENDENCIES
   fastlane
   fastlane-plugin-firebase_app_distribution
