@@ -35,6 +35,7 @@ class KeysetRecoverViewModel : ViewModel() {
 
 	fun onUserInput(rawUserInput: String) {
 		val currentModel = _recoverSeed.value
+
 		if (currentModel.enteredWords.size <= KeysetRecoverModel.WORDS_CAP) {
 			if (rawUserInput.isEmpty()) {
 				_recoverSeed.update {
@@ -55,7 +56,7 @@ class KeysetRecoverViewModel : ViewModel() {
 				val input = rawUserInput.trim()
 					.lowercase() // word could be capitalized by keyboard autocompletion
 				val guessing = getGuessWords(input)
-				if (rawUserInput.endsWith(KeysetRecoverModel.SPACE_CHARACTER)) {
+				if (rawUserInput.length > 1 && rawUserInput.endsWith(KeysetRecoverModel.SPACE_CHARACTER)) {
 					if (guessing.contains(input)) {
 						onAddword(input)
 					}
