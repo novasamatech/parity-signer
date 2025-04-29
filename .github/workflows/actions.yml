@@ -40,7 +40,7 @@ jobs:
           bundle install
 
       - name: Get cached Swift Packages managed by Xcode
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}

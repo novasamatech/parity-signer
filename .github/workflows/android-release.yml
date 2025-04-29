@@ -48,7 +48,7 @@ jobs:
           workspaces:   rust -> rust/target
 
       - name:           Gradle Cache
-        uses:           actions/cache@v3
+        uses:           actions/cache@v4
         with:
           path:         |
             ~/.gradle/caches
@@ -102,7 +102,7 @@ jobs:
           workspaces:   rust -> rust/target
 
       - name:           Gradle Cache
-        uses:           actions/cache@v3
+        uses:           actions/cache@v4
         with:
           path:         |
             ~/.gradle/caches
