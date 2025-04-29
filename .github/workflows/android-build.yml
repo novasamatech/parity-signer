@@ -1,0 +1,18 @@
+name: Build Android app
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-apk:
+    name: Build apk
+    uses: ./.github/workflows/reusable-android-build.yml
+    with:
+      is-release: false

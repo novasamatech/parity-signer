@@ -1,4 +1,4 @@
-name:                         Semantic PR
+name: Semantic PR
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,14 +19,13 @@ jobs:
   main:
     # By default, these PR titles are allowed:
     # https://github.com/commitizen/conventional-commit-types
-    name:                     Validate PR title
-    runs-on:                  ubuntu-latest
+    name: Validate PR title
+    runs-on: ubuntu-latest
     steps:
-
       # Documentation: https://github.com/amannn/action-semantic-pull-request
-      - uses:                 amannn/action-semantic-pull-request@e9fabac35e210fea40ca5b14c0da95a099eff26f # v5.4.0
+      - uses: amannn/action-semantic-pull-request@e9fabac35e210fea40ca5b14c0da95a099eff26f # v5.4.0
         env:
-          GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
             major

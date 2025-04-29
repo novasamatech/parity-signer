@@ -1,0 +1,52 @@
+name: Manual QA iOS Firebase distribution
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      firebase_group:
+        description: "Firebase group"
+        required: true
+        default: dev-team
+
+jobs:
+  distribute-firebase:
+    runs-on: macos-15
+    name: Distribute Firabase QA Build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install iOS Dependencies
+        uses: ./.github/actions/install-ios-dep
+
+      - name: Write Firebase service account key
+        shell: bash
+        run: |
+          cd ios
+          printf '%s' '${{ secrets.ANDROID_FIREBASE_CREDENTIAL_FILE_CONTENT }}' > firebase_key.json
+
+      - name: Distribute Firebase QA build
+        shell: bash
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          BUILD_NUMBER: $GITHUB_RUN_ID
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FIREBASE_GROUPS: ${{ github.event.inputs.firebase_group }}
+          FIREBASE_RELEASE_NOTES: ${{ github.event.head_commit.message }}
+          FIREBASE_APP_ID: ${{ secrets.IOS_FIREBASE_APP_ID }}
+        run: |
+          cleanup() {
+            rm -f firebase_key.json
+          }
+          trap cleanup EXIT
+          cd ios
+          bundle exec fastlane distribute_qa_firebase

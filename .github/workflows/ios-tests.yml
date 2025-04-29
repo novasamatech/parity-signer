@@ -1,0 +1,28 @@
+name: Test iOS app
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-tests:
+    name: Run tests
+    runs-on: macos-15
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install iOS Dependencies
+        uses: ./.github/actions/install-ios-dep
+
+      - name: Run unit tests
+        shell: bash
+        run: |
+          cd ios
+          bundle exec fastlane run_unit_tests

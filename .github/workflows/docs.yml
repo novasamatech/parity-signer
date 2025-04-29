@@ -1,9 +1,9 @@
-name:                         Check links and Publish Docs
+name: Check links and Publish Docs
 
 permissions:
   contents: write
-  pages: write 
-  id-token: write 
+  pages: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,50 +17,49 @@ on:
 
 jobs:
   rustdocs_user_docs:
-    name:                     Build rustdocs, user-docs and check links
-    runs-on:                  ubuntu-22.04
+    name: Build rustdocs, user-docs and check links
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/${{ github.repository }}/opencv-builder:4.11.0
     steps:
-
-      - name:                 Checkout sources
-        uses:                 actions/checkout@v4.1.1
+      - name: Checkout sources
+        uses: actions/checkout@v4.1.1
         with:
-          fetch-depth:        1
-          submodules:         recursive
+          fetch-depth: 1
+          submodules: recursive
 
       # rustdocs
-      - name:                 Install rustdocs dependencies
-        run:                  |
+      - name: Install rustdocs dependencies
+        run: |
           sudo apt update
           sudo apt install -y clang libclang-dev
 
-      - name:                 Install Rust stable toolchain
-        uses:                 dtolnay/rust-toolchain@stable
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name:                 Rust Cache
-        uses:                 Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
         with:
-          workspaces:         rust -> rust/target
+          workspaces: rust -> rust/target
 
-      - name:                 Install cargo-spellcheck
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+      - name: Install cargo-spellcheck
+        uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
         with:
-          crate:              cargo-spellcheck
+          crate: cargo-spellcheck
 
-      - name:                 Install uniffi_bindgen
-        uses:                 actions-rs/install@v0.1
+      - name: Install uniffi_bindgen
+        uses: actions-rs/install@v0.1
         with:
-          crate:              uniffi_bindgen
-          version:            0.22.0 # Must be in sync with version in Cargo.toml
-          use-tool-cache:     true
+          crate: uniffi_bindgen
+          version: 0.22.0 # Must be in sync with version in Cargo.toml
+          use-tool-cache: true
 
-      - name:                 Run spellcheck
-        run:                  |
+      - name: Run spellcheck
+        run: |
           cargo spellcheck check --cfg=.spellcheck/config.toml -m 99
 
-      - name:                 Generate cargo doc
-        run:                  |
+      - name: Generate cargo doc
+        run: |
           cd rust
           echo "_____Generating rustdocs to ./docs/book/src dir so it's published from ./rustdocs/"
           echo "_____And to check the relative links to the rustdoc while mdbook build_____"
@@ -69,24 +68,24 @@ jobs:
 
       # user-docs
       # they are generated after rustdocs to check the relative links
-      - name:                 Setup mdBook
-        uses:                 peaceiris/actions-mdbook@adeb05db28a0c0004681db83893d56c0388ea9ea # v1.2.0
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@adeb05db28a0c0004681db83893d56c0388ea9ea # v1.2.0
         with:
-          mdbook-version:     latest
+          mdbook-version: latest
 
-      - name:                 Install mdbook-linkcheck
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+      - name: Install mdbook-linkcheck
+        uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
         with:
-          crate:              mdbook-linkcheck
+          crate: mdbook-linkcheck
 
-      - name:                 Install mdbook-mermaid
-        uses:                 baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
+      - name: Install mdbook-mermaid
+        uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
         with:
-          crate:              mdbook-mermaid
+          crate: mdbook-mermaid
 
-      - name:                 Build user-docs
+      - name: Build user-docs
         # docs source dir ./docs/book/html/
-        run:                  |
+        run: |
           mdbook build docs
           echo "_____Hosting user-docs from root and rustdocs from ./rustdocs/_____"
           echo "_____gh-pages branch would be the size of_____"
@@ -94,13 +93,13 @@ jobs:
           du -sh ./docs/book/html/*
 
       # deploy
-      - name:                 Deploy rustdocs and user-docs
-        uses:                 peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
+      - name: Deploy rustdocs and user-docs
+        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
         # published only from master AND if the triggerer is not dependabot
         # https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-797125425
-        if:                   ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
+        if: ${{ github.ref == 'refs/heads/master' && github.actor != 'dependabot[bot]' }}
         with:
-          github_token:       ${{ github.token }}
-          force_orphan:       true
+          github_token: ${{ github.token }}
+          force_orphan: true
           # this is the only dir that's pushed to gh-pages branch
-          publish_dir:        ./docs/book/html
+          publish_dir: ./docs/book/html
