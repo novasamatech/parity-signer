@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'docker/opencv.Dockerfile'
+      - "docker/opencv.Dockerfile"
     branches:
       - master
 

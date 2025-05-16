@@ -9,6 +9,8 @@
 import XCTest
 
 final class DatabaseMediatorTests: XCTestCase {
+    static let expectedDatabaseName = "DatabaseV7_0_0"
+
     private var bundle: BundleProtocolMock!
     private var fileManager: FileManagingProtocolMock!
     private var subject: DatabaseMediator!
@@ -40,7 +42,7 @@ final class DatabaseMediatorTests: XCTestCase {
             appropriateFor: nil,
             create: false
         )
-        let expectedValue = documentsURL?.appendingPathComponent("Database").path ?? ""
+        let expectedValue = documentsURL?.appendingPathComponent(Self.expectedDatabaseName).path ?? ""
 
         // When
         let result = subject.databaseName
@@ -57,7 +59,7 @@ final class DatabaseMediatorTests: XCTestCase {
             appropriateFor: nil,
             create: false
         )
-        let expectedValue = documentsURL?.appendingPathComponent("Database").path ?? ""
+        let expectedValue = documentsURL?.appendingPathComponent(Self.expectedDatabaseName).path ?? ""
 
         // When
         _ = subject.isDatabaseAvailable()
@@ -94,7 +96,8 @@ final class DatabaseMediatorTests: XCTestCase {
 
     func test_wipeDatabase_removesFileAtExpectedDestination() {
         // Given
-        let expectedPathUrl = fileManager.urlForInAppropriateForCreateReturnValue.appendingPathComponent("Database")
+        let expectedPathUrl = fileManager.urlForInAppropriateForCreateReturnValue
+            .appendingPathComponent(Self.expectedDatabaseName)
 
         // When
         subject.wipeDatabase()
@@ -169,7 +172,8 @@ final class DatabaseMediatorTests: XCTestCase {
 
     func test_recreateDatabaseFile_whenFileExists_removesFileAtExpectedDestination() {
         // Given
-        let expectedPathUrl = fileManager.urlForInAppropriateForCreateReturnValue.appendingPathComponent("Database")
+        let expectedPathUrl = fileManager.urlForInAppropriateForCreateReturnValue
+            .appendingPathComponent(Self.expectedDatabaseName)
         fileManager.fileExistsAtPathReturnValue = true
 
         // When

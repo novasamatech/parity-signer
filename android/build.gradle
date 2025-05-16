@@ -3,17 +3,20 @@ plugins {
 	id 'kotlin-android'
 	id 'org.mozilla.rust-android-gradle.rust-android'
 	id 'idea'
+	// Add the Google services Gradle plugin
+  id 'com.google.gms.google-services'
 }
 
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
 	defaultConfig {
 		applicationId "io.parity.signer"
 		minSdk 23
 		targetSdk 34
-		versionCode 60301
-		versionName "6.3.1"
+		versionCode 70000
+		versionName "7.0.0"
 		ndk {
 			abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
 		}
@@ -131,6 +134,8 @@ dependencies {
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 	androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_libs_version"
 	debugImplementation "androidx.compose.ui:ui-tooling:$compose_libs_version"
+	// Import the Firebase BoM
+  implementation platform('com.google.firebase:firebase-bom:33.12.0')
 }
 
 preBuild.dependsOn "cargoBuild","buildDB"

@@ -79,7 +79,7 @@ fun KeysetRecoverSubgraph(
 						submitErrorState("navigation to finish called, but seed is not valid")
 					}
 				},
-				onScanOpen = { CoreUnlockedNavSubgraph.Camera.destination(keysetName) },
+				onScanOpen = { coreNavController.navigate(CoreUnlockedNavSubgraph.Camera.destination(keysetName)) },
 				modifier = Modifier
 					.statusBarsPadding()
 					.imePadding(),

@@ -21,6 +21,7 @@ buildscript {
 		classpath 'net.java.dev.jna:jna:5.12.1'
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
+		classpath 'com.google.gms:google-services:4.4.2'
 	}
 }
 

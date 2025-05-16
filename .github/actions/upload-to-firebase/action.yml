@@ -1,0 +1,49 @@
+name: Deploy to Firebase
+description: Deploy artifacts by provided path to firebase for provided groups
+inputs:
+  appId:
+    description: 'Firebase AppID'
+    required: true
+  firebase-token:
+    description: 'Token from firebase CLI'
+    required: true
+  releaseNotes:
+    description: 'Notes which will attach to version'
+    required: true
+    default: 'update'
+  test-groups:
+    description: 'Groups which will receive the version'
+    required: true
+  upload-file:
+    description: 'File to uploading'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Upload artifact to Firebase App Distribution
+      id: upload
+      continue-on-error: true
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+      with:
+        appId: ${{ inputs.appId }}
+        serviceCredentialsFileContent: ${{ inputs.firebase-token }}
+        releaseNotes: ${{ inputs.releaseNotes }}
+        groups: ${{ inputs.test-groups }}
+        file: ${{ inputs.upload-file }}
+
+    - name: Sleep for 60 seconds
+      uses: whatnick/wait-action@master
+      if: steps.upload.outcome=='failure'
+      with:
+        time: '60s'
+
+    - name: Retry upload artifacts
+      if: steps.upload.outcome=='failure'
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+      with:
+        appId: ${{ inputs.appId }}
+        serviceCredentialsFileContent: ${{ inputs.firebase-token }}
+        releaseNotes: ${{ inputs.releaseNotes }}
+        groups: ${{ inputs.test-groups }}
+        file: ${{ inputs.upload-file }}

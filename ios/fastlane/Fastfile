@@ -9,6 +9,8 @@ platform :ios do
   import ("lanes/lane_tests.rb")
   import ("lanes/lane_build.rb")
   import ("lanes/lane_testflight.rb")
+  import ("lanes/lane_appstore.rb")
+  import ("lanes/lane_firebase.rb")
 
   # shared variables
   main_target = "PolkadotVault"
@@ -29,37 +31,71 @@ platform :ios do
     )
   end
 
+  desc "Build iOS QA"
+  desc "Example usage: fastlane build_qa"
+  lane :build_qa do
+    load_asc_api_key
+    prepare_code_signing(
+    	type: "adhoc"
+    )
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration,
+      profile_name:"match AdHoc io.parity.NativeSigner",
+      export_method: "ad-hoc"
+    )
+  end
+  
+  desc "Distribute new iOS QA build through Firebase"
+  desc "Example usage: fastlane distribute_qa_firebase"
+  lane :distribute_qa_firebase do
+    load_asc_api_key
+    prepare_code_signing(
+    	type: "adhoc"
+    )
+    build_release(
+      scheme:distribution_qa_scheme,
+      target:main_target,
+      configuration:distribution_qa_configuration,
+      profile_name:"match AdHoc io.parity.NativeSigner",
+      export_method: "ad-hoc"
+    )
+    upload_firebase
+  end
+  
   desc "Distribute new iOS production build through TestFlight"
   desc "Example usage: fastlane distribute_production_testflight"
   lane :distribute_production_testflight do
     load_asc_api_key
-    prepare_code_signing
+    prepare_code_signing(
+    	type: "appstore"
+    )
     build_release(
       scheme:distribution_scheme,
       target:main_target,
-      configuration:distribution_configuration
+      configuration:distribution_configuration,
+      profile_name:"match AppStore io.parity.NativeSigner",
+      export_method: "app-store"
     )
-    upload_testflight(
-      scheme:distribution_scheme,
-      target:main_target,
-      configuration:distribution_configuration
-    )
+    upload_testflight
   end
 
   desc "Distribute new iOS QA build through TestFlight"
   desc "Example usage: fastlane distribute_qa_testflight"
   lane :distribute_qa_testflight do
     load_asc_api_key
-    prepare_code_signing
+    prepare_code_signing(
+      type: "appstore"
+    )
     build_release(
       scheme:distribution_qa_scheme,
       target:main_target,
-      configuration:distribution_qa_configuration
+      configuration:distribution_qa_configuration,
+      profile_name:"match AppStore io.parity.NativeSigner",
+      export_method: "app-store"
     )
-    upload_testflight(
-      scheme:distribution_qa_scheme,
-      target:main_target,
-      configuration:distribution_qa_configuration
-    )
+    upload_testflight
   end
+  
 end

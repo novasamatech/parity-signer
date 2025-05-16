@@ -1,0 +1,16 @@
+name: Test Android app
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-tests:
+    name: Run unit tests
+    uses: ./.github/workflows/reusable-android-tests.yml
