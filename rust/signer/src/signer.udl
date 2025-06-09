@@ -719,6 +719,9 @@ namespace signer {
 
     [Throws=ErrorDisplayed]
     sequence<QrData> bs_encrypt([ByRef] string secret, [ByRef] string title, [ByRef] string passphrase, u32 total_shards, u32 required_shards);
+
+    [Throws=ErrorDisplayed]
+    MKeysInfoExport export_root_keys_info([ByRef] string seed_phrase);
 };
 
 dictionary MKeysNew {

@@ -554,10 +554,10 @@ pub fn derive_root_public_keys(
 
     let raw_substrate_key = multisigner_to_public(&substrate)
         .try_into()
-        .map_err(|_| DefError::WrongPublicKeyLength)?;
+        .map_err(|_| Error::DefinitionsError(DefError::WrongPublicKeyLength))?;
     let raw_ethereum_key = multisigner_to_public(&ethereum)
         .try_into()
-        .map_err(|_| DefError::WrongPublicKeyLength)?;
+        .map_err(|_| Error::DefinitionsError(DefError::WrongPublicKeyLength))?;
 
     let public_keys = vec![
         RootPublicKey::Sr25519(sr25519::Public(raw_substrate_key)),
