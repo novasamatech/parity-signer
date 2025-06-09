@@ -31,6 +31,7 @@
 //! [`ADDRTREE`](constants::ADDRTREE) tree of the cold database as SCALE-encoded
 //! [`AddressDetails`](definitions::users::AddressDetails).
 use bip39::{Language, Mnemonic, MnemonicType};
+use definitions::keyring::RootPublicKey;
 use lazy_static::lazy_static;
 use parity_scale_codec::Decode;
 #[cfg(feature = "active")]
@@ -62,6 +63,7 @@ use definitions::helpers::{base58_or_eth_to_multisigner, multisigner_to_encrypti
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
+use definitions::error::Error as DefError;
 #[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
@@ -535,6 +537,34 @@ pub fn derive_single_key(
         secret_exposed: false,
     };
     Ok((multi_signer, address_details))
+}
+
+pub fn derive_root_public_keys(
+    seed_phrase: &str
+)  -> Result<Vec<RootPublicKey>> {
+    let substrate = full_address_to_multisigner(
+        seed_phrase.to_string(), 
+        Encryption::Sr25519
+    )?;
+    
+    let ethereum = full_address_to_multisigner(
+        seed_phrase.to_string(), 
+        Encryption::Ethereum
+    )?;
+
+    let raw_substrate_key = multisigner_to_public(&substrate)
+        .try_into()
+        .map_err(|_| DefError::WrongPublicKeyLength)?;
+    let raw_ethereum_key = multisigner_to_public(&ethereum)
+        .try_into()
+        .map_err(|_| DefError::WrongPublicKeyLength)?;
+
+    let public_keys = vec![
+        RootPublicKey::Sr25519(sr25519::Public(raw_substrate_key)),
+        RootPublicKey::Ethereum(ecdsa::Public(raw_ethereum_key))
+    ];
+
+    Ok(public_keys)
 }
 
 pub fn inject_derivations_has_pwd(

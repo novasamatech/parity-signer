@@ -25,6 +25,7 @@ mod error;
 
 mod actions;
 pub use actions::Action;
+use db_handling::identities::{derive_root_public_keys};
 use db_handling::helpers::get_address_details;
 use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth};
 use definitions::keyring::AddressKey;
@@ -97,6 +98,16 @@ pub fn export_key_info(
     let export_all_addrs = export_key_set_addrs(database, seed_name, exported_set)?;
 
     let data = [&[0x53, 0xff, 0xde], export_all_addrs.encode().as_slice()].concat();
+    let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
+
+    Ok(MKeysInfoExport { frames })
+}
+
+pub fn export_root_keys_info(seed_phrase: &str) -> Result<MKeysInfoExport> {
+    let export_root_pub_keys = derive_root_public_keys(seed_phrase)?;
+
+    let data = [&[0x53, 0xff, 0xe0], export_root_pub_keys.encode().as_slice()].concat();
+
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
 
     Ok(MKeysInfoExport { frames })
