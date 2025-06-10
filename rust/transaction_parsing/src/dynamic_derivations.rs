@@ -42,7 +42,7 @@ pub fn dd_transaction_msg_genesis_encryption(
     (data[1], data[2]) = (data[2], data[1]);
     let transaction = <DynamicDerivationTransaction>::decode(&mut &data[2..])?;
     data = data[(transaction.encode().len() + 2)..].to_vec();
-    let encryption = multisigner_to_encryption(&transaction.root_multisigner);
+    let encryption = transaction.encryption;
 
     // network genesis hash
     let raw_hash: [u8; 32] = data[data.len() - 32..]
