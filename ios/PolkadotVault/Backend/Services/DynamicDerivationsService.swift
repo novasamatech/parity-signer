@@ -48,7 +48,7 @@ final class DynamicDerivationsService {
         completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
     ) {
         backendService.performCall({
-            try signDdTransaction(payload: payload, seeds: seedPhrases)
+            try signDdTransaction(payload: payload, seeds: seedPhrases, withProof: true)
         }, completion: { (result: Result<MSignedTransaction, ErrorDisplayed>) in
             switch result {
             case let .success(transaction):
