@@ -6194,7 +6194,7 @@ fn test_sign_dd_transaction() {
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
 
-    let result = sign_dd_transaction(&db, &transaction, seeds);
+    let result = sign_dd_transaction(&db, &transaction, seeds, false);
     let transaction = result.expect("transaction is ok");
     assert_eq!(transaction.signature.signatures.len(), 1);
 
@@ -6244,7 +6244,7 @@ fn test_bulk_dd_signing() {
     populate_cold_nav_test(&db).unwrap();
 
     try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
-    let signed_transaction = handle_dd_sign(&db, &transactions, seeds).expect("signing is ok");
+    let signed_transaction = handle_dd_sign(&db, &transactions, seeds, false).expect("signing is ok");
 
     // Identical non-dynamic derivation transaction
     let alice_westend_public =

@@ -98,6 +98,19 @@ pub fn parse_dd_transaction(
     database: &sled::Db,
     data_hex: &str,
     seeds: &HashMap<String, String>,
+    with_proof: bool
+) -> Result<TransactionAction> {
+    if with_proof {
+        parse_dd_transaction_with_proof(database, data_hex, seeds)
+    } else {
+        parse_dd_transaction_without_proof(database, data_hex, seeds)
+    }
+}
+
+pub fn parse_dd_transaction_without_proof(
+    database: &sled::Db,
+    data_hex: &str,
+    seeds: &HashMap<String, String>,
 ) -> Result<TransactionAction> {
     let (transaction, call_data, genesis_hash, encryption) =
         dd_transaction_msg_genesis_encryption(data_hex)?;

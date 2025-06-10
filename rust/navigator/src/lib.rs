@@ -151,10 +151,11 @@ pub fn sign_dd_transaction(
     database: &sled::Db,
     payload_set: &[String],
     seeds: HashMap<String, String>,
+    with_proof: bool
 ) -> Result<MSignedTransaction> {
     let mut transactions = vec![];
     let mut signatures = vec![];
-    for (a, signature) in handle_dd_sign(database, payload_set, seeds)? {
+    for (a, signature) in handle_dd_sign(database, payload_set, seeds, with_proof)? {
         transactions.push(MTransaction {
             content: a.content.clone(),
             ttype: TransactionType::Sign,
@@ -174,13 +175,14 @@ pub(crate) fn handle_dd_sign(
     database: &sled::Db,
     payload_set: &[String],
     seeds: HashMap<String, String>,
+    with_proof: bool
 ) -> Result<Vec<(TransactionSignAction, SignatureAndChecksum)>> {
     let mut signed_transactions = vec![];
 
     let mut actions = vec![];
     let mut checksum = 0;
     for t in payload_set.iter() {
-        match parse_dd_transaction(database, t, &seeds) {
+        match parse_dd_transaction(database, t, &seeds, with_proof) {
             Ok(TransactionAction::Sign {
                 actions: a,
                 checksum: c,
