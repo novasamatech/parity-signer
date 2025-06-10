@@ -106,9 +106,10 @@ pub fn export_key_info(
 pub fn export_root_keys_info(seed_phrase: &str) -> Result<MKeysInfoExport> {
     let export_root_pub_keys = derive_root_public_keys(seed_phrase)?;
 
-    let data = [&[0x53, 0xff, 0xe0], export_root_pub_keys.encode().as_slice()].concat();
+    let data = export_root_pub_keys.encode();
 
-    let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
+    let qr_code = QrData::Regular { data: data };
+    let frames = vec![qr_code];
 
     Ok(MKeysInfoExport { frames })
 }
