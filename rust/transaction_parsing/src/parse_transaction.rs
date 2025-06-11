@@ -13,6 +13,7 @@ use definitions::{
     network_specs::VerifierValue,
     users::AddressDetails,
 };
+use parser::MetadataProof;
 use parser::{
     cut_method_extensions, decode_call, decode_extensions, decode_metadata_proof,
     decoding_commons::OutputCard, parse_extensions, parse_method,
@@ -127,7 +128,7 @@ fn do_parse_dd_transaction(
     )?;
 
     if with_proof {
-        do_dd_parse_transaction_with_proof(
+        do_parse_transaction_with_proof(
             database,
             author_multi_signer,
             &call_data,
@@ -162,12 +163,23 @@ fn do_parse_transaction_with_proof(
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    let network_specs = try_get_network_specs(database, &network_specs_key)?.ok_or_else(|| {
+    let copied_vec: Vec<u8> = payload.to_vec();
+    let mut remained_payload = &copied_vec[..];
+
+    let metadata_proof = decode_metadata_proof(&mut remained_payload).map_err(|_| {
         Error::UnknownNetwork {
             genesis_hash,
             encryption,
         }
     })?;
+
+    let network_specs = do_get_network_specs(
+        database, 
+        &network_specs_key, 
+        &metadata_proof, 
+        genesis_hash, 
+        encryption
+    )?;
 
     let cards_prep = match address_details {
         Some(address_details) => {
@@ -195,25 +207,6 @@ fn do_parse_transaction_with_proof(
             .card(&mut index, indent),
             Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
         ),
-    };
-
-    let copied_vec: Vec<u8> = payload.to_vec();
-    let mut remained_payload = &copied_vec[..];
-
-    let metadata_proof = match decode_metadata_proof(&mut remained_payload) {
-        Ok(v) => v,
-        Err(e) => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: None,
-                maybe_extension_cards: None,
-                index,
-                indent,
-            })
-        }
     };
 
     let (call_data, extensions_data) = match cut_method_extensions(remained_payload) {
@@ -330,185 +323,35 @@ fn do_parse_transaction_with_proof(
     })
 }
 
-fn do_dd_parse_transaction_with_proof(
+fn do_get_network_specs(
     database: &sled::Db,
-    author_multi_signer: MultiSigner,
-    payload: &[u8],
+    network_specs_key: &NetworkSpecsKey,
+    metadata_proof: &MetadataProof,
     genesis_hash: H256,
     encryption: Encryption,
-    address_details: Option<AddressDetails>,
-) -> Result<TransactionAction> {
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
+) -> Result<OrderedNetworkSpecs> {
+    let network_specs = try_get_network_specs(database, &network_specs_key)?.unwrap_or_else(|| {
+        let path_id = String::from("//") + &metadata_proof.extra_info.spec_name;
 
-    // initialize index and indent
-    let mut index: u32 = 0;
-    let indent: u32 = 0;
-
-    let copied_vec: Vec<u8> = payload.to_vec();
-    let mut remained_payload = &copied_vec[..];
-
-    let metadata_proof = decode_metadata_proof(&mut remained_payload).map_err(|_| Error::UnknownNetwork {
-        genesis_hash,
-        encryption,
-    })?;
-
-    let network_specs = OrderedNetworkSpecs { 
-        specs: NetworkSpecs {
-            base58prefix: metadata_proof.extra_info.base58_prefix,
-            color: "".into(),
-            decimals: metadata_proof.extra_info.decimals,
-            encryption: encryption,
-            genesis_hash: genesis_hash,
-            logo: metadata_proof.extra_info.spec_name.clone(),
-            name: metadata_proof.extra_info.spec_name.clone(),
-            path_id: metadata_proof.extra_info.spec_name.clone(),
-            secondary_color: "".into(),
-            title: metadata_proof.extra_info.spec_name.clone(),
-            unit: metadata_proof.extra_info.token_symbol.clone()
-        }, 
-        order: 0 
-    };
-
-    let cards_prep = match address_details {
-        Some(address_details) => {
-            if address_details.network_id.as_ref() == Some(&network_specs_key) {
-                CardsPrep::SignProceed(address_details, None)
-            } else {
-                let author_card = (Card::Author {
-                    author: &author_multi_signer,
-                    base58prefix: network_specs.specs.base58prefix,
-                    genesis_hash: network_specs.specs.genesis_hash,
-                    address_details: &address_details,
-                })
-                .card(&mut index, indent);
-                CardsPrep::ShowOnly(
-                    author_card,
-                    Box::new(Card::Warning(Warning::NoNetworkID).card(&mut index, indent)),
-                )
-            }
+        OrderedNetworkSpecs { 
+            specs: NetworkSpecs {
+                base58prefix: metadata_proof.extra_info.base58_prefix,
+                color: String::from("#000"),
+                decimals: metadata_proof.extra_info.decimals,
+                encryption: encryption,
+                genesis_hash: genesis_hash,
+                logo: metadata_proof.extra_info.spec_name.clone(),
+                name: metadata_proof.extra_info.spec_name.clone(),
+                path_id: path_id,
+                secondary_color: String::from("#000"),
+                title: metadata_proof.extra_info.spec_name.clone(),
+                unit: metadata_proof.extra_info.token_symbol.clone()
+            }, 
+            order: 0 
         }
-        None => CardsPrep::ShowOnly(
-            (Card::AuthorPlain {
-                author: &author_multi_signer,
-                base58prefix: network_specs.specs.base58prefix,
-            })
-            .card(&mut index, indent),
-            Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
-        ),
-    };
+    });
 
-    let (call_data, extensions_data) = match cut_method_extensions(remained_payload) {
-        Ok(v) => v,
-        Err(e) => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: None,
-                maybe_extension_cards: None,
-                index,
-                indent,
-            })
-        }
-    };
-
-    let extensions_cards = match decode_extensions(
-        &mut extensions_data.as_slice(),
-        &metadata_proof,
-        &genesis_hash.0,
-    ) {
-        Ok(v) => v,
-        Err(e) => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: None,
-                maybe_extension_cards: None,
-                index,
-                indent,
-            })
-        }
-    };
-
-    let call_cards = match decode_call(&mut call_data.as_slice(), &metadata_proof) {
-        Ok(v) => v,
-        Err(e) => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: None,
-                maybe_extension_cards: Some(extensions_cards),
-                index,
-                indent,
-            })
-        }
-    };
-
-    let (address_details, possible_warning) = match cards_prep {
-        CardsPrep::SignProceed(a, w) => (a, w),
-        _ => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: None,
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: Some(call_cards),
-                maybe_extension_cards: Some(extensions_cards),
-                index,
-                indent,
-            })
-        }
-    };
-
-    let sign_one = TrDbColdSignOne::generate(
-        SignContent::Transaction {
-            method: call_data,
-            extensions: extensions_data,
-        },
-        &network_specs.specs.name,
-        &address_details.path,
-        address_details.has_pwd,
-        &author_multi_signer,
-        vec![],
-    );
-
-    let mut sign = TrDbColdSign::from_storage(database, None)?.unwrap_or_default();
-    sign.signing_bulk.push(sign_one);
-    let checksum = sign.store_and_get_checksum(database)?;
-    let author_info = make_author_info(
-        &author_multi_signer,
-        network_specs.specs.base58prefix,
-        network_specs.specs.genesis_hash,
-        &address_details,
-    );
-
-    let warning = possible_warning
-        .map(|w| Card::Warning(w).card(&mut index, indent))
-        .map(|w| vec![w]);
-
-    let method_cards = into_cards(&call_cards, &mut index);
-    let extensions_cards = into_cards(&extensions_cards, &mut index);
-    let content = TransactionCardSet {
-        warning,
-        method: Some(method_cards),
-        extensions: Some(extensions_cards),
-        ..Default::default()
-    };
-
-    Ok(TransactionAction::Sign {
-        actions: vec![TransactionSignAction {
-            content,
-            has_pwd: address_details.has_pwd,
-            author_info,
-            network_info: network_specs.clone(),
-        }],
-        checksum,
-    })
+    Ok(network_specs)
 }
 
 fn prepare_read_transaction_action(
