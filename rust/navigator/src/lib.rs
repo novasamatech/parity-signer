@@ -103,6 +103,9 @@ pub fn export_key_info(
     Ok(MKeysInfoExport { frames })
 }
 
+// Exports keyset with the key id (root key) and public keys
+// Public keys can be used to display address information in ui
+// Key id is used to identify the key set later when signing transactions such as dynamic derivation one
 pub fn export_root_keys_info(seed_phrase: &str) -> Result<MKeysInfoExport> {
     let export_root_pub_keys = derive_root_public_keys(seed_phrase)?;
 

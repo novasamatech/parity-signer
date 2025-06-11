@@ -31,14 +31,13 @@
 //! [`ADDRTREE`](constants::ADDRTREE) tree of the cold database as SCALE-encoded
 //! [`AddressDetails`](definitions::users::AddressDetails).
 use bip39::{Language, Mnemonic, MnemonicType};
-use definitions::keyring::RootPublicKey;
+use definitions::keyring::{RootKeyInfo, RootPublicKey};
 use lazy_static::lazy_static;
 use parity_scale_codec::Decode;
 #[cfg(feature = "active")]
 use parity_scale_codec::Encode;
 use regex::Regex;
 use sled::Batch;
-use sp_core::testing::SR25519;
 use sp_core::H256;
 #[cfg(feature = "active")]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
@@ -60,7 +59,7 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsResponseInfo,
 };
 use definitions::helpers::print_multisigner_as_base58_or_eth;
-use definitions::helpers::{base58_or_eth_to_multisigner, multisigner_to_encryption};
+use definitions::helpers::{base58_or_eth_to_multisigner};
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
@@ -545,7 +544,7 @@ pub fn derive_single_key(
 
 pub fn derive_root_public_keys(
     seed_phrase: &str
-)  -> Result<Vec<RootPublicKey>> {
+)  -> Result<RootKeyInfo> {
     let substrate = full_address_to_multisigner(
         seed_phrase.to_string(), 
         Encryption::Sr25519
@@ -568,7 +567,7 @@ pub fn derive_root_public_keys(
         RootPublicKey::Ethereum(ecdsa::Public(raw_ethereum_key))
     ];
 
-    Ok(public_keys)
+    Ok(RootKeyInfo::new(raw_substrate_key, public_keys))
 }
 
 pub fn inject_derivations_has_pwd(

@@ -155,6 +155,25 @@ impl VerifierKey {
     }
 }
 
+// Used to export keyset
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, Debug)]
+pub struct RootKeyInfo {
+    // used as a keyset identifier in transactions, e.g. dynamic derivation
+    key_id: [u8; 32],
+
+    // root public keys depending on derivation method, e.g. substrate and ethereum
+    public_keys: Vec<RootPublicKey>
+}
+
+impl RootKeyInfo {
+    pub fn new(key_id: [u8; 32], public_keys: Vec<RootPublicKey>) -> Self {
+        Self {
+            key_id,
+            public_keys,
+        }
+    }
+}
+
 /// Used when referring to a root key of the keyset
 #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, Debug)]
 pub enum RootPublicKey {
