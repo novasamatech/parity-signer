@@ -14,9 +14,7 @@ use transaction_signing::{
 };
 
 use definitions::navigation::{
-    ActionResult, Address, ExportedSet, MAddressCard, MKeysInfoExport, MKeysNew, MSignatureReady,
-    MSignedTransaction, MSufficientCryptoReady, MTransaction, QrData, TransactionAction,
-    TransactionSignAction, TransactionType,
+    ActionResult, Address, DynamicDerivationTransactionPayload, ExportedSet, MAddressCard, MKeysInfoExport, MKeysNew, MSignatureReady, MSignedTransaction, MSufficientCryptoReady, MTransaction, QrData, TransactionAction, TransactionSignAction, TransactionType
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -152,13 +150,12 @@ pub fn export_signatures_bulk(
 /// Sign dynamic derivation transaction and return data for mobile
 pub fn sign_dd_transaction(
     database: &sled::Db,
-    payload_set: &[String],
-    seeds: HashMap<String, String>,
-    with_proof: bool
+    payload_set: &[DynamicDerivationTransactionPayload],
+    seeds: HashMap<String, String>
 ) -> Result<MSignedTransaction> {
     let mut transactions = vec![];
     let mut signatures = vec![];
-    for (a, signature) in handle_dd_sign(database, payload_set, seeds, with_proof)? {
+    for (a, signature) in handle_dd_sign(database, payload_set, seeds)? {
         transactions.push(MTransaction {
             content: a.content.clone(),
             ttype: TransactionType::Sign,
@@ -176,16 +173,15 @@ pub fn sign_dd_transaction(
 /// Parse and sign dynamic derivation transaction
 pub(crate) fn handle_dd_sign(
     database: &sled::Db,
-    payload_set: &[String],
-    seeds: HashMap<String, String>,
-    with_proof: bool
+    payload_set: &[DynamicDerivationTransactionPayload],
+    seeds: HashMap<String, String>
 ) -> Result<Vec<(TransactionSignAction, SignatureAndChecksum)>> {
     let mut signed_transactions = vec![];
 
     let mut actions = vec![];
     let mut checksum = 0;
     for t in payload_set.iter() {
-        match parse_dd_transaction(database, t, &seeds, with_proof) {
+        match parse_dd_transaction(database, t, &seeds) {
             Ok(TransactionAction::Sign {
                 actions: a,
                 checksum: c,

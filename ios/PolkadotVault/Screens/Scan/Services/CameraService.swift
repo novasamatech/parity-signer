@@ -15,9 +15,21 @@ enum DecodedPayloadType: Equatable {
     case dynamicDerivationsTransaction
 }
 
-struct DecodedPayload: Equatable {
-    let payload: [String]
-    let type: DecodedPayloadType
+enum DecodedPayload: Equatable {
+    case transaction(String)
+    case dynamicDerivations(String)
+    case dynamicDerivationsTransaction([DynamicDerivationTransactionPayload])
+
+    var type: DecodedPayloadType {
+        switch self {
+        case .transaction:
+            DecodedPayloadType.transaction
+        case .dynamicDerivations:
+            DecodedPayloadType.dynamicDerivations
+        case .dynamicDerivationsTransaction:
+            DecodedPayloadType.dynamicDerivationsTransaction
+        }
+    }
 }
 
 final class CameraService: ObservableObject {
@@ -155,13 +167,13 @@ private extension CameraService {
                     () // Invalid code path, BS can't be recovered without a password
                 }
             case let .dynamicDerivations(s: payload):
-                self.payload = .init(payload: [payload], type: .dynamicDerivations)
+                self.payload = .dynamicDerivations(payload)
                 self.shutdown()
             case let .other(s: payload):
-                self.payload = .init(payload: [payload], type: .transaction)
+                self.payload = .transaction(payload)
                 self.shutdown()
             case let .dynamicDerivationTransaction(s: payload):
-                self.payload = .init(payload: payload, type: .dynamicDerivationsTransaction)
+                self.payload = .dynamicDerivationsTransaction(payload)
                 self.shutdown()
             }
         }

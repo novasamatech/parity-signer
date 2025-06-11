@@ -4,7 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
-use definitions::navigation::NetworkSpecs;
+use definitions::navigation::{DynamicDerivationTransactionPayload, NetworkSpecs};
 use definitions::network_specs::OrderedNetworkSpecs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -96,65 +96,56 @@ pub(crate) fn parse_transaction_with_proof(
 
 pub fn parse_dd_transaction(
     database: &sled::Db,
+    payload: &DynamicDerivationTransactionPayload,
+    seeds: &HashMap<String, String>
+) -> Result<TransactionAction> {
+    match payload {
+        DynamicDerivationTransactionPayload::WithoutProof { s  } => {
+            do_parse_dd_transaction(database, s, seeds, false)
+        },
+        DynamicDerivationTransactionPayload::WithProof { s } => {
+            do_parse_dd_transaction(database, s, seeds, true)
+        }
+    }
+}
+
+fn do_parse_dd_transaction(
+    database: &sled::Db,
     data_hex: &str,
     seeds: &HashMap<String, String>,
     with_proof: bool
 ) -> Result<TransactionAction> {
+    let (transaction, call_data, genesis_hash, encryption) =
+        dd_transaction_msg_genesis_encryption(data_hex)?;
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
+    let (author_multi_signer, address_details) = derive_single_key(
+        database,
+        seeds,
+        &transaction.derivation_path,
+        &transaction.root_key_id,
+        network_specs_key,
+    )?;
+
     if with_proof {
-        parse_dd_transaction_with_proof(database, data_hex, seeds)
+        do_dd_parse_transaction_with_proof(
+            database,
+            author_multi_signer,
+            &call_data,
+            genesis_hash,
+            encryption,
+            Some(address_details),
+        )
     } else {
-        parse_dd_transaction_without_proof(database, data_hex, seeds)
+        do_parse_transaction(
+            database,
+            author_multi_signer,
+            &call_data,
+            genesis_hash,
+            encryption,
+            Some(address_details),
+        )
     }
-}
-
-pub fn parse_dd_transaction_without_proof(
-    database: &sled::Db,
-    data_hex: &str,
-    seeds: &HashMap<String, String>,
-) -> Result<TransactionAction> {
-    let (transaction, call_data, genesis_hash, encryption) =
-        dd_transaction_msg_genesis_encryption(data_hex)?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
-    let (author_multi_signer, address_details) = derive_single_key(
-        database,
-        seeds,
-        &transaction.derivation_path,
-        &transaction.root_key,
-        network_specs_key,
-    )?;
-    do_parse_transaction(
-        database,
-        author_multi_signer,
-        &call_data,
-        genesis_hash,
-        encryption,
-        Some(address_details),
-    )
-}
-
-pub fn parse_dd_transaction_with_proof(
-    database: &sled::Db,
-    data_hex: &str,
-    seeds: &HashMap<String, String>,
-) -> Result<TransactionAction> {
-    let (transaction, call_data, genesis_hash, encryption) =
-        dd_transaction_msg_genesis_encryption(data_hex)?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
-    let (author_multi_signer, address_details) = derive_single_key(
-        database,
-        seeds,
-        &transaction.derivation_path,
-        &transaction.root_key,
-        network_specs_key,
-    )?;
-    do_dd_parse_transaction_with_proof(
-        database,
-        author_multi_signer,
-        &call_data,
-        genesis_hash,
-        encryption,
-        Some(address_details),
-    )
+    
 }
 
 fn do_parse_transaction_with_proof(

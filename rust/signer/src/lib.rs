@@ -363,11 +363,10 @@ fn try_create_address(
 
 /// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
 fn sign_dd_transaction(
-    payload: &[String],
-    seeds: HashMap<String, String>,
-    with_proof: bool
+    payload: &[DynamicDerivationTransactionPayload],
+    seeds: HashMap<String, String>
 ) -> Result<MSignedTransaction, ErrorDisplayed> {
-    navigator::sign_dd_transaction(&get_db()?, payload, seeds, with_proof).map_err(|e| e.to_string().into())
+    navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())
 }
 
 /// Must be called once on normal first start of the app upon accepting conditions; relies on old

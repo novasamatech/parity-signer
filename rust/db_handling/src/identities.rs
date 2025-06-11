@@ -126,7 +126,7 @@ impl From<&[MultiSignature]> for SignaturesBulkV1 {
 #[derive(Clone, Encode, Decode)]
 pub struct DynamicDerivationTransaction {
     pub encryption: Encryption,
-    pub root_key: [u8; 32],
+    pub root_key_id: [u8; 32],
     pub derivation_path: String,
 }
 
@@ -509,10 +509,10 @@ pub fn derive_single_key(
     database: &sled::Db,
     seeds: &HashMap<String, String>,
     derivation_path: &str,
-    root_key: &[u8; 32],
+    root_key_id: &[u8; 32],
     network_key: NetworkSpecsKey
 ) -> Result<(MultiSigner, AddressDetails)> {
-    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(root_key.clone()));
+    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(root_key_id.clone()));
 
     let seed_name =
         find_seed_name_for_multisigner(database, &root_multisigner)?.ok_or_else(|| {
