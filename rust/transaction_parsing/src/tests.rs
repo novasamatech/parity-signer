@@ -2789,7 +2789,7 @@ fn parse_dd_transaction_1() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, &data[0], &seeds, false).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,
@@ -3128,7 +3128,7 @@ fn parse_dd_transaction_2() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &action {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, &data[0], &seeds, false).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,
@@ -3306,7 +3306,7 @@ fn parse_dd_transaction_3() {
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
         if let TransactionAction::Sign { actions, .. } =
-            parse_dd_transaction(&db, &data[0], &seeds, false).unwrap()
+            parse_dd_transaction(&db, &data[0], &seeds).unwrap()
         {
             let TransactionSignAction {
                 content,
@@ -3338,7 +3338,7 @@ fn parse_dd_transaction_no_ket_set() {
     let output = decode_payload(&line, true).unwrap();
     let no_seeds = HashMap::new();
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
-        let result = parse_dd_transaction(&db, &data[0], &no_seeds, false);
+        let result = parse_dd_transaction(&db, &data[0], &no_seeds);
         assert!(matches!(
             result,
             Err(Error::DbError(db_handling::Error::NoSeedFound { .. }))
@@ -3360,7 +3360,7 @@ fn parse_dd_transaction_wrong_metadata() {
     let mut seeds = HashMap::new();
     seeds.insert("Alice".to_string(), ALICE_SEED_PHRASE.to_string());
     if let DecodeSequenceResult::DynamicDerivationTransaction { s: data, .. } = &output {
-        let result = parse_dd_transaction(&db, &data[0], &seeds, false);
+        let result = parse_dd_transaction(&db, &data[0], &seeds);
         if let Err(Error::AllExtensionsParsingFailed {
             network_name,
             errors,
