@@ -4,6 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
+use definitions::navigation::{DynamicDerivationTransactionPayload, NetworkSpecs};
 use definitions::network_specs::OrderedNetworkSpecs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -12,6 +13,7 @@ use definitions::{
     network_specs::VerifierValue,
     users::AddressDetails,
 };
+use parser::MetadataProof;
 use parser::{
     cut_method_extensions, decode_call, decode_extensions, decode_metadata_proof,
     decoding_commons::OutputCard, parse_extensions, parse_method,
@@ -95,8 +97,24 @@ pub(crate) fn parse_transaction_with_proof(
 
 pub fn parse_dd_transaction(
     database: &sled::Db,
+    payload: &DynamicDerivationTransactionPayload,
+    seeds: &HashMap<String, String>
+) -> Result<TransactionAction> {
+    match payload {
+        DynamicDerivationTransactionPayload::WithoutProof { s  } => {
+            do_parse_dd_transaction(database, s, seeds, false)
+        },
+        DynamicDerivationTransactionPayload::WithProof { s } => {
+            do_parse_dd_transaction(database, s, seeds, true)
+        }
+    }
+}
+
+fn do_parse_dd_transaction(
+    database: &sled::Db,
     data_hex: &str,
     seeds: &HashMap<String, String>,
+    with_proof: bool
 ) -> Result<TransactionAction> {
     let (transaction, call_data, genesis_hash, encryption) =
         dd_transaction_msg_genesis_encryption(data_hex)?;
@@ -105,17 +123,30 @@ pub fn parse_dd_transaction(
         database,
         seeds,
         &transaction.derivation_path,
-        &transaction.root_multisigner,
+        &transaction.root_key_id,
         network_specs_key,
     )?;
-    do_parse_transaction(
-        database,
-        author_multi_signer,
-        &call_data,
-        genesis_hash,
-        encryption,
-        Some(address_details),
-    )
+
+    if with_proof {
+        do_parse_transaction_with_proof(
+            database,
+            author_multi_signer,
+            &call_data,
+            genesis_hash,
+            encryption,
+            Some(address_details),
+        )
+    } else {
+        do_parse_transaction(
+            database,
+            author_multi_signer,
+            &call_data,
+            genesis_hash,
+            encryption,
+            Some(address_details),
+        )
+    }
+    
 }
 
 fn do_parse_transaction_with_proof(
@@ -132,12 +163,23 @@ fn do_parse_transaction_with_proof(
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    let network_specs = try_get_network_specs(database, &network_specs_key)?.ok_or_else(|| {
+    let copied_vec: Vec<u8> = payload.to_vec();
+    let mut remained_payload = &copied_vec[..];
+
+    let metadata_proof = decode_metadata_proof(&mut remained_payload).map_err(|_| {
         Error::UnknownNetwork {
             genesis_hash,
             encryption,
         }
     })?;
+
+    let network_specs = do_get_network_specs(
+        database, 
+        &network_specs_key, 
+        &metadata_proof, 
+        genesis_hash, 
+        encryption
+    )?;
 
     let cards_prep = match address_details {
         Some(address_details) => {
@@ -165,25 +207,6 @@ fn do_parse_transaction_with_proof(
             .card(&mut index, indent),
             Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
         ),
-    };
-
-    let copied_vec: Vec<u8> = payload.to_vec();
-    let mut remained_payload = &copied_vec[..];
-
-    let metadata_proof = match decode_metadata_proof(&mut remained_payload) {
-        Ok(v) => v,
-        Err(e) => {
-            return prepare_read_transaction_action(ReadTransactionPrepareParams {
-                maybe_error: Some(e),
-                cards_prep,
-                network_specs,
-                author_multi_signer,
-                maybe_method_cards: None,
-                maybe_extension_cards: None,
-                index,
-                indent,
-            })
-        }
     };
 
     let (call_data, extensions_data) = match cut_method_extensions(remained_payload) {
@@ -298,6 +321,37 @@ fn do_parse_transaction_with_proof(
         }],
         checksum,
     })
+}
+
+fn do_get_network_specs(
+    database: &sled::Db,
+    network_specs_key: &NetworkSpecsKey,
+    metadata_proof: &MetadataProof,
+    genesis_hash: H256,
+    encryption: Encryption,
+) -> Result<OrderedNetworkSpecs> {
+    let network_specs = try_get_network_specs(database, &network_specs_key)?.unwrap_or_else(|| {
+        let path_id = String::from("//") + &metadata_proof.extra_info.spec_name;
+
+        OrderedNetworkSpecs { 
+            specs: NetworkSpecs {
+                base58prefix: metadata_proof.extra_info.base58_prefix,
+                color: String::from("#000"),
+                decimals: metadata_proof.extra_info.decimals,
+                encryption: encryption,
+                genesis_hash: genesis_hash,
+                logo: metadata_proof.extra_info.spec_name.clone(),
+                name: metadata_proof.extra_info.spec_name.clone(),
+                path_id: path_id,
+                secondary_color: String::from("#000"),
+                title: metadata_proof.extra_info.spec_name.clone(),
+                unit: metadata_proof.extra_info.token_symbol.clone()
+            }, 
+            order: 0 
+        }
+    });
+
+    Ok(network_specs)
 }
 
 fn prepare_read_transaction_action(

@@ -363,8 +363,8 @@ fn try_create_address(
 
 /// Must be called with `DecodeSequenceResult::DynamicDerivationTransaction` payload
 fn sign_dd_transaction(
-    payload: &[String],
-    seeds: HashMap<String, String>,
+    payload: &[DynamicDerivationTransactionPayload],
+    seeds: HashMap<String, String>
 ) -> Result<MSignedTransaction, ErrorDisplayed> {
     navigator::sign_dd_transaction(&get_db()?, payload, seeds).map_err(|e| e.to_string().into())
 }
@@ -419,6 +419,11 @@ fn export_key_info(
     exported_set: ExportedSet,
 ) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
     navigator::export_key_info(&get_db()?, seed_name, exported_set)
+        .map_err(|e| e.to_string().into())
+}
+
+fn export_root_keys_info(seed_phrase: &str) -> anyhow::Result<MKeysInfoExport, ErrorDisplayed> {
+    navigator::export_root_keys_info(seed_phrase)
         .map_err(|e| e.to_string().into())
 }
 

@@ -31,6 +31,7 @@
 //! [`ADDRTREE`](constants::ADDRTREE) tree of the cold database as SCALE-encoded
 //! [`AddressDetails`](definitions::users::AddressDetails).
 use bip39::{Language, Mnemonic, MnemonicType};
+use definitions::keyring::{RootKeyInfo, RootPublicKey};
 use lazy_static::lazy_static;
 use parity_scale_codec::Decode;
 #[cfg(feature = "active")]
@@ -58,10 +59,11 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsResponseInfo,
 };
 use definitions::helpers::print_multisigner_as_base58_or_eth;
-use definitions::helpers::{base58_or_eth_to_multisigner, multisigner_to_encryption};
+use definitions::helpers::{base58_or_eth_to_multisigner};
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
+use definitions::error::Error as DefError;
 #[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
@@ -123,7 +125,8 @@ impl From<&[MultiSignature]> for SignaturesBulkV1 {
 
 #[derive(Clone, Encode, Decode)]
 pub struct DynamicDerivationTransaction {
-    pub root_multisigner: MultiSigner,
+    pub encryption: Encryption,
+    pub root_key_id: [u8; 32],
     pub derivation_path: String,
 }
 
@@ -506,11 +509,13 @@ pub fn derive_single_key(
     database: &sled::Db,
     seeds: &HashMap<String, String>,
     derivation_path: &str,
-    root_multisigner: &MultiSigner,
-    network_key: NetworkSpecsKey,
+    root_key_id: &[u8; 32],
+    network_key: NetworkSpecsKey
 ) -> Result<(MultiSigner, AddressDetails)> {
+    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(root_key_id.clone()));
+
     let seed_name =
-        find_seed_name_for_multisigner(database, root_multisigner)?.ok_or_else(|| {
+        find_seed_name_for_multisigner(database, &root_multisigner)?.ok_or_else(|| {
             Error::NoSeedFound {
                 multisigner: root_multisigner.clone(),
             }
@@ -523,7 +528,7 @@ pub fn derive_single_key(
     full_address.push_str(seed_phrase);
     full_address.push_str(derivation_path);
 
-    let encryption = multisigner_to_encryption(root_multisigner);
+    let (_, encryption) = network_key.genesis_hash_encryption()?;
     let multi_signer = full_address_to_multisigner(full_address, encryption)?;
 
     let address_details = AddressDetails {
@@ -535,6 +540,34 @@ pub fn derive_single_key(
         secret_exposed: false,
     };
     Ok((multi_signer, address_details))
+}
+
+pub fn derive_root_public_keys(
+    seed_phrase: &str
+)  -> Result<RootKeyInfo> {
+    let substrate = full_address_to_multisigner(
+        seed_phrase.to_string(), 
+        Encryption::Sr25519
+    )?;
+    
+    let ethereum = full_address_to_multisigner(
+        seed_phrase.to_string(), 
+        Encryption::Ethereum
+    )?;
+
+    let raw_substrate_key = multisigner_to_public(&substrate)
+        .try_into()
+        .map_err(|_| Error::DefinitionsError(DefError::WrongPublicKeyLength))?;
+    let raw_ethereum_key = multisigner_to_public(&ethereum)
+        .try_into()
+        .map_err(|_| Error::DefinitionsError(DefError::WrongPublicKeyLength))?;
+
+    let public_keys = vec![
+        RootPublicKey::Sr25519(sr25519::Public(raw_substrate_key)),
+        RootPublicKey::Ethereum(ecdsa::Public(raw_ethereum_key))
+    ];
+
+    Ok(RootKeyInfo::new(raw_substrate_key, public_keys))
 }
 
 pub fn inject_derivations_has_pwd(
