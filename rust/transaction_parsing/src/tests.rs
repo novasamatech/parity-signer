@@ -5,7 +5,9 @@ use constants::test_values::{
 };
 
 use db_handling::{
-    cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks}, identities::try_create_address, manage_history::get_history
+    cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
+    identities::try_create_address,
+    manage_history::get_history,
 };
 use definitions::navigation::{
     DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction,
@@ -2632,7 +2634,14 @@ fn import_derivation_existing_for_another_chain() {
         &Encryption::Sr25519,
     );
 
-    try_create_address(&db, "Alice", ALICE_SEED_PHRASE, derivation_path, &westend_specs_key).unwrap();
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        derivation_path,
+        &westend_specs_key,
+    )
+    .unwrap();
 
     // try to import the same derivation for polkadot
 
