@@ -16,7 +16,7 @@ protocol DynamicDerivationsServicing: AnyObject {
     )
     func signDynamicDerivationsTransaction(
         for seedPhrases: [String: String],
-        payload: [DynamicDerivationTransactionPayload],
+        payload: [String],
         completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
     )
 }
@@ -44,7 +44,7 @@ final class DynamicDerivationsService {
 
     func signDynamicDerivationsTransaction(
         for seedPhrases: [String: String],
-        payload: [DynamicDerivationTransactionPayload],
+        payload: [String],
         completion: @escaping (Result<MSignedTransaction, TransactionError>) -> Void
     ) {
         backendService.performCall({

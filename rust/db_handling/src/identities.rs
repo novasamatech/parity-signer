@@ -58,12 +58,12 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
     DynamicDerivationsResponseInfo,
 };
+use definitions::error::Error as DefError;
+use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
-use definitions::helpers::{base58_or_eth_to_multisigner};
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
-use definitions::error::Error as DefError;
 #[cfg(feature = "active")]
 use definitions::{
     crypto::Encryption,
@@ -510,7 +510,7 @@ pub fn derive_single_key(
     seeds: &HashMap<String, String>,
     derivation_path: &str,
     root_key_id: &[u8; 32],
-    network_key: NetworkSpecsKey
+    network_key: NetworkSpecsKey,
 ) -> Result<(MultiSigner, AddressDetails)> {
     let root_multisigner = MultiSigner::Sr25519(sr25519::Public(root_key_id.clone()));
 
@@ -542,18 +542,10 @@ pub fn derive_single_key(
     Ok((multi_signer, address_details))
 }
 
-pub fn derive_root_public_keys(
-    seed_phrase: &str
-)  -> Result<RootKeyInfo> {
-    let substrate = full_address_to_multisigner(
-        seed_phrase.to_string(), 
-        Encryption::Sr25519
-    )?;
-    
-    let ethereum = full_address_to_multisigner(
-        seed_phrase.to_string(), 
-        Encryption::Ethereum
-    )?;
+pub fn derive_root_public_keys(seed_phrase: &str) -> Result<RootKeyInfo> {
+    let substrate = full_address_to_multisigner(seed_phrase.to_string(), Encryption::Sr25519)?;
+
+    let ethereum = full_address_to_multisigner(seed_phrase.to_string(), Encryption::Ethereum)?;
 
     let raw_substrate_key = multisigner_to_public(&substrate)
         .try_into()
@@ -564,7 +556,7 @@ pub fn derive_root_public_keys(
 
     let public_keys = vec![
         RootPublicKey::Sr25519(sr25519::Public(raw_substrate_key)),
-        RootPublicKey::Ethereum(ecdsa::Public(raw_ethereum_key))
+        RootPublicKey::Ethereum(ecdsa::Public(raw_ethereum_key)),
     ];
 
     Ok(RootKeyInfo::new(raw_substrate_key, public_keys))

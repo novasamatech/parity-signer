@@ -4,7 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
-use definitions::navigation::{DynamicDerivationTransactionPayload, NetworkSpecs};
+use definitions::navigation::NetworkSpecs;
 use definitions::network_specs::OrderedNetworkSpecs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -97,24 +97,8 @@ pub(crate) fn parse_transaction_with_proof(
 
 pub fn parse_dd_transaction(
     database: &sled::Db,
-    payload: &DynamicDerivationTransactionPayload,
-    seeds: &HashMap<String, String>
-) -> Result<TransactionAction> {
-    match payload {
-        DynamicDerivationTransactionPayload::WithoutProof { s  } => {
-            do_parse_dd_transaction(database, s, seeds, false)
-        },
-        DynamicDerivationTransactionPayload::WithProof { s } => {
-            do_parse_dd_transaction(database, s, seeds, true)
-        }
-    }
-}
-
-fn do_parse_dd_transaction(
-    database: &sled::Db,
     data_hex: &str,
     seeds: &HashMap<String, String>,
-    with_proof: bool
 ) -> Result<TransactionAction> {
     let (transaction, call_data, genesis_hash, encryption) =
         dd_transaction_msg_genesis_encryption(data_hex)?;
@@ -127,26 +111,25 @@ fn do_parse_dd_transaction(
         network_specs_key,
     )?;
 
-    if with_proof {
-        do_parse_transaction_with_proof(
+    match &data_hex[4..6] {
+        "05" => do_parse_transaction(
             database,
             author_multi_signer,
             &call_data,
             genesis_hash,
             encryption,
             Some(address_details),
-        )
-    } else {
-        do_parse_transaction(
+        ),
+        "07" => do_parse_transaction_with_proof(
             database,
             author_multi_signer,
             &call_data,
             genesis_hash,
             encryption,
             Some(address_details),
-        )
+        ),
+        _ => Err(Error::PayloadNotSupported(data_hex[4..6].to_string())),
     }
-    
 }
 
 fn do_parse_transaction_with_proof(
@@ -166,19 +149,18 @@ fn do_parse_transaction_with_proof(
     let copied_vec: Vec<u8> = payload.to_vec();
     let mut remained_payload = &copied_vec[..];
 
-    let metadata_proof = decode_metadata_proof(&mut remained_payload).map_err(|_| {
-        Error::UnknownNetwork {
+    let metadata_proof =
+        decode_metadata_proof(&mut remained_payload).map_err(|_| Error::UnknownNetwork {
             genesis_hash,
             encryption,
-        }
-    })?;
+        })?;
 
     let network_specs = do_get_network_specs(
-        database, 
-        &network_specs_key, 
-        &metadata_proof, 
-        genesis_hash, 
-        encryption
+        database,
+        &network_specs_key,
+        &metadata_proof,
+        genesis_hash,
+        encryption,
     )?;
 
     let cards_prep = match address_details {
@@ -333,7 +315,7 @@ fn do_get_network_specs(
     let network_specs = try_get_network_specs(database, &network_specs_key)?.unwrap_or_else(|| {
         let path_id = String::from("//") + &metadata_proof.extra_info.spec_name;
 
-        OrderedNetworkSpecs { 
+        OrderedNetworkSpecs {
             specs: NetworkSpecs {
                 base58prefix: metadata_proof.extra_info.base58_prefix,
                 color: String::from("#000"),
@@ -345,9 +327,9 @@ fn do_get_network_specs(
                 path_id: path_id,
                 secondary_color: String::from("#000"),
                 title: metadata_proof.extra_info.spec_name.clone(),
-                unit: metadata_proof.extra_info.token_symbol.clone()
-            }, 
-            order: 0 
+                unit: metadata_proof.extra_info.token_symbol.clone(),
+            },
+            order: 0,
         }
     });
 

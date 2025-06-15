@@ -2,7 +2,7 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
 use db_handling::identities::TransactionBulk;
-use definitions::{helpers::unhex, navigation::DynamicDerivationTransactionPayload};
+use definitions::helpers::unhex;
 use parity_scale_codec::Decode;
 
 pub use definitions::navigation::{StubNav, TransactionAction};
@@ -102,10 +102,10 @@ pub fn decode_payload(
     match &data_hex[4..6] {
         "04" => decode_transaction_bulk(data_hex, enable_dynamic_derivations),
         "05" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
-            s: vec![DynamicDerivationTransactionPayload::WithoutProof { s: data_hex.to_string() }],
+            s: vec![data_hex.to_string()],
         }),
         "07" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
-            s: vec![DynamicDerivationTransactionPayload::WithProof { s: data_hex.to_string() }],
+            s: vec![data_hex.to_string()],
         }),
         "df" => decode_dynamic_derivations(data_hex),
         _ => Ok(DecodeSequenceResult::Other {

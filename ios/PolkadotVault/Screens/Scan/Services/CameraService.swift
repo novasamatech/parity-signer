@@ -18,7 +18,7 @@ enum DecodedPayloadType: Equatable {
 enum DecodedPayload: Equatable {
     case transaction(String)
     case dynamicDerivations(String)
-    case dynamicDerivationsTransaction([DynamicDerivationTransactionPayload])
+    case dynamicDerivationsTransaction([String])
 
     var type: DecodedPayloadType {
         switch self {

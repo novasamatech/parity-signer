@@ -32,10 +32,7 @@
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_core::{
-	ecdsa, ed25519, sr25519,
-	H256
-};
+use sp_core::{ecdsa, ed25519, sr25519, H256};
 use sp_runtime::MultiSigner;
 
 use crate::helpers::{get_multisigner, unhex};
@@ -162,7 +159,7 @@ pub struct RootKeyInfo {
     key_id: [u8; 32],
 
     // root public keys depending on derivation method, e.g. substrate and ethereum
-    public_keys: Vec<RootPublicKey>
+    public_keys: Vec<RootPublicKey>,
 }
 
 impl RootKeyInfo {
@@ -177,10 +174,10 @@ impl RootKeyInfo {
 /// Used when referring to a root key of the keyset
 #[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, Debug)]
 pub enum RootPublicKey {
-	Ed25519(ed25519::Public),
-	Sr25519(sr25519::Public),
-	Ecdsa(ecdsa::Public),
-	Ethereum(ecdsa::Public)
+    Ed25519(ed25519::Public),
+    Sr25519(sr25519::Public),
+    Ecdsa(ecdsa::Public),
+    Ethereum(ecdsa::Public),
 }
 
 /// Key in `ADDRTREE` tree (cold database)  

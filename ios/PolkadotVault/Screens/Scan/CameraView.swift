@@ -525,7 +525,7 @@ private extension CameraView.ViewModel {
 
 private extension CameraView.ViewModel {
     func startDynamicDerivationsTransactionFlow(
-        _ payload: [DynamicDerivationTransactionPayload]
+        _ payload: [String]
     ) {
         let seedPhrases = seedsMediator.getAllSeeds()
         dynamicDerivationsService.signDynamicDerivationsTransaction(for: seedPhrases, payload: payload) { result in

@@ -14,7 +14,9 @@ use transaction_signing::{
 };
 
 use definitions::navigation::{
-    ActionResult, Address, DynamicDerivationTransactionPayload, ExportedSet, MAddressCard, MKeysInfoExport, MKeysNew, MSignatureReady, MSignedTransaction, MSufficientCryptoReady, MTransaction, QrData, TransactionAction, TransactionSignAction, TransactionType
+    ActionResult, Address, ExportedSet, MAddressCard, MKeysInfoExport, MKeysNew, MSignatureReady,
+    MSignedTransaction, MSufficientCryptoReady, MTransaction, QrData, TransactionAction,
+    TransactionSignAction, TransactionType,
 };
 use parity_scale_codec::Encode;
 use qrcode_rtx::make_data_packs;
@@ -23,8 +25,8 @@ mod error;
 
 mod actions;
 pub use actions::Action;
-use db_handling::identities::{derive_root_public_keys};
 use db_handling::helpers::get_address_details;
+use db_handling::identities::derive_root_public_keys;
 use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth};
 use definitions::keyring::AddressKey;
 
@@ -150,8 +152,8 @@ pub fn export_signatures_bulk(
 /// Sign dynamic derivation transaction and return data for mobile
 pub fn sign_dd_transaction(
     database: &sled::Db,
-    payload_set: &[DynamicDerivationTransactionPayload],
-    seeds: HashMap<String, String>
+    payload_set: &[String],
+    seeds: HashMap<String, String>,
 ) -> Result<MSignedTransaction> {
     let mut transactions = vec![];
     let mut signatures = vec![];
@@ -173,8 +175,8 @@ pub fn sign_dd_transaction(
 /// Parse and sign dynamic derivation transaction
 pub(crate) fn handle_dd_sign(
     database: &sled::Db,
-    payload_set: &[DynamicDerivationTransactionPayload],
-    seeds: HashMap<String, String>
+    payload_set: &[String],
+    seeds: HashMap<String, String>,
 ) -> Result<Vec<(TransactionSignAction, SignatureAndChecksum)>> {
     let mut signed_transactions = vec![];
 

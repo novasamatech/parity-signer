@@ -227,16 +227,10 @@ pub enum BananaSplitRecoveryResult {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum DynamicDerivationTransactionPayload {
-    WithoutProof { s: String },
-    WithProof { s: String }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DecodeSequenceResult {
     BBananaSplitRecoveryResult { b: BananaSplitRecoveryResult },
     DynamicDerivations { s: String },
-    DynamicDerivationTransaction { s: Vec<DynamicDerivationTransactionPayload> },
+    DynamicDerivationTransaction { s: Vec<String> },
     Other { s: String },
 }
 
