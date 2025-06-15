@@ -5,7 +5,7 @@ use std::convert::TryInto;
 use crate::Error;
 use db_handling::identities::{process_dynamic_derivations_v1, DynamicDerivationTransaction};
 use definitions::crypto::Encryption;
-use definitions::helpers::{multisigner_to_encryption, unhex};
+use definitions::helpers::unhex;
 use definitions::navigation::{DDPreview, DecodeSequenceResult};
 use parity_scale_codec::{Decode, Encode};
 use sp_core::H256;
@@ -42,7 +42,7 @@ pub fn dd_transaction_msg_genesis_encryption(
     (data[1], data[2]) = (data[2], data[1]);
     let transaction = <DynamicDerivationTransaction>::decode(&mut &data[2..])?;
     data = data[(transaction.encode().len() + 2)..].to_vec();
-    let encryption = multisigner_to_encryption(&transaction.root_multisigner);
+    let encryption = transaction.encryption;
 
     // network genesis hash
     let raw_hash: [u8; 32] = data[data.len() - 32..]
