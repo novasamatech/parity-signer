@@ -4,6 +4,7 @@ use db_handling::{
     helpers::{get_all_networks, try_get_address_details, try_get_network_specs},
 };
 use definitions::crypto::Encryption;
+use definitions::navigation::TransactionSignActionNetwork;
 use definitions::network_specs::OrderedNetworkSpecs;
 use definitions::{
     history::{Entry, Event, SignDisplay},
@@ -294,7 +295,7 @@ fn do_parse_transaction_with_proof(
             content,
             has_pwd: address_details.has_pwd,
             author_info,
-            network_info: network_specs.clone(),
+            network_info: TransactionSignActionNetwork::Concrete(network_specs.clone()),
         }],
         checksum,
     })
@@ -514,7 +515,7 @@ fn do_parse_transaction(
                                                 content,
                                                 has_pwd: address_details.has_pwd,
                                                 author_info,
-                                                network_info: network_specs.clone(),
+                                                network_info: TransactionSignActionNetwork::Concrete(network_specs.clone()),
                                             }],
                                             checksum,
                                         })

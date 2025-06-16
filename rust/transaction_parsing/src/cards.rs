@@ -294,12 +294,23 @@ pub(crate) fn make_author_info(
     genesis_hash: H256,
     address_details: &AddressDetails,
 ) -> MAddressCard {
+    let address_key = AddressKey::new(author.clone(), Some(genesis_hash));
+    
+    make_author_info_with_key(author, base58prefix, address_key, address_details)
+}
+
+pub(crate) fn make_author_info_with_key(
+    author: &MultiSigner,
+    base58prefix: u16,
+    address_key: AddressKey,
+    address_details: &AddressDetails,
+) -> MAddressCard {
     let base58 =
         print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
-    let address_key = hex::encode(AddressKey::new(author.clone(), Some(genesis_hash)).key());
+    let address_key_str = hex::encode(address_key.key());
     MAddressCard {
         base58,
-        address_key,
+        address_key: address_key_str,
         address: Address {
             identicon: make_identicon_from_multisigner(author, address_details.identicon_style()),
             seed_name: address_details.seed_name.clone(),

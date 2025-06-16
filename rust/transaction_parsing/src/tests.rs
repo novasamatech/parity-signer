@@ -744,7 +744,7 @@ fn parse_transaction_1() {
         assert_eq!(actions.len(), 1);
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         assert_eq!(*has_pwd, false)
     } else {
         panic!("Wrong action {:?}", output)
@@ -1068,7 +1068,7 @@ fn parse_transaction_2() {
         assert_eq!(actions.len(), 1);
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         assert!(!has_pwd, "Expected no password");
     } else {
         panic!("Wrong action {:?}", action)
@@ -1236,7 +1236,7 @@ fn parse_transaction_3() {
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
         assert!(!has_pwd, "Expected no password");
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
     } else {
         panic!("Wrong action {:?}", output)
     }
@@ -2540,7 +2540,7 @@ fn parse_msg_1() {
         assert_eq!(actions.len(), 1);
         assert_eq!(set, &set_expected);
         assert_eq!(author_info, &author_info_known);
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         assert!(!has_pwd, "Expected no password");
     } else {
         panic!("Wrong action {:?}", action)
@@ -2801,7 +2801,7 @@ fn parse_dd_transaction_1() {
             assert_eq!(actions.len(), 1);
             assert_eq!(content, &content_known);
             assert_eq!(author_info, &author_info_known);
-            assert_eq!(network_info, &network_info_known);
+            assert_eq!(network_info.get_network_spec(), Some(network_info_known));
             assert_eq!(*has_pwd, false)
         } else {
             panic!("Wrong action {:?}", output)
@@ -3140,7 +3140,7 @@ fn parse_dd_transaction_2() {
             assert_eq!(actions.len(), 1);
             assert_eq!(content, &content_known);
             assert_eq!(author_info, &author_info_known);
-            assert_eq!(network_info, &network_info_known);
+            assert_eq!(network_info.get_network_spec(), Some(network_info_known));
             assert!(!has_pwd, "Expected no password");
         } else {
             panic!("Wrong action {:?}", action)
@@ -3319,7 +3319,7 @@ fn parse_dd_transaction_3() {
             assert_eq!(content, &content_known);
             assert_eq!(author_info, &author_info_known);
             assert!(!has_pwd, "Expected no password");
-            assert_eq!(network_info, &network_info_known);
+            assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         } else {
             panic!("Wrong action {:?}", output)
         }

@@ -14,6 +14,29 @@ pub struct SeedNameWithIdenticon {
     pub identicon: Identicon,
 }
 
+/// Network information to use during signing
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum TransactionSignActionNetwork {
+    Concrete(OrderedNetworkSpecs),
+    AnyNetwork(Encryption)
+}
+
+impl TransactionSignActionNetwork {
+    pub fn get_network_spec(&self) -> Option<OrderedNetworkSpecs> {
+        match self {
+            TransactionSignActionNetwork::Concrete(spec) => Some(spec.clone()),
+            TransactionSignActionNetwork::AnyNetwork(_) => None,
+        }
+    }
+
+    pub fn get_encryption(&self) -> Encryption {
+        match self {
+            TransactionSignActionNetwork::Concrete(spec) => spec.specs.encryption,
+            TransactionSignActionNetwork::AnyNetwork(encryption) => *encryption,
+        }
+    }
+}
+
 /// A single transaction signing action.
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct TransactionSignAction {
@@ -27,7 +50,17 @@ pub struct TransactionSignAction {
     pub author_info: MAddressCard,
 
     /// Info about the network this tx happens on.
-    pub network_info: OrderedNetworkSpecs,
+    pub network_info: TransactionSignActionNetwork,
+}
+
+impl TransactionSignAction {
+    pub fn get_network_spec(&self) -> Option<OrderedNetworkSpecs> {
+        self.network_info.get_network_spec()
+    }
+
+    pub fn get_encryption(&self) -> Encryption {
+        self.network_info.get_encryption()
+    }
 }
 
 /// Enum containing card sets for four different outcomes:

@@ -67,11 +67,11 @@ pub struct TransactionState {
 }
 
 impl TransactionState {
-    pub fn current_password_author_info(&self) -> Option<(MAddressCard, OrderedNetworkSpecs)> {
+    pub fn current_password_author_info(&self) -> Option<(MAddressCard, Option<OrderedNetworkSpecs>)> {
         match &self.action {
             TransactionAction::Sign { actions, .. } => Some((
                 actions[self.currently_signing].author_info.clone(),
-                actions[self.currently_signing].network_info.clone(),
+                actions[self.currently_signing].get_network_spec(),
             )),
             _ => None,
         }
@@ -151,7 +151,7 @@ impl TransactionState {
                         .unwrap_or_else(|| ""),
                     *checksum,
                     self.currently_signing,
-                    action.network_info.specs.encryption,
+                    action.get_encryption(),
                 ) {
                     Ok(signature_and_checksum) => {
                         // If signed successfully progress to the

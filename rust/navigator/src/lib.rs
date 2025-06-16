@@ -147,7 +147,7 @@ pub fn sign_dd_transaction(
             content: a.content.clone(),
             ttype: TransactionType::Sign,
             author_info: Some(a.author_info.clone()),
-            network_info: Some(a.network_info.clone().into()),
+            network_info: a.get_network_spec().map(|spec| spec.into()),
         });
         signatures.push((signature.signature().to_owned(), signature.signature_type()));
     }
@@ -192,7 +192,7 @@ pub(crate) fn handle_dd_sign(
             "",
             checksum,
             idx,
-            sign_action.network_info.specs.encryption,
+            sign_action.get_encryption(),
         )?;
         checksum = signature_and_checksum.new_checksum();
         signed_transactions.push((sign_action, signature_and_checksum));
