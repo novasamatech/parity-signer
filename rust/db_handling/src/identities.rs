@@ -512,7 +512,7 @@ pub fn derive_single_key(
     root_key_id: &[u8; 32],
     network_key: NetworkSpecsKey,
 ) -> Result<(MultiSigner, AddressDetails)> {
-    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(root_key_id.clone()));
+    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(*root_key_id));
 
     let seed_name =
         find_seed_name_for_multisigner(database, &root_multisigner)?.ok_or_else(|| {

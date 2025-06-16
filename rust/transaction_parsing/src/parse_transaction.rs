@@ -312,7 +312,7 @@ fn do_get_network_specs(
     genesis_hash: H256,
     encryption: Encryption,
 ) -> Result<OrderedNetworkSpecs> {
-    let network_specs = try_get_network_specs(database, &network_specs_key)?.unwrap_or_else(|| {
+    let network_specs = try_get_network_specs(database, network_specs_key)?.unwrap_or_else(|| {
         let path_id = String::from("//") + &metadata_proof.extra_info.spec_name;
 
         OrderedNetworkSpecs {
@@ -320,11 +320,11 @@ fn do_get_network_specs(
                 base58prefix: metadata_proof.extra_info.base58_prefix,
                 color: String::from("#000"),
                 decimals: metadata_proof.extra_info.decimals,
-                encryption: encryption,
-                genesis_hash: genesis_hash,
+                encryption,
+                genesis_hash,
                 logo: metadata_proof.extra_info.spec_name.clone(),
                 name: metadata_proof.extra_info.spec_name.clone(),
-                path_id: path_id,
+                path_id,
                 secondary_color: String::from("#000"),
                 title: metadata_proof.extra_info.spec_name.clone(),
                 unit: metadata_proof.extra_info.token_symbol.clone(),
