@@ -644,6 +644,9 @@ namespace signer {
     MKeysInfoExport export_key_info([ByRef] string seed_name, ExportedSet exported_set);
 
     [Throws=ErrorDisplayed]
+    MKeysInfoExport export_root_keys_info([ByRef] string seed_phrase);
+
+    [Throws=ErrorDisplayed]
     MKeysNew keys_by_seed_name([ByRef] string seed_name);
 
     [Throws=ErrorDisplayed]

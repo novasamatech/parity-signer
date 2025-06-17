@@ -32,7 +32,7 @@
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_core::H256;
+use sp_core::{ecdsa, ed25519, sr25519, H256};
 use sp_runtime::MultiSigner;
 
 use crate::helpers::{get_multisigner, unhex};
@@ -110,6 +110,34 @@ impl NetworkSpecsKey {
     pub fn key(&self) -> Vec<u8> {
         self.0.to_vec()
     }
+}
+
+// Used to export keyset
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, Debug)]
+pub struct RootKeyInfo {
+    // used as a keyset identifier in transactions, e.g. dynamic derivation
+    key_id: [u8; 32],
+
+    // root public keys depending on derivation method, e.g. substrate and ethereum
+    public_keys: Vec<RootPublicKey>,
+}
+
+impl RootKeyInfo {
+    pub fn new(key_id: [u8; 32], public_keys: Vec<RootPublicKey>) -> Self {
+        Self {
+            key_id,
+            public_keys,
+        }
+    }
+}
+
+/// Used when referring to a root key of the keyset
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, Debug)]
+pub enum RootPublicKey {
+    Ed25519(ed25519::Public),
+    Sr25519(sr25519::Public),
+    Ecdsa(ecdsa::Public),
+    Ethereum(ecdsa::Public),
 }
 
 /// Key in `VERIFIERS` tree (cold database)  

@@ -24,11 +24,14 @@ extension ExportKeySetService: ExportKeySetServicing {}
 
 final class ExportKeySetService {
     private let backendService: BackendService
+    private let seedsMediator: SeedsMediating
 
     init(
-        backendService: BackendService = BackendService()
+        backendService: BackendService = BackendService(),
+        seedsMediator: SeedsMediating = ServiceLocator.seedsMediator
     ) {
         self.backendService = backendService
+        self.seedsMediator = seedsMediator
     }
 
     func exportRootWithDerivedKeys(
@@ -47,8 +50,10 @@ final class ExportKeySetService {
         seedName: String,
         _ completion: @escaping (Result<AnimatedQRCodeViewModel, ServiceError>) -> Void
     ) {
+        let seed = seedsMediator.getSeed(seedName: seedName)
+
         backendService.performCall({
-            let qrCodes = try exportKeyInfo(seedName: seedName, exportedSet: .selected(s: [])).frames
+            let qrCodes = try exportRootKeysInfo(seedPhrase: seed).frames
             return AnimatedQRCodeViewModel(qrCodes: qrCodes.map(\.payload))
         }, completion: completion)
     }

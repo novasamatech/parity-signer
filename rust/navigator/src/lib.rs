@@ -4,7 +4,9 @@
 #![deny(unused_crate_dependencies)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-use db_handling::identities::{export_key_set_addrs, SignaturesBulk, SignaturesBulkV1};
+use db_handling::identities::{
+    derive_root_public_keys, export_key_set_addrs, SignaturesBulk, SignaturesBulkV1,
+};
 //do we support mutex?
 use lazy_static::lazy_static;
 use sp_runtime::MultiSignature;
@@ -98,6 +100,20 @@ pub fn export_key_info(
 
     let data = [&[0x53, 0xff, 0xde], export_all_addrs.encode().as_slice()].concat();
     let frames = make_data_packs(&data, 128).map_err(|e| Error::DataPacking(e.to_string()))?;
+
+    Ok(MKeysInfoExport { frames })
+}
+
+// Exports keyset with the key id (root key) and public keys
+// Public keys can be used to display address information in ui
+// Key id is used to identify the key set later when signing transactions such as dynamic derivation one
+pub fn export_root_keys_info(seed_phrase: &str) -> Result<MKeysInfoExport> {
+    let export_root_pub_keys = derive_root_public_keys(seed_phrase)?;
+
+    let data = export_root_pub_keys.encode();
+
+    let qr_code = QrData::Regular { data };
+    let frames = vec![qr_code];
 
     Ok(MKeysInfoExport { frames })
 }
