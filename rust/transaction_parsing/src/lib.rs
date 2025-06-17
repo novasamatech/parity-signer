@@ -104,6 +104,9 @@ pub fn decode_payload(
         "05" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
             s: vec![data_hex.to_string()],
         }),
+        "07" => Ok(DecodeSequenceResult::DynamicDerivationTransaction {
+            s: vec![data_hex.to_string()],
+        }),
         "df" => decode_dynamic_derivations(data_hex),
         _ => Ok(DecodeSequenceResult::Other {
             s: payload.to_string(),

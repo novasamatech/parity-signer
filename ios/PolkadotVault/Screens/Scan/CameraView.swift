@@ -289,23 +289,23 @@ extension CameraView {
         func didUpdatePayload(_ payload: DecodedPayload) {
             guard !isInTransactionProgress else { return }
             isInTransactionProgress = true
-            switch payload.type {
-            case .dynamicDerivations:
+            switch payload {
+            case let .dynamicDerivations(data):
                 guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
                     presentableError = .featureNotAvailable()
                     isPresentingError = true
                     return
                 }
-                startDynamicDerivationsFlow(payload.payload.first ?? "")
-            case .dynamicDerivationsTransaction:
+                startDynamicDerivationsFlow(data)
+            case let .dynamicDerivationsTransaction(data):
                 guard runtimePropertiesProvider.dynamicDerivationsEnabled else {
                     presentableError = .featureNotAvailable()
                     isPresentingError = true
                     return
                 }
-                startDynamicDerivationsTransactionFlow(payload.payload)
-            case .transaction:
-                startTransactionSigningFlow(payload.payload.first ?? "")
+                startDynamicDerivationsTransactionFlow(data)
+            case let .transaction(data):
+                startTransactionSigningFlow(data)
             }
         }
 
@@ -524,7 +524,9 @@ private extension CameraView.ViewModel {
 }
 
 private extension CameraView.ViewModel {
-    func startDynamicDerivationsTransactionFlow(_ payload: [String]) {
+    func startDynamicDerivationsTransactionFlow(
+        _ payload: [String]
+    ) {
         let seedPhrases = seedsMediator.getAllSeeds()
         dynamicDerivationsService.signDynamicDerivationsTransaction(for: seedPhrases, payload: payload) { result in
             switch result {
