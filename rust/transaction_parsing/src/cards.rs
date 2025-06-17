@@ -295,7 +295,7 @@ pub(crate) fn make_author_info(
     address_details: &AddressDetails,
 ) -> MAddressCard {
     let address_key = AddressKey::new(author.clone(), Some(genesis_hash));
-    
+
     make_author_info_with_key(author, base58prefix, address_key, address_details)
 }
 

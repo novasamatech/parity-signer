@@ -23,7 +23,7 @@ use load_metadata::load_metadata;
 mod load_types;
 use load_types::load_types;
 mod message;
-use message::{ process_concrete_chain_message, process_any_chain_message};
+use message::{process_any_chain_message, process_concrete_chain_message};
 pub mod parse_transaction;
 pub use parse_transaction::entry_to_transactions_with_decoding;
 use parse_transaction::{parse_transaction, parse_transaction_with_proof};

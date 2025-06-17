@@ -148,7 +148,7 @@ pub fn specs_are_new(database: &sled::Db, new: &NetworkSpecs) -> Result<bool> {
 /// data to process (either transaction to parse or message to decode)
 pub fn multisigner_msg_encryption(
     database: &sled::Db,
-    data_hex: &str
+    data_hex: &str,
 ) -> Result<(MultiSigner, Vec<u8>, Encryption)> {
     let data = unhex(data_hex)?;
     let (multi_signer, data, encryption) = match &data_hex[2..4] {
@@ -221,26 +221,25 @@ pub fn multisigner_msg_encryption(
     Ok((multi_signer, msg, encryption))
 }
 
-
 /// function to process hex data and get from it author_public_key, encryption,
 /// data to process (either transaction to parse or message to decode),
 /// and network specs key
 pub fn multisigner_msg_genesis_encryption(
     database: &sled::Db,
-    data_hex: &str
+    data_hex: &str,
 ) -> Result<(MultiSigner, Vec<u8>, H256, Encryption)> {
     let (multi_signer, data, encryption) = multisigner_msg_encryption(database, data_hex)?;
 
     if data.len() < 32 {
         return Err(Error::TooShort);
     }
-        
+
     // network genesis hash
     let raw_hash: [u8; 32] = data[data.len() - 32..]
         .try_into()
         .map_err(|_| Error::TooShort)?;
     let genesis_hash_vec = H256::from(raw_hash);
     let msg = data[..data.len() - 32].to_vec();
-        
+
     Ok((multi_signer, msg, genesis_hash_vec, encryption))
 }

@@ -1,6 +1,7 @@
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
-    helpers::{try_get_address_details, try_get_network_specs}, identities::find_address_details_for_multisigner,
+    helpers::{try_get_address_details, try_get_network_specs},
+    identities::find_address_details_for_multisigner,
 };
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
@@ -15,10 +16,13 @@ use nom::IResult;
 
 use crate::cards::{make_author_info, make_author_info_with_key, Card, Warning};
 use crate::error::{Error, Result};
-use crate::helpers::{multisigner_msg_genesis_encryption, multisigner_msg_encryption};
+use crate::helpers::{multisigner_msg_encryption, multisigner_msg_genesis_encryption};
 use crate::TransactionAction;
 
-pub fn process_concrete_chain_message(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
+pub fn process_concrete_chain_message(
+    database: &sled::Db,
+    data_hex: &str,
+) -> Result<TransactionAction> {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(database, data_hex)?;
 
@@ -138,10 +142,14 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
     let indent: u32 = 0;
 
     let prioritizing_networks = vec![];
-    match find_address_details_for_multisigner(database, &author_multi_signer, prioritizing_networks)? {
+    match find_address_details_for_multisigner(
+        database,
+        &author_multi_signer,
+        prioritizing_networks,
+    )? {
         Some(address_details) => {
-            let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
-                .card(&mut index, indent);
+            let message_card =
+                Card::ParserCard(&ParserCard::Text(display_msg)).card(&mut index, indent);
             let sign = TrDbColdSignOne::generate(
                 SignContent::Message(message),
                 "Any network",
@@ -150,7 +158,7 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
                 &author_multi_signer,
                 Vec::new(),
             );
-            
+
             let sign: TrDbColdSign = sign.into();
             let checksum = sign.store_and_get_checksum(database)?;
 
@@ -160,17 +168,13 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
             };
 
             let address_key = AddressKey::new(author_multi_signer.clone(), maybe_genesis_hash);
-            let author_info = make_author_info_with_key(
-                &author_multi_signer,
-                42,
-                address_key,
-                &address_details,
-            );
-            
+            let author_info =
+                make_author_info_with_key(&author_multi_signer, 42, address_key, &address_details);
+
             Ok(TransactionAction::Sign {
                 actions: vec![TransactionSignAction {
                     content: TransactionCardSet {
-                    message: Some(vec![message_card]),
+                        message: Some(vec![message_card]),
                         ..Default::default()
                     },
                     has_pwd: address_details.has_pwd,
@@ -179,10 +183,8 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
                 }],
                 checksum,
             })
-        },
-        None => {
-            Err(Error::AddrNotFound("".into()))
-        },
+        }
+        None => Err(Error::AddrNotFound("".into())),
     }
 }
 

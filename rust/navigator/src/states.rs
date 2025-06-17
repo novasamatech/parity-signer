@@ -67,7 +67,9 @@ pub struct TransactionState {
 }
 
 impl TransactionState {
-    pub fn current_password_author_info(&self) -> Option<(MAddressCard, Option<OrderedNetworkSpecs>)> {
+    pub fn current_password_author_info(
+        &self,
+    ) -> Option<(MAddressCard, Option<OrderedNetworkSpecs>)> {
         match &self.action {
             TransactionAction::Sign { actions, .. } => Some((
                 actions[self.currently_signing].author_info.clone(),

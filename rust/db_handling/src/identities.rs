@@ -373,7 +373,7 @@ pub fn validate_key_password(
 pub fn find_address_details_for_multisigner(
     database: &sled::Db,
     multisigner: &MultiSigner,
-    prioritizing_network_hashes: Vec<H256>
+    prioritizing_network_hashes: Vec<H256>,
 ) -> Result<Option<AddressDetails>> {
     let matching_addresses: Vec<AddressDetails> = get_all_addresses(database)?
         .into_iter()
@@ -381,10 +381,12 @@ pub fn find_address_details_for_multisigner(
         .map(|(_, details)| details)
         .collect();
 
-    let maybe_root_address = matching_addresses.iter().find(|details| details.network_id == None);
+    let maybe_root_address = matching_addresses
+        .iter()
+        .find(|details| details.network_id == None);
 
     if let Some(root_address) = maybe_root_address {
-        return Ok(Some(root_address.clone()))
+        return Ok(Some(root_address.clone()));
     }
 
     if prioritizing_network_hashes.is_empty() {
@@ -396,14 +398,14 @@ pub fn find_address_details_for_multisigner(
     for addr in matching_addresses.iter() {
         if let Some(network_id) = &addr.network_id {
             match network_id.genesis_hash_encryption() {
-                Ok((hash, _)) => { _ = indexed_addresses.insert(hash, addr) },
-                Err(_) => {},
+                Ok((hash, _)) => _ = indexed_addresses.insert(hash, addr),
+                Err(_) => {}
             }
         }
     }
 
     for genesis_hash in prioritizing_network_hashes {
-        if  let Some(addr) = indexed_addresses.get(&genesis_hash) {
+        if let Some(addr) = indexed_addresses.get(&genesis_hash) {
             return Ok(Some((*addr).clone()));
         }
     }

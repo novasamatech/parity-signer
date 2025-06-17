@@ -18,7 +18,7 @@ pub struct SeedNameWithIdenticon {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum TransactionSignActionNetwork {
     Concrete(OrderedNetworkSpecs),
-    AnyNetwork(Encryption)
+    AnyNetwork(Encryption),
 }
 
 impl TransactionSignActionNetwork {

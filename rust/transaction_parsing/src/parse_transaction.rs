@@ -551,7 +551,10 @@ fn do_parse_transaction(
                                                 content,
                                                 has_pwd: address_details.has_pwd,
                                                 author_info,
-                                                network_info: TransactionSignActionNetwork::Concrete(network_specs.clone()),
+                                                network_info:
+                                                    TransactionSignActionNetwork::Concrete(
+                                                        network_specs.clone(),
+                                                    ),
                                             }],
                                             checksum,
                                         })
