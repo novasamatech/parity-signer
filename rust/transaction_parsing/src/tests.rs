@@ -6,6 +6,7 @@ use constants::test_values::{
 
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
+    identities::try_create_address,
     manage_history::get_history,
 };
 use definitions::navigation::{
@@ -2567,7 +2568,7 @@ fn parse_msg_2() {
 }
 
 #[test]
-fn import_derivations() {
+fn import_unique_derivation() {
     let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
     let db = sled::open(dbname).unwrap();
     populate_cold(&db, Verifier { v: None }).unwrap();
@@ -2602,6 +2603,81 @@ fn import_derivations() {
                         },
                         has_pwd: None,
                         network_title: Some("Westend".to_string()),
+                        status: DerivedKeyStatus::Importable,
+                    }],
+                }],
+            },
+        }]),
+        ..Default::default()
+    };
+
+    let action = produce_output(&db, line).unwrap();
+    if let TransactionAction::Derivations { content: set } = action {
+        assert_eq!(*set, set_expected);
+    } else {
+        panic!("Wrong action {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
+fn import_derivation_existing_for_another_chain() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+
+    // import derived key for westend
+    let derivation_path = "//westend//0";
+    let westend_specs_key = NetworkSpecsKey::from_parts(
+        &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            .unwrap(),
+        &Encryption::Sr25519,
+    );
+
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        derivation_path,
+        &westend_specs_key,
+    )
+    .unwrap();
+
+    // try to import the same derivation for polkadot
+
+    let line = "53ffde00041c6d7920736565640146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a04c0354847694263466745424d6754364745756f395341393873426e4767774874504b44586955756b5436617143724b457801302f2f77657374656e642f2f300191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3";
+
+    let polkadot_genesis =
+        H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
+            .unwrap();
+
+    let set_expected = TransactionCardSet {
+        importing_derivations: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::DerivationsCard {
+                f: vec![SeedKeysPreview {
+                    name: "Alice".to_string(),
+                    multisigner: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                            )
+                            .unwrap()
+                            .as_ref(),
+                        )
+                        .unwrap(),
+                    ),
+                    derived_keys: vec![DerivedKeyPreview {
+                        address: "5HGiBcFgEBMgT6GEuo9SA98sBnGgwHtPKDXiUukT6aqCrKEx".to_string(),
+                        derivation_path: Some(derivation_path.to_string()),
+                        encryption: Encryption::Sr25519,
+                        genesis_hash: polkadot_genesis,
+                        identicon: Identicon::Dots {
+                            identity: alice_sr_westend_0(),
+                        },
+                        has_pwd: None,
+                        network_title: Some("Polkadot".to_string()),
                         status: DerivedKeyStatus::Importable,
                     }],
                 }],

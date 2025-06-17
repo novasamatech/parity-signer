@@ -65,6 +65,7 @@ fn prepare_derivations_v1(
                 database,
                 &path,
                 &network_title,
+                &Some(network_specs_key),
                 &seed_info.multisigner,
                 &multisigner,
             )?;
@@ -109,16 +110,17 @@ fn get_derivation_status(
     database: &sled::Db,
     path: &str,
     network_title: &Option<String>,
+    network_specs_key: &Option<NetworkSpecsKey>,
     seed_multisigner: &MultiSigner,
     key_multisigner: &MultiSigner,
 ) -> Result<DerivedKeyStatus> {
     let mut seed_found = false;
     // FIXME: nested loop, should be optimized
-    for (m, _) in get_all_addresses(database)?.into_iter() {
+    for (m, address_details) in get_all_addresses(database)?.into_iter() {
         if m == *seed_multisigner {
             seed_found = true;
         }
-        if m == *key_multisigner {
+        if m == *key_multisigner && address_details.network_id == *network_specs_key {
             return Ok(DerivedKeyStatus::AlreadyExists);
         }
     }

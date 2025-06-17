@@ -57,8 +57,8 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
     DynamicDerivationsResponseInfo,
 };
+use definitions::helpers::base58_or_eth_to_multisigner;
 use definitions::helpers::print_multisigner_as_base58_or_eth;
-use definitions::helpers::{base58_or_eth_to_multisigner, multisigner_to_encryption};
 use definitions::helpers::{get_multisigner, unhex};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
@@ -123,7 +123,8 @@ impl From<&[MultiSignature]> for SignaturesBulkV1 {
 
 #[derive(Clone, Encode, Decode)]
 pub struct DynamicDerivationTransaction {
-    pub root_multisigner: MultiSigner,
+    pub encryption: Encryption,
+    pub root_key_id: [u8; 32],
     pub derivation_path: String,
 }
 
@@ -550,11 +551,13 @@ pub fn derive_single_key(
     database: &sled::Db,
     seeds: &HashMap<String, String>,
     derivation_path: &str,
-    root_multisigner: &MultiSigner,
+    root_key_id: &[u8; 32],
     network_key: NetworkSpecsKey,
 ) -> Result<(MultiSigner, AddressDetails)> {
+    let root_multisigner = MultiSigner::Sr25519(sr25519::Public(*root_key_id));
+
     let seed_name =
-        find_seed_name_for_multisigner(database, root_multisigner)?.ok_or_else(|| {
+        find_seed_name_for_multisigner(database, &root_multisigner)?.ok_or_else(|| {
             Error::NoSeedFound {
                 multisigner: root_multisigner.clone(),
             }
@@ -567,7 +570,7 @@ pub fn derive_single_key(
     full_address.push_str(seed_phrase);
     full_address.push_str(derivation_path);
 
-    let encryption = multisigner_to_encryption(root_multisigner);
+    let (_, encryption) = network_key.genesis_hash_encryption()?;
     let multi_signer = full_address_to_multisigner(full_address, encryption)?;
 
     let address_details = AddressDetails {
