@@ -347,10 +347,11 @@ pub fn export_key(
             };
             QrData::Regular {
                 data: format!(
-                    "{}:{}:0x{}",
+                    "{}:{}:0x{}:0x{}",
                     prefix,
                     base58,
-                    hex::encode(network_specs.genesis_hash)
+                    hex::encode(network_specs.genesis_hash),
+                    hex::encode(public_key.clone()),
                 )
                 .as_bytes()
                 .to_vec(),
