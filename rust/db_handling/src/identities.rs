@@ -410,7 +410,7 @@ pub fn find_address_details_for_multisigner(
         }
     }
 
-    Ok(None)
+    Ok(matching_addresses.first().cloned())
 }
 
 /// Return seed name for the given key
