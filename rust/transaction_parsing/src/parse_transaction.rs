@@ -1,3 +1,4 @@
+use db_handling::helpers::try_get_address_details_by_multisigner;
 use db_handling::identities::derive_single_key;
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
@@ -65,8 +66,13 @@ pub(crate) fn parse_transaction(database: &sled::Db, data_hex: &str) -> Result<T
     let (author_multi_signer, call_data, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(database, data_hex)?;
 
-    let author_address_key = AddressKey::new(author_multi_signer.clone(), Some(genesis_hash));
-    let address_details = try_get_address_details(database, &author_address_key)?;
+    let address_details = try_get_address_details_by_multisigner(
+        database, 
+        &author_multi_signer, 
+        &genesis_hash, 
+        &encryption
+    )?;
+    
     do_parse_transaction(
         database,
         author_multi_signer,
@@ -84,8 +90,13 @@ pub(crate) fn parse_transaction_with_proof(
     let (author_multi_signer, payload, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(database, data_hex)?;
 
-    let author_address_key = AddressKey::new(author_multi_signer.clone(), Some(genesis_hash));
-    let address_details = try_get_address_details(database, &author_address_key)?;
+    let address_details = try_get_address_details_by_multisigner(
+        database, 
+        &author_multi_signer, 
+        &genesis_hash, 
+        &encryption
+    )?;
+
     do_parse_transaction_with_proof(
         database,
         author_multi_signer,
