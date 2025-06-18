@@ -456,8 +456,10 @@ pub fn default_types_content() -> Result<ContentLoadTypes> {
 /// Generate network specs [`OrderedNetworkSpecs`] set for the default networks plus Mythos, for
 /// cold database
 #[cfg(feature = "active")]
-pub fn default_chainspecs_with_mythos() -> Vec<OrderedNetworkSpecs> {
+pub fn substrate_chainspecs_with_ethereum() -> Vec<OrderedNetworkSpecs> {
     let mut out: Vec<OrderedNetworkSpecs> = default_chainspecs();
+
+    let max_order = out.iter().max_by_key(|network| network.order);
 
     // Add Mythos network
     let mythos = OrderedNetworkSpecs {
@@ -477,7 +479,7 @@ pub fn default_chainspecs_with_mythos() -> Vec<OrderedNetworkSpecs> {
             title: String::from("Mythos"),
             unit: String::from("MYTH"),
         },
-        order: 3, // Adding after existing networks
+        order: max_order.map(|v| v.order + 1).unwrap_or(0)
     };
     out.push(mythos);
     out

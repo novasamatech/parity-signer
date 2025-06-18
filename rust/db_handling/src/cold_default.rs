@@ -315,7 +315,7 @@ pub fn populate_cold_nav_test_with_ethereum_based_networks(database: &sled::Db) 
     database.clear()?;
 
     let mut batch = Batch::default();
-    for x in defaults::default_chainspecs_with_mythos().iter() {
+    for x in defaults::substrate_chainspecs_with_ethereum().iter() {
         let network_specs_key =
             NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption);
         batch.insert(network_specs_key.key(), x.encode());
