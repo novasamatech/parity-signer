@@ -479,7 +479,7 @@ pub fn substrate_chainspecs_with_ethereum() -> Vec<OrderedNetworkSpecs> {
             title: String::from("Mythos"),
             unit: String::from("MYTH"),
         },
-        order: max_order.map(|v| v.order + 1).unwrap_or(0)
+        order: max_order.map(|v| v.order + 1).unwrap_or(0),
     };
     out.push(mythos);
     out
