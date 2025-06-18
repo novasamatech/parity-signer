@@ -26,7 +26,7 @@ mod error;
 mod actions;
 pub use actions::Action;
 use db_handling::helpers::get_address_details;
-use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth};
+use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth_address};
 use definitions::keyring::AddressKey;
 
 pub mod alerts;
@@ -229,7 +229,7 @@ pub fn sign_sufficient_content(
         .as_ref()
         .ok_or(Error::NoNetwork(address_details.path.clone()))?;
     let network_specs = db_handling::helpers::get_network_specs(database, network_key)?.specs;
-    let base58 = print_multisigner_as_base58_or_eth(
+    let base58 = print_multisigner_as_base58_or_eth_address(
         multisigner,
         Some(network_specs.base58prefix),
         network_specs.encryption,

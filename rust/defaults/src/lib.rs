@@ -453,6 +453,35 @@ pub fn default_types_content() -> Result<ContentLoadTypes> {
     Ok(ContentLoadTypes::generate(&default_types_vec()?))
 }
 
+/// Generate network specs [`OrderedNetworkSpecs`] set for the default networks plus Mythos, for
+/// cold database
+#[cfg(feature = "active")]
+pub fn default_chainspecs_with_mythos() -> Vec<OrderedNetworkSpecs> {
+    let mut out: Vec<OrderedNetworkSpecs> = default_chainspecs();
+    
+    // Add Mythos network
+    let mythos = OrderedNetworkSpecs {
+        specs: NetworkSpecs {
+            base58prefix: 29972,
+            color: String::from("#262528"),
+            decimals: 18,
+            encryption: Encryption::Ethereum,
+            genesis_hash: H256::from_str(
+                "f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9"
+            ).expect("known value"),
+            logo: String::from("mythos"),
+            name: String::from("mythos"),
+            path_id: String::from("//mythos"),
+            secondary_color: String::from("#262626"),
+            title: String::from("Mythos"),
+            unit: String::from("MYTH"),
+        },
+        order: 3, // Adding after existing networks
+    };
+    out.push(mythos);
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

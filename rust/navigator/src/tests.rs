@@ -8,14 +8,12 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot,
-        alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130,
-        kusama_9151, types_known,
+        alice_ethereum_polkadot, alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot, alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130, kusama_9151, types_known
     },
     ALICE_SEED_PHRASE,
 };
 use db_handling::{
-    cold_default::{init_db, populate_cold_nav_test},
+    cold_default::{init_db, populate_cold_nav_test, populate_cold_nav_test_with_ethereum_based_networks},
     identities::{
         import_all_addrs, try_create_address, try_create_seed, TransactionBulk, TransactionBulkV1,
     },
@@ -675,8 +673,8 @@ fn export_import_substrate_and_ethereum_addrs() {
     let db_from = sled::open(dbname_from).unwrap();
     let db_to = sled::open(dbname_to).unwrap();
 
-    populate_cold_nav_test(&db_from).unwrap();
-    populate_cold_nav_test(&db_to).unwrap();
+    populate_cold_nav_test_with_ethereum_based_networks(&db_from).unwrap();
+    populate_cold_nav_test_with_ethereum_based_networks(&db_to).unwrap();
     try_create_seed(&db_from, "Alice", ALICE_SEED_PHRASE, true).unwrap();
     try_create_seed(&db_to, "Alice", ALICE_SEED_PHRASE, true).unwrap();
 
@@ -716,26 +714,26 @@ fn export_import_substrate_and_ethereum_addrs() {
             .into(),
         derived_keys: vec![
             DerivedKeyPreview {
-                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+                address: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_owned(),
                 derivation_path: Some(derivation_path.to_string()),
                 encryption: Encryption::Sr25519,
                 genesis_hash: polkadot_genesis,
                 identicon: Identicon::Dots {
                     identity: alice_sr_polkadot().to_vec(),
                 },
-                has_pwd: Some(true),
+                has_pwd: Some(false),
                 network_title: Some("Polkadot".to_string()),
                 status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
-                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+                address: "0x02c08517b1ff9501d42ab480ea6fa1b9b92f0430fb07e4a9575dbb2d5ec6edb6d6".to_owned(),
                 derivation_path: Some(derivation_path.to_string()),
                 encryption: Encryption::Ethereum,
                 genesis_hash: mythos_genesis,
-                identicon: Identicon::Dots {
-                    identity: alice_sr_polkadot().to_vec(),
+                identicon: Identicon::Blockies {
+                    identity: alice_ethereum_polkadot(),
                 },
-                has_pwd: Some(true),
+                has_pwd: Some(false),
                 network_title: Some("Mythos".to_string()),
                 status: DerivedKeyStatus::AlreadyExists,
             },
