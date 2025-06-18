@@ -662,6 +662,96 @@ fn export_import_addrs() {
 }
 
 #[test]
+fn export_import_substrate_and_ethereum_addrs() {
+    let dbname_from = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let dbname_to = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let polkadot_genesis =
+        H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
+            .unwrap();
+    
+    let mythos_genesis: H256 = 
+        H256::from_str("f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9").unwrap();
+
+    let db_from = sled::open(dbname_from).unwrap();
+    let db_to = sled::open(dbname_to).unwrap();
+
+    populate_cold_nav_test(&db_from).unwrap();
+    populate_cold_nav_test(&db_to).unwrap();
+    try_create_seed(&db_from, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+    try_create_seed(&db_to, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+
+    let derivation_path = "//polkadot";
+
+    try_create_address(
+        &db_from,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        derivation_path,
+        &NetworkSpecsKey::from_parts(&polkadot_genesis, &Encryption::Sr25519),
+    )
+    .unwrap();
+
+    try_create_address(
+        &db_from,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        derivation_path,
+        &NetworkSpecsKey::from_parts(&mythos_genesis, &Encryption::Ethereum),
+    )
+    .unwrap();
+
+    let mut alice_seeds = HashMap::new();
+    alice_seeds.insert("Alice".to_owned(), ALICE_SEED_PHRASE.to_owned());
+
+    let addrs = export_key_set_addrs(&db_from, "Alice", ExportedSet::All).unwrap();
+    let addrs = prepare_derivations_preview(&db_from, addrs).unwrap();
+    let addrs = inject_derivations_has_pwd(addrs, alice_seeds.clone()).unwrap();
+
+    let addrs_expected = vec![SeedKeysPreview {
+        name: "Alice".to_owned(),
+        multisigner: sr25519::Pair::from_phrase(ALICE_SEED_PHRASE, None)
+            .unwrap()
+            .0
+            .public()
+            .into(),
+        derived_keys: vec![
+            DerivedKeyPreview {
+                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+                derivation_path: Some(derivation_path.to_string()),
+                encryption: Encryption::Sr25519,
+                genesis_hash: polkadot_genesis,
+                identicon: Identicon::Dots {
+                    identity: alice_sr_polkadot().to_vec(),
+                },
+                has_pwd: Some(true),
+                network_title: Some("Polkadot".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
+            },
+            DerivedKeyPreview {
+                address: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_owned(),
+                derivation_path: Some(derivation_path.to_string()),
+                encryption: Encryption::Ethereum,
+                genesis_hash: mythos_genesis,
+                identicon: Identicon::Dots {
+                    identity: alice_sr_polkadot().to_vec(),
+                },
+                has_pwd: Some(true),
+                network_title: Some("Mythos".to_string()),
+                status: DerivedKeyStatus::AlreadyExists,
+            },
+        ],
+    }];
+
+    import_all_addrs(&db_to, addrs).unwrap();
+
+    let addrs_new = export_key_set_addrs(&db_to, "Alice", ExportedSet::All).unwrap();
+    let addrs_new = prepare_derivations_preview(&db_to, addrs_new).unwrap();
+    let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
+    
+    assert_eq!(addrs_new, addrs_expected);
+}
+
+#[test]
 #[ignore]
 fn flow_test_1() {
     let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
