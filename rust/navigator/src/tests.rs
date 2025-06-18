@@ -8,12 +8,16 @@ use std::{collections::HashMap, convert::TryInto, fs, str::FromStr};
 
 use constants::{
     test_values::{
-        alice_ethereum_polkadot, alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama, alice_sr_polkadot, alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob, kusama_9130, kusama_9151, types_known
+        alice_ethereum_polkadot, alice_sr_alice, alice_sr_alice_secret_secret, alice_sr_kusama,
+        alice_sr_polkadot, alice_sr_root, alice_sr_secret_path_multipass, alice_sr_westend, bob,
+        kusama_9130, kusama_9151, types_known,
     },
     ALICE_SEED_PHRASE,
 };
 use db_handling::{
-    cold_default::{init_db, populate_cold_nav_test, populate_cold_nav_test_with_ethereum_based_networks},
+    cold_default::{
+        init_db, populate_cold_nav_test, populate_cold_nav_test_with_ethereum_based_networks,
+    },
     identities::{
         import_all_addrs, try_create_address, try_create_seed, TransactionBulk, TransactionBulkV1,
     },
@@ -666,8 +670,8 @@ fn export_import_substrate_and_ethereum_addrs() {
     let polkadot_genesis =
         H256::from_str("0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3")
             .unwrap();
-    
-    let mythos_genesis: H256 = 
+
+    let mythos_genesis: H256 =
         H256::from_str("f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9").unwrap();
 
     let db_from = sled::open(dbname_from).unwrap();
@@ -726,7 +730,8 @@ fn export_import_substrate_and_ethereum_addrs() {
                 status: DerivedKeyStatus::AlreadyExists,
             },
             DerivedKeyPreview {
-                address: "0x02c08517b1ff9501d42ab480ea6fa1b9b92f0430fb07e4a9575dbb2d5ec6edb6d6".to_owned(),
+                address: "0x02c08517b1ff9501d42ab480ea6fa1b9b92f0430fb07e4a9575dbb2d5ec6edb6d6"
+                    .to_owned(),
                 derivation_path: Some(derivation_path.to_string()),
                 encryption: Encryption::Ethereum,
                 genesis_hash: mythos_genesis,
@@ -745,7 +750,7 @@ fn export_import_substrate_and_ethereum_addrs() {
     let addrs_new = export_key_set_addrs(&db_to, "Alice", ExportedSet::All).unwrap();
     let addrs_new = prepare_derivations_preview(&db_to, addrs_new).unwrap();
     let addrs_new = inject_derivations_has_pwd(addrs_new, alice_seeds).unwrap();
-    
+
     assert_eq!(addrs_new, addrs_expected);
 }
 

@@ -49,8 +49,10 @@ fn prepare_derivations_v1(
     for seed_info in export_info.addrs {
         let mut derived_keys = vec![];
         for addr_info in seed_info.derived_keys {
-            let multisigner =
-                base58_or_eth_pubkey_to_multisigner(&addr_info.address_or_pubkey, &addr_info.encryption)?;
+            let multisigner = base58_or_eth_pubkey_to_multisigner(
+                &addr_info.address_or_pubkey,
+                &addr_info.encryption,
+            )?;
             let identicon = make_identicon_from_multisigner(
                 &multisigner,
                 addr_info.encryption.identicon_style(),

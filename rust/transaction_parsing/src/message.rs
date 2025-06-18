@@ -99,7 +99,7 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                     let author_card = Card::AuthorPlain {
                         author: &author_multi_signer,
                         base58prefix: network_specs.specs.base58prefix,
-                        encryption
+                        encryption,
                     }
                     .card(&mut index, indent);
                     let warning_card =

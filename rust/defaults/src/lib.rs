@@ -458,7 +458,7 @@ pub fn default_types_content() -> Result<ContentLoadTypes> {
 #[cfg(feature = "active")]
 pub fn default_chainspecs_with_mythos() -> Vec<OrderedNetworkSpecs> {
     let mut out: Vec<OrderedNetworkSpecs> = default_chainspecs();
-    
+
     // Add Mythos network
     let mythos = OrderedNetworkSpecs {
         specs: NetworkSpecs {
@@ -467,8 +467,9 @@ pub fn default_chainspecs_with_mythos() -> Vec<OrderedNetworkSpecs> {
             decimals: 18,
             encryption: Encryption::Ethereum,
             genesis_hash: H256::from_str(
-                "f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9"
-            ).expect("known value"),
+                "f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9",
+            )
+            .expect("known value"),
             logo: String::from("mythos"),
             name: String::from("mythos"),
             path_id: String::from("//mythos"),

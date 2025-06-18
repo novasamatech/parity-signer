@@ -185,7 +185,7 @@ fn do_parse_transaction_with_proof(
             (Card::AuthorPlain {
                 author: &author_multi_signer,
                 base58prefix: network_specs.specs.base58prefix,
-                encryption
+                encryption,
             })
             .card(&mut index, indent),
             Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
@@ -449,7 +449,7 @@ fn do_parse_transaction(
                     (Card::AuthorPlain {
                         author: &author_multi_signer,
                         base58prefix: network_specs.specs.base58prefix,
-                        encryption
+                        encryption,
                     })
                     .card(&mut index, indent),
                     Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),

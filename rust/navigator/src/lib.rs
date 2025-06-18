@@ -26,7 +26,9 @@ mod error;
 mod actions;
 pub use actions::Action;
 use db_handling::helpers::get_address_details;
-use definitions::helpers::{make_identicon_from_multisigner, print_multisigner_as_base58_or_eth_address};
+use definitions::helpers::{
+    make_identicon_from_multisigner, print_multisigner_as_base58_or_eth_address,
+};
 use definitions::keyring::AddressKey;
 
 pub mod alerts;

@@ -200,7 +200,7 @@ pub fn print_multisigner_as_base58_or_eth_address(
 // This leaves an opportunity to restore the `MultiSigner` back if needed.
 pub fn print_multisigner_as_base58_or_eth_public_key(
     multi_signer: &MultiSigner,
-    optional_prefix: Option<u16>
+    optional_prefix: Option<u16>,
 ) -> String {
     match optional_prefix {
         Some(base58prefix) => {
@@ -212,9 +212,7 @@ pub fn print_multisigner_as_base58_or_eth_public_key(
                 MultiSigner::Sr25519(pubkey) => {
                     pubkey.to_ss58check_with_version(version_for_base58)
                 }
-                MultiSigner::Ecdsa(pubkey) => {
-                    print_ecdsa_public_key(pubkey)
-                }
+                MultiSigner::Ecdsa(pubkey) => print_ecdsa_public_key(pubkey),
             }
         }
         None => match multi_signer {
@@ -228,9 +226,7 @@ pub fn print_multisigner_as_base58_or_eth_public_key(
                     .expect("unable to make Ss58AddressFormat from `BareSr25519`");
                 pubkey.to_ss58check_with_version(version)
             }
-            MultiSigner::Ecdsa(pubkey) => {
-                print_ecdsa_public_key(pubkey)
-            }
+            MultiSigner::Ecdsa(pubkey) => print_ecdsa_public_key(pubkey),
         },
     }
 }
@@ -354,13 +350,12 @@ mod tests {
         let secret_key =
             hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
                 .unwrap();
-        let public = ecdsa::Pair::from_seed_slice(&secret_key)
-            .unwrap()
-            .public();
+        let public = ecdsa::Pair::from_seed_slice(&secret_key).unwrap().public();
         let multisigner = MultiSigner::Ecdsa(public);
 
         let hexpubkey = print_multisigner_as_base58_or_eth_public_key(&multisigner, None);
-        let result = base58_or_eth_pubkey_to_multisigner(&hexpubkey, &Encryption::Ethereum).unwrap();
+        let result =
+            base58_or_eth_pubkey_to_multisigner(&hexpubkey, &Encryption::Ethereum).unwrap();
         assert_eq!(result, multisigner);
     }
 
