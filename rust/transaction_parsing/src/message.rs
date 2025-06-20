@@ -1,10 +1,10 @@
+use constants::GENERAL_SUBSTRATE_PREFIX;
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
     identities::find_address_details_for_multisigner,
 };
 use definitions::{
-    helpers::GENERAL_SUBSTRATE_PREFIX,
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{TransactionCardSet, TransactionSignAction, TransactionSignActionNetwork},
 };
