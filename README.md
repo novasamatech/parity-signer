@@ -164,6 +164,14 @@ Try launching Studio from the shell (command assumes you are in the "Application
 ./Android\ Studio.app/Contents/MacOS/studio
 ```
 
+#### "build fails when runnning particular test"
+
+Try to enable features for the dependencies. For example,
+
+```
+cargo test -p navigator export_import_substrate_and_ethereum_addrs --features db_handling/active
+```
+
 # Release Android
 
 - Create PR with new app version updated

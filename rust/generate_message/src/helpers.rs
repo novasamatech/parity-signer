@@ -624,7 +624,7 @@ pub fn generate_key_info_export_to_qr<P: AsRef<Path>>(
 
     let derived_keys: Vec<AddrInfo> = (0..keys_num)
         .map(|num| AddrInfo {
-            address: "0xdeadbeefdeadbeefdeadbeef".to_string(),
+            address_or_pubkey: "0xdeadbeefdeadbeefdeadbeef".to_string(),
             derivation_path: Some(format!("//this//is//a//path//{num}")),
             encryption: Encryption::Sr25519,
             genesis_hash: H256::default(),

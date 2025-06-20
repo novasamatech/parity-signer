@@ -21,7 +21,7 @@ pub struct DerivedKeyPreview {
     /// Address in the network.
     ///
     /// This is either `ss58` form for substrate-based chains or
-    /// h160 form for ethereum based chains
+    /// hex public key form for ethereum based chains (ecdsa)
     pub address: String,
 
     /// The derivation path of the key if user provided one
