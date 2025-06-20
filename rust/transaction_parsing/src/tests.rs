@@ -10,7 +10,8 @@ use db_handling::{
     manage_history::get_history,
 };
 use definitions::navigation::{
-    DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction, TransactionSignActionNetwork,
+    DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction,
+    TransactionSignActionNetwork,
 };
 use definitions::{
     crypto::Encryption,
@@ -2556,7 +2557,8 @@ fn parse_any_chain_msg() {
     populate_cold(&db, Verifier { v: None }).unwrap();
     let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
     let text = String::from("uuid-abcd");
-    let line = format!("530108d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}");
+    let line =
+        format!("530108d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}");
 
     let set_expected = TransactionCardSet {
         message: Some(vec![TransactionCard {

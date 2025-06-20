@@ -4,9 +4,9 @@ use db_handling::{
     identities::find_address_details_for_multisigner,
 };
 use definitions::{
+    helpers::GENERAL_SUBSTRATE_PREFIX,
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{TransactionCardSet, TransactionSignAction, TransactionSignActionNetwork},
-    helpers::GENERAL_SUBSTRATE_PREFIX,
 };
 use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
@@ -169,8 +169,12 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
             };
 
             let address_key = AddressKey::new(author_multi_signer.clone(), maybe_genesis_hash);
-            let author_info =
-                make_author_info_with_key(&author_multi_signer, GENERAL_SUBSTRATE_PREFIX, address_key, &address_details);
+            let author_info = make_author_info_with_key(
+                &author_multi_signer,
+                GENERAL_SUBSTRATE_PREFIX,
+                address_key,
+                &address_details,
+            );
 
             Ok(TransactionAction::Sign {
                 actions: vec![TransactionSignAction {
