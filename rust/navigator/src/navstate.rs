@@ -1151,7 +1151,7 @@ impl State {
                             content: a.content.clone(),
                             ttype: TransactionType::Sign,
                             author_info: Some(a.author_info.clone()),
-                            network_info: Some(a.network_info.clone().into()),
+                            network_info: a.get_network_spec().map(|spec| spec.into()),
                         })
                         .collect(),
                     TransactionAction::Stub { s, .. } => vec![MTransaction {
@@ -1367,7 +1367,7 @@ impl State {
                         .map(|(author_info, network_info)| ModalData::EnterPassword {
                             f: MEnterPassword {
                                 author_info,
-                                network_info: Some(network_info.into()),
+                                network_info: network_info.map(|info| info.into()),
                                 counter: t.counter() as u32,
                             },
                         })

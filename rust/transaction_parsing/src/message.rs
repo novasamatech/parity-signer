@@ -1,10 +1,12 @@
+use constants::GENERAL_SUBSTRATE_PREFIX;
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
+    identities::find_address_details_for_multisigner,
 };
 use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{TransactionCardSet, TransactionSignAction},
+    navigation::{TransactionCardSet, TransactionSignAction, TransactionSignActionNetwork},
 };
 use nom::bytes::complete::{tag, take_until};
 use parser::cards::ParserCard;
@@ -13,14 +15,18 @@ use std::str;
 use nom::sequence::preceded;
 use nom::IResult;
 
-use crate::cards::{make_author_info, Card, Warning};
+use crate::cards::{make_author_info, make_author_info_with_key, Card, Warning};
 use crate::error::{Error, Result};
-use crate::helpers::multisigner_msg_genesis_encryption;
+use crate::helpers::{multisigner_msg_encryption, multisigner_msg_genesis_encryption};
 use crate::TransactionAction;
 
-pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
+pub fn process_concrete_chain_message(
+    database: &sled::Db,
+    data_hex: &str,
+) -> Result<TransactionAction> {
     let (author_multi_signer, message_vec, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(database, data_hex)?;
+
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     let message = str::from_utf8(&message_vec)?.to_owned();
@@ -66,7 +72,9 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
                                 },
                                 has_pwd: address_details.has_pwd,
                                 author_info,
-                                network_info,
+                                network_info: TransactionSignActionNetwork::Concrete(Box::new(
+                                    network_info,
+                                )),
                             }],
                             checksum,
                         })
@@ -122,6 +130,68 @@ pub fn process_message(database: &sled::Db, data_hex: &str) -> Result<Transactio
             genesis_hash,
             encryption,
         }),
+    }
+}
+
+pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<TransactionAction> {
+    let (author_multi_signer, message_vec, encryption) =
+        multisigner_msg_encryption(database, data_hex)?;
+
+    let message = str::from_utf8(&message_vec)?.to_owned();
+    let display_msg = strip_bytes_tag(&message)?;
+
+    // initialize index and indent
+    let mut index: u32 = 0;
+    let indent: u32 = 0;
+
+    let prioritizing_networks = vec![];
+    match find_address_details_for_multisigner(
+        database,
+        &author_multi_signer,
+        prioritizing_networks,
+    )? {
+        Some(address_details) => {
+            let message_card =
+                Card::ParserCard(&ParserCard::Text(display_msg)).card(&mut index, indent);
+            let sign = TrDbColdSignOne::generate(
+                SignContent::Message(message),
+                "Any network",
+                &address_details.path,
+                address_details.has_pwd,
+                &author_multi_signer,
+                Vec::new(),
+            );
+
+            let sign: TrDbColdSign = sign.into();
+            let checksum = sign.store_and_get_checksum(database)?;
+
+            let maybe_genesis_hash = match &address_details.network_id {
+                Some(network_id) => Some(network_id.genesis_hash_encryption()?.0),
+                _ => None,
+            };
+
+            let address_key = AddressKey::new(author_multi_signer.clone(), maybe_genesis_hash);
+            let author_info = make_author_info_with_key(
+                &author_multi_signer,
+                GENERAL_SUBSTRATE_PREFIX,
+                address_key,
+                &address_details,
+            );
+
+            Ok(TransactionAction::Sign {
+                actions: vec![TransactionSignAction {
+                    content: TransactionCardSet {
+                        message: Some(vec![message_card]),
+                        ..Default::default()
+                    },
+                    has_pwd: address_details.has_pwd,
+                    author_info,
+                    network_info: TransactionSignActionNetwork::AnyNetwork(encryption),
+                }],
+                checksum,
+            })
+        }
+        None => Err(Error::AddrNotFound("".into())),
     }
 }
 

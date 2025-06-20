@@ -117,6 +117,9 @@ pub const SIGN: &[u8] = b"sign";
 /// Key in transactions tree [`TRANSACTION`] for derivations import data
 pub const DRV: &[u8] = b"derivations";
 
+/// Address prefix to display general/chain agnostic addresses
+pub const GENERAL_SUBSTRATE_PREFIX: u16 = 42;
+
 /// Maximum number of words displayed to user based on user input in seed
 /// recovery process
 pub const MAX_WORDS_DISPLAY: usize = 8;
