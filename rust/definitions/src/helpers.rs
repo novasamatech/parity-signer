@@ -14,6 +14,8 @@ use crate::crypto::Encryption;
 use crate::error::Error;
 use crate::error::Result;
 
+pub const GENERAL_SUBSTRATE_PREFIX: u16 = 42;
+
 /// Decode hexadecimal `&str` into `Vec<u8>`, with descriptive error  
 ///
 /// Function could be used both on hot and cold side.  
