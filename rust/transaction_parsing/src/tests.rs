@@ -2620,8 +2620,8 @@ fn parse_msg_2() {
     let error = produce_output(&db, &line).unwrap_err();
 
     match error {
-        error::Error::InvalidMessagePayload => {},
-        _ => panic!("Unexpected error {:?}", error)
+        error::Error::InvalidMessagePayload => {}
+        _ => panic!("Unexpected error {:?}", error),
     }
 
     fs::remove_dir_all(dbname).unwrap();

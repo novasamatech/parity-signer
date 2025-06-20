@@ -12,7 +12,7 @@ use definitions::{
 use parser::cards::ParserCard;
 use std::str;
 
-use crate::{cards::{make_author_info, make_author_info_with_key, Card, Warning}};
+use crate::cards::{make_author_info, make_author_info_with_key, Card, Warning};
 use crate::error::{Error, Result};
 use crate::helpers::{multisigner_msg_encryption, multisigner_msg_genesis_encryption};
 use crate::TransactionAction;
@@ -43,7 +43,7 @@ fn decode_display_message_ensuring_tags(message_bytes: &[u8]) -> Result<String> 
     }
 
     let bytes = strip_bytes_tag(message_bytes);
-    
+
     match std::str::from_utf8(bytes) {
         Ok(s) => Ok(s.to_string()),
         Err(_) => Ok(hex::encode(bytes)),
@@ -115,8 +115,8 @@ pub fn process_concrete_chain_message(
                         .card(&mut index, indent);
                         let warning_card =
                             Card::Warning(Warning::NoNetworkID).card(&mut index, indent);
-                        let message_card =
-                            Card::ParserCard(&ParserCard::Text(display_msg.clone())).card(&mut index, indent);
+                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg.clone()))
+                            .card(&mut index, indent);
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(TransactionAction::Read {
@@ -138,8 +138,8 @@ pub fn process_concrete_chain_message(
                     .card(&mut index, indent);
                     let warning_card =
                         Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
-                    let message_card =
-                        Card::ParserCard(&ParserCard::Text(display_msg.clone())).card(&mut index, indent);
+                    let message_card = Card::ParserCard(&ParserCard::Text(display_msg.clone()))
+                        .card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(TransactionAction::Read {
                         r: Box::new(TransactionCardSet {

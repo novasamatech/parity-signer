@@ -850,8 +850,12 @@ impl TrDbColdSign {
             }
             SignContent::Message(message) => {
                 let hex_message = hex::encode(message);
-                let sign_message_display =
-                    SignMessageDisplay::get(&hex_message, &s.network_name, &signed_by, user_comment);
+                let sign_message_display = SignMessageDisplay::get(
+                    &hex_message,
+                    &s.network_name,
+                    &signed_by,
+                    user_comment,
+                );
                 if wrong_password {
                     history.push(Event::MessageSignError {
                         sign_message_display,
