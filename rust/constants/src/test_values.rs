@@ -37,7 +37,7 @@ pub fn alice_sr_polkadot() -> Vec<u8> {
     hex::decode("f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730").unwrap()
 }
 
-/// Identicon for Alice ehtereum key with derivation `//polkadot`, `Ethereum` encryption
+/// Identicon for Alice ethereum key with derivation `//polkadot`, `Ethereum` encryption
 pub fn alice_ethereum_polkadot() -> String {
     "0xe9267b732a8e9c9444e46f3d04d4610a996d682d".to_string()
 }
