@@ -11,6 +11,7 @@ use db_handling::{
 };
 use definitions::navigation::{
     DecodeSequenceResult, Identicon, MAddressCard, TransactionSignAction,
+    TransactionSignActionNetwork,
 };
 use definitions::{
     crypto::Encryption,
@@ -2550,6 +2551,64 @@ fn parse_msg_1() {
 }
 
 #[test]
+fn parse_any_chain_msg() {
+    let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
+    let db = sled::open(dbname).unwrap();
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    let sign_msg = hex::encode(b"<Bytes>uuid-abcd</Bytes>");
+    let text = String::from("uuid-abcd");
+    let line =
+        format!("530108d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}");
+
+    let set_expected = TransactionCardSet {
+        message: Some(vec![TransactionCard {
+            index: 0,
+            indent: 0,
+            card: Card::TextCard { f: text },
+        }]),
+        ..Default::default()
+    };
+
+    let author_info_known = MAddressCard {
+        address_key: concat!(
+            "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+            "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        )
+        .to_string(),
+        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        address: Address {
+            identicon: Identicon::Dots {
+                identity: alice_sr_alice(),
+            },
+            seed_name: "Alice".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+    };
+
+    let network_info_known = TransactionSignActionNetwork::AnyNetwork(Encryption::Sr25519);
+    let action = produce_output(&db, &line).unwrap();
+
+    if let TransactionAction::Sign { actions, .. } = action {
+        let TransactionSignAction {
+            content: set,
+            has_pwd,
+            author_info,
+            network_info,
+        } = &actions[0];
+        assert_eq!(actions.len(), 1);
+        assert_eq!(set, &set_expected);
+        assert_eq!(author_info, &author_info_known);
+        assert_eq!(network_info, &network_info_known);
+        assert!(!has_pwd, "Expected no password");
+    } else {
+        panic!("Wrong action {:?}", action)
+    }
+    fs::remove_dir_all(dbname).unwrap();
+}
+
+#[test]
 fn parse_msg_2() {
     let dbname = &tempdir().unwrap().into_path().to_str().unwrap().to_string();
     let db = sled::open(dbname).unwrap();
@@ -2559,11 +2618,12 @@ fn parse_msg_2() {
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
 
     let error = produce_output(&db, &line).unwrap_err();
-    if let error::Error::ParserError(a) = error {
-        assert_eq!(a, "Error(Error { input: \"uuid-abcd\", code: TakeUntil })");
-    } else {
-        panic!("Unexpected error {:?}", error)
+
+    match error {
+        error::Error::InvalidMessagePayload => {}
+        _ => panic!("Unexpected error {:?}", error),
     }
+
     fs::remove_dir_all(dbname).unwrap();
 }
 

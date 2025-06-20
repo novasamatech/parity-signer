@@ -17,14 +17,14 @@ pub struct SeedNameWithIdenticon {
 /// Network information to use during signing
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum TransactionSignActionNetwork {
-    Concrete(OrderedNetworkSpecs),
+    Concrete(Box<OrderedNetworkSpecs>),
     AnyNetwork(Encryption),
 }
 
 impl TransactionSignActionNetwork {
     pub fn get_network_spec(&self) -> Option<OrderedNetworkSpecs> {
         match self {
-            TransactionSignActionNetwork::Concrete(spec) => Some(spec.clone()),
+            TransactionSignActionNetwork::Concrete(spec) => Some(spec.as_ref().clone()),
             TransactionSignActionNetwork::AnyNetwork(_) => None,
         }
     }

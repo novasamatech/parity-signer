@@ -1,3 +1,4 @@
+use constants::GENERAL_SUBSTRATE_PREFIX;
 use db_handling::{
     db_transactions::{SignContent, TrDbColdSign, TrDbColdSignOne},
     helpers::{try_get_address_details, try_get_network_specs},
@@ -7,17 +8,47 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{TransactionCardSet, TransactionSignAction, TransactionSignActionNetwork},
 };
-use nom::bytes::complete::{tag, take_until};
+
 use parser::cards::ParserCard;
 use std::str;
-
-use nom::sequence::preceded;
-use nom::IResult;
 
 use crate::cards::{make_author_info, make_author_info_with_key, Card, Warning};
 use crate::error::{Error, Result};
 use crate::helpers::{multisigner_msg_encryption, multisigner_msg_genesis_encryption};
 use crate::TransactionAction;
+
+const BYTES_START: &[u8; 7] = b"<Bytes>";
+const BYTES_END: &[u8; 8] = b"</Bytes>";
+
+// Checks whether message_bytes include wrapping with tags
+fn is_wrapped_tags(message_bytes: &[u8]) -> bool {
+    message_bytes.starts_with(BYTES_START) && message_bytes.ends_with(BYTES_END)
+}
+
+/// Strips <Bytes> tags if needed
+fn strip_bytes_tag(message_bytes: &[u8]) -> &[u8] {
+    if is_wrapped_tags(message_bytes) {
+        let start = BYTES_START.len();
+        let end = message_bytes.len() - BYTES_END.len();
+        &message_bytes[start..end]
+    } else {
+        message_bytes
+    }
+}
+
+/// Strips <Bytes> tags, decodes as UTF-8 if possible, otherwise returns hex.
+fn decode_display_message_ensuring_tags(message_bytes: &[u8]) -> Result<String> {
+    if !is_wrapped_tags(message_bytes) {
+        return Err(Error::InvalidMessagePayload);
+    }
+
+    let bytes = strip_bytes_tag(message_bytes);
+
+    match std::str::from_utf8(bytes) {
+        Ok(s) => Ok(s.to_string()),
+        Err(_) => Ok(hex::encode(bytes)),
+    }
+}
 
 pub fn process_concrete_chain_message(
     database: &sled::Db,
@@ -28,8 +59,7 @@ pub fn process_concrete_chain_message(
 
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
-    let message = str::from_utf8(&message_vec)?.to_owned();
-    let display_msg = strip_bytes_tag(&message)?;
+    let display_msg = decode_display_message_ensuring_tags(&message_vec)?;
 
     // initialize index and indent
     let mut index: u32 = 0;
@@ -44,10 +74,10 @@ pub fn process_concrete_chain_message(
             match try_get_address_details(database, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id == Some(network_specs_key) {
-                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg))
+                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg.clone()))
                             .card(&mut index, indent);
                         let sign = TrDbColdSignOne::generate(
-                            SignContent::Message(message),
+                            SignContent::Message(message_vec.clone()),
                             &network_specs.specs.name,
                             &address_details.path,
                             address_details.has_pwd,
@@ -71,7 +101,9 @@ pub fn process_concrete_chain_message(
                                 },
                                 has_pwd: address_details.has_pwd,
                                 author_info,
-                                network_info: TransactionSignActionNetwork::Concrete(network_info),
+                                network_info: TransactionSignActionNetwork::Concrete(Box::new(
+                                    network_info,
+                                )),
                             }],
                             checksum,
                         })
@@ -85,8 +117,8 @@ pub fn process_concrete_chain_message(
                         .card(&mut index, indent);
                         let warning_card =
                             Card::Warning(Warning::NoNetworkID).card(&mut index, indent);
-                        let message_card =
-                            Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
+                        let message_card = Card::ParserCard(&ParserCard::Text(display_msg.clone()))
+                            .card(&mut index, indent);
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(TransactionAction::Read {
@@ -108,8 +140,8 @@ pub fn process_concrete_chain_message(
                     .card(&mut index, indent);
                     let warning_card =
                         Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
-                    let message_card =
-                        Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
+                    let message_card = Card::ParserCard(&ParserCard::Text(display_msg.clone()))
+                        .card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(TransactionAction::Read {
                         r: Box::new(TransactionCardSet {
@@ -134,8 +166,7 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
     let (author_multi_signer, message_vec, encryption) =
         multisigner_msg_encryption(database, data_hex)?;
 
-    let message = str::from_utf8(&message_vec)?.to_owned();
-    let display_msg = strip_bytes_tag(&message)?;
+    let display_msg = decode_display_message_ensuring_tags(&message_vec)?;
 
     // initialize index and indent
     let mut index: u32 = 0;
@@ -151,7 +182,7 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
             let message_card =
                 Card::ParserCard(&ParserCard::Text(display_msg)).card(&mut index, indent);
             let sign = TrDbColdSignOne::generate(
-                SignContent::Message(message),
+                SignContent::Message(message_vec),
                 "Any network",
                 &address_details.path,
                 address_details.has_pwd,
@@ -168,8 +199,12 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
             };
 
             let address_key = AddressKey::new(author_multi_signer.clone(), maybe_genesis_hash);
-            let author_info =
-                make_author_info_with_key(&author_multi_signer, 42, address_key, &address_details);
+            let author_info = make_author_info_with_key(
+                &author_multi_signer,
+                GENERAL_SUBSTRATE_PREFIX,
+                address_key,
+                &address_details,
+            );
 
             Ok(TransactionAction::Sign {
                 actions: vec![TransactionSignAction {
@@ -188,20 +223,6 @@ pub fn process_any_chain_message(database: &sled::Db, data_hex: &str) -> Result<
     }
 }
 
-fn bytes_prefix(i: &str) -> IResult<&str, &str> {
-    tag("<Bytes>")(i)
-}
-
-fn take_until_suffix(i: &str) -> IResult<&str, &str> {
-    take_until("</Bytes>")(i)
-}
-
-fn strip_bytes_tag(message: &str) -> Result<String> {
-    let mut parser = preceded(bytes_prefix, take_until_suffix);
-    let (_, payload) = parser(message).map_err(|e| Error::ParserError(format!("{e:?}")))?;
-    Ok(payload.to_owned())
-}
-
 #[cfg(test)]
 mod tests {
 
@@ -209,18 +230,25 @@ mod tests {
 
     #[test]
     fn parse_bytes_msg() {
-        let result = strip_bytes_tag("<Bytes>uuid-1234</Bytes>");
+        let result = decode_display_message_ensuring_tags(b"<Bytes>uuid-1234</Bytes>");
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "uuid-1234");
     }
 
     #[test]
+    fn parse_nonutf_msg() {
+        let expected_message = "fffefdfcfbfaf9f8";
+        let mut payload = BYTES_START.to_vec();
+        payload.extend(hex::decode(expected_message).unwrap());
+        payload.extend_from_slice(BYTES_END);
+        let result = decode_display_message_ensuring_tags(&payload);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), expected_message);
+    }
+
+    #[test]
     fn parse_bytes_err() {
-        let result = strip_bytes_tag("<Bytes>uuid-1234");
+        let result = decode_display_message_ensuring_tags(b"<Bytes>uuid-1234");
         assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err().to_string(),
-            "Parser error: Error(Error { input: \"uuid-1234\", code: TakeUntil })"
-        );
     }
 }
