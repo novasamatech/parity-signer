@@ -383,7 +383,7 @@ pub fn find_address_details_for_multisigner(
 
     let maybe_root_address = matching_addresses
         .iter()
-        .find(|details| details.network_id == None);
+        .find(|details| details.network_id.is_none());
 
     if let Some(root_address) = maybe_root_address {
         return Ok(Some(root_address.clone()));
@@ -396,11 +396,12 @@ pub fn find_address_details_for_multisigner(
     let mut indexed_addresses: HashMap<H256, &AddressDetails> = HashMap::new();
 
     for addr in matching_addresses.iter() {
-        if let Some(network_id) = &addr.network_id {
-            match network_id.genesis_hash_encryption() {
-                Ok((hash, _)) => _ = indexed_addresses.insert(hash, addr),
-                Err(_) => {}
-            }
+        if let Some(Ok((hash, _))) = addr
+            .network_id
+            .as_ref()
+            .map(|id| id.genesis_hash_encryption())
+        {
+            _ = indexed_addresses.insert(hash, addr)
         }
     }
 

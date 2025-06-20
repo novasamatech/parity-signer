@@ -300,7 +300,7 @@ fn do_parse_transaction_with_proof(
             content,
             has_pwd: address_details.has_pwd,
             author_info,
-            network_info: TransactionSignActionNetwork::Concrete(network_specs.clone()),
+            network_info: TransactionSignActionNetwork::Concrete(Box::new(network_specs)),
         }],
         checksum,
     })
@@ -553,7 +553,7 @@ fn do_parse_transaction(
                                                 author_info,
                                                 network_info:
                                                     TransactionSignActionNetwork::Concrete(
-                                                        network_specs.clone(),
+                                                        Box::new(network_specs.clone()),
                                                     ),
                                             }],
                                             checksum,
