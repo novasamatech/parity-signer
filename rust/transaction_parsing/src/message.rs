@@ -72,7 +72,9 @@ pub fn process_concrete_chain_message(
                                 },
                                 has_pwd: address_details.has_pwd,
                                 author_info,
-                                network_info: TransactionSignActionNetwork::Concrete(network_info),
+                                network_info: TransactionSignActionNetwork::Concrete(Box::new(
+                                    network_info,
+                                )),
                             }],
                             checksum,
                         })
