@@ -36,7 +36,7 @@ final class AirgapMediator: AirgapMediating {
     private let notificationCenter: NotificationCenter
     private let locationManager: LocationServicesManaging.Type
     private var wifiSubject = CurrentValueSubject<Bool, Never>(false)
-    private var airplaneSubject = CurrentValueSubject<Bool, Never>(false)
+    private var airplaneSubject = CurrentValueSubject<Bool, Never>(true)
     private var locationSubject = CurrentValueSubject<Bool, Never>(false)
 
     var airgapPublisher: AnyPublisher<AirgapState, Never> {
