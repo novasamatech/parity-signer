@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C1290FF2E085195002A5E67 /* DeviceStatusMediator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1290FE2E085195002A5E67 /* DeviceStatusMediator.swift */; };
 		0C2F8C4D2D512C34003A9DA0 /* PlainTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2F8C4C2D512C34003A9DA0 /* PlainTextField.swift */; };
 		2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35027609CDE004B27BE /* HistoryCard.swift */; };
 		2D48F3532760A2D8004B27BE /* PrimaryFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3522760A2D8004B27BE /* PrimaryFont.swift */; };
@@ -428,6 +429,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C1290FE2E085195002A5E67 /* DeviceStatusMediator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStatusMediator.swift; sourceTree = "<group>"; };
 		0C2F8C4C2D512C34003A9DA0 /* PlainTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainTextField.swift; sourceTree = "<group>"; };
 		2D48F35027609CDE004B27BE /* HistoryCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
 		2D48F3522760A2D8004B27BE /* PrimaryFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryFont.swift; sourceTree = "<group>"; };
@@ -2351,6 +2353,7 @@
 				6DAA6CB029BF482E002329A8 /* AuthenticatedStateMediator.swift */,
 				6DAA6CB229BF7155002329A8 /* OnboardingMediator.swift */,
 				6D7DE0D32ACB178800BFAACA /* DatabaseVersionMediator.swift */,
+				0C1290FE2E085195002A5E67 /* DeviceStatusMediator.swift */,
 			);
 			path = StateMediators;
 			sourceTree = "<group>";
@@ -2867,6 +2870,7 @@
 				2DA5F86427566C3600D8DD29 /* TCError.swift in Sources */,
 				6DC5643D28B91EFE003D540B /* NavbarButton.swift in Sources */,
 				6D3DF92829920AA800B8A430 /* UnknownNetworkColorsGenerator.swift in Sources */,
+				0C1290FF2E085195002A5E67 /* DeviceStatusMediator.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				6D755C092A6FECCD00A73E20 /* JdenticonViewPreviews.swift in Sources */,
 				6DA9DAE929E5831C009CC12C /* ManageNetworkDetailsService.swift in Sources */,

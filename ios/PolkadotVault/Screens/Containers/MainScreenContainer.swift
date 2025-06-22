@@ -59,6 +59,7 @@ extension MainScreenContainer {
         private let passwordProtectionStatePublisher: PasswordProtectionStatePublisher
         private let databaseVersionMediator: DatabaseVersionMediator
         private let appLaunchMediator: AppLaunchMediating
+        private let deviceStatusMediator: DeviceStatusMediating
         private let airgapMediator: AirgapMediating
 
         private let cancelBag = CancelBag()
@@ -70,6 +71,7 @@ extension MainScreenContainer {
         init(
             authenticationStateMediator: AuthenticatedStateMediator = ServiceLocator.authenticationStateMediator,
             onboardingMediator: OnboardingMediating = ServiceLocator.onboardingMediator,
+            deviceStatusMediator: DeviceStatusMediating = DeviceStatusMediator(),
             passwordProtectionStatePublisher: PasswordProtectionStatePublisher = PasswordProtectionStatePublisher(),
             databaseVersionMediator: DatabaseVersionMediator = DatabaseVersionMediator(),
             appLaunchMediator: AppLaunchMediating = AppLaunchMediator(),
@@ -79,6 +81,7 @@ extension MainScreenContainer {
             self.onboardingMediator = onboardingMediator
             self.passwordProtectionStatePublisher = passwordProtectionStatePublisher
             self.databaseVersionMediator = databaseVersionMediator
+            self.deviceStatusMediator = deviceStatusMediator
             self.appLaunchMediator = appLaunchMediator
             self.airgapMediator = airgapMediator
             initialiseAppRun()
@@ -94,26 +97,23 @@ extension MainScreenContainer {
 
 private extension MainScreenContainer.ViewModel {
     func initialiseAppRun() {
-        airgapMediator.isConnectedPublisher
-            .first()
-            .sink { [weak self] isConnected in
-                self?.appLaunchMediator.finaliseInitialisation(isConnected) { result in
-                    switch result {
-                    case .success:
-                        self?.checkInitialState()
-                    case let .failure(error):
-                        self?.presentableError = .alertError(message: error.localizedDescription)
-                        self?.isPresentingError = true
-                    }
-                }
+        appLaunchMediator.finaliseInitialisation { [weak self] result in
+            switch result {
+            case .success:
+                self?.checkInitialState()
+            case let .failure(error):
+                self?.presentableError = .alertError(message: error.localizedDescription)
+                self?.isPresentingError = true
             }
-            .store(in: cancelBag)
+        }
     }
 
     func checkInitialState() {
         databaseVersionMediator.checkDatabaseScheme { result in
             switch result {
             case .success:
+                // make sure a user goes through security checklist on start
+                self.presentNoAirgapOnStart()
                 self.listenToStateChanges()
             case let .failure(error):
                 switch error {
@@ -131,7 +131,18 @@ private extension MainScreenContainer.ViewModel {
         }
     }
 
+    func presentNoAirgapOnStart() {
+        if isPresentingNoAirgap, onboardingMediator.isUserOnboarded {
+            isPresentingNoAirgap = true
+        }
+    }
+
     func listenToStateChanges() {
+        listenViewStateChanges()
+        listAirgapStateChanges()
+    }
+
+    func listenViewStateChanges() {
         Publishers.CombineLatest3(
             onboardingMediator.onboardingDone,
             authenticationStateMediator.$authenticated,
@@ -149,11 +160,30 @@ private extension MainScreenContainer.ViewModel {
         }
         .assign(to: \.viewState, on: self)
         .store(in: cancelBag)
+    }
+
+    func listAirgapStateChanges() {
         airgapMediator.isConnectedPublisher
             .sink { [weak self] isConnected in
-                guard let self, !self.isPresentingNoAirgap else { return }
+                guard let self else { return }
+
+                reportAirgrapConnect(isConnected)
+
+                guard !isPresentingNoAirgap else { return }
                 isPresentingNoAirgap = isConnected
             }
             .store(in: cancelBag)
+    }
+
+    func reportAirgrapConnect(_ isConnected: Bool) {
+        guard onboardingMediator.isUserOnboarded else {
+            return
+        }
+
+        if isConnected {
+            deviceStatusMediator.deviceBecameOnline()
+        } else {
+            deviceStatusMediator.deviceWentOffline()
+        }
     }
 }

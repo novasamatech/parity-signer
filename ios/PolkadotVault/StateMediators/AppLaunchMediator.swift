@@ -9,7 +9,6 @@ import Foundation
 
 protocol AppLaunchMediating: AnyObject {
     func finaliseInitialisation(
-        _ isConnected: Bool,
         _ completion: @escaping (Result<Void, ServiceError>) -> Void
     )
 }
@@ -30,11 +29,10 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
     }
 
     func finaliseInitialisation(
-        _ isConnected: Bool,
         _ completion: @escaping (Result<Void, ServiceError>) -> Void
     ) {
         if databaseMediator.isDatabaseAvailable() {
-            initialiseOnboardedUserRun(isConnected, completion)
+            initialiseOnboardedUserRun(completion)
         } else {
             initialiseFirstRun(completion)
         }
@@ -47,15 +45,11 @@ final class AppLaunchMediator: ObservableObject, AppLaunchMediating {
     }
 
     private func initialiseOnboardedUserRun(
-        _ isConnected: Bool,
         _ completion: @escaping (Result<Void, ServiceError>) -> Void
     ) {
         seedsMediator.refreshSeeds()
         backendService.performCall({
             try initNavigation(dbname: self.databaseMediator.databaseName, seedNames: self.seedsMediator.seedNames)
-            if isConnected {
-                try? historyDeviceWasOnline()
-            }
         }, completion: completion)
     }
 }
