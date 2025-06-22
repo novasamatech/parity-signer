@@ -132,7 +132,7 @@ private extension MainScreenContainer.ViewModel {
     }
 
     func presentNoAirgapOnStart() {
-        if isPresentingNoAirgap, onboardingMediator.isUserOnboarded {
+        if onboardingMediator.isUserOnboarded {
             isPresentingNoAirgap = true
         }
     }
