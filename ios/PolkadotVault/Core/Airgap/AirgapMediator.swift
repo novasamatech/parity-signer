@@ -27,18 +27,17 @@ extension CLLocationManager: LocationServicesManaging {}
 protocol AirgapMediating: AnyObject {
     var isConnectedPublisher: AnyPublisher<Bool, Never> { get }
     var airgapPublisher: AnyPublisher<AirgapState, Never> { get }
-
-    func startMonitoringAirgap()
 }
 
 final class AirgapMediator: AirgapMediating {
     private let adaptee: PathMonitorProtocol
     private let monitoringQueue: DispatchQueue
     private let notificationQueue: DispatchQueue
+    private let notificationCenter: NotificationCenter
     private let locationManager: LocationServicesManaging.Type
-    private var wifiSubject = CurrentValueSubject<Bool, Never>(true)
+    private var wifiSubject = CurrentValueSubject<Bool, Never>(false)
     private var airplaneSubject = CurrentValueSubject<Bool, Never>(false)
-    private var locationSubject = CurrentValueSubject<Bool, Never>(true)
+    private var locationSubject = CurrentValueSubject<Bool, Never>(false)
 
     var airgapPublisher: AnyPublisher<AirgapState, Never> {
         Publishers.CombineLatest3(wifiSubject, airplaneSubject, locationSubject)
@@ -65,17 +64,21 @@ final class AirgapMediator: AirgapMediating {
     init(
         adaptee: PathMonitorProtocol = NWPathMonitor(),
         locationManager: LocationServicesManaging.Type = CLLocationManager.self,
+        notificationCenter: NotificationCenter = NotificationCenter.default,
         monitoringQueue: DispatchQueue = DispatchQueue.global(qos: .userInteractive),
         notificationQueue: DispatchQueue = DispatchQueue.main
     ) {
         self.adaptee = adaptee
         self.locationManager = locationManager
         self.monitoringQueue = monitoringQueue
+        self.notificationCenter = notificationCenter
         self.notificationQueue = notificationQueue
+
         listenToLocationChanges()
+        startMonitoringAirgap()
     }
 
-    func startMonitoringAirgap() {
+    private func startMonitoringAirgap() {
         adaptee.pathUpdateHandler = { [weak self] path in
             guard let self else { return }
             let isWifiOn: Bool = path.usesInterfaceType(.wifi)
@@ -89,8 +92,13 @@ final class AirgapMediator: AirgapMediating {
         adaptee.start(queue: monitoringQueue)
     }
 
+    private func stopMonitoringAirgap() {
+        adaptee.cancel()
+        adaptee.pathUpdateHandler = nil
+    }
+
     private func listenToLocationChanges() {
-        NotificationCenter.default.addObserver(
+        notificationCenter.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
             queue: nil
@@ -101,8 +109,8 @@ final class AirgapMediator: AirgapMediating {
         updateLocationServicesStatus()
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+    private func stopLocationStatusListening() {
+        notificationCenter.removeObserver(self)
     }
 
     private func updateLocationServicesStatus() {
@@ -112,6 +120,11 @@ final class AirgapMediator: AirgapMediating {
                 self.locationSubject.send(isEnabled)
             }
         }
+    }
+
+    deinit {
+        stopMonitoringAirgap()
+        stopLocationStatusListening()
     }
 }
 
@@ -128,6 +141,4 @@ final class AirgapMediatingStub: AirgapMediating {
         Just(stubState)
             .eraseToAnyPublisher()
     }
-
-    func startMonitoringAirgap() {}
 }

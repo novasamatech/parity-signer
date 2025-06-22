@@ -148,7 +148,7 @@ extension NoAirgapView {
 
         init(
             mode: Mode,
-            airgapMediator: AirgapMediating = AirgapMediatorAssembler().assemble(),
+            airgapMediator: AirgapMediating = ServiceLocator.airgapMediator,
             onActionTap: @escaping () -> Void
         ) {
             self.mode = mode
@@ -167,7 +167,6 @@ extension NoAirgapView {
                     self?.updateActionState()
                 }
                 .store(in: cancelBag)
-            airgapMediator.startMonitoringAirgap()
         }
 
         func onDoneTap() {

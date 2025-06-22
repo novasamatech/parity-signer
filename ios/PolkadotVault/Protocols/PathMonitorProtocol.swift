@@ -27,6 +27,9 @@ protocol PathMonitorProtocol: AnyObject {
     /// be ignored.
     /// - Parameter queue:
     func start(queue: DispatchQueue)
+
+    // Cancels the connection monitoring
+    func cancel()
 }
 
 extension NWPathMonitor: PathMonitorProtocol {}
