@@ -314,7 +314,7 @@ pub(crate) fn make_author_info_with_key(
         Some(base58prefix),
         address_details.encryption,
     );
-    let address_key = hex::encode(AddressKey::new(author.clone(), Some(genesis_hash)).key());
+    let address_key_str = hex::encode(address_key.key());
     MAddressCard {
         base58,
         address_key: address_key_str,
