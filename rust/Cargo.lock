@@ -4857,7 +4857,6 @@ dependencies = [
  "frame-metadata 16.0.0",
  "hex",
  "log",
- "nom",
  "parity-scale-codec",
  "parser",
  "pretty_assertions",
