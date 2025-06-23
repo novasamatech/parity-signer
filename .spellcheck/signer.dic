@@ -26,6 +26,7 @@ app's
 backend/S
 base58
 ss58
+sr25519
 h160
 biometric
 biometrics

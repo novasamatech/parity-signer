@@ -57,9 +57,11 @@ use definitions::dynamic_derivations::{
     DynamicDerivationsAddressResponse, DynamicDerivationsAddressResponseV1,
     DynamicDerivationsResponseInfo,
 };
-use definitions::helpers::base58_or_eth_to_multisigner;
-use definitions::helpers::print_multisigner_as_base58_or_eth;
+use definitions::helpers::base58_or_eth_pubkey_to_multisigner;
 use definitions::helpers::{get_multisigner, unhex};
+use definitions::helpers::{
+    print_multisigner_as_base58_or_eth_address, print_multisigner_as_base58_or_eth_public_key,
+};
 use definitions::navigation::{DDDetail, DDKeySet, DDPreview, ExportedSet};
 use definitions::network_specs::NetworkSpecs;
 #[cfg(feature = "active")]
@@ -197,10 +199,10 @@ pub struct SeedInfo {
 pub struct AddrInfo {
     /// Address in the network.
     ///
-    /// This is either `ss58` form for substrate-based chains or
-    /// h160 form for ethereum based
+    /// This is either `ss58` form for sr25519 chains or
+    /// public key form for ecdsa based
     /// chains
-    pub address: String,
+    pub address_or_pubkey: String,
 
     /// The derivation path of the key if user provided one
     pub derivation_path: Option<String>,
@@ -258,13 +260,12 @@ pub fn export_key_set_addrs(
 
         if let Some(id) = &key.1.network_id {
             let specs = get_network_specs(database, id)?;
-            let address = print_multisigner_as_base58_or_eth(
+            let address_or_pub_key = print_multisigner_as_base58_or_eth_public_key(
                 &key.0,
                 Some(specs.specs.base58prefix),
-                key.1.encryption,
             );
             derived_keys.push(AddrInfo {
-                address: address.clone(),
+                address_or_pubkey: address_or_pub_key.clone(),
                 derivation_path: if key.1.path.is_empty() {
                     None
                 } else {
@@ -484,7 +485,7 @@ pub fn process_dynamic_derivations_v1(
         };
         let encryption = derivation_request.encryption;
         derivations.push(DDDetail {
-            base58: print_multisigner_as_base58_or_eth(
+            base58: print_multisigner_as_base58_or_eth_address(
                 multisigner,
                 Some(network_specs.specs.base58prefix),
                 encryption,
@@ -633,7 +634,7 @@ pub fn inject_derivations_has_pwd(
             let multisigner_pwdless =
                 full_address_to_multisigner(full_address, derived_key.encryption)?;
             let multisigner =
-                base58_or_eth_to_multisigner(&derived_key.address, &derived_key.encryption)?;
+                base58_or_eth_pubkey_to_multisigner(&derived_key.address, &derived_key.encryption)?;
             derived_key.has_pwd = Some(multisigner_pwdless != multisigner);
         }
     }
@@ -892,10 +893,11 @@ pub(crate) fn create_derivation_address(
     path: &str,
     network_specs: &NetworkSpecs,
     seed_name: &str,
-    ss58: &str,
+    ss58_or_pubkey: &str,
     has_pwd: bool,
 ) -> Result<PrepData> {
-    let multisigner = base58_or_eth_to_multisigner(ss58, &network_specs.encryption)?;
+    let multisigner =
+        base58_or_eth_pubkey_to_multisigner(ss58_or_pubkey, &network_specs.encryption)?;
     do_create_address(
         database,
         input_batch_prep,
@@ -1785,7 +1787,7 @@ pub fn export_secret_key(
         qr,
         pubkey: hex::encode(public_key),
         network_info,
-        base58: print_multisigner_as_base58_or_eth(
+        base58: print_multisigner_as_base58_or_eth_address(
             multisigner,
             Some(network_specs.specs.base58prefix),
             address_details.encryption,

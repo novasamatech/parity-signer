@@ -7,7 +7,7 @@ use definitions::derivations::{
 };
 
 use db_handling::helpers::get_network_specs;
-use definitions::helpers::{base58_or_eth_to_multisigner, make_identicon_from_multisigner};
+use definitions::helpers::{base58_or_eth_pubkey_to_multisigner, make_identicon_from_multisigner};
 use definitions::keyring::NetworkSpecsKey;
 use definitions::{helpers::unhex, navigation::TransactionCardSet};
 use parity_scale_codec::Decode;
@@ -49,8 +49,10 @@ fn prepare_derivations_v1(
     for seed_info in export_info.addrs {
         let mut derived_keys = vec![];
         for addr_info in seed_info.derived_keys {
-            let multisigner =
-                base58_or_eth_to_multisigner(&addr_info.address, &addr_info.encryption)?;
+            let multisigner = base58_or_eth_pubkey_to_multisigner(
+                &addr_info.address_or_pubkey,
+                &addr_info.encryption,
+            )?;
             let identicon = make_identicon_from_multisigner(
                 &multisigner,
                 addr_info.encryption.identicon_style(),
@@ -70,7 +72,7 @@ fn prepare_derivations_v1(
                 &multisigner,
             )?;
             derived_keys.push(DerivedKeyPreview {
-                address: addr_info.address.clone(),
+                address: addr_info.address_or_pubkey.clone(),
                 derivation_path: addr_info.derivation_path,
                 identicon,
                 has_pwd: None, // unknown at this point
