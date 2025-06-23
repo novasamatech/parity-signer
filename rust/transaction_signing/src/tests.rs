@@ -405,7 +405,7 @@ fn can_sign_transaction_1() {
         assert_eq!(actions.len(), 1);
         assert_eq!(set, &set_expected);
         assert_eq!(author_info, &author_info_known);
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         assert!(!has_pwd, "Expected no password");
 
         match sign_action_test(
@@ -414,7 +414,7 @@ fn can_sign_transaction_1() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         ) {
             Ok(signature) => assert!(
                 (signature.len() == 130) && (signature.starts_with("01")),
@@ -454,7 +454,7 @@ fn can_sign_transaction_1() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
@@ -667,7 +667,7 @@ fn can_sign_message_1() {
         assert_eq!(actions.len(), 1);
         assert_eq!(content, &content_known);
         assert_eq!(author_info, &author_info_known);
-        assert_eq!(network_info, &network_info_known);
+        assert_eq!(network_info.get_network_spec(), Some(network_info_known));
         assert!(!has_pwd, "Expected no password");
 
         match sign_action_test(
@@ -676,7 +676,7 @@ fn can_sign_message_1() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         ) {
             Ok(signature) => assert_eq!(
                 signature.len(),
@@ -693,7 +693,6 @@ fn can_sign_message_1() {
             .flat_map(|e| e.1.events)
             .collect();
 
-        let message = String::from_utf8(hex::decode(message).unwrap()).unwrap();
         let my_event = Event::MessageSigned {
             sign_message_display: SignMessageDisplay {
                 message,
@@ -726,7 +725,7 @@ fn can_sign_message_1() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         );
         if let Err(e) = result {
             if let Error::DbHandling(db_handling::Error::ChecksumMismatch) = e {
@@ -2323,7 +2322,7 @@ Identities:
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         )
         .unwrap();
     } else {
@@ -2645,7 +2644,7 @@ Identities:
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         )
         .unwrap();
     } else {
@@ -3957,7 +3956,7 @@ fn can_parse_westend_trasfer_with_proof() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         )
         .unwrap();
     } else {
@@ -4370,7 +4369,7 @@ fn can_parse_westend_staking_with_proof() {
             ALICE_SEED_PHRASE,
             PWD,
             USER_COMMENT,
-            network_info.specs.encryption,
+            network_info.get_encryption(),
         )
         .unwrap();
     } else {
