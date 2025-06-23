@@ -303,3 +303,28 @@ pub(crate) fn populate_cold_release(database: &sled::Db) -> Result<()> {
 pub fn populate_cold_nav_test(database: &sled::Db) -> Result<()> {
     cold_database_no_init(database, Purpose::TestNavigator)
 }
+
+/// Generate **not initiated** test cold database for `navigator` testing with Mythos network.
+pub fn populate_cold_nav_test_with_ethereum_based_networks(database: &sled::Db) -> Result<()> {
+    use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
+
+    database.drop_tree(SPECSTREE)?;
+    database.drop_tree(VERIFIERS)?;
+    database.drop_tree(METATREE)?;
+    database.drop_tree(SETTREE)?;
+    database.clear()?;
+
+    let mut batch = Batch::default();
+    for x in defaults::substrate_chainspecs_with_ethereum().iter() {
+        let network_specs_key =
+            NetworkSpecsKey::from_parts(&x.specs.genesis_hash, &x.specs.encryption);
+        batch.insert(network_specs_key.key(), x.encode());
+    }
+
+    TrDbCold::new()
+        .set_network_specs(batch) // set default network specs including Mythos
+        .set_settings(default_cold_settings_init_later()?) // set general verifier and load default types
+        .set_verifiers(default_cold_verifiers()) // set default verifiers
+        .apply(database)?;
+    Ok(())
+}

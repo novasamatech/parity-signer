@@ -9,7 +9,9 @@ use definitions::derivations::SeedKeysPreview;
 use definitions::navigation::MAddressCard;
 use definitions::{
     crypto::Encryption,
-    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58_or_eth},
+    helpers::{
+        make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58_or_eth_address,
+    },
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
@@ -38,6 +40,7 @@ pub(crate) enum Card<'a> {
     AuthorPlain {
         author: &'a MultiSigner,
         base58prefix: u16,
+        encryption: Encryption,
     },
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
@@ -216,12 +219,13 @@ impl Card<'_> {
             Card::AuthorPlain {
                 author,
                 base58prefix,
+                encryption,
             } => NavCard::AuthorPlainCard {
                 f: MSCId {
-                    base58: print_multisigner_as_base58_or_eth(
+                    base58: print_multisigner_as_base58_or_eth_address(
                         author,
                         Some(*base58prefix),
-                        Encryption::Sr25519,
+                        *encryption,
                     ),
                     identicon: make_identicon_from_multisigner(author, IdenticonStyle::Dots),
                 },
@@ -305,8 +309,11 @@ pub(crate) fn make_author_info_with_key(
     address_key: AddressKey,
     address_details: &AddressDetails,
 ) -> MAddressCard {
-    let base58 =
-        print_multisigner_as_base58_or_eth(author, Some(base58prefix), address_details.encryption);
+    let base58 = print_multisigner_as_base58_or_eth_address(
+        author,
+        Some(base58prefix),
+        address_details.encryption,
+    );
     let address_key_str = hex::encode(address_key.key());
     MAddressCard {
         base58,
