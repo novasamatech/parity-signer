@@ -74,7 +74,7 @@ pub fn create_signature(
         SignContent::Transaction { method, extensions } => {
             [method.to_vec(), extensions.to_vec()].concat()
         }
-        SignContent::Message(a) => a.as_bytes().to_vec(),
+        SignContent::Message(a) => a.to_vec(),
     };
 
     // For larger transactions, their hash should be signed instead; this is not implemented

@@ -2618,11 +2618,12 @@ fn parse_msg_2() {
     let line = format!("530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d{sign_msg}e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
 
     let error = produce_output(&db, &line).unwrap_err();
-    if let error::Error::ParserError(a) = error {
-        assert_eq!(a, "Error(Error { input: \"uuid-abcd\", code: TakeUntil })");
-    } else {
-        panic!("Unexpected error {:?}", error)
+
+    match error {
+        error::Error::InvalidMessagePayload => {}
+        _ => panic!("Unexpected error {:?}", error),
     }
+
     fs::remove_dir_all(dbname).unwrap();
 }
 

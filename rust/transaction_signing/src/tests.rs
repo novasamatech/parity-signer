@@ -693,7 +693,6 @@ fn can_sign_message_1() {
             .flat_map(|e| e.1.events)
             .collect();
 
-        let message = String::from_utf8(hex::decode(message).unwrap()).unwrap();
         let my_event = Event::MessageSigned {
             sign_message_display: SignMessageDisplay {
                 message,
