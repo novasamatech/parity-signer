@@ -67,12 +67,12 @@ pub(crate) fn parse_transaction(database: &sled::Db, data_hex: &str) -> Result<T
         multisigner_msg_genesis_encryption(database, data_hex)?;
 
     let address_details = try_get_address_details_by_multisigner(
-        database, 
-        &author_multi_signer, 
-        &genesis_hash, 
-        &encryption
+        database,
+        &author_multi_signer,
+        &genesis_hash,
+        &encryption,
     )?;
-    
+
     do_parse_transaction(
         database,
         author_multi_signer,
@@ -91,10 +91,10 @@ pub(crate) fn parse_transaction_with_proof(
         multisigner_msg_genesis_encryption(database, data_hex)?;
 
     let address_details = try_get_address_details_by_multisigner(
-        database, 
-        &author_multi_signer, 
-        &genesis_hash, 
-        &encryption
+        database,
+        &author_multi_signer,
+        &genesis_hash,
+        &encryption,
     )?;
 
     do_parse_transaction_with_proof(

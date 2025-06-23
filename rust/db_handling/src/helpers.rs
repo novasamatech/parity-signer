@@ -350,25 +350,20 @@ pub fn try_get_address_details_by_multisigner(
     database: &sled::Db,
     multisigner: &MultiSigner,
     genesis_hash: &H256,
-    encryption: &Encryption
+    encryption: &Encryption,
 ) -> Result<Option<AddressDetails>> {
-    let maybe_address_details = find_address_details_for_multisigner(
-        database, 
-        multisigner, 
-        vec![*genesis_hash]
-    )?;
+    let maybe_address_details =
+        find_address_details_for_multisigner(database, multisigner, vec![*genesis_hash])?;
 
     let network_specs_key = NetworkSpecsKey::from_parts(genesis_hash, encryption);
 
-    let new_details =  maybe_address_details.map(|address_details| {
-        AddressDetails {
-            seed_name: address_details.seed_name,
-            path: address_details.path,
-            has_pwd: address_details.has_pwd,
-            network_id: Some(network_specs_key),
-            encryption: encryption.clone(),
-            secret_exposed: address_details.secret_exposed
-        }
+    let new_details = maybe_address_details.map(|address_details| AddressDetails {
+        seed_name: address_details.seed_name,
+        path: address_details.path,
+        has_pwd: address_details.has_pwd,
+        network_id: Some(network_specs_key),
+        encryption: encryption.clone(),
+        secret_exposed: address_details.secret_exposed,
     });
 
     Ok(new_details)
