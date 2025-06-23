@@ -167,7 +167,7 @@ private extension MainScreenContainer.ViewModel {
             .sink { [weak self] isConnected in
                 guard let self else { return }
 
-                reportAirgrapConnect(isConnected)
+                reportAirgrapStatus(isConnected)
 
                 guard !isPresentingNoAirgap else { return }
                 isPresentingNoAirgap = isConnected
@@ -175,7 +175,7 @@ private extension MainScreenContainer.ViewModel {
             .store(in: cancelBag)
     }
 
-    func reportAirgrapConnect(_ isConnected: Bool) {
+    func reportAirgrapStatus(_ isConnected: Bool) {
         guard onboardingMediator.isUserOnboarded else {
             return
         }
