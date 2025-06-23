@@ -274,7 +274,7 @@ fn export_alice_westend() {
     // `subkey inspect "ALICE_SEED_PHRASE"`
     let expected_key = MKeyDetails {
         qr: definitions::navigation::QrData::Regular {
-            data: format!("substrate:{expected_addr}:0x{westend_genesis}")
+            data: format!("substrate:{expected_addr}:0x{westend_genesis}:0x{pubkey}")
                 .as_bytes()
                 .to_vec(),
         },
