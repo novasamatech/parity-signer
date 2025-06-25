@@ -849,8 +849,13 @@ impl TrDbColdSign {
                 }
             }
             SignContent::Message(message) => {
-                let sign_message_display =
-                    SignMessageDisplay::get(message, &s.network_name, &signed_by, user_comment);
+                let hex_message = hex::encode(message);
+                let sign_message_display = SignMessageDisplay::get(
+                    &hex_message,
+                    &s.network_name,
+                    &signed_by,
+                    user_comment,
+                );
                 if wrong_password {
                     history.push(Event::MessageSignError {
                         sign_message_display,
@@ -928,7 +933,7 @@ pub enum SignContent {
     },
 
     /// `53xx03` text message
-    Message(String),
+    Message(Vec<u8>),
 }
 
 impl TrDbColdSignOne {

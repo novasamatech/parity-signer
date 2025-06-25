@@ -581,11 +581,8 @@ pub enum Error {
         encryption: Encryption,
     },
 
-    #[error(transparent)]
-    NotUtf8(#[from] std::str::Utf8Error),
-
-    #[error("Parser error: {0}")]
-    ParserError(String),
+    #[error("Message payload must be wrapped with tags <Bytes></Bytes>")]
+    InvalidMessagePayload,
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {
