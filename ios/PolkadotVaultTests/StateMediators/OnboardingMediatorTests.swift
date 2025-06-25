@@ -83,6 +83,8 @@ final class OnboardingMediatorTests: XCTestCase {
             receivedValue,
             isDatabaseAvailable
         )
+
+        XCTAssertEqual(mediator.isUserOnboarded, isDatabaseAvailable)
     }
 
     func testOnboardingWhenRemoveAllSeedsDoneCallsInitialisationNavigationWithPassedValue() {

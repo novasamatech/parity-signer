@@ -13,6 +13,8 @@ import SwiftUI
 protocol OnboardingMediating: AnyObject {
     var onboardingDone: AnyPublisher<Bool, Never> { get }
 
+    var isUserOnboarded: Bool { get }
+
     func onboard(verifierRemoved: Bool)
 }
 
@@ -25,6 +27,10 @@ final class OnboardingMediator: OnboardingMediating {
         onboardingDoneSubject.eraseToAnyPublisher()
     }
 
+    var isUserOnboarded: Bool {
+        databaseMediator.isDatabaseAvailable()
+    }
+
     init(
         navigationInitialisationService: NavigationInitialisationServicing = NavigationInitialisationService(),
         seedsMediator: SeedsMediating = ServiceLocator.seedsMediator,
@@ -34,7 +40,7 @@ final class OnboardingMediator: OnboardingMediating {
         self.seedsMediator = seedsMediator
         self.databaseMediator = databaseMediator
         // Set initial state based on database availability
-        onboardingDoneSubject.send(databaseMediator.isDatabaseAvailable())
+        onboardingDoneSubject.send(isUserOnboarded)
     }
 
     func onboard(verifierRemoved: Bool) {
