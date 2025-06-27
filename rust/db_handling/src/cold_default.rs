@@ -309,7 +309,7 @@ pub fn populate_cold_nav_test_with_ethereum_based_networks(database: &sled::Db) 
     populate_all_network_specs(database)
 }
 
-/// Generate database with networks specs both for substrate and evm
+/// Generate database with networks specs both for substrate and ethereum
 pub fn populate_all_network_specs(database: &sled::Db) -> Result<()> {
     use constants::{METATREE, SETTREE, SPECSTREE, VERIFIERS};
 
