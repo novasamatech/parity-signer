@@ -1,5 +1,8 @@
+use constants::test_values::alice_ethereum_polkadot;
+use db_handling::cold_default::populate_all_network_specs;
 use pretty_assertions::{assert_eq, assert_ne};
 use sled::{Batch, Tree};
+use sp_core::ecdsa::Public as EcdsaPublic;
 use sp_core::sr25519::Public;
 use sp_core::H256;
 use sp_runtime::MultiSigner;
@@ -76,6 +79,10 @@ fn westend_genesis() -> H256 {
 
 fn polkadot_genesis() -> H256 {
     H256::from_str("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").unwrap()
+}
+
+fn mythos_genesis() -> H256 {
+    H256::from_str("f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9").unwrap()
 }
 
 #[test]
@@ -274,7 +281,7 @@ fn export_alice_westend() {
     // `subkey inspect "ALICE_SEED_PHRASE"`
     let expected_key = MKeyDetails {
         qr: definitions::navigation::QrData::Regular {
-            data: format!("substrate:{expected_addr}:0x{westend_genesis}:0x{pubkey}")
+            data: format!("substrate:{expected_addr}:0x{westend_genesis}")
                 .as_bytes()
                 .to_vec(),
         },
@@ -294,6 +301,67 @@ fn export_alice_westend() {
             network_logo: "westend".to_string(),
             network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 .to_string(),
+        },
+    };
+    assert_eq!(key, expected_key);
+}
+
+#[test]
+fn export_alice_mythos() {
+    use definitions::navigation::Identicon;
+    let dbname = tempdir().unwrap();
+    let db = sled::open(dbname).unwrap();
+
+    populate_all_network_specs(&db).unwrap();
+
+    try_create_seed(&db, "Alice", ALICE_SEED_PHRASE, true).unwrap();
+
+    let derivation_path = "//polkadot";
+    let genesis = mythos_genesis();
+
+    try_create_address(
+        &db,
+        "Alice",
+        ALICE_SEED_PHRASE,
+        derivation_path,
+        &NetworkSpecsKey::from_parts(&genesis, &Encryption::Ethereum),
+    )
+    .unwrap();
+
+    let pubkey = "02c08517b1ff9501d42ab480ea6fa1b9b92f0430fb07e4a9575dbb2d5ec6edb6d6";
+    let public: [u8; 33] = hex::decode(pubkey).unwrap().try_into().unwrap();
+    let key = export_key(
+        &db,
+        &MultiSigner::Ecdsa(EcdsaPublic::from_raw(public)),
+        "Alice",
+        &NetworkSpecsKey::from_parts(&genesis, &Encryption::Ethereum),
+    )
+    .unwrap();
+
+    let expected_addr = "0xe9267b732a8e9c9444e46f3d04d4610a996d682d";
+    let hex_genesis = hex::encode(genesis);
+
+    let expected_key = MKeyDetails {
+        qr: definitions::navigation::QrData::Regular {
+            data: format!("ethereum:0x{pubkey}:0x{hex_genesis}")
+                .as_bytes()
+                .to_vec(),
+        },
+        pubkey: pubkey.to_string(),
+        base58: expected_addr.to_string(),
+        address: Address {
+            identicon: Identicon::Blockies {
+                identity: alice_ethereum_polkadot(),
+            },
+            seed_name: "Alice".to_string(),
+            path: derivation_path.to_string(),
+            has_pwd: false,
+            secret_exposed: false,
+        },
+        network_info: MSCNetworkInfo {
+            network_title: "mythos".to_string(),
+            network_logo: "mythos".to_string(),
+            network_specs_key: format!("03{hex_genesis}").to_string(),
         },
     };
     assert_eq!(key, expected_key);
