@@ -362,7 +362,7 @@ pub fn try_get_address_details_by_multisigner(
         path: address_details.path,
         has_pwd: address_details.has_pwd,
         network_id: Some(network_specs_key),
-        encryption: encryption.clone(),
+        encryption: *encryption,
         secret_exposed: address_details.secret_exposed,
     });
 
