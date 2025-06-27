@@ -298,7 +298,7 @@ pub fn first_network(database: &sled::Db) -> Result<Option<OrderedNetworkSpecs>>
 ///
 /// For QR code the address information is put in format
 /// `substrate:{address as base58}:0x{network genesis hash}`
-/// `ethereum:{public key as hex}:0x{network genesis hash}`
+/// `ethereum:{address as hex}:0x{network genesis hash}`
 /// transformed into bytes, to be compatible with `polkadot-js` interface.
 /// Note that no [`Encryption`](definitions::crypto::Encryption) algorithm
 /// information is contained in the QR code. If there are multiple `Encryption`
@@ -340,28 +340,21 @@ pub fn export_key(
     let identicon = make_identicon_from_multisigner(multisigner, address_details.identicon_style());
     let qr = {
         if address_details.network_id.as_ref() == Some(network_specs_key) {
-            if network_specs.encryption == Encryption::Ethereum {
-                QrData::Regular {
-                    data: format!(
-                        "{}:0x{}:0x{}",
-                        "ethereum",
-                        hex::encode(public_key.clone()),
-                        hex::encode(network_specs.genesis_hash)
-                    )
-                    .as_bytes()
-                    .to_vec(),
-                }
+            let prefix = if network_specs.encryption == Encryption::Ethereum {
+                "ethereum"
             } else {
-                QrData::Regular {
-                    data: format!(
-                        "{}:{}:0x{}",
-                        "substrate",
-                        base58,
-                        hex::encode(network_specs.genesis_hash)
-                    )
-                    .as_bytes()
-                    .to_vec(),
-                }
+                "substrate"
+            };
+
+            QrData::Regular {
+                data: format!(
+                    "{}:{}:0x{}",
+                    prefix,
+                    base58,
+                    hex::encode(network_specs.genesis_hash)
+                )
+                .as_bytes()
+                .to_vec(),
             }
         } else {
             return Err(Error::NetworkSpecsKeyForAddressNotFound {

@@ -343,7 +343,7 @@ fn export_alice_mythos() {
 
     let expected_key = MKeyDetails {
         qr: definitions::navigation::QrData::Regular {
-            data: format!("ethereum:0x{pubkey}:0x{hex_genesis}")
+            data: format!("ethereum:{expected_addr}:0x{hex_genesis}")
                 .as_bytes()
                 .to_vec(),
         },
