@@ -675,7 +675,7 @@ pub fn entry_to_transactions_with_decoding(
                     .iter()
                     .find(|network| sign_display.network_name == network.specs.name)
                     .cloned()
-                    .unwrap();
+                    .ok_or_else(|| Error::HistoryUnknownNetwork { name: sign_display.network_name.clone() })?;
 
                 let address_key = AddressKey::new(m.clone(), Some(network.specs.genesis_hash));
                 let verifier_details = Some(sign_display.signed_by.show_card());

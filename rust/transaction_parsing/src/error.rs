@@ -583,6 +583,19 @@ pub enum Error {
 
     #[error("Message payload must be wrapped with tags <Bytes></Bytes>")]
     InvalidMessagePayload,
+
+    /// [`OrderedNetworkSpecs`] needed to parse
+    /// historical transactions saved into history log, searched by network
+    /// name.
+    ///
+    /// [`OrderedNetworkSpecs`]: definitions::network_specs::OrderedNetworkSpecs
+    #[error(
+        "Could not find network specs for {name} \
+        needed to decode historical transaction."
+    )]
+    HistoryUnknownNetwork {
+        name: String
+    }
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {
