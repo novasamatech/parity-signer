@@ -593,9 +593,7 @@ pub enum Error {
         "Could not find network specs for {name} \
         needed to decode historical transaction."
     )]
-    HistoryUnknownNetwork {
-        name: String
-    }
+    HistoryUnknownNetwork { name: String },
 }
 
 fn display_parsing_errors(network_name: &str, errors: &[(u32, parser::Error)]) -> String {
