@@ -342,10 +342,10 @@ pub fn try_get_address_details(
         .transpose()
 }
 
-/// Try to get [`AddressDetails`] from the Vault database, using
-/// [`AddressKey`].
+/// Try to get [`AddressDetails`] from the Vault database, matching by
+/// [`MultiSigner`].
 ///
-/// If no entry with provided [`AddressKey`] is found, the result is `Ok(None)`.
+/// If no entry is found, the result is `Ok(None)`.
 pub fn try_get_address_details_by_multisigner(
     database: &sled::Db,
     multisigner: &MultiSigner,
