@@ -297,9 +297,9 @@ pub fn first_network(database: &sled::Db) -> Result<Option<OrderedNetworkSpecs>>
 /// Prepare export key screen struct [`MKeyDetails`].
 ///
 /// For QR code the address information is put in format
-/// `substrate:{public key as base58}:0x{network genesis hash}`
+/// `substrate:{address as base58}:0x{network genesis hash}`
+/// `ethereum:{address as hex}:0x{network genesis hash}`
 /// transformed into bytes, to be compatible with `polkadot-js` interface.
-///
 /// Note that no [`Encryption`](definitions::crypto::Encryption) algorithm
 /// information is contained in the QR code. If there are multiple `Encryption`
 /// algorithms supported by the network, the only visible difference in exports
@@ -345,6 +345,7 @@ pub fn export_key(
             } else {
                 "substrate"
             };
+
             QrData::Regular {
                 data: format!(
                     "{}:{}:0x{}",
