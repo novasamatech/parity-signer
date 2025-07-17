@@ -6,7 +6,10 @@ concurrency:
 
 on:
   workflow_dispatch:
-  
+
+permissions:
+  contents: write
+
 jobs:
   run-tests:
     name: Run tests
@@ -50,3 +53,54 @@ jobs:
           releaseFiles: ${{ steps.sign_app.outputs.signedReleaseFile }}
           packageName: io.parity.signer
           track: internal
+
+      - name: Upload signed APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-apk
+          path: ${{ steps.sign_app.outputs.signedReleaseFile }}  
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [upload-apk]
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+    
+      - name: Download signed APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: signed-apk
+          path: release-assets
+
+      - name: Extract version from build.gradle
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=versionName ")[^"]+' android/build.gradle | head -n1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+      # Get last published tag (the latest reachable tag in the repo)
+      - name: Get last tag
+        id: last_tag
+        run: |
+          git fetch --tags --force
+          echo "tag=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1))" >> $GITHUB_OUTPUT
+
+      # Build changelog from git log between last tag and HEAD
+      - name: Generate changelog
+        id: changelog
+        run: |
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${{ steps.last_tag.outputs.tag }}..HEAD)
+          echo "${CHANGELOG}" > release-notes.md
+          echo "${CHANGELOG}"
+
+      # Create GitHub Release using the generated changelog
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Polkadot Vault ${{ steps.version.outputs.version }} android
+          body_path: release-notes.md
+          files: release-assets/*.apk
+          draft: true
