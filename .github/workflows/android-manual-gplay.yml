@@ -6,7 +6,10 @@ concurrency:
 
 on:
   workflow_dispatch:
-  
+
+permissions:
+  contents: write
+
 jobs:
   run-tests:
     name: Run tests
