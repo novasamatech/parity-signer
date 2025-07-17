@@ -97,3 +97,4 @@ jobs:
           name: Polkadot Vault ${{ steps.version.outputs.version }}
           body_path: release-notes.md
           files: release-assets/*.apk
+          prerelease: true`

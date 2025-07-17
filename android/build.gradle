@@ -16,7 +16,8 @@ android {
 		minSdk 23
 		targetSdk 34
 		versionCode 70000
-		versionName "7.0.0"
+		//version-Name "7.0.0"
+		versionName "0.0.1"
 		ndk {
 			abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
 		}
