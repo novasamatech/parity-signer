@@ -100,6 +100,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Polkadot Vault ${{ steps.version.outputs.version }}
+          name: Polkadot Vault ${{ steps.version.outputs.version }} android
           body_path: release-notes.md
           files: release-assets/*.apk
+          draft: true
