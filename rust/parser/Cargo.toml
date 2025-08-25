@@ -16,7 +16,7 @@ num-bigint = "0.4.4"
 parity-scale-codec = {version = "3.6.9", features = ["derive", "bit-vec"]}
 merkleized-metadata = {git = "https://github.com/novasamatech/merkleized-metadata.git", tag = "0.4.0"}
 printing_balance = {path = "../printing_balance"}
-regex = "1.10.3"
+regex = "1.11.2"
 scale-info = "2.10.0"
 sp-arithmetic = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3"}
 sp-core = {git = "https://github.com/paritytech/substrate", rev = "49734dd1d72a00b9d3b87ba397661a63e0e17af3", default-features = false, features = ["full_crypto"]}
