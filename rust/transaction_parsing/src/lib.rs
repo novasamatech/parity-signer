@@ -130,9 +130,9 @@ fn parse_transaction_bulk(database: &sled::Db, payload: &str) -> Result<Transact
                 let encoded = "53".to_string() + &encoded;
                 let action = if &encoded[4..6] == "06" {
                     parse_transaction_with_proof(database, &encoded)?
-                 } else {
+                } else {
                     parse_transaction(database, &encoded)?
-                 };
+                };
                 match action {
                     TransactionAction::Sign {
                         actions: a,
