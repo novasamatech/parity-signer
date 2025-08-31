@@ -332,8 +332,7 @@ impl Visitor for StateMachineParser<'_> {
             .get_first_type(&type_id)
             .map(|v| v.path);
 
-        let seq_items: Vec<_> = value.collect();
-        let items_count = seq_items.len();
+        let items_count = value.remaining();
 
         let input = StateInputCompound {
             name: None,
@@ -348,7 +347,7 @@ impl Visitor for StateMachineParser<'_> {
         let output = visitor.state.process_sequence(&input, visitor.indent)?;
         visitor.apply(output);
 
-        for (index, field_result) in seq_items.into_iter().enumerate() {
+        for (index, field_result) in value.enumerate() {
             visitor.push_indent();
 
             let field = field_result.clone()?;
@@ -462,8 +461,8 @@ impl Visitor for StateMachineParser<'_> {
             .type_registry
             .get_first_type(&type_id)
             .map(|v| v.path);
-        let items: Vec<_> = value.collect();
-        let items_count = value.count();
+
+        let items_count = value.remaining();
 
         let input = StateInputCompound {
             name: None,
@@ -480,7 +479,7 @@ impl Visitor for StateMachineParser<'_> {
             .process_tuple(&input, visitor.indent)?;
         visitor.apply(output);
 
-        for (index, field_result) in items.into_iter().enumerate() {
+        for (index, field_result) in value.enumerate() {
             visitor.push_indent();
 
             let field = field_result?;
@@ -525,8 +524,8 @@ impl Visitor for StateMachineParser<'_> {
             .get_enum_variant_type(&type_id, value.index() as u32)
             .map(|v| v.path);
 
-        let fields: Vec<_> = value.fields().collect();
-        let fields_count = fields.len();
+        let fields_count = value.fields().remaining();
+        let variant_index = value.index();
 
         let input = StateInputCompound {
             name: Some(value.name().to_string()),
@@ -543,14 +542,14 @@ impl Visitor for StateMachineParser<'_> {
             .process_variant(&input, visitor.indent)?;
         visitor.apply(output);
 
-        for (index, field_result) in fields.into_iter().enumerate() {
+        for (index, field_result) in value.fields().enumerate() {
             visitor.push_indent();
 
             let field = field_result?;
             let field_name = field.name().map(|name| name.to_string());
             let type_name = visitor.type_registry.get_enum_field_type_name(
                 &type_id,
-                value.index() as u32,
+                variant_index as u32,
                 index,
             );
 
@@ -594,8 +593,8 @@ impl Visitor for StateMachineParser<'_> {
             .type_registry
             .get_first_type(&type_id)
             .map(|v| v.path);
-        let items: Vec<_> = value.collect();
-        let items_count = items.len();
+
+        let items_count = value.remaining();
 
         let input = StateInputCompound {
             name: None,
@@ -612,7 +611,7 @@ impl Visitor for StateMachineParser<'_> {
             .process_array(&input, visitor.indent)?;
         visitor.apply(output);
 
-        for (index, field) in items.into_iter().enumerate() {
+        for (index, field) in value.enumerate() {
             visitor.push_indent();
 
             let field_result = field.clone()?;
