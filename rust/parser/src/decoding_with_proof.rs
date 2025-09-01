@@ -19,7 +19,7 @@ use merkleized_metadata::{types::Hash, verify_metadata_digest, TypeResolver};
 use parity_scale_codec::DecodeLimit;
 use scale_decode::visitor::decode_with_visitor;
 
-/// To avoid OOM issues during scale decoding
+/// To avoid out of memory issues during scale decoding
 /// one need to decode_all_with_depth_limit with a proper depth limit.
 /// Typically stack has 1MB limit, choose the depth base on it.
 const DECODING_DEPTH_LIMIT: u32 = 1000;
