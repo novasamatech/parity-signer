@@ -16,7 +16,7 @@ use crate::{
 
 use merkleized_metadata::{types::Hash, verify_metadata_digest, TypeResolver};
 
-use parity_scale_codec::{DecodeLimit};
+use parity_scale_codec::DecodeLimit;
 use scale_decode::visitor::decode_with_visitor;
 
 /// To avoid OOM issues during scale decoding
