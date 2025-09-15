@@ -16,5 +16,7 @@ members = [
 	"qrcode_static",
 	"signer",
 	"transaction_parsing",
-	"transaction_signing"
+	"transaction_signing",
+	"fuzz/decode-call",
+	"fuzz/grammar-fuzzer",
 ]
