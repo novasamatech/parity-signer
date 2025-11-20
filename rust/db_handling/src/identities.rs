@@ -1850,7 +1850,6 @@ mod tests {
         assert!(!is_potentially_exposed("//A//0", false, "//B", false));
     }
 
-
     fn test_export_with_path(path: &str) {
         let genesis_hash = H256::from([0u8; 32]);
         let mut full_address = String::with_capacity(ALICE_SEED_PHRASE.len() + path.len());
