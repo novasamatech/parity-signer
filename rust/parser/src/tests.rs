@@ -14,6 +14,7 @@ use defaults::default_types_vec;
 use definitions::metadata::info_from_metadata;
 use definitions::network_specs::ShortSpecs;
 use frame_metadata::RuntimeMetadata;
+use hex::ToHex;
 use merkleized_metadata::types::Hash;
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
@@ -604,4 +605,30 @@ fn parse_raw_extrinsic_with_proof() {
     let extension_result = decode_extensions(&mut &extension_data[..], &metadata, &genesis_hash);
 
     assert!(extension_result.is_ok());
+}
+
+#[test]
+fn parse_extrinsic_with_invalid_metadata() {
+    let proof_line = "3000039881af39160330c2544f9e8fa1b204286e483878327a426e7a3302130345a3b897041c414832766f434e020a0338aec441041c6e365a583472320208fc0428567632577732685a486b031cd4a5ec160345819a4703580badc20004081511fdff04205a634a6b77534259031562cbde05f628dc28040449032fea48580803c62375ac00020b034b2daf9400021603d6dca56403256986630420736f6d344e46734204000330c2544f0428703459496d587242795500007a4f3c61041433e35904ebfc086774801e04e5d8e5d1df46ad98fe8f3c40870dc3f758738fa5835e1ee9831603a9e853fb169e8fa1b208080c51767a10031c4d5564427659771107600942012433627032564366766fb6a57a1c4a57616c674f690460";
+    let data = hex::decode(proof_line).unwrap();
+    
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+
+    let call_result = decode_call(&mut &call_data[..], &metadata);
+
+    println!("Call result: {:?}", call_result);
+    assert!(call_result.is_ok());
+}
+
+#[test]
+fn parse_oom_case_extrinsic_() {
+    let data = fs::read("for_tests/malicios_extrinsic").unwrap();
+    
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+
+    println!("Data: {}", hex::encode(data));
+    let call_result = decode_call(&mut &call_data[..], &metadata);
+
+    println!("Call result: {:?}", call_result);
+    assert!(call_result.is_ok());
 }

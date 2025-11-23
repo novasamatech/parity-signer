@@ -1,0 +1,12 @@
+[package]
+name = "decode-call"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ziggy = { version = "1.3.2", default-features = false }
+parser = {path = "../../parser"}
+parity-scale-codec = { version = "3.7.5", features = ["derive"] }
+
+[features]
+fuzzing = []
