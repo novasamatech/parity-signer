@@ -1642,7 +1642,7 @@ fn prepare_secret_key_for_export(
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
-) -> Result<[u8; 32]> {
+) -> Result<Vec<u8>> {
     match multisigner {
         MultiSigner::Ed25519(public) => {
             let ed25519_pair =
@@ -1650,7 +1650,10 @@ fn prepare_secret_key_for_export(
             if public != &ed25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(ed25519_pair.seed().to_owned())
+
+            let raw_secret = ed25519_pair.seed().to_vec();
+
+            Ok(raw_secret)
         }
         MultiSigner::Sr25519(public) => {
             let (sr25519_pair, seed) = sr25519::Pair::from_string_with_seed(full_address, pwd)
@@ -1658,9 +1661,14 @@ fn prepare_secret_key_for_export(
             if public != &sr25519_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(seed.ok_or_else(|| Error::NoSeedForKeyPair {
-                multisigner: multisigner.clone(),
-            })?)
+
+            // if no seed (for example, soft derivation) then export private key + nonce
+            let secret = seed.map_or_else(
+                || sr25519_pair.to_raw_vec(),
+                |s| s.to_vec()
+            );
+
+            Ok(secret)
         }
         MultiSigner::Ecdsa(public) => {
             let ecdsa_pair =
@@ -1668,7 +1676,10 @@ fn prepare_secret_key_for_export(
             if public != &ecdsa_pair.public() {
                 return Err(Error::WrongPassword);
             }
-            Ok(ecdsa_pair.seed())
+
+            let raw_secret = ecdsa_pair.seed().to_vec();
+
+            Ok(raw_secret)
         }
     }
 }
@@ -1823,7 +1834,7 @@ fn generate_secret_qr(
     let qr = QrData::Sensitive {
         data: format!(
             "secret:0x{}:{}",
-            hex::encode(secret),
+            hex::encode(&secret),
             hex::encode(genesis_hash)
         )
         .as_bytes()
