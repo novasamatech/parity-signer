@@ -142,14 +142,14 @@ final class CreateDerivedKeyService {
         var occuredErrors: [(network: MmNetwork, error: String)] = []
 
         pathAndNetworks.forEach { pathAndNetwork in
-            backendService.performCall({
+            backendService.performCall {
                 try tryCreateAddress(
                     seedName: seedName,
                     seedPhrase: seedPhrase,
                     path: pathAndNetwork.path,
                     network: pathAndNetwork.network.key
                 )
-            }, completion: { (result: Result<Void, ErrorDisplayed>) in
+            } completion: { (result: Result<Void, ErrorDisplayed>) in
                 if case let .failure(displayedError) = result {
                     occuredErrors.append((network: pathAndNetwork.network, error: displayedError.localizedDescription))
                 }
@@ -164,7 +164,7 @@ final class CreateDerivedKeyService {
                         }
                     completion(result)
                 }
-            })
+            }
         }
     }
 
@@ -199,14 +199,14 @@ final class CreateDerivedKeyService {
             return
         }
         seedKeys.forEach { seedKey in
-            backendService.performCall({
+            backendService.performCall {
                 try tryCreateAddress(
                     seedName: seedKey,
                     seedPhrase: seeds[seedKey] ?? "",
                     path: network.pathId,
                     network: network.key
                 )
-            }, completion: { (result: Result<Void, ErrorDisplayed>) in
+            } completion: { (result: Result<Void, ErrorDisplayed>) in
                 if case let .failure(displayedError) = result {
                     occuredErrors.append((seedName: seedKey, error: displayedError.localizedDescription))
                 }
@@ -219,7 +219,7 @@ final class CreateDerivedKeyService {
                         }
                     completion(result)
                 }
-            })
+            }
         }
     }
 
