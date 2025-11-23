@@ -16,8 +16,13 @@ use crate::{
 
 use merkleized_metadata::{types::Hash, verify_metadata_digest, TypeResolver};
 
-use parity_scale_codec::Decode;
+use parity_scale_codec::DecodeLimit;
 use scale_decode::visitor::decode_with_visitor;
+
+/// To avoid out of memory issues during scale decoding
+/// one need to decode_all_with_depth_limit with a proper depth limit.
+/// Typically stack has 1MB limit, choose the depth base on it.
+const DECODING_DEPTH_LIMIT: u32 = 1000;
 
 fn verify_decoded_metadata_hash(
     output: &ExtensionsOutput,
@@ -67,7 +72,7 @@ fn verify_genesis_hash(
 }
 
 pub fn decode_metadata_proof(data: &mut &[u8]) -> Result<MetadataProof, Error> {
-    MetadataProof::decode(data)
+    MetadataProof::decode_with_depth_limit(DECODING_DEPTH_LIMIT, data)
         .map_err(|_| Error::Decoding(ParserDecodingError::MetadataProofExpected))
 }
 
