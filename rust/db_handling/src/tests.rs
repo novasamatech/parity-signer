@@ -1,5 +1,6 @@
 use bip39::{Language, Mnemonic};
 use pretty_assertions::assert_eq;
+use sp_core::H256;
 
 use constants::ALICE_SEED_PHRASE;
 
@@ -219,4 +220,46 @@ fn validate_mnemonic_ok() {
 fn validate_mnemonic_err() {
     let invalid_seed = "park remain person kitchen mule spell knee armed position rail grid";
     assert!(!validate_mnemonic(invalid_seed));
+}
+
+fn test_export_with_path(path: &str) {
+    let genesis_hash = H256::from([0u8; 32]);
+    let mut full_address = String::with_capacity(ALICE_SEED_PHRASE.len() + path.len());
+    full_address.push_str(ALICE_SEED_PHRASE);
+    full_address.push_str(path);
+    let multisigner = full_address_to_multisigner(full_address, Encryption::Sr25519).unwrap();
+    let address_details = AddressDetails {
+        seed_name: "Alice".to_string(),
+        path: path.to_string(),
+        has_pwd: false,
+        network_id: None,
+        encryption: Encryption::Sr25519,
+        secret_exposed: false,
+    };
+
+    let qr = generate_secret_qr(
+        &multisigner,
+        &address_details,
+        &genesis_hash,
+        ALICE_SEED_PHRASE,
+        None,
+    )
+    .expect("Export should succeed for Sr25519 keys with soft derivation paths");
+
+    let QrData::Sensitive { data } = qr else {
+        panic!("Expected Sensitive QR data");
+    };
+    let qr_string = String::from_utf8(data).unwrap();
+    assert!(qr_string.starts_with("secret:0x"));
+    assert!(qr_string.contains(&hex::encode(genesis_hash)));
+}
+
+#[test]
+fn export_secret_key_soft_derivation() {
+    test_export_with_path("/soft");
+}
+
+#[test]
+fn export_secret_key_mixed_derivation() {
+    test_export_with_path("//hard/soft");
 }
