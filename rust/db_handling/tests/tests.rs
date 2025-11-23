@@ -103,11 +103,8 @@ fn export_secret_key_with_path(path: &str) -> Result<MKeyDetails, Error> {
     let identities: Vec<(MultiSigner, AddressDetails)> =
         get_addresses_by_seed_name(&db, seed_name).unwrap();
 
-    let (derivation_multisigner, _) = identities
-        .iter()
-        .find(|(_, a)| a.path == path)
-        .unwrap();
-    
+    let (derivation_multisigner, _) = identities.iter().find(|(_, a)| a.path == path).unwrap();
+
     export_secret_key(
         &db,
         hex::encode(multisigner_to_public(derivation_multisigner)).as_str(),
@@ -2133,7 +2130,6 @@ fn export_secret_key_soft_derivation() {
 fn export_secret_key_mixed_derivation() {
     assert!(export_secret_key_with_path("//hard/soft").is_ok())
 }
-
 
 #[test]
 fn test_create_key_set_generate_default_addresses() {

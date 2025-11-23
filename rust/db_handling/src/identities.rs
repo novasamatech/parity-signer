@@ -1663,10 +1663,7 @@ fn prepare_secret_key_for_export(
             }
 
             // if no seed (for example, soft derivation) then export private key + nonce
-            let secret = seed.map_or_else(
-                || sr25519_pair.to_raw_vec(),
-                |s| s.to_vec()
-            );
+            let secret = seed.map_or_else(|| sr25519_pair.to_raw_vec(), |s| s.to_vec());
 
             Ok(secret)
         }
