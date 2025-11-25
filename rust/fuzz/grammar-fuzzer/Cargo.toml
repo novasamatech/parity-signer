@@ -1,0 +1,23 @@
+[package]
+name = "grammar-fuzzer"
+version = "0.5.0"
+edition = "2021"
+authors = ["Bastian Köcher <git@kchr.de>", "Aarnav Bos <aarnav@srlabs.de>"]
+documentation = "https://docs.rs/merkleized-metadata"
+repository = "https://github.com/bkchr/merkleized-metadata"
+keywords = ["FRAME", "metadata", "polkadot"]
+license = "MIT OR Apache-2.0"
+description = """
+FRAME metadata merkleization
+"""
+readme = "./README.md"
+
+[dependencies]
+array-bytes = { version = "9.1.2", default-features = false }
+autarkie = { git = "https://github.com/R9295/autarkie", version = "0.1.0", features = ["derive", "afl"] }
+blake3 = { version = "1.5.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.7.4", features = [ "derive" ], default-features = false }
+scale-decode = { version = "0.16.0", default-features = false }
+scale-info = { version = "2.11.6", default-features = false }
+serde = { version = "1.0.219", features = ["derive"] }
+frame-metadata = { version = "16.0.0", default-features = false, features = ["std", "legacy", "current"]}
