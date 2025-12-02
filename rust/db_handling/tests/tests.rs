@@ -85,6 +85,36 @@ fn mythos_genesis() -> H256 {
     H256::from_str("f6ee56e9c5277df5b4ce6ae9983ee88f3cbed27d31beeb98f9f84f997a1ab0b9").unwrap()
 }
 
+fn export_secret_key_with_path(path: &str) -> Result<MKeyDetails, Error> {
+    let dbname = tempdir().unwrap();
+    let db = sled::open(dbname).unwrap();
+
+    populate_cold(&db, Verifier { v: None }).unwrap();
+    let ordered_specs = default_chainspecs();
+    let spec = ordered_specs
+        .into_iter()
+        .find(|spec| spec.specs.name == "westend")
+        .unwrap()
+        .specs;
+    let network_id = NetworkSpecsKey::from_parts(&spec.genesis_hash, &spec.encryption);
+    let seed_name = "Alice";
+
+    try_create_address(&db, seed_name, ALICE_SEED_PHRASE, path, &network_id).unwrap();
+    let identities: Vec<(MultiSigner, AddressDetails)> =
+        get_addresses_by_seed_name(&db, seed_name).unwrap();
+
+    let (derivation_multisigner, _) = identities.iter().find(|(_, a)| a.path == path).unwrap();
+
+    export_secret_key(
+        &db,
+        hex::encode(multisigner_to_public(derivation_multisigner)).as_str(),
+        seed_name,
+        &hex::encode(network_id.key()),
+        ALICE_SEED_PHRASE,
+        None,
+    )
+}
+
 #[test]
 fn print_seed_names() {
     let dbname = tempdir().unwrap();
@@ -2084,6 +2114,21 @@ fn test_export_secret_key() {
         .find(|(_, a)| a.path == child_path)
         .unwrap();
     assert!(child_address.secret_exposed);
+}
+
+#[test]
+fn export_secret_key_hard_derivation() {
+    assert!(export_secret_key_with_path("//hard//hardmore").is_ok())
+}
+
+#[test]
+fn export_secret_key_soft_derivation() {
+    assert!(export_secret_key_with_path("/soft").is_ok())
+}
+
+#[test]
+fn export_secret_key_mixed_derivation() {
+    assert!(export_secret_key_with_path("//hard/soft").is_ok())
 }
 
 #[test]
