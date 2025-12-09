@@ -32,6 +32,7 @@ fun BottomSheetWrapperContent(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = bottomSheetState,
+		sheetElevation = 0.dp,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
 				bottomSheetContent()
@@ -90,6 +91,7 @@ fun BottomSheetWrapperRoot(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = modalBottomSheetState,
+		sheetElevation = 0.dp,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
 				bottomSheetContent(handle)

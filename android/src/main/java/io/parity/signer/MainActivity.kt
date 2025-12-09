@@ -1,6 +1,5 @@
 package io.parity.signer
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -21,9 +20,7 @@ class MainActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		ServiceLocator.initActivityDependencies(this)
 
-		//remove automatic insets so bottom sheet can dimm status bar, other views will add their paddings if needed.
-		WindowCompat.setDecorFitsSystemWindows(window, false)
-		window.statusBarColor = Color.TRANSPARENT;
+		WindowCompat.enableEdgeToEdge(window)
 
 		setContent {
 			SignerNewTheme {
