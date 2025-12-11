@@ -13,8 +13,10 @@ import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
 
 /**
- * For use in the same screen with content
+ * Deprecated note: For use in the same screen with content
  * .navigationBarsPadding().captionBarPadding() paddings should be added already
+ * TODO: Bottom sheets must manage insets by themselves as well as any screen in app
+ * TODO: clipping bounds for ModalBottomSheetLayout is a workaround for current insets strategy. Clipping must be removed after solving the previous TODO
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
