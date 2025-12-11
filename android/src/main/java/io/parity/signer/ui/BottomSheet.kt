@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
@@ -29,6 +30,7 @@ fun BottomSheetWrapperContent(
 	}
 
 	ModalBottomSheetLayout(
+		modifier = Modifier.clipToBounds(),
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = bottomSheetState,
