@@ -71,17 +71,19 @@ jobs:
       - name: Setup mdBook
         uses: peaceiris/actions-mdbook@adeb05db28a0c0004681db83893d56c0388ea9ea # v1.2.0
         with:
-          mdbook-version: latest
+          mdbook-version: "0.4.40"
 
       - name: Install mdbook-linkcheck
         uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
         with:
           crate: mdbook-linkcheck
+          version: "0.7.7"
 
       - name: Install mdbook-mermaid
         uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
         with:
           crate: mdbook-mermaid
+          version: "0.14.0"
 
       - name: Build user-docs
         # docs source dir ./docs/book/html/
