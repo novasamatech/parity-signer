@@ -9,7 +9,7 @@ use merkleized_metadata::{
 
 /// Maximum allowed array length to prevent DoS attacks from malicious metadata.
 /// Arrays with length exceeding this limit will be rejected early before iteration.
-const MAX_ARRAY_LEN: u32 = 10_000;
+const MAX_ARRAY_LEN: u32 = 100_000;
 
 use crate::{
     decoding_commons::OutputCard,
