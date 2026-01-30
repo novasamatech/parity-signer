@@ -33,7 +33,7 @@ final class ExportPrivateKeyService {
         _ keyDetails: MKeyDetails,
         completion: @escaping (Result<ExportPrivateKeyViewModel, ServiceError>) -> Void
     ) {
-        backendService.performCall({
+        backendService.performCall {
             try generateSecretKeyQr(
                 publicKey: keyDetails.pubkey,
                 expectedSeedName: keyDetails.address.seedName,
@@ -41,7 +41,7 @@ final class ExportPrivateKeyService {
                 seedPhrase: self.seedsMediator.getSeed(seedName: keyDetails.address.seedName),
                 keyPassword: nil
             )
-        }, completion: { (result: Result<MKeyDetails, ErrorDisplayed>) in
+        } completion: { (result: Result<MKeyDetails, ErrorDisplayed>) in
             switch result {
             case let .success(keyDetails):
                 completion(.success(ExportPrivateKeyViewModel(
@@ -55,6 +55,6 @@ final class ExportPrivateKeyService {
             case let .failure(error):
                 completion(.failure(.init(message: error.backendDisplayError)))
             }
-        })
+        }
     }
 }

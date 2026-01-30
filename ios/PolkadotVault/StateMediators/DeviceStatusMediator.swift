@@ -37,16 +37,16 @@ extension DeviceStatusMediator: DeviceStatusMediating {
             return
         }
 
-        backendService.performCall({
+        backendService.performCall {
             try historyDeviceWasOnline()
-        }, completion: { [weak self] (result: Result<Void, ErrorDisplayed>) in
+        } completion: { [weak self] (result: Result<Void, ErrorDisplayed>) in
             switch result {
             case .success:
                 self?.state = .reported
             case .failure:
                 self?.state = .notReported
             }
-        })
+        }
     }
 
     func deviceWentOffline() {

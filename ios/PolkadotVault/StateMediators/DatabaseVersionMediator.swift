@@ -31,9 +31,9 @@ final class DatabaseVersionMediator {
         guard databaseMediator.isDatabaseAvailable() else { completion(.success(()))
             return
         }
-        backendService.performCall({
+        backendService.performCall {
             try checkDbVersion()
-        }, completion: { (result: Result<Void, ErrorDisplayed>) in
+        } completion: { (result: Result<Void, ErrorDisplayed>) in
             switch result {
             case .success:
                 completion(.success(()))
@@ -45,6 +45,6 @@ final class DatabaseVersionMediator {
                     completion(.failure(.error(.init(message: error.backendDisplayError))))
                 }
             }
-        })
+        }
     }
 }

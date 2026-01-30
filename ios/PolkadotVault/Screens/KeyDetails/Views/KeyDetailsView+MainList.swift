@@ -10,15 +10,29 @@ import SwiftUI
 extension KeyDetailsView {
     @ViewBuilder
     func derivedKeysList() -> some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                // Main key cell
-                rootKeyHeader()
-                // Derived Keys header
-                listHeader()
-                // List
-                derivedKeys()
+        ZStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Main key cell
+                    rootKeyHeader()
+                    // Derived Keys header
+                    listHeader()
+                    // List
+                    derivedKeys()
+                }
             }
+            NavigationLink(
+                destination:
+                KeyDetailsPublicKeyView(
+                    viewModel: .init(
+                        keyDetails: viewModel.presentedKeyDetails,
+                        addressKey: viewModel.presentedPublicKeyDetails,
+                        onCompletion: viewModel.onPublicKeyCompletion(_:)
+                    )
+                )
+                .navigationBarHidden(true),
+                isActive: $viewModel.isPresentingKeyDetails
+            ) { EmptyView() }
         }
     }
 
@@ -38,18 +52,6 @@ extension KeyDetailsView {
                     viewModel.onDerivedKeyTap(deriveKey)
                 }
             }
-            NavigationLink(
-                destination:
-                KeyDetailsPublicKeyView(
-                    viewModel: .init(
-                        keyDetails: viewModel.presentedKeyDetails,
-                        addressKey: viewModel.presentedPublicKeyDetails,
-                        onCompletion: viewModel.onPublicKeyCompletion(_:)
-                    )
-                )
-                .navigationBarHidden(true),
-                isActive: $viewModel.isPresentingKeyDetails
-            ) { EmptyView() }
             Spacer()
                 .frame(height: Heights.actionButton + Spacing.large)
         }

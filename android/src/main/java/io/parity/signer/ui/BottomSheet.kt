@@ -6,14 +6,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.backgroundTertiary
 import kotlinx.coroutines.launch
 
 /**
- * For use in the same screen with content
+ * Deprecated note: For use in the same screen with content
  * .navigationBarsPadding().captionBarPadding() paddings should be added already
+ * TODO: Bottom sheets must manage insets by themselves as well as any screen in app
+ * TODO: clipping bounds for ModalBottomSheetLayout is a workaround for current insets strategy. Clipping must be removed after solving the previous TODO
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -29,9 +32,11 @@ fun BottomSheetWrapperContent(
 	}
 
 	ModalBottomSheetLayout(
+		modifier = Modifier.clipToBounds(),
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = bottomSheetState,
+		sheetElevation = 0.dp,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
 				bottomSheetContent()
@@ -90,6 +95,7 @@ fun BottomSheetWrapperRoot(
 		sheetBackgroundColor = MaterialTheme.colors.backgroundTertiary,
 		sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
 		sheetState = modalBottomSheetState,
+		sheetElevation = 0.dp,
 		sheetContent = {
 			BottomSheetContentWrapperInternal {
 				bottomSheetContent(handle)

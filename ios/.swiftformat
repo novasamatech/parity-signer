@@ -8,6 +8,8 @@
 
 # file options
 --exclude PolkadotVault/Generated/
+--exclude PolkadotVault/Stubs/Stubs.swift
+--exclude PolkadotVault/Previews/Stubs.swift
 
 # rules
 --enable blankLineAfterImports
