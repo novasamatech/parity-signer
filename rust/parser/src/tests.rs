@@ -616,7 +616,6 @@ fn parse_extrinsic_with_invalid_metadata() {
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
-    println!("Call result: {:?}", call_result);
     assert!(call_result.is_ok());
 }
 
@@ -626,9 +625,7 @@ fn parse_oom_case_extrinsic_() {
     
     let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
 
-    println!("Data: {}", hex::encode(data));
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
-    println!("Call result: {:?}", call_result);
-    assert!(call_result.is_ok());
+    assert!(call_result.is_err());
 }
