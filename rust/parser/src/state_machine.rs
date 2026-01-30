@@ -1,11 +1,15 @@
-use alloc::{collections::BTreeMap, string::String, vec::Vec};
+use alloc::{collections::BTreeMap, format, string::String, vec::Vec};
 
-use scale_decode::Visitor;
+use scale_decode::{visitor::DecodeAsTypeResult, Visitor};
 
 use merkleized_metadata::{
     types::{Type, TypeDef, TypeRef},
     ExtraInfo, TypeResolver,
 };
+
+/// Maximum allowed array length to prevent DoS attacks from malicious metadata.
+/// Arrays with length exceeding this limit will be rejected early before iteration.
+const MAX_ARRAY_LEN: u32 = 10_000;
 
 use crate::{
     decoding_commons::OutputCard,
@@ -137,6 +141,32 @@ impl Visitor for StateMachineParser<'_> {
     type TypeResolver = TypeResolver;
     type Value<'scale, 'resolver> = Self;
     type Error = StateError;
+
+    /// Early bailout for types that could cause DoS (e.g., arrays with huge lengths).
+    ///
+    /// This method is called before the type is resolved and decoded. By returning
+    /// `DecodeAsTypeResult::Decoded(Err(...))` here, we bypass the normal decoding path
+    /// entirely, including the `skip_decoding` call that would otherwise iterate through
+    /// all array elements (potentially billions of times for malicious metadata).
+    fn unchecked_decode_as_type<'scale, 'resolver>(
+        self,
+        _input: &mut &'scale [u8],
+        type_id: TypeRef,
+        _types: &'resolver Self::TypeResolver,
+    ) -> DecodeAsTypeResult<Self, Result<Self::Value<'scale, 'resolver>, Self::Error>> {
+        // Check if this type is an array with unreasonable length
+        if let Some(ty) = self.type_registry.get_first_type(&type_id) {
+            if let TypeDef::Array(arr) = &ty.type_def {
+                if arr.len > MAX_ARRAY_LEN {
+                    return DecodeAsTypeResult::Decoded(Err(StateError::BadInput(format!(
+                        "Array length {} exceeds maximum allowed {}",
+                        arr.len, MAX_ARRAY_LEN
+                    ))));
+                }
+            }
+        }
+        DecodeAsTypeResult::Skipped(self)
+    }
 
     fn visit_bool<'scale, 'resolver>(
         mut self,
@@ -415,7 +445,7 @@ impl Visitor for StateMachineParser<'_> {
         let output = visitor.state.process_composite(&input, visitor.indent)?;
         visitor.apply(output);
 
-        while let Some((index, field_result)) = value.enumerate().next() {
+        for (index, field_result) in value.enumerate() {
             visitor.push_indent();
 
             let field = field_result?;
