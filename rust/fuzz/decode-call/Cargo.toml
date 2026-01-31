@@ -3,10 +3,14 @@ name = "decode-call"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+
 [dependencies]
 ziggy = { version = "1.3.2", default-features = false }
 parser = {path = "../../parser"}
-parity-scale-codec = { version = "3.7.5", features = ["derive"] }
+parity-scale-codec = { version = "3.6.9", features = ["derive"] }
+# Pin to avoid schnorrkel version conflict
+substrate-bip39 = "=0.4.4"
 
 [features]
 fuzzing = []
