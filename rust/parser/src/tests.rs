@@ -613,7 +613,9 @@ fn parse_extrinsic_with_malicious_array_type() {
     let proof_line = "3000039881af39160330c2544f9e8fa1b204286e483878327a426e7a3302130345a3b897041c414832766f434e020a0338aec441041c6e365a583472320208fc0428567632577732685a486b031cd4a5ec160345819a4703580badc20004081511fdff04205a634a6b77534259031562cbde05f628dc28040449032fea48580803c62375ac00020b034b2daf9400021603d6dca56403256986630420736f6d344e46734204000330c2544f0428703459496d587242795500007a4f3c61041433e35904ebfc086774801e04e5d8e5d1df46ad98fe8f3c40870dc3f758738fa5835e1ee9831603a9e853fb169e8fa1b208080c51767a10031c4d5564427659771107600942012433627032564366766fb6a57a1c4a57616c674f690460";
     let data = hex::decode(proof_line).unwrap();
 
-    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..])
+        .ok()
+        .unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
@@ -625,7 +627,9 @@ fn parse_extrinsic_with_malicious_array_type() {
 fn parse_extrinsic_with_unknown_type() {
     let data = fs::read("for_tests/malicios_extrinsic").unwrap();
 
-    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..])
+        .ok()
+        .unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
@@ -642,94 +646,21 @@ fn parse_extrinsic_with_malicious_sequence_length() {
     // - Call data claiming 1 million items but only providing 4 bytes
     //
     // Generated using generate_malicious_sequence_hex test (run with --ignored)
-    let proof_line = "04000203000400000000000415160015000100000010746573742a000c1054455354200290d00300010203";
+    let proof_line =
+        "04000203000400000000000415160015000100000010746573742a000c1054455354200290d00300010203";
     let data = hex::decode(proof_line).unwrap();
 
-    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..])
+        .ok()
+        .unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
     // Should be rejected because claimed length (1 million) exceeds available bytes (4)
-    assert!(call_result.is_err(), "Malicious sequence with impossible length should be rejected");
-}
-
-#[test]
-#[ignore] // Run with: cargo test --package parser generate_nested_call_hex -- --ignored --nocapture
-fn generate_nested_call_hex() {
-    use merkleized_metadata::{
-        types::{EnumerationVariant, ExtrinsicMetadata, Field, Type, TypeDef, TypeRef},
-        ExtraInfo, Proof,
-    };
-    use parity_scale_codec::Compact;
-
-    // Create a recursive type structure:
-    // Type 0: RuntimeCall enum with "batch" variant containing Vec<RuntimeCall>
-    // Type 1: Vec<RuntimeCall> (Sequence of Type 0)
-
-    // Type 1: Sequence of Type 0 (Vec<RuntimeCall>)
-    let vec_call_type = Type {
-        path: vec![],
-        type_def: TypeDef::Sequence(TypeRef::ById(Compact(0))),
-        type_id: Compact(1),
-    };
-
-    // Type 0: RuntimeCall enum with batch variant
-    let call_enum_type = Type {
-        path: vec!["RuntimeCall".to_string()],
-        type_def: TypeDef::Enumeration(EnumerationVariant {
-            name: "Utility".to_string(),
-            fields: vec![Field {
-                name: Some("calls".to_string()),
-                ty: TypeRef::ById(Compact(1)), // Vec<RuntimeCall>
-                type_name: Some("Vec<RuntimeCall>".to_string()),
-            }],
-            index: Compact(0),
-        }),
-        type_id: Compact(0),
-    };
-
-    let proof = Proof {
-        leaves: vec![call_enum_type, vec_call_type],
-        leaf_indices: vec![0, 1],
-        nodes: vec![],
-    };
-
-    let extrinsic = ExtrinsicMetadata {
-        version: 4,
-        address_ty: TypeRef::Void,
-        call_ty: TypeRef::ById(Compact(0)), // RuntimeCall enum
-        signature_ty: TypeRef::Void,
-        signed_extensions: vec![],
-    };
-
-    let extra_info = ExtraInfo {
-        spec_version: 1,
-        spec_name: "test".to_string(),
-        base58_prefix: 42,
-        decimals: 12,
-        token_symbol: "TEST".to_string(),
-    };
-
-    let metadata = MetadataProof {
-        proof,
-        extrinsic,
-        extra_info,
-    };
-
-    // Create deeply nested call data: each level is variant 0 with Vec of length 1
-    // Pattern: 00 (variant) 04 (compact len=1) repeated
-    // Must exceed MAX_RECURSION_DEPTH (64) to trigger the protection
-    let nesting_depth = 1000;
-    let mut call_data: Vec<u8> = Vec::new();
-    for _ in 0..nesting_depth {
-        call_data.push(0x00); // variant index 0
-        call_data.push(0x04); // compact encoded length 1
-    }
-    call_data.push(0x00); // innermost variant
-    call_data.push(0x00); // empty vec (length 0)
-
-    let encoded = (metadata, call_data).encode();
-    println!("Nested call hex: {}", hex::encode(&encoded));
+    assert!(
+        call_result.is_err(),
+        "Malicious sequence with impossible length should be rejected"
+    );
 }
 
 #[test]
@@ -742,10 +673,15 @@ fn parse_extrinsic_with_deeply_nested_calls() {
     // Contains 1000 levels of nested batch calls
     let data = fs::read("for_tests/deeply_nested_extrinsic").unwrap();
 
-    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..])
+        .ok()
+        .unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
     // Should be rejected due to excessive recursion depth
-    assert!(call_result.is_err(), "Deeply nested calls should be rejected to prevent stack overflow");
+    assert!(
+        call_result.is_err(),
+        "Deeply nested calls should be rejected to prevent stack overflow"
+    );
 }
