@@ -157,8 +157,7 @@ impl Visitor for StateMachineParser<'_> {
     ) -> DecodeAsTypeResult<Self, Result<Self::Value<'scale, 'resolver>, Self::Error>> {
         if let Some(ty) = self.type_registry.get_first_type(&type_id) {
             match &ty.type_def {
-                // Check array length against both MAX_ARRAY_LEN and available bytes.
-                // Each element requires at least 1 byte for non-zero-sized types.
+                // Each element of array or sequence requires at least 1 byte for non-zero-sized types.
                 TypeDef::Array(arr) => {
                     if arr.len as usize > input.len() {
                         return DecodeAsTypeResult::Decoded(Err(StateError::BadInput(format!(
@@ -168,8 +167,6 @@ impl Visitor for StateMachineParser<'_> {
                         ))));
                     }
                 }
-                // Check sequence length against available bytes.
-                // Each element requires at least 1 byte for non-zero-sized types.
                 TypeDef::Sequence(_) => {
                     // Peek at the compact-encoded length without consuming bytes
                     let mut peek_input = *input;
