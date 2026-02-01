@@ -411,7 +411,7 @@ impl Visitor for StateMachineParser<'_> {
 
         // Extract item type from sequence's TypeDef to avoid using iterator which pre-decodes with IgnoreVisitor
         let item_type_id = seq_type.and_then(|ty| match &ty.type_def {
-            TypeDef::Sequence(inner_type) => Some(inner_type.clone()),
+            TypeDef::Sequence(inner_type) => Some(*inner_type),
             _ => None,
         });
 
@@ -505,7 +505,7 @@ impl Visitor for StateMachineParser<'_> {
         let field_infos: Vec<_> = value
             .fields()
             .iter()
-            .map(|f| (f.name.map(|s| s.to_string()), f.id.clone()))
+            .map(|f| (f.name.map(|s| s.to_string()), f.id))
             .collect();
 
         for (index, (field_name, field_type_id)) in field_infos.into_iter().enumerate() {
@@ -639,7 +639,7 @@ impl Visitor for StateMachineParser<'_> {
             .fields()
             .fields()
             .iter()
-            .map(|f| (f.name.map(|s| s.to_string()), f.id.clone()))
+            .map(|f| (f.name.map(|s| s.to_string()), f.id))
             .collect();
 
         for (index, (field_name, field_type_id)) in field_infos.into_iter().enumerate() {
@@ -696,7 +696,7 @@ impl Visitor for StateMachineParser<'_> {
 
         // Extract item type from array's TypeDef to avoid using iterator which pre-decodes with IgnoreVisitor
         let item_type_id = arr_type.and_then(|ty| match &ty.type_def {
-            TypeDef::Array(arr) => Some(arr.type_param.clone()),
+            TypeDef::Array(arr) => Some(arr.type_param),
             _ => None,
         });
 
