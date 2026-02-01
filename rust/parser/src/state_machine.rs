@@ -18,7 +18,7 @@ use crate::{
 ///
 /// Calculation for mobile safety (iOS secondary thread = 512KB, Android ~1MB):
 /// - Each batch nesting level uses 4 stack entries (variant, field, sequence, item)
-/// - Each level also adds ~2 decode_with_visitor calls to native stack
+/// - Each level also adds approx. 2 decode_with_visitor calls to native stack
 /// - Empirically tested: 128 works safely, 256 overflows in debug builds
 /// - 128 / 4 = 32 levels of nested batch calls supported
 ///
