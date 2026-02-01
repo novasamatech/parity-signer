@@ -652,3 +652,100 @@ fn parse_extrinsic_with_malicious_sequence_length() {
     // Should be rejected because claimed length (1 million) exceeds available bytes (4)
     assert!(call_result.is_err(), "Malicious sequence with impossible length should be rejected");
 }
+
+#[test]
+#[ignore] // Run with: cargo test --package parser generate_nested_call_hex -- --ignored --nocapture
+fn generate_nested_call_hex() {
+    use merkleized_metadata::{
+        types::{EnumerationVariant, ExtrinsicMetadata, Field, Type, TypeDef, TypeRef},
+        ExtraInfo, Proof,
+    };
+    use parity_scale_codec::Compact;
+
+    // Create a recursive type structure:
+    // Type 0: RuntimeCall enum with "batch" variant containing Vec<RuntimeCall>
+    // Type 1: Vec<RuntimeCall> (Sequence of Type 0)
+
+    // Type 1: Sequence of Type 0 (Vec<RuntimeCall>)
+    let vec_call_type = Type {
+        path: vec![],
+        type_def: TypeDef::Sequence(TypeRef::ById(Compact(0))),
+        type_id: Compact(1),
+    };
+
+    // Type 0: RuntimeCall enum with batch variant
+    let call_enum_type = Type {
+        path: vec!["RuntimeCall".to_string()],
+        type_def: TypeDef::Enumeration(EnumerationVariant {
+            name: "Utility".to_string(),
+            fields: vec![Field {
+                name: Some("calls".to_string()),
+                ty: TypeRef::ById(Compact(1)), // Vec<RuntimeCall>
+                type_name: Some("Vec<RuntimeCall>".to_string()),
+            }],
+            index: Compact(0),
+        }),
+        type_id: Compact(0),
+    };
+
+    let proof = Proof {
+        leaves: vec![call_enum_type, vec_call_type],
+        leaf_indices: vec![0, 1],
+        nodes: vec![],
+    };
+
+    let extrinsic = ExtrinsicMetadata {
+        version: 4,
+        address_ty: TypeRef::Void,
+        call_ty: TypeRef::ById(Compact(0)), // RuntimeCall enum
+        signature_ty: TypeRef::Void,
+        signed_extensions: vec![],
+    };
+
+    let extra_info = ExtraInfo {
+        spec_version: 1,
+        spec_name: "test".to_string(),
+        base58_prefix: 42,
+        decimals: 12,
+        token_symbol: "TEST".to_string(),
+    };
+
+    let metadata = MetadataProof {
+        proof,
+        extrinsic,
+        extra_info,
+    };
+
+    // Create deeply nested call data: each level is variant 0 with Vec of length 1
+    // Pattern: 00 (variant) 04 (compact len=1) repeated
+    // Must exceed MAX_RECURSION_DEPTH (64) to trigger the protection
+    let nesting_depth = 1000;
+    let mut call_data: Vec<u8> = Vec::new();
+    for _ in 0..nesting_depth {
+        call_data.push(0x00); // variant index 0
+        call_data.push(0x04); // compact encoded length 1
+    }
+    call_data.push(0x00); // innermost variant
+    call_data.push(0x00); // empty vec (length 0)
+
+    let encoded = (metadata, call_data).encode();
+    println!("Nested call hex: {}", hex::encode(&encoded));
+}
+
+#[test]
+fn parse_extrinsic_with_deeply_nested_calls() {
+    // This test verifies that deeply nested call data (e.g., utility.batch containing
+    // utility.batch containing ...) is rejected to prevent stack overflow.
+    // See: https://github.com/novasamatech/parity-signer/issues/2542
+    //
+    // Generated using generate_nested_call_hex test (run with --ignored)
+    // Contains 1000 levels of nested batch calls
+    let data = fs::read("for_tests/deeply_nested_extrinsic").unwrap();
+
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+
+    let call_result = decode_call(&mut &call_data[..], &metadata);
+
+    // Should be rejected due to excessive recursion depth
+    assert!(call_result.is_err(), "Deeply nested calls should be rejected to prevent stack overflow");
+}
