@@ -15,9 +15,15 @@ use crate::{
 
 /// Maximum allowed recursion depth to prevent stack overflow from deeply nested types.
 /// This protects against malicious payloads like deeply nested utility.batch calls.
-/// Each nested batch call uses ~4 stack slots (variant, field, sequence, item),
-/// so a value of 64 allows ~16 levels of nested batch calls.
-const MAX_RECURSION_DEPTH: u32 = 64;
+///
+/// Calculation for mobile safety (iOS secondary thread = 512KB, Android ~1MB):
+/// - Each batch nesting level uses 4 stack entries (variant, field, sequence, item)
+/// - Each level also adds ~2 decode_with_visitor calls to native stack
+/// - Empirically tested: 128 works safely, 256 overflows in debug builds
+/// - 128 / 4 = 32 levels of nested batch calls supported
+///
+/// This is far beyond any legitimate use case (complex governance rarely exceeds 6 levels).
+const MAX_RECURSION_DEPTH: u32 = 128;
 
 /// Implements the state machine responsible for decoding SCALE-encoded data
 /// into a human-readable format, represented as a list of output cards.
