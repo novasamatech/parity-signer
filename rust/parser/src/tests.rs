@@ -607,7 +607,7 @@ fn parse_raw_extrinsic_with_proof() {
 }
 
 #[test]
-fn parse_extrinsic_with_invalid_metadata() {
+fn parse_extrinsic_with_malicious_array_type() {
     // This test verifies that malicious metadata with unreasonably large array sizes
     // is rejected early instead of causing a hang/DoS.
     let proof_line = "3000039881af39160330c2544f9e8fa1b204286e483878327a426e7a3302130345a3b897041c414832766f434e020a0338aec441041c6e365a583472320208fc0428567632577732685a486b031cd4a5ec160345819a4703580badc20004081511fdff04205a634a6b77534259031562cbde05f628dc28040449032fea48580803c62375ac00020b034b2daf9400021603d6dca56403256986630420736f6d344e46734204000330c2544f0428703459496d587242795500007a4f3c61041433e35904ebfc086774801e04e5d8e5d1df46ad98fe8f3c40870dc3f758738fa5835e1ee9831603a9e853fb169e8fa1b208080c51767a10031c4d5564427659771107600942012433627032564366766fb6a57a1c4a57616c674f690460";
@@ -624,10 +624,31 @@ fn parse_extrinsic_with_invalid_metadata() {
 #[test]
 fn parse_extrinsic_with_unknown_type() {
     let data = fs::read("for_tests/malicios_extrinsic").unwrap();
-    
+
     let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
 
     let call_result = decode_call(&mut &call_data[..], &metadata);
 
     assert!(call_result.is_err());
+}
+
+#[test]
+fn parse_extrinsic_with_malicious_sequence_length() {
+    // This test verifies that malicious call data with a sequence claiming more items
+    // than available bytes is rejected early instead of causing a hang/DoS.
+    //
+    // The hex data below contains:
+    // - MetadataProof with a Sequence type (Vec<u8>) as the call type
+    // - Call data claiming 1 million items but only providing 4 bytes
+    //
+    // Generated using generate_malicious_sequence_hex test (run with --ignored)
+    let proof_line = "04000203000400000000000415160015000100000010746573742a000c1054455354200290d00300010203";
+    let data = hex::decode(proof_line).unwrap();
+
+    let (metadata, call_data) = <(MetadataProof, Vec<u8>)>::decode(&mut &data[..]).ok().unwrap();
+
+    let call_result = decode_call(&mut &call_data[..], &metadata);
+
+    // Should be rejected because claimed length (1 million) exceeds available bytes (4)
+    assert!(call_result.is_err(), "Malicious sequence with impossible length should be rejected");
 }

@@ -1,15 +1,12 @@
 use alloc::{collections::BTreeMap, format, string::String, vec::Vec};
 
+use parity_scale_codec::Decode;
 use scale_decode::{visitor::DecodeAsTypeResult, Visitor};
 
 use merkleized_metadata::{
     types::{Type, TypeDef, TypeRef},
     ExtraInfo, TypeResolver,
 };
-
-/// Maximum allowed array length to prevent DoS attacks from malicious metadata.
-/// Arrays with length exceeding this limit will be rejected early before iteration.
-const MAX_ARRAY_LEN: u32 = 100_000;
 
 use crate::{
     decoding_commons::OutputCard,
@@ -142,27 +139,55 @@ impl Visitor for StateMachineParser<'_> {
     type Value<'scale, 'resolver> = Self;
     type Error = StateError;
 
-    /// Early bailout for types that could cause DoS (e.g., arrays with huge lengths).
+    /// Early bailout for types that could cause DoS (e.g., arrays or sequences with huge lengths).
     ///
     /// This method is called before the type is resolved and decoded. By returning
     /// `DecodeAsTypeResult::Decoded(Err(...))` here, we bypass the normal decoding path
     /// entirely, including the `skip_decoding` call that would otherwise iterate through
-    /// all array elements (potentially billions of times for malicious metadata).
+    /// all elements (potentially billions of times for malicious input).
+    ///
+    /// Note: This validation assumes non-zero-sized element types (at least 1 byte per item).
+    /// Arrays or sequences with zero-sized element types (e.g., `[(); N]` or `Vec<()>`) are
+    /// not supported and will be rejected if their length exceeds available bytes.
     fn unchecked_decode_as_type<'scale, 'resolver>(
         self,
-        _input: &mut &'scale [u8],
+        input: &mut &'scale [u8],
         type_id: TypeRef,
         _types: &'resolver Self::TypeResolver,
     ) -> DecodeAsTypeResult<Self, Result<Self::Value<'scale, 'resolver>, Self::Error>> {
-        // Check if this type is an array with unreasonable length
         if let Some(ty) = self.type_registry.get_first_type(&type_id) {
-            if let TypeDef::Array(arr) = &ty.type_def {
-                if arr.len > MAX_ARRAY_LEN {
-                    return DecodeAsTypeResult::Decoded(Err(StateError::BadInput(format!(
-                        "Array length {} exceeds maximum allowed {}",
-                        arr.len, MAX_ARRAY_LEN
-                    ))));
+            match &ty.type_def {
+                // Check array length against both MAX_ARRAY_LEN and available bytes.
+                // Each element requires at least 1 byte for non-zero-sized types.
+                TypeDef::Array(arr) => {
+                    if arr.len as usize > input.len() {
+                        return DecodeAsTypeResult::Decoded(Err(StateError::BadInput(format!(
+                            "Array claims {} items but only {} bytes remain",
+                            arr.len,
+                            input.len()
+                        ))));
+                    }
                 }
+                // Check sequence length against available bytes.
+                // Each element requires at least 1 byte for non-zero-sized types.
+                TypeDef::Sequence(_) => {
+                    // Peek at the compact-encoded length without consuming bytes
+                    let mut peek_input = *input;
+                    if let Ok(parity_scale_codec::Compact(claimed_len)) =
+                        <parity_scale_codec::Compact<u32>>::decode(&mut peek_input)
+                    {
+                        let remaining_bytes = peek_input.len();
+                        if claimed_len as usize > remaining_bytes {
+                            return DecodeAsTypeResult::Decoded(Err(StateError::BadInput(
+                                format!(
+                                    "Sequence claims {} items but only {} bytes remain",
+                                    claimed_len, remaining_bytes
+                                ),
+                            )));
+                        }
+                    }
+                }
+                _ => {}
             }
         }
         DecodeAsTypeResult::Skipped(self)
