@@ -551,10 +551,16 @@ impl Visitor for StateMachineParser<'_> {
     ) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
         let mut visitor = self;
 
-        let path = visitor
-            .type_registry
-            .get_first_type(&type_id)
-            .map(|v| v.path);
+        let tuple_type = visitor.type_registry.get_first_type(&type_id);
+        let path = tuple_type.as_ref().map(|v| v.path.clone());
+
+        // Extract item type refs from tuple's TypeDef to avoid using iterator which pre-decodes with IgnoreVisitor
+        let item_type_refs: Vec<TypeRef> = tuple_type
+            .and_then(|ty| match ty.type_def {
+                TypeDef::Tuple(refs) => Some(refs),
+                _ => None,
+            })
+            .unwrap_or_default();
 
         let items_count = value.remaining();
 
@@ -577,12 +583,17 @@ impl Visitor for StateMachineParser<'_> {
         for index in 0..items_count {
             visitor.push_indent();
 
+            let item_path = item_type_refs
+                .get(index)
+                .and_then(|type_ref| visitor.type_registry.get_first_type(type_ref))
+                .map(|ty| ty.path);
+
             let input = StateInputCompoundItem {
                 index,
                 name: None,
-                path: &None,
+                path: &item_path,
                 extra_info: visitor.extra_info.clone(),
-                type_name: None,
+                type_name: item_path.as_ref().and_then(|p| p.last()).cloned(),
                 items_count,
             };
 
