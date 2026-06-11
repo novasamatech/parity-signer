@@ -89,6 +89,13 @@ impl StateOutput {
 pub trait State: Send + Sync {
     fn clone_box(&self) -> Box<dyn State>;
 
+    /// Whether an upcoming byte sequence (`Vec<u8>`) holds human-readable text
+    /// and should be rendered as a single text card. The byte-sequence fast
+    /// path in `state_machine.rs` consults this flag.
+    fn expects_text(&self) -> bool {
+        false
+    }
+
     fn get_default_output(&self, input: String, indent: u32) -> StateOutput {
         let card = OutputCard {
             card: ParserCard::Default(input),
@@ -316,8 +323,16 @@ pub trait State: Send + Sync {
             }
         };
 
-        let next_state: Box<dyn State> =
-            self.get_special_state_or_default(&input.type_name, &input.extra_info);
+        // Same field-name rule as the legacy decoder (`decoding_sci.rs`): the
+        // `remark` of `system.remark`/`system.remarkWithEvent` is user text.
+        let next_state: Box<dyn State> = if matches!(
+            input.name.as_deref(),
+            Some("remark") | Some("remark_with_event")
+        ) {
+            Box::new(TextState)
+        } else {
+            self.get_special_state_or_default(&input.type_name, &input.extra_info)
+        };
 
         Ok(StateOutput {
             next_state,
@@ -419,5 +434,21 @@ pub struct DefaultState;
 impl State for DefaultState {
     fn clone_box(&self) -> Box<dyn State> {
         Box::new(self.clone())
+    }
+}
+
+/// Entered for fields whose bytes are human-readable text (e.g. `remark`).
+/// Behaves as [`DefaultState`] for every type except byte sequences, which the
+/// state machine renders as a single text card instead of per-byte cards.
+#[derive(Debug, Clone, Default)]
+pub struct TextState;
+
+impl State for TextState {
+    fn clone_box(&self) -> Box<dyn State> {
+        Box::new(self.clone())
+    }
+
+    fn expects_text(&self) -> bool {
+        true
     }
 }
