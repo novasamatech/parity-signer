@@ -685,3 +685,136 @@ fn parse_extrinsic_with_deeply_nested_calls() {
         "Deeply nested calls should be rejected to prevent stack overflow"
     );
 }
+
+/// Builds a minimal `MetadataProof` describing a single-pallet runtime whose
+/// only call is `System::<method_name> { <field_name>: Vec<u8> }`.
+fn byte_sequence_metadata_proof(method_name: &str, field_name: &str) -> MetadataProof {
+    use merkleized_metadata::types::{
+        EnumerationVariant, ExtrinsicMetadata, Field, Type, TypeDef, TypeRef,
+    };
+    use merkleized_metadata::{ExtraInfo, Proof};
+
+    let call_enum = Type {
+        path: vec!["test_runtime".to_string(), "RuntimeCall".to_string()],
+        type_def: TypeDef::Enumeration(EnumerationVariant {
+            name: "System".to_string(),
+            fields: vec![Field {
+                name: None,
+                ty: TypeRef::ById(1u32.into()),
+                type_name: None,
+            }],
+            index: 0u32.into(),
+        }),
+        type_id: 0u32.into(),
+    };
+
+    let pallet_call_enum = Type {
+        path: vec![
+            "frame_system".to_string(),
+            "pallet".to_string(),
+            "Call".to_string(),
+        ],
+        type_def: TypeDef::Enumeration(EnumerationVariant {
+            name: method_name.to_string(),
+            fields: vec![Field {
+                name: Some(field_name.to_string()),
+                ty: TypeRef::ById(2u32.into()),
+                type_name: Some("Vec<u8>".to_string()),
+            }],
+            index: 7u32.into(),
+        }),
+        type_id: 1u32.into(),
+    };
+
+    let byte_sequence = Type {
+        path: vec![],
+        type_def: TypeDef::Sequence(TypeRef::U8),
+        type_id: 2u32.into(),
+    };
+
+    MetadataProof {
+        proof: Proof {
+            leaves: vec![call_enum, pallet_call_enum, byte_sequence],
+            leaf_indices: vec![0, 1, 2],
+            nodes: vec![],
+        },
+        extrinsic: ExtrinsicMetadata {
+            version: 4,
+            address_ty: TypeRef::Void,
+            call_ty: TypeRef::ById(0u32.into()),
+            signature_ty: TypeRef::Void,
+            signed_extensions: vec![],
+        },
+        extra_info: ExtraInfo {
+            spec_version: 1,
+            spec_name: "test".to_string(),
+            base58_prefix: 42,
+            decimals: 12,
+            token_symbol: "UNIT".to_string(),
+        },
+    }
+}
+
+fn encode_byte_sequence_call(payload: &[u8]) -> Vec<u8> {
+    // pallet variant 0 (System), method variant 7, then SCALE-encoded Vec<u8>
+    let mut call_data = vec![0u8, 7u8];
+    call_data.extend(payload.to_vec().encode());
+    call_data
+}
+
+fn collect_text_cards(cards: &[crate::decoding_commons::OutputCard]) -> Vec<String> {
+    cards
+        .iter()
+        .filter_map(|c| match &c.card {
+            crate::cards::ParserCard::Text(text) => Some(text.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+fn collect_default_cards(cards: &[crate::decoding_commons::OutputCard]) -> Vec<String> {
+    cards
+        .iter()
+        .filter_map(|c| match &c.card {
+            crate::cards::ParserCard::Default(value) => Some(value.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+#[test]
+fn parse_remark_with_event_bytes_as_text() {
+    let metadata = byte_sequence_metadata_proof("remark_with_event", "remark");
+    let call_data = encode_byte_sequence_call(b"verify proxy ping");
+
+    let cards = decode_call(&mut &call_data[..], &metadata).unwrap();
+
+    assert_eq!(collect_text_cards(&cards), vec!["verify proxy ping"]);
+    assert_eq!(
+        collect_default_cards(&cards),
+        Vec::<String>::new(),
+        "remark bytes must not be rendered as per-byte cards"
+    );
+}
+
+#[test]
+fn parse_remark_with_invalid_utf8_as_hex() {
+    let metadata = byte_sequence_metadata_proof("remark_with_event", "remark");
+    let call_data = encode_byte_sequence_call(&[0xff, 0xfe, 0x00]);
+
+    let cards = decode_call(&mut &call_data[..], &metadata).unwrap();
+
+    assert_eq!(collect_text_cards(&cards), Vec::<String>::new());
+    assert_eq!(collect_default_cards(&cards), vec!["0xfffe00"]);
+}
+
+#[test]
+fn parse_non_remark_byte_sequence_as_single_hex_card() {
+    let metadata = byte_sequence_metadata_proof("set_code", "code");
+    let call_data = encode_byte_sequence_call(&[0xde, 0xad, 0xbe, 0xef]);
+
+    let cards = decode_call(&mut &call_data[..], &metadata).unwrap();
+
+    assert_eq!(collect_text_cards(&cards), Vec::<String>::new());
+    assert_eq!(collect_default_cards(&cards), vec!["0xdeadbeef"]);
+}
