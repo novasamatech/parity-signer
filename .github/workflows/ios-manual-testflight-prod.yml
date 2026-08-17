@@ -10,7 +10,7 @@ on:
 jobs:
   distribute_testflight:
     if: contains('["krodak","ERussel","stepanLav"]', github.actor)
-    runs-on: macos-15
+    runs-on: macos-26
     name: Distribute TestFlight Production Build
 
     steps:

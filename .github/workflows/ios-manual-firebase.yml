@@ -14,7 +14,7 @@ on:
 
 jobs:
   distribute-firebase:
-    runs-on: macos-15
+    runs-on: macos-26
     name: Distribute Firabase QA Build
 
     steps:
