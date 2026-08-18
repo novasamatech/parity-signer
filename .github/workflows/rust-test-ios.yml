@@ -13,14 +13,18 @@ on:
 jobs:
   check:
     name: Cargo test on macOS
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
 
       - name: Install dependencies
+        shell: bash
         run: |
-          brew install opencv
+          # The default `opencv` formula is OpenCV 5 now, which the pinned opencv
+          # crate cannot bind. Stay on the OpenCV 4 line the Linux jobs use.
+          brew install opencv@4
+          echo "PKG_CONFIG_PATH=$(brew --prefix opencv@4)/lib/pkgconfig" >> "$GITHUB_ENV"
 
       - name: Install Rust stable toolchain
         uses: dtolnay/rust-toolchain@stable
