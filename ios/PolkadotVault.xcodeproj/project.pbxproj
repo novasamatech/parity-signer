@@ -3218,7 +3218,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 7.3.0;
+				MARKETING_VERSION = 7.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3253,7 +3253,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 7.3.0;
+				MARKETING_VERSION = 7.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3395,7 +3395,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolkadotVault",
 				);
-				MARKETING_VERSION = 7.3.0;
+				MARKETING_VERSION = 7.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_MODULE_NAME = PolkadotVault;
 				PROVISIONING_PROFILE_SPECIFIER = "";
