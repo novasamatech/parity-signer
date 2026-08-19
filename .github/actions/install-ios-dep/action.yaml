@@ -7,13 +7,13 @@ runs:
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "2.7"
+        ruby-version: "3.2"
         bundler-cache: false
 
     - name: Setup - Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: 16
+        xcode-version: "26"
 
     - name: Install dependencies
       shell: bash
