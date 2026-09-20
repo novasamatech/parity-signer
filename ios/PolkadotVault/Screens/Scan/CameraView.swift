@@ -346,6 +346,10 @@ extension CameraView {
                     style: .info
                 )
                 isSnackbarPresented = true
+                guard !seedsMediator.seedNames.isEmpty else {
+                    resumeCamera()
+                    return
+                }
                 networkName = network
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self.isPresentingAddKeysForNetwork = true

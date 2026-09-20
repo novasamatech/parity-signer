@@ -15,6 +15,8 @@ protocol OnboardingMediating: AnyObject {
 
     var isUserOnboarded: Bool { get }
 
+    func prepareForScanning(_ completion: @escaping (Bool) -> Void)
+    func finishOnboarding()
     func onboard(verifierRemoved: Bool)
 }
 
@@ -41,6 +43,26 @@ final class OnboardingMediator: OnboardingMediating {
         self.databaseMediator = databaseMediator
         // Set initial state based on database availability
         onboardingDoneSubject.send(isUserOnboarded)
+    }
+
+    func prepareForScanning(_ completion: @escaping (Bool) -> Void) {
+        guard seedsMediator.removeAllSeeds(), databaseMediator.recreateDatabaseFile() else {
+            completion(false)
+            return
+        }
+        navigationInitialisationService.initialiseNavigation(verifierRemoved: false) { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure:
+                completion(false)
+            }
+        }
+    }
+
+    func finishOnboarding() {
+        seedsMediator.refreshSeeds()
+        onboardingDoneSubject.send(true)
     }
 
     func onboard(verifierRemoved: Bool) {
