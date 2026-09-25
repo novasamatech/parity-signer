@@ -9,8 +9,11 @@ use merkleized_metadata::{
 };
 
 use crate::{
+    cards::ParserCard,
     decoding_commons::OutputCard,
-    state::{State, StateError, StateInputCompound, StateInputCompoundItem, StateOutput},
+    state::{
+        DefaultState, State, StateError, StateInputCompound, StateInputCompoundItem, StateOutput,
+    },
 };
 
 /// Maximum allowed recursion depth to prevent stack overflow from deeply nested types.
@@ -143,6 +146,24 @@ impl StateMachineParser<'_> {
 
     fn pop_indent(&mut self) {
         self.indent = self.stack.pop().unwrap();
+    }
+}
+
+/// Minimal visitor that extracts a single `u8` — used to drain byte sequences
+/// without producing per-byte cards.
+struct U8Collector;
+
+impl Visitor for U8Collector {
+    type TypeResolver = TypeResolver;
+    type Value<'scale, 'resolver> = u8;
+    type Error = StateError;
+
+    fn visit_u8<'scale, 'resolver>(
+        self,
+        value: u8,
+        _type_id: TypeRef,
+    ) -> Result<Self::Value<'scale, 'resolver>, Self::Error> {
+        Ok(value)
     }
 }
 
@@ -416,6 +437,39 @@ impl Visitor for StateMachineParser<'_> {
         });
 
         let items_count = value.remaining();
+
+        // Byte sequences (`Vec<u8>`) collapse into a single card: UTF-8 text when
+        // the current state expects text (`remark`-like fields), hex otherwise.
+        // Per-byte numeric cards would make the value unreviewable on the signing
+        // screen.
+        if matches!(item_type_id, Some(TypeRef::U8)) {
+            let mut bytes = Vec::with_capacity(items_count);
+            for _ in 0..items_count {
+                let byte = value
+                    .decode_item(U8Collector)
+                    .ok_or_else(|| StateError::BadInput("Unexpected end of sequence".into()))??;
+                bytes.push(byte);
+            }
+
+            let card = if visitor.state.expects_text() {
+                match String::from_utf8(bytes) {
+                    Ok(text) => ParserCard::Text(text),
+                    Err(error) => {
+                        ParserCard::Default(format!("0x{}", hex::encode(error.into_bytes())))
+                    }
+                }
+            } else {
+                ParserCard::Default(format!("0x{}", hex::encode(&bytes)))
+            };
+
+            visitor.cards.push(OutputCard {
+                card,
+                indent: visitor.indent,
+            });
+            visitor.state = Box::new(DefaultState);
+
+            return Ok(visitor);
+        }
 
         let input = StateInputCompound {
             name: None,

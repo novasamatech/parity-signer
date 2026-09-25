@@ -30,9 +30,9 @@ When you first launch Vault, it prompts you to read and accept terms and conditi
 
 ### Create keys
 
-Open key manager by tapping bottom left symbol. On fresh start you will be prompted to create seed (otherwise you could always create more seeds by tapping `New seed` button in Key Manager). Enter any convenient seed name (it does not matter anything and is not used anywhere except for this particulat Vault device) and - if you would like to use custom seed phrase - switch to recovery mode and type the seed phrase. Custom seed phrase should be used only to recover or import existing key(s), do not input custom seed phrase unless it is properly random! **Security of your accounts relies on randomness of seed phrase**. If you are generating new seed phrase, use built-in random generator and do not input a custom seed phrase.
+Open key manager by tapping bottom left symbol. On fresh start you will be prompted to create seed (otherwise you could always create more seeds by tapping `New seed` button in Key Manager). Enter any convenient seed name (it does not matter anything and is not used anywhere except for this particular Vault device) and - if you would like to use custom seed phrase - switch to recovery mode and type the seed phrase. Custom seed phrase should be used only to recover or import existing key(s), do not input custom seed phrase unless it is properly random! **Security of your accounts relies on randomness of seed phrase**. If you are generating new seed phrase, use built-in random generator and do not input a custom seed phrase.
 
-Once you click `create` button, you will be prompted to authenticate yourself. This will happen every time cruptographic engine of the phone is used to handle seeds - on all creations, backups, derivations and signatures and in some OS versions on starting the Vault.
+Once you click `create` button, you will be prompted to authenticate yourself. This will happen every time cryptographic engine of the phone is used to handle seeds - on all creations, backups, derivations and signatures and in some OS versions on starting the Vault.
 
 You will see the created secret seed. Please back it up on paper and store it in safe place. If you lose your Vault device or it will become non-functional, you will be able to recover your keys using this seed phrase. Anyone could recover your keys with knowledge of this phrase. If you lose this seed phrase, though, **it will be impossible to recover your keys**. You can check the seed phrase anytime in Settings menu, but make sure that it is backed up at all times.
 
@@ -44,4 +44,4 @@ To learn more on key generation, read [subkey specifications](https://substrate.
 
 Once you have a keypair you would like to use, you should first export it to hot wallet. Tap the key and select `Export` button. You will see the export QR code you can use with hot wallet.
 
-Details on [signing with Pokadot.js Apps](./Kusama-tutorial.md)
+Details on [signing with Polkadot.js Apps](./Kusama-tutorial.md)

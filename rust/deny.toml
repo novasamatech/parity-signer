@@ -20,6 +20,12 @@ ignore = [
     "RUSTSEC-2025-0009",  # ring AES panic (via rustls; upgrade when jsonrpsee/rustls allow)
     "RUSTSEC-2025-0134",  # rustls-pemfile unmaintained (via rustls-native-certs)
     "RUSTSEC-2025-0055",  # tracing-subscriber ANSI injection (via substrate sp-tracing)
+    "RUSTSEC-2026-0007",  # bytes BytesMut::reserve integer overflow (via substrate/subxt deps)
+    "RUSTSEC-2025-0161",  # libsecp256k1 unmaintained (via substrate sp-io)
+    "RUSTSEC-2026-0098",  # rustls-webpki name constraints URI (via subxt/jsonrpsee tls)
+    "RUSTSEC-2026-0099",  # rustls-webpki name constraints wildcard (via subxt/jsonrpsee tls)
+    "RUSTSEC-2026-0104",  # rustls-webpki CRL parsing panic (via subxt/jsonrpsee tls)
+    "RUSTSEC-2026-0009",  # time DoS via stack exhaustion (via transitive deps)
 ]
 
 [licenses]

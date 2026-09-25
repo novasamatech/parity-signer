@@ -901,7 +901,7 @@
 //! `$ cargo run make-cold-release <optional path>`
 //!
 //! Removes old cold release database and generates new one with default values
-//! (unitiniated) at user-provided path or, if no valid path is given, at
+//! (uninitiated) at user-provided path or, if no valid path is given, at
 //! default path [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
 //!
 //! By default, the uninitiated cold release database contains:
