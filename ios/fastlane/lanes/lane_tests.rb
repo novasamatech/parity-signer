@@ -9,7 +9,7 @@ lane :test_build do |options|
   scan(
     clean: true,
     scheme: scheme,
-    device: "iPhone 15",
+    device: "iPhone 17",
     xcargs: "-skipPackagePluginValidation -skipMacroValidation",
     output_directory: "./fastlane/test_output/"
   )
