@@ -7,13 +7,13 @@ runs:
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "2.7"
+        ruby-version: "3.2"
         bundler-cache: false
 
     - name: Setup - Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: 16
+        xcode-version: "26"
 
     - name: Install dependencies
       shell: bash
@@ -37,11 +37,18 @@ runs:
         components: rust-std
 
     - name: Install uniffi_bindgen
-      uses: actions-rs/install@v0.1
+      uses: baptiste0928/cargo-install@1cd874a5478fdca35d868ccc74640c5aabbb8f1b # v3.0.0
       with:
         crate: uniffi_bindgen
         version: 0.22.0 # Must be in sync with version in Cargo.toml
-        use-tool-cache: true
+        # Without the crate's lockfile cargo resolves latest deps, which need a newer rustc
+        locked: true
+
+    # The Xcode .udl build rule calls $HOME/.cargo/bin/uniffi-bindgen directly,
+    # but cargo-install puts the binary under ~/.cargo-install
+    - name: Link uniffi-bindgen into ~/.cargo/bin
+      shell: bash
+      run: ln -sf "$(command -v uniffi-bindgen)" "$HOME/.cargo/bin/uniffi-bindgen"
 
     - name: Rust Cache
       uses: Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7

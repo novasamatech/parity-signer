@@ -164,7 +164,7 @@ Try launching Studio from the shell (command assumes you are in the "Application
 ./Android\ Studio.app/Contents/MacOS/studio
 ```
 
-#### "build fails when runnning particular test"
+#### "build fails when running particular test"
 
 Try to enable features for the dependencies. For example,
 

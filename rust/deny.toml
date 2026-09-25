@@ -20,6 +20,12 @@ ignore = [
     "RUSTSEC-2025-0009",  # ring AES panic (via rustls; upgrade when jsonrpsee/rustls allow)
     "RUSTSEC-2025-0134",  # rustls-pemfile unmaintained (via rustls-native-certs)
     "RUSTSEC-2025-0055",  # tracing-subscriber ANSI injection (via substrate sp-tracing)
+    "RUSTSEC-2025-0161",  # libsecp256k1 unmaintained (via definitions; no maintained drop-in yet)
+    "RUSTSEC-2026-0009",  # time RFC 2822 parsing DoS; we only format. Fix (0.3.47) needs rustc 1.85, clippy is pinned to 1.84
+    "RUSTSEC-2026-0258",  # h2 0.3 empty DATA frames; only via jsonrpsee 0.16 in the generate_message CLI, fixed only in h2 0.4
+    "RUSTSEC-2026-0098",  # rustls-webpki 0.101 name constraints; only via jsonrpsee 0.16 in the generate_message CLI
+    "RUSTSEC-2026-0099",  # rustls-webpki 0.101 wildcard name constraints; same path as above
+    "RUSTSEC-2026-0104",  # rustls-webpki 0.101 CRL parsing panic; same path as above
 ]
 
 [licenses]
