@@ -14,6 +14,8 @@ runs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: 12266719
+        # The default also installs the legacy `tools` package, which is no longer published
+        packages: 'platform-tools'
 
     - name: Install NDK
       shell: bash
