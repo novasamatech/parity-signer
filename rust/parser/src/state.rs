@@ -327,7 +327,7 @@ pub trait State: Send + Sync {
         // `remark` of `system.remark`/`system.remarkWithEvent` is user text.
         let next_state: Box<dyn State> = if matches!(
             input.name.as_deref(),
-            Some("remark") | Some("remark_with_event")
+            Some("remark")
         ) {
             Box::new(TextState)
         } else {
