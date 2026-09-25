@@ -44,6 +44,12 @@ runs:
         # Without the crate's lockfile cargo resolves latest deps, which need a newer rustc
         locked: true
 
+    # The Xcode .udl build rule calls $HOME/.cargo/bin/uniffi-bindgen directly,
+    # but cargo-install puts the binary under ~/.cargo-install
+    - name: Link uniffi-bindgen into ~/.cargo/bin
+      shell: bash
+      run: ln -sf "$(command -v uniffi-bindgen)" "$HOME/.cargo/bin/uniffi-bindgen"
+
     - name: Rust Cache
       uses: Swatinem/rust-cache@27b8ea9368cf428f0bfe41b0876b1a7e809d9844 # v2.7.7
       with:
