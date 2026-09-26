@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload debug APKs
         if: ${{ inputs.is-release == false }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: polkadot-vault-apk
           path: android/build/outputs/apk/debug/*.apk
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload release APKs
         if: ${{ inputs.is-release == true }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: polkadot-vault-apk
           path: android/build/outputs/apk/release/*.apk
