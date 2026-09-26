@@ -119,7 +119,7 @@ dependencies {
 	implementation "com.halilibo.compose-richtext:richtext-commonmark-android:0.20.0"
 	implementation "com.halilibo.compose-richtext:richtext-ui-material-android:0.20.0"
 	implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7"
-	implementation "net.java.dev.jna:jna:5.13.0@aar"
+	implementation "net.java.dev.jna:jna:5.17.0@aar"
 	implementation "com.appmattus.crypto:cryptohash:0.10.1" //black2b hash for dot icon
 	implementation "io.coil-kt:coil-compose:$coilVersion"
 	implementation "io.coil-kt:coil-svg:$coilVersion"
