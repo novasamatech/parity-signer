@@ -19,6 +19,7 @@ enum OnboardingState: Equatable {
 
 final class OnboardingStateMachine: ObservableObject {
     @Published var currentState: OnboardingState = .terms
+    private var isPreparingBackend = false
     private let onboardingMediator: OnboardingMediating
 
     init(
@@ -73,7 +74,14 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func onScreenshotNextTap() {
-        currentState = .setUpNetworksIntro
+        guard !isPreparingBackend else { return }
+        isPreparingBackend = true
+        onboardingMediator.prepareForScanning { [weak self] isPrepared in
+            guard let self else { return }
+            isPreparingBackend = false
+            guard isPrepared else { return }
+            currentState = .setUpNetworksIntro
+        }
     }
 
     func onSetUpNetworksIntroNext() {
@@ -93,6 +101,6 @@ final class OnboardingStateMachine: ObservableObject {
     }
 
     func finishOnboarding() {
-        onboardingMediator.onboard(verifierRemoved: false)
+        onboardingMediator.finishOnboarding()
     }
 }

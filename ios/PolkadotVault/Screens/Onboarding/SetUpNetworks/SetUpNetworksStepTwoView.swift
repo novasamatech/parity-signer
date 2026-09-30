@@ -57,6 +57,9 @@ struct SetUpNetworksStepTwoView: View {
                 minHeight: geo.size.height
             )
             .background(.backgroundSystem)
+            .fullScreenModal(isPresented: $viewModel.isShowingQRScanner) {
+                CameraView(viewModel: .init(isPresented: $viewModel.isShowingQRScanner))
+            }
         }
     }
 
@@ -151,7 +154,9 @@ extension SetUpNetworksStepTwoView {
             onNextTap()
         }
 
-        func onScanTap() {}
+        func onScanTap() {
+            isShowingQRScanner = true
+        }
     }
 }
 

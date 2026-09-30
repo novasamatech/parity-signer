@@ -156,4 +156,81 @@ final class OnboardingMediatorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
         XCTAssertTrue(receivedValue ?? false)
     }
+
+    func testPrepareForScanningRemovesSeedsRecreatesDatabaseAndInitialisesNavigationWithCertificate() {
+        databaseMediator.recreateDatabaseFileReturnValue = true
+
+        mediator.prepareForScanning { _ in }
+
+        XCTAssertEqual(seedsMediator.removeAllSeedsCallsCount, 1)
+        XCTAssertEqual(databaseMediator.recreateDatabaseFileCallsCount, 1)
+        XCTAssertEqual(navigationInitialisationService.initialiseNavigationVerifierRemovedCallsCount, 1)
+        XCTAssertEqual(
+            navigationInitialisationService.initialiseNavigationVerifierRemovedReceivedVerifierRemoved,
+            [false]
+        )
+    }
+
+    func testPrepareForScanningWhenNavigationInitialisedCompletesWithoutFinishingOnboarding() {
+        databaseMediator.recreateDatabaseFileReturnValue = true
+        var isPrepared: Bool?
+        var onboardingDone: Bool?
+        mediator.onboardingDone
+            .sink { onboardingDone = $0 }
+            .store(in: &cancellables)
+
+        mediator.prepareForScanning { isPrepared = $0 }
+        navigationInitialisationService.initialiseNavigationVerifierRemovedReceivedCompletion.first?(.success(()))
+
+        XCTAssertEqual(isPrepared, true)
+        XCTAssertEqual(onboardingDone, false)
+        XCTAssertEqual(seedsMediator.refreshSeedsCallsCount, 0)
+    }
+
+    func testPrepareForScanningWhenNavigationInitialisationFailsCompletesWithFailure() {
+        databaseMediator.recreateDatabaseFileReturnValue = true
+        var isPrepared: Bool?
+
+        mediator.prepareForScanning { isPrepared = $0 }
+        navigationInitialisationService.initialiseNavigationVerifierRemovedReceivedCompletion
+            .first?(.failure(.init(message: "")))
+
+        XCTAssertEqual(isPrepared, false)
+    }
+
+    func testPrepareForScanningWhenSeedsRemovalFailsDoesNotRecreateDatabase() {
+        seedsMediator.removeAllSeedsReturnValue = false
+        var isPrepared: Bool?
+
+        mediator.prepareForScanning { isPrepared = $0 }
+
+        XCTAssertEqual(isPrepared, false)
+        XCTAssertEqual(databaseMediator.recreateDatabaseFileCallsCount, 0)
+        XCTAssertEqual(navigationInitialisationService.initialiseNavigationVerifierRemovedCallsCount, 0)
+    }
+
+    func testPrepareForScanningWhenDatabaseRecreationFailsDoesNotInitialiseNavigation() {
+        databaseMediator.recreateDatabaseFileReturnValue = false
+        var isPrepared: Bool?
+
+        mediator.prepareForScanning { isPrepared = $0 }
+
+        XCTAssertEqual(isPrepared, false)
+        XCTAssertEqual(navigationInitialisationService.initialiseNavigationVerifierRemovedCallsCount, 0)
+    }
+
+    func testFinishOnboardingUpdatesOnboardingDoneToTrueWithoutRecreatingDatabase() {
+        var onboardingDone: Bool?
+        mediator.onboardingDone
+            .sink { onboardingDone = $0 }
+            .store(in: &cancellables)
+
+        mediator.finishOnboarding()
+
+        XCTAssertEqual(onboardingDone, true)
+        XCTAssertEqual(seedsMediator.refreshSeedsCallsCount, 1)
+        XCTAssertEqual(seedsMediator.removeAllSeedsCallsCount, 0)
+        XCTAssertEqual(databaseMediator.recreateDatabaseFileCallsCount, 0)
+        XCTAssertEqual(navigationInitialisationService.initialiseNavigationVerifierRemovedCallsCount, 0)
+    }
 }
